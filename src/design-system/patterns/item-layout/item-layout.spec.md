@@ -2,250 +2,116 @@
 
 ## 定位
 
-所有「prefix + content」結構的元件共用此佈局邏輯。這不是一個元件，是一組設計規則——每個元件獨立實作，但遵循同一套公式。
+Item Layout 定義**結構和對齊系統**，不定義具體間距值。每個消費元件根據自身場景設定間距，但遵循相同的結構和對齊規則。
 
-**目前套用的元件**：SelectionItem（Checkbox/Radio）、SelectMenuItem。
-**新建同類元件時必須遵循此規則。**
+**這不是一個元件，是一套佈局原則。**
 
 ---
 
 ## 結構
 
+所有「prefix + content + suffix」元件共用三區域結構：
+
 ```
-[prefix 對齊容器]  [content 區塊]
-     ↑                  ↑
-  h-[1lh] 或          label
-  h-[calc(...)]       gap-0.5 (2px)
-  flex items-center   description?
+[prefix]  [content]  [suffix]
+  ↑          ↑          ↑
+ 對齊       flex-1     對齊
+ 容器      min-w-0    容器
+                      ml-auto
 ```
 
-外層：`flex items-start`——多行時 prefix Y 不隨文字下移。
+- **外層**：`flex items-start`——多行時 prefix / suffix 的 Y 不隨文字下移
+- **prefix / suffix**：對齊容器，垂直置中內容物
+- **content**：label + 可選 description，佔滿剩餘空間
 
 ---
 
-## Padding 公式
+## 對齊容器——24px 閾值
 
-```
-py = (field-height - 1lh) / 2
-```
+prefix 和 suffix **共用相同的對齊容器高度**，由 prefix 內容物決定：
 
-- 單行時 item 總高度 = field-height（與同 size 的 Button、TextField 等高）
-- 多行時 padding 不變，item 高度自然撐開
-- density 切換時 field-height 自動調整，padding 跟著算
-
-Tailwind 寫法：
-```
-py-[calc((var(--field-height-sm)-1lh)/2)]
-py-[calc((var(--field-height-md)-1lh)/2)]
-py-[calc((var(--field-height-lg)-1lh)/2)]
-```
-
----
-
-## Prefix 對齊——24px 閾值
-
-prefix 內所有元素共享同一個對齊容器，容器高度決定對齊行為：
-
-| prefix 最大內容高度 | 容器 | 對齊目標 |
+| prefix 內容物高度 | 對齊容器 | 對齊目標 |
 |---|---|---|
 | ≤ 24px | `h-[1lh]` | 第一行 label 的垂直中心 |
-| > 24px | `h-[calc(1lh + 2px + desc_1lh)]` | label + gap + description 文字塊的垂直中心 |
+| > 24px | `h-[calc(1lh + 2px + desc_1lh)]` | label + gap + description 文字塊的中心 |
 
-**24px 是物理限制**——16px icon 在 24px 圓內仍可辨識（stroke icon 下限 12px），更小則不行。
+**suffix 永遠跟 prefix 使用相同的容器高度。** prefix 用 `h-[1lh]` → suffix 也用 `h-[1lh]`。prefix 用 calc → suffix 也用 calc。
 
-**無 description 時 prefix 上限 24px**——沒有文字塊可對齊，強制 inline。
-
-### Block 容器高度
-
-Block 對齊只用於**掃描模式**（浮層元件）。desc_1lh 取決於 size tier 和掃描模式的字體：
-
-| Size | desc 字體 | desc_1lh | 容器高度 calc |
-|---|---|---|---|
-| sm | text-caption (12px × 1.3) | 15.6px | `calc(1lh + 2px + var(--font-caption-size) * 1.3)` |
-| md | text-caption (12px × 1.3) | 15.6px | `calc(1lh + 2px + var(--font-caption-size) * 1.3)` |
-| lg | text-body leading-compact (14px × 1.3) | 18.2px | `calc(1lh + 2px + var(--font-body-size) * 1.3)` |
-
-閱讀模式（SelectionItem）的 prefix 永遠 ≤ 控件尺寸（16/20px），不需要 block 對齊。
+**24px 是物理限制**——16px icon 在 24px 圓內仍可辨識（stroke icon 下限 12px），更小則不行。無 description 時 prefix 上限 24px。
 
 ---
 
-## Typography——兩種閱讀模式
+## 兩種閱讀模式
 
-同一套佈局公式，typography 策略根據使用者的閱讀模式調整：
-
-### 掃描模式（浮層 / overlay）
-
-適用元件：SelectMenuItem、未來的 ComboboxItem、DropdownItem。
-
-使用者一掃而過，需要快速辨識——**緊湊行高 + 字體降級 + gap 分隔**：
-
-| Size | Label | Description | Label ↔ Desc |
-|---|---|---|---|
-| sm | `text-body leading-compact` (14px, 1.3) | `text-caption` (12px, 1.3) | `gap-0.5` (2px) |
-| md | `text-body leading-compact` (14px, 1.3) | `text-caption` (12px, 1.3) | `gap-0.5` (2px) |
-| lg | `text-body-lg leading-compact` (16px, 1.3) | `text-body leading-compact` (14px, 1.3) | `gap-0.5` (2px) |
-
-description 降一級字體 + `text-fg-secondary` 顏色，用**尺寸差 + 顏色差 + gap** 建立層級。
-
-### 閱讀模式（頁面 / 表單）
-
-適用元件：SelectionItem（Checkbox/Radio label）。
-
-使用者仔細閱讀，需要舒適行距——**正常行高 + 同字體 + 無 gap**：
-
-| Size | Label | Description | Label ↔ Desc |
-|---|---|---|---|
-| sm | `text-body` (14px, 1.5) | `text-body` (14px, 1.5) | `mt-0.5` (2px) |
-| md | `text-body` (14px, 1.5) | `text-body` (14px, 1.5) | `mt-0.5` (2px) |
-| lg | `text-body-lg` (16px, 1.5) | `text-body-lg` (16px, 1.5) | `mt-0.5` (2px) |
-
-description 僅以 `text-fg-secondary` 顏色弱化，字體、行高與 label 完全一致——同一段落的韻律，顏色自然區分主次。2px gap 提供最小的視覺分隔，避免 label 和 description 完全黏在一起。
-
-### 判斷標準
-
-「使用者會仔細讀，還是一掃而過？」
-
-- 會停留閱讀 → 閱讀模式（1.5 lh，同字體，無 gap）
-- 快速掃描選擇 → 掃描模式（1.3 lh，字體降級，2px gap）
-
----
-
-## Icon / 控件 Tier
-
-跟隨 uiSize.spec.md 的 icon tier 系統：
-
-| Size | Icon | Checkbox/Radio |
+| | 掃描模式 | 閱讀模式 |
 |---|---|---|
-| sm | 16px | 16px (sm) |
-| md | 16px | 16px (md) |
-| lg | 20px | 20px (lg) |
+| **場景** | 浮層 / overlay（一掃而過） | 頁面 / 表單（仔細閱讀） |
+| **Label 行高** | `leading-compact` (1.3) | 預設 (1.5) |
+| **Description 字體** | 降一級（14→12px, 16→14px） | 同 label |
+| **Description 顏色** | `fg-secondary` | `fg-secondary` |
+| **Label ↔ Desc 間距** | 2px (`mt-0.5`) | 2px (`mt-0.5`) |
+| **判斷標準** | 使用者快速掃描選擇 | 使用者停留閱讀 |
 
 ---
 
-## Prefix / Suffix 對稱對齊
+## Icon 色彩原則
 
-Prefix 和 suffix 使用**完全相同的對齊邏輯**——不管另一方是否存在。
-
-```
-完整結構:
-[prefix h-ref]  [content flex-1 min-w-0]  [suffix h-ref ml-auto]
-
-只有 prefix:
-[prefix h-ref]  [content flex-1]
-
-只有 suffix:
-                [content flex-1]          [suffix h-ref ml-auto]
-
-兩者都沒有:
-                [content]
-```
-
-**對齊參考高度（h-ref）** 的規則 prefix 和 suffix 共用：
-- 內容物 ≤ 24px → `h-[1lh]`，對齊第一行 label
-- 內容物 > 24px → `h-[calc(1lh+2px+desc_1lh)]`，對齊文字塊
-- 外層 `items-start`，多行時 prefix/suffix Y 不動
-
-**Suffix 永遠跟 prefix 使用相同的 h-ref。** prefix 是 inline → suffix 也 inline。prefix 是 block → suffix 也 block。兩者垂直置中於同一個參考高度。
-
-### 兩種 suffix pattern
-
-| Pattern | 內部 gap | 內容 | 用途 |
-|---|---|---|---|
-| **獨立後綴** | `gap-2` (8px) | `[badge?] [endIcon?]` | 狀態指示、導覽 |
-| **子選單指示** | `gap-1` (4px) | `[value?] [badge?] [ChevronRight]` | 展開下一層選單 |
-
-子選單指示中的 `value` 和 `badge` 是可選的——用來反映下一層選單的目前狀態（如 "Dark"、Badge count），讓使用者不用展開就能看到。
-
-### Icon 色彩原則
-
-一條統一規則，跨所有元件：
-
-**icon 代表 label 或 label 的類別 → 與 label 同色。icon 純粹指示方向/展開/導覽 → `fg-muted`（neutral-7）。**
+一條統一規則，跨所有元件（詳見 `color.spec.md`）：
 
 | 判斷 | 顏色 | 範例 |
 |---|---|---|
-| 代表內容/類別 | **與 label 同色**（foreground） | Mail「電子郵件」、Settings「設定」、Trash2「刪除」 |
-| 代表危險操作的內容 | **與 label 同色**（text-error） | Trash2 + 紅色「刪除」 |
-| 純指示方向/展開 | `fg-muted`（neutral-7） | ChevronRight（子選單）、ChevronDown（下拉）、ExternalLink（另開） |
+| icon 代表內容或類別 | **與 label 同色** | Mail「電子郵件」、Settings「設定」 |
+| icon 代表危險操作 | **與 label 同色**（text-error） | Trash2「刪除」 |
+| icon 純指示方向/展開 | `fg-muted`（neutral-7） | ChevronRight、ChevronDown、ExternalLink |
+| suffix value 文字 | `fg-muted`，**字體大小與 label 相同** | "深色"、"已啟用" |
 | disabled 時 | `fg-disabled` | 全部統一 |
 
-#### 套用到各元件
-
-| 元件 | 位置 | 判斷 | 顏色 |
-|---|---|---|---|
-| Menu Item prefix icon | 左側 | 代表 item 內容 | **foreground** |
-| Menu Item suffix icon | 右側 | 指示方向 | `fg-muted` |
-| Menu Item suffix value 文字 | 右側 | 反映子選單狀態 | `fg-muted`，字體大小與 label 相同 |
-| Field startIcon | 左側 | 指示 field 用途（像 placeholder） | `fg-muted` |
-| Field ChevronDown | 右側 | 指示可下拉 | `fg-muted` |
-| Field value icon | 左側 | 代表目前 value 的類別 | **foreground** |
-
 ---
 
-## Gap 慣例
+## 消費元件預設
 
-| 位置 | Gap | Token |
+每個消費元件根據場景自訂間距，但結構和對齊規則不變：
+
+### SelectMenuItem / DropdownMenuItem（浮層選單）
+
+| 屬性 | 值 | 原因 |
 |---|---|---|
-| prefix 內部元素之間 | 8px | `gap-2` |
-| prefix ↔ content | 8px | `gap-2` |
-| content ↔ suffix | auto | `ml-auto`（推到右邊） |
-| label ↔ description | 2px | `mt-0.5`（兩種模式統一） |
-| suffix 獨立後綴內部 | 8px | `gap-2` |
-| suffix 子選單指示內部 | 4px | `gap-1` |
+| padding-y | `calc((field-height - 1lh) / 2)` | 單行高度 = field-height，對齊 Button / TextField |
+| padding-x | 12px (`px-3`) | 選單項目的標準水平間距 |
+| prefix ↔ content gap | 8px (`gap-2`) | 緊湊但可辨識 |
+| suffix 獨立後綴 gap | 8px (`gap-2`) | tag / badge / endIcon 間距 |
+| suffix 子選單指示 gap | 4px (`gap-1`) | value / badge / ChevronRight 更緊湊 |
+| 閱讀模式 | 掃描模式 | 浮層內一掃而過 |
 
----
+### SelectionItem（表單 Checkbox / Radio）
 
-## 套用範例
+| 屬性 | 值 | 原因 |
+|---|---|---|
+| padding-y | `calc((field-height - 1lh) / 2)` | 單行高度 = field-height，對齊同 size 的 TextField |
+| padding-x | 無（由外層容器決定） | 表單佈局各異 |
+| prefix ↔ content gap | 8px (`gap-2`) | 控件與 label 的標準間距 |
+| 閱讀模式 | 閱讀模式 | 表單內仔細閱讀 |
 
-### SelectionItem（Checkbox/Radio）— 閱讀模式
+### ListItem（頁面列表，未來元件）
 
-```
-prefix = [control]
-content = [label + description?]
-typography = 閱讀模式（1.5 lh，description 同字體，2px gap）
-padding-x = 無（由外層容器決定）
-prefix-content gap = gap-2
-prefix align = h-[1lh]（control 永遠 ≤ 24px）
-```
-
-### SelectMenuItem — 掃描模式
-
-```
-prefix = [checkbox?] + [startIcon? | avatar?]
-content = [label + description?]
-typography = 掃描模式（1.3 lh，description 降一級，2px gap）
-padding-x = px-3 (12px)
-prefix-content gap = gap-2
-prefix align = avatar > 24px ? block : inline
-互動 = hover:bg-neutral-hover, selected:bg-neutral-active
-```
-
-### DropdownMenuItem — 掃描模式（含 suffix）
-
-```
-prefix = [startIcon?]
-content = [label + description?]
-suffix = [badge? + endIcon?]（gap-2）
-       或 [value? + badge? + ChevronRight]（gap-1，子選單指示）
-typography = 掃描模式
-padding-x = px-3 (12px)
-prefix-content gap = gap-2
-suffix align = 與 prefix 共用 h-ref，ml-auto 靠右
-互動 = hover:bg-neutral-hover
-子選單 = Radix DropdownMenuSub，ChevronRight 自動
-```
+| 屬性 | 值 | 原因 |
+|---|---|---|
+| padding-y | 12px (`py-3`) | 舒適的列表行高，觸控友好 |
+| padding-x | 16px (`px-4`) | 頁面內容的標準水平間距 |
+| prefix ↔ content gap | 12px (`gap-3`) | 較寬鬆，適合較大的 avatar / thumbnail |
+| 閱讀模式 | 閱讀模式 | 頁面內停留閱讀 |
 
 ---
 
 ## 新元件 checklist
 
-建立新的「prefix + content + suffix?」元件時：
+建立新的「prefix + content + suffix」元件時：
 
-1. ✅ padding 使用 `(field-height - 1lh) / 2` 公式
-2. ✅ prefix 容器使用 `h-[1lh]` 或 block calc（依 24px 閾值）
-3. ✅ suffix 容器使用與 prefix 相同的 h-ref（對齊）
-4. ✅ 外層 `flex items-start`（多行釘住 prefix/suffix）
-5. ✅ 字體使用 `leading-compact`（掃描模式）或預設 lh（閱讀模式）
-5. ✅ description 字體降一級
-6. ✅ icon/控件尺寸跟隨 tier 系統
-7. ✅ gap 使用 `gap-2`（prefix ↔ content）、`gap-0.5`（label ↔ desc）
+1. ✅ 確定閱讀模式（掃描 or 閱讀）→ 決定 typography 策略
+2. ✅ 確定 padding-y（field-height 公式 or 固定值）
+3. ✅ 確定 padding-x 和 gap
+4. ✅ prefix / suffix 對齊容器遵循 24px 閾值
+5. ✅ suffix 跟 prefix 共用同一個容器高度
+6. ✅ 外層 `flex items-start`（多行釘住 prefix/suffix）
+7. ✅ icon 色彩遵循「代表內容 = label 同色，指示方向 = fg-muted」
+8. ✅ description 字體遵循閱讀模式規則

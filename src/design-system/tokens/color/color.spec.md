@@ -33,6 +33,21 @@ Tailwind utility 透過 `@theme inline` 橋接語義 token，元件寫 `bg-prima
 弱化 icon hover 後變 `text-fg-secondary`。
 
 
+## Disabled 狀態
+
+disabled 元件內的所有子元素必須呈現 disabled 狀態：
+
+| 元素類型 | Disabled 處理 |
+|---|---|
+| 文字 | `text-fg-disabled` |
+| Icon（stroke） | `text-fg-disabled` |
+| 圖片 / Avatar | `opacity-40`——圖片無法套用語義色，用透明度弱化 |
+| Checkbox / Radio | 元件自身的 disabled 樣式 |
+| 背景色 | `bg-disabled`（如適用） |
+
+**判斷標準：disabled 元件內不應有任何元素看起來是可互動的。**
+
+
 ## Icon 色彩原則
 
 一條統一規則，跨所有元件：
