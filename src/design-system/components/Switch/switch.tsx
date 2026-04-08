@@ -68,10 +68,10 @@ const Switch = React.forwardRef<
     >
       <SwitchPrimitives.Thumb
         className={cn(
-          'pointer-events-none flex items-center justify-center rounded-full bg-white',
+          'pointer-events-none flex items-center justify-center rounded-full bg-white border-2',
           'transition-all duration-150',
-          'data-[state=unchecked]:translate-x-0',
-          'data-[state=checked]:border-2 data-[state=checked]:border-primary',
+          'data-[state=unchecked]:translate-x-0 data-[state=unchecked]:border-border',
+          'data-[state=checked]:border-primary',
           sizeKey === 'lg' ? 'data-[state=checked]:translate-x-6' : 'data-[state=checked]:translate-x-5',
         )}
         style={{ width: spec.thumb, height: spec.thumb }}
