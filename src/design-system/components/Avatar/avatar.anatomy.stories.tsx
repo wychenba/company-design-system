@@ -15,21 +15,22 @@ export default meta
 
 type ModeKey = 'image' | 'icon' | 'text'
 type ShapeKey = 'circle' | 'square'
-type ColorKey = 'neutral' | 'info' | 'success' | 'warning' | 'error' | 'purple' | 'magenta' | 'turquoise' | 'indigo'
+type ColorKey = 'neutral' | 'blue' | 'red' | 'green' | 'yellow' | 'purple' | 'magenta' | 'turquoise' | 'indigo'
 
-const ALL_COLORS: ColorKey[] = ['neutral', 'info', 'success', 'warning', 'error', 'purple', 'magenta', 'turquoise', 'indigo']
+const ALL_COLORS: ColorKey[] = ['neutral', 'blue', 'red', 'green', 'yellow', 'purple', 'magenta', 'turquoise', 'indigo']
 const PRESET_SIZES = [20, 24, 32, 40] as const
 
+// 與 Tag 元件對齊：neutral = foreground，有色 = step-7
 const COLOR_TOKENS: Record<ColorKey, { bg: string; text: string }> = {
-  neutral:   { bg: '--muted',            text: '--fg-muted' },
-  info:      { bg: '--info-subtle',      text: '--info' },
-  success:   { bg: '--success-subtle',   text: '--success' },
-  warning:   { bg: '--warning-subtle',   text: '--warning' },
-  error:     { bg: '--error-subtle',     text: '--error' },
-  purple:    { bg: '--purple-subtle',    text: '--purple' },
-  magenta:   { bg: '--magenta-subtle',   text: '--magenta' },
-  turquoise: { bg: '--turquoise-subtle', text: '--turquoise' },
-  indigo:    { bg: '--indigo-subtle',    text: '--indigo' },
+  neutral:   { bg: '--muted',              text: '--foreground' },
+  blue:      { bg: '--info-subtle',        text: '--color-blue-7' },
+  red:       { bg: '--error-subtle',       text: '--color-deep-orange-7' },
+  green:     { bg: '--success-subtle',     text: '--color-green-7' },
+  yellow:    { bg: '--warning-subtle',     text: '--color-yellow-7' },
+  purple:    { bg: '--purple-subtle',      text: '--color-purple-7' },
+  magenta:   { bg: '--magenta-subtle',     text: '--color-magenta-7' },
+  turquoise: { bg: '--turquoise-subtle',   text: '--color-turquoise-7' },
+  indigo:    { bg: '--indigo-subtle',      text: '--color-indigo-7' },
 }
 
 /** round_even(size * 0.6) */
@@ -186,7 +187,7 @@ const InspectorInner = () => {
   const [mode, setMode] = useState<ModeKey>('icon')
   const [shape, setShape] = useState<ShapeKey>('circle')
   const [size, setSize] = useState(32)
-  const [color, setColor] = useState<ColorKey>('info')
+  const [color, setColor] = useState<ColorKey>('blue')
 
   const iconPx = getIconSize(size)
   const textPx = getTextSize(size)
