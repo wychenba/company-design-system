@@ -21,18 +21,35 @@ import { cn } from '@/lib/utils'
  *   square → rounded-md (4px)，用於實體（專案、組織、App）
  */
 
-// ── 語義色對應 ──
-// 色彩對齊 Tag 元件：neutral 用 foreground，有色用 step-7（非 step-6）優先辨識度
-const COLOR_MAP: Record<string, { bg: string; text: string }> = {
-  neutral:   { bg: 'var(--muted)',              text: 'var(--foreground)' },
-  blue:      { bg: 'var(--info-subtle)',        text: 'var(--color-blue-7)' },
-  red:       { bg: 'var(--error-subtle)',       text: 'var(--color-deep-orange-7)' },
-  green:     { bg: 'var(--success-subtle)',     text: 'var(--color-green-7)' },
-  yellow:    { bg: 'var(--warning-subtle)',     text: 'var(--color-yellow-7)' },
-  turquoise: { bg: 'var(--turquoise-subtle)',   text: 'var(--color-turquoise-7)' },
-  purple:    { bg: 'var(--purple-subtle)',      text: 'var(--color-purple-7)' },
-  magenta:   { bg: 'var(--magenta-subtle)',     text: 'var(--color-magenta-7)' },
-  indigo:    { bg: 'var(--indigo-subtle)',      text: 'var(--color-indigo-7)' },
+// ── 色彩 ──
+// subtle（預設）：對齊 Tag — subtle 底色 + step-7 前景
+// solid：step-6 全色底 + 白色前景（warning 例外用 --warning-foreground）
+type ColorKey = 'neutral' | 'blue' | 'red' | 'green' | 'yellow' | 'turquoise' | 'purple' | 'magenta' | 'indigo'
+type VariantKey = 'subtle' | 'solid'
+
+const COLOR_MAP: Record<VariantKey, Record<ColorKey, { bg: string; text: string }>> = {
+  subtle: {
+    neutral:   { bg: 'var(--muted)',              text: 'var(--foreground)' },
+    blue:      { bg: 'var(--info-subtle)',        text: 'var(--color-blue-7)' },
+    red:       { bg: 'var(--error-subtle)',       text: 'var(--color-deep-orange-7)' },
+    green:     { bg: 'var(--success-subtle)',     text: 'var(--color-green-7)' },
+    yellow:    { bg: 'var(--warning-subtle)',     text: 'var(--color-yellow-7)' },
+    turquoise: { bg: 'var(--turquoise-subtle)',   text: 'var(--color-turquoise-7)' },
+    purple:    { bg: 'var(--purple-subtle)',      text: 'var(--color-purple-7)' },
+    magenta:   { bg: 'var(--magenta-subtle)',     text: 'var(--color-magenta-7)' },
+    indigo:    { bg: 'var(--indigo-subtle)',      text: 'var(--color-indigo-7)' },
+  },
+  solid: {
+    neutral:   { bg: 'var(--fg-secondary)',       text: '#fff' },
+    blue:      { bg: 'var(--primary)',            text: '#fff' },
+    red:       { bg: 'var(--error)',              text: '#fff' },
+    green:     { bg: 'var(--success)',            text: '#fff' },
+    yellow:    { bg: 'var(--warning)',            text: 'var(--warning-foreground)' },
+    turquoise: { bg: 'var(--turquoise)',          text: '#fff' },
+    purple:    { bg: 'var(--purple)',             text: '#fff' },
+    magenta:   { bg: 'var(--magenta)',            text: '#fff' },
+    indigo:    { bg: 'var(--indigo)',             text: '#fff' },
+  },
 }
 
 // ── Icon size: round to nearest even, ≈ 60% ──
@@ -59,15 +76,17 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Icon 模式（LucideIcon） */
   icon?: LucideIcon
   /** Icon / text fallback 的背景色，預設 neutral */
-  color?: keyof typeof COLOR_MAP
+  color?: ColorKey
+  /** 色彩變體：subtle（淡底深字）或 solid（深底白字），預設 subtle */
+  variant?: VariantKey
 }
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
-  ({ size = 32, shape = 'circle', src, alt, icon: Icon, color = 'neutral', className, style, ...props }, ref) => {
+  ({ size = 32, shape = 'circle', src, alt, icon: Icon, color = 'neutral', variant = 'subtle', className, style, ...props }, ref) => {
     const [imgError, setImgError] = React.useState(false)
     const iconPx = getIconSize(size)
     const fontSize = Math.round(size * 0.5)
-    const colors = COLOR_MAP[color] ?? COLOR_MAP.neutral
+    const colors = COLOR_MAP[variant]?.[color] ?? COLOR_MAP.subtle.neutral
     const radius = shape === 'circle' ? '9999px' : '4px'
 
     // 決定內容
