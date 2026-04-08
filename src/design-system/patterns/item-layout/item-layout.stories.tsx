@@ -45,7 +45,7 @@ const CONSUMERS: Record<ConsumerKey, ConsumerPreset> = {
     label: 'SelectMenuItem',
     desc: '浮層選單（DropdownMenu / ComboBox）',
     mode: 'scanning',
-    py: 'calc((field-height - 1lh) / 2)',
+    py: '(field-height − 一行文字高度) / 2',
     pyDesc: '單行 = field-height',
     px: 'px-3 (12px)',
     pxDesc: '選單標準水平間距',
@@ -58,7 +58,7 @@ const CONSUMERS: Record<ConsumerKey, ConsumerPreset> = {
     label: 'SelectionItem',
     desc: '表單 Checkbox / Radio',
     mode: 'reading',
-    py: 'calc((field-height - 1lh) / 2)',
+    py: '(field-height − 一行文字高度) / 2',
     pyDesc: '單行 = field-height',
     px: 'none',
     pxDesc: '由外層容器決定',
@@ -245,8 +245,8 @@ const InspectorInner = () => {
   const preset = CONSUMERS[consumer]
   const spec = preset.mode === 'scanning' ? SCANNING_SPECS[size] : READING_SPECS[size]
   const isBlockAlign = prefixType === 'avatar' && hasDescription
-  const alignContainer = isBlockAlign ? 'h-[calc(1lh+2px+desc_1lh)]' : 'h-[1lh]'
-  const alignDesc = isBlockAlign ? 'prefix > 24px, block 對齊' : 'prefix <= 24px, inline 對齊'
+  const alignContainer = isBlockAlign ? '= label行高 + 2px + desc行高' : '= 一行文字高度'
+  const alignDesc = isBlockAlign ? 'prefix > 24px → 對齊 label + description 文字塊' : 'prefix ≤ 24px → 對齊第一行 label'
 
   // Blueprint sizing
   const bpH = hasDescription ? 80 : 60
@@ -549,7 +549,7 @@ export const AlignmentThreshold = {
         <H3>對齊容器 — 24px 閾值</H3>
         <Desc>
           prefix 和 suffix 共用相同的對齊容器高度，由 prefix 內容物決定。
-          &le; 24px 用 h-[1lh]（inline），&gt; 24px 用 h-[calc(1lh+2px+desc_1lh)]（block）。
+          &le; 24px → 對齊容器 = 一行文字高度（inline），&gt; 24px → 對齊容器 = label行高 + 2px + desc行高（block）。
           Suffix 永遠跟 prefix 使用相同的容器高度。
         </Desc>
       </div>
@@ -570,7 +570,7 @@ export const AlignmentThreshold = {
                 style={{ width: 72, height: '100%', background: Z.icon.bg, borderRight: `1.5px dashed ${Z.icon.border}` }}>
                 <div className="flex flex-col items-center gap-1">
                   <span className="text-[14px] font-mono font-bold" style={{ color: Z.icon.text }}>prefix</span>
-                  <span className="text-[11px] font-mono font-semibold" style={{ color: Z.icon.text }}>h-[1lh]</span>
+                  <span className="text-[11px] font-mono font-semibold" style={{ color: Z.icon.text }}>一行文字高度</span>
                 </div>
               </div>
               <div className="flex items-center justify-center shrink-0"
@@ -587,11 +587,11 @@ export const AlignmentThreshold = {
                 style={{ width: 72, height: '100%', background: Z.suffix.bg, borderLeft: `1.5px dashed ${Z.suffix.border}` }}>
                 <div className="flex flex-col items-center gap-1">
                   <span className="text-[14px] font-mono font-bold" style={{ color: Z.suffix.text }}>suffix</span>
-                  <span className="text-[11px] font-mono font-semibold" style={{ color: Z.suffix.text }}>h-[1lh]</span>
+                  <span className="text-[11px] font-mono font-semibold" style={{ color: Z.suffix.text }}>一行文字高度</span>
                 </div>
               </div>
             </div>
-            <span className="text-[11px] text-fg-muted">prefix center = label 第一行垂直中心，suffix 使用相同的 h-[1lh]</span>
+            <span className="text-[11px] text-fg-muted">prefix center = label 第一行垂直中心，suffix 使用相同的 一行文字高度</span>
           </div>
 
           {/* Live example */}
@@ -666,7 +666,7 @@ export const AlignmentThreshold = {
             <tbody>
               <tr>
                 <Td>prefix &le; 24px</Td>
-                <Td mono>h-[1lh]</Td>
+                <Td mono>一行文字高度</Td>
                 <Td>第一行 label 垂直中心</Td>
                 <Td>icon (16/20px), checkbox (16/20px)</Td>
               </tr>
@@ -678,7 +678,7 @@ export const AlignmentThreshold = {
               </tr>
               <tr>
                 <Td>無 description</Td>
-                <Td mono>h-[1lh]</Td>
+                <Td mono>一行文字高度</Td>
                 <Td>強制 inline（prefix 上限 24px）</Td>
                 <Td>所有無 description 的情況</Td>
               </tr>
