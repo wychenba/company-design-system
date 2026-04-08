@@ -39,7 +39,7 @@ export const Basic: StoryObj = {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <DropdownMenuItemPrefix><Trash2 size={16} /></DropdownMenuItemPrefix>
+          <DropdownMenuItemPrefix><Trash2 size={16} className="text-error" /></DropdownMenuItemPrefix>
           <span className="text-error">刪除</span>
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -114,9 +114,11 @@ export const WithSuffix: StoryObj = {
 
 // ── 子選單 ──
 
-export const SubMenu: StoryObj = {
-  name: '子選單',
-  render: () => (
+const SubMenuDemo = () => {
+  const [theme, setTheme] = useState('dark')
+  const themeLabels: Record<string, string> = { light: '淺色', dark: '深色', system: '跟隨系統' }
+
+  return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="tertiary" endIcon={ChevronDown}>設定</Button>
@@ -127,24 +129,25 @@ export const SubMenu: StoryObj = {
           個人資料
         </DropdownMenuItem>
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger value={themeLabels[theme]}>
             <DropdownMenuItemPrefix><Monitor size={16} /></DropdownMenuItemPrefix>
-            <span className="flex-1">主題</span>
-            <span className="text-caption text-fg-muted mr-1">深色</span>
+            主題
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuItem>
-              <DropdownMenuItemPrefix><Sun size={16} /></DropdownMenuItemPrefix>
-              淺色
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuItemPrefix><Moon size={16} /></DropdownMenuItemPrefix>
-              深色
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <DropdownMenuItemPrefix><Monitor size={16} /></DropdownMenuItemPrefix>
-              跟隨系統
-            </DropdownMenuItem>
+            <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+              <DropdownMenuRadioItem value="light">
+                <DropdownMenuItemPrefix><Sun size={16} /></DropdownMenuItemPrefix>
+                淺色
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="dark">
+                <DropdownMenuItemPrefix><Moon size={16} /></DropdownMenuItemPrefix>
+                深色
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="system">
+                <DropdownMenuItemPrefix><Monitor size={16} /></DropdownMenuItemPrefix>
+                跟隨系統
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
@@ -154,7 +157,12 @@ export const SubMenu: StoryObj = {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  ),
+  )
+}
+
+export const SubMenu: StoryObj = {
+  name: '子選單',
+  render: () => <SubMenuDemo />,
 }
 
 // ── Checkbox Items ──

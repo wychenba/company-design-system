@@ -53,7 +53,17 @@ const ICON_SIZE: Record<SizeKey, number> = { sm: 16, md: 16, lg: 20 }
 
 // ── Root ──
 const DropdownMenu = DropdownMenuPrimitive.Root
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
+const DropdownMenuTrigger = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Trigger>
+>(({ className, ...props }, ref) => (
+  <DropdownMenuPrimitive.Trigger
+    ref={ref}
+    className={cn('outline-none', className)}
+    {...props}
+  />
+))
+DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
 const DropdownMenuPortal = DropdownMenuPrimitive.Portal
 const DropdownMenuSub = DropdownMenuPrimitive.Sub
@@ -63,18 +73,27 @@ const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
 interface DropdownMenuContentProps
   extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> {
   size?: SizeKey
+  /** 最小寬度（px），預設跟隨觸發元件寬度 */
+  minWidth?: number
+  /** 最大高度（px），超過時捲動 */
+  maxHeight?: number
 }
 
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   DropdownMenuContentProps
->(({ className, size = 'md', sideOffset = 8, children, ...props }, ref) => (
+>(({ className, size = 'md', sideOffset = 8, align = 'start', minWidth, maxHeight, children, ...props }, ref) => (
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
-      className={cn(floatingLayerClass, 'py-2', className)}
-      style={{ boxShadow: 'var(--elevation-200)', minWidth: 'var(--radix-dropdown-menu-trigger-width)' }}
+      align={align}
+      className={cn(floatingLayerClass, 'py-2', maxHeight && 'overflow-y-auto', className)}
+      style={{
+        boxShadow: 'var(--elevation-200)',
+        minWidth: minWidth ?? 'max(180px, var(--radix-dropdown-menu-trigger-width))',
+        maxHeight,
+      }}
       {...props}
     >
       <SizeContext.Provider value={size}>
@@ -96,7 +115,7 @@ const DropdownMenuSubContent = React.forwardRef<
       ref={ref}
       sideOffset={8}
       className={cn(floatingLayerClass, 'py-2', className)}
-      style={{ boxShadow: 'var(--elevation-200)' }}
+      style={{ boxShadow: 'var(--elevation-200)', minWidth: 180 }}
       {...props}
     />
   )
@@ -122,10 +141,18 @@ const DropdownMenuItem = React.forwardRef<
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
 
 // ── SubTrigger（子選單觸發器，自動附加 ChevronRight）──
+interface DropdownMenuSubTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> {
+  /** 子選單目前狀態值文字（如 "深色"），顯示在 ChevronRight 前方 */
+  value?: string
+  /** 子選單狀態 badge */
+  badge?: React.ReactNode
+}
+
 const DropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger>
->(({ className, children, ...props }, ref) => {
+  DropdownMenuSubTriggerProps
+>(({ className, children, value, badge, ...props }, ref) => {
   const size = React.useContext(SizeContext)
   const iconPx = ICON_SIZE[size]
   return (
@@ -135,7 +162,9 @@ const DropdownMenuSubTrigger = React.forwardRef<
       {...props}
     >
       {children}
-      <div className="h-[1lh] flex items-center ml-auto shrink-0">
+      <div className="h-[1lh] flex items-center gap-1 ml-auto shrink-0">
+        {value && <span className="text-fg-muted">{value}</span>}
+        {badge}
         <ChevronRight size={iconPx} className="text-fg-muted" />
       </div>
     </DropdownMenuPrimitive.SubTrigger>
@@ -155,6 +184,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
       ref={ref}
       className={cn(menuItemVariants({ size }), className)}
       checked={checked}
+      onSelect={(e) => e.preventDefault()}
       {...props}
     >
       <div className="h-[1lh] flex items-center shrink-0">
@@ -162,6 +192,8 @@ const DropdownMenuCheckboxItem = React.forwardRef<
           'grid place-content-center shrink-0 rounded-md border border-border bg-surface',
           size === 'lg' ? 'h-5 w-5' : 'h-4 w-4',
           checked && 'bg-primary border-primary text-white',
+          props.disabled && 'bg-disabled border-transparent',
+          props.disabled && checked && 'text-fg-disabled',
         )}>
           <DropdownMenuPrimitive.ItemIndicator>
             <Check style={{ width: size === 'lg' ? 16 : 12, height: size === 'lg' ? 16 : 12 }} />
@@ -247,15 +279,11 @@ const DropdownMenuItemSuffix = ({ className, gap = 'gap-2', children }: { classN
 DropdownMenuItemSuffix.displayName = "DropdownMenuItemSuffix"
 
 // ── Prefix helper（前綴容器）──
-const DropdownMenuItemPrefix = ({ className, children }: { className?: string; children: React.ReactNode }) => {
-  const size = React.useContext(SizeContext)
-  const iconPx = ICON_SIZE[size]
-  return (
-    <div className={cn("h-[1lh] flex items-center shrink-0 text-fg-muted", className)}>
-      {children}
-    </div>
-  )
-}
+const DropdownMenuItemPrefix = ({ className, children }: { className?: string; children: React.ReactNode }) => (
+  <div className={cn("h-[1lh] flex items-center shrink-0", className)}>
+    {children}
+  </div>
+)
 DropdownMenuItemPrefix.displayName = "DropdownMenuItemPrefix"
 
 export {

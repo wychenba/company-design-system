@@ -194,7 +194,7 @@ const SelectMenuItem = React.forwardRef<HTMLDivElement, SelectMenuItemProps>(
             {StartIcon && (
               <StartIcon
                 size={iconPx}
-                className={cn('shrink-0', disabled ? 'text-fg-disabled' : 'text-fg-muted')}
+                className={cn('shrink-0', disabled && 'text-fg-disabled')}
                 aria-hidden
               />
             )}

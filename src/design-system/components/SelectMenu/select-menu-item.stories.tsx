@@ -1,3 +1,4 @@
+import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { Mail, Check, Circle, Star, Bell, User, Settings, Plus, Folder, FileText, BarChart3 } from 'lucide-react'
@@ -7,28 +8,28 @@ const meta: Meta<typeof SelectMenuItem> = {
   title: 'Design System/Components/SelectMenu/MenuItem 展示',
   component: SelectMenuItem,
   parameters: { layout: 'padded' },
-  decorators: [
-    (Story) => (
-      <div className="w-[320px] rounded-lg bg-surface-raised border border-border overflow-hidden"
-        style={{ boxShadow: 'var(--elevation-200)' }}>
-        <Story />
-      </div>
-    ),
-  ],
 }
 export default meta
 type Story = StoryObj<typeof SelectMenuItem>
+
+/** Menu 容器 — 模擬浮層外觀 */
+const MenuContainer = ({ children, width = 320 }: { children: React.ReactNode; width?: number }) => (
+  <div className="rounded-lg bg-surface-raised border border-border overflow-hidden"
+    style={{ boxShadow: 'var(--elevation-200)', width }}>
+    {children}
+  </div>
+)
 
 // ── 基本 ──
 
 export const Basic: Story = {
   name: '基本',
   render: () => (
-    <SelectMenuGroup>
+    <MenuContainer><SelectMenuGroup>
       <SelectMenuItem>選項一</SelectMenuItem>
       <SelectMenuItem>選項二</SelectMenuItem>
       <SelectMenuItem>選項三</SelectMenuItem>
-    </SelectMenuGroup>
+    </SelectMenuGroup></MenuContainer>
   ),
 }
 
@@ -37,11 +38,11 @@ export const Basic: Story = {
 export const WithStartIcon: Story = {
   name: 'startIcon',
   render: () => (
-    <SelectMenuGroup>
+    <MenuContainer><SelectMenuGroup>
       <SelectMenuItem startIcon={Mail}>電子郵件</SelectMenuItem>
       <SelectMenuItem startIcon={Bell}>通知</SelectMenuItem>
       <SelectMenuItem startIcon={Settings}>設定</SelectMenuItem>
-    </SelectMenuGroup>
+    </SelectMenuGroup></MenuContainer>
   ),
 }
 
@@ -50,11 +51,11 @@ export const WithStartIcon: Story = {
 export const WithDescription: Story = {
   name: 'startIcon + description',
   render: () => (
-    <SelectMenuGroup>
+    <MenuContainer><SelectMenuGroup>
       <SelectMenuItem startIcon={Mail} description="每日摘要信件">電子郵件通知</SelectMenuItem>
       <SelectMenuItem startIcon={Bell} description="即時推播到裝置">推播通知</SelectMenuItem>
       <SelectMenuItem startIcon={Settings} description="自訂通知偏好">進階設定</SelectMenuItem>
-    </SelectMenuGroup>
+    </SelectMenuGroup></MenuContainer>
   ),
 }
 
@@ -69,11 +70,11 @@ const AvatarImg = ({ bg = '#e0e7ff' }: { bg?: string }) => (
 export const AvatarInline: Story = {
   name: 'Avatar（inline）',
   render: () => (
-    <SelectMenuGroup>
+    <MenuContainer><SelectMenuGroup>
       <SelectMenuItem avatar={<AvatarImg />}>Alice Chen</SelectMenuItem>
       <SelectMenuItem avatar={<AvatarImg bg="#fce7f3" />}>Bob Wang</SelectMenuItem>
       <SelectMenuItem avatar={<AvatarImg bg="#d1fae5" />}>Carol Lin</SelectMenuItem>
-    </SelectMenuGroup>
+    </SelectMenuGroup></MenuContainer>
   ),
 }
 
@@ -82,11 +83,11 @@ export const AvatarInline: Story = {
 export const AvatarBlock: Story = {
   name: 'Avatar + description（block）',
   render: () => (
-    <SelectMenuGroup>
+    <MenuContainer><SelectMenuGroup>
       <SelectMenuItem avatar={<AvatarImg />} description="設計部門">Alice Chen</SelectMenuItem>
       <SelectMenuItem avatar={<AvatarImg bg="#fce7f3" />} description="工程部門">Bob Wang</SelectMenuItem>
       <SelectMenuItem avatar={<AvatarImg bg="#d1fae5" />} description="行銷部門">Carol Lin</SelectMenuItem>
-    </SelectMenuGroup>
+    </SelectMenuGroup></MenuContainer>
   ),
 }
 
@@ -95,11 +96,11 @@ export const AvatarBlock: Story = {
 export const States: Story = {
   name: '狀態',
   render: () => (
-    <SelectMenuGroup>
+    <MenuContainer><SelectMenuGroup>
       <SelectMenuItem startIcon={Check}>Default</SelectMenuItem>
       <SelectMenuItem startIcon={Check} selected>Selected（單選）</SelectMenuItem>
       <SelectMenuItem startIcon={Check} disabled>Disabled</SelectMenuItem>
-    </SelectMenuGroup>
+    </SelectMenuGroup></MenuContainer>
   ),
 }
 
@@ -135,7 +136,7 @@ const MultiSelectDemo = () => {
 
 export const MultiSelect: Story = {
   name: '多選（checkbox）',
-  render: () => <MultiSelectDemo />,
+  render: () => <MenuContainer><MultiSelectDemo /></MenuContainer>,
 }
 
 // ── Group header ──
@@ -143,7 +144,7 @@ export const MultiSelect: Story = {
 export const Groups: Story = {
   name: '群組',
   render: () => (
-    <>
+    <MenuContainer>
       <SelectMenuGroup>
         <SelectMenuItem header>最近使用</SelectMenuItem>
         <SelectMenuItem startIcon={FileText}>文件 A</SelectMenuItem>
@@ -155,7 +156,7 @@ export const Groups: Story = {
         <SelectMenuItem startIcon={Folder}>專案二</SelectMenuItem>
         <SelectMenuItem startIcon={BarChart3}>儀表板</SelectMenuItem>
       </SelectMenuGroup>
-    </>
+    </MenuContainer>
   ),
 }
 
@@ -164,9 +165,9 @@ export const Groups: Story = {
 export const Creatable: Story = {
   name: 'Creatable（搜尋無結果）',
   render: () => (
-    <SelectMenuGroup>
+    <MenuContainer><SelectMenuGroup>
       <SelectMenuItem startIcon={Plus}>直接使用「新標籤」</SelectMenuItem>
-    </SelectMenuGroup>
+    </SelectMenuGroup></MenuContainer>
   ),
 }
 
@@ -174,26 +175,21 @@ export const Creatable: Story = {
 
 export const Sizes: Story = {
   name: '尺寸比較',
-  decorators: [
-    // 移除外層 menu container decorator，避免雙重邊框
-    (Story) => <div className="flex flex-col gap-6 p-4"><Story /></div>,
-  ],
   render: () => (
-    <>
+    <div className="flex flex-col gap-6">
       {(['sm', 'md', 'lg'] as const).map((sz) => (
         <div key={sz} className="flex flex-col gap-1">
           <span className="text-caption text-fg-muted font-mono">{sz}{sz === 'md' ? '（預設）' : ''}</span>
-          <div className="w-[360px] rounded-lg bg-surface-raised border border-border overflow-hidden"
-            style={{ boxShadow: 'var(--elevation-200)' }}>
+          <MenuContainer width={360}>
             <SelectMenuGroup>
               <SelectMenuItem size={sz} startIcon={Mail} description="每日寄送摘要信件">電子郵件通知</SelectMenuItem>
               <SelectMenuItem size={sz} avatar={<AvatarImg />}>Alice Chen</SelectMenuItem>
               <SelectMenuItem size={sz} avatar={<AvatarImg bg="#fce7f3" />} description="工程部門">Bob Wang</SelectMenuItem>
             </SelectMenuGroup>
-          </div>
+          </MenuContainer>
         </div>
       ))}
-    </>
+    </div>
   ),
 }
 
@@ -202,7 +198,7 @@ export const Sizes: Story = {
 export const FullExample: Story = {
   name: '完整範例',
   render: () => (
-    <>
+    <MenuContainer>
       <SelectMenuGroup>
         <SelectMenuItem header>成員</SelectMenuItem>
         <SelectMenuItem checkbox checked={true} avatar={<AvatarImg />} description="設計部門">Alice Chen</SelectMenuItem>
@@ -212,6 +208,6 @@ export const FullExample: Story = {
       <SelectMenuFooter>
         <SelectMenuItem checkbox checked="indeterminate">全部</SelectMenuItem>
       </SelectMenuFooter>
-    </>
+    </MenuContainer>
   ),
 }

@@ -137,6 +137,21 @@ description 降一級：sm/md 的 label 14px → description 12px；lg 的 label
 
 disabled 時所有元素（icon、checkbox、文字）統一 `fg-disabled`。
 
+### 浮層關閉行為
+
+| 模式 | 選了之後 | 原因 |
+|---|---|---|
+| 單選 | **關閉浮層** | 選完就結束 |
+| 多選 | **不關閉** | 需要繼續勾選 |
+| DropdownMenu CheckboxItem | **不關閉** | 同多選邏輯 |
+| DropdownMenu 一般 Item | **關閉** | 執行動作後結束 |
+
+### Prefix icon 色彩
+
+Menu item 的 prefix icon 跟 label 同色（foreground），不是 fg-muted。Prefix icon 是 label 的視覺延伸。
+
+詳見 `item-layout.spec.md` 的 Icon 色彩原則。
+
 ---
 
 ## Group
