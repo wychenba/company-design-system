@@ -58,19 +58,15 @@ SelectMenuItem 是 SelectMenu 的選項元件——處理 prefix 對齊、尺寸
 ## 結構
 
 ```
-prefix                          content                    suffix
-[✓? | checkbox?] [icon? | avatar?]  [label + description?]  [tag?] [badge?] [suffixIcon?]
+prefix                       content               suffix
+[checkbox?] [icon? | avatar?]  [label + description?]  [tag?]
 ```
 
-- **Prefix**：✓ 勾號（單選）或 checkbox（多選）+ startIcon 或 avatar（互斥）
+- **Prefix**：checkbox（多選，由父層注入）+ startIcon 或 avatar（互斥）
 - **Content**：label + 可選 description
-- **Suffix**：tag / badge / suffixIcon（ml-auto 靠右），指示型 icon 用 fg-muted
+- **Suffix**：tag（ml-auto 靠右）
 
-### ✓ 與 suffix 不衝突的原因
-
-✓ 在 prefix（左側），tag/badge 在 suffix（右側，ml-auto）。兩個區域獨立，互不影響對齊。
-
-**同一群組內的 item 必須統一可選性**——要嘛都可選（都有 ✓ 空間），要嘛都不可選。用 separator 或 header 分隔。避免群組內 label x 位置不一致。
+prefix icon 跟 label 同色（foreground），不是 fg-muted。詳見 item-layout.spec.md 的 Icon 色彩原則。
 
 ---
 

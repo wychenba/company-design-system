@@ -97,9 +97,9 @@ export const States: Story = {
   name: '狀態',
   render: () => (
     <MenuContainer><SelectMenuGroup>
-      <SelectMenuItem startIcon={Check}>Default</SelectMenuItem>
-      <SelectMenuItem startIcon={Check} selected>Selected（單選）</SelectMenuItem>
-      <SelectMenuItem startIcon={Check} disabled>Disabled</SelectMenuItem>
+      <SelectMenuItem startIcon={Mail}>Default</SelectMenuItem>
+      <SelectMenuItem startIcon={Mail} selected>Selected（單選）</SelectMenuItem>
+      <SelectMenuItem startIcon={Mail} disabled>Disabled</SelectMenuItem>
     </SelectMenuGroup></MenuContainer>
   ),
 }

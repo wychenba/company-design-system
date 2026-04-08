@@ -109,7 +109,7 @@ export const Overview = {
             {/* sideOffset */}
             <div className="flex flex-col items-center py-1">
               <span className="text-[10px] font-mono text-fg-muted">sideOffset 8px</span>
-              <div className="w-px h-3 bg-border" />
+              <div className="w-px h-3 bg-divider" />
             </div>
             {/* Trigger */}
             <div className="inline-flex items-center border-2 border-dashed rounded-md px-3 py-2"

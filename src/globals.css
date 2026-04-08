@@ -6,6 +6,9 @@
 @import "./design-system/tokens/layoutSpace/layoutSpace.css";
 @import "./design-system/components/DataTable/data-table.css";
 
+/* ── Icon stroke width ── */
+.lucide { stroke-width: 1.75; }
+
 /* ── Tailwind Theme ── */
 @theme inline {
   /* White — 明確納入 token 系統，供 text-white / bg-white 使用 */

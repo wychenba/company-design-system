@@ -245,6 +245,7 @@ export function SelectMenu({
                     <CommandItem
                       key={opt.value}
                       value={opt.label}
+                      keywords={opt.description ? [opt.description] : undefined}
                       disabled={opt.disabled}
                       onSelect={() => handleSelect(opt.value)}
                       className="p-0 rounded-none data-[selected=true]:bg-transparent"

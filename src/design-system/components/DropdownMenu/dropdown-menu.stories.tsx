@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { Mail, Settings, User, LogOut, Plus, Trash2, Copy, Pencil, ExternalLink, Moon, Sun, Monitor, ChevronDown } from 'lucide-react'
+import { Mail, Settings, User, LogOut, Plus, Trash2, Copy, Pencil, ExternalLink, Moon, Sun, Monitor, ChevronDown, FileText } from 'lucide-react'
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuCheckboxItem, DropdownMenuRadioItem, DropdownMenuRadioGroup,
@@ -82,11 +82,11 @@ export const Groups: StoryObj = {
 // ── Suffix（badge + endIcon）──
 
 export const WithSuffix: StoryObj = {
-  name: '後綴（badge + icon）',
+  name: '後綴',
   render: () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="tertiary" endIcon={ChevronDown}>通知</Button>
+        <Button variant="tertiary" endIcon={ChevronDown}>操作</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem>
@@ -97,8 +97,8 @@ export const WithSuffix: StoryObj = {
           </div>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <DropdownMenuItemIcon><ExternalLink size={16} /></DropdownMenuItemIcon>
-          在新視窗開啟
+          <DropdownMenuItemIcon><FileText size={16} /></DropdownMenuItemIcon>
+          說明文件
           <div className="h-[1lh] flex items-center ml-auto shrink-0">
             <ExternalLink size={16} className="text-fg-muted" />
           </div>
@@ -184,7 +184,7 @@ const CheckboxDemo = () => {
         <DropdownMenuCheckboxItem checked={showActivity} onCheckedChange={setShowActivity}>
           最近活動
         </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem disabled>
+        <DropdownMenuCheckboxItem checked disabled>
           名稱（必要）
         </DropdownMenuCheckboxItem>
       </DropdownMenuContent>
