@@ -228,7 +228,7 @@ export const Overview = {
                   <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                     style={{ borderColor: 'var(--success)', backgroundColor: 'var(--success-subtle)', color: 'var(--success)' }}>label</span>
                   <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
-                    style={{ borderColor: 'var(--magenta)', backgroundColor: 'var(--magenta-subtle)', color: 'var(--magenta)' }}>description</span>
+                    style={{ borderColor: 'var(--color-magenta-6)', backgroundColor: 'var(--color-magenta-1)', color: 'var(--color-magenta-6)' }}>description</span>
                 </div>
               </div>
               <span className="text-[10px] text-fg-muted font-mono">prefix 容器高度 = 一行文字高度，對齊第一行 label</span>
@@ -242,7 +242,7 @@ export const Overview = {
                   <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                     style={{ borderColor: 'var(--success)', backgroundColor: 'var(--success-subtle)', color: 'var(--success)' }}>label</span>
                   <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
-                    style={{ borderColor: 'var(--magenta)', backgroundColor: 'var(--magenta-subtle)', color: 'var(--magenta)' }}>description</span>
+                    style={{ borderColor: 'var(--color-magenta-6)', backgroundColor: 'var(--color-magenta-1)', color: 'var(--color-magenta-6)' }}>description</span>
                 </div>
               </div>
               <span className="text-[10px] text-fg-muted font-mono">prefix 容器高度 = label行高 + 2px + desc行高，對齊文字塊中心</span>
@@ -394,7 +394,7 @@ const InspectorInner = () => {
                 <SelectMenuItem
                   size={size}
                   startIcon={hasIcon ? Mail : undefined}
-                  avatar={hasAvatar ? <Avatar alt="Alice" color="indigo" className="w-full h-full" /> : undefined}
+                  avatar={hasAvatar ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
                   description={hasDesc ? '每日摘要信件到信箱' : undefined}
                   checkbox={isMulti}
                   checked={isMulti ? selected : undefined}
@@ -746,10 +746,10 @@ export const SizeMatrix = {
                   <SelectMenuItem size={sz} startIcon={Mail} description="每日摘要信件">
                     電子郵件通知
                   </SelectMenuItem>
-                  <SelectMenuItem size={sz} avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />}>
+                  <SelectMenuItem size={sz} avatar={<Avatar alt="Alice" color="indigo" size="fill" />}>
                     Alice Chen
                   </SelectMenuItem>
-                  <SelectMenuItem size={sz} avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />} description="工程部門">
+                  <SelectMenuItem size={sz} avatar={<Avatar alt="Bob" color="magenta" size="fill" />} description="工程部門">
                     Bob Wang
                   </SelectMenuItem>
                   <SelectMenuItem size={sz} checkbox checked={true} startIcon={Bell}>

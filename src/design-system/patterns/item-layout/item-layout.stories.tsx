@@ -309,7 +309,7 @@ const InspectorInner = () => {
                 <SelectMenuItem
                   size={size}
                   startIcon={hasPrefix && prefixType === 'icon' ? Mail : undefined}
-                  avatar={hasPrefix && prefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" className="w-full h-full" /> : undefined}
+                  avatar={hasPrefix && prefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
                   description={hasDescription ? '每日寄送摘要信件' : undefined}
                   tag={hasSuffix ? <Tag size={size} variant="blue">Pro</Tag> : undefined}
                 >
@@ -332,7 +332,7 @@ const InspectorInner = () => {
                 <ListItemPreview
                   size={size}
                   startIcon={hasPrefix && prefixType === 'icon' ? Mail : undefined}
-                  avatar={hasPrefix && prefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" className="w-full h-full" /> : undefined}
+                  avatar={hasPrefix && prefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
                   label="電子郵件通知"
                   description={hasDescription ? '每日寄送摘要信件到您的電子信箱' : undefined}
                   suffix={hasSuffix ? <ChevronRight size={spec.iconPx} className="text-fg-muted" /> : undefined}
@@ -639,10 +639,10 @@ export const AlignmentThreshold = {
 
           {/* Live example */}
           <MenuFrame width={360}>
-            <SelectMenuItem size="md" avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />} description="Design team lead">
+            <SelectMenuItem size="md" avatar={<Avatar alt="Alice" color="indigo" size="fill" />} description="Design team lead">
               Alice Chen
             </SelectMenuItem>
-            <SelectMenuItem size="md" avatar={<Avatar alt="Bob" color="yellow" className="w-full h-full" />} description="Backend engineer">
+            <SelectMenuItem size="md" avatar={<Avatar alt="Bob" color="yellow" size="fill" />} description="Backend engineer">
               Bob Wang
             </SelectMenuItem>
           </MenuFrame>

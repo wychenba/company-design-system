@@ -28,16 +28,17 @@ const tagVariants = cva(
   {
     variants: {
       variant: {
-        // 有顏色的 Tag 文字一律用 step-7（非 step-6），優先辨識度
-        neutral: "bg-muted text-foreground",
-        blue: "bg-[var(--blue-subtle)] text-[var(--blue-active)]",
-        red: "bg-[var(--red-subtle)] text-[var(--red-active)]",
-        green: "bg-[var(--green-subtle)] text-[var(--green-active)]",
-        yellow: "bg-[var(--yellow-subtle)] text-[var(--yellow-active)]",
-        turquoise: "bg-turquoise-subtle text-[var(--turquoise-active)]",
-        purple: "bg-purple-subtle text-[var(--purple-active)]",
-        magenta: "bg-magenta-subtle text-[var(--magenta-active)]",
-        indigo: "bg-indigo-subtle text-[var(--indigo-active)]",
+        // 直接引用 primitive（bg=step-1, text=step-7），不經過語義層
+        // step-1 在 dark mode 用 alpha 公式，step-7 用 lighter 公式——兩個 mode 都正確
+        neutral:   "bg-muted text-foreground",
+        blue:      "bg-[var(--color-blue-1)] text-[var(--color-blue-7)]",
+        red:       "bg-[var(--color-deep-orange-1)] text-[var(--color-deep-orange-7)]",
+        green:     "bg-[var(--color-green-1)] text-[var(--color-green-7)]",
+        yellow:    "bg-[var(--color-yellow-1)] text-[var(--color-yellow-7)]",
+        turquoise: "bg-[var(--color-turquoise-1)] text-[var(--color-turquoise-7)]",
+        purple:    "bg-[var(--color-purple-1)] text-[var(--color-purple-7)]",
+        magenta:   "bg-[var(--color-magenta-1)] text-[var(--color-magenta-7)]",
+        indigo:    "bg-[var(--color-indigo-1)] text-[var(--color-indigo-7)]",
       },
       size: {
         sm: "h-5 px-1 text-caption font-medium",
@@ -53,19 +54,18 @@ const tagVariants = cva(
 )
 
 // ── Solid variant 色彩（step-6 底 + 白字，warning 用 --warning-foreground）──
-// solid: step-6 底 + 白字（Tag 本身不 hover，hover 只在 dismiss inline action）
-// 統一用 categorical token（--turquoise 等）或語義等價（--primary = blue-6）
-// 不混用語義名和色名——Tag 的 "blue" 不代表 "primary" 語義
+// 直接引用 primitive step-6，不經過語義層
+// neutral 用 neutral-9 + --inverse-fg（light=白字, dark=深字，自動反轉）
 const SOLID_CLASSES: Record<string, string> = {
-  neutral:   'bg-[var(--fg-secondary)] text-white',
-  blue:      'bg-[var(--blue)] text-white',
-  red:       'bg-[var(--red)] text-white',
-  green:     'bg-[var(--green)] text-white',
-  yellow:    'bg-[var(--yellow)] text-[var(--warning-foreground)]',
-  turquoise: 'bg-[var(--turquoise)] text-white',
-  purple:    'bg-[var(--purple)] text-white',
-  magenta:   'bg-[var(--magenta)] text-white',
-  indigo:    'bg-[var(--indigo)] text-white',
+  neutral:   'bg-[var(--color-neutral-9)] text-inverse-fg',
+  blue:      'bg-[var(--color-blue-6)] text-white',
+  red:       'bg-[var(--color-deep-orange-6)] text-white',
+  green:     'bg-[var(--color-green-6)] text-white',
+  yellow:    'bg-[var(--color-yellow-6)] text-[var(--warning-foreground)]',
+  turquoise: 'bg-[var(--color-turquoise-6)] text-white',
+  purple:    'bg-[var(--color-purple-6)] text-white',
+  magenta:   'bg-[var(--color-magenta-6)] text-white',
+  indigo:    'bg-[var(--color-indigo-6)] text-white',
 }
 
 export interface TagProps
@@ -81,20 +81,21 @@ export interface TagProps
   solid?: boolean
 }
 
-// ── Solid dismiss hover/active bg（用色相自己的 hover/active token）──
-// solid dismiss hover/active：用 step-5 (hover) / step-7 (active)，跟 semantic.css 同邏輯
-// 直接引用色階 token，不混用語義名
-// 統一用 categorical hover/active token（自動處理 dark mode 方向反轉）
+// ── Solid dismiss hover/active bg ──
+// 用 semantic --{hue}-hover/active token，跟 --primary-hover/active 同模式：
+// solid 色彩 shade change（hover 較亮 step、active 較暗 step），跟 Button 等
+// 互動元件視覺一致。在 semantic 層做 dark mode swap 確保方向跨 mode 一致。
+// neutral 特例：bg 是 neutral-9 隨 mode 反轉，用 --inverse-neutral-* 鏡射
 const SOLID_DISMISS_HOVER: Record<string, { hover: string; active: string }> = {
-  neutral:   { hover: 'var(--fg-muted)',          active: 'var(--foreground)' },
-  blue:      { hover: 'var(--blue-hover)',        active: 'var(--blue-active)' },
-  red:       { hover: 'var(--red-hover)',         active: 'var(--red-active)' },
-  green:     { hover: 'var(--green-hover)',       active: 'var(--green-active)' },
-  yellow:    { hover: 'var(--yellow-hover)',      active: 'var(--yellow-active)' },
-  turquoise: { hover: 'var(--turquoise-hover)',   active: 'var(--turquoise-active)' },
-  purple:    { hover: 'var(--purple-hover)',      active: 'var(--purple-active)' },
-  magenta:   { hover: 'var(--magenta-hover)',     active: 'var(--magenta-active)' },
-  indigo:    { hover: 'var(--indigo-hover)',      active: 'var(--indigo-active)' },
+  neutral:   { hover: 'var(--inverse-neutral-hover)', active: 'var(--inverse-neutral-active)' },
+  blue:      { hover: 'var(--blue-hover)',            active: 'var(--blue-active)' },
+  red:       { hover: 'var(--red-hover)',             active: 'var(--red-active)' },
+  green:     { hover: 'var(--green-hover)',           active: 'var(--green-active)' },
+  yellow:    { hover: 'var(--yellow-hover)',          active: 'var(--yellow-active)' },
+  turquoise: { hover: 'var(--turquoise-hover)',       active: 'var(--turquoise-active)' },
+  purple:    { hover: 'var(--purple-hover)',          active: 'var(--purple-active)' },
+  magenta:   { hover: 'var(--magenta-hover)',         active: 'var(--magenta-active)' },
+  indigo:    { hover: 'var(--indigo-hover)',          active: 'var(--indigo-active)' },
 }
 
 // ── Dismiss（internal）────────────────────────────────────────────────────

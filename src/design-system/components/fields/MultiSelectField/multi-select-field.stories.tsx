@@ -110,15 +110,28 @@ export const Searchable: Story = {
   name: '搜尋',
   render: () => {
     const [value, setValue] = React.useState<string[]>(['electronics'])
+    const [value2, setValue2] = React.useState<string[]>(['electronics'])
     return (
-      <div className="flex flex-col gap-4 max-w-sm">
-        <p className="text-caption text-fg-muted">searchable — 浮層內搜尋框，關鍵字保留可連續勾選</p>
-        <MultiSelectField
-          options={categoryOptions}
-          value={value}
-          onChange={setValue}
-          searchable
-        />
+      <div className="flex flex-col gap-6 max-w-sm">
+        <div className="flex flex-col gap-4">
+          <p className="text-caption text-fg-muted">searchable — 浮層內搜尋框，關鍵字保留可連續勾選</p>
+          <MultiSelectField
+            options={categoryOptions}
+            value={value}
+            onChange={setValue}
+            searchable
+          />
+        </div>
+        <div className="flex flex-col gap-4">
+          <p className="text-caption text-fg-muted">searchIn='trigger' — inline 搜尋框，直接在欄位內輸入</p>
+          <MultiSelectField
+            options={categoryOptions}
+            value={value2}
+            onChange={setValue2}
+            searchable
+            searchIn="trigger"
+          />
+        </div>
       </div>
     )
   },

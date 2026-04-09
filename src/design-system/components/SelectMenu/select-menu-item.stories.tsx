@@ -66,9 +66,9 @@ export const AvatarInline: Story = {
   name: 'Avatar（inline）',
   render: () => (
     <MenuContainer><SelectMenuGroup>
-      <SelectMenuItem avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />}>Alice Chen</SelectMenuItem>
-      <SelectMenuItem avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />}>Bob Wang</SelectMenuItem>
-      <SelectMenuItem avatar={<Avatar alt="Carol" color="green" className="w-full h-full" />}>Carol Lin</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Alice" color="indigo" size="fill" />}>Alice Chen</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Bob" color="magenta" size="fill" />}>Bob Wang</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Carol" color="green" size="fill" />}>Carol Lin</SelectMenuItem>
     </SelectMenuGroup></MenuContainer>
   ),
 }
@@ -79,9 +79,9 @@ export const AvatarBlock: Story = {
   name: 'Avatar + description（block）',
   render: () => (
     <MenuContainer><SelectMenuGroup>
-      <SelectMenuItem avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />} description="設計部門">Alice Chen</SelectMenuItem>
-      <SelectMenuItem avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />} description="工程部門">Bob Wang</SelectMenuItem>
-      <SelectMenuItem avatar={<Avatar alt="Carol" color="green" className="w-full h-full" />} description="行銷部門">Carol Lin</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Alice" color="indigo" size="fill" />} description="設計部門">Alice Chen</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Bob" color="magenta" size="fill" />} description="工程部門">Bob Wang</SelectMenuItem>
+      <SelectMenuItem avatar={<Avatar alt="Carol" color="green" size="fill" />} description="行銷部門">Carol Lin</SelectMenuItem>
     </SelectMenuGroup></MenuContainer>
   ),
 }
@@ -178,8 +178,8 @@ export const Sizes: Story = {
           <MenuContainer width={360}>
             <SelectMenuGroup>
               <SelectMenuItem size={sz} startIcon={Mail} description="每日寄送摘要信件">電子郵件通知</SelectMenuItem>
-              <SelectMenuItem size={sz} avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />}>Alice Chen</SelectMenuItem>
-              <SelectMenuItem size={sz} avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />} description="工程部門">Bob Wang</SelectMenuItem>
+              <SelectMenuItem size={sz} avatar={<Avatar alt="Alice" color="indigo" size="fill" />}>Alice Chen</SelectMenuItem>
+              <SelectMenuItem size={sz} avatar={<Avatar alt="Bob" color="magenta" size="fill" />} description="工程部門">Bob Wang</SelectMenuItem>
             </SelectMenuGroup>
           </MenuContainer>
         </div>
@@ -207,9 +207,9 @@ const FullExampleDemo = () => {
     <MenuContainer>
       <SelectMenuGroup>
         <SelectMenuItem header>成員</SelectMenuItem>
-        <SelectMenuItem checkbox checked={selected.alice} onClick={() => toggle('alice')} avatar={<Avatar alt="Alice" color="indigo" className="w-full h-full" />} description="設計部門">Alice Chen</SelectMenuItem>
-        <SelectMenuItem checkbox checked={selected.bob} onClick={() => toggle('bob')} avatar={<Avatar alt="Bob" color="magenta" className="w-full h-full" />} description="工程部門">Bob Wang</SelectMenuItem>
-        <SelectMenuItem checkbox checked={false} avatar={<Avatar alt="Carol" color="green" className="w-full h-full" />} description="行銷部門" disabled>Carol Lin（已離職）</SelectMenuItem>
+        <SelectMenuItem checkbox checked={selected.alice} onClick={() => toggle('alice')} avatar={<Avatar alt="Alice" color="indigo" size="fill" />} description="設計部門">Alice Chen</SelectMenuItem>
+        <SelectMenuItem checkbox checked={selected.bob} onClick={() => toggle('bob')} avatar={<Avatar alt="Bob" color="magenta" size="fill" />} description="工程部門">Bob Wang</SelectMenuItem>
+        <SelectMenuItem checkbox checked={false} avatar={<Avatar alt="Carol" color="green" size="fill" />} description="行銷部門" disabled>Carol Lin（已離職）</SelectMenuItem>
       </SelectMenuGroup>
       <SelectMenuFooter>
         <SelectMenuItem checkbox checked={allState} onClick={toggleAll}>全部</SelectMenuItem>

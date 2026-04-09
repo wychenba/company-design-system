@@ -22,11 +22,13 @@ Tag 是 inline label，用於分類標籤、狀態標記、多選已選值。不
 | `magenta` | 分類色（無固定語義） |
 | `indigo` | 分類色（無固定語義） |
 
-所有有色 variant 使用 categorical token（`--blue`、`--red`、`--green`、`--yellow`、`--turquoise` 等），不使用 semantic token（`--primary`、`--error`）。Tag 的「blue」代表藍色本身，不代表「主要操作」語義。
+所有有色 variant 直接使用 primitive token（`--color-blue-*`、`--color-deep-orange-*` 等），不使用 semantic token（`--primary`、`--error`）。Tag 的「blue」代表藍色本身，不代表「主要操作」語義。
+
+**注意**：`red` variant 使用 primitive `deep-orange`（`--color-deep-orange-*`）。
 
 ### 文字色
 
-所有有色 variant 的文字一律使用色盤 **step-7**（非 step-6），優先辨識度。Tag 以呈現資訊為主，小面積色塊文字需要更高對比才能舒適閱讀。neutral variant 用 `text-foreground`（不適用此規則）。
+所有有色 variant 的文字一律使用 primitive step-7（`--color-{hue}-7`），優先辨識度。Primitives 的相對色階公式在 dark mode 自動把 step-7 解析為高對比方向，確保文字在 subtle 底色上始終可讀。Tag 以呈現資訊為主，小面積色塊文字需要更高對比才能舒適閱讀。neutral variant 用 `text-foreground`（不適用此規則）。
 
 見 `color.spec.md` 的「文字色 Step 原則」。
 
@@ -40,15 +42,15 @@ Tag 是 inline label，用於分類標籤、狀態標記、多選已選值。不
 
 | Variant | Subtle 背景 | Subtle 文字 | Solid 背景 | Solid 文字 |
 |---|---|---|---|---|
-| neutral | `--muted` | `--foreground` | `--fg-secondary` | white |
-| blue | `--blue-subtle` | step-7 | `--blue` | white |
-| red | `--red-subtle` | step-7 | `--red` | white |
-| green | `--green-subtle` | step-7 | `--green` | white |
-| yellow | `--yellow-subtle` | step-7 | `--yellow` | **`--warning-foreground`** |
-| turquoise | `--turquoise-subtle` | step-7 | `--turquoise` | white |
-| purple | `--purple-subtle` | step-7 | `--purple` | white |
-| magenta | `--magenta-subtle` | step-7 | `--magenta` | white |
-| indigo | `--indigo-subtle` | step-7 | `--indigo` | white |
+| neutral | `--muted` | `--foreground` | `--color-neutral-9` | `--inverse-fg` |
+| blue | `--color-blue-1` | `--color-blue-7` | `--color-blue-6` | white |
+| red | `--color-deep-orange-1` | `--color-deep-orange-7` | `--color-deep-orange-6` | white |
+| green | `--color-green-1` | `--color-green-7` | `--color-green-6` | white |
+| yellow | `--color-yellow-1` | `--color-yellow-7` | `--color-yellow-6` | **`--warning-foreground`** |
+| turquoise | `--color-turquoise-1` | `--color-turquoise-7` | `--color-turquoise-6` | white |
+| purple | `--color-purple-1` | `--color-purple-7` | `--color-purple-6` | white |
+| magenta | `--color-magenta-1` | `--color-magenta-7` | `--color-magenta-6` | white |
+| indigo | `--color-indigo-1` | `--color-indigo-7` | `--color-indigo-6` | white |
 
 **yellow 例外**：yellow solid 背景亮度高，白字對比不足，改用 `--warning-foreground`（深色文字）。
 
@@ -58,10 +60,32 @@ Dismiss 是 Inline Action，但 icon 色繼承 Tag 文字色（非 `fg-muted`）
 
 | 模式 | Icon 色 | Hover 背景 | Active 背景 |
 |---|---|---|---|
-| subtle | 繼承 Tag 文字色 | `neutral-hover` | `neutral-active` |
-| solid | 繼承 Tag 文字色 | 色相自身的 hover token（如 `--blue-hover`） | 色相自身的 active token（如 `--blue-active`） |
+| subtle | 繼承 Tag 文字色 | `--neutral-hover` | `--neutral-active` |
+| solid（有色） | 繼承 Tag 文字色 | `--{hue}-hover`（如 `--blue-hover`） | `--{hue}-active` |
+| solid neutral | `--inverse-fg` | `--inverse-neutral-hover` | `--inverse-neutral-active` |
 
-Solid 模式的 dismiss hover/active 使用色相自己的 categorical hover/active token，而非 neutral-hover——因為 solid 底色是深色，neutral-hover 在深色底上幾乎不可見。Categorical token 自動處理 dark mode 方向反轉。
+**Solid dismiss 採 solid color shade change**——跟 Button 等互動元件同視覺語言（hover 換較亮 step、active 換較暗 step），維持整個設計系統的互動一致性。這是我們選擇 Atlassian-style semantic state token 流派的具體體現（非 Material 3 的 state layer overlay）。
+
+#### 為什麼 Tag 同時用 primitive（靜態色）和 semantic（互動色）
+
+這是 **有意的職責分離**，非 code smell：
+
+| 概念 | 為什麼住這層 |
+|------|------------|
+| 靜態色（subtle bg、text、solid bg）→ **primitive** | 不需要 mode 翻轉知識——primitives 公式翻轉已自動處理 step-1 alpha、step-7 對比方向 |
+| 互動色（hover、active）→ **semantic `--{hue}-hover/active`** | 需要保證「hover 永遠較亮、active 永遠較暗」，dark mode swap 必須住 semantic 層 |
+
+兩個概念本來就不該綁同一層。Tailwind 也是同樣分離：`bg-blue-500`（靜態 scale step）vs `hover:bg-blue-600 dark:hover:bg-blue-400`（互動需 consumer 處理 mode）。差別只在於我們把 mode swap 封裝進 token，consumer 不需自己寫 dark variant。
+
+詳細流派討論見 `color.spec.md` 的「架構流派定位」段落。
+
+#### `--{hue}-hover/active` 的定位
+
+Semantic 互動 token，從 brand color (`--primary-hover`) 延伸到所有作為 bg 的色相。**刻意只有 hover/active 兩個 token**——base/subtle/text 用 primitive。沒有 `--blue` base 或 `--blue-subtle`，避免重新引入完整 categorical 層。
+
+#### Neutral 例外
+
+neutral solid 的 bg 是 `--color-neutral-9`，在 dark mode 反轉（近黑 → 近白），bg 本身會跨 mode 變色。所以 overlay 不能用 `--{hue}-hover/active`（這些針對「bg 不變」的飽和色），改用 `--inverse-neutral-hover` / `--inverse-neutral-active`（內部處理 mode 鏡射 swap）。
 
 Inline Action 的其他規則（尺寸、hover 背景 pattern）不變。
 

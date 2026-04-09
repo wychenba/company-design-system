@@ -216,7 +216,7 @@ function NativeMultiSelectField({
   ) : null
 
   return (
-    <div className={cn(fieldWrapperStyles({ mode: 'edit', size }), tagPadding[size], 'relative',
+    <div className={cn(fieldWrapperStyles({ mode: 'edit', size }), value.length > 0 && tagPadding[size], 'relative',
       wrap && 'items-start py-1', error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
       style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode="edit" data-error={error ? '' : undefined}
       onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}>
@@ -299,7 +299,7 @@ function CustomMultiSelectField({
       <PopoverTrigger asChild>
         <div
           role="combobox" aria-expanded={open} tabIndex={0}
-          className={cn(fieldWrapperStyles({ mode: 'edit', size }), tagPadding[size], 'relative cursor-pointer',
+          className={cn(fieldWrapperStyles({ mode: 'edit', size }), value.length > 0 && tagPadding[size], 'relative cursor-pointer',
             wrap && 'items-start py-1',
             open && !error && 'border-primary',
             error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
@@ -310,7 +310,7 @@ function CustomMultiSelectField({
               <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
                 renderTag={(item) => (
                   <Tag size={size} className="shrink-0 relative z-10"
-                    onDismiss={(e) => { e.stopPropagation(); handleRemove(item.value) }}>{item.label}</Tag>
+                    onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>
                 )}
                 trailing={searchable && searchIn === 'trigger' ? (
                   <input value={search} onChange={(e) => setSearch(e.target.value)}

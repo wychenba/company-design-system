@@ -138,7 +138,7 @@ const NativeSelectField = React.forwardRef<HTMLSelectElement, SelectFieldProps>(
 
     if (!isTextDisplay) {
       return (
-        <div className={cn(fieldWrapperStyles({ mode: 'edit', size }), tagPadding[size], 'relative',
+        <div className={cn(fieldWrapperStyles({ mode: 'edit', size }), value && tagPadding[size], 'relative',
           error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
           style={{ paddingRight: '0.75rem' }} data-field-mode="edit" data-error={error ? '' : undefined}>
           {value ? <Tag size={size} className="shrink-0 relative z-10 pointer-events-none">{label}</Tag> : <span className="text-fg-muted">{placeholder ?? '選擇...'}</span>}

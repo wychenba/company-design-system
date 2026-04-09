@@ -1,0 +1,17 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Opacity Tokens
+   ═══════════════════════════════════════════════════════════════════════
+
+   系統內唯一的 opacity token（disabled 狀態）。其他所有透明度需求
+   應透過 alpha 色階（--white-aN / --black-aN）解決，不另開 opacity token。
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@theme inline {
+  --opacity-disabled: 0.45;
+}
+
+
+/* ── Custom Utility ── */
+@utility opacity-disabled {
+  opacity: var(--opacity-disabled);
+}

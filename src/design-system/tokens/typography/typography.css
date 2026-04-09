@@ -34,6 +34,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
+  /* Font Size */
   --font-h1-size:       48px;
   --font-h2-size:       32px;
   --font-h3-size:       24px;
@@ -46,6 +47,38 @@
 
   --font-caption-size:  12px;
   --font-footnote-size: 10px;
+}
+
+
+/* ── Tailwind Theme Bridge ──
+   font-sans — Roboto 為品牌字體（假設系統已有，不另外載入 web font）
+
+   ┌─ Stack 順序 ───────────────────────────────────────────────────────┐
+   │  1. Roboto（假設系統有；沒有則 fallback）                           │
+   │  2. OS 系統字 fallback（macOS / Windows / generic）                 │
+   │  3. CJK 字體 fallback（瀏覽器 glyph-level fallback 自動觸發）       │
+   │  4. generic + emoji                                                │
+   └────────────────────────────────────────────────────────────────────┘
+
+   原理：瀏覽器做 glyph-level fallback，自動沿 stack 找有對應字元的字體 */
+@theme {
+  --font-sans:
+    /* Brand font — 假設系統已有 */
+    Roboto,
+    /* Latin OS fallback */
+    -apple-system, BlinkMacSystemFont,
+    "Segoe UI Variable", "Segoe UI",
+    system-ui,
+    /* Japanese */
+    "Hiragino Sans", "Yu Gothic UI", Meiryo, "Noto Sans JP",
+    /* Korean */
+    "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR",
+    /* Chinese (TC) */
+    "PingFang TC", "Microsoft JhengHei UI", "Microsoft JhengHei",
+    /* generic */
+    sans-serif,
+    /* emoji */
+    "Apple Color Emoji", "Segoe UI Emoji";
 }
 
 

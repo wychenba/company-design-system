@@ -2,8 +2,28 @@
    Semantic Tokens — Layer 2
    ═══════════════════════════════════════════════════════════════════════
 
-   這個檔案是語意色彩的唯一來源。
-   元件應優先引用這裡的語意 token，而非直接使用 --color-blue-6 等 Layer 1 色票。
+   架構流派：Atlassian-style Semantic State Token（見 color.spec.md「架構流派定位」）
+   核心原則：靜態色用 primitive（無 mode 知識），互動狀態用 semantic（封裝 mode swap）
+
+   ┌─ 元件如何消費 ──────────────────────────────────────────────────────┐
+   │  Button / Checkbox / Badge（語義元件）                              │
+   │    → 用 semantic 全套：--primary、--primary-hover、--primary-text   │
+   │                                                                     │
+   │  Tag / Avatar（分類元件）— 有意的混合存取                            │
+   │    → 靜態色用 primitive：--color-blue-1、--color-blue-6、-7         │
+   │      （bg、subtle、text 沒有 mode 翻轉問題）                         │
+   │    → 互動色用 semantic hue token：--blue-hover、--blue-active       │
+   │      （hover/active 需要 dark mode swap，必須住 semantic 層）        │
+   │                                                                     │
+   │  ⚠ 「混合存取」不是 code smell——是有意的職責分離                   │
+   │    靜態色與互動狀態本來就是兩個不同概念，不該綁同一層。              │
+   │    Tailwind 也是同樣分離（bg-blue-500 vs hover:bg-blue-600）。       │
+   │                                                                     │
+   │  分類 vs 語義為何兩條 namespace？                                    │
+   │    Tag 的「藍」≠ semantic「primary」。改 primary 從藍變紫，         │
+   │    Tag 的 blue variant 不該跟著變。所以分類用 primitive 解耦，      │
+   │    semantic 用 purpose token 表達意圖。                              │
+   └─────────────────────────────────────────────────────────────────────┘
 
    ┌─ 命名原則 ────────────────────────────────────────────────────────────┐
    │  短名稱（無 --color- 前綴），對應到 Layer 1 原始色票                │
@@ -74,13 +94,31 @@
    │    不要 → 只寫在 ②                                                 │
    └─────────────────────────────────────────────────────────────────────┘
 
-   Tailwind 使用方式（@theme inline 橋接）：
-     bg-canvas           bg-surface          bg-surface-raised
-     bg-overlay          bg-tooltip          bg-disabled     bg-muted
-     bg-primary          bg-destructive      bg-success     bg-warning
-     text-foreground     text-fg-secondary   text-fg-muted  text-fg-disabled
-     text-primary        text-error          text-success   text-warning   text-info
-     border-border       ring-ring
+   ┌─ Tailwind utility 一覽（@theme inline 橋接）─────────────────────────┐
+   │  Surface     bg-canvas / bg-surface / bg-surface-raised              │
+   │              bg-overlay / bg-tooltip                                 │
+   │  Text level  text-foreground / text-fg-secondary / text-fg-muted    │
+   │              text-fg-disabled / text-inverse-fg                      │
+   │  Semantic    bg-primary / bg-info / bg-error / bg-success / bg-warning│
+   │   (base)     text-{primary|info|error|success|warning}              │
+   │   (hover)    hover:bg-{primary|info|error|success|warning}-hover    │
+   │   (active)   active:bg-{primary|info|error|success|warning}-active  │
+   │   (subtle)   bg-{primary|info|error|success|warning}-subtle         │
+   │   (text)     text-{info|error|success|warning}-text                  │
+   │                  ↑ 用於 subtle bg 上的文字（資訊呈現）                │
+   │  Special     text-warning-foreground（yellow solid 例外）            │
+   │  Neutral     bg-neutral-hover / bg-neutral-active / bg-disabled     │
+   │              bg-muted / bg-secondary                                 │
+   │  Border      border-border / border-border-hover / border-divider   │
+   │  Focus       ring-ring                                               │
+   │  Inverse     bg-inverse-neutral-hover / bg-inverse-neutral-active   │
+   │              （solid neutral 上的互動 overlay）                      │
+   │                                                                      │
+   │  Tag/Avatar 的色相 hover/active 用 var() 直接引用：                  │
+   │     hover: var(--blue-hover) / var(--red-hover) / ...                │
+   │     （不橋接成 utility class——只有 Tag/Avatar dismiss 一個 consumer）│
+   └─────────────────────────────────────────────────────────────────────┘
+
    選中邊框/文字 → border-[var(--primary-hover)] / text-[var(--primary-hover)]
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -110,72 +148,100 @@
   --fg-muted:             var(--color-neutral-7);
   --fg-disabled:          var(--color-neutral-6);
 
-  /* Brand / Action — 指向 categorical --blue */
-  --primary:              var(--blue);
-  --primary-hover:        var(--blue-hover);
-  --primary-active:       var(--blue-active);
-  --primary-subtle:       var(--blue-subtle);
+  /* Brand / Action — 品牌主操作色
+     --primary-text 為 SOP 規定的 5 件套之一，目前無消費者
+     （Button 用 --primary-foreground=white，Tag 用 primitive --color-blue-7） */
+  --primary:              var(--color-blue-6);
+  --primary-hover:        var(--color-blue-5);
+  --primary-active:       var(--color-blue-7);
+  --primary-subtle:       var(--color-blue-1);
+  --primary-text:         var(--color-blue-7);
 
-  /* Status: Info — 指向 categorical --blue（與 primary 同色但語義獨立） */
-  --info:                 var(--blue);
-  --info-hover:           var(--blue-hover);
-  --info-active:          var(--blue-active);
-  --info-subtle:          var(--blue-subtle);
+  /* Status: Info — 資訊狀態色
+     目前指向 blue（與 primary 同源），但語義獨立——如未來 brand 改色，
+     primary 跟著改，info 仍維持「資訊=藍」的通用慣例 */
+  --info:                 var(--color-blue-6);
+  --info-hover:           var(--color-blue-5);
+  --info-active:          var(--color-blue-7);
+  --info-subtle:          var(--color-blue-1);
+  --info-text:            var(--color-blue-7);
 
-  /* Status: Error — 指向 categorical --red */
-  --error:                var(--red);
-  --error-hover:          var(--red-hover);
-  --error-active:         var(--red-active);
-  --error-subtle:         var(--red-subtle);
+  /* Status: Error — 指向 primitive deep-orange */
+  --error:                var(--color-deep-orange-6);
+  --error-hover:          var(--color-deep-orange-5);
+  --error-active:         var(--color-deep-orange-7);
+  --error-subtle:         var(--color-deep-orange-1);
+  --error-text:           var(--color-deep-orange-7);
 
-  /* Status: Success — 指向 categorical --green */
-  --success:              var(--green);
-  --success-hover:        var(--green-hover);
-  --success-active:       var(--green-active);
-  --success-subtle:       var(--green-subtle);
+  /* Status: Success — 指向 primitive green */
+  --success:              var(--color-green-6);
+  --success-hover:        var(--color-green-5);
+  --success-active:       var(--color-green-7);
+  --success-subtle:       var(--color-green-1);
+  --success-text:         var(--color-green-7);
 
-  /* Status: Warning — 指向 categorical --yellow */
-  --warning:              var(--yellow);
-  --warning-hover:        var(--yellow-hover);
-  --warning-active:       var(--yellow-active);
-  --warning-subtle:       var(--yellow-subtle);
+  /* Status: Warning — 指向 primitive yellow */
+  --warning:              var(--color-yellow-6);
+  --warning-hover:        var(--color-yellow-5);
+  --warning-active:       var(--color-yellow-7);
+  --warning-subtle:       var(--color-yellow-1);
+  --warning-text:         var(--color-yellow-7);
 
-  /* Categorical — 分類色，用於 Tag、Avatar 等需要多色區分的場景
-     無固定語義，消費端自行決定用途（專案標籤、團隊分類等）
-     base = -6，subtle = -1，hover = -5，active = -7
-     語義色（primary/error/success/warning）指向對應的 categorical token */
-  --blue:                 var(--color-blue-6);
+  /* Hue Interaction Tokens — 色相 bg 的 hover / active 互動狀態
+     ─────────────────────────────────────────────────────────────────
+     用途：作為 bg 使用的飽和色相（Tag/Avatar solid 等）的 hover/active 狀態。
+
+     設計原則：跟 --primary-hover/active 同模式——solid 色彩 shade change
+     （hover 較亮 step、active 較暗 step），跨整個設計系統視覺一致。
+
+     存在原因：直接用 primitive `--color-{hue}-5/7` 在 dark mode 公式翻轉
+     方向錯誤，需要 semantic 層做 dark mode swap 維持「hover lift / active
+     press」方向跨 mode 一致。
+
+     刻意只有 hover/active：base/subtle/text 必須直接用 primitive
+     （`--color-{hue}-6` / `-1` / `-7`）。沒有 `--blue` base 或 `--blue-subtle`
+     等 token，避免重新引入完整 categorical 層。
+
+     不要混淆為「categorical 復辟」：這是 semantic 互動 token 從 brand color
+     擴展到所有作為 bg 的色相，跟 --primary-hover 同邏輯、同層級。
+     ───────────────────────────────────────────────────────────────── */
   --blue-hover:           var(--color-blue-5);
   --blue-active:          var(--color-blue-7);
-  --blue-subtle:          var(--color-blue-1);
-  --red:                  var(--color-deep-orange-6);
   --red-hover:            var(--color-deep-orange-5);
   --red-active:           var(--color-deep-orange-7);
-  --red-subtle:           var(--color-deep-orange-1);
-  --green:                var(--color-green-6);
   --green-hover:          var(--color-green-5);
   --green-active:         var(--color-green-7);
-  --green-subtle:         var(--color-green-1);
-  --yellow:               var(--color-yellow-6);
   --yellow-hover:         var(--color-yellow-5);
   --yellow-active:        var(--color-yellow-7);
-  --yellow-subtle:        var(--color-yellow-1);
-  --turquoise:            var(--color-turquoise-6);
   --turquoise-hover:      var(--color-turquoise-5);
   --turquoise-active:     var(--color-turquoise-7);
-  --turquoise-subtle:     var(--color-turquoise-1);
-  --purple:               var(--color-purple-6);
   --purple-hover:         var(--color-purple-5);
   --purple-active:        var(--color-purple-7);
-  --purple-subtle:        var(--color-purple-1);
-  --magenta:              var(--color-magenta-6);
   --magenta-hover:        var(--color-magenta-5);
   --magenta-active:       var(--color-magenta-7);
-  --magenta-subtle:       var(--color-magenta-1);
-  --indigo:               var(--color-indigo-6);
   --indigo-hover:         var(--color-indigo-5);
   --indigo-active:        var(--color-indigo-7);
-  --indigo-subtle:        var(--color-indigo-1);
+
+  /* Inverse — solid neutral（neutral-9）背景上的內容
+     neutral 在 dark mode 反轉（近黑 → 近白），上面的文字與互動覆蓋層也要反轉
+     - --inverse-fg 對應 --foreground（文字 base）
+     - --inverse-neutral-hover/active 對應 --neutral-hover/active（互動覆蓋層）
+     - 未來擴充：--inverse-fg-secondary/muted/disabled 對齊 --fg-* 變體
+
+     ┌─ Inverse-neutral-* 數值規則（嚴格對稱）─────────────────────────┐
+     │  --inverse-neutral-* 在某 mode 的值 = --neutral-* 在「另一 mode」 │
+     │  的值。即 inverse 是 neutral 的 mode 鏡射。                       │
+     │                                                                  │
+     │  light --inverse-neutral-hover  = white @ 4% (= dark neutral-1)  │
+     │  light --inverse-neutral-active = white @ 8% (= dark neutral-2)  │
+     │  dark  --inverse-neutral-hover  = black @ 2% (= light neutral-1) │
+     │  dark  --inverse-neutral-active = black @ 4% (= light neutral-2) │
+     │                                                                  │
+     │  好處：完全對稱、重用既有 tuned values、自動繼承感知補償          │
+     └────────────────────────────────────────────────────────────────┘ */
+  --inverse-fg:               oklch(1 0 0);
+  --inverse-neutral-hover:    var(--white-a04);
+  --inverse-neutral-active:   var(--white-a08);
 
   /* Notification */
   --notification:         var(--color-deep-orange-6);
@@ -222,7 +288,21 @@
   --overlay:              var(--black-a65);
   --tooltip:              var(--color-neutral-5-opaque);
 
-  /* Categorical hover/active 方向反轉（dark: hover=step-7, active=step-5） */
+  /* Semantic hover/active 方向反轉（dark: hover=step-7, active=step-5）
+     subtle 和 text 不需要覆寫——primitives 已在 dark mode 處理
+     （step-1 用 alpha 公式，step-7 用 lighter 公式） */
+  --primary-hover:        var(--color-blue-7);
+  --primary-active:       var(--color-blue-5);
+  --info-hover:           var(--color-blue-7);
+  --info-active:          var(--color-blue-5);
+  --error-hover:          var(--color-deep-orange-7);
+  --error-active:         var(--color-deep-orange-5);
+  --success-hover:        var(--color-green-7);
+  --success-active:       var(--color-green-5);
+  --warning-hover:        var(--color-yellow-7);
+  --warning-active:       var(--color-yellow-5);
+
+  /* Hue interaction tokens — 同樣的方向反轉（hover 永遠較亮、active 永遠較暗） */
   --blue-hover:           var(--color-blue-7);
   --blue-active:          var(--color-blue-5);
   --red-hover:            var(--color-deep-orange-7);
@@ -231,14 +311,6 @@
   --green-active:         var(--color-green-5);
   --yellow-hover:         var(--color-yellow-7);
   --yellow-active:        var(--color-yellow-5);
-
-  /* Categorical subtle — dark mode alpha + 亮度補償 */
-  --blue-subtle:          oklch(from var(--blue)    l c h / calc(0.12 / l));
-  --red-subtle:           oklch(from var(--red)     l c h / calc(0.12 / l));
-  --green-subtle:         oklch(from var(--green)   l c h / calc(0.12 / l));
-  --yellow-subtle:        oklch(from var(--yellow)  l c h / calc(0.12 / l));
-
-  /* Categorical hover/active — 方向反轉 */
   --turquoise-hover:      var(--color-turquoise-7);
   --turquoise-active:     var(--color-turquoise-5);
   --purple-hover:         var(--color-purple-7);
@@ -248,11 +320,11 @@
   --indigo-hover:         var(--color-indigo-7);
   --indigo-active:        var(--color-indigo-5);
 
-  /* Categorical subtle — 同公式 */
-  --turquoise-subtle:     oklch(from var(--turquoise) l c h / calc(0.12 / l));
-  --purple-subtle:        oklch(from var(--purple)    l c h / calc(0.12 / l));
-  --magenta-subtle:       oklch(from var(--magenta)   l c h / calc(0.12 / l));
-  --indigo-subtle:        oklch(from var(--indigo)    l c h / calc(0.12 / l));
+  /* Inverse — dark mode 反轉（深字 + 黑色透明 overlay）
+     overlay 值為 light mode neutral-* 的鏡射（black @ 2% / 4%） */
+  --inverse-fg:               oklch(0 0 0 / 0.85);
+  --inverse-neutral-hover:    var(--black-a02);
+  --inverse-neutral-active:   var(--black-a04);
 }
 
 
@@ -315,6 +387,17 @@
   --color-success-subtle:        var(--success-subtle);
   --color-warning-subtle:        var(--warning-subtle);
 
+  /* Text on subtle bg（step-7，不隨 dark mode 反轉） */
+  --color-info-text:             var(--info-text);
+  --color-error-text:            var(--error-text);
+  --color-success-text:          var(--success-text);
+  --color-warning-text:          var(--warning-text);
+
+  /* Inverse — solid neutral surface 上的內容 */
+  --color-inverse-fg:                var(--inverse-fg);
+  --color-inverse-neutral-hover:     var(--inverse-neutral-hover);
+  --color-inverse-neutral-active:    var(--inverse-neutral-active);
+
   /* Neutral Interaction */
   --color-neutral-hover:         var(--neutral-hover);
   --color-neutral-active:        var(--neutral-active);
@@ -335,16 +418,6 @@
   --color-border-hover:          var(--border-hover);
   --color-input:                 var(--input);
   --color-ring:                  var(--ring);
-
-  /* Categorical */
-  --color-turquoise:             var(--turquoise);
-  --color-turquoise-subtle:      var(--turquoise-subtle);
-  --color-purple:                var(--purple);
-  --color-purple-subtle:         var(--purple-subtle);
-  --color-magenta:               var(--magenta);
-  --color-magenta-subtle:        var(--magenta-subtle);
-  --color-indigo:                var(--indigo);
-  --color-indigo-subtle:         var(--indigo-subtle);
 
   /* Branding */
   --color-brand:                 var(--brand);

@@ -139,6 +139,8 @@ SelectField 支援兩種顯示模式（`display` prop）：
 
 `tag` 模式的 edit 用 hidden select overlay（跟 MultiSelectField 同模式），Tag 用 `pointer-events-none`，點擊穿透到 select。右側元素 `paddingRight: 12px`。
 
+tagPadding 只在有 Tag 時才套用。Placeholder/空值狀態使用 fieldWrapper 的標準 px-3 padding，確保文字與邊框有足夠間距。
+
 ---
 
 ## endAction（Inline Action）

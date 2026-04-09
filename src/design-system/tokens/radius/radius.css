@@ -1,0 +1,17 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Radius Tokens
+   ═══════════════════════════════════════════════════════════════════════
+
+   見 radius.spec.md 的使用原則。
+
+   sm / md：4px（小元件、Tag、Badge、Button、Field、checkbox 等）
+   lg     ：8px（卡片、彈窗、容器層）
+   full   ：9999px（pill / circular，Avatar、Switch track 等）
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@theme inline {
+  --radius-sm:   4px;
+  --radius-md:   4px;
+  --radius-lg:   8px;
+  --radius-full: 9999px;
+}

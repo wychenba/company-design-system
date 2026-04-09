@@ -258,7 +258,7 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">readonly / disabled</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
-                style={{ borderColor: 'var(--turquoise)', backgroundColor: 'var(--turquoise-subtle)', color: 'var(--turquoise)' }}>Tag</span>
+                style={{ borderColor: 'var(--color-turquoise-6)', backgroundColor: 'var(--color-turquoise-1)', color: 'var(--color-turquoise-6)' }}>Tag</span>
             </div>
             <span className="text-[10px] text-fg-muted font-mono">無 chevron · 無 select overlay · tagPadding 置中</span>
           </div>

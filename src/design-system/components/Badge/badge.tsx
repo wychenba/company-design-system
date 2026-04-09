@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 // 四個層級（視覺強度由高到低）：
 //   critical — 紅底白字（bg-notification）
 //   high     — 藍底白字（bg-info）
-//   medium   — 淺藍底藍字（bg-info-subtle + text-info）
+//   medium   — 淺藍底藍字（bg-info-subtle + text-info-text）
 //   low      — 灰底灰字（neutral-3 + neutral-7）
 
 const badgeVariants = cva(
@@ -22,7 +22,7 @@ const badgeVariants = cva(
       variant: {
         critical: 'bg-notification text-white',
         high: 'bg-info text-white',
-        medium: 'bg-info-subtle text-info',
+        medium: 'bg-info-subtle text-info-text',
         low: 'bg-secondary text-fg-muted',
       },
       dot: {

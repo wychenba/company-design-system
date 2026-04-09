@@ -22,30 +22,30 @@ const PRESET_SIZES = [20, 24, 32, 40] as const
 
 type VariantKey = 'subtle' | 'solid'
 
-// 與 Tag 元件完全對齊：使用 categorical token（--blue 等），不用 semantic（--primary 等）
-// subtle = step-7 前景，solid = step-6 背景 + 白字（yellow 例外）
+// 與 Tag 元件完全對齊：使用 primitive token（--color-blue-1 等），不用 semantic（--primary 等）
+// subtle = primitive step-1 背景 + step-7 前景，solid = step-6 背景 + 白字（yellow 例外）
 const COLOR_TOKENS: Record<VariantKey, Record<ColorKey, { bg: string; text: string }>> = {
   subtle: {
-    neutral:   { bg: '--muted',              text: '--foreground' },
-    blue:      { bg: '--blue-subtle',        text: '--color-blue-7' },
-    red:       { bg: '--red-subtle',         text: '--color-deep-orange-7' },
-    green:     { bg: '--green-subtle',       text: '--color-green-7' },
-    yellow:    { bg: '--yellow-subtle',      text: '--color-yellow-7' },
-    turquoise: { bg: '--turquoise-subtle',   text: '--color-turquoise-7' },
-    purple:    { bg: '--purple-subtle',      text: '--color-purple-7' },
-    magenta:   { bg: '--magenta-subtle',     text: '--color-magenta-7' },
-    indigo:    { bg: '--indigo-subtle',      text: '--color-indigo-7' },
+    neutral:   { bg: '--muted',               text: '--foreground' },
+    blue:      { bg: '--color-blue-1',        text: '--color-blue-7' },
+    red:       { bg: '--color-deep-orange-1', text: '--color-deep-orange-7' },
+    green:     { bg: '--color-green-1',       text: '--color-green-7' },
+    yellow:    { bg: '--color-yellow-1',      text: '--color-yellow-7' },
+    turquoise: { bg: '--color-turquoise-1',   text: '--color-turquoise-7' },
+    purple:    { bg: '--color-purple-1',      text: '--color-purple-7' },
+    magenta:   { bg: '--color-magenta-1',     text: '--color-magenta-7' },
+    indigo:    { bg: '--color-indigo-1',      text: '--color-indigo-7' },
   },
   solid: {
-    neutral:   { bg: '--fg-secondary',       text: 'white (#fff)' },
-    blue:      { bg: '--blue',               text: 'white (#fff)' },
-    red:       { bg: '--red',                text: 'white (#fff)' },
-    green:     { bg: '--green',              text: 'white (#fff)' },
-    yellow:    { bg: '--yellow',             text: '--warning-foreground' },
-    turquoise: { bg: '--turquoise',          text: 'white (#fff)' },
-    purple:    { bg: '--purple',             text: 'white (#fff)' },
-    magenta:   { bg: '--magenta',            text: 'white (#fff)' },
-    indigo:    { bg: '--indigo',             text: 'white (#fff)' },
+    neutral:   { bg: '--color-neutral-9',     text: '--inverse-fg' },
+    blue:      { bg: '--color-blue-6',        text: 'white (#fff)' },
+    red:       { bg: '--color-deep-orange-6', text: 'white (#fff)' },
+    green:     { bg: '--color-green-6',       text: 'white (#fff)' },
+    yellow:    { bg: '--color-yellow-6',      text: '--warning-foreground' },
+    turquoise: { bg: '--color-turquoise-6',   text: 'white (#fff)' },
+    purple:    { bg: '--color-purple-6',      text: 'white (#fff)' },
+    magenta:   { bg: '--color-magenta-6',     text: 'white (#fff)' },
+    indigo:    { bg: '--color-indigo-6',      text: 'white (#fff)' },
   },
 }
 
@@ -172,7 +172,7 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['size', 'number', '32', '尺寸（px），接受任意值'],
+                ['size', "number | 'fill'", '32', '尺寸（px）或 \'fill\'（填滿父容器，icon 60%、text 50cqi）'],
                 ['shape', "'circle' | 'square'", "'circle'", '圓形（人物）或方形（實體）'],
                 ['src', 'string', '—', '圖片 URL'],
                 ['alt', 'string', '—', '替代文字（圖片失敗時取首字作 fallback）'],
@@ -384,7 +384,7 @@ export const ColorMatrix = {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
         <H3>色彩對照表</H3>
-        <Desc>所有語義色的背景 + 前景 token 對照，含 subtle 與 solid 兩種模式。色塊即時渲染，切 dark mode 自動更新。Image 模式不使用背景色。</Desc>
+        <Desc>所有 primitive 色的背景 + 前景 token 對照，含 subtle 與 solid 兩種模式。色塊即時渲染，切 dark mode 自動更新。Image 模式不使用背景色。</Desc>
       </div>
 
       {/* Subtle */}

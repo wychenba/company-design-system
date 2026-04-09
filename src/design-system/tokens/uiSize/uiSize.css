@@ -40,3 +40,16 @@
   --table-row-md: 3rem;         /* 48px */
   --table-row-lg: 3.5rem;       /* 56px */
 }
+
+
+/* ── Tailwind Theme Bridge ──
+   橋接成 spacing utility，讓 h-field-md / h-table-row-lg 等 class 可用 */
+@theme inline {
+  --spacing-field-xs:    var(--field-height-xs);
+  --spacing-field-sm:    var(--field-height-sm);
+  --spacing-field-md:    var(--field-height-md);
+  --spacing-field-lg:    var(--field-height-lg);
+  --spacing-table-row-sm: var(--table-row-sm);
+  --spacing-table-row-md: var(--table-row-md);
+  --spacing-table-row-lg: var(--table-row-lg);
+}

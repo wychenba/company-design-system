@@ -190,6 +190,96 @@ element.style.backgroundColor = 'var(--primary)'
 | `rounded-full` | 9999px（--radius-full）|
 
 
+# Token 命名原則
+
+所有 design token（color、typography、spacing、radius、opacity 等）必須遵循一致命名邏輯——看到 token 名就能判斷它的層級、角色和關聯，不需要查文件。
+
+## 1. Primitive vs Semantic 區分
+
+| 層級 | 命名特徵 | 範例 |
+|------|---------|------|
+| **Primitive**（原始值，無語意） | `--color-*` 前綴 + 編號 / 類別 + 具體值 | `--color-blue-6`、`--color-neutral-9`、`--font-h1-size`、`--field-height-md` |
+| **Semantic**（賦予 purpose） | 無 `--color-` 前綴，直接表 purpose | `--primary`、`--foreground`、`--neutral-hover`、`--inverse-fg` |
+
+**判斷法**：看到 `--color-*` 或具體編號 → primitive；看到無前綴的 purpose 名 → semantic。
+
+## 2. Namespace + Role 結構
+
+Token 命名 = `--{namespace}-{role}-{variant?}`
+
+- **Namespace**：上下文（`primary`、`error`、`neutral`、`inverse`、`fg`、`bg`、`field`）
+- **Role**：角色（`fg`、`bg`、`hover`、`active`、`subtle`、`text`、`height`、`size`）
+- **Variant**：變體（`secondary`、`muted`、`disabled`、`xs`/`sm`/`md`/`lg`）
+
+範例：
+- `--neutral-hover` = neutral 上下文的 hover 狀態
+- `--inverse-fg` = inverse 上下文的 foreground 文字
+- `--primary-subtle` = primary 上下文的 subtle 變體
+- `--field-height-md` = field 上下文的 height、md 變體
+
+## 3. 對齊既有 family
+
+新增 token 必須鏡射既有 family 的命名模式，不孤立發明。
+
+| 既有 family | 新增應對齊 |
+|------|------|
+| `--foreground` / `--fg-secondary` / `--fg-muted` / `--fg-disabled` | 新文字 base 用 `--{ctx}-fg`、變體用 `--{ctx}-fg-secondary` 等 |
+| `--neutral-hover` / `--neutral-active` | 新互動覆蓋層用 `--{ctx}-neutral-hover`（明確指出鏡射 neutral 互動） |
+| `--{semantic}-hover` / `--{semantic}-active` | 新語義 hover 對齊（如 `--primary-hover`） |
+| `--field-height-{xs,sm,md,lg}` | 新 height token 對齊既有尺寸維度 |
+
+**判斷標準**：
+- `--inverse-fg` → 應該預期它對應 `--foreground`
+- `--inverse-neutral-hover` → 應該預期它鏡射 `--neutral-hover`
+- 如果新 token 找不到對應 family，先質疑這個 token 是否真的需要
+
+## 4. 不混語義名和色名
+
+分類元件（Tag、Avatar）和語義元件（Button、Checkbox）的 token 不能混用：
+
+- **分類**用 primitive 色名：`var(--color-deep-orange-1)`（Tag 的 red variant）
+- **語義**用 purpose 名：`var(--error-subtle)`（Button 的 destructive variant）
+
+雖然兩者底層可能指向相同 primitive，但消費端必須明確選擇是「色」還是「義」。改 `--error` 從 deep-orange 改成別的色，不應該影響 Tag 的 red variant——這是 Tag 直接用 primitive 而非 semantic 的根本原因。
+
+## 5. 禁止事項
+
+- ❌ **籠統命名**：`--inverse-hover`（不知道是 text/bg/border）→ 用 `--inverse-neutral-hover` 明確指出鏡射對象
+- ❌ **孤立命名**：`--strong-text` 沒對齊任何既有 family → 先找對齊對象
+- ❌ **自創縮寫**：`--fg`、`--bg` 作為 base token（已用 `--foreground`、`--background`）
+- ❌ **Primitive 帶語意**：`--color-primary-6`（primitive 不該有 purpose）
+- ❌ **Semantic 帶色相**：`--primary-blue`（semantic 不該暗示色相）
+- ❌ **Categorical 中間層**：`--blue` / `--blue-hover` 等（已廢除——Tag 直接用 primitive，Button 用 semantic）
+
+## 6. 新增語意色相必須依照 SOP
+
+新增 semantic 色相（如 `--accent`、`--brand-secondary` 等）**必須遵循** `src/design-system/tokens/color/color.spec.md` 的「新增語意色相的標準流程」，完整執行 4 步：
+
+1. Primitive base-6（如不存在）
+2. Semantic 五件套：`base` / `hover` / `active` / `subtle` / `text`（**不可缺任何一個**）
+3. Dark mode `hover` / `active` 方向反轉
+4. Tailwind bridge 五件套
+
+對應規則固定不可改：base=-6、hover=-5、active=-7、subtle=-1、text=-7。
+所有現有 semantic 色相（`--primary` / `--info` / `--error` / `--success` / `--warning`）都遵守這個結構，新色相必須一致。
+
+## 7. 色彩架構流派立場
+
+本系統採 **Atlassian-style Semantic State Token** 流派（業界四大流派之一），意思是：
+
+- **靜態色**（不需要 mode 翻轉知識）→ 用 primitive `--color-{hue}-N`
+- **互動狀態**（需要 dark mode swap）→ 用 semantic state token `--{hue}-hover` / `--{hue}-active` / `--primary-hover` 等
+
+**Tag/Avatar 同時用 primitive（靜態）和 semantic（互動）是有意的職責分離，不是 code smell**。兩個概念（raw color value vs interaction state with mode awareness）本來就該住不同層。
+
+我們**有意拒絕**其他三個流派：
+- **Radix Numbered Role Scale**（step number = role）——工程量極大，需重構整套 12-step scale
+- **Material 3 State Layer Overlay**（互動用透明 overlay）——跟我們 Button 用 solid shade change 的視覺語言不一致
+- **Tailwind Consumer-side Mode Handling**（consumer 寫 `dark:hover:`）——放棄 token 層級的抽象化價值
+
+**重要**：未來討論色彩架構或新增色彩 token 時，**先讀 `color.spec.md` 的「架構流派定位」段落**確認方向，避免無意間漂移到別的流派造成設計斷裂。
+
+
 # 元件 Props 命名原則
 
 **按「是什麼」命名，不按「在哪裡」命名。** 參考 Material（Chip: avatar / icon / deleteIcon）、Ant Design（Tag: icon / closeIcon）等世界級設計系統。

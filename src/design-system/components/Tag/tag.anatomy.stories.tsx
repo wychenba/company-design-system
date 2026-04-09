@@ -23,26 +23,26 @@ const SIZES: SizeKey[] = ['sm', 'md', 'lg']
 
 const TOKEN_MAP: Record<SolidSpec, Record<VariantKey, ColorSpec>> = {
   subtle: {
-    neutral:   { bg: '--muted',            text: '--foreground',           border: 'transparent' },
-    blue:      { bg: '--blue-subtle',      text: '--color-blue-7',        border: 'transparent' },
-    red:       { bg: '--red-subtle',       text: '--color-deep-orange-7', border: 'transparent' },
-    green:     { bg: '--green-subtle',     text: '--color-green-7',       border: 'transparent' },
-    yellow:    { bg: '--yellow-subtle',    text: '--color-yellow-7',      border: 'transparent' },
-    turquoise: { bg: '--turquoise-subtle', text: '--color-turquoise-7',   border: 'transparent' },
-    purple:    { bg: '--purple-subtle',    text: '--color-purple-7',      border: 'transparent' },
-    magenta:   { bg: '--magenta-subtle',   text: '--color-magenta-7',     border: 'transparent' },
-    indigo:    { bg: '--indigo-subtle',    text: '--color-indigo-7',      border: 'transparent' },
+    neutral:   { bg: '--muted',               text: '--foreground',            border: 'transparent' },
+    blue:      { bg: '--color-blue-1',        text: '--color-blue-7',         border: 'transparent' },
+    red:       { bg: '--color-deep-orange-1', text: '--color-deep-orange-7',  border: 'transparent' },
+    green:     { bg: '--color-green-1',       text: '--color-green-7',        border: 'transparent' },
+    yellow:    { bg: '--color-yellow-1',      text: '--color-yellow-7',       border: 'transparent' },
+    turquoise: { bg: '--color-turquoise-1',   text: '--color-turquoise-7',    border: 'transparent' },
+    purple:    { bg: '--color-purple-1',      text: '--color-purple-7',       border: 'transparent' },
+    magenta:   { bg: '--color-magenta-1',     text: '--color-magenta-7',      border: 'transparent' },
+    indigo:    { bg: '--color-indigo-1',      text: '--color-indigo-7',       border: 'transparent' },
   },
   solid: {
-    neutral:   { bg: '--fg-secondary',     text: 'white (#fff)',           border: 'transparent' },
-    blue:      { bg: '--blue',             text: 'white (#fff)',           border: 'transparent' },
-    red:       { bg: '--red',              text: 'white (#fff)',           border: 'transparent' },
-    green:     { bg: '--green',            text: 'white (#fff)',           border: 'transparent' },
-    yellow:    { bg: '--yellow',           text: '--warning-foreground',   border: 'transparent' },
-    turquoise: { bg: '--turquoise',        text: 'white (#fff)',           border: 'transparent' },
-    purple:    { bg: '--purple',           text: 'white (#fff)',           border: 'transparent' },
-    magenta:   { bg: '--magenta',          text: 'white (#fff)',           border: 'transparent' },
-    indigo:    { bg: '--indigo',           text: 'white (#fff)',           border: 'transparent' },
+    neutral:   { bg: '--color-neutral-9',     text: '--inverse-fg',            border: 'transparent' },
+    blue:      { bg: '--color-blue-6',        text: 'white (#fff)',           border: 'transparent' },
+    red:       { bg: '--color-deep-orange-6', text: 'white (#fff)',           border: 'transparent' },
+    green:     { bg: '--color-green-6',       text: 'white (#fff)',           border: 'transparent' },
+    yellow:    { bg: '--color-yellow-6',      text: '--warning-foreground',   border: 'transparent' },
+    turquoise: { bg: '--color-turquoise-6',   text: 'white (#fff)',           border: 'transparent' },
+    purple:    { bg: '--color-purple-6',      text: 'white (#fff)',           border: 'transparent' },
+    magenta:   { bg: '--color-magenta-6',     text: 'white (#fff)',           border: 'transparent' },
+    indigo:    { bg: '--color-indigo-6',      text: 'white (#fff)',           border: 'transparent' },
   },
 }
 
@@ -430,7 +430,7 @@ export const ColorMatrix = {
       <div className="flex flex-col gap-1">
         <H3>Variant 色彩對照</H3>
         <Desc>
-          Tag 無 hover/active 狀態（非互動元件），只有單一色彩組合。有色 variant 文字一律 step-7（優先辨識度），neutral 用 foreground。Solid 模式使用 step-6 背景 + 白字（yellow 例外用 --warning-foreground）。色塊即時渲染，切 dark mode 自動更新。
+          Tag 無 hover/active 狀態（非互動元件），只有單一色彩組合。有色 variant 文字一律使用 --color-&#123;hue&#125;-7 primitive token（step-7，不隨 dark mode 反轉），neutral 用 foreground。Solid 模式使用 step-6 背景 + 白字（yellow 例外用 --warning-foreground）。色塊即時渲染，切 dark mode 自動更新。
         </Desc>
       </div>
 
@@ -520,7 +520,7 @@ export const ColorMatrix = {
       {/* Dismiss action colors */}
       <div className="flex flex-col gap-3">
         <span className="text-caption font-semibold text-fg-secondary">Dismiss 按鈕色彩</span>
-        <Desc>Subtle 模式使用 neutral-hover/active。Solid 模式使用色相自身的 categorical hover/active token——深色底上 neutral-hover 幾乎不可見。</Desc>
+        <Desc>Subtle 模式使用 neutral-hover/active。Solid 模式使用色相自身的 primitive hover/active token——深色底上 neutral-hover 幾乎不可見。</Desc>
         <div className="overflow-x-auto">
           <table className="border-collapse text-caption">
             <thead><tr><Th>模式</Th><Th>狀態</Th><Th>Icon 色</Th><Th>Hover 背景</Th></tr></thead>
@@ -530,8 +530,8 @@ export const ColorMatrix = {
                 { mode: '', state: 'hover', iconColor: '繼承 Tag 文字色', hoverBg: '--neutral-hover' },
                 { mode: '', state: 'active', iconColor: '繼承 Tag 文字色', hoverBg: '--neutral-active' },
                 { mode: 'Solid', state: 'default', iconColor: '繼承 Tag 文字色', hoverBg: 'transparent' },
-                { mode: '', state: 'hover', iconColor: '繼承 Tag 文字色', hoverBg: '--{hue}-hover（如 --blue-hover）' },
-                { mode: '', state: 'active', iconColor: '繼承 Tag 文字色', hoverBg: '--{hue}-active（如 --blue-active）' },
+                { mode: '', state: 'hover', iconColor: '繼承 Tag 文字色', hoverBg: '--{hue}-hover（如 --blue-hover）· neutral: --inverse-neutral-hover' },
+                { mode: '', state: 'active', iconColor: '繼承 Tag 文字色', hoverBg: '--{hue}-active（如 --blue-active）· neutral: --inverse-neutral-active' },
               ].map(({ mode, state, iconColor, hoverBg }, i) => (
                 <tr key={i}>
                   {mode ? <td className="p-2 border-b border-divider align-top text-caption font-mono font-medium" rowSpan={3}>{mode}</td> : null}

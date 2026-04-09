@@ -4,47 +4,20 @@
 @import "./design-system/tokens/typography/typography.css";
 @import "./design-system/tokens/uiSize/uiSize.css";
 @import "./design-system/tokens/layoutSpace/layoutSpace.css";
+@import "./design-system/tokens/radius/radius.css";
+@import "./design-system/tokens/opacity/opacity.css";
 @import "./design-system/components/DataTable/data-table.css";
 
-/* ── Icon stroke width ── */
+/* ── Icon stroke width（全域 lucide 預設）── */
 .lucide { stroke-width: 1.75; }
 
-/* ── Tailwind Theme ── */
+/* ── 雜項 token（不屬於任何 token category）── */
 @theme inline {
-  /* White — 明確納入 token 系統，供 text-white / bg-white 使用 */
+  /* white — 明確納入 token 系統，供 text-white / bg-white 使用 */
   --color-white: oklch(1 0 0);
-
-  /* Radius — 對應 radius.spec.md 的命名 */
-  --radius-sm:   4px;
-  --radius-md:   4px;
-  --radius-lg:   8px;
-  --radius-full: 9999px;
-
-  /* Opacity */
-  --opacity-disabled: 0.45;
-
-  /* Component Size — field height + table row */
-  --spacing-field-xs: var(--field-height-xs);
-  --spacing-field-sm: var(--field-height-sm);
-  --spacing-field-md: var(--field-height-md);
-  --spacing-field-lg: var(--field-height-lg);
-  --spacing-table-row-sm: var(--table-row-sm);
-  --spacing-table-row-md: var(--table-row-md);
-  --spacing-table-row-lg: var(--table-row-lg);
-
-  /* Font */
-  --font-sans: Roboto, -apple-system, BlinkMacSystemFont,
-               "Segoe UI Variable", "Segoe UI", system-ui,
-               "PingFang TC", "Microsoft JhengHei UI", "Microsoft JhengHei",
-               sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
-/* ── Custom Utilities ── */
-@utility opacity-disabled {
-  opacity: var(--opacity-disabled);
-}
-
-/* ── Base ── */
+/* ── Base reset ── */
 @layer base {
   *, ::before, ::after {
     box-sizing: border-box;
