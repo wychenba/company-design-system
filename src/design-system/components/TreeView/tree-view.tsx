@@ -99,7 +99,8 @@ interface TreeViewContextValue {
   toggleExpand: (id: string) => void
   select: (id: string) => void
   setFocusedId: (id: string | null) => void
-  registerNode: (id: string, parentId: string | null, hasChildren: boolean) => void
+  registerNode: (id: string, parentId: string | null, hasChildren: boolean, label?: React.ReactNode, icon?: LucideIcon) => void
+  getNodeInfo: (id: string) => NodeInfo | undefined
   unregisterNode: (id: string) => void
 }
 
@@ -122,14 +123,17 @@ interface NodeInfo {
   id: string
   parentId: string | null
   hasChildren: boolean
+  /** 用於 DragOverlay ghost 渲染 */
+  label?: React.ReactNode
+  icon?: LucideIcon
 }
 
 function useNodeRegistry() {
   const nodesRef = React.useRef(new Map<string, NodeInfo>())
 
   const registerNode = React.useCallback(
-    (id: string, parentId: string | null, hasChildren: boolean) => {
-      nodesRef.current.set(id, { id, parentId, hasChildren })
+    (id: string, parentId: string | null, hasChildren: boolean, label?: React.ReactNode, icon?: LucideIcon) => {
+      nodesRef.current.set(id, { id, parentId, hasChildren, label, icon })
     },
     []
   )
@@ -138,7 +142,9 @@ function useNodeRegistry() {
     nodesRef.current.delete(id)
   }, [])
 
-  return { nodesRef, registerNode, unregisterNode }
+  const getNodeInfo = React.useCallback((id: string) => nodesRef.current.get(id), [])
+
+  return { nodesRef, registerNode, unregisterNode, getNodeInfo }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -305,7 +311,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
     }, [])
 
     // ── Node registry ──
-    const { registerNode, unregisterNode } = useNodeRegistry()
+    const { registerNode, unregisterNode, getNodeInfo } = useNodeRegistry()
 
     // ── Actions ──
     const toggleExpand = React.useCallback(
@@ -356,6 +362,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
         setFocusedId,
         registerNode,
         unregisterNode,
+        getNodeInfo,
       }),
       [
         size,
@@ -374,6 +381,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
         setFocusedId,
         registerNode,
         unregisterNode,
+        getNodeInfo,
       ]
     )
 
@@ -507,11 +515,19 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
           {treeEl}
           {draggable && (
             <DragOverlay dropAnimation={null}>
-              {draggingId ? (
-                <div className="opacity-80 shadow-lg rounded-md bg-surface px-3 py-1 text-body leading-compact pointer-events-none">
-                  <span className="text-foreground">Dragging...</span>
-                </div>
-              ) : null}
+              {draggingId ? (() => {
+                const info = getNodeInfo(draggingId)
+                const IconComp = info?.icon
+                return (
+                  <div className={cn(
+                    'flex items-center gap-2 rounded-md bg-surface px-3 py-1.5 shadow-lg pointer-events-none opacity-80',
+                    size === 'lg' ? 'text-body-lg leading-compact' : 'text-body leading-compact',
+                  )}>
+                    {IconComp && <IconComp size={ICON_PX[size]} className="shrink-0" aria-hidden />}
+                    <span className="text-foreground truncate">{info?.label ?? draggingId}</span>
+                  </div>
+                )
+              })() : null}
             </DragOverlay>
           )}
         </DndContext>
@@ -634,9 +650,9 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
 
     // ── Register / unregister ──
     React.useEffect(() => {
-      registerNode(id, parentId, hasChildren)
+      registerNode(id, parentId, hasChildren, label, Icon)
       return () => unregisterNode(id)
-    }, [id, parentId, hasChildren, registerNode, unregisterNode])
+    }, [id, parentId, hasChildren, label, Icon, registerNode, unregisterNode])
 
     // ── Focus scroll into view ──
     const itemRef = React.useRef<HTMLDivElement>(null)

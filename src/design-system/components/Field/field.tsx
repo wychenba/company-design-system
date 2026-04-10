@@ -49,7 +49,7 @@ import { cn } from '@/lib/utils'
 // field.tsx 只 import 不 re-export——consumer 直接從 field-context.ts import useFieldContext。
 
 import type { FieldMode, FieldOrientation, FieldSize, FieldControlLayout, FieldContextValue } from './field-context'
-import { FieldContext } from './field-context'
+import { FieldContext, useFieldContext } from './field-context'
 
 // ── Internal helpers ────────────────────────────────────────────────────────
 

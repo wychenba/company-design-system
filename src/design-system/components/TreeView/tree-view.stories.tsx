@@ -228,7 +228,8 @@ export const DragAndDrop: Story = {
       <div className="flex gap-6 items-start">
         <div className="flex flex-col gap-2">
           <p className="text-caption text-fg-muted max-w-xs">
-            hover 出現 grip handle,拖曳到其他 node 上方 / 下方 / 中間。
+            Figma 風格:整列可拖曳(click = select,拖動 5px 後 = drag)。
+            拖到其他 node 上方(before) / 下方(after) / 中間(inside)。
             Consumer 透過 onDragEnd 接收 reorder 事件(右側 log)。
           </p>
           <div className="w-[280px] border border-divider rounded-lg bg-surface overflow-hidden">
