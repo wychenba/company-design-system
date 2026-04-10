@@ -271,11 +271,18 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
       setDraggingId(String(event.active.id))
     }, [])
 
-    // ── Figma-style drop detection ──
-    // 用實際指標座標(起點 + delta)算相對於 target 的 Y offset
-    // Folder: 上 25% = before, 中 50% = inside, 下 25% = after
-    // Leaf: 上 50% = before, 下 50% = after(不能 inside)
-    // "inside" = append 到 folder children 最後
+    // ── Figma-style drop detection(X + Y 雙軸）──
+    //
+    // Y 軸:決定在哪個 item 附近
+    //   - item 上 25% = before
+    //   - item 中 50% = inside(只有 folder)
+    //   - item 下 25% = after
+    //
+    // X 軸:決定 nesting 深度(Figma 核心邏輯)
+    //   - 滑鼠越左 = 越淺層(放在 parent 層級)
+    //   - 滑鼠越右 = 越深層(放進 folder)
+    //   - 用 pointer X 相對於 tree 左邊界計算 indent level
+    //
     const handleDragOver = React.useCallback((event: DragOverEvent) => {
       const { over, active } = event
       if (!over || over.id === active.id) {
@@ -283,14 +290,14 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
         return
       }
 
-      // 用 ROW 元素(data-tree-row)的 rect,不是 treeitem wrapper 的
-      // treeitem wrapper 展開時包含所有 children,高度很大,ratio 算出來會指到子項區域
       const rowEl = document.querySelector(`[data-tree-row="${over.id}"]`) as HTMLElement | null
       const targetEl = document.querySelector(`[data-tree-id="${over.id}"]`) as HTMLElement | null
       if (!rowEl || !targetEl) { setDropTarget(null); return }
 
-      // 實際指標 Y = 拖曳起點 Y + delta Y
+      // 實際指標位置
+      const startX = (event.activatorEvent as PointerEvent)?.clientX ?? 0
       const startY = (event.activatorEvent as PointerEvent)?.clientY ?? 0
+      const currentX = startX + (event.delta?.x ?? 0)
       const currentY = startY + (event.delta?.y ?? 0)
 
       const rect = rowEl.getBoundingClientRect()
@@ -299,42 +306,52 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
       const ratio = Math.max(0, Math.min(1, offsetY / height))
 
       const hasChildren = targetEl.dataset.treeHasChildren === 'true'
-      const depth = Number(targetEl.getAttribute('aria-level') ?? 1) - 1
+      const targetDepth = Number(targetEl.getAttribute('aria-level') ?? 1) - 1
+
+      // ── X 軸:計算指標在哪個 indent level ──
+      const treeEl = treeRef.current
+      const treeLeft = treeEl?.getBoundingClientRect().left ?? 0
+      const indentStep = INDENT_STEP[size]
+      const pointerIndentLevel = Math.max(0, Math.floor((currentX - treeLeft) / indentStep))
 
       let position: DropPosition
-      if (hasChildren) {
-        // Folder: 大中間區 = inside
-        if (ratio < 0.25) position = 'before'
-        else if (ratio > 0.75) position = 'after'
-        else position = 'inside'
-      } else {
-        // Leaf: 上半 = before, 下半 = after
-        position = ratio < 0.5 ? 'before' : 'after'
-      }
+      let finalDepth = targetDepth
 
-      // ── 關鍵:「after 最後一個子項」自動轉成「inside 父資料夾」──
-      // 展開的資料夾裡,使用者永遠先碰到子項目而非資料夾本身。
-      // 如果 position=after 且 target 是某個 group 的最後一個 child,
-      // 轉成 inside 父 folder——這樣資料夾會高亮,視覺一致。
-      if (position === 'after' && !hasChildren) {
-        const groupEl = targetEl.closest('[role="group"]')
-        if (groupEl) {
-          const siblings = Array.from(groupEl.querySelectorAll(':scope > [role="treeitem"]'))
-          const lastSibling = siblings[siblings.length - 1]
-          const isLast = lastSibling?.querySelector(`[data-tree-id="${over.id}"]`) || lastSibling?.getAttribute('data-tree-id') === String(over.id)
-          if (isLast) {
-            const parentTreeItem = groupEl.parentElement?.closest('[role="treeitem"]')
+      if (hasChildren) {
+        // Folder node
+        if (ratio < 0.25) {
+          position = 'before'
+        } else if (ratio > 0.75) {
+          // after folder: 如果指標在 folder 層級或更淺 = after(同層)
+          // 如果指標更深 = inside(放進 folder)
+          position = pointerIndentLevel > targetDepth ? 'inside' : 'after'
+        } else {
+          position = 'inside'
+        }
+      } else {
+        // Leaf node
+        if (ratio < 0.5) {
+          position = 'before'
+        } else {
+          position = 'after'
+          // X 軸:如果指標在比 target 更淺的層級,提升 drop depth
+          // 例:Contact(depth 1)的 after,如果滑鼠在 depth 0 → 變成「after Pages」
+          if (pointerIndentLevel < targetDepth) {
+            // 找 parent 來放
+            const groupEl = targetEl.closest('[role="group"]')
+            const parentTreeItem = groupEl?.parentElement?.closest('[role="treeitem"]')
             const parentId = parentTreeItem?.getAttribute('data-tree-id')
             if (parentId && parentId !== String(active.id)) {
               const parentDepth = Number(parentTreeItem?.getAttribute('aria-level') ?? 1) - 1
-              setDropTarget({ id: parentId, position: 'inside', depth: parentDepth })
+              finalDepth = parentDepth
+              setDropTarget({ id: parentId, position: 'after', depth: parentDepth })
               return
             }
           }
         }
       }
 
-      setDropTarget({ id: String(over.id), position, depth })
+      setDropTarget({ id: String(over.id), position, depth: finalDepth })
     }, [])
 
     const dropTargetRef = React.useRef(dropTarget)

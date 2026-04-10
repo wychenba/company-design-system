@@ -60,20 +60,21 @@ export const Modes: Story = {
 export const DisplayMode: Story = {
   name: '顯示模式',
   render: () => {
-    const [value, setValue] = React.useState('in_stock')
+    const [textVal, setTextVal] = React.useState('in_stock')
+    const [tagVal, setTagVal] = React.useState('in_stock')
     return (
       <div className="flex flex-col gap-6 max-w-xs">
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">text（預設）</h3>
           <p className="text-caption text-fg-muted mb-2">純文字，readonly/disabled 跟 Input 一致</p>
-          <Select options={statusOptions} value={value} onChange={setValue} />
-          <div className="mt-2"><Select mode="readonly" options={statusOptions} value={value} /></div>
+          <Select options={statusOptions} value={textVal} onChange={setTextVal} />
+          <div className="mt-2"><Select mode="readonly" options={statusOptions} value={textVal} /></div>
         </div>
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">tag</h3>
-          <p className="text-caption text-fg-muted mb-2">Tag 標籤，readonly/disabled 用 tagPadding</p>
-          <Select display="tag" options={statusOptions} value={value} onChange={setValue} />
-          <div className="mt-2"><Select display="tag" mode="readonly" options={statusOptions} value={value} /></div>
+          <p className="text-caption text-fg-muted mb-2">Tag 標籤 + 顏色(tagVariant),readonly/disabled 用 tagPadding</p>
+          <Select display="tag" options={statusOptions} value={tagVal} onChange={setTagVal} />
+          <div className="mt-2"><Select display="tag" mode="readonly" options={statusOptions} value={tagVal} /></div>
         </div>
       </div>
     )

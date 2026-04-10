@@ -1,5 +1,7 @@
+import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { PeoplePicker } from '@/design-system/components/PeoplePicker/people-picker'
+import type { PersonValue } from './person-display'
 import { PersonDisplay, MultiPersonDisplay } from './person-display'
 import { Button } from '@/design-system/components/Button/button'
 
@@ -26,54 +28,52 @@ const samplePeople = [
   { name: 'Fiona Lee', avatarUrl: 'https://i.pravatar.cc/48?u=fiona' },
 ]
 
-/* ── 單人 ── */
-export const Single: Story = {
-  name: '單人',
-  render: () => (
+/* ── 單人（互動） ── */
+const SinglePicker = () => {
+  const [val, setVal] = React.useState<PersonValue | null>(samplePeople[0])
+  return (
     <div className="flex flex-col gap-6 max-w-xs">
       <div>
-        <h3 className="text-body font-bold text-foreground mb-2">edit（有值）</h3>
-        <PeoplePicker value={samplePeople[0]} people={samplePeople} />
-      </div>
-      <div>
-        <h3 className="text-body font-bold text-foreground mb-2">edit（無 avatar）</h3>
-        <PeoplePicker value="Bob Lin" people={samplePeople} />
-      </div>
-      <div>
-        <h3 className="text-body font-bold text-foreground mb-2">edit（空）</h3>
-        <PeoplePicker value={null} people={samplePeople} />
+        <h3 className="text-body font-bold text-foreground mb-2">edit（可互動）</h3>
+        <PeoplePicker value={val} people={samplePeople} onChange={(v) => setVal(v[0] ?? null)} />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
-        <PeoplePicker mode="readonly" value={samplePeople[0]} />
+        <PeoplePicker mode="readonly" value={val} />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">disabled</h3>
-        <PeoplePicker mode="disabled" value={samplePeople[0]} />
+        <PeoplePicker mode="disabled" value={val} />
       </div>
     </div>
-  ),
+  )
 }
 
-/* ── 多人 ── */
-export const Multi: Story = {
-  name: '多人',
-  render: () => (
+export const Single: Story = {
+  name: '單人',
+  render: () => <SinglePicker />,
+}
+
+/* ── 多人（互動） ── */
+const MultiPicker = () => {
+  const [val, setVal] = React.useState<PersonValue[]>(samplePeople.slice(0, 3))
+  return (
     <div className="flex flex-col gap-6 max-w-xs">
       <div>
-        <h3 className="text-body font-bold text-foreground mb-2">edit（3 人）</h3>
-        <PeoplePicker value={samplePeople.slice(0, 3)} people={samplePeople} />
-      </div>
-      <div>
-        <h3 className="text-body font-bold text-foreground mb-2">edit（6 人，溢出 +3）</h3>
-        <PeoplePicker value={samplePeople} people={samplePeople} />
+        <h3 className="text-body font-bold text-foreground mb-2">edit（可互動,多選）</h3>
+        <PeoplePicker value={val} people={samplePeople} onChange={setVal} />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
-        <PeoplePicker mode="readonly" value={samplePeople} />
+        <PeoplePicker mode="readonly" value={val} />
       </div>
     </div>
-  ),
+  )
+}
+
+export const Multi: Story = {
+  name: '多人',
+  render: () => <MultiPicker />,
 }
 
 /* ── 尺寸與 Button 對齊 ── */

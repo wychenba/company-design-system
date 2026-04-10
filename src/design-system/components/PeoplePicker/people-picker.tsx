@@ -60,8 +60,6 @@ function PeoplePicker({
   const isMulti = Array.isArray(value)
   const isEmpty = !value || (isMulti && value.length === 0)
 
-  const [open, setOpen] = React.useState(false)
-
   // ── Readonly / disabled ──
   if (!isEditable) {
     return (
@@ -109,26 +107,19 @@ function PeoplePicker({
   )
 
   // ── Edit mode trigger ──
+  // 不自己管 open state——讓 SelectMenu 內部的 Popover 管理
+  // (controlled open 容易跟 Radix Popover 衝突)
   const trigger = (
     <div
       role="combobox"
-      aria-expanded={open}
       aria-haspopup="listbox"
       tabIndex={0}
       className={cn(
         fieldWrapperStyles({ mode: 'edit', size }),
-        open && 'border-primary',
         'cursor-pointer',
         className,
       )}
       data-field-mode="edit"
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          setOpen(true)
-        }
-        if (e.key === 'Escape') setOpen(false)
-      }}
     >
       <span className="flex-1 min-w-0 inline-flex items-center">
         {isEmpty
@@ -140,7 +131,7 @@ function PeoplePicker({
       </span>
       <ChevronDown
         size={iconSize}
-        className={cn('shrink-0 text-fg-muted transition-transform', open && 'rotate-180')}
+        className="shrink-0 text-fg-muted"
         aria-hidden
       />
     </div>
@@ -156,8 +147,6 @@ function PeoplePicker({
       searchPlaceholder={searchPlaceholder}
       emptyText={emptyText}
       size={size}
-      open={open}
-      onOpenChange={setOpen}
     >
       {trigger}
     </SelectMenu>
