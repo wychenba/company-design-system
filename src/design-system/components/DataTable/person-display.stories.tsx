@@ -33,15 +33,15 @@ export const Single: Story = {
     <div className="flex flex-col gap-6 max-w-xs">
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">edit（有值）</h3>
-        <PeoplePicker value={samplePeople[0]} />
+        <PeoplePicker value={samplePeople[0]} people={samplePeople} />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">edit（無 avatar）</h3>
-        <PeoplePicker value="Bob Lin" />
+        <PeoplePicker value="Bob Lin" people={samplePeople} />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">edit（空）</h3>
-        <PeoplePicker value={null} />
+        <PeoplePicker value={null} people={samplePeople} />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
@@ -62,11 +62,11 @@ export const Multi: Story = {
     <div className="flex flex-col gap-6 max-w-xs">
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">edit（3 人）</h3>
-        <PeoplePicker value={samplePeople.slice(0, 3)} />
+        <PeoplePicker value={samplePeople.slice(0, 3)} people={samplePeople} />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">edit（6 人，溢出 +3）</h3>
-        <PeoplePicker value={samplePeople} />
+        <PeoplePicker value={samplePeople} people={samplePeople} />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>

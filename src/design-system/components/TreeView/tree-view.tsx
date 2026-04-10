@@ -303,13 +303,35 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
 
       let position: DropPosition
       if (hasChildren) {
-        // Folder: 大中間區 = inside(容易命中)
+        // Folder: 大中間區 = inside
         if (ratio < 0.25) position = 'before'
         else if (ratio > 0.75) position = 'after'
         else position = 'inside'
       } else {
         // Leaf: 上半 = before, 下半 = after
         position = ratio < 0.5 ? 'before' : 'after'
+      }
+
+      // ── 關鍵:「after 最後一個子項」自動轉成「inside 父資料夾」──
+      // 展開的資料夾裡,使用者永遠先碰到子項目而非資料夾本身。
+      // 如果 position=after 且 target 是某個 group 的最後一個 child,
+      // 轉成 inside 父 folder——這樣資料夾會高亮,視覺一致。
+      if (position === 'after' && !hasChildren) {
+        const groupEl = targetEl.closest('[role="group"]')
+        if (groupEl) {
+          const siblings = Array.from(groupEl.querySelectorAll(':scope > [role="treeitem"]'))
+          const lastSibling = siblings[siblings.length - 1]
+          const isLast = lastSibling?.querySelector(`[data-tree-id="${over.id}"]`) || lastSibling?.getAttribute('data-tree-id') === String(over.id)
+          if (isLast) {
+            const parentTreeItem = groupEl.parentElement?.closest('[role="treeitem"]')
+            const parentId = parentTreeItem?.getAttribute('data-tree-id')
+            if (parentId && parentId !== String(active.id)) {
+              const parentDepth = Number(parentTreeItem?.getAttribute('aria-level') ?? 1) - 1
+              setDropTarget({ id: parentId, position: 'inside', depth: parentDepth })
+              return
+            }
+          }
+        }
       }
 
       setDropTarget({ id: String(over.id), position, depth })
