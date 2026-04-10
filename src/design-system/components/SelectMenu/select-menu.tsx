@@ -230,7 +230,8 @@ export function SelectMenu({
             </div>
           )}
           <CommandList>
-            <CommandEmpty className="py-4 text-center text-caption text-fg-muted">
+            {/* 空狀態:高度 = 一個 item 的 field-height,字體跟 item 一致(text-body) */}
+            <CommandEmpty className="flex items-center justify-center h-field-md text-body text-fg-muted">
               {emptyText}
             </CommandEmpty>
 
@@ -290,8 +291,8 @@ export function SelectMenu({
             )}
           </CommandList>
 
-          {/* Multi-select footer: Select All */}
-          {multiple && (
+          {/* Multi-select footer: Select All — 只在有可見選項時顯示(空狀態不該有「全部」) */}
+          {multiple && selectableOptions.length > 0 && (
             <SelectMenuFooter>
               <SelectMenuItem
                 size={size}

@@ -283,14 +283,17 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
         return
       }
 
+      // 用 ROW 元素(data-tree-row)的 rect,不是 treeitem wrapper 的
+      // treeitem wrapper 展開時包含所有 children,高度很大,ratio 算出來會指到子項區域
+      const rowEl = document.querySelector(`[data-tree-row="${over.id}"]`) as HTMLElement | null
       const targetEl = document.querySelector(`[data-tree-id="${over.id}"]`) as HTMLElement | null
-      if (!targetEl) { setDropTarget(null); return }
+      if (!rowEl || !targetEl) { setDropTarget(null); return }
 
       // 實際指標 Y = 拖曳起點 Y + delta Y
       const startY = (event.activatorEvent as PointerEvent)?.clientY ?? 0
       const currentY = startY + (event.delta?.y ?? 0)
 
-      const rect = targetEl.getBoundingClientRect()
+      const rect = rowEl.getBoundingClientRect()
       const offsetY = currentY - rect.top
       const height = rect.height || 32
       const ratio = Math.max(0, Math.min(1, offsetY / height))
@@ -743,11 +746,9 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
       <ParentIdContext.Provider value={id}>
         <div
           ref={(node) => {
-            // 合併 3 個 ref:itemRef(scroll into view)、drag ref、drop ref
             (itemRef as React.MutableRefObject<HTMLDivElement | null>).current = node
             if (typeof ref === 'function') ref(node)
             else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node
-            setDropRef(node)
           }}
           role="treeitem"
           aria-expanded={hasChildren ? isExpanded : undefined}
@@ -768,8 +769,10 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             />
           )}
 
-          {/* Row: drag handle + indent + chevron + checkbox + icon + label + hover actions */}
+          {/* Row: droppable 在 ROW 上(不是 treeitem wrapper),確保碰撞偵測只看這一行的高度 */}
           <div
+            ref={setDropRef}
+            data-tree-row={id}
             className={cn(
               'group/tree-item',
               treeItemVariants({ size }),

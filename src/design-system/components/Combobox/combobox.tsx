@@ -314,7 +314,7 @@ function CustomCombobox({
                 )}
                 trailing={searchable && searchIn === 'trigger' ? (
                   <input value={search} onChange={(e) => setSearch(e.target.value)}
-                    placeholder="搜尋…" onClick={(e) => { e.stopPropagation(); setOpen(true) }}
+                    placeholder={items.length === 0 ? '搜尋…' : ''} onClick={(e) => { e.stopPropagation(); setOpen(true) }}
                     className="flex-1 min-w-[60px] bg-transparent outline-none text-body leading-compact relative z-10" />
                 ) : undefined} />
             ) : (
