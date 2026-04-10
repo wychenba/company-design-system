@@ -762,18 +762,12 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
           tabIndex={-1}
           className={cn('w-full min-w-0 relative', isDragging && 'opacity-30')}
         >
-          {/* Drop indicator — before: 藍色線 + 起始圓點(Figma 風格） */}
+          {/* Drop indicator — before: 藍色細線(indent 跟隨 depth) */}
           {isDropTarget && dropTarget?.position === 'before' && (
-            <>
-              <div
-                className="absolute top-0 right-0 h-0.5 bg-primary z-10"
-                style={{ left: `calc(var(--tree-px) + ${indentPx}px)` }}
-              />
-              <div
-                className="absolute top-0 w-1.5 h-1.5 rounded-full bg-primary z-10 -translate-y-[2px]"
-                style={{ left: `calc(var(--tree-px) + ${indentPx}px - 2px)` }}
-              />
-            </>
+            <div
+              className="absolute top-0 right-0 h-0.5 bg-primary z-10"
+              style={{ left: `calc(var(--tree-px) + ${indentPx}px)` }}
+            />
           )}
 
           {/* Row: draggable + droppable 都在這一行(合併 ref),確保碰撞偵測只看行高 */}
@@ -841,18 +835,12 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             )}
           </div>
 
-          {/* Drop indicator — after: 藍色線 + 起始圓點 */}
+          {/* Drop indicator — after: 藍色細線 */}
           {isDropTarget && dropTarget?.position === 'after' && (
-            <>
-              <div
-                className="absolute bottom-0 right-0 h-0.5 bg-primary z-10"
-                style={{ left: `calc(var(--tree-px) + ${indentPx}px)` }}
-              />
-              <div
-                className="absolute bottom-0 w-1.5 h-1.5 rounded-full bg-primary z-10 translate-y-[2px]"
-                style={{ left: `calc(var(--tree-px) + ${indentPx}px - 2px)` }}
-              />
-            </>
+            <div
+              className="absolute bottom-0 right-0 h-0.5 bg-primary z-10"
+              style={{ left: `calc(var(--tree-px) + ${indentPx}px)` }}
+            />
           )}
 
           {/* Children: Collapsible 展開/收合 */}
