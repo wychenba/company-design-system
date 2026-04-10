@@ -340,7 +340,9 @@ function CustomCombobox({
       </PopoverTrigger>
       <PopoverContent className="p-0 rounded-lg border border-border bg-surface-raised overflow-hidden"
         style={{ boxShadow: 'var(--elevation-200)', minWidth: 'var(--radix-popover-trigger-width)' }}
-        align="start" sideOffset={8}>
+        align="start" sideOffset={8}
+        // searchIn='trigger' 時,focus 留在 trigger 的 inline input,不讓 popover 搶走
+        onOpenAutoFocus={searchIn === 'trigger' ? (e) => e.preventDefault() : undefined}>
         <Command shouldFilter={searchable && searchIn === 'menu'}>
           {searchable && searchIn === 'menu' && (
             <div className={cn(
