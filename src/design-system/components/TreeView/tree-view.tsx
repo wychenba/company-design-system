@@ -272,9 +272,10 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
     }, [])
 
     // ── Figma-style drop detection ──
-    // Y position → which item to drop near (top 30% = before, middle 40% = inside, bottom 30% = after)
-    // Leaf nodes: only before/after (no inside, since they can't have children)
-    // Drop indicator 的 indent 跟隨 target depth(使用者能看到 drop 在哪一層）
+    // 用實際指標座標(起點 + delta)算相對於 target 的 Y offset
+    // Folder: 上 25% = before, 中 50% = inside, 下 25% = after
+    // Leaf: 上 50% = before, 下 50% = after(不能 inside)
+    // "inside" = append 到 folder children 最後
     const handleDragOver = React.useCallback((event: DragOverEvent) => {
       const { over, active } = event
       if (!over || over.id === active.id) {
@@ -285,10 +286,12 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
       const targetEl = document.querySelector(`[data-tree-id="${over.id}"]`) as HTMLElement | null
       if (!targetEl) { setDropTarget(null); return }
 
+      // 實際指標 Y = 拖曳起點 Y + delta Y
+      const startY = (event.activatorEvent as PointerEvent)?.clientY ?? 0
+      const currentY = startY + (event.delta?.y ?? 0)
+
       const rect = targetEl.getBoundingClientRect()
-      // 用 pointer coordinates (from the delta of the drag)
-      const pointerY = rect.top + (event.delta?.y ?? 0)
-      const offsetY = pointerY - rect.top
+      const offsetY = currentY - rect.top
       const height = rect.height || 32
       const ratio = Math.max(0, Math.min(1, offsetY / height))
 
@@ -297,12 +300,12 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
 
       let position: DropPosition
       if (hasChildren) {
-        // Folder: 上 30% = before, 中 40% = inside, 下 30% = after
-        if (ratio < 0.3) position = 'before'
-        else if (ratio > 0.7) position = 'after'
+        // Folder: 大中間區 = inside(容易命中)
+        if (ratio < 0.25) position = 'before'
+        else if (ratio > 0.75) position = 'after'
         else position = 'inside'
       } else {
-        // Leaf: 上 50% = before, 下 50% = after (不能 inside)
+        // Leaf: 上半 = before, 下半 = after
         position = ratio < 0.5 ? 'before' : 'after'
       }
 
