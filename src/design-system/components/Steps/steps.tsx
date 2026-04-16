@@ -151,7 +151,8 @@ const stepsRootVariants = cva('list-none p-0 m-0', {
   variants: {
     orientation: {
       vertical: 'flex flex-col',
-      horizontal: 'flex flex-row items-start gap-3',
+      // pb-10:預留 description(absolute top-full,脫離 flow 掛在 label 下方)的空間
+      horizontal: 'flex flex-row items-start gap-3 pb-10',
     },
   },
   defaultVariants: { orientation: 'vertical' },
@@ -319,9 +320,9 @@ const stepItemVariants = cva('group/step-item outline-none', {
     orientation: {
       // pb-6 on li provides spacing for next item; connector is absolute within li
       vertical: 'relative flex flex-col',
-      // Items flex-1 等寬:不論 label / description 多長,每個 item 分配相同寬度。
-      // Description 在等寬空間內自然 wrap,不會把 item 撐寬、壓縮 connector。
-      horizontal: 'flex-1 min-w-0',
+      // Items shrink-0:自然寬度由 label 決定(description 是 absolute 不參與)。
+      // Connectors flex-1 均分剩餘空間 → 所有 connector 等長。
+      horizontal: 'flex shrink-0 min-w-0 relative',
     },
     size: {
       sm: 'text-body',
@@ -538,17 +539,26 @@ function HorizontalLayout({
   label: React.ReactNode
   description: React.ReactNode
 }) {
-  // Description 在 flow 裡正常 wrap。Item 用 flex-1 等寬(不是 shrink-0 natural),
-  // 所以 description 再長也不會把 item 撐寬——它被限制在 item 分配到的等寬空間裡。
-  // Connector 用固定寬度(不是 flex-1 均分),跟 item 寬度無關,永遠一致。
+  // ── Label 決定 item 寬度,description absolute 不影響 ──
+  //
+  // 佈局:StepItemHeader 包 indicator + label → 決定 item 自然寬度(shrink-0)。
+  // Description 用 `absolute top-full left-0 right-0`:脫離 flow,不影響 item
+  // 寬度,在 label 下方 wrap 到 item 寬度。Root ol 用 `pb-10` 預留空間。
+  //
+  // 效果:connector flex-1 均分剩餘空間,長度只取決於 label 末端到下個 circle
+  // 的距離,跟 description 長度無關。
   return (
-    <StepItemHeader className="flex items-start gap-3 min-w-0 w-full">
+    <StepItemHeader className="flex items-start gap-3">
       <div className="h-[1lh] flex items-center shrink-0">
         <StepIndicator />
       </div>
-      <div className="flex flex-col min-w-0">
+      <div className="min-w-0">
         {label}
-        {description}
+        {description && (
+          <div className="absolute left-0 right-0" style={{ top: '100%' }}>
+            {description}
+          </div>
+        )}
       </div>
     </StepItemHeader>
   )
@@ -564,9 +574,9 @@ function HorizontalRootConnector({ isBlue, size }: { isBlue: boolean; size: Step
     <li
       role="presentation"
       aria-hidden
-      // shrink-0 w-8:固定 32px 短寬度,跟 item 內容無關,connector 永遠一致。
+      // flex-1:均分剩餘空間 → 所有 connector 等長(跟 item label 寬度無關)。
       // self-stretch:填滿行高(跟 items 等高),讓 absolute line 有正確定位空間。
-      className="shrink-0 w-8 relative self-stretch"
+      className="flex-1 min-w-4 relative self-stretch"
     >
       {/* 絕對定位到 indicator 中心 Y,不依賴 `lh` CSS 單位 */}
       <div
