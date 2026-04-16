@@ -58,7 +58,10 @@ const Empty = React.forwardRef<HTMLDivElement, EmptyProps>(
         {description && (
           <span
             className={cn(
-              'text-body text-fg-muted',
+              // 有 title 或 action = content mode(fg-secondary,有資訊要讀)
+              // 都沒有 = placeholder mode(fg-muted,純佔位提示)
+              'text-body',
+              (title || action) ? 'text-fg-secondary' : 'text-fg-muted',
               title && 'mt-0.5',
             )}
           >

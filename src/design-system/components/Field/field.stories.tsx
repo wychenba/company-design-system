@@ -567,7 +567,7 @@ export const SliderWithLiveNumberInput: Story = {
       <div className="max-w-sm">
         <Field>
           <FieldLabel>縮放比例</FieldLabel>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full">
             <div className="flex-1 min-w-0">
               <Slider
                 value={[value]}
