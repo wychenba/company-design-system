@@ -1,17 +1,12 @@
 import * as React from 'react'
-import { X, ChevronDown, Plus } from 'lucide-react'
-import { Command as CommandPrimitive } from 'cmdk'
+import { X, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode } from '@/design-system/components/fields/field-types'
-import { getMenuListMinHeight } from '@/design-system/components/fields/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/fields/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { ItemInlineAction } from '@/design-system/patterns/item-layout/item-layout'
 import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
-import { Popover, PopoverContent, PopoverTrigger } from '@/design-system/components/Popover/popover'
-import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem } from '@/design-system/components/Command/command'
-import { SelectMenuItem, SelectMenuGroup, SelectMenuFooter } from '@/design-system/components/SelectMenu/select-menu-item'
-import { Empty } from '@/design-system/components/Empty/empty'
+import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
 import { useIsMobile } from '@/design-system/hooks/use-is-mobile'
 
 // ── constants ───────────────────────────────────────────────────────────────
@@ -248,7 +243,7 @@ function NativeCombobox({
   )
 }
 
-// ── Custom Combobox (desktop — Popover + Command) ───────────────────
+// ── Custom Combobox (desktop — consumes SelectMenu) ───────────────────
 
 function CustomCombobox({
   mode = 'edit', error = false, size = 'md', options, value = [], onChange, placeholder,
@@ -270,118 +265,79 @@ function CustomCombobox({
   const tagAreaRef = React.useRef<HTMLDivElement>(null)
   const tagHeight = size === 'sm' ? 20 : 24
 
-  const handleToggle = (optValue: string) => {
-    if (value.includes(optValue)) onChange?.(value.filter(v => v !== optValue))
-    else onChange?.([...value, optValue])
-  }
-
   const handleRemove = (v: string) => onChange?.(value.filter(x => x !== v))
 
-  // Select all
-  const selectableOptions = options.filter(o => !(o as any).disabled)
-  const checkedCount = selectableOptions.filter(o => value.includes(o.value)).length
-  const allState: boolean | 'indeterminate' = checkedCount === 0 ? false : checkedCount === selectableOptions.length ? true : 'indeterminate'
-  const handleSelectAll = () => {
-    if (allState === true) onChange?.([])
-    else onChange?.(selectableOptions.map(o => o.value))
-  }
-
-  // 過濾
-  const filteredOptions = searchable && search
+  // searchIn='trigger' 時由 trigger input 過濾，不走 SelectMenu 內建搜尋
+  const filteredOptions = searchable && searchIn === 'trigger' && search
     ? options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()))
     : options
 
+  // 轉換 SelectOption → SelectMenuOption
+  const menuOptions: SelectMenuOption[] = React.useMemo(
+    () => filteredOptions.map(opt => ({ value: opt.value, label: opt.label })),
+    [filteredOptions]
+  )
+
   const chevronEl = <ChevronDown size={iconSize} className={cn('shrink-0 text-fg-muted transition-transform', open && 'rotate-180')} aria-hidden />
 
+  const trigger = (
+    <div
+      role="combobox" aria-expanded={open} tabIndex={0}
+      className={cn(fieldWrapperStyles({ mode: 'edit', size }), value.length > 0 && tagPadding[size], 'relative cursor-pointer',
+        wrap && 'items-start py-1',
+        open && !error && 'border-primary',
+        error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
+      style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }}
+      data-field-mode="edit" data-error={error ? '' : undefined}>
+      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
+        {value.length > 0 ? (
+          <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
+            renderTag={(item) => (
+              <Tag size={size} className="shrink-0 relative z-10"
+                onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>
+            )}
+            trailing={searchable && searchIn === 'trigger' ? (
+              <input value={search} onChange={(e) => setSearch(e.target.value)}
+                placeholder={items.length === 0 ? '搜尋…' : ''} onClick={(e) => { e.stopPropagation(); setOpen(true) }}
+                className="flex-1 min-w-[60px] bg-transparent outline-none text-body leading-compact relative z-10" />
+            ) : undefined} />
+        ) : (
+          <span className="text-fg-muted">{placeholder ?? '選擇…'}</span>
+        )}
+      </div>
+      <div className={cn('flex items-center gap-2 shrink-0 relative z-10 pointer-events-none', wrap && 'self-start')}
+        style={wrap ? { height: tagHeight } : undefined}>
+        {showClear && (
+          <span className="pointer-events-auto">
+            <ItemInlineAction
+              size={size ?? 'md'}
+              action={{
+                icon: X,
+                label: '清除全部',
+                onClick: (e) => { e?.stopPropagation(); onChange?.([]) },
+              }}
+            />
+          </span>
+        )}
+        {chevronEl}
+      </div>
+    </div>
+  )
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <div
-          role="combobox" aria-expanded={open} tabIndex={0}
-          className={cn(fieldWrapperStyles({ mode: 'edit', size }), value.length > 0 && tagPadding[size], 'relative cursor-pointer',
-            wrap && 'items-start py-1',
-            open && !error && 'border-primary',
-            error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
-          style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }}
-          data-field-mode="edit" data-error={error ? '' : undefined}>
-          <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
-            {value.length > 0 ? (
-              <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
-                renderTag={(item) => (
-                  <Tag size={size} className="shrink-0 relative z-10"
-                    onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>
-                )}
-                trailing={searchable && searchIn === 'trigger' ? (
-                  <input value={search} onChange={(e) => setSearch(e.target.value)}
-                    placeholder={items.length === 0 ? '搜尋…' : ''} onClick={(e) => { e.stopPropagation(); setOpen(true) }}
-                    className="flex-1 min-w-[60px] bg-transparent outline-none text-body leading-compact relative z-10" />
-                ) : undefined} />
-            ) : (
-              <span className="text-fg-muted">{placeholder ?? '選擇…'}</span>
-            )}
-          </div>
-          <div className={cn('flex items-center gap-2 shrink-0 relative z-10 pointer-events-none', wrap && 'self-start')}
-            style={wrap ? { height: tagHeight } : undefined}>
-            {showClear && (
-              <span className="pointer-events-auto">
-                <ItemInlineAction
-                  size={size ?? 'md'}
-                  action={{
-                    icon: X,
-                    label: '清除全部',
-                    onClick: (e) => { e?.stopPropagation(); onChange?.([]) },
-                  }}
-                />
-              </span>
-            )}
-            {chevronEl}
-          </div>
-        </div>
-      </PopoverTrigger>
-      <PopoverContent className="p-0 rounded-lg border border-border bg-surface-raised overflow-hidden"
-        style={{ boxShadow: 'var(--elevation-200)', minWidth: 'var(--radix-popover-trigger-width)' }}
-        align="start" sideOffset={8}
-        // searchIn='trigger' 時,focus 留在 trigger 的 inline input,不讓 popover 搶走
-        onOpenAutoFocus={searchIn === 'trigger' ? (e) => e.preventDefault() : undefined}>
-        <Command shouldFilter={searchable && searchIn === 'menu'}>
-          {searchable && searchIn === 'menu' && (
-            <div className={cn(
-              'flex items-center gap-2 px-3 py-1 border-b border-divider',
-              size === 'lg' ? 'min-h-[calc(var(--field-height-lg)+8px)]'
-                : size === 'sm' ? 'min-h-[calc(var(--field-height-sm)+8px)]'
-                : 'min-h-[calc(var(--field-height-md)+8px)]',
-            )}>
-              <span className="shrink-0 text-fg-muted" aria-hidden>
-                <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-                </svg>
-              </span>
-              <CommandPrimitive.Input placeholder="搜尋…" value={search} onValueChange={setSearch}
-                className={cn('flex w-full bg-transparent outline-none placeholder:text-fg-muted',
-                  size === 'lg' ? 'text-body-lg leading-compact' : 'text-body leading-compact')} />
-            </div>
-          )}
-          <CommandList className="relative" style={{ minHeight: getMenuListMinHeight(size) }}>
-            <CommandEmpty className="absolute inset-0 flex items-center justify-center">
-              <Empty description="沒有符合的選項" />
-            </CommandEmpty>
-            <CommandGroup className="p-0 py-2">
-              {filteredOptions.map((opt) => (
-                <CommandItem key={opt.value} value={opt.label} onSelect={() => handleToggle(opt.value)}
-                  className="p-0 rounded-none data-[selected=true]:bg-transparent">
-                  <SelectMenuItem size={size} checkbox checked={value.includes(opt.value)}>
-                    {opt.label}
-                  </SelectMenuItem>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-          <SelectMenuFooter>
-            <SelectMenuItem size={size} checkbox checked={allState} onClick={handleSelectAll}>全部</SelectMenuItem>
-          </SelectMenuFooter>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <SelectMenu
+      options={menuOptions}
+      value={value}
+      onValueChange={onChange as (value: string | string[]) => void}
+      multiple
+      searchable={searchable && searchIn === 'menu'}
+      size={size}
+      open={open}
+      onOpenChange={setOpen}
+      onOpenAutoFocus={searchIn === 'trigger' ? (e) => e.preventDefault() : undefined}
+    >
+      {trigger}
+    </SelectMenu>
   )
 }
 

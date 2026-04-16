@@ -1,13 +1,12 @@
 import * as React from 'react'
-import { Plus, Search, Check } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { AvatarData } from '@/design-system/components/Avatar/avatar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/design-system/components/Popover/popover'
 import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from '@/design-system/components/Command/command'
 import { Command as CommandPrimitive } from 'cmdk'
-import { SelectMenuItem, SelectMenuGroup, SelectMenuFooter } from './select-menu-item'
-import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
+import { SelectMenuItem, SelectMenuFooter } from './select-menu-item'
 import { Empty } from '@/design-system/components/Empty/empty'
 import { getMenuListMinHeight } from '@/design-system/components/fields/field-types'
 import { RowSizeProvider } from '@/design-system/patterns/item-layout/item-layout'
@@ -46,9 +45,6 @@ export interface SelectMenuGroupConfig {
 }
 
 type SizeKey = 'sm' | 'md' | 'lg'
-
-// ── Shared sizes ──
-const CHECKBOX_SIZE: Record<SizeKey, 'sm' | 'md' | 'lg'> = { sm: 'sm', md: 'md', lg: 'lg' }
 
 // ── Component ──
 
@@ -95,6 +91,11 @@ export interface SelectMenuProps {
   /** open 狀態變更 callback */
   onOpenChange?: (open: boolean) => void
 
+  /** 自訂選項 label 渲染（預設渲染 option.label 純文字） */
+  renderLabel?: (option: SelectMenuOption) => React.ReactNode
+  /** 攔截 PopoverContent 的 onOpenAutoFocus（如 Select searchable 需阻止 focus 搶走） */
+  onOpenAutoFocus?: (e: Event) => void
+
   className?: string
 }
 
@@ -117,6 +118,8 @@ export function SelectMenu({
   minWidth,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
+  renderLabel,
+  onOpenAutoFocus,
   className,
 }: SelectMenuProps) {
   // ── State ──
@@ -220,6 +223,7 @@ export function SelectMenu({
         }}
         align={align}
         sideOffset={8}
+        onOpenAutoFocus={onOpenAutoFocus}
       >
         <Command shouldFilter={searchable} className="bg-transparent">
           {searchable && (
@@ -277,7 +281,7 @@ export function SelectMenu({
                         selected={!multiple && isSelected(opt.value)}
                         disabled={opt.disabled}
                       >
-                        {opt.label}
+                        {renderLabel ? renderLabel(opt) : opt.label}
                       </SelectMenuItem>
                     </CommandItem>
                   ))}

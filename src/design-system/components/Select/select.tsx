@@ -1,17 +1,12 @@
 import * as React from 'react'
-import { X, ChevronDown, Search } from 'lucide-react'
+import { X, ChevronDown } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { Command as CommandPrimitive } from 'cmdk'
 import { cn } from '@/lib/utils'
 import type { FieldMode } from '@/design-system/components/fields/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/fields/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { ItemInlineAction } from '@/design-system/patterns/item-layout/item-layout'
-import { Popover, PopoverContent, PopoverTrigger } from '@/design-system/components/Popover/popover'
-import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from '@/design-system/components/Command/command'
-import { SelectMenuItem, SelectMenuGroup } from '@/design-system/components/SelectMenu/select-menu-item'
-import { Empty } from '@/design-system/components/Empty/empty'
-import { getMenuListMinHeight } from '@/design-system/components/fields/field-types'
+import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
 import { useIsMobile } from '@/design-system/hooks/use-is-mobile'
 
 // ── Tag padding per size ────────────────────────────────────────────────────
@@ -173,10 +168,10 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
 )
 NativeSelect.displayName = 'NativeSelect'
 
-// ── Custom Select (desktop — Popover + Command) ────────────────────────
+// ── Custom Select (desktop — consumes SelectMenu) ────────────────────────
 
 const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
-  ({ mode = 'edit', error = false, size = 'md', options, value, onChange, placeholder, className, disabled, clearable = false, display = 'text', startIcon: StartIcon, searchable = false, ...props }, ref) => {
+  ({ mode = 'edit', error = false, size = 'md', options, value, onChange, placeholder, className, disabled, clearable = false, display = 'text', startIcon: StartIcon, searchable = false }, ref) => {
     const resolvedMode = disabled ? 'disabled' : mode
     const iconSize = getIconSize(size)
     const showClear = clearable && value && resolvedMode === 'edit'
@@ -196,11 +191,6 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
     const selectedOpt = options?.find(o => o.value === value)
     const selectedLabel = selectedOpt?.label ?? ''
     const SelectedIcon = selectedOpt?.icon
-
-    const handleSelect = (optValue: string) => {
-      onChange?.(optValue)
-      setOpen(false)
-    }
 
     const clearEl = showClear ? (
       <span className="relative z-10">
@@ -234,7 +224,6 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
     ) : isTextDisplay ? (
       // Text display: 純文字 + optional value icon
       <>
-        {/* startIcon(field 用途 icon)或 option.icon(value icon) */}
         {StartIcon && <StartIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />}
         {!StartIcon && SelectedIcon && value && <SelectedIcon size={iconSize} className="shrink-0 pointer-events-none" aria-hidden />}
         <span className={cn('flex-1 min-w-0 truncate', !value && 'text-fg-muted')}>
@@ -254,83 +243,86 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
       </>
     )
 
-    // ── 過濾選項 ──
+    // ── 過濾選項（searchable 時由 trigger input 過濾，不走 SelectMenu 內建搜尋）──
     const filteredOptions = searchable && search
       ? options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()))
       : options
 
+    // ── 轉換 SelectOption → SelectMenuOption ──
+    const menuOptions: SelectMenuOption[] = React.useMemo(
+      () => filteredOptions.map(opt => ({
+        value: opt.value,
+        label: opt.label,
+        icon: isTextDisplay ? opt.icon : undefined,
+      })),
+      [filteredOptions, isTextDisplay]
+    )
+
+    // ── Tag display: 自訂 label 渲染 ──
+    const renderLabel = React.useMemo(() => {
+      if (isTextDisplay) return undefined
+      return (menuOpt: SelectMenuOption) => {
+        const srcOpt = options.find(o => o.value === menuOpt.value)
+        if (srcOpt?.tagVariant) {
+          return <Tag size={size} variant={srcOpt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'}>{menuOpt.label}</Tag>
+        }
+        return menuOpt.label
+      }
+    }, [isTextDisplay, options, size])
+
+    const handleValueChange = React.useCallback(
+      (newValue: string | string[]) => {
+        const v = Array.isArray(newValue) ? newValue[0] : newValue
+        onChange?.(v)
+      },
+      [onChange]
+    )
+
+    const trigger = (
+      <div
+        ref={ref}
+        role="combobox"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        tabIndex={0}
+        className={cn(
+          fieldWrapperStyles({ mode: 'edit', size }),
+          !isTextDisplay && value && !searchable && tagPadding[size],
+          open && !error && 'border-primary',
+          error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'],
+          'cursor-pointer',
+          className,
+        )}
+        style={!isTextDisplay ? { paddingRight: '0.75rem' } : undefined}
+        data-field-mode="edit"
+        data-error={error ? '' : undefined}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            if (!searchable) { e.preventDefault(); setOpen(true) }
+          }
+          if (e.key === 'Escape') setOpen(false)
+        }}
+      >
+        {triggerContent}
+        {clearEl}
+        {chevronEl}
+      </div>
+    )
+
     return (
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <div
-            ref={ref}
-            role="combobox"
-            aria-expanded={open}
-            aria-haspopup="listbox"
-            tabIndex={0}
-            className={cn(
-              fieldWrapperStyles({ mode: 'edit', size }),
-              !isTextDisplay && value && !searchable && tagPadding[size],
-              open && !error && 'border-primary',
-              error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'],
-              'cursor-pointer',
-              className,
-            )}
-            style={!isTextDisplay ? { paddingRight: '0.75rem' } : undefined}
-            data-field-mode="edit"
-            data-error={error ? '' : undefined}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                if (!searchable) { e.preventDefault(); setOpen(true) }
-              }
-              if (e.key === 'Escape') setOpen(false)
-            }}
-          >
-            {triggerContent}
-            {clearEl}
-            {chevronEl}
-          </div>
-        </PopoverTrigger>
-        <PopoverContent
-          className="p-0 rounded-lg border border-border bg-surface-raised overflow-hidden"
-          style={{ boxShadow: 'var(--elevation-200)', minWidth: 'var(--radix-popover-trigger-width)' }}
-          align="start"
-          sideOffset={8}
-          onOpenAutoFocus={(e) => { if (searchable) { e.preventDefault(); inputRef.current?.focus() } }}
-        >
-          <Command shouldFilter={false}>
-            <CommandList className="relative" style={{ minHeight: getMenuListMinHeight(size) }}>
-              <CommandEmpty className="absolute inset-0 flex items-center justify-center">
-                <Empty description="沒有符合的選項" />
-              </CommandEmpty>
-              <CommandGroup className="p-0 py-2">
-                {filteredOptions.map((opt) => {
-                  const OptIcon = opt.icon
-                  return (
-                    <CommandItem
-                      key={opt.value}
-                      value={opt.label}
-                      onSelect={() => handleSelect(opt.value)}
-                      className="p-0 rounded-none data-[selected=true]:bg-transparent"
-                    >
-                      <SelectMenuItem
-                        size={size}
-                        selected={value === opt.value}
-                        startIcon={isTextDisplay && OptIcon ? OptIcon : undefined}
-                      >
-                        {/* tag mode: 選項也用 Tag 顯示(跟 trigger 一致) */}
-                        {!isTextDisplay && opt.tagVariant
-                          ? <Tag size={size} variant={opt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'}>{opt.label}</Tag>
-                          : opt.label}
-                      </SelectMenuItem>
-                    </CommandItem>
-                  )
-                })}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+      <SelectMenu
+        options={menuOptions}
+        value={value ?? null}
+        onValueChange={handleValueChange}
+        searchable={false}
+        size={size}
+        open={open}
+        onOpenChange={setOpen}
+        renderLabel={renderLabel}
+        onOpenAutoFocus={searchable ? (e) => { e.preventDefault(); inputRef.current?.focus() } : undefined}
+      >
+        {trigger}
+      </SelectMenu>
     )
   }
 )
