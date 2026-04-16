@@ -2,6 +2,7 @@ import * as React from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
+import { useRowSize } from '@/design-system/patterns/item-layout/item-layout'
 
 /**
  * Empty — 空狀態視覺元件
@@ -30,6 +31,11 @@ export interface EmptyProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Empty = React.forwardRef<HTMLDivElement, EmptyProps>(
   ({ icon, title, description, action, className, ...props }, ref) => {
+    // 字體 tier:讀 RowSizeContext(menu 內自動對齊 menu items 的字體）
+    // 沒有 context(standalone）→ fallback 'md' → text-body (14px)
+    const rowSize = useRowSize('md')
+    const descFont = rowSize === 'lg' ? 'text-body-lg' : 'text-body'
+
     // Icon rendering: LucideIcon (function) → Avatar; ReactElement → as-is
     let iconElement: React.ReactNode = null
     if (icon) {
@@ -58,9 +64,9 @@ const Empty = React.forwardRef<HTMLDivElement, EmptyProps>(
         {description && (
           <span
             className={cn(
-              // 有 title 或 action = content mode(fg-secondary,有資訊要讀)
-              // 都沒有 = placeholder mode(fg-muted,純佔位提示)
-              'text-body',
+              // 字體跟 RowSizeContext 對齊:sm/md = text-body (14px),lg = text-body-lg (16px)
+              // 在 menu 內自動對齊 menu items;standalone 時 fallback text-body
+              descFont,
               (title || action) ? 'text-fg-secondary' : 'text-fg-muted',
               title && 'mt-0.5',
             )}

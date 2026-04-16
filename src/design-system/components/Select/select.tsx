@@ -10,6 +10,7 @@ import { ItemInlineAction } from '@/design-system/patterns/item-layout/item-layo
 import { Popover, PopoverContent, PopoverTrigger } from '@/design-system/components/Popover/popover'
 import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from '@/design-system/components/Command/command'
 import { SelectMenuItem, SelectMenuGroup } from '@/design-system/components/SelectMenu/select-menu-item'
+import { Empty } from '@/design-system/components/Empty/empty'
 import { useIsMobile } from '@/design-system/hooks/use-is-mobile'
 
 // ── Tag padding per size ────────────────────────────────────────────────────
@@ -298,8 +299,8 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
         >
           <Command shouldFilter={false}>
             <CommandList>
-              <CommandEmpty className="py-4 text-center text-caption text-fg-muted">
-                沒有符合的選項
+              <CommandEmpty>
+                <Empty description="沒有符合的選項" className="py-6" />
               </CommandEmpty>
               <CommandGroup className="p-0 py-2">
                 {filteredOptions.map((opt) => {
