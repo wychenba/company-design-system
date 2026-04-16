@@ -441,7 +441,9 @@ function StepItemHeader({ children, className }: { children: React.ReactNode; cl
       aria-disabled={item.disabled || undefined}
       className={cn(
         'outline-none',
-        item.clickable && 'cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+        item.clickable
+          ? 'cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
+          : 'cursor-not-allowed',  // upcoming (locked) = disabled-like → 禁止 cursor
         className,
       )}
     >
@@ -547,15 +549,18 @@ function HorizontalLayout({
   //
   // 效果:connector flex-1 均分剩餘空間,長度只取決於 label 末端到下個 circle
   // 的距離,跟 description 長度無關。
+  // Text col 用 `relative` 讓 description 的 absolute 定位對齊 label 左邊(不是 li 左邊)。
+  // Description `top-full left-0`:label 正下方、左邊跟 label 齊。
+  // `whitespace-nowrap`:大多數 horizontal desc 是短文字,不 wrap 延伸到右邊空間。
   return (
     <StepItemHeader className="flex items-start gap-3">
       <div className="h-[1lh] flex items-center shrink-0">
         <StepIndicator />
       </div>
-      <div className="min-w-0">
+      <div className="relative min-w-0">
         {label}
         {description && (
-          <div className="absolute left-0 right-0" style={{ top: '100%' }}>
+          <div className="absolute top-full left-0 whitespace-nowrap mt-0.5">
             {description}
           </div>
         )}
