@@ -294,8 +294,9 @@ const Steps = React.forwardRef<HTMLOListElement, StepsProps>(
     const horizontalGridStyle: React.CSSProperties | undefined = isHorizontal
       ? {
           display: 'grid',
-          // items 3fr 等寬 + connectors 1fr 等寬(3:1 比例,對齊 Material / Ant 世界級節奏)
-          gridTemplateColumns: count > 1 ? `repeat(${count - 1}, 3fr 1fr) 3fr` : '1fr',
+          // items auto(label 決定寬度)+ connectors 1fr(均分剩餘)
+          // column-gap 12px → label↔connector 和 connector↔circle **等距**
+          gridTemplateColumns: count > 1 ? `repeat(${count - 1}, auto 1fr) auto` : 'auto',
           gridTemplateRows: 'auto auto',
           columnGap: 12,
         }
