@@ -124,8 +124,8 @@ const Slider = React.forwardRef<
             // Hover:border 加深到 primary-hover + elevation 陰影
             'hover:border-primary-hover hover:[box-shadow:var(--elevation-100)]',
             'active:cursor-grabbing active:border-primary-hover active:[box-shadow:var(--elevation-200)]',
-            // Focus ring — 走 focus-visible 只在鍵盤 Tab 時出現,滑鼠點不觸發
-            'outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            // Focus:soft primary halo(不用 ring,避免 border + ring-offset 三層同心圓）
+            'outline-none focus-visible:[box-shadow:0_0_0_4px_var(--primary-subtle)]',
             // Disabled:border 跟 Range 一起退成 border(n-5),bg 保留 bg-surface
             'data-[disabled]:cursor-not-allowed data-[disabled]:border-border',
             'data-[disabled]:hover:[box-shadow:none]',
