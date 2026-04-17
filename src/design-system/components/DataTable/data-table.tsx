@@ -79,7 +79,7 @@ function renderTypedValue(value: unknown, meta?: Record<string, any>, autoRowHei
 
 const CELL_PX = '0.75rem'
 const cellPadding: React.CSSProperties = { paddingBlock: 'var(--table-cell-py)', paddingInline: CELL_PX }
-const HEADER_BG = 'bg-[var(--color-neutral-2-opaque)]'
+const HEADER_BG = 'bg-muted'
 
 // ── TruncateCell ─────────────────────────────────────────────────────────────
 
