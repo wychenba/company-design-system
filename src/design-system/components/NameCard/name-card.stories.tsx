@@ -33,13 +33,15 @@ function NameCardHover({ name, src, subtitle, minimal }: { name: string; src: st
           avatar={{ src, alt: name }}
           subtitle={subtitle}
           status="available"
-          {...(!minimal && {
+          {...(!minimal ? {
             statusMessage: 'Out of Office: Back on Monday! For urgent matters please contact @Wei-Lun Cheng in the meantime.',
             actions: actionButtons,
             fields: [
               { label: 'ID', value: 'YHANAX' },
               { label: 'Employee number', value: '1234567' },
             ],
+            onViewMore: noop,
+          } : {
             onViewMore: noop,
           })}
         />
