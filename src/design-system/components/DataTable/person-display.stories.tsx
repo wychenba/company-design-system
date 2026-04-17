@@ -24,7 +24,7 @@ const samplePeople = [
   { name: 'Bob Lin', avatarUrl: 'https://i.pravatar.cc/48?u=bob', description: 'Engineering｜E-0087｜EMP-1002' },
   { name: 'Charlie Wu', avatarUrl: 'https://i.pravatar.cc/48?u=charlie', description: 'Product｜P-0015｜EMP-1003' },
   { name: 'Diana Huang', avatarUrl: 'https://i.pravatar.cc/48?u=diana', description: 'Marketing｜M-0023｜EMP-1004' },
-  { name: 'Eric Tsai', description: 'Engineering｜E-0091｜EMP-1005' },
+  { name: 'Eric Tsai', avatarUrl: 'https://i.pravatar.cc/48?u=eric', description: 'Engineering｜E-0091｜EMP-1005' },
   { name: 'Fiona Lee', avatarUrl: 'https://i.pravatar.cc/48?u=fiona', description: 'Design｜D-0056｜EMP-1006' },
 ]
 
@@ -39,11 +39,11 @@ const SinglePicker = () => {
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
-        <PeoplePicker mode="readonly" value={val} />
+        <PeoplePicker mode="readonly" value={samplePeople[0]} />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">disabled</h3>
-        <PeoplePicker mode="disabled" value={val} />
+        <PeoplePicker mode="disabled" value={samplePeople[0]} />
       </div>
     </div>
   )
@@ -56,7 +56,8 @@ export const Single: Story = {
 
 /* ── 多人（互動） ── */
 const MultiPicker = () => {
-  const [val, setVal] = React.useState<PersonValue[]>(samplePeople.slice(0, 3))
+  const [val, setVal] = React.useState<PersonValue[]>(samplePeople.slice(0, 4))
+  const readonlyVal = samplePeople.slice(0, 4)
   return (
     <div className="flex flex-col gap-6 max-w-xs">
       <div>
@@ -65,7 +66,7 @@ const MultiPicker = () => {
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
-        <PeoplePicker mode="readonly" value={val} />
+        <PeoplePicker mode="readonly" value={readonlyVal} />
       </div>
     </div>
   )
