@@ -67,11 +67,14 @@ function MultiPersonDisplay({
   value,
   size = 'md',
   max,
+  onRemove,
 }: {
   value?: PersonValue[] | null
   size?: 'sm' | 'md' | 'lg'
   /** 最多顯示幾個 avatar（不含 +N），預設 3 */
   max?: number
+  /** 傳入時啟用 dismiss（edit mode），callback 接收被移除的 person */
+  onRemove?: (person: PersonValue) => void
 }) {
   if (!value || value.length === 0) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
 
@@ -109,6 +112,7 @@ function MultiPersonDisplay({
               variant="neutral"
               size="sm"
               avatar={<Avatar person={person} />}
+              onDismiss={onRemove ? () => onRemove(value![resolvedMax + i]) : undefined}
             >
               {person.name}
             </Tag>

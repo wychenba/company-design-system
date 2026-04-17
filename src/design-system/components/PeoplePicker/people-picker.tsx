@@ -129,7 +129,14 @@ function PeoplePicker({
         {isEmpty
           ? <span className="text-fg-muted">選擇...</span>
           : isMulti
-            ? <MultiPersonDisplay value={value as PersonValue[]} size={size} />
+            ? <MultiPersonDisplay
+                value={value as PersonValue[]}
+                size={size}
+                onRemove={onChange ? (person) => {
+                  const arr = value as PersonValue[]
+                  onChange(arr.filter(v => resolvePerson(v).name !== resolvePerson(person).name))
+                } : undefined}
+              />
             : <PersonDisplay value={value as PersonValue} size={size} />
         }
       </span>

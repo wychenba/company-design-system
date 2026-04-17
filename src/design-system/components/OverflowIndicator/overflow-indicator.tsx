@@ -1,16 +1,18 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/design-system/components/Tooltip/tooltip'
-import { Tag } from '@/design-system/components/Tag/tag'
+import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/design-system/components/HoverCard/hover-card'
+import { tagVariants } from '@/design-system/components/Tag/tag'
 
-// ── OverflowIndicator ───────────────────────────────────────────────────────
-// 溢出指示器：+N 觸發器 + tooltip 顯示隱藏內容。
-//
-// 兩種 shape：
-//   circle — avatar 堆疊溢出（rounded-full）
-//   tag    — tag 溢出（用 Tag component，與 Tag 外觀一致）
-//
-// Tooltip 用 flex-wrap 排列，JS 量測後收縮容器寬度到最寬行。
+/**
+ * OverflowIndicator — +N 觸發器 + HoverCard 顯示溢出內容
+ *
+ * 統一用 HoverCard（不用 Tooltip）——溢出內容可能需要互動：
+ * - 人員 +N：tag dismiss + hover name card
+ * - 一般 +N：穩定顯示溢出項目
+ *
+ * trigger 不用 Tag 元件（Tag 有內建 truncation Tooltip 會跟 HoverCard 衝突），
+ * 改用 tagVariants 直接套樣式。
+ */
 
 const triggerSize: Record<string, string> = {
   sm: 'h-5 min-w-5',
@@ -32,10 +34,6 @@ export interface OverflowIndicatorProps {
   className?: string
 }
 
-// ── ShrinkWrapList ──────────────────────────────────────────────────────────
-// flex-wrap 容器，mount 後量測每行實際寬度，收縮到最寬行。
-// 邏輯來自消費端驗證過的 calculateContainerWidth 演算法。
-
 function ShrinkWrapList({ children }: { children: React.ReactNode }) {
   const ref = React.useCallback((container: HTMLDivElement | null) => {
     if (!container) return
@@ -50,7 +48,6 @@ function ShrinkWrapList({ children }: { children: React.ReactNode }) {
       const items = Array.from(container.children) as HTMLElement[]
       if (items.length === 0) return
 
-      // 模擬 flex-wrap：逐一加入 item，超出則換行，記錄最寬行
       let currentRow = 0
       let maxRow = 0
 
@@ -67,7 +64,6 @@ function ShrinkWrapList({ children }: { children: React.ReactNode }) {
       })
       maxRow = Math.max(maxRow, currentRow)
 
-      // 收縮到最寬行 + padding
       container.style.maxWidth = `${Math.ceil(maxRow) + padL + padR + 1}px`
     })
   }, [children])
@@ -82,31 +78,33 @@ function ShrinkWrapList({ children }: { children: React.ReactNode }) {
 function OverflowIndicator({ count, shape = 'circle', size = 'md', children, className }: OverflowIndicatorProps) {
   if (count <= 0) return null
 
+  const trigger = shape === 'tag' ? (
+    <span className={cn(tagVariants({ variant: 'neutral', size }), 'cursor-default', className)}>
+      <span className="px-1">+{count}</span>
+    </span>
+  ) : (
+    <span
+      className={cn(
+        'shrink-0 rounded-full inline-grid place-content-center',
+        'bg-muted text-foreground font-medium leading-none cursor-default',
+        triggerSize[size],
+        triggerText[size],
+        className,
+      )}
+    >
+      +{count}
+    </span>
+  )
+
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        {shape === 'tag' ? (
-          <Tag variant="neutral" size={size} className={cn('cursor-default', className)}>
-            +{count}
-          </Tag>
-        ) : (
-          <span
-            className={cn(
-              'shrink-0 rounded-full inline-grid place-content-center',
-              'bg-muted text-foreground font-medium leading-none cursor-default',
-              triggerSize[size],
-              triggerText[size],
-              className,
-            )}
-          >
-            +{count}
-          </span>
-        )}
-      </TooltipTrigger>
-      <TooltipContent className="!p-0">
+    <HoverCard openDelay={200} closeDelay={300}>
+      <HoverCardTrigger asChild>
+        {trigger}
+      </HoverCardTrigger>
+      <HoverCardContent className="bg-tooltip rounded-lg" data-theme="dark">
         <ShrinkWrapList>{children}</ShrinkWrapList>
-      </TooltipContent>
-    </Tooltip>
+      </HoverCardContent>
+    </HoverCard>
   )
 }
 OverflowIndicator.displayName = 'OverflowIndicator'

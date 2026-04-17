@@ -77,10 +77,11 @@ interface OverflowTagListProps {
   size: 'sm' | 'md' | 'lg'
   wrap: boolean
   renderTag: (item: { value: string; label: string }, index: number) => React.ReactNode
+  onRemove?: (value: string) => void
   trailing?: React.ReactNode
 }
 
-function OverflowTagList({ containerRef, items, size, wrap, renderTag, trailing }: OverflowTagListProps) {
+function OverflowTagList({ containerRef, items, size, wrap, renderTag, onRemove, trailing }: OverflowTagListProps) {
   const tagEls = React.useRef<(HTMLDivElement | null)[]>([])
   const overflowEl = React.useRef<HTMLDivElement>(null)
   const { visibleCount, ready } = useOverflowCount(containerRef, tagEls, overflowEl, items.length, !wrap)
@@ -98,7 +99,11 @@ function OverflowTagList({ containerRef, items, size, wrap, renderTag, trailing 
       ))}
       <div ref={overflowEl} className="shrink-0">
         <OverflowIndicator count={overflow} shape="tag" size={size}>
-          {hiddenItems.map(item => <Tag key={item.value} size="sm">{item.label}</Tag>)}
+          {hiddenItems.map(item => (
+            <Tag key={item.value} size="sm" onDismiss={onRemove ? () => onRemove(item.value) : undefined}>
+              {item.label}
+            </Tag>
+          ))}
         </OverflowIndicator>
       </div>
       {trailing}
@@ -223,7 +228,7 @@ function NativeCombobox({
           renderTag={(item) => (
             <Tag size={size} className="shrink-0 relative z-10" onClick={() => { selectRef.current?.showPicker?.(); selectRef.current?.focus() }}
               onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>
-          )} trailing={value.length === 0 ? selectDropdown : undefined} />
+          )} onRemove={handleRemove} trailing={value.length === 0 ? selectDropdown : undefined} />
       </div>
       {value.length > 0 && selectDropdown}
       <div className={cn('flex items-center gap-2 shrink-0 relative z-10 pointer-events-none', wrap && 'self-start')}
@@ -296,6 +301,7 @@ function CustomCombobox({
               <Tag size={size} className="shrink-0 relative z-10"
                 onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>
             )}
+            onRemove={handleRemove}
             trailing={searchable && searchIn === 'trigger' ? (
               <input value={search} onChange={(e) => setSearch(e.target.value)}
                 placeholder={items.length === 0 ? '搜尋…' : ''} onClick={(e) => { e.stopPropagation(); setOpen(true) }}
