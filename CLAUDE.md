@@ -28,13 +28,15 @@
 
 **Level 1 — `CLAUDE.md`（專案層，跨元件）**
 - 技術棧、檔案結構
-- 跨元件架構原則（shadcn 框架、Props 命名、Token 命名）
-- 影響任何元件的技術陷阱（Tailwind v4 `var()` 語法、tailwind-merge 註冊、陰影用 elevation、Provider 放置）
+- 跨元件架構原則的**判斷框架**（如何決定 Props 命名、如何決定用 Inline Action vs Button）
+- AI 會反覆踩的**技術陷阱**（Tailwind v4 `var()` 語法、tailwind-merge 註冊、陰影用 elevation、Provider 放置）
 - 品質閘門、Story 結構規範
-- 指向詳細 spec 的指標
+- 指向詳細 spec 的**指標**（一行連結，不展開細節）
 - 「如何寫 spec / story / code」的 meta 規則
 
-不適合：單一元件的設計細節、超過 5 行的技術細節（那是 spec 的工作）。
+**CLAUDE.md 的判斷法**：問「這是 AI 每次執行都需要的提醒，還是查閱特定 spec 就能找到的設計規則？」前者留，後者搬到 spec 並留指標。
+
+不適合：具體設計規則（超過 5 行的對照表、場景列舉、公式推導）——那是 spec 的工作。CLAUDE.md 只放判斷框架 + 指向 spec 的指標。
 
 **Level 2 — 元件 `spec.md`（單一元件）**
 - 元件定位一句話
@@ -77,96 +79,64 @@ src/
 ├── globals.css                        ← Tailwind v4 入口 + CSS token bridge
 ├── lib/
 │   └── utils.ts                       ← cn() 工具（clsx + tailwind-merge）
+├── hooks/
+│   └── use-mobile.tsx                 ← 觸控裝置偵測（pointer: coarse）
 ├── design-system/
 │   ├── hooks/
-│   │   └── useOverflowItems.ts        ← 水平溢出追蹤（useScrollEdges + useOverflowIndices），Tabs / ChipGroup 共用
+│   │   ├── useOverflowItems.ts        ← 水平溢出追蹤（useScrollEdges + useOverflowIndices），Tabs / ChipGroup 共用
+│   │   └── use-is-mobile.ts           ← mobile 偵測 re-export
 │   ├── tokens/
-│   │   ├── color/
-│   │   │   ├── primitives.css         ← 原始色票（靜態 CSS）
-│   │   │   ├── semantic.css           ← 語義色彩 + dark mode（靜態 CSS）
-│   │   │   ├── color.spec.md          ← 色彩設計原則與使用規則
-│   │   │   └── color.stories.tsx
-│   │   ├── typography/
-│   │   │   ├── typography.css         ← utilities（靜態 CSS）
-│   │   │   ├── typography.spec.md     ← 字體設計原則與使用規則
-│   │   │   └── typography.stories.tsx
-│   │   ├── uiSize/
-│   │   │   ├── uiSize.css             ← 元件尺寸 tokens（md/lg 兩種模式）
-│   │   │   └── uiSize.spec.md         ← 元件尺寸使用規則
-│   │   ├── layoutSpace/
-│   │   │   ├── layoutSpace.css        ← 版面間距 tokens（md/lg 兩種模式）
-│   │   │   └── layoutSpace.spec.md    ← 版面間距使用規則
-│   │   ├── density/
-│   │   │   ├── density.spec.md        ← Density 系統說明（data-density 統一控制）
-│   │   │   └── density.stories.tsx    ← UI Size + Layout Space 合併展示
-│   │   ├── elevation/
-│   │   │   ├── elevation.spec.md      ← 陰影層級使用規則
-│   │   │   └── elevation.stories.tsx  ← 陰影層級展示
-│   │   └── radius/
-│   │       ├── radius.spec.md         ← 圓角使用規則
-│   │       └── radius.stories.tsx
-│   ├── components/                    ← shadcn 積木元件（一個元件一個資料夾）
-│   │   ├── Badge/                     ← 通知計數指示器（紅點 / 計數膠囊）
-│   │   ├── Tag/                       ← inline label（分類標籤 / 狀態標記）
-│   │   ├── Avatar/                    ← 視覺身份標識（人物 / 實體）
-│   │   ├── Button/                    ← 觸發操作或導覽
-│   │   ├── Switch/                    ← 即時開關切換
-│   │   ├── Checkbox/                  ← 選擇控件（方形，含 indeterminate）
-│   │   ├── Radio/                     ← 選擇控件（圓形，互斥）
-│   │   ├── Tooltip/                   ← hover 短文字提示
+│   │   ├── color/                     ← primitives.css + semantic.css + color.spec.md + color.stories.tsx
+│   │   ├── typography/                ← typography.css + typography.spec.md + typography.stories.tsx
+│   │   ├── uiSize/                    ← uiSize.css + uiSize.spec.md
+│   │   ├── layoutSpace/               ← layoutSpace.css + layoutSpace.spec.md
+│   │   ├── density/                   ← density.spec.md + density.stories.tsx
+│   │   ├── elevation/                 ← elevation.spec.md + elevation.stories.tsx
+│   │   ├── radius/                    ← radius.spec.md + radius.stories.tsx
+│   │   └── opacity/                   ← opacity.css + opacity.spec.md
+│   ├── components/                    ← 以實際目錄內容為準（目前 46 個元件資料夾）
+│   │   │
+│   │   │  ⚙ internal primitive（不直接使用，由其他元件消費）
+│   │   ├── Menu/                      ← menu item 共用佈局層（→ SelectMenu / DropdownMenu）
+│   │   ├── Notice/                    ← 通知共用佈局層（→ Toast / Alert）
+│   │   ├── SelectMenu/                ← 下拉選單浮層（→ Select / Combobox）
 │   │   ├── SelectionControl/          ← Checkbox/Radio 共用的 SelectionItem 佈局
-│   │   ├── Command/                   ← shadcn Command（cmdk 搜尋 + 鍵盤導覽）
-│   │   ├── Popover/                   ← shadcn Popover（浮動容器）
-│   │   ├── Dialog/                    ← shadcn Dialog
-│   │   ├── ScrollArea/                ← shadcn ScrollArea
-│   │   ├── Menu/                      ← ⚙ internal primitive：menu item 共用佈局層（SelectMenu / DropdownMenu 消費，不直接使用）
-│   │   │   ├── menu-item.tsx          ← MenuItem / MenuGroup / MenuFooter
-│   │   │   └── menu-item.spec.md      ← 設計原則
-│   │   ├── Notice/                    ← ⚙ internal primitive：通知共用佈局層（Toast / Alert 消費，不直接使用）
-│   │   │   ├── notice.tsx             ← Notice（layout + icon + dismiss）
-│   │   │   └── notice.spec.md         ← 設計原則
-│   │   ├── Toast/                     ← 非阻斷式浮動通知（消費 Notice + Sonner）
-│   │   │   └── toast.tsx              ← Toaster provider + toast() API
-│   │   ├── Alert/                     ← inline / fixed 通知（消費 Notice，subtle + solid）
-│   │   │   └── alert.tsx              ← Alert 元件（subtle/solid × inline/fixed）
-│   │   ├── SelectMenu/                ← ⚙ internal primitive：下拉選單浮層（Select / Combobox 消費，不直接使用）
-│   │   │   └── select-menu.tsx        ← SelectMenu（Popover + Command 組合，消費 MenuItem）
-│   │   ├── DropdownMenu/              ← 操作選單（由 Button 觸發，消費 MenuItem）
-│   │   │   ├── dropdown-menu.tsx      ← Radix DropdownMenu + 設計系統 token
-│   │   │   └── dropdown-menu.spec.md
-│   │   ├── TreeView/                  ← 階層結構遞迴元件（expand/collapse + drag + keyboard）
-│   │   ├── Breadcrumb/                ← 階層位置指示器（nav + ol/li，link hover 用 primary-hover）
-│   │   ├── Tabs/                      ← 切 view 的頁籤（Radix Tabs + underline + primary-hover + overflow scroll/menu）
-│   │   ├── SegmentedControl/          ← 切 value 的互斥選擇器（Radix ToggleGroup type="single"）
-│   │   ├── Chip/                      ← Material Filter Chip（Radix ToggleGroup + wrap/scroll/menu overflow）
-│   │   ├── FileItem/                  ← 檔案上傳列表項目（detail=avatar / compact=icon，uploading/completed/error）
-│   │   ├── DescriptionList/           ← 唯讀 label+value 展示（dl/dt/dd，Atlassian/Polaris 命名對齊）
-│   │   ├── HoverCard/                 ← ⚙ internal primitive：hover 觸發可互動浮層（行為 primitive，不含視覺樣式）
-│   │   ├── NameCard/                  ← 人員 HoverCard 內容（profile + status + actions + info fields）
-│   │   ├── Sidebar/                   ← 佈局外殼（Provider + Header + Content + Footer + Trigger）
-│   │   ├── Field/                     ← shadcn Field（Label + Control + Description + Message）
-│   │   │   ├── field.tsx
-│   │   │   └── field-context.ts       ← FieldContext + useFieldContext（獨立檔案避免循環引用）
-│   │   └── fields/                    ← 資料輸入 / 顯示元件
-│   │       ├── field-types.ts         ← FieldMode、InlineActionConfig 共用型別
-│   │       ├── field-wrapper.tsx      ← 共用 wrapper 樣式
-│   │       ├── field.spec.md          ← Field 共用設計原則（含驗證標準）
-│   │       ├── TextField/
-│   │       ├── NumberField/
-│   │       ├── CheckboxField/
-│   │       ├── DateField/
-│   │       ├── SelectField/
-│   │       ├── MultiSelectField/
-│   │       ├── SwitchField/           ← Switch 欄位（即時開關切換）
-│   │       └── LinkField/             ← URL 輸入，藍色連結 + Pencil 編輯
-│   └── patterns/                      ← 複合元件 / 已定案的 UI 流程（依互動領域分資料夾）
-│       ├── action-bar/                ← 工具列、操作列
-│       │   ├── action-bar.spec.md
-│       │   └── action-bar.stories.tsx
-│       └── item-layout/               ← prefix + content 佈局原則（掃描/閱讀兩種模式）
-│           └── item-layout.spec.md
+│   │   ├── HoverCard/                 ← hover 觸發可互動浮層（行為 primitive）
+│   │   ├── OverflowIndicator/         ← 溢出指示器
+│   │   │
+│   │   │  shadcn passthrough（薄包裝，遵循 shadcn 原始結構）
+│   │   ├── Command/                   ← cmdk 搜尋 + 鍵盤導覽
+│   │   ├── Popover/                   ← 浮動容器
+│   │   ├── ScrollArea/                ← 自訂捲軸
+│   │   ├── Separator/                 ← 分隔線
+│   │   ├── Sheet/                     ← 側邊抽屜
+│   │   ├── Skeleton/                  ← 載入佔位
+│   │   │
+│   │   │  Field 系統
+│   │   ├── Field/                     ← 表單欄位容器（Label + Control + Description + Message）
+│   │   │   ├── field.tsx / field-context.ts
+│   │   │   ├── field-types.ts         ← FieldMode、InlineActionConfig 共用型別
+│   │   │   ├── field-wrapper.tsx      ← Field Controls 共用 wrapper 樣式
+│   │   │   ├── field.spec.md          ← Field 佈局容器設計原則
+│   │   │   ├── field-controls.spec.md ← Field Controls 共用設計原則（三 mode / Display / endAction）
+│   │   │   └── form-validation.spec.md ← 表單驗證標準
+│   │   │
+│   │   │  其餘為 public-facing 元件，各有獨立資料夾
+│   │   └── ...                        ← Alert, Avatar, Badge, Breadcrumb, Button, Checkbox,
+│   │                                     Chip, Combobox, DataTable, DatePicker, DescriptionList,
+│   │                                     Dialog, DropdownMenu, Empty, FileItem, Input, LinkInput,
+│   │                                     NameCard, NumberInput, PeoplePicker, RadioGroup,
+│   │                                     SegmentedControl, Select, Sidebar, Slider, Spinner,
+│   │                                     Steps, Switch, Tabs, Tag, Textarea, Toast, Tooltip, TreeView
+│   │
+│   └── patterns/                      ← 跨元件共用的佈局 / 互動公式
+│       ├── item-layout/               ← row primitive 共用規則（prefix + content 佈局）
+│       ├── action-bar/                ← 工具列 / 操作列排列規則
+│       └── horizontal-overflow/       ← 水平溢出處理（scroll arrows / menu trigger）
 └── explorations/                      ← 未定案的 prototype 比稿
 ```
+
+**元件目錄以實際檔案系統為準**，不依賴上方列表。建立或修改 UI 前，先 `ls src/design-system/components/` 確認可用元件。
 
 
 # Token 系統運作方式
@@ -177,6 +147,7 @@ src/
 - `typography/typography.css`：字體尺寸 utilities
 - `uiSize/uiSize.css`：元件尺寸，用 `[data-ui-size="lg"]` 處理模式切換
 - `layoutSpace/layoutSpace.css`：版面間距，用 `[data-layout-space="lg"]` 處理模式切換
+- `opacity/opacity.css`：opacity 值
 - radius 透過 `globals.css` 的 `@theme inline` 定義
 
 **初始狀態在 `index.html` 設定，無需 JavaScript：**
@@ -214,22 +185,35 @@ element.style.backgroundColor = 'var(--primary)'
 
 # 建立 UI 前必讀
 
-建立任何 UI 前，必須先讀對應的 spec：
+## Token spec（全系統基礎）
 
-- **色彩**：`src/design-system/tokens/color/color.spec.md`
-- **字體**：`src/design-system/tokens/typography/typography.spec.md`
-- **密度系統**：`src/design-system/tokens/density/density.spec.md`
-- **元件尺寸**：`src/design-system/tokens/uiSize/uiSize.spec.md`
-- **版面間距**：`src/design-system/tokens/layoutSpace/layoutSpace.spec.md`
-- **陰影**：`src/design-system/tokens/elevation/elevation.spec.md`
-- **圓角**：`src/design-system/tokens/radius/radius.spec.md`
+| 主題 | 位置 |
+|------|------|
+| 色彩架構 + neutral-active/selected 兩個 family | `tokens/color/color.spec.md` |
+| 字體 | `tokens/typography/typography.spec.md` |
+| 密度系統 | `tokens/density/density.spec.md` |
+| 元件尺寸 + Inline Action 尺寸推導 | `tokens/uiSize/uiSize.spec.md` |
+| 版面間距 | `tokens/layoutSpace/layoutSpace.spec.md` |
+| 陰影 | `tokens/elevation/elevation.spec.md` |
+| 圓角 | `tokens/radius/radius.spec.md` |
 
-並檢查以下資料夾確認可用元件：
+## 跨元件 pattern spec（建立或修改相關元件前必查）
 
-- `src/design-system/components/`（shadcn 積木元件）
-- `src/design-system/patterns/`（已定案的 UI 流程）
+| 主題 | 位置 | 影響範圍 |
+|------|------|---------|
+| Row primitive 共用規則 | `patterns/item-layout/item-layout.spec.md` | MenuItem / SidebarMenuButton / TreeItem / DropdownMenuItem / SelectMenu |
+| 工具列 / 操作列 | `patterns/action-bar/action-bar.spec.md` | 任何有按鈕列的頁面 |
+| 水平溢出處理 | `patterns/horizontal-overflow/horizontal-overflow.spec.md` | Tabs / Chip / 未來 Steps |
+| Field 佈局容器 | `components/Field/field.spec.md` | 所有表單元件 |
+| Field Controls 共用規則 | `components/Field/field-controls.spec.md` | Input / NumberInput / DatePicker / Select / Combobox / LinkInput / Textarea |
+| 表單驗證標準 | `components/Field/form-validation.spec.md` | 所有表單元件 |
+| 選擇 / 狀態視覺 | `patterns/item-layout/item-layout.spec.md`「選擇 / 狀態視覺規則」節 | 任何有選中態的元件 |
+| 分隔線 vs CSS border | `components/Separator/separator.spec.md` | 任何有分隔線的元件 |
 
-不要依賴 CLAUDE.md 列出的固定元件名稱，以實際目錄內容為準。
+## 檢查可用元件
+
+- `ls src/design-system/components/`（以實際目錄為準，不依賴 CLAUDE.md 列表）
+- `ls src/design-system/patterns/`（已定案的跨元件 UI 流程）
 
 
 # UI 開發規則
@@ -257,96 +241,30 @@ element.style.backgroundColor = 'var(--primary)'
 
 **如果確實需要新值**,先提出理由讓使用者確認,不要自己決定後寫進去。
 
-## 互動元素：被動資訊 / Inline Action / Button
+## 互動元素：Inline Action vs Button
 
-加互動元素前按順序判斷：
+加互動 icon 前，判斷用 Inline Action 還是 Button iconOnly。完整判斷樹（3 步驟 + 場景對照表）詳見 `patterns/item-layout/item-layout.spec.md`「Inline Action 設計規格」節。
 
-**第一步：這是資訊還是動作？**
-- 資訊（hover 顯示說明，不改變狀態）→ **被動資訊**（靜態 icon + Tooltip，fg-muted → hover fg-secondary）
-- 動作 → 進第二步
+## 分隔線：Separator vs CSS border
 
-**第二步：有文字嗎？**
-- 有 → **Button**（Inline Action 不支援文字）
-- 純 icon → 進第三步
-
-**第三步：符合以下任一條件嗎？**
-- **條件 A**：元件行高**由 field-height token 推導**（CSS 引用 `var(--field-height-*)`）
-- **條件 B**：Button xs（24px）佔可用垂直空間 **> 75%**
-- **條件 C**：**dismiss / close 操作**（×）——通用符號，不需要 button chrome 傳達可點擊性
-符合任一 → **Inline Action**。都不符合 → **Button iconOnly**。
-
-**元件設計時決定一次，不隨 size variant 切換。** Button 用 size prop 縮放，Inline Action 用 RowSizeContext 縮放。
-
-| | Inline Action | Button iconOnly |
-|---|---|---|
-| Layout 佔位 | icon 尺寸（16/20px） | field-height-xs（24px）起 |
-| 休息狀態 | 無 chrome，fg-muted | 有 chrome（依 variant） |
-| Hover | icon+2 圓形 bg 溢出 | 整個按鈕變色 |
-| 尺寸來源 | RowSizeContext 自動（sm/md=16, lg=20px） | 固定（xs=24, sm=28…） |
-
-| 場景 | 觸發條件 | 選擇 |
-|---|---|---|
-| MenuItem / TreeView / Sidebar | 條件 A（field-height 推導） | Inline Action |
-| Input / Select endAction | 條件 A（在 field-height 容器內） | Inline Action |
-| Tag dismiss | 條件 A（Tag 高度 = field-height-xs/sm） | Inline Action |
-| FieldLabel pin | 條件 B（24/21px = 114%） | Inline Action |
-| Toast/Alert dismiss X | 條件 C（dismiss 通用符號） | Inline Action |
-| Dialog close X | 條件 C（dismiss 通用符號） | Inline Action |
-| Table row action | 都不符合（自訂行高，24/32px = 75%） | Button |
-| FileItem action | 都不符合（固定 padding） | Button |
-| Toast/Alert CTA | 有文字 | Button |
-| Toolbar icons | 都不符合（空間充裕） | Button iconOnly |
+判斷核心：**誰決定「這裡要分隔」？** 完整規則詳見 `components/Separator/separator.spec.md`。
 
 ## 陰影一律用 `--elevation-*` token
 
-專案**沒有定義** Tailwind `shadow-*` utility。陰影只有兩個 token:`--elevation-100`(Card)/`--elevation-200`(浮層,必須搭 `bg-surface-raised`),用 `style={{ boxShadow: 'var(--elevation-200)' }}` 套。
-
-**禁止** `shadow-sm/md/lg/xl/2xl`、硬寫 `box-shadow`。**允許** `shadow-none`。詳見 `src/design-system/tokens/elevation/elevation.spec.md`。
+**禁止** `shadow-sm/md/lg/xl/2xl`、硬寫 `box-shadow`。**允許** `shadow-none`。詳見 `tokens/elevation/elevation.spec.md`。
 
 ## Row primitives 共用 item-layout 公式
 
-所有 row 類元件(SidebarMenuButton / TreeItem / MenuItem / DropdownMenuItem)共用同一套 padding / height / hover / active / color 規則。**寫任何新 row 元件前,讀 `src/design-system/patterns/item-layout/item-layout.spec.md`**。不自己發明新規格。
+寫任何新 row 元件前，讀 `patterns/item-layout/item-layout.spec.md`。Audit grep guard 和 SidebarMenuButton 獨立實作風險也在該 spec 的「自我檢查」節。
 
-Canonical 實作:`MenuItem` 的 `menuItemVariants` cva。Helper 元件、prefix 規則、inline action predicate、asChild 責任等詳見 `src/design-system/patterns/item-layout/item-layout.spec.md`。
+## 清 unused imports 後必須跑 runtime 驗證
 
-### Audit 指令(grep guard)
+`tsc --noEmit` 不充分（曾漏抓 JSX 內 identifier 和未宣告 export）。任何 import/export 異動後：
 
-任何時候不確定 row primitive 內部是否漂移,跑這幾條 grep:
-
-```bash
-# 找出可疑的 raw ItemPrefix wrap 用法(應該幾乎沒有)
-rg '<ItemPrefix>\s*<[A-Z]' src/design-system
-
-# 找出硬寫 size 的 Avatar / Icon(在 row primitive 內應該為零)
-rg '<Avatar[^>]*size=\{[0-9]+\}' src/design-system/components/{Sidebar,TreeView,SelectMenu,DropdownMenu}
-rg 'size=\{16\}|size=\{20\}|size=\{24\}' src/design-system/components/{Sidebar,TreeView}
-
-# 找出沒走 ItemInlineAction 的 inline action button
-rg "group/action.*relative grid place-content-center" src/design-system
-```
-
-任何一條結果非空就是 drift,要修。
-
-### 清 unused imports 後**必須**跑 storybook 驗證
-
-`tsc --noEmit` clean ≠ runtime clean。曾發生過兩類 bug,都是 tsc 漏抓、runtime 才炸:
-
-> **Case A — 刪 import 但 JSX 還在用**:清 SidebarMenuButton 的 unused imports 時,順手把 `ItemInlineAction` 從 import 砍掉,但這個 identifier 還在 JSX 渲染裡用(`{inlineActions.map(...<ItemInlineAction>...)}`)。tsc 因為 JSX 內 identifier resolution 的特定規則沒抓到,storybook runtime 才爆 `ItemInlineAction is not defined`。
-
-> **Case B — 刪 symbol 但 export list 還在引用**:重構 Tabs 時把 `tabsListVariants` cva 定義拿掉(因為 TabsList 改走 branch 不再需要統一 cva),但底部 `export { ..., tabsListVariants, ... }` 還留著。tsc 沒抓到未宣告的 export identifier,runtime 時 Vite ESM 解析失敗整個 module 標記為 failed,Storybook 報「Failed to fetch dynamically imported module」,看起來像網路錯誤實則是 ESM 解析錯誤。
-
-**規則**:任何「import 清理」/「rename」/「刪 export」/「刪 helper / const / cva」之後,必須:
-
-1. `npx tsc --noEmit` 通過(必要但不充分)
-2. **grep export list 跟當前檔案定義比對**:確認 `export { A, B, C }` 裡每個 identifier 都還真的存在定義
-3. **`npm run dev` 或 `npm run storybook` 跑起來,實際載入動到的 story** ——這才是 runtime truth
-4. 對動到的元件至少切一次互動(點 button、開 collapsible)確保動態 path 也通過
-
-第 2、3、4 步不能省。特別是第 2 步,tsc 的 `--noEmit` 在某些配置下不會警告 "export 一個不存在的 symbol",必須人眼檢查。
-
-### Sidebar item 必須支援 single selection
-
-詳見 `components/Sidebar/sidebar.spec.md`。
+1. `npx tsc --noEmit`（必要但不充分）
+2. grep `export { }` 確認每個 identifier 都有定義
+3. `npm run storybook` 實際載入動到的 story
+4. 互動操作確認動態 path
 
 
 # Tailwind 使用規則
@@ -383,50 +301,14 @@ rg "group/action.*relative grid place-content-center" src/design-system
 | `rounded-lg`   | 8px（--radius-lg）    |
 | `rounded-full` | 9999px（--radius-full）|
 
-## tailwind-merge 自訂 utility 註冊規則(必讀)
+## tailwind-merge 自訂 utility 註冊（技術陷阱）
 
-`cn()`(`src/lib/utils.ts`)用 `tailwind-merge` 解決 class 衝突。tailwind-merge 看到 `text-{xxx}` 類 utility 時會用 heuristic 猜分組——猜錯就會把不該衝突的 class 誤判為衝突,strip 掉其中一個。
+新增任何 `text-*`、`bg-*`、`border-*`、`ring-*` 自訂 utility 後，**必須到 `lib/utils.ts` 顯式註冊到正確的 group**（font-size / text-color 等）。否則 tailwind-merge 會用 heuristic 猜分組，把不衝突的 class 誤判為衝突並 strip 掉。
 
-**已發生過的 bug**:`text-body`(font-size 14px)和 `text-fg-secondary`(color)被誤判為同組,tailwind-merge 把 `text-body` 吃掉,description 失去自己的 font-size、從父層繼承 16px。
+**曾發生的 bug**：`text-body`（font-size）和 `text-fg-secondary`（color）被誤判同組，description 失去 font-size。
 
-### 規則:任何新增的 `text-*` 自訂 utility 都必須在 `lib/utils.ts` 顯式註冊
-
-**font-size 類**(影響 `--font-{xxx}-size`)→ 註冊到 `font-size` group:
-```ts
-'font-size': ['text-h1', ..., 'text-body-lg', 'text-body', 'text-caption', 'text-footnote', 'text-你的新size']
-```
-
-**color 類**(影響 `color`)→ 註冊到 `text-color` group:
-```ts
-'text-color': [
-  'text-foreground', 'text-fg-secondary', 'text-fg-muted', 'text-fg-disabled',
-  'text-inverse-fg', 'text-error-text', 'text-success-text', ...,
-  'text-你的新色'
-]
-```
-
-**判斷法**:你新增的 utility 是設 font-size 還是 color?寫進對應的 group。**兩個 group 都要顯式列舉,不能讓 tailwind-merge 用 heuristic 自動猜**。
-
-### 不只是 text-*。其他可能誤判的 utility prefix
-
-| Utility 類型 | tailwind-merge 預設 group |
-|---|---|
-| `text-{xxx}` | `font-size` 或 `text-color` |
-| `bg-{xxx}` | `background-color` 或 `background-image` |
-| `border-{xxx}` | `border-color` 或 `border-width` 或 `border-style` |
-| `ring-{xxx}` | `ring-color` 或 `ring-width` |
-
-新增**任何**自訂 `{prefix}-{semantic-name}` utility 後,先確認它落在哪個 group。如果 cn() 後 class 不見了,99% 是 tailwind-merge 誤判,去 `lib/utils.ts` 註冊。
-
-### 終極逃生艙:inline style + CSS variable
-
-若 utility class 真的無法解決(例如同 element 同 cn() chain 必定衝突),改用 inline style + CSS variable,**仍然是 design token,沒有硬寫 px**:
-
-```tsx
-<span style={{ fontSize: 'var(--font-body-size)' }}>
-```
-
-inline style 的 specificity 高過 utility class,絕對不會被 strip。但這是逃生艙,不是預設做法——優先讓 utility 正確 work。
+**診斷法**：`cn()` 後某個 class 消失 → 99% 是 tailwind-merge 誤判 → 去 `lib/utils.ts` 註冊。
+**逃生艙**：inline style + CSS variable（`style={{ fontSize: 'var(--font-body-size)' }}`）。
 
 
 # Token 命名原則
@@ -458,19 +340,7 @@ Token 命名 = `--{namespace}-{role}-{variant?}`
 
 ## 3. 對齊既有 family
 
-新增 token 必須鏡射既有 family 的命名模式，不孤立發明。
-
-| 既有 family | 新增應對齊 |
-|------|------|
-| `--foreground` / `--fg-secondary` / `--fg-muted` / `--fg-disabled` | 新文字 base 用 `--{ctx}-fg`、變體用 `--{ctx}-fg-secondary` 等 |
-| `--neutral-hover` / `--neutral-active` | 新互動覆蓋層用 `--{ctx}-neutral-hover`（明確指出鏡射 neutral 互動） |
-| `--{semantic}-hover` / `--{semantic}-active` | 新語義 hover 對齊（如 `--primary-hover`） |
-| `--field-height-{xs,sm,md,lg}` | 新 height token 對齊既有尺寸維度 |
-
-**判斷標準**：
-- `--inverse-fg` → 應該預期它對應 `--foreground`
-- `--inverse-neutral-hover` → 應該預期它鏡射 `--neutral-hover`
-- 如果新 token 找不到對應 family，先質疑這個 token 是否真的需要
+新增 token 必須鏡射既有 family 的命名模式，不孤立發明。如果新 token 找不到對應 family，先質疑是否真的需要。既有 family 詳見 `tokens/color/color.spec.md`。
 
 ## 4. 不混語義名和色名
 
@@ -492,31 +362,11 @@ Token 命名 = `--{namespace}-{role}-{variant?}`
 
 ## 6. 新增語意色相必須依照 SOP
 
-新增 semantic 色相（如 `--accent`、`--brand-secondary` 等）**必須遵循** `src/design-system/tokens/color/color.spec.md` 的「新增語意色相的標準流程」，完整執行 4 步：
+新增 semantic 色相必須完整執行 4 步（primitive base → semantic 五件套 → dark mode 反轉 → Tailwind bridge）。詳見 `tokens/color/color.spec.md`「新增語意色相的標準流程」。
 
-1. Primitive base-6（如不存在）
-2. Semantic 五件套：`base` / `hover` / `active` / `subtle` / `text`（**不可缺任何一個**）
-3. Dark mode `hover` / `active` 方向反轉
-4. Tailwind bridge 五件套
+## 7. 色彩架構流派
 
-對應規則固定不可改：base=-6、hover=-5、active=-7、subtle=-1、text=-7。
-所有現有 semantic 色相（`--primary` / `--info` / `--error` / `--success` / `--warning`）都遵守這個結構，新色相必須一致。
-
-## 7. 色彩架構流派立場
-
-本系統採 **Atlassian-style Semantic State Token** 流派（業界四大流派之一），意思是：
-
-- **靜態色**（不需要 mode 翻轉知識）→ 用 primitive `--color-{hue}-N`
-- **互動狀態**（需要 dark mode swap）→ 用 semantic state token `--{hue}-hover` / `--{hue}-active` / `--primary-hover` 等
-
-**Tag/Avatar 同時用 primitive（靜態）和 semantic（互動）是有意的職責分離，不是 code smell**。兩個概念（raw color value vs interaction state with mode awareness）本來就該住不同層。
-
-我們**有意拒絕**其他三個流派：
-- **Radix Numbered Role Scale**（step number = role）——工程量極大，需重構整套 12-step scale
-- **Material 3 State Layer Overlay**（互動用透明 overlay）——跟我們 Button 用 solid shade change 的視覺語言不一致
-- **Tailwind Consumer-side Mode Handling**（consumer 寫 `dark:hover:`）——放棄 token 層級的抽象化價值
-
-**重要**：未來討論色彩架構或新增色彩 token 時，**先讀 `color.spec.md` 的「架構流派定位」段落**確認方向，避免無意間漂移到別的流派造成設計斷裂。
+本系統採 **Atlassian-style Semantic State Token** 流派。靜態色用 primitive，互動狀態用 semantic state token。新增色彩 token 前必讀 `tokens/color/color.spec.md`「架構流派定位」段落。
 
 
 # 元件 Props 命名原則
@@ -695,7 +545,7 @@ Provider 是**應用層配置**（delay、theme、portal target、toast position
 - 本地 `npm run storybook` 確認所有 stories 正常渲染
 - 沒有 TypeScript 錯誤
 - import 路徑正確（`@/design-system/...`）
-- 元件加入 `CLAUDE.md` 的目錄結構（如有異動）
+- 若元件為 internal primitive 或 shadcn passthrough，確認 `CLAUDE.md` 目錄結構的分類標註正確
 
 
 # 正式系統與探索區的區別
@@ -732,6 +582,23 @@ src/explorations/create-project-form/
 | Exploration story | `src/explorations/{topic}/` |
 
 不要把 exploration stories 放進 design-system，反之亦然。
+
+## Storybook title 命名規則
+
+```
+Design System/Tokens/{TokenName}                          ← Color, Typography, Density...
+Design System/Patterns/{PatternName}                      ← Item Layout, Action Bar...
+Design System/Components/{ComponentName}/展示              ← public-facing 元件
+Design System/Components/{ComponentName}/設計規格
+Design System/Components/{ComponentName}/設計原則
+Design System/Internal/{ComponentName}/展示                ← internal primitive（Menu, SelectMenu, Notice...）
+Design System/Internal/{ComponentName}/設計規格
+```
+
+- 第一層分類用英文（Components / Internal / Patterns / Tokens）
+- 元件名用 PascalCase 英文（與資料夾名一致）
+- 子頁面用中文（展示 / 設計規格 / 設計原則）
+- 不在子頁面前加元件名（❌ `MenuItem 展示` → ✅ `展示`）
 
 
 # Story 三層定位
