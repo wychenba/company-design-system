@@ -24,6 +24,18 @@ const Th = ({ children }: { children: React.ReactNode }) => (
   <th className="border border-border px-3 py-1.5 text-caption text-fg-secondary bg-muted text-left">{children}</th>
 )
 
+const Swatch = ({ value, size = 'sm' }: { value: string; size?: 'sm' | 'md' }) => {
+  const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
+  return <span className={`${s} rounded-md shrink-0 border border-black/10 inline-block align-middle`} style={{ backgroundColor: value === 'white' ? '#fff' : `var(${value})` }} />
+}
+
+const TokenCell = ({ token, display }: { token: string; display?: string }) => (
+  <span className="inline-flex items-center gap-1.5">
+    <Swatch value={token} size="sm" />
+    <span className="font-mono">{display ?? token}</span>
+  </span>
+)
+
 export const Overview: Story = {
   name: '元件總覽',
   render: () => (
@@ -128,9 +140,9 @@ export const StateMatrix: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>State</Th><Th>Bg</Th><Th>Text</Th><Th>Border</Th><Th>Z-index</Th></tr></thead>
             <tbody>
-              <tr><Td>Unselected</Td><Td mono>bg-surface</Td><Td mono>text-fg-secondary</Td><Td mono>border-border</Td><Td>—</Td></tr>
-              <tr><Td>Hover unselected</Td><Td mono>bg-surface(不變)</Td><Td mono>text-foreground</Td><Td mono>border-border</Td><Td>—</Td></tr>
-              <tr><Td>Selected</Td><Td mono>bg-surface</Td><Td mono>text-primary</Td><Td mono>border-primary</Td><Td mono>z-10(浮在相鄰 item border 上)</Td></tr>
+              <tr><Td>Unselected</Td><Td><TokenCell token="--surface" display="bg-surface" /></Td><Td><TokenCell token="--fg-secondary" display="text-fg-secondary" /></Td><Td><TokenCell token="--border" display="border-border" /></Td><Td>—</Td></tr>
+              <tr><Td>Hover unselected</Td><Td><TokenCell token="--surface" display="bg-surface(不變)" /></Td><Td><TokenCell token="--foreground" display="text-foreground" /></Td><Td><TokenCell token="--border" display="border-border" /></Td><Td>—</Td></tr>
+              <tr><Td>Selected</Td><Td><TokenCell token="--surface" display="bg-surface" /></Td><Td><TokenCell token="--primary" display="text-primary" /></Td><Td><TokenCell token="--primary" display="border-primary" /></Td><Td mono>z-10(浮在相鄰 item border 上)</Td></tr>
               <tr><Td>Disabled</Td><Td>灰化</Td><Td>灰化</Td><Td>—</Td><Td>—</Td></tr>
             </tbody>
           </table>

@@ -22,6 +22,18 @@ const Th = ({ children }: { children: React.ReactNode }) => (
   <th className="border border-border px-3 py-1.5 text-caption text-fg-secondary bg-muted text-left">{children}</th>
 )
 
+const Swatch = ({ value, size = 'sm' }: { value: string; size?: 'sm' | 'md' }) => {
+  const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
+  return <span className={`${s} rounded-md shrink-0 border border-black/10 inline-block align-middle`} style={{ backgroundColor: value === 'white' ? '#fff' : `var(${value})` }} />
+}
+
+const TokenCell = ({ token, display }: { token: string; display?: string }) => (
+  <span className="inline-flex items-center gap-1.5">
+    <Swatch value={token} size="sm" />
+    <span className="font-mono">{display ?? token}</span>
+  </span>
+)
+
 export const Overview: Story = {
   name: '元件總覽',
   render: () => (
@@ -107,8 +119,8 @@ export const StateMatrix: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>State</Th><Th>Track</Th><Th>Thumb</Th><Th>Check icon</Th></tr></thead>
             <tbody>
-              <tr><Td>OFF</Td><Td mono>bg-border(neutral-5)</Td><Td mono>白色無 border</Td><Td>—</Td></tr>
-              <tr><Td>ON</Td><Td mono>bg-primary</Td><Td mono>白色 + 2px primary border</Td><Td mono>primary check</Td></tr>
+              <tr><Td>OFF</Td><Td><TokenCell token="--border" display="bg-border(neutral-5)" /></Td><Td mono>白色無 border</Td><Td>—</Td></tr>
+              <tr><Td>ON</Td><Td><TokenCell token="--primary" display="bg-primary" /></Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary" size="sm" /><span className="font-mono">白色 + 2px primary border</span></span></Td><Td><TokenCell token="--primary" display="primary check" /></Td></tr>
               <tr><Td>Disabled OFF</Td><Td>opacity-disabled 套於整體</Td><Td>同 OFF(顏色保留)</Td><Td>—</Td></tr>
               <tr><Td>Disabled ON</Td><Td>opacity-disabled 套於整體</Td><Td>同 ON(顏色保留)</Td><Td>同 ON</Td></tr>
               <tr><Td>Readonly</Td><Td>正常顏色</Td><Td>正常視覺</Td><Td>視 on/off</Td></tr>

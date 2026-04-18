@@ -89,6 +89,21 @@ Modal 與 viewport 四邊保持 `--layout-space-bottom`（48px）最小間距。
 - 進場：fade-in + zoom-in-95 + slide-in-from-center
 - 離場：fade-out + zoom-out-95 + slide-out-to-center
 
+## 狀態處理的職責邊界
+
+Dialog 是容器，無整體 disabled / loading / empty 狀態——這些屬於內容層的責任：
+
+| 狀態 | 處理方式 |
+|------|---------|
+| **Loading**（內容載入中）| Consumer 在 `DialogContent` 內渲染 Skeleton / Spinner，不是讓 Dialog 本身等待開啟 |
+| **Empty**（如步驟 dialog 還沒資料）| Consumer 在 content 區用 `Empty` primitive |
+| **Error**（操作失敗）| Consumer 在 content 區用 `Alert` |
+| **Disabled**（整個 dialog）| N/A——dialog 要麼開著（可互動）要麼關著（不存在）。要鎖操作請 disable 內部個別 Button / Field |
+
+**Dark mode**：由 semantic token（`bg-surface-raised` / `border-border`）自動切換，無自訂 palette。
+
+**Density**：Dialog 強制 `data-density="lg"`（見上「Density」段），不繼承頁面 density。
+
 ---
 
 ## 相關

@@ -23,6 +23,18 @@ const Th = ({ children }: { children: React.ReactNode }) => (
   <th className="border border-border px-3 py-1.5 text-caption text-fg-secondary bg-muted text-left">{children}</th>
 )
 
+const Swatch = ({ value, size = 'sm' }: { value: string; size?: 'sm' | 'md' }) => {
+  const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
+  return <span className={`${s} rounded-md shrink-0 border border-black/10 inline-block align-middle`} style={{ backgroundColor: value === 'white' ? '#fff' : `var(${value})` }} />
+}
+
+const TokenCell = ({ token, display }: { token: string; display?: string }) => (
+  <span className="inline-flex items-center gap-1.5">
+    <Swatch value={token} size="sm" />
+    <span className="font-mono">{display ?? token}</span>
+  </span>
+)
+
 export const Overview: Story = {
   name: '元件總覽',
   render: () => (
@@ -109,11 +121,11 @@ export const VariantThemeStrategy: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>Variant</Th><Th>Bg</Th><Th>data-theme</Th><Th>視覺</Th></tr></thead>
             <tbody>
-              <tr><Td mono>neutral</Td><Td mono>bg-surface-raised(同層翻轉)</Td><Td mono>{'{inverse}'}</Td><Td>light 頁→暗底 / dark 頁→亮底</Td></tr>
-              <tr><Td mono>success</Td><Td mono>bg-surface-raised(同層翻轉)</Td><Td mono>{'{inverse}'}</Td><Td>同上 + 綠色 icon</Td></tr>
-              <tr><Td mono>info</Td><Td mono>bg-info(outer)</Td><Td mono>"dark"(inner)</Td><Td>藍底白字</Td></tr>
-              <tr><Td mono>warning</Td><Td mono>bg-warning(outer)</Td><Td mono>"light"(inner)</Td><Td>黃底深字</Td></tr>
-              <tr><Td mono>error</Td><Td mono>bg-error(outer)</Td><Td mono>"dark"(inner)</Td><Td>橘底白字</Td></tr>
+              <tr><Td mono>neutral</Td><Td><TokenCell token="--surface-raised" display="bg-surface-raised(同層翻轉)" /></Td><Td mono>{'{inverse}'}</Td><Td>light 頁→暗底 / dark 頁→亮底</Td></tr>
+              <tr><Td mono>success</Td><Td><TokenCell token="--surface-raised" display="bg-surface-raised(同層翻轉)" /></Td><Td mono>{'{inverse}'}</Td><Td>同上 + 綠色 icon</Td></tr>
+              <tr><Td mono>info</Td><Td><TokenCell token="--info" display="bg-info(outer)" /></Td><Td mono>"dark"(inner)</Td><Td>藍底白字</Td></tr>
+              <tr><Td mono>warning</Td><Td><TokenCell token="--warning" display="bg-warning(outer)" /></Td><Td mono>"light"(inner)</Td><Td>黃底深字</Td></tr>
+              <tr><Td mono>error</Td><Td><TokenCell token="--error" display="bg-error(outer)" /></Td><Td mono>"dark"(inner)</Td><Td>橘底白字</Td></tr>
             </tbody>
           </table>
         </div>

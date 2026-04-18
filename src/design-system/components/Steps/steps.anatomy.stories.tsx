@@ -23,6 +23,18 @@ const Th = ({ children }: { children: React.ReactNode }) => (
   <th className="border border-border px-3 py-1.5 text-caption text-fg-secondary bg-muted text-left">{children}</th>
 )
 
+const Swatch = ({ value, size = 'sm' }: { value: string; size?: 'sm' | 'md' }) => {
+  const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
+  return <span className={`${s} rounded-md shrink-0 border border-black/10 inline-block align-middle`} style={{ backgroundColor: value === 'white' ? '#fff' : `var(${value})` }} />
+}
+
+const TokenCell = ({ token, display }: { token: string; display?: string }) => (
+  <span className="inline-flex items-center gap-1.5">
+    <Swatch value={token} size="sm" />
+    <span className="font-mono">{display ?? token}</span>
+  </span>
+)
+
 export const Overview: Story = {
   name: '元件總覽',
   render: () => (
@@ -47,10 +59,10 @@ export const Overview: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>狀態</Th><Th>Indicator</Th><Th>Label</Th><Th>Connector(右側)</Th></tr></thead>
             <tbody>
-              <tr><Td>completed</Td><Td>filled primary + white check icon</Td><Td>foreground</Td><Td mono>bg-primary</Td></tr>
-              <tr><Td>current(= value)</Td><Td>hollow + primary border + ring</Td><Td>foreground</Td><Td mono>bg-divider</Td></tr>
-              <tr><Td>upcoming</Td><Td>hollow + border</Td><Td>fg-secondary</Td><Td mono>bg-divider</Td></tr>
-              <tr><Td>error</Td><Td>bg-error + white icon</Td><Td>error</Td><Td>—</Td></tr>
+              <tr><Td>completed</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary" size="sm" /><span>filled primary + white check icon</span></span></Td><Td><TokenCell token="--foreground" display="foreground" /></Td><Td><TokenCell token="--primary" display="bg-primary" /></Td></tr>
+              <tr><Td>current(= value)</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary" size="sm" /><span>hollow + primary border + ring</span></span></Td><Td><TokenCell token="--foreground" display="foreground" /></Td><Td><TokenCell token="--divider" display="bg-divider" /></Td></tr>
+              <tr><Td>upcoming</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--border" size="sm" /><span>hollow + border</span></span></Td><Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td><Td><TokenCell token="--divider" display="bg-divider" /></Td></tr>
+              <tr><Td>error</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--error" size="sm" /><span>bg-error + white icon</span></span></Td><Td><TokenCell token="--error" display="error" /></Td><Td>—</Td></tr>
             </tbody>
           </table>
         </div>

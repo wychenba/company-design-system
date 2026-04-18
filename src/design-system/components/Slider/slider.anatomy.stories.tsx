@@ -22,6 +22,18 @@ const Th = ({ children }: { children: React.ReactNode }) => (
   <th className="border border-border px-3 py-1.5 text-caption text-fg-secondary bg-muted text-left">{children}</th>
 )
 
+const Swatch = ({ value, size = 'sm' }: { value: string; size?: 'sm' | 'md' }) => {
+  const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
+  return <span className={`${s} rounded-md shrink-0 border border-black/10 inline-block align-middle`} style={{ backgroundColor: value === 'white' ? '#fff' : `var(${value})` }} />
+}
+
+const TokenCell = ({ token, display }: { token: string; display?: string }) => (
+  <span className="inline-flex items-center gap-1.5">
+    <Swatch value={token} size="sm" />
+    <span className="font-mono">{display ?? token}</span>
+  </span>
+)
+
 export const Overview: Story = {
   name: '元件總覽',
   render: () => (
@@ -80,17 +92,17 @@ export const VisualSpecs: Story = {
             <thead><tr><Th>元素</Th><Th>值</Th><Th>Token</Th></tr></thead>
             <tbody>
               <tr><Td>Track 厚度</Td><Td mono>4px(h-1)</Td><Td>—</Td></tr>
-              <tr><Td>Track 底色 default</Td><Td mono>bg-secondary</Td><Td mono>--secondary(neutral-3)</Td></tr>
-              <tr><Td>Track 底色 disabled</Td><Td mono>bg-muted</Td><Td mono>--muted(neutral-2)</Td></tr>
-              <tr><Td>Range 填滿色 default</Td><Td mono>bg-primary</Td><Td mono>--primary</Td></tr>
-              <tr><Td>Range 填滿色 disabled</Td><Td mono>bg-border</Td><Td mono>--border(neutral-5)</Td></tr>
+              <tr><Td>Track 底色 default</Td><Td><TokenCell token="--secondary" display="bg-secondary" /></Td><Td><TokenCell token="--secondary" display="--secondary(neutral-3)" /></Td></tr>
+              <tr><Td>Track 底色 disabled</Td><Td><TokenCell token="--muted" display="bg-muted" /></Td><Td><TokenCell token="--muted" display="--muted(neutral-2)" /></Td></tr>
+              <tr><Td>Range 填滿色 default</Td><Td><TokenCell token="--primary" display="bg-primary" /></Td><Td><TokenCell token="--primary" /></Td></tr>
+              <tr><Td>Range 填滿色 disabled</Td><Td><TokenCell token="--border" display="bg-border" /></Td><Td><TokenCell token="--border" display="--border(neutral-5)" /></Td></tr>
               <tr><Td>Thumb 直徑</Td><Td mono>16px(h-4 w-4)</Td><Td>—</Td></tr>
-              <tr><Td>Thumb 底色</Td><Td mono>bg-surface(白,default+disabled 不變)</Td><Td mono>--surface</Td></tr>
-              <tr><Td>Thumb 邊框 default</Td><Td mono>border-2 border-primary</Td><Td mono>--primary(與 Range default 同色)</Td></tr>
-              <tr><Td>Thumb 邊框 disabled</Td><Td mono>border-border</Td><Td mono>--border(與 Range disabled 同色)</Td></tr>
+              <tr><Td>Thumb 底色</Td><Td><TokenCell token="--surface" display="bg-surface(白,default+disabled 不變)" /></Td><Td><TokenCell token="--surface" /></Td></tr>
+              <tr><Td>Thumb 邊框 default</Td><Td><TokenCell token="--primary" display="border-2 border-primary" /></Td><Td><TokenCell token="--primary" display="--primary(與 Range default 同色)" /></Td></tr>
+              <tr><Td>Thumb 邊框 disabled</Td><Td><TokenCell token="--border" display="border-border" /></Td><Td><TokenCell token="--border" display="--border(與 Range disabled 同色)" /></Td></tr>
               <tr><Td>Thumb hover</Td><Td mono>border primary-hover + --elevation-100</Td><Td>—</Td></tr>
               <tr><Td>Thumb active</Td><Td mono>--elevation-200</Td><Td>—</Td></tr>
-              <tr><Td>Focus ring</Td><Td mono>ring-2 ring-ring ring-offset-2</Td><Td mono>--ring</Td></tr>
+              <tr><Td>Focus ring</Td><Td mono>ring-2 ring-ring ring-offset-2</Td><Td><TokenCell token="--ring" /></Td></tr>
             </tbody>
           </table>
         </div>
@@ -161,8 +173,8 @@ export const ColorBindingRule: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>State</Th><Th>Range bg</Th><Th>Thumb border</Th><Th>共享 token</Th></tr></thead>
             <tbody>
-              <tr><Td>Default</Td><Td mono>bg-primary</Td><Td mono>border-primary</Td><Td mono>--primary</Td></tr>
-              <tr><Td>Disabled</Td><Td mono>bg-border</Td><Td mono>border-border</Td><Td mono>--border</Td></tr>
+              <tr><Td>Default</Td><Td><TokenCell token="--primary" display="bg-primary" /></Td><Td><TokenCell token="--primary" display="border-primary" /></Td><Td><TokenCell token="--primary" /></Td></tr>
+              <tr><Td>Disabled</Td><Td><TokenCell token="--border" display="bg-border" /></Td><Td><TokenCell token="--border" display="border-border" /></Td><Td><TokenCell token="--border" /></Td></tr>
             </tbody>
           </table>
         </div>
