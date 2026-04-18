@@ -5,7 +5,7 @@ import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta = {
-  title: 'Design System/Components/HoverCard/設計規格',
+  title: 'Design System/Internal/HoverCard/設計規格',
   parameters: { layout: 'padded' },
 }
 export default meta
