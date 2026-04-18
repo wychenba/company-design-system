@@ -29,6 +29,15 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_sync_update.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_token_hygiene.sh\""
+          }
+        ]
       }
     ]
   }

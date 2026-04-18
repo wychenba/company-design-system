@@ -59,9 +59,9 @@
 若缺少上述檔案，請先建立再進行其他修改。
 
 
-# 規則分層（7 個 home，寫任何新規則前先決定位置）
+# 規則分層（8 個 home，寫任何新規則前先決定位置）
 
-設計系統的知識分 7 個 home。**寫任何新規則、新文件、新協議前,先跑下方「放哪裡 decision flowchart」——不要全部塞進 CLAUDE.md**。
+設計系統的知識分 8 個 home。**寫任何新規則、新文件、新協議前,先跑下方「放哪裡 decision flowchart」——不要全部塞進 CLAUDE.md**。
 
 ## 7 個 home + 各自的 scope
 
@@ -111,8 +111,25 @@
 - **不適合**:固定規則、跑得出的資訊（git log / 現行 code 有就不用記）、user 明確「先不管」的事項
 
 **Level 7 — Hook (`.claude/hooks/*.sh` / `*.py`)**
-- **Pre/post-tool 自動化**（邊界守衛、sync check 提醒、import guard）
+- **Pre/post-tool 自動化**（邊界守衛、sync check 提醒、token hygiene、import guard）
 - **判斷法**:這條規則能「機械化在 tool 執行前後自動跑」嗎? 是 → hook;否 → CLAUDE.md 或 spec
+- **當前 hooks** (4 個): `pre_edit_spec_check.sh` / `check_sync_update.sh` / `check_token_hygiene.sh` / `block_prototype_imports.py`
+
+**Level 8 — Slash Command (`.claude/commands/*.md`)**
+- **輕量 user-invokable shortcut**（單步 action,無 workflow / checkpoints）
+- 跟 Skill 的差別:Skill 是多步驟 workflow + user 決策點;Command 是一次性 scaffold / 單步觸發
+- **判斷法**:這是「一次性 scaffold 或單步 action」嗎? 是且**重複使用 ≥ 3 次** → Command;否 → 需要 workflow → Skill
+- **當前狀態**:專案目前未採納(無高頻 scaffold 需求);未來若需 `/new-component` / `/check-token-hygiene` 等 shortcut 時加到 `.claude/commands/`
+
+### 已知但未採納的 Claude Code 能力（future-ready）
+
+僅供參考,**目前專案未使用**——寫新規則前先用上述 8 個 home,用盡才考慮這些。
+
+| 能力 | 路徑 | 何時該採納 |
+|------|------|-----------|
+| Custom sub-agent | `.claude/agents/*.md` | 需要 persona 化的 specialized agent,且會重複使用(目前用 generic + 客製 prompt 就夠) |
+| MCP server | 外部 server | 需要對接外部工具/資料(e.g., Figma token sync)——屬整合層,非規則放置 |
+| Output style | `.claude/output-styles/*.md` | 特定場合需要自訂輸出格式(對 DS 工作無關) |
 
 ## 放哪裡 decision flowchart
 
@@ -124,7 +141,8 @@ Q1. 是設計規則嗎?(如何寫 spec / code / token / story / pattern)
     → NO: 繼續 Q2
 
 Q2. 只在「特定 invoke 情境」才需要嗎?(audit / code review / setup 等)
-    → YES: Skill(SKILL.md 主流程,references/ 細節)
+    → YES 且是**多步驟 workflow + user 決策點**: Skill(SKILL.md + references/)
+    → YES 且是**一次性單步 action**(scaffold / 單一 check): Slash Command(.claude/commands/*.md)
     → NO: 繼續 Q3
 
 Q3. 是「隨時間變化的狀態」嗎?(已完成 / 待辦 / 決策紀錄 / user 偏好)
