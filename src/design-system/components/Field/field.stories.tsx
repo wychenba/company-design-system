@@ -397,7 +397,7 @@ export const BlockControlRadioGroup: Story = {
         <h3 className="text-body font-bold mb-2">Inline + Block 並排:FieldGroup 韻律不斷</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
           同一個 FieldGroup 內混用 inline(Input)和 block(RadioGroup),每個 Field 的 label
-          第一行中線都落在同一條視覺基準上——Input 的中線、Option A 的中線、Email 的中線。
+          第一行中線都落在同一條視覺基準上——姓名 Input 的中線、性別第一個 Radio(男性)的中線、Email Input 的中線。
           這就是 field-height 韻律。
         </p>
         <FieldGroup>

@@ -72,7 +72,7 @@ Slider 接收 `size?: 'sm' | 'md' | 'lg'` prop(預設 `md`),**這個 prop 只決
 
 ### 為什麼 thumb 是**白底 + 邊框**,不是**實心 primary**
 
-實心 primary thumb 在 range mode(兩個 thumb)+ primary range 一起時,會跟 range 融為一體,看不出 thumb 邊界。白底 + 邊框讓 thumb 的位置清楚浮出:**thumb 的白底是「被 range 圍住的空心洞」**,border 則是 range 的連續延伸。這是 Material 3 / iOS / Linear 的共同解法。
+實心 primary thumb 在 range mode(兩個 thumb)與 primary range 共存時邊界無法分離。白底 + 邊框讓 thumb 與 range 視覺可區分——thumb 作為位置指示器,必須能從 range 中辨別。這是 Material 3 / iOS / Linear 的共同解法。
 
 ### 為什麼 Track 永遠是 `bg-muted`,不跟 state 變動
 
@@ -94,7 +94,7 @@ Range 填滿色和 Thumb border 色**永遠是同一個 token**:
 | Rest | `bg-primary` | `border-primary` | `--primary` |
 | Disabled | `bg-border` | `border-border` | `--border` |
 
-**為什麼綁在一起**:thumb 坐落在 range 的端點上,border 是 range 的視覺延續。兩者同色時,視覺上看起來像「range 包住 thumb」——thumb 的白底是「被 range 圍住的空心洞」,而不是「thumb 浮在 range 上面的異物」。這個 mental model 更接近真實滑桿(物理滑桿的 handle 就是軌道本身的延伸)。
+**為什麼綁在一起**:thumb 坐落在 range 的端點上,border 是 range 的視覺延續;兩者同色讓 thumb 作為「range 的終點標記」而非獨立元素,對齊物理滑桿 handle 屬於軌道一部分的 mental model(具體視覺呈現見 `.principles.stories.tsx` 的 ThumbBindingRule)。
 
 **強制規則**:未來若要改 Range 的 disabled 色(例如加新 variant),必須同步改 Thumb border。不要讓兩者漂移。
 

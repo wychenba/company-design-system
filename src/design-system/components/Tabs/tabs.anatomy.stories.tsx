@@ -107,11 +107,11 @@ export const SizeMatrix: Story = {
         <Desc>Tabs 有自己的高度 tier(不直接複用 field-height)——tab 需要較高視覺重量,`--tab-height-*` 比 `--field-height-*` 略高。</Desc>
         <div className="overflow-x-auto mb-4">
           <table className="text-caption border-collapse">
-            <thead><tr><Th>Size</Th><Th>md density</Th><Th>lg density</Th><Th>Token</Th><Th>字體</Th><Th>使用場景</Th></tr></thead>
+            <thead><tr><Th>Size</Th><Th>Token</Th><Th>字體</Th><Th>使用場景</Th></tr></thead>
             <tbody>
-              <tr><Td mono>sm</Td><Td mono>32</Td><Td mono>40</Td><Td mono>--tab-height-sm</Td><Td>text-body</Td><Td>Dialog / Sidebar / dense</Td></tr>
-              <tr><Td mono>md ★default</Td><Td mono>40</Td><Td mono>48</Td><Td mono>--tab-height-md</Td><Td>text-body</Td><Td>一般頁面</Td></tr>
-              <tr><Td mono>lg</Td><Td mono>48</Td><Td mono>56</Td><Td mono>--tab-height-lg</Td><Td>text-body-lg</Td><Td>page-level hero</Td></tr>
+              <tr><Td mono>sm</Td><Td mono>--tab-height-sm</Td><Td>text-body</Td><Td>Dialog / Sidebar / dense</Td></tr>
+              <tr><Td mono>md ★default</Td><Td mono>--tab-height-md</Td><Td>text-body</Td><Td>一般頁面</Td></tr>
+              <tr><Td mono>lg</Td><Td mono>--tab-height-lg</Td><Td>text-body-lg</Td><Td>page-level hero</Td></tr>
             </tbody>
           </table>
         </div>

@@ -63,7 +63,7 @@ export const Overview: Story = {
                 ['SegmentedControl', '', '', ''],
                 ['  value / defaultValue', 'string', '必填', '當前 value(Radix ToggleGroup type="single"),必須落在可選 item 上'],
                 ['  onValueChange', '(value: string) => void', '—', '切換 callback'],
-                ['  size', "'xs' | 'sm' | 'md' | 'lg'", "'sm'", '對齊 --field-height-*(跟 Button / Input 同)'],
+                ['  size', "'xs' | 'sm' | 'md' | 'lg'", "'md'", '對齊 --field-height-*(跟 Button / Input 同,field-height family 共享 default md)'],
                 ['  fullWidth', 'boolean', 'false', 'hug content(false)vs 撐滿父容器並等分(true)'],
                 ['  iconOnly', 'boolean', 'false', 'group-level:全部 icon-only(必須整組一致,不可混搭)'],
                 ['  disabled', 'boolean', 'false', '整個 SegmentedControl 停用'],
@@ -92,12 +92,12 @@ export const SizeMatrix: Story = {
         <H3>四種 Size — 對齊 field-height / button 系統</H3>
         <div className="overflow-x-auto mb-4">
           <table className="text-caption border-collapse">
-            <thead><tr><Th>Size</Th><Th>md density</Th><Th>lg density</Th><Th>Padding</Th><Th>字體</Th><Th>Icon</Th></tr></thead>
+            <thead><tr><Th>Size</Th><Th>Token</Th><Th>Padding</Th><Th>字體</Th><Th>Icon</Th></tr></thead>
             <tbody>
-              <tr><Td mono>xs</Td><Td mono>24</Td><Td mono>24(固定)</Td><Td mono>px-2</Td><Td>text-caption(12)</Td><Td mono>14</Td></tr>
-              <tr><Td mono>sm</Td><Td mono>28</Td><Td mono>32</Td><Td mono>px-3</Td><Td>text-body(14)</Td><Td mono>16</Td></tr>
-              <tr><Td mono>md ★default</Td><Td mono>32</Td><Td mono>36</Td><Td mono>px-3</Td><Td>text-body(14)</Td><Td mono>16</Td></tr>
-              <tr><Td mono>lg</Td><Td mono>36</Td><Td mono>40</Td><Td mono>px-3</Td><Td>text-body-lg(16)</Td><Td mono>20</Td></tr>
+              <tr><Td mono>xs</Td><Td mono>--field-height-xs(固定)</Td><Td mono>px-2</Td><Td>text-caption</Td><Td mono>14</Td></tr>
+              <tr><Td mono>sm</Td><Td mono>--field-height-sm</Td><Td mono>px-3</Td><Td>text-body</Td><Td mono>16</Td></tr>
+              <tr><Td mono>md ★default</Td><Td mono>--field-height-md</Td><Td mono>px-3</Td><Td>text-body</Td><Td mono>16</Td></tr>
+              <tr><Td mono>lg</Td><Td mono>--field-height-lg</Td><Td mono>px-3</Td><Td>text-body-lg</Td><Td mono>20</Td></tr>
             </tbody>
           </table>
         </div>

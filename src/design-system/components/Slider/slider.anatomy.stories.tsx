@@ -80,13 +80,13 @@ export const VisualSpecs: Story = {
             <thead><tr><Th>元素</Th><Th>值</Th><Th>Token</Th></tr></thead>
             <tbody>
               <tr><Td>Track 厚度</Td><Td mono>4px(h-1)</Td><Td>—</Td></tr>
-              <tr><Td>Track 底色 rest</Td><Td mono>bg-secondary</Td><Td mono>--secondary(neutral-3)</Td></tr>
+              <tr><Td>Track 底色 default</Td><Td mono>bg-secondary</Td><Td mono>--secondary(neutral-3)</Td></tr>
               <tr><Td>Track 底色 disabled</Td><Td mono>bg-muted</Td><Td mono>--muted(neutral-2)</Td></tr>
-              <tr><Td>Range 填滿色 rest</Td><Td mono>bg-primary</Td><Td mono>--primary</Td></tr>
+              <tr><Td>Range 填滿色 default</Td><Td mono>bg-primary</Td><Td mono>--primary</Td></tr>
               <tr><Td>Range 填滿色 disabled</Td><Td mono>bg-border</Td><Td mono>--border(neutral-5)</Td></tr>
               <tr><Td>Thumb 直徑</Td><Td mono>16px(h-4 w-4)</Td><Td>—</Td></tr>
-              <tr><Td>Thumb 底色</Td><Td mono>bg-surface(白,rest+disabled 不變)</Td><Td mono>--surface</Td></tr>
-              <tr><Td>Thumb 邊框 rest</Td><Td mono>border-2 border-primary</Td><Td mono>--primary(與 Range rest 同色)</Td></tr>
+              <tr><Td>Thumb 底色</Td><Td mono>bg-surface(白,default+disabled 不變)</Td><Td mono>--surface</Td></tr>
+              <tr><Td>Thumb 邊框 default</Td><Td mono>border-2 border-primary</Td><Td mono>--primary(與 Range default 同色)</Td></tr>
               <tr><Td>Thumb 邊框 disabled</Td><Td mono>border-border</Td><Td mono>--border(與 Range disabled 同色)</Td></tr>
               <tr><Td>Thumb hover</Td><Td mono>border primary-hover + --elevation-100</Td><Td>—</Td></tr>
               <tr><Td>Thumb active</Td><Td mono>--elevation-200</Td><Td>—</Td></tr>
@@ -120,7 +120,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StatesMatrix: Story = {
-  name: '狀態(rest / hover / active / focus / disabled)',
+  name: '狀態(default / hover / active / focus / disabled)',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>
@@ -128,7 +128,7 @@ export const StatesMatrix: Story = {
         <Desc>Hover 和 Active 用**陰影**(elevation)不用色變——Slider 是「當前位置指示器」,底色不該動(動了會暗示是另一個狀態)。對齊 Material 3 / iOS / Linear 共識。</Desc>
         <div className="flex flex-col gap-3">
           <div className="border border-dashed border-divider rounded-md p-3">
-            <div className="text-caption text-fg-muted mb-2">Rest(預設)</div>
+            <div className="text-caption text-fg-muted mb-2">Default</div>
             <Slider defaultValue={[50]} />
           </div>
           <div className="border border-dashed border-divider rounded-md p-3">
@@ -161,7 +161,7 @@ export const ColorBindingRule: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>State</Th><Th>Range bg</Th><Th>Thumb border</Th><Th>共享 token</Th></tr></thead>
             <tbody>
-              <tr><Td>Rest</Td><Td mono>bg-primary</Td><Td mono>border-primary</Td><Td mono>--primary</Td></tr>
+              <tr><Td>Default</Td><Td mono>bg-primary</Td><Td mono>border-primary</Td><Td mono>--primary</Td></tr>
               <tr><Td>Disabled</Td><Td mono>bg-border</Td><Td mono>border-border</Td><Td mono>--border</Td></tr>
             </tbody>
           </table>

@@ -68,7 +68,7 @@ export const Overview: Story = {
                 ['  completedValues', 'string[]', '[]', '已完成的步驟 values'],
                 ['  errorValues', 'string[]', '[]', '錯誤的步驟 values'],
                 ['  size', "'sm' | 'md' | 'lg'", "'md'", 'indicator / 字體 tier'],
-                ['  orientation', "'horizontal' | 'vertical'", "'horizontal'", '步驟排列方向'],
+                ['  orientation', "'horizontal' | 'vertical'", "'vertical'", '步驟排列方向'],
                 ['  onStepClick', '(value: string) => void', '—', '點擊 completed step 的 callback(linear 流程可回查)'],
                 ['StepItem', '', '', ''],
                 ['  value', 'string', '必填', '唯一識別碼'],
@@ -91,7 +91,7 @@ export const OrientationMatrix: Story = {
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
-        <H3>Horizontal(預設)</H3>
+        <H3>Horizontal</H3>
         <Desc>步驟水平排列,常見於結帳流程 / wizard 頂部。Indicator 之間有橫向 connector。</Desc>
         <div className="border border-border rounded-lg p-4 max-w-2xl">
           <Steps value="payment" completedValues={['cart']}>
@@ -104,7 +104,7 @@ export const OrientationMatrix: Story = {
       </div>
 
       <div>
-        <H3>Vertical</H3>
+        <H3>Vertical(預設)</H3>
         <Desc>步驟垂直排列,支援 description(多行描述)。常見於 onboarding / 安裝引導 / 複雜流程。</Desc>
         <div className="border border-border rounded-lg p-4 max-w-md">
           <Steps orientation="vertical" value="config" completedValues={['install']}>

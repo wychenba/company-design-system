@@ -12,7 +12,7 @@
 
 `ScrollArrow` 元件在 `Tabs/tabs.tsx` 和 `Chip/chip.tsx` **逐行 copy-paste**,`buildFadeMask` / `ARROW_BUTTON_WIDTH` / `SCROLL_PAGE_RATIO` 常數也是複製的。任何修改都要手動改兩處,是漂移溫床——實際上已經造成了一個 bug:
 
-**Chip 的 menu trigger 用 chip-shaped outlined button(`chipVariants() + aspect-square + p-0`),而不是 text button**。這讓 Chip 的 menu trigger 看起來像「第六個可選 chip」,mental model 完全錯誤:使用者點下去預期是選中,實際是打開選單。而 Tabs 的 menu trigger 用 text button 正確表達「這是 overflow 工具」,兩個元件自相矛盾。
+**Chip 的 menu trigger 曾用 chip variant 的視覺語言(與可選 chip 同形狀),讓 menu trigger 與可選 chip 在 mental model 上無法區分——使用者預期點擊是選中,實際是打開選單。同期 Tabs 的 menu trigger 用 text button 正確表達「這是 overflow 工具」,兩個元件 overflow affordance 自相矛盾。**
 
 ### Canonical 規則
 

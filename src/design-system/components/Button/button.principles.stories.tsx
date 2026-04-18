@@ -231,11 +231,11 @@ export const OrderRule: Story = {
         title="視覺重量序列 — 決定按鈕在群組中的相對位置"
         note="按視覺重量由高至低排列，最強吸引力的動作放在「起點」位置。danger 是顏色疊加，不影響排序位置；同 variant 內 danger 排在非 danger 之後（遠離主要焦點）"
       >
-        <Button variant="primary">Primary</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="secondary" danger>Secondary danger</Button>
-        <Button variant="tertiary">Tertiary</Button>
-        <Button variant="text">Text</Button>
+        <Button variant="primary">發布</Button>
+        <Button variant="secondary">儲存草稿</Button>
+        <Button variant="secondary" danger>放棄變更</Button>
+        <Button variant="tertiary">預覽</Button>
+        <Button variant="text">查看歷史</Button>
       </Rule>
 
       <Rule

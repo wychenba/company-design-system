@@ -134,13 +134,7 @@ Chip 的 overflow 處理有三種模式：
 
 ### wrap — 預設
 
-```css
-display: flex;
-flex-wrap: wrap;
-gap: 8px; /* gap-2 */
-```
-
-最簡單、最常見。filter panel 裡 chip 數量不定時用這個。
+塞不下時 chip 換到下一排。最簡單、最常見——filter panel 裡 chip 數量不定時用這個。實作細節（flex-wrap / gap token）見 `.tsx`。
 
 ### scroll — 滾動 + fade mask + scroll arrows
 

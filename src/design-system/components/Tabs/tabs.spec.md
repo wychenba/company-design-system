@@ -204,9 +204,9 @@ Tabs 是 **navigation anchor**，不是 compact control：
 
 TabsList 底部有 1px gray border（`border-border`），selected trigger 有 2px primary-hover 底線。**這兩條線視覺上必須是同一條**——selected 底線從 TabsList 的 gray border 位置「長出來」，不得出現雙線。
 
-**實作方式**：trigger 用 `::after` 絕對定位在 `bottom: -1px`，高度 2px。inactive 時 `bg-transparent`（gray border 穿透顯示），active 時 `bg-primary-hover`（完全覆蓋 gray border 並向上延伸 1px）。
+**原則**：selected 底線必須覆蓋並延伸 TabsList 的 gray border，避免疊線。實作手法（pseudo-element 定位）見 `.tsx`。
 
-這個實作原則是為了在 Dialog / Sidebar header 內特別重要——header 的 `border-b` 和 Tabs 的 `border-b` 必須感知為同一條水平線。
+在 Dialog / Sidebar header 內特別重要——header 的 `border-b` 和 Tabs 的 `border-b` 必須感知為同一條水平線。
 
 ---
 

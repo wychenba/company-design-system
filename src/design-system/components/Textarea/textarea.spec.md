@@ -68,7 +68,7 @@ sm 與 md 視覺相同（純命名 mapping，對齊 Field family）。
 
 ### Readonly 特例
 
-不同於 Input 的 readonly（同高度、緊湊底色），Textarea readonly **保留邊框與 padding**——多行內容需要明確的閱讀區域邊界，完全扁平會讓使用者誤以為可編輯或混在純文字內容中。
+不同於 Input 的 readonly（同高度、緊湊底色），Textarea readonly **保留邊框與 padding**——多行內容需要明確的閱讀區域邊界訊號,移除邊框後無法與周圍純文字內容區分。
 
 ---
 
@@ -78,7 +78,7 @@ sm 與 md 視覺相同（純命名 mapping，對齊 Field family）。
 - ❌ Textarea 裡放 startIcon / endAction——textarea 慣例無 icon 框內
 - ❌ Textarea 啟用水平 resize（`resize-x` / `resize: both`）——破壞 form 佈局
 - ❌ 把 Textarea 當 code editor 用（無 syntax highlight / auto-complete）
-- ❌ Readonly 時扁平化（移除邊框 + padding）——多行內容需要閱讀區域邊界
+- ❌ Readonly 時移除邊框 + padding——多行內容需要閱讀區域邊界訊號
 
 ---
 

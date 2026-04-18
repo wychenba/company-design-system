@@ -286,9 +286,9 @@ export const Sizes: Story = {
           <tbody>
             <tr>
               <Td>Row height (field-height)</Td>
-              <Td><TkVal token="--field-height-sm" value="28→32px" /></Td>
-              <Td><TkVal token="--field-height-md" value="32→36px" /></Td>
-              <Td><TkVal token="--field-height-lg" value="36→40px" /></Td>
+              <Td mono>--field-height-sm</Td>
+              <Td mono>--field-height-md</Td>
+              <Td mono>--field-height-lg</Td>
             </tr>
             <tr>
               <Td>Horizontal padding</Td>
@@ -323,7 +323,7 @@ export const Sizes: Story = {
           </tbody>
         </table>
         <p className="text-caption text-fg-muted">
-          (箭頭 `→` 代表 md density → lg density 的值變化)
+          Token 的 md / lg density 解析值見 `tokens/uiSize/uiSize.spec.md`。
         </p>
       </div>
     </div>
@@ -472,15 +472,13 @@ export const Tokens: Story = {
           <thead>
             <tr>
               <Th>Token</Th>
-              <Th>md density</Th>
-              <Th>lg density</Th>
+              <Th>Purpose</Th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <Td mono>--chrome-header-height</Td>
-              <Td mono>3rem (48px)</Td>
-              <Td mono>3.5rem (56px)</Td>
+              <Td>Sidebar header / footer 固定高度；density 解析值見 uiSize.spec.md</Td>
             </tr>
           </tbody>
         </table>

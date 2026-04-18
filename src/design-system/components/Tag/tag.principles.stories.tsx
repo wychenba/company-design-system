@@ -147,11 +147,11 @@ export const SubtleVsSolidRule: Story = {
         note="視覺重量太高,使用者無法分辨哪個真的重要。subtle 是基礎,solid 是強調——多數應該是 subtle"
       >
         <div className="flex items-center gap-2 flex-wrap">
-          <Tag variant="blue" solid>分類 A</Tag>
-          <Tag variant="green" solid>分類 B</Tag>
-          <Tag variant="red" solid>分類 C</Tag>
-          <Tag variant="yellow" solid>分類 D</Tag>
-          <Tag variant="purple" solid>分類 E</Tag>
+          <Tag variant="blue" solid>電子產品</Tag>
+          <Tag variant="green" solid>服飾</Tag>
+          <Tag variant="red" solid>食品</Tag>
+          <Tag variant="yellow" solid>書籍</Tag>
+          <Tag variant="purple" solid>家具</Tag>
         </div>
         <Label warn>↑ 所有 Tag solid → 互相爭奪注意力 → 都不重要</Label>
       </Rule>
@@ -184,10 +184,10 @@ export const DismissRule: Story = {
           note="不同於一般 inline action 的 fg-muted——Tag 有色變體時 dismiss 跟 Tag 文字同色,視覺一體"
         >
           <div className="flex items-center gap-2 flex-wrap">
-            <Tag variant="blue" onDismiss={() => {}}>Blue</Tag>
-            <Tag variant="green" onDismiss={() => {}}>Green</Tag>
-            <Tag variant="red" onDismiss={() => {}}>Red</Tag>
-            <Tag variant="neutral" onDismiss={() => {}}>Neutral</Tag>
+            <Tag variant="blue" onDismiss={() => {}}>React</Tag>
+            <Tag variant="green" onDismiss={() => {}}>TypeScript</Tag>
+            <Tag variant="red" onDismiss={() => {}}>Storybook</Tag>
+            <Tag variant="neutral" onDismiss={() => {}}>Design System</Tag>
           </div>
           <Label>↑ X icon 跟 Tag 文字同色,融入 Tag 視覺</Label>
         </Rule>

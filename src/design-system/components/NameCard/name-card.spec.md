@@ -24,48 +24,28 @@
 
 ## 結構
 
-```
-NameCard (w-320px)
-├── Profile header (avatar + name + subtitle)
-├── Action buttons (optional)
-├── Status section (border-t, optional)
-│   ├── Status badge (dot + label, bg-muted rounded-md)
-│   └── Status message (DescriptionItem, line-clamp-2)
-├── Info fields (border-t, DescriptionList cols=2, optional)
-└── View more (border-t, Button link w-full, optional)
-```
+NameCard 為固定寬度的垂直 section 堆疊：
+- **Profile header** — Avatar + Name + Subtitle
+- **Action buttons**（選用）— 快速動作列
+- **Status section**（選用）— 狀態標籤 + 訊息
+- **Info fields**（選用）— 透過 DescriptionList 呈現結構化欄位
+- **View more**（選用）— 導向 profile 頁的 link
+
+Section 之間用 `border-t border-divider` 固定分隔（見 `separator.spec.md`「元件固定結構 → CSS border-t/b」）。詳細 class / padding token 見 `name-card.tsx`。
 
 ## 寬度
 
-固定 320px。HoverCard 浮層寬度由 NameCard 決定，不隨內容伸縮。
+固定寬度（見 `.tsx` 常數）。HoverCard 浮層寬度由 NameCard 決定，不隨內容伸縮——避免 hover 時浮層寬度跳動。
 
 ## Profile Header
 
-- **Avatar**：64px circle，透過 Avatar 元件的 `status` prop 顯示狀態圓點
-- **Text column 對齊**：`justify-center` + `minHeight: 64px`（= avatar 高度）。短文字（單行名字）垂直置中於 avatar；長文字（多行名字 + subtitle）自然撐高
-- **Name**：`text-body-lg font-medium text-foreground`
-- **Subtitle**：`text-body text-fg-secondary mt-0.5`
-- **間距**：`gap-3`（avatar 與 text column 之間）
-
-## Section Padding
-
-- **一般 section**：`px-4 py-3`
-- **View more footer**：`px-4 py-2`（較緊湊，因為 Button link 自帶 padding）
-- **Action buttons**：`px-4 pb-3`（無 top padding，緊貼 profile header）
+- **Avatar**：透過 Avatar `status` prop 顯示狀態圓點（見 `avatar.spec.md`）
+- **Text column 對齊**：最小高度對齊 avatar 高度——短文字（單行名字）垂直置中於 avatar；長文字（多行名字 + subtitle）自然撐高
+- **字級層級**：Name > Subtitle；name 為 strong weight,subtitle 為 secondary color
 
 ## Status 區
 
-### Status badge
-
-`bg-muted rounded-md px-3 py-2`——非互動元素使用 `bg-muted`（不是 `bg-secondary`），視覺重量低。
-
-包含：
-- **Status dot**：`w-2.5 h-2.5 rounded-full`，顏色依狀態而定（available=success, away=warning, busy=error, offline=fg-muted）
-- **Status label**：`text-body`
-
-### Status message
-
-使用 `DescriptionItem`（label="Status message"），value 加 `line-clamp-2` 限制最多兩行。
+非互動狀態標籤以 `bg-muted` 承載（不用 `bg-secondary`——Muted 視覺重量更低,對齊 Badge / Skeleton family）。狀態點顏色語意：available=success / away=warning / busy=error / offline=fg-muted。訊息以 DescriptionItem 呈現,clamp 兩行避免無限伸展。
 
 ## Info Fields
 

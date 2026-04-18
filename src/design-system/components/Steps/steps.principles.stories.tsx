@@ -139,27 +139,27 @@ export const BlueConnectorLogic: Story = {
       subtitle="即使使用者在非線性模式跳到未完成的 step,前面的 connector 也不會無中生有變藍——藍色跟 step 本身的 completed bg 一對一對應,避免「藍線連灰 step」的矛盾。"
     >
       <ExamplePair>
-        <Example label="✅ 對:value 在 step-4,但只有 step-1 是 completed → 只有 step-1 底下的 connector 藍">
+        <Example label="✅ 對:value 在「確認送出」,但只有「基本資料」是 completed → 只有它底下的 connector 藍">
           <Steps
             value="step-4"
             completedValues={['step-1']}
             linear={false}
           >
             <StepItem value="step-1">
-              <StepLabel>Step 1</StepLabel>
-              <StepDescription>completed</StepDescription>
+              <StepLabel>基本資料</StepLabel>
+              <StepDescription>已完成</StepDescription>
             </StepItem>
             <StepItem value="step-2">
-              <StepLabel>Step 2</StepLabel>
-              <StepDescription>upcoming</StepDescription>
+              <StepLabel>帳號設定</StepLabel>
+              <StepDescription>待填寫</StepDescription>
             </StepItem>
             <StepItem value="step-3">
-              <StepLabel>Step 3</StepLabel>
-              <StepDescription>upcoming</StepDescription>
+              <StepLabel>付款方式</StepLabel>
+              <StepDescription>待填寫</StepDescription>
             </StepItem>
             <StepItem value="step-4">
-              <StepLabel>Step 4(focused)</StepLabel>
-              <StepDescription>upcoming + ring</StepDescription>
+              <StepLabel>確認送出</StepLabel>
+              <StepDescription>當前聚焦</StepDescription>
             </StepItem>
           </Steps>
         </Example>
@@ -185,20 +185,20 @@ export const ColumnRhythm: Story = {
             size="lg"
           >
             <StepItem value="step-1">
-              <StepLabel>只有 label</StepLabel>
+              <StepLabel>選擇商品</StepLabel>
             </StepItem>
             <StepItem value="step-2">
-              <StepLabel>Label + desc</StepLabel>
-              <StepDescription>一行說明</StepDescription>
+              <StepLabel>填寫地址</StepLabel>
+              <StepDescription>收件人、地址、郵遞區號</StepDescription>
             </StepItem>
             <StepItem value="step-3">
-              <StepLabel>Label + 長 desc</StepLabel>
+              <StepLabel>付款方式</StepLabel>
               <StepDescription>
-                這是一段比較長的說明文字,會自動換行到第二行
+                信用卡 / Apple Pay / 銀行轉帳(處理時間 1–2 個工作天)
               </StepDescription>
             </StepItem>
             <StepItem value="step-4">
-              <StepLabel>最後一步</StepLabel>
+              <StepLabel>完成訂單</StepLabel>
             </StepItem>
           </Steps>
         </Example>
