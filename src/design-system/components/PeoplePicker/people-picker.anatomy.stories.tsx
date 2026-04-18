@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { PeoplePicker } from './people-picker'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/PeoplePicker/設計規格',
@@ -108,14 +108,6 @@ export const ModeMatrix: Story = {
   ),
 }
 
-const PpSwatch = ({ token, display }: { token: string; display?: string }) => (
-  <span className="inline-flex items-center gap-1.5">
-    <span className="w-3 h-3 rounded-md shrink-0 border border-black/10 inline-block align-middle"
-      style={{ backgroundColor: token === '—' ? 'transparent' : `var(${token})` }} />
-    <span className="font-mono">{display ?? token}</span>
-  </span>
-)
-
 export const SizeMatrix: Story = {
   name: 'Size 對照(sm / md / lg)',
   render: () => (
@@ -186,39 +178,39 @@ export const ColorMatrix: Story = {
             <tbody>
               <tr>
                 <Td mono>edit default</Td>
-                <Td><PpSwatch token="--surface" /></Td>
-                <Td><PpSwatch token="--border" /></Td>
-                <Td><PpSwatch token="--foreground" /></Td>
+                <Td><TokenCell token="--surface" /></Td>
+                <Td><TokenCell token="--border" /></Td>
+                <Td><TokenCell token="--foreground" /></Td>
               </tr>
               <tr>
                 <Td mono>edit hover</Td>
-                <Td><PpSwatch token="--surface" /></Td>
-                <Td><PpSwatch token="--border-hover" display="border-hover" /></Td>
-                <Td><PpSwatch token="--foreground" /></Td>
+                <Td><TokenCell token="--surface" /></Td>
+                <Td><TokenCell token="--border-hover" display="border-hover" /></Td>
+                <Td><TokenCell token="--foreground" /></Td>
               </tr>
               <tr>
                 <Td mono>edit focus(open)</Td>
-                <Td><PpSwatch token="--surface" /></Td>
-                <Td><PpSwatch token="--ring" display="ring" /></Td>
-                <Td><PpSwatch token="--foreground" /></Td>
+                <Td><TokenCell token="--surface" /></Td>
+                <Td><TokenCell token="--ring" display="ring" /></Td>
+                <Td><TokenCell token="--foreground" /></Td>
               </tr>
               <tr>
                 <Td mono>readonly</Td>
-                <Td><PpSwatch token="--muted" display="muted(緊湊底)" /></Td>
+                <Td><TokenCell token="--muted" display="muted(緊湊底)" /></Td>
                 <Td>—(no border)</Td>
-                <Td><PpSwatch token="--foreground" /></Td>
+                <Td><TokenCell token="--foreground" /></Td>
               </tr>
               <tr>
                 <Td mono>disabled</Td>
-                <Td><PpSwatch token="--bg-disabled" display="bg-disabled" /></Td>
-                <Td><PpSwatch token="--border" /></Td>
-                <Td><PpSwatch token="--fg-disabled" display="fg-disabled" /></Td>
+                <Td><TokenCell token="--bg-disabled" display="bg-disabled" /></Td>
+                <Td><TokenCell token="--border" /></Td>
+                <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
               </tr>
               <tr>
                 <Td mono>invalid</Td>
-                <Td><PpSwatch token="--surface" /></Td>
-                <Td><PpSwatch token="--error" display="error" /></Td>
-                <Td><PpSwatch token="--foreground" /></Td>
+                <Td><TokenCell token="--surface" /></Td>
+                <Td><TokenCell token="--error" display="error" /></Td>
+                <Td><TokenCell token="--foreground" /></Td>
               </tr>
             </tbody>
           </table>
@@ -243,10 +235,10 @@ export const ColorMatrix: Story = {
               </tr>
             </thead>
             <tbody>
-              <tr><Td mono>default</Td><Td>—</Td><Td>Avatar 24/32(由 description 有無決定)</Td><Td><PpSwatch token="--foreground" /></Td><Td>—</Td></tr>
-              <tr><Td mono>hover</Td><Td><PpSwatch token="--neutral-hover" display="neutral-hover" /></Td><Td>—</Td><Td><PpSwatch token="--foreground" /></Td><Td>—</Td></tr>
-              <tr><Td mono>selected</Td><Td>—</Td><Td>—</Td><Td><PpSwatch token="--foreground" display="foreground(medium)" /></Td><Td>Check 16px fg-muted</Td></tr>
-              <tr><Td mono>selected + hover</Td><Td><PpSwatch token="--neutral-hover" display="neutral-hover" /></Td><Td>—</Td><Td><PpSwatch token="--foreground" display="foreground(medium)" /></Td><Td>Check 16px foreground</Td></tr>
+              <tr><Td mono>default</Td><Td>—</Td><Td>Avatar 24/32(由 description 有無決定)</Td><Td><TokenCell token="--foreground" /></Td><Td>—</Td></tr>
+              <tr><Td mono>hover</Td><Td><TokenCell token="--neutral-hover" display="neutral-hover" /></Td><Td>—</Td><Td><TokenCell token="--foreground" /></Td><Td>—</Td></tr>
+              <tr><Td mono>selected</Td><Td>—</Td><Td>—</Td><Td><TokenCell token="--foreground" display="foreground(medium)" /></Td><Td>Check 16px fg-muted</Td></tr>
+              <tr><Td mono>selected + hover</Td><Td><TokenCell token="--neutral-hover" display="neutral-hover" /></Td><Td>—</Td><Td><TokenCell token="--foreground" display="foreground(medium)" /></Td><Td>Check 16px foreground</Td></tr>
             </tbody>
           </table>
         </div>

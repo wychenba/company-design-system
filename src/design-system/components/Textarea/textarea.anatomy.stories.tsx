@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { Textarea } from './textarea'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Textarea/設計規格',
@@ -121,14 +121,6 @@ export const ModeMatrix: Story = {
   ),
 }
 
-const TaSwatch = ({ token, display }: { token: string; display?: string }) => (
-  <span className="inline-flex items-center gap-1.5">
-    <span className="w-3 h-3 rounded-md shrink-0 border border-black/10 inline-block align-middle"
-      style={{ backgroundColor: token === '—' || token === 'transparent' ? 'transparent' : `var(${token})` }} />
-    <span className="font-mono">{display ?? token}</span>
-  </span>
-)
-
 export const ColorMatrix: Story = {
   name: '色彩對照(mode × error 狀態)',
   render: () => (
@@ -154,38 +146,38 @@ export const ColorMatrix: Story = {
             <tbody>
               <tr>
                 <Td mono>edit default</Td>
-                <Td><TaSwatch token="--surface" display="surface" /></Td>
-                <Td><TaSwatch token="--border" display="border" /></Td>
-                <Td><TaSwatch token="--foreground" display="foreground" /></Td>
-                <Td><TaSwatch token="--fg-muted" display="fg-muted" /></Td>
+                <Td><TokenCell token="--surface" display="surface" /></Td>
+                <Td><TokenCell token="--border" display="border" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                <Td><TokenCell token="--fg-muted" display="fg-muted" /></Td>
               </tr>
               <tr>
                 <Td mono>edit focus</Td>
-                <Td><TaSwatch token="--surface" display="surface" /></Td>
-                <Td><TaSwatch token="--ring" display="ring(2px ring)" /></Td>
-                <Td><TaSwatch token="--foreground" display="foreground" /></Td>
-                <Td><TaSwatch token="--fg-muted" display="fg-muted" /></Td>
+                <Td><TokenCell token="--surface" display="surface" /></Td>
+                <Td><TokenCell token="--ring" display="ring(2px ring)" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                <Td><TokenCell token="--fg-muted" display="fg-muted" /></Td>
               </tr>
               <tr>
                 <Td mono>readonly</Td>
-                <Td><TaSwatch token="--surface" display="surface(保留邊框)" /></Td>
-                <Td><TaSwatch token="--divider" display="divider(比 edit 淡)" /></Td>
-                <Td><TaSwatch token="--foreground" display="foreground" /></Td>
+                <Td><TokenCell token="--surface" display="surface(保留邊框)" /></Td>
+                <Td><TokenCell token="--divider" display="divider(比 edit 淡)" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
                 <Td>—</Td>
               </tr>
               <tr>
                 <Td mono>disabled</Td>
-                <Td><TaSwatch token="--bg-disabled" display="bg-disabled" /></Td>
-                <Td><TaSwatch token="--border" display="border" /></Td>
-                <Td><TaSwatch token="--fg-disabled" display="fg-disabled" /></Td>
-                <Td><TaSwatch token="--fg-disabled" display="fg-disabled" /></Td>
+                <Td><TokenCell token="--bg-disabled" display="bg-disabled" /></Td>
+                <Td><TokenCell token="--border" display="border" /></Td>
+                <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
+                <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
               </tr>
               <tr>
                 <Td mono>error(invalid)</Td>
-                <Td><TaSwatch token="--surface" display="surface" /></Td>
-                <Td><TaSwatch token="--error" display="error" /></Td>
-                <Td><TaSwatch token="--foreground" display="foreground" /></Td>
-                <Td><TaSwatch token="--fg-muted" display="fg-muted" /></Td>
+                <Td><TokenCell token="--surface" display="surface" /></Td>
+                <Td><TokenCell token="--error" display="error" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                <Td><TokenCell token="--fg-muted" display="fg-muted" /></Td>
               </tr>
             </tbody>
           </table>

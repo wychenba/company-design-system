@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Folder, FileText, Image, Users, User, Settings } from 'lucide-react'
 import { TreeView, TreeItem } from './tree-view'
 import { Badge } from '@/design-system/components/Badge/badge'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/TreeView/設計規格',
@@ -84,13 +84,6 @@ export const Overview: Story = {
   ),
 }
 
-const TreeSwatch = ({ token, display }: { token: string; display?: string }) => (
-  <span className="inline-flex items-center gap-1.5">
-    <span className="w-3 h-3 rounded-md shrink-0 border border-black/10 inline-block align-middle"
-      style={{ backgroundColor: `var(${token})` }} />
-    <span className="font-mono">{display ?? token}</span>
-  </span>
-)
 
 export const SizeMatrix: Story = {
   name: 'Size 對照(sm / md / lg)',
@@ -167,26 +160,26 @@ export const ColorMatrix: Story = {
                 <tr>
                   <Td mono>default</Td>
                   <Td>—(transparent)</Td>
-                  <Td><TreeSwatch token="--foreground" display="foreground" /></Td>
-                  <Td><TreeSwatch token="--fg-muted" display="fg-muted" /></Td>
+                  <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                  <Td><TokenCell token="--fg-muted" display="fg-muted" /></Td>
                 </tr>
                 <tr>
                   <Td mono>hover</Td>
-                  <Td><TreeSwatch token="--neutral-hover" display="neutral-hover" /></Td>
-                  <Td><TreeSwatch token="--foreground" display="foreground" /></Td>
-                  <Td><TreeSwatch token="--foreground" display="foreground" /></Td>
+                  <Td><TokenCell token="--neutral-hover" display="neutral-hover" /></Td>
+                  <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                  <Td><TokenCell token="--foreground" display="foreground" /></Td>
                 </tr>
                 <tr>
                   <Td mono>selected</Td>
-                  <Td><TreeSwatch token="--neutral-selected" display="neutral-selected" /></Td>
-                  <Td><TreeSwatch token="--foreground" display="foreground(medium)" /></Td>
-                  <Td><TreeSwatch token="--foreground" display="foreground" /></Td>
+                  <Td><TokenCell token="--neutral-selected" display="neutral-selected" /></Td>
+                  <Td><TokenCell token="--foreground" display="foreground(medium)" /></Td>
+                  <Td><TokenCell token="--foreground" display="foreground" /></Td>
                 </tr>
                 <tr>
                   <Td mono>disabled</Td>
                   <Td>—</Td>
-                  <Td><TreeSwatch token="--fg-disabled" display="fg-disabled" /></Td>
-                  <Td><TreeSwatch token="--fg-disabled" display="fg-disabled" /></Td>
+                  <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
+                  <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
                 </tr>
               </tbody>
             </table>

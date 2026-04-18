@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Users, Settings, Bell, FileText } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'
 import { Badge } from '@/design-system/components/Badge/badge'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Tabs/設計規格',
@@ -124,14 +124,6 @@ export const SizeMatrix: Story = {
   ),
 }
 
-const TabSwatch = ({ token, display }: { token: string; display?: string }) => (
-  <span className="inline-flex items-center gap-1.5">
-    <span className="w-3 h-3 rounded-md shrink-0 border border-black/10 inline-block align-middle"
-      style={{ backgroundColor: `var(${token})` }} />
-    <span className="font-mono">{display ?? token}</span>
-  </span>
-)
-
 export const ColorMatrix: Story = {
   name: '色彩對照(trigger 四態色彩)',
   render: () => (
@@ -156,31 +148,31 @@ export const ColorMatrix: Story = {
             <tbody>
               <tr>
                 <Td mono>default(未選)</Td>
-                <Td><TabSwatch token="--fg-secondary" display="fg-secondary" /></Td>
+                <Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td>
                 <Td>—(transparent)</Td>
                 <Td>—</Td>
               </tr>
               <tr>
                 <Td mono>hover(未選)</Td>
-                <Td><TabSwatch token="--primary-hover" display="primary-hover" /></Td>
+                <Td><TokenCell token="--primary-hover" display="primary-hover" /></Td>
                 <Td>—(transparent)</Td>
                 <Td>—</Td>
               </tr>
               <tr>
                 <Td mono>active(mousedown)</Td>
-                <Td><TabSwatch token="--primary-active" display="primary-active" /></Td>
+                <Td><TokenCell token="--primary-active" display="primary-active" /></Td>
                 <Td>—</Td>
                 <Td>—</Td>
               </tr>
               <tr>
                 <Td mono>selected</Td>
-                <Td><TabSwatch token="--foreground" display="foreground" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
                 <Td>—(transparent)</Td>
-                <Td><TabSwatch token="--primary-hover" display="2px primary-hover" /></Td>
+                <Td><TokenCell token="--primary-hover" display="2px primary-hover" /></Td>
               </tr>
               <tr>
                 <Td mono>disabled</Td>
-                <Td><TabSwatch token="--fg-disabled" display="fg-disabled" /></Td>
+                <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
                 <Td>—</Td>
                 <Td>—</Td>
               </tr>

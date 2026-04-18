@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { DataTable } from './data-table'
 import './column-types'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/DataTable/設計規格',
@@ -245,14 +245,6 @@ export const Features: Story = {
   },
 }
 
-const DtSwatch = ({ token, display }: { token: string; display?: string }) => (
-  <span className="inline-flex items-center gap-1.5">
-    <span className="w-3 h-3 rounded-md shrink-0 border border-black/10 inline-block align-middle"
-      style={{ backgroundColor: token === '—' ? 'transparent' : `var(${token})` }} />
-    <span className="font-mono">{display ?? token}</span>
-  </span>
-)
-
 export const ColorMatrix: Story = {
   name: '色彩對照(header / row / cell 狀態)',
   render: () => (
@@ -275,27 +267,27 @@ export const ColorMatrix: Story = {
             <tbody>
               <tr>
                 <Td>Header bg</Td>
-                <Td><DtSwatch token="--muted" display="muted" /></Td>
+                <Td><TokenCell token="--muted" display="muted" /></Td>
                 <Td>比 surface 深一階,跟 row 拉開層次</Td>
               </tr>
               <tr>
                 <Td>Header text</Td>
-                <Td><DtSwatch token="--fg-secondary" display="fg-secondary" /></Td>
+                <Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td>
                 <Td>比 row text 淡,強調「這是標籤不是資料」</Td>
               </tr>
               <tr>
                 <Td>Header border-bottom</Td>
-                <Td><DtSwatch token="--border" display="border" /></Td>
+                <Td><TokenCell token="--border" display="border" /></Td>
                 <Td>區隔 header 與 body</Td>
               </tr>
               <tr>
                 <Td>Sort icon(active)</Td>
-                <Td><DtSwatch token="--foreground" display="foreground" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
                 <Td>排序中的欄位,icon 加深</Td>
               </tr>
               <tr>
                 <Td>Sort icon(inactive hover)</Td>
-                <Td><DtSwatch token="--fg-secondary" display="fg-secondary" /></Td>
+                <Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td>
                 <Td>Hover 可排序欄時出現的指示</Td>
               </tr>
             </tbody>
@@ -323,33 +315,33 @@ export const ColorMatrix: Story = {
             <tbody>
               <tr>
                 <Td mono>default</Td>
-                <Td><DtSwatch token="--surface" display="surface" /></Td>
-                <Td><DtSwatch token="--foreground" display="foreground" /></Td>
-                <Td><DtSwatch token="--divider" display="divider(cell border)" /></Td>
+                <Td><TokenCell token="--surface" display="surface" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                <Td><TokenCell token="--divider" display="divider(cell border)" /></Td>
               </tr>
               <tr>
                 <Td mono>hover</Td>
-                <Td><DtSwatch token="--neutral-hover" display="neutral-hover" /></Td>
-                <Td><DtSwatch token="--foreground" display="foreground" /></Td>
-                <Td><DtSwatch token="--divider" display="divider" /></Td>
+                <Td><TokenCell token="--neutral-hover" display="neutral-hover" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                <Td><TokenCell token="--divider" display="divider" /></Td>
               </tr>
               <tr>
                 <Td mono>selected(checkbox 勾選)</Td>
-                <Td><DtSwatch token="--primary-subtle" display="primary-subtle" /></Td>
-                <Td><DtSwatch token="--foreground" display="foreground" /></Td>
-                <Td><DtSwatch token="--divider" display="divider" /></Td>
+                <Td><TokenCell token="--primary-subtle" display="primary-subtle" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                <Td><TokenCell token="--divider" display="divider" /></Td>
               </tr>
               <tr>
                 <Td mono>striped(zebra,可選)</Td>
-                <Td><DtSwatch token="--muted" display="muted(odd row)" /></Td>
-                <Td><DtSwatch token="--foreground" display="foreground" /></Td>
-                <Td><DtSwatch token="--divider" display="divider" /></Td>
+                <Td><TokenCell token="--muted" display="muted(odd row)" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                <Td><TokenCell token="--divider" display="divider" /></Td>
               </tr>
               <tr>
                 <Td mono>disabled row</Td>
-                <Td><DtSwatch token="--bg-disabled" display="bg-disabled" /></Td>
-                <Td><DtSwatch token="--fg-disabled" display="fg-disabled" /></Td>
-                <Td><DtSwatch token="--divider" display="divider" /></Td>
+                <Td><TokenCell token="--bg-disabled" display="bg-disabled" /></Td>
+                <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
+                <Td><TokenCell token="--divider" display="divider" /></Td>
               </tr>
             </tbody>
           </table>
@@ -375,11 +367,11 @@ export const ColorMatrix: Story = {
               </tr>
             </thead>
             <tbody>
-              <tr><Td mono>text / date / number / currency</Td><Td><DtSwatch token="--foreground" /></Td></tr>
+              <tr><Td mono>text / date / number / currency</Td><Td><TokenCell token="--foreground" /></Td></tr>
               <tr><Td mono>select(Tag)</Td><Td>Tag 的 variant 色(green / yellow / red / blue…)</Td></tr>
               <tr><Td mono>person</Td><Td>Avatar + foreground 文字</Td></tr>
-              <tr><Td mono>link</Td><Td><DtSwatch token="--primary" /></Td></tr>
-              <tr><Td mono>boolean</Td><Td><DtSwatch token="--fg-secondary" display="— / ✓ 均用 fg-secondary" /></Td></tr>
+              <tr><Td mono>link</Td><Td><TokenCell token="--primary" /></Td></tr>
+              <tr><Td mono>boolean</Td><Td><TokenCell token="--fg-secondary" display="— / ✓ 均用 fg-secondary" /></Td></tr>
             </tbody>
           </table>
         </div>

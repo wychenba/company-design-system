@@ -8,7 +8,7 @@ import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Switch } from '@/design-system/components/Switch/switch'
 import { Textarea } from '@/design-system/components/Textarea/textarea'
 import { Slider } from '@/design-system/components/Slider/slider'
-import { H3, Desc, Td, Th } from '@/design-system/components/_anatomy/anatomy-utils'
+import { H3, Desc, Td, Th, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
 
 const meta: Meta = {
   title: 'Design System/Components/Field/設計規格',
@@ -266,14 +266,6 @@ export const StateMatrix: Story = {
   ),
 }
 
-const FieldSwatch = ({ token, display }: { token: string; display?: string }) => (
-  <span className="inline-flex items-center gap-1.5">
-    <span className="w-3 h-3 rounded-md shrink-0 border border-black/10 inline-block align-middle"
-      style={{ backgroundColor: token === '—' ? 'transparent' : `var(${token})` }} />
-    <span className="font-mono">{display ?? token}</span>
-  </span>
-)
-
 export const ColorMatrix: Story = {
   name: '色彩對照(label / required / invalid / disabled)',
   render: () => (
@@ -297,39 +289,39 @@ export const ColorMatrix: Story = {
             <tbody>
               <tr>
                 <Td mono>FieldLabel</Td>
-                <Td><FieldSwatch token="--foreground" display="foreground" /></Td>
-                <Td><FieldSwatch token="--foreground" display="foreground(不變)" /></Td>
-                <Td><FieldSwatch token="--fg-disabled" display="fg-disabled" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground(不變)" /></Td>
+                <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
               </tr>
               <tr>
                 <Td mono>Required 星號(*)</Td>
-                <Td><FieldSwatch token="--error" display="error" /></Td>
-                <Td><FieldSwatch token="--error" display="error" /></Td>
-                <Td><FieldSwatch token="--fg-disabled" display="fg-disabled" /></Td>
+                <Td><TokenCell token="--error" display="error" /></Td>
+                <Td><TokenCell token="--error" display="error" /></Td>
+                <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
               </tr>
               <tr>
                 <Td mono>FieldDescription</Td>
-                <Td><FieldSwatch token="--fg-secondary" display="fg-secondary" /></Td>
+                <Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td>
                 <Td>—(隱藏,被 FieldError 取代)</Td>
-                <Td><FieldSwatch token="--fg-disabled" display="fg-disabled" /></Td>
+                <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
               </tr>
               <tr>
                 <Td mono>FieldError</Td>
                 <Td>—(不渲染)</Td>
-                <Td><FieldSwatch token="--error" display="error" /></Td>
+                <Td><TokenCell token="--error" display="error" /></Td>
                 <Td>—</Td>
               </tr>
               <tr>
                 <Td mono>Control border(傳給 Field Controls)</Td>
-                <Td><FieldSwatch token="--border" display="border" /></Td>
-                <Td><FieldSwatch token="--error" display="error(border)" /></Td>
-                <Td><FieldSwatch token="--border" display="border" /></Td>
+                <Td><TokenCell token="--border" display="border" /></Td>
+                <Td><TokenCell token="--error" display="error(border)" /></Td>
+                <Td><TokenCell token="--border" display="border" /></Td>
               </tr>
               <tr>
                 <Td mono>Control bg(disabled)</Td>
-                <Td><FieldSwatch token="--surface" display="surface" /></Td>
+                <Td><TokenCell token="--surface" display="surface" /></Td>
                 <Td>—</Td>
-                <Td><FieldSwatch token="--bg-disabled" display="bg-disabled" /></Td>
+                <Td><TokenCell token="--bg-disabled" display="bg-disabled" /></Td>
               </tr>
             </tbody>
           </table>
