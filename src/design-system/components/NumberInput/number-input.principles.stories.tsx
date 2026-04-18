@@ -140,6 +140,16 @@ export const DataTypeMatchRule: Story = {
         <Input defaultValue="1234567" />
         <Label warn>↑ 1234567 難讀、無貨幣前綴、無 locale、無右對齊</Label>
       </Rule>
+
+      <Rule
+        title="❌ 看起來像數字但不是算術型的資料：用 Input"
+        note="電話、郵遞區號、身分證字號、產品代碼都「長得像數字」但不是算術型 value——不做加減、不做千分位、不做 step。用 NumberInput 會錯誤套用千分位（0912-345-678 變成「912,345,678」）、誤導 mobile 彈出數字鍵盤且關閉符號輸入"
+      >
+        <NumberInput value={912345678} onChange={() => {}} />
+        <Label warn>↑ 電話 912-345-678 被當 912,345,678 格式化 → 數字意義錯誤</Label>
+        <Input defaultValue="0912-345-678" />
+        <Label>↑ 電話用 Input（可自訂 type=tel 或 pattern），保留 dash / 前導零</Label>
+      </Rule>
     </div>
   ),
 }

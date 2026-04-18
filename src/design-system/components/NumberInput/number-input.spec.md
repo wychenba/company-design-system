@@ -2,9 +2,27 @@
 
 ## 定位
 
-NumberInput 是數值的輸入與顯示元件。格式化邏輯：`toLocaleString()` + prefix/suffix。
+NumberInput 是**數值的**輸入與顯示元件。格式化邏輯：`toLocaleString()` + prefix/suffix + precision。
 
-共用規則見 `field.spec.md`。本文件只記錄 NumberInput 特有的原則。
+共用規則見 `../Field/field-controls.spec.md`。本文件只記錄 NumberInput 特有的原則。
+
+---
+
+## 何時用
+
+- **所有數值資料**：金額、數量、百分比、比率、測量值、年齡、計數
+- **需要格式化的 value**：千分位（`1,234,567`）、貨幣前綴（`$2,490`）、百分比後綴（`85.5%`）、小數精度（`0.00`）
+- **需要 locale-aware 顯示**（`toLocaleString()` 自動處理千分位分隔符、小數點形式）
+- **DataTable 的數值欄位**（right-aligned + 自動格式化）
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 純文字 / 看起來像數字的字串（電話、郵遞區號）| `Input` | 電話不是算術型數字，不需要千分位 / 不該用 step |
+| 日期 / 時間戳 | `DatePicker` | 需要日期語意和 picker 互動 |
+| 視覺調整數值（音量、亮度、滑動調整）| `Slider` | 使用者目標是「感受」而非「輸入精確值」 |
+| 大量帶小數的科學計算 | `Input` + 自訂驗證 | 極端精度需求超出 NumberInput 格式化能力 |
 
 ---
 
@@ -40,3 +58,12 @@ col.accessor('price', {
 ```
 
 `currency` 類型預設 `prefix: '$'`，其餘等同 `number`。
+
+---
+
+## 相關
+
+- `../Input/input.spec.md` — 純文字（含電話 / 郵遞區號等「看起來像數字」的資料）
+- `../DatePicker/date-picker.spec.md` — 日期
+- `../Slider/slider.spec.md` — 視覺調整數值（音量、亮度）
+- `../Field/field-controls.spec.md` — Field Control 共用規則（mode / size / endAction / error）

@@ -2,9 +2,28 @@
 
 ## 定位
 
-DatePicker 是日期的輸入與顯示元件。Edit 模式用原生 `<input type="date">`，格式化邏輯用 `Intl.DateTimeFormat`。
+DatePicker 是**單一日期**的輸入與顯示元件。Edit 用原生 `<input type="date">`，Display 用 `Intl.DateTimeFormat`。
 
-共用規則見 `field.spec.md`。本文件只記錄 DatePicker 特有的原則。
+共用規則見 `../Field/field-controls.spec.md`。本文件只記錄 DatePicker 特有的原則。
+
+---
+
+## 何時用
+
+- **單一日期選擇**：出生日、到期日、提醒日、發佈日
+- **需要 locale-aware 顯示**（`Intl.DateTimeFormat` 自動處理年月日順序、月份語言）
+- **需要 mobile 原生 picker UX**（行動裝置會彈出系統 date wheel）
+- **DataTable 的日期欄位**（自動整合，meta.type='date'）
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 日期範圍（from → to） | ⚠️ 尚未提供（未來 Date Range Picker） | 目前暫用兩個獨立 DatePicker + 自己組範圍邏輯 |
+| 日期 + 時間（含時分） | ⚠️ 尚未提供（未來 DateTime Picker） | 目前暫用 DatePicker + 另一個 Input for time，不理想 |
+| 相對時間（「3 天前」「昨天」）| 自訂 Display 元件 | DatePicker 的 Display 是絕對日期；相對時間需要計算 + locale 格式化 |
+| 純文字 YYYY-MM-DD（不需要 picker）| `Input` | 如 API debug 介面、不需互動的純記錄 |
+| 生日等「只有月日、不需要年」的欄位 | 目前用 DatePicker 忍受年份 | 多數情境可接受；要極致可自訂 MonthDayPicker |
 
 ---
 
@@ -46,3 +65,11 @@ Display 模式（readonly / disabled / DataTable cell）使用 `Intl.DateTimeFor
 
 - ❌ 不自建 calendar picker——使用原生 `<input type="date">`
 - ❌ 不在 readonly / disabled 模式顯示 clear 按鈕
+
+---
+
+## 相關
+
+- `../Input/input.spec.md` — 純文字 YYYY-MM-DD（不需 picker 互動的場景）
+- `../NumberInput/number-input.spec.md` — 年齡、天數等數值
+- `../Field/field-controls.spec.md` — Field Control 共用規則（mode / size / endAction / error）
