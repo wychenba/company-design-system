@@ -4,6 +4,8 @@
 
 Textarea 是**多行文字**的輸入與顯示元件——Input 的多行版本。格式化邏輯為 identity（value → value）。
 
+**Layout Family**：Family 4（Field control）— multi-line variant。結構與單行 Family 4 相同（fieldWrapper + startIcon + content + endAction，視覺對齊 Family 1），僅高度可隨 rows / auto-resize 擴展、不受 `--field-height-*` 約束。
+
 **實作基礎**：native `<textarea>` + 橋接 DS token，無 external primitive base。shadcn 同類做法。
 
 共用規則見 `../Field/field-controls.spec.md`。本文件只記錄 Textarea 特有的原則。

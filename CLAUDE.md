@@ -869,7 +869,7 @@ Provider 是**應用層配置**（delay、theme、portal target、toast position
 | **1. Menu item layout** | Menu 容器內的掃視單列（scanning mode）| `[small icon/avatar 16-20px] [content: label 單行 + desc 選用] [small suffix]`, tight density, leading-compact | **sm / md / lg** | `patterns/item-layout/item-layout.spec.md`「Menu item」章節 |
 | **2. List item layout** | 頁面上的閱讀式單列（reading mode）| `[larger icon/avatar 20-24px] [content: label + multi-line desc OK] [suffix action/button/counter]`, looser density, reading typography | **sm / md / lg** | `patterns/item-layout/item-layout.spec.md`「List item」章節 |
 | **3. Pill layout** | 單行互動 pill（action trigger / data indicator）| `[startIcon?] [<span px-1>label</span>] [suffix badge/endIcon/dismiss]`, single-line, whitespace-nowrap | **sm / md / lg + 可選 xs**（xs = 24px 固定，icon-only toolbar utility 專用） | `components/Button/button.spec.md`「Pill Layout」章節 |
-| **4. Field control layout** | 單行可編輯資料輸入 | `fieldWrapperStyles + [startIcon?] [<editable content>] [endAction?]`, **視覺對齊 Family 1** 讓 SelectMenu trigger + options 對齊 | **sm / md / lg** | `components/Field/field-controls.spec.md` |
+| **4. Field control layout** | 可編輯資料輸入（單行為主，Textarea 多行 variant） | `fieldWrapperStyles + [startIcon?] [<editable content>] [endAction?]`, **視覺對齊 Family 1** 讓 SelectMenu trigger + options 對齊 | **sm / md / lg** | `components/Field/field-controls.spec.md` |
 
 ## 尺寸 baseline 規則
 
@@ -893,7 +893,7 @@ Provider 是**應用層配置**（delay、theme、portal target、toast position
 | 1 Menu item | `MenuItem` | `TreeItem`, `SidebarMenuButton`, `DropdownMenuItem`（重用 MenuItem） |
 | 2 List item | (無單一 canonical) | `StepItem`（例外：indicator 對齊）, `FileItem`（icon 作邊界）, `Notice` → `Alert/Toast`（視覺一致非語意）, `SelectionItem` variant（prefix 為 selection control）→ `RadioGroup` / `Checkbox` group |
 | 3 Pill | `Button` | `SegmentedControlItem`, `Chip`, `Tag`（data indicator variant—見下） |
-| 4 Field control | `Input`（field-controls SSOT） | `NumberInput`, `DatePicker`, `Select`, `Combobox`, `LinkInput`, `PeoplePicker` |
+| 4 Field control | `Input`（field-controls SSOT） | `NumberInput`, `DatePicker`, `Select`, `Combobox`, `LinkInput`, `PeoplePicker`, `Textarea`（multi-line variant） |
 
 ## Family 3 兩個 sub-profile（重要）
 
