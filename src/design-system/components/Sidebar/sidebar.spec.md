@@ -10,6 +10,25 @@
 
 ---
 
+## 何時用
+
+- **多頁 app 的主導覽**：Slack、Linear、Notion、Figma 的左側 workspace + channel / project 清單
+- **需要在所有頁面持續存在的次導覽**：settings 頁的分類、文件的章節跳轉
+- **workspace 切換 + 功能分組並存**：頂部 workspace switcher + 下方常用功能 + 底部 settings
+- **需要展開 / 收合但不消失**：小螢幕收合為 icon bar，大螢幕展開完整 label
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 頁面頂部水平導覽（單頁品牌、行銷站、電商）| 自訂 Nav / NavigationMenu | Sidebar 專於垂直結構、持續存在 |
+| 同層切換內容（總覽 / 成員 / 設定）| `Tabs` | Tabs 切換的是平行視圖，不是跨頁導覽 |
+| 暫時性的側邊面板（filter、detail pane）| `Sheet` | Sheet 可以被關閉消失，Sidebar 持續存在 |
+| 跨頁搜尋 / 快速跳轉 | `Command`（Cmd+K palette）| Sidebar 是持久清單，Command 是即時查詢 |
+| 少於 3 個頂層項目的 app | 頂部 tab bar 或直接頁面 | Sidebar 的視覺成本對小 app 過高 |
+
+---
+
 ## 結構
 
 ```
@@ -595,9 +614,11 @@ Collapsible：內容優先低頻導覽 → offcanvas；扁平高頻切換 → ic
 
 ---
 
-## 關聯文件
+## 相關
 
-- `tree-view.spec.md` — 階層樹元件
-- `dropdown-menu.spec.md` — Header / Footer 常用的下拉選單
-- `command.spec.md` — icon 模式下的跳轉逃生艙
-- `tabs.spec.md` — in-page secondary nav
+- `../TreeView/tree-view.spec.md` — 階層樹元件（user data、任意深度）
+- `../DropdownMenu/dropdown-menu.spec.md` — Header / Footer 常用的下拉選單
+- `../Tabs/tabs.spec.md` — in-page secondary nav（不塞 sidebar 的子頁切換）
+- `../Menu/menu-item.spec.md` — SidebarMenuButton 的 item-layout 共用規則
+- Command palette（`components/Command/`，shadcn passthrough 無 spec）— icon 模式下的跳轉逃生艙
+- Sheet（`components/Sheet/`，shadcn passthrough 無 spec）— 暫時性側邊面板的替代

@@ -88,3 +88,14 @@ Modal 與 viewport 四邊保持 `--layout-space-bottom`（48px）最小間距。
 
 - 進場：fade-in + zoom-in-95 + slide-in-from-center
 - 離場：fade-out + zoom-out-95 + slide-out-to-center
+
+---
+
+## 相關
+
+- `../Sheet/sheet.spec.md` — 側邊滑入的輕量替代（共用 Radix Dialog base）
+- `../Toast/toast.spec.md` — 非阻斷的短暫回饋
+- `../Alert/alert.spec.md` — 頁面內持久通知
+- `../Popover/popover.spec.md` — 輕量浮層（non-modal）
+- `../DropdownMenu/dropdown-menu.spec.md` — 浮動選單
+- `../Tooltip/tooltip.spec.md` — hover 輔助資訊
