@@ -42,6 +42,39 @@ export const Compact = {
   ),
 }
 
+export const HoverSwap = {
+  name: 'Hover swap(狀態 ↔ 操作)',
+  render: () => (
+    <div className="flex flex-col max-w-md gap-4">
+      <div>
+        <div className="text-caption text-fg-muted mb-2">
+          ↓ 游標移入任一 row:completed 綠 ✓ 變 Download ↓,error 紅 ✗ 變 Retry ⟲
+        </div>
+        <div className="flex flex-col border border-divider rounded-lg overflow-hidden">
+          <FileItem mode="rich" name="Q1 營收報表.xlsx" status="completed"
+            description="Uploaded to URL" thumbnailSrc="https://i.pravatar.cc/80?u=xls"
+            onDownload={noop} actions={deleteBtn} />
+          <FileItem mode="rich" name="合約草案 v3.pdf" status="error"
+            description="There's something wrong. View log"
+            thumbnailSrc="https://i.pravatar.cc/80?u=pdf"
+            onRetry={noop} actions={deleteBtn} />
+        </div>
+      </div>
+      <div>
+        <div className="text-caption text-fg-muted mb-2">
+          同樣 pattern 在 compact mode:幾何(16×16)與刪除按鈕一致,center 自動對齊
+        </div>
+        <div className="flex flex-col border border-divider rounded-lg overflow-hidden">
+          <FileItem mode="compact" name="data-2024-q1.csv" status="completed"
+            onDownload={noop} actions={deleteBtnXs} />
+          <FileItem mode="compact" name="backup-failed.json" status="error"
+            description="Network timeout. View log" onRetry={noop} actions={deleteBtnXs} />
+        </div>
+      </div>
+    </div>
+  ),
+}
+
 export const Clickable = {
   name: '已上傳（點擊下載）',
   render: () => (

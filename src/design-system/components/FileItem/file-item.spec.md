@@ -100,6 +100,42 @@ Consumer 自行組合：
 用 Button（不是 Inline Action）——FileItem 的 action 是始終可見的獨立操作。
 詳見 CLAUDE.md「互動元素三層級」。
 
+## Status ↔ Action hover-swap（passive → active affordance）
+
+**世界級 UX pattern**（Gmail / Slack / Dropbox 附件 convention）:status 預設是 passive 狀態標記(綠 ✓ / 紅 ✗),使用者 hover 整個 row 時,**狀態 icon 自動換成「相應的操作」**,click 即觸發:
+
+| status | Passive icon | Hover 換成 | Consumer handler |
+|--------|-------------|-----------|------------------|
+| `completed` | `CircleCheck` 綠 ✓ | `Download ↓` | `onDownload` |
+| `error` | `XCircle` 紅 ✗ | `RotateCw ⟲` | `onRetry` |
+| `uploading` | *(progress %)* | *(無 swap)* | — |
+
+**幾何一致性**:status slot 固定 `ICON_PX × ICON_PX`(16 × 16),與右側 `actions`(typically 刪除按鈕,`ItemInlineActionButton` 同 16 px)**中心點自動對齊** — 幾何相同所以 hover swap 不位移。
+
+**Backward compat**:consumer 若沒傳 `onDownload` / `onRetry`,status icon 永遠保持 passive(不響應 hover)——既有使用者無感。
+
+**為什麼值得這麼做**:
+- passive 階段清楚告知使用者檔案狀態(✓ / ✗ 顏色強訊號)
+- hover 階段立即提供相應行動(completed → 下載 / error → 重試),不需另外挪位置做按鈕
+- 符合「改一處看多處」的 design system primitive 思維:passive + active 共用 slot,不讓使用者多認一處
+
+```tsx
+<FileItem
+  name="report.pdf"
+  status="completed"
+  onDownload={() => downloadFile(id)}   // hover ✓ → ↓
+  actions={<ItemInlineActionButton icon={Trash2} onClick={del} aria-label="刪除" />}
+/>
+
+<FileItem
+  name="backup.json"
+  status="error"
+  description="There's something wrong."
+  onRetry={() => retryUpload(id)}        // hover ✗ → ⟲
+  actions={<ItemInlineActionButton icon={Trash2} onClick={del} aria-label="刪除" />}
+/>
+```
+
 ## Suffix 24px 閾值
 
 | Mode | 最大 suffix 元素 | 有 desc 時 | alignment |

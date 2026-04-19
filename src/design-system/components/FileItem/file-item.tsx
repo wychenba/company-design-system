@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { Paperclip, CircleCheck, XCircle } from 'lucide-react'
+import { Paperclip, CircleCheck, XCircle, Download, RotateCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
+import { ItemInlineActionButton } from '@/design-system/patterns/item-layout/item-layout'
 
 /**
  * FileItem — 檔案顯示 / 上傳進度
@@ -56,6 +57,18 @@ export interface FileItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   thumbnailSrc?: string
   actions?: React.ReactNode
   onClick?: () => void
+  /**
+   * Hover 動作(passive 狀態 icon 變互動 button 的 UX):
+   * - `onDownload`:有值時,`status="completed"` 的綠 ✓ icon 在 row hover 時
+   *   換成 Download ↓ button;click 觸發 onDownload。無值保持 passive 綠 ✓。
+   * - `onRetry`:有值時,`status="error"` 的紅 ✗ icon 在 row hover 時換成 RotateCw ⟲
+   *   button;click 觸發 onRetry。無值保持 passive 紅 ✗。
+   *
+   * 世界級對照:Gmail / Slack / Dropbox 附件的 passive 狀態 → hover 變 action
+   * 的 UX,使用者知道檔案狀態且能立即行動。
+   */
+  onDownload?: () => void
+  onRetry?: () => void
 }
 
 const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
@@ -69,6 +82,8 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       thumbnailSrc,
       actions,
       onClick,
+      onDownload,
+      onRetry,
       className,
       ...props
     },
@@ -99,14 +114,44 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       ? 'h-[calc(1lh+2px+var(--font-body-size)*1.5)]'
       : 'h-[1lh]'
 
+    // Status slot:completed + onDownload / error + onRetry 時 row-hover 換成 action button。
+    // 幾何(ICON_PX × ICON_PX)與 ItemInlineActionButton 相同,視覺中心與右側 actions 自然對齊。
+    const hoverAction =
+      status === 'completed' && onDownload ? { icon: Download, onClick: onDownload, label: '下載' } :
+      status === 'error' && onRetry        ? { icon: RotateCw, onClick: onRetry,    label: '重試' } :
+      null
+
+    const statusSlot = statusConfig ? (
+      hoverAction ? (
+        <span className="relative inline-flex shrink-0" style={{ width: ICON_PX, height: ICON_PX }}>
+          <statusConfig.icon
+            size={ICON_PX}
+            className={cn(
+              'absolute inset-0 shrink-0 transition-opacity',
+              statusConfig.color,
+              'group-hover/row:opacity-0',
+            )}
+            aria-hidden
+          />
+          <ItemInlineActionButton
+            icon={hoverAction.icon}
+            aria-label={hoverAction.label}
+            onClick={(e) => { e.stopPropagation(); hoverAction.onClick() }}
+            size="md"
+            className="absolute inset-0 opacity-0 group-hover/row:opacity-100 transition-opacity"
+          />
+        </span>
+      ) : (
+        <statusConfig.icon size={ICON_PX} className={cn('shrink-0', statusConfig.color)} aria-hidden />
+      )
+    ) : null
+
     const suffix = (
       <div className={cn('flex items-center gap-2 shrink-0', suffixAlign)}>
         {status === 'uploading' && isRich && (
           <span className="text-fg-secondary tabular-nums">{progress}%</span>
         )}
-        {statusConfig && (
-          <statusConfig.icon size={ICON_PX} className={cn('shrink-0', statusConfig.color)} aria-hidden />
-        )}
+        {statusSlot}
         {actions}
       </div>
     )
@@ -131,7 +176,7 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       return (
         <div
           ref={ref}
-          className={cn('flex items-start gap-3 px-3 py-2 w-full text-body transition-colors', hoverClass, className)}
+          className={cn('group/row flex items-start gap-3 px-3 py-2 w-full text-body transition-colors', hoverClass, className)}
           onClick={onClick}
           {...props}
         >
@@ -151,7 +196,7 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
     return (
       <div
         ref={ref}
-        className={cn('relative flex items-start gap-2 px-3 py-2 w-full text-body transition-colors', hoverClass, className)}
+        className={cn('group/row relative flex items-start gap-2 px-3 py-2 w-full text-body transition-colors', hoverClass, className)}
         onClick={onClick}
         {...props}
       >
@@ -169,9 +214,7 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
               )}
             </div>
             <div className="flex items-center gap-2 shrink-0 h-[1lh]">
-              {statusConfig && (
-                <statusConfig.icon size={ICON_PX} className={cn('shrink-0', statusConfig.color)} aria-hidden />
-              )}
+              {statusSlot}
               {actions}
             </div>
           </div>
