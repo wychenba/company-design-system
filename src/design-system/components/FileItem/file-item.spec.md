@@ -79,12 +79,16 @@ rich 的 py 固定——高度由 avatar 決定，不走 row 公式。
 
 ## Progress bar
 
+**SSOT**:FileItem 不自 roll bar,消費 `../Progress/progress.spec.md` 元件(Radix Progress 包裝 + 本 DS token)。避免視覺漂移。
+
 | 屬性 | 值 | 依據 |
 |---|---|---|
-| 高度 | `h-1`（4px） | 跟 Slider track 對齊 |
-| Track 底色 | `bg-secondary` | 跟 Slider track 對齊（見 color.spec.md） |
-| 圓角 | `rounded-full` | 跟 Slider 對齊 |
-| 進度色 | uploading=`bg-primary`, completed=`bg-success`, error=`bg-error` | 語義色 |
+| 消費元件 | `<Progress status={...} value={...} size={...} />` | 本 DS Progress SSOT |
+| status 映射 | `uploading → primary` / `completed → success` / `error → error` | Progress `status` 原生支援 |
+| size 映射 | `rich → md(4px)` / `compact → sm(2px)` | 與原視覺一致 |
+| value | `status === 'completed' ? 100 : progress` | completed 永遠 100% |
+
+改動進度條視覺(高度 / 色 / 動畫) → 去 Progress 改,**本元件無本地 bar 實作**。
 
 ## Actions（suffix）
 

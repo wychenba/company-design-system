@@ -591,6 +591,25 @@ element.style.backgroundColor = 'var(--primary)'
 - 若缺少元件，請明確指出，不要假裝元件已存在
 - 使用 `cn()` 合併 Tailwind class（來自 `@/lib/utils`）
 
+## 同 flex 列的互動 slot 幾何鐵律（避免 gap token 被破壞）
+
+**規則**:任何新 slot(status indicator / inline action / hover-swap button)放進既有 flex row 之前,**必須**執行以下 3 步 mechanical check,不可憑直覺:
+
+1. **grep 該行既有 interactive slot 的 box 尺寸**:
+   - 先讀 row host 元件的 spec(例:FileItem spec line 100「用 Button 非 Inline Action」+ line 107「compact=xs 24 / rich=sm 28」)
+   - grep 該 row 的 stories 看 consumer 實際傳什麼 Button/action
+2. **新 slot 的 box 尺寸 = 既有 slot 尺寸**(嚴格相等,不是「差不多」):
+   - 不同:`gap-*` token 會被 overflow / overshoot 吃掉,實際視覺 gap 不等於宣告值
+   - 例外:需明文在 spec 註解(「xs 小刻意縮小因為 ...」)
+3. **Hover state 也要驗**:
+   - hover-bg / ring / focus outline 若超出 box,會吃進 gap token 空間
+   - 例:`ItemInlineActionButton` 的 16 px box + 24 px hover-bg overflow → hover 時視覺變寬,`gap-2`(8 px) 實際剩 ~4 px
+
+**失敗案例(作為記憶 anchor)**:
+- 2026-04-19 FileItem status-slot hover-swap:原本用 `ItemInlineActionButton` 16 px(不符 spec line 100「用 Button」),hover-bg 24 px overflow 吃掉 4 px `gap-2`,造成 status ↔ delete 實際 gap 變 ~4 px 違反 8 px 規格。修法:改用 Button 同 consumer size(compact xs 24 / rich sm 28),slot 容器等同 Button 尺寸。
+
+**世界級 DS 的幾何鐵律**:同 flex 列的互動元素統一 box 尺寸,gap token 才能如實呈現——這是跨元件治理層的不變量,不是元件內部細節。
+
 ## 新增數值前必須先查既有 pattern（舉一反三原則）
 
 **寫任何 gap、padding、font-size、line-height、icon size、border-radius 等數值之前,必須先 grep 系統內同類型的值,確認是否有既有 pattern 可以直接套用。不要憑直覺發明新值。**

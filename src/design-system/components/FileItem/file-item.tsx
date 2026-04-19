@@ -3,6 +3,7 @@ import { Paperclip, CircleCheck, XCircle, Download, RotateCw } from 'lucide-reac
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
+import { Progress } from '@/design-system/components/Progress/progress'
 
 /**
  * FileItem — 檔案顯示 / 上傳進度
@@ -25,22 +26,21 @@ import { Button } from '@/design-system/components/Button/button'
  * onClick → hover:bg-neutral-hover + cursor-pointer。
  */
 
-const PROGRESS_COLOR = {
-  uploading: 'bg-primary',
-  completed: 'bg-success',
-  error: 'bg-error',
-} as const
-
 const STATUS_ICON = {
   completed: { icon: CircleCheck, color: 'text-success' },
   error: { icon: XCircle, color: 'text-error' },
 } as const
 
+// Progress status 映射:uploading=primary(藍) / completed=success(綠) / error=error(紅)
+// 與 Progress 元件的 status prop 對齊,不需再維護 PROGRESS_COLOR 本地 map。
+const PROGRESS_STATUS_MAP = {
+  uploading: 'primary',
+  completed: 'success',
+  error: 'error',
+} as const
+
 const AVATAR_SIZE = 56
 const ICON_PX = 16
-
-const BAR_H = 4          // progress bar 高度，跟 Slider track 對齊
-const COMPACT_BAR_H = 2  // compact bar 高度（absolute 裝飾，比 rich 更細）
 
 export interface FileItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   name: string
@@ -99,14 +99,13 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
 
     const hoverClass = onClick ? 'cursor-pointer hover:bg-neutral-hover' : ''
 
-    const barH = isRich ? BAR_H : COMPACT_BAR_H
+    // 消費 Progress 元件(SSOT);不再自 roll bar。rich=md(4px)/ compact=sm(2px)。
     const progressBar = hasStatus ? (
-      <div className="rounded-full bg-secondary" style={{ height: barH }}>
-        <div
-          className={cn('h-full rounded-full transition-all duration-300', PROGRESS_COLOR[status!])}
-          style={{ width: `${progressWidth}%` }}
-        />
-      </div>
+      <Progress
+        value={progressWidth}
+        status={PROGRESS_STATUS_MAP[status!]}
+        size={isRich ? 'md' : 'sm'}
+      />
     ) : null
 
     // suffix
