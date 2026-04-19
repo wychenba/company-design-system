@@ -56,6 +56,45 @@ title: 'Explorations/{Topic Title}/{Candidate Name}'
 | Notion Command Palette | modal Cmd-K + query | 11/15 | `notion-command-palette.stories.tsx` |
 | Stripe Step Wizard | Dialog + 3 步 fine-grained | 12/15 | `stripe-step-wizard.stories.tsx` |
 
+## Phase 3.0 Object Map(全 candidate 共享)
+
+本 feature 的 canonical object model,由 Phase 1 benchmark 的 OOUX 分析收斂 + Phase 0 framing 收敛而成。**3 個 candidate 共享此 Object Map**,差異只在 UI shape + CTAs 順序。
+
+**Objects**(core nouns):
+- {Object A}(核心名詞 1)
+- {Object B}(核心名詞 2)
+- {Object C}(若有)
+
+**Attributes per object**:
+
+| Object | Core attributes | Metadata | Identifying |
+|--------|----------------|----------|-------------|
+| {A} | ... | ... | ... |
+| {B} | ... | ... | ... |
+
+**Relationships(NOM)**:
+
+| From → To | Relationship |
+|-----------|-------------|
+| {A} → {B} | belongs to / has many / ... |
+| ... | ... |
+
+**CTAs per role per object**:
+
+| Role | {A} CTAs | {B} CTAs |
+|------|----------|----------|
+| Admin | Create / Edit / Delete | ... |
+| Member | View / Comment | ... |
+
+**UI Shape → DS 元件映射**:
+
+| Object | List | Card | Detail | Inline |
+|--------|------|------|--------|--------|
+| {A} | MenuItem / DataTable row | Card / FileItem | Page + Tabs | Tag / Chip |
+| {B} | ... | ... | ... | ... |
+
+完整 ORCA 方法與範本見 [`ooux-template.md`](ooux-template.md)。
+
 ## 候選獨立說明
 
 ### Linear Quick-Filter

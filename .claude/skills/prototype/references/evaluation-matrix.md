@@ -91,6 +91,11 @@ Phase 2 將 Phase 1 scan 結果變成可決策的評分表。
    - 「此候選在我們的 `{業務場景 A}` / `{場景 B}` 會呈現 ___」
    - 不是抽象「UX 好」
 
+4. **OOUX / IA 深度對標**(see `ooux-template.md`):
+   - 「此 candidate 的 object model 對應競品的 `{Linear/Jira}` 方式,差異在 `{relationship depth / progressive disclosure 策略}` 是 ___」
+   - 不是只比視覺表皮;若 candidate 實際上是同個 object model 的 UI shape 變體,narrative 需明點出
+   - 若候選會變更 object definition(拆分 / 合併 object),**扣 DS 一致性分**(代表與 product canonical object model 漂移)
+
 4. **對齊 Mindset #5「猶豫就問」**:
    - 若 candidate 的某部分無法評(資訊不足),**flag 而非猜**
 
@@ -133,3 +138,4 @@ Phase 2 將 Phase 1 scan 結果變成可決策的評分表。
 - ❌ **過度保守**:只打 3 分求穩 → Phase 2 失去篩選功能
 - ❌ **抽象優缺**:「好看」「直覺」「簡潔」— 無決策力,等於沒寫
 - ❌ **跳 tie-breaker 規則**:AI 挑一個 convenient 進 shortlist,違反 Checkpoint 2 精神
+- ❌ **只比視覺不比 IA**:只看 Phase 1 表層 / 沒分析 object model 就打分 → 抄到形式,抄不到深度(見 ooux-template.md)
