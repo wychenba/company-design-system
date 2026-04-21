@@ -20,6 +20,7 @@ import { AspectRatio } from '@/design-system/components/AspectRatio/aspect-ratio
 import { Textarea } from '@/design-system/components/Textarea/textarea'
 import { Field, FieldLabel } from '@/design-system/components/Field/field'
 import { DescriptionList, DescriptionItem } from '@/design-system/components/DescriptionList/description-list'
+import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -305,9 +306,11 @@ const Toolbar: React.FC<ToolbarProps> = ({
         'px-[var(--layout-space-loose)]',
       )}
     >
-      {/* 檔名(左,佔據可用寬度,ellipsis)*/}
+      {/* 檔名(左,佔據可用寬度,ellipsis)—— file-type icon 代表檔名的意象(這是什麼檔),
+          對齊 CLAUDE.md「icon 代表 label 意象時與 label 同色」原則:icon 走 text-foreground
+          不走 text-fg-muted(後者是裝飾性 / 輔助 icon 的色階) */}
       <div className="flex items-center gap-2 min-w-0 flex-1">
-        <FileIcon size={16} className="text-fg-muted shrink-0" aria-hidden />
+        <FileIcon size={16} className="text-foreground shrink-0" aria-hidden />
         <span
           className="text-body-lg text-foreground truncate"
           title={file.name}
@@ -340,13 +343,16 @@ const Toolbar: React.FC<ToolbarProps> = ({
             onClick={onDownload}
           />
         )}
-        <Button
-          variant="text"
+        {/* Close X 走 dismiss canonical(`ItemInlineActionButton`)——對齊 CLAUDE.md
+            `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss 按鈕 canonical」:
+            dismiss overlay session 必用 Inline Action,不用 label Button。 */}
+        <ItemInlineAction
           size="sm"
-          iconOnly
-          startIcon={X}
-          aria-label="關閉檢視器"
-          onClick={onClose}
+          action={{
+            icon: X,
+            label: '關閉檢視器',
+            onClick: onClose,
+          }}
         />
       </div>
     </div>
@@ -407,13 +413,14 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
         )}
       >
         <h3 className="text-body-lg font-medium text-foreground">詳細資訊</h3>
-        <Button
-          variant="text"
+        {/* InfoPanel close 走 dismiss canonical ItemInlineAction,對齊 item-anatomy 規則 */}
+        <ItemInlineAction
           size="sm"
-          iconOnly
-          startIcon={X}
-          aria-label="關閉詳細資訊"
-          onClick={onClose}
+          action={{
+            icon: X,
+            label: '關閉詳細資訊',
+            onClick: onClose,
+          }}
         />
       </div>
 
@@ -767,11 +774,20 @@ const FileViewer: React.FC<FileViewerProps> = ({
               onClose={() => onOpenChange(false)}
             />
 
-            {/* 主區:Viewport + 可選 InfoPanel(右側) */}
+            {/* 主區:Viewport + 可選 InfoPanel(右側)
+                group/viewer:讓內部 prev/next 箭頭 hover-only(對齊 Google Photos /
+                Dropbox lightbox / Carousel spec canonical — 常駐箭頭干擾 media 閱讀) */}
             <div className="flex-1 min-h-0 flex">
-              <div className="relative flex-1 min-w-0 bg-canvas">
+              <div className="group/viewer relative flex-1 min-w-0 bg-canvas">
                 {showArrows && activeIndex > 0 && (
-                  <div className="absolute left-[var(--layout-space-loose)] top-1/2 -translate-y-1/2 z-10">
+                  <div
+                    className={cn(
+                      'absolute left-[var(--layout-space-loose)] top-1/2 -translate-y-1/2 z-10',
+                      // hover-only:預設隱藏,group hover 或 focus-within 時淡入
+                      'opacity-0 transition-opacity duration-150',
+                      'group-hover/viewer:opacity-100 focus-within:opacity-100',
+                    )}
+                  >
                     <Button
                       variant="text"
                       size="md"
@@ -792,7 +808,13 @@ const FileViewer: React.FC<FileViewerProps> = ({
                   />
                 </div>
                 {showArrows && activeIndex < files.length - 1 && (
-                  <div className="absolute right-[var(--layout-space-loose)] top-1/2 -translate-y-1/2 z-10">
+                  <div
+                    className={cn(
+                      'absolute right-[var(--layout-space-loose)] top-1/2 -translate-y-1/2 z-10',
+                      'opacity-0 transition-opacity duration-150',
+                      'group-hover/viewer:opacity-100 focus-within:opacity-100',
+                    )}
+                  >
                     <Button
                       variant="text"
                       size="md"

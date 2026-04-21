@@ -57,6 +57,12 @@ Tooltip 底色是深色，子元素永遠套用 dark theme token（透過 `data-
 
 **Tooltip 走「輕量浮層」例外**(見 `../Popover/popover.spec.md`「SSOT 適用範圍」)—— hover 觸發、純文字展示、寬度極窄(max 280px),Radix 預設 `center` 貼合指標即可。不強制對齊 structured overlay 的 trigger-position canonical。
 
+## Edge collision(避免貼 viewport 邊)
+
+**`collisionPadding` default = 8**(與 HoverCard 一致),Radix `avoidCollisions` 預設 true 會自動翻邊,但 padding 0 會讓 tooltip **貼齊 viewport 邊緣**(視覺上擠)。default 8 讓 tooltip 跟 viewport 邊保留最少 8px 呼吸距離。consumer 需自訂傳 prop 即可覆寫。
+
+世界級對照:Material Tooltip `margin: 14px` default / Polaris Tooltip 8-12px — 本 DS 選 8 對齊 HoverCard。
+
 ## 最大寬度（元件級常數）
 
 Tooltip 最大寬度 **280px**（見 `.tsx` 的 `max-w-[280px]`）——超過換行。避免單條 tooltip 占據過大空間遮蔽內容，同時保證文字可完整呈現（見「內容完整性」節，tooltip 是資訊終點，不截斷）。

@@ -91,7 +91,26 @@ Family 的 canonical 規定的是「同用途同 layout」;FileViewer 用途(ful
 
 ---
 
-## Toolbar 按鈕順序(canonical triangulation)
+## Toolbar 三分區(對齊 action-bar pattern)
+
+FileViewer Toolbar 消費 `patterns/action-bar/action-bar.spec.md` 的**左中右三分區**(非 primitive,是 layout 原則):
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│ [🗎] filename.ext          [Zoom controls]    [Info][DL][X]    │
+│     └─ context(左)         └─ data op(中)    └─ action(右)     │
+└────────────────────────────────────────────────────────────────┘
+```
+
+| 區 | 職責 | FileViewer 對應 |
+|---|---|---|
+| **左 Context** | 告訴 user「在看什麼」| File type icon + file name(occupy 可用寬度 truncate) |
+| **中 Data operation** | 對當前資料的控制 | ZoomInput(`[−][%][+][⌄]`) |
+| **右 Action** | session-level 影響力遞增的動作 | Info → Download → Close(見下「順序」) |
+
+**File-type icon 顏色規則**:icon 代表 filename 的**意象**(「這是什麼檔」),依本 DS「icon 與 label 同色」原則走 `text-foreground`,**不走** `text-fg-muted`(後者是裝飾性 / 輔助 icon 的色階)。
+
+### 按鈕順序(canonical triangulation)
 
 **順序:zoom → info → download → close**。
 
@@ -106,6 +125,23 @@ Family 的 canonical 規定的是「同用途同 layout」;FileViewer 用途(ful
 - **info** — 切換附加資訊面板(影響範圍:layout,不破壞現有內容)
 - **download** — 把內容搬出 viewer(影響範圍:外部檔案系統,不可逆副作用)
 - **close** — 結束整個 viewing session(影響範圍:最大,unmount 所有 state)
+
+### Dismiss canonical(Close X)
+
+Toolbar 右側 `X` + InfoPanel header `X` **都走 `ItemInlineAction`**(dismiss canonical,見 `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss 按鈕 canonical」),**非 `<Button iconOnly>`**。理由:
+
+- CLAUDE.md canonical:dismiss = `ItemInlineActionButton`,唯一例外是 anchor 有 solid 色(Tag)
+- Toolbar chrome dark-mode context 下 ItemInlineAction 的 `neutral-hover` bg token 走 inverse 色階自動適應,跟 chrome 融合更細緻
+- 跟其他 `<Button iconOnly>`(info / download)視覺有區隔 — info/download 是 **action**(做事),close 是 **dismiss**(結束 session),不同語義用不同元件(Button vs Inline Action)符合 canonical
+
+### Prev/Next 檔案切換(hover-only,對齊 Google Photos / Dropbox lightbox / Carousel)
+
+viewport 左右的 `<` `>` 切檔案箭頭**預設 opacity-0**,`group-hover/viewer:opacity-100` + `focus-within:opacity-100` 才浮現。理由:
+
+- **世界級對照**:Google Photos / Dropbox preview / PhotoSwipe / Instagram lightbox 皆 hover-only — 常駐箭頭干擾 media(檔案)閱讀
+- **a11y**:鍵盤 focus 時強制顯示(不 hover 不知道有箭頭不可用)
+- **邊界**:第一/最後一張時直接不 render(非 disabled state,避免視覺噪音)
+- 對齊 `components/Carousel/carousel.spec.md`「Arrow 行為」canonical
 
 ---
 
@@ -148,6 +184,12 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 - 消費 `react-zoom-pan-pinch`(zoom + pan 行為 primitive,無 UI);世界級產品 Figma / Miro / PhotoSwipe 同流派
 - Scroll wheel 縮放;`zoom > 100%` 時可拖曳 pan
 - **Wheel step 為 `0.1`**(每 tick ~10% 縮放變化,對齊 Figma canonical);不用 additive step 因為高低縮放區間的感受不一致(低 zoom 時 0.15 太跳、高 zoom 時 0.15 又太慢),multiplicative 0.1 在整個 10–400% 範圍內操作感一致
+- **Zoom anchor(中心點)canonical**:
+  - **Wheel zoom** — anchor 固定在 **cursor pointer 位置**(react-zoom-pan-pinch default,對齊 Figma / Photoshop / 瀏覽器 cmd-scroll canonical)。user 滑鼠指哪,zoom 就以那點為中心,內容不會「跑掉」
+  - **± button zoom**(沒 cursor 位置時)— anchor 固定在 **viewport center**(對齊 Figma / Google Slides 的 toolbar ± zoom 行為)
+  - **Fit to width / page** — reset pan 到 `(0, 0)`,anchor center(`centerOnInit: true`)
+  - **100% 重設**(user 按 `0` 鍵 / double-click)— `centerZoomedOut: true` 讓 ≤100% 時自動 center,避免飄在角落
+  - 結果:user 看哪,zoom 完 **看哪**,視覺焦點不漂移 — 世界級 media viewer 共識
 - Min scale 10%,max scale 400%
 - 雙擊重設 100%
 - 切換檔案時 shell 自動重設 zoom 到 100%(避免上一張檔案的 zoom 狀態帶到下一張)
