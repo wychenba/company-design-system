@@ -232,25 +232,42 @@ Per CLAUDE.md `## 命名必過三重 test`, when proposing ANY new naming (varia
 
 **If any test fails → iterate naming, don't propose**. Historical: `text/picture` (Ant Design idiom ✓) failed test 3 (collides with Button `variant="text"`), changed to `compact/rich`.
 
-### Phase 3.5 — Visual audit(scope 依稽核模式)
+### Phase 3.5 — 進階 6 維稽核 D3-D5(scope 依稽核模式)
 
-對齊 **CLAUDE.md 稽核三級 policy**:日常 DS audit 走 Tier 2(scoped),釋出 / token 大改 / 季度健檢走 Tier 3(full DS-wide)。
+對齊 **CLAUDE.md `# 稽核 6 維 + 2 模式 + 觸發 canonical`**:本 skill 完成 Phase 1-3 後,已覆蓋 D1 設計語言 + D2 程式語言;D3 效能 / D4 UX / D5 視覺 需 chain 專門 skill。**進階模式必跑全 D3-D5**;高效模式可只跑 D5。
 
 **模式判定**:
-- **Default(Tier 2 daily)**:`npm run visual-audit -- --scope=changed`(讀 git diff 掃動到的 component + direct consumer)
-- **Deep(Tier 3 periodic)**:`npm run visual-audit -- --scope=all`
-  - Trigger 條件:user 顯式 invoke `/design-system-audit --deep`,OR 本次 Phase 3 commits 動到 `tokens/` / `patterns/element-anatomy/` / `patterns/overlay-surface/`(影響擴散到多元件)
-- **Component focus**:若 audit 主要集中在某單一元件 → `--scope=component:<Name>`
+- **高效(default,Tier 2 daily)**:scope=changed,只跑 D5(visual)
+- **進階(Tier 3 periodic)**:scope=all,**D3 + D4 + D5 全跑**
+  - Trigger 條件:user 顯式 invoke `/design-system-audit --deep`,OR 本次 Phase 3 commits 動到 `tokens/` / `patterns/element-anatomy/` / `patterns/overlay-surface/`(擴散多元件),OR user 要求「整個 DS 大稽核」「完整 audit」「進階模式」
+- **Component focus**:audit 集中在單一元件 → `--scope=component:<Name>`
 
-**Process**:
-1. Auto 選模式 + run Layer A(contrast + geometry + screenshot)
-2. Layer A violation:若有 → 開新 commit 修,回圈到 Phase 2 triage
-3. Layer A 過 → chain `/visual-audit` skill 做 Layer B AI judgement,讀 `snapshots/*.png`(設計合理性、世界級對照)
-4. Layer B finding:P0 / P1 / P2 分級,P0 必修,P1/P2 走 Phase 2 同樣 user-decision 流程
+**Process(進階模式完整 6 維)**:
 
-**為什麼在 Phase 3 後**:先讓 20 dim code audit 修完,再跑視覺 — 避免 visual audit 抓到的 finding 其實是 code audit 該抓的(例如 token leak)。兩層互補,code 先 visual 後。
+**Phase 3.5a — D5 視覺品質**
+1. Auto 選 scope + run `npm run visual-audit --` with scope flag(Layer A:contrast + geometry + screenshot)
+2. Layer A violation 有 → 開新 commit 修,回圈到 Phase 2 triage
+3. Layer A 過 → chain `/visual-audit` skill 做 Layer B AI judgement,讀 `snapshots/*.png`
 
-**跳過條件**:本次 audit 所有 commits 都是 spec.md 純文字修正(無 tsx / token 改動)→ visual 無變,可跳 Phase 3.5。
+**Phase 3.5b — D3 元件效能(進階模式強制)**
+- Chain `/performance-audit` scope 同上
+- 檢查:render count / memo gap / bundle impact / useEffect 鏈 / context thrashing
+- 高 impact finding → Phase 2 triage;`# 稽核 vs 執行 分權 canonical`:修實作類 auto,改 canonical 類 STOP
+
+**Phase 3.5c — D4 UX 行為(進階模式強制)**
+- Chain `/ux-audit` scope 同上
+- 檢查:keyboard nav / focus / ARIA / animation / interaction canonical / 三態
+- P0(完全 block a11y)必修;P1 Phase 2 triage
+
+**Phase 3.5d — D6 原則自檢(進階模式)**
+- 彙整 D1-D5 中所有「提議討論」finding(牴觸 canonical 但非明顯 bug)
+- 列入 Phase 4 final report「提議討論區」,**STOP 等 user sign-off**(不自改原則)
+
+**為什麼在 Phase 3 後**:先讓 20 dim code audit 修完,再跑 D3-D5 — 避免 D3-D5 抓到的 finding 其實是 code audit 該抓的(例如 token leak 影響視覺)。
+
+**跳過條件**:
+- 本次 audit commits 都是 spec.md 純文字修正(無 tsx / token 改動)→ D3-D5 無變,可跳 Phase 3.5
+- 高效模式:只跑 Phase 3.5a(D5),跳 3.5b / 3.5c
 
 ### Phase 4 — Final report + memory update
 
