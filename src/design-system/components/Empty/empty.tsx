@@ -36,14 +36,16 @@ const Empty = React.forwardRef<HTMLDivElement, EmptyProps>(
     const rowSize = useRowSize('md')
     const descFont = rowSize === 'lg' ? 'text-body-lg' : 'text-body'
 
-    // Icon rendering: LucideIcon (function) → Avatar; ReactElement → as-is
+    // Icon rendering: ReactElement → as-is;LucideIcon(component,包括 forwardRef 物件)→ 包 Avatar
+    // 注意:Lucide v0.577+ icons 是 forwardRef 物件(`typeof === 'object'`),不是 function。
+    // 必用 React.isValidElement 判斷 element vs component(typeof 會把 forwardRef 物件誤歸 object)。
     let iconElement: React.ReactNode = null
     if (icon) {
-      if (typeof icon === 'function') {
+      if (React.isValidElement(icon)) {
+        iconElement = icon
+      } else {
         const Icon = icon as LucideIcon
         iconElement = <Avatar icon={Icon} size={48} color="neutral" />
-      } else {
-        iconElement = icon
       }
     }
 

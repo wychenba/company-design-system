@@ -130,8 +130,11 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
           filterAndDispatch(e.dataTransfer.files)
         }}
         className={cn(
-          'flex flex-col items-center justify-center gap-2 text-center',
-          'rounded-md border-2 border-dashed px-6 py-10',
+          // 寬度 w-full 填滿 consumer 容器(user 明示「寬度填滿」);高度由 padding + 內容物決定(不固定 h)
+          'flex flex-col items-center justify-center gap-2 text-center w-full',
+          // 對稱 padding p-[var(--layout-space-loose)]:四邊等距,density-aware(md=24px / lg=32px),對齊 DS chrome padding canonical。
+          // 不再硬寫 px-6 py-10(不對稱+非 token)。內容物(icon + title + description)垂直堆疊由 gap-2 控制
+          'rounded-md border-2 border-dashed p-[var(--layout-space-loose)]',
           'cursor-pointer transition-colors',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           // idle
