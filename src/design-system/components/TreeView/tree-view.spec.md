@@ -523,9 +523,19 @@ TreeView 真實展示需要**多層巢狀結構**才有意義(單節點無法體
 
 ---
 
+## 邊界狀態
+
+- **Empty(無 items)**:TreeView 不自帶 empty state UI,由 consumer 在 items 為空時顯示 `<Empty>`(file browser 常見:「此資料夾是空的」+ 上傳 CTA)
+- **Loading 整棵樹**:若資料異步載入,consumer 在 data 未到時顯示 `<CircularProgress>` 或 `<Skeleton>`,不在 TreeView 內建 loading
+- **單一 leaf node**:結構上合法(不一定要多層),視覺跟多層無差別
+- **Dark mode**:由 semantic token 自動切換,詳見 `../../tokens/color/color.spec.md`
+
+---
+
 ## 相關
 
 - `../Sidebar/sidebar.spec.md` — 常見的 TreeView 消費者（導覽場景）
 - `../DataTable/data-table.spec.md` — 平面資料的對應元件
 - `../DropdownMenu/dropdown-menu.spec.md` — 彈出式 sub-menu（TreeView 是 persistent）
+- `../Empty/empty.spec.md` — no-data state 的 canonical placeholder
 - `../../patterns/element-anatomy/item-anatomy.spec.md` — TreeItem 內部佈局共用規則
