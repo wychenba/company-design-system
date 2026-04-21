@@ -44,15 +44,17 @@ export const Overview = {
 - **強制編號**:Storybook sidebar 不依 `export` 順序,改依 story `name` 字母排序。中文無字母序,sidebar 會亂序;加編號前綴強制排序 canonical 化,順序跟 anatomy-standard 這份文件一致
 - **世界級對照**:Polaris(Anatomy / Variants / States)/ Material(Anatomy / Guidelines)/ Atlassian(Examples / Code) 的 Storybook 皆為每個 story 明確標題,從不靠 identifier 帶出 sidebar 名稱
 
-### Canonical 是 applicable-where-meaningful,非 rigid uniform
+### Canonical 是**預設 5 section 都要建**,N/A 是嚴格例外
 
-**canonical 5 section 的意圖不是「每個元件強制 5 section」**,而是:**該元件若有對應視覺決策,必須用 canonical 命名 + 編號表達;若沒有(N/A),必須在 spec.md 明文 rationale**。
+**canonical 5 section = 每個 Components/(public)元件預設都該有**。N/A 不是「省工豁免」,是嚴格例外 — 必須是「建了毫無意義 / 反而有害」才算 N/A。下方判斷標準**從嚴**。
 
-判斷一個 section 是否 applicable:
-- **ColorMatrix**:元件有 variant / severity / hue / theme 差異 → applicable;單一視覺(Separator / Skeleton) → N/A
-- **SizeMatrix**:元件有 size tier(sm/md/lg) → applicable;固定尺寸(Notice 單一 size / AspectRatio 自由比例) → N/A
-- **StateBehavior**:元件有互動 state(hover / selected / disabled / loading) → applicable;純視覺 indicator(Badge / Tag) → N/A
-- **Inspector**:元件有可 inspect 的 slot + token 對照 → applicable;純 wrapper 無 slot → N/A
+**判斷預設 applicable**(採 Polaris / Material / Atlassian 世界級 baseline):
+- **Inspector**:**幾乎所有 public 元件都 applicable**。只要元件有 ≥ 2 props,就該有 Inspector 讓 designer 切 props 看 render + token 對照。拒絕 Inspector 的唯一理由 = 元件 props < 2(極罕見,例 Separator / Skeleton 無互動 prop)
+- **ColorMatrix**:applicable 如元件有 variant / hue / severity / theme。N/A 僅當元件色彩完全繼承 context(例 HoverCard 繼承 page theme 無自己 palette)
+- **SizeMatrix**:applicable 如元件有 size prop(sm/md/lg)。固定尺寸才 N/A(Notice / Chip / Avatar 的特定固定場合)
+- **StateBehavior**:applicable 如元件有任何互動 state(hover / selected / disabled / loading / error / focus)。純靜態 indicator(Badge / Tag)才 N/A
+
+**嚴格警告**:曾經被誤用「applicable-where-meaningful」放行大量元件跳 Inspector,造成 anatomy 紙本文件不如世界級。**2026-04-21 audit 重修:policy 改回「預設全建,N/A 要硬 rationale」**。N/A 不是省工通行證。
 
 ### 允許的偏離(CLAUDE.md「Consistency Audit 原則」公式)
 
