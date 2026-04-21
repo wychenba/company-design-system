@@ -135,3 +135,49 @@ Curated from the `# 失敗記憶索引` in CLAUDE.md plus audit runs. Each entry
 | 16. Layout Family 宣告 | 元件缺 Family declaration | 系統遊離 |
 | 17. Prop value 跨元件認知衝突 | 同 literal 不同語義 | 違反命名三重 test #3 |
 | 18. shadcn compat alias 回流 | `npx shadcn add` 遺留 alias | 硬寫 Tailwind shadow |
+
+---
+
+## Meta-Pattern layered index (2026-04-21 rebuild)
+
+After the 2026-04-21 governance rebuild, each historical bug maps to one of the 6 Meta-Patterns in CLAUDE.md `# Meta-Pattern 預警`. The index below is the canonical mapping; specific bug classes are kept below as historical context, but future bugs should be classified into a Meta-Pattern first.
+
+### M1 — 視覺決策前必消費 SSOT
+
+- **FileViewer 初版**(2026-04-20 / AR26-38):dismiss 用 Button 不用 ItemInlineAction / header 硬寫 h-14 不用 `--chrome-header-height` / toolbar 按鈕 gap 沒對齊 `action-bar.spec.md` / Sheet 表單 gap 沒用 `--layout-space-tight`
+- **Input `variant="bare"`**(2026-04-20):FileViewer ZoomInput 發明新 variant 未先 grep 既有 Input variant 值;事後 codify 進 Input spec 但 discovery pattern 有誤(不該先發明)
+- **Row 硬刻 `<div><Icon/><span/><Button/></div>`**(反覆發生):應用 MenuItem + slot components
+- **Loading overlay 手刻 `<div absolute inset-0 flex center>`**(反覆發生):應用 `<Empty icon={<CircularProgress/>}/>` 或 Input `loading` prop
+
+### M2 — 消費 3rd-party lib 必驗 rendered DOM
+
+- **react-day-picker v9 `data-range-*` 不存在**(2026-04-21 / AR43):DateGrid 用 `[&[data-range-middle]]:bg-...` 靜默失效,正解走 classNames prop
+- **react-zoom-pan-pinch fit-to-page 算錯**(2026-04-21 / AR 本輪):formula 混淆 `object-contain` 的 pre-scale 和 transform scale,導致 fit 反而縮小;正解移除 object-contain 用 natural size + onLoad 計算 fit scale
+- **wheel step 10% 太粗**(2026-04-21 / AR 本輪):預設 0.1 非世界級(Figma ~3%、Preview ~5%),調到 0.03 + smoothStep 0.005
+- **DateGrid today `[&>button]:relative` 破壞 absolute**(2026-04-21):button 已 `absolute inset-0.5` 是 positioning context,重加 relative 覆蓋掉 absolute → sizing 破壞
+
+### M3 — Portal 逃逸 subtree context
+
+- **FileViewer DropdownMenu dark subtree 變亮**(2026-04-20 / AR26):Portal 到 document body,不繼承 FileViewer `data-theme="dark"` subtree,需顯式 forward + 強制 `bg-surface-raised` 等 dark token class
+
+### M4 — Group 元件必隔離 fieldCtx
+
+- **Checkbox in CheckboxGroup 所有 label 抑制**(2026-04-21 / AR34):fieldCtx 在 CheckboxGroup 內傳染到每個 item,每個 Checkbox 以為自己在 Field 裡唯一 → label 被抑制;正解建 `CheckboxGroupContext` 隔離,`shouldSuppressLabel = insideField && !insideGroup`
+- **Checkbox 共用 fieldCtx.id 點擊只 toggle 第一個**(2026-04-21 / AR34):同上 root cause,所有 item 的 `<label htmlFor={fieldCtx.id}>` 指向同一 id;正解 `insideGroup ? generatedId : fieldCtx?.id ?? generatedId`
+
+### M5 — State 疊加必 spec 聲明
+
+- **DateGrid today + selected bar 色隱形**(2026-04-21):today bar 用 `bg-primary` 藍色,selected cell bg 也是藍色 → bar 隱形;正解 `[&[data-selected=true]>button]:after:bg-on-emphasis` 在 selected 時切白
+- **DateGrid today bar 過於貼近 button 邊**(2026-04-21):`bottom-[2px]` 離 button 底太近,視覺「黏邊」;正解 `bottom-[5px]` 貼近數字行底
+
+### M6 — Stakeholder gate 強制進階稽核
+
+- **FileViewer 初版多 round 反覆修 AR26-38**(2026-04-20):初版出給人看前沒跑進階稽核 / 沒截圖全 state 驗證 → 後續 user 發現 8+ 項問題分多輪修;若 merge 前過了 `/component-quality-gate` Phase 4.5 進階模式 + `/visual-audit` Layer A + Layer B,多數問題應當場攔下
+
+### 獨立技術陷阱(非 meta-pattern,保留 anchor)
+
+- cva `defaultVariants.size` 三方漂移(SegmentedControl) → `/story-writing` Phase 4 + hook `check_cva_default_sync.sh`
+- Row 硬寫 `py-2` 產生 gap(TreeView in SidebarGroup) → item-anatomy spec
+- asChild pattern consumer 自查 avatar size → item-anatomy spec
+- HoverCard 誤放 Components/(純行為 primitive 應 Internal/) → `# Story` 判斷 test
+- Chip 誤列 field-height family(Material 3 固定 sm) → `tokens/uiSize/uiSize.spec.md`
