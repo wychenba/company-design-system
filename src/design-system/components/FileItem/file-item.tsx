@@ -98,7 +98,13 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
     // compact 只有 error 才顯示 description
     const showDesc = isRich ? !!description : (status === 'error' && !!description)
 
-    const hoverClass = onClick ? 'cursor-pointer hover:bg-neutral-hover' : ''
+    // Hover 行為 canonical(2026-04-23 user 校準):**FileItem 永不顯示 hover-bg**。
+    // 三種型態都有永久 visual anchor:rich = border card / compact Type B = bg-secondary /
+    // compact Type A = 底部 progress bar(分隔線型 affordance)——再加 hover-bg 是
+    // double-emphasis,視覺雜。世界級共識(Slack / Notion / Figma / Gmail 皆無 hover-bg):
+    // permanent-anchored 元件 hover 只靠 cursor + action icon fade / border highlight,
+    // 不靠 row bg。onClick 存在時只給 `cursor-pointer`,affordance 靠 cursor + 點擊行為本身。
+    const hoverClass = onClick ? 'cursor-pointer' : ''
 
     // 消費 ProgressBar 元件(SSOT);不再自 roll bar。
     // height override:compact mode 用 2px(極密集 row layout),rich mode 用預設 4px。
@@ -213,8 +219,8 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       : {}
 
     // Compact 靜態背景(AR20):無進度條 → 顯示 `bg-secondary`(= neutral-3)作「檔案已上傳 /
-    // 靜態列表」視覺區隔,跟「上傳中(有 progress bar)」對照。hover 仍然用 `bg-neutral-hover`
-    // 覆蓋(higher specificity 於行內 hover class)。
+    // 靜態列表」視覺區隔,跟「上傳中(有 progress bar)」對照。hover 不改 bg(見上方
+    // hoverClass canonical:FileItem 永不顯示 hover-bg)。
     // **為什麼 bg-secondary 不 bg-neutral-3**:`bg-neutral-3` 不是合法 Tailwind utility
     // (primitive token `--color-neutral-3` 沒經 `@theme inline` 橋接);`bg-secondary`
     // 是 semantic token 橋接的 utility(見 `tokens/color/semantic.css`@theme inline),

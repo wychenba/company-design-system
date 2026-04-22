@@ -118,7 +118,37 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
 |------|---------|-----------|
 | **rich**(所有 status) | `border border-divider rounded-md bg-surface` | Rich mode **永遠是「檔案 card」**,不因 status 改變——Slack / Notion / Linear attachment 皆獨立 card;邊框讓每個 row 視覺上是自立單元 |
 | **compact + 有 progress**(上傳中 / 類 Upload manager 完成態) | 無背景、無邊框,只靠 progress bar 提供 affordance | 「正在發生」/「剛發生」的動態 narrative,progress 本身就是視覺焦點 |
-| **compact + 無 progress**(form attachment 靜態態) | `bg-secondary rounded-md`(= neutral-3 色) | 靜態清單(form / 訊息附件)背景色區隔出「檔案 row」邊界,跟純文字內容區分;hover 時 `bg-neutral-hover` 覆蓋。**為何 `bg-secondary` 不 `bg-neutral-3`**:`--secondary` 是 semantic token 經 `@theme inline` 橋接成合法 Tailwind utility,`--color-neutral-3` 是 primitive token(僅 `:root` CSS var)不生成 utility,寫 `bg-neutral-3` 會 silent 失效。對齊 Badge low / ProgressBar track SSOT(同色) |
+| **compact + 無 progress**(form attachment 靜態態) | `bg-secondary rounded-md`(= neutral-3 色) | 靜態清單(form / 訊息附件)背景色區隔出「檔案 row」邊界,跟純文字內容區分。**為何 `bg-secondary` 不 `bg-neutral-3`**:`--secondary` 是 semantic token 經 `@theme inline` 橋接成合法 Tailwind utility,`--color-neutral-3` 是 primitive token(僅 `:root` CSS var)不生成 utility,寫 `bg-neutral-3` 會 silent 失效。對齊 Badge low / ProgressBar track SSOT(同色) |
+
+### Hover 行為 canonical(2026-04-23)
+
+**FileItem 永不顯示 hover-bg**,不論 mode / status / onClick。affordance 只靠 `cursor-pointer`(onClick 存在時)+ actions icon / hover-swap(status slot icon fade → action icon fade)。
+
+**Rationale(permanent visual anchor → 不加 hover-bg double-emphasis)**:
+
+| Mode | 永久 visual anchor | 加 hover-bg 後果 |
+|------|-------------------|-----------------|
+| rich | `border + rounded-md + bg-surface` 永遠 card | card + hover-bg = 雙層強調,視覺 heavy |
+| compact Type B(無 status) | `bg-secondary rounded-md` 永遠 pill | pill bg + hover-bg neutral-hover 兩層相近灰,視覺雜 |
+| compact Type A(uploading / error / completed with bar) | 底部 2px progress bar(分隔線型 permanent affordance) | bar + hover-bg 同時並存,affordance 重複 |
+
+三種型態**都已 anchored**,hover-bg 是多餘的視覺層。Cursor + click 本身已是足夠互動 affordance,世界級檔案 card / attachment 皆如此。
+
+**世界級對照**(M8 / M12 benchmark):
+
+| DS | File card / attachment hover 行為 | 跟本 canonical 對齊? |
+|----|----------------------------------|----------------------|
+| Slack file tile | border highlight,**無 bg 變化** | ✓ |
+| Notion file callout | **無 bg 變化**,action icons fade in | ✓ |
+| Figma file card | shadow lift,**無 bg 變化** | ✓ |
+| Gmail attachment chip | **無 bg 變化**,download icon fade in | ✓ |
+| Dropbox / Google Drive file **row**(flush transparent 無 permanent anchor) | **有** hover-bg | Opposite case(證明 canonical:anchored → 無、flush → 有) |
+
+**跟 MenuItem / DataTable row 對比**(它們用 hover-bg):兩者是 **flush transparent row**(無 permanent bg / border),hover-bg 是唯一 affordance。FileItem 三種型態皆已 anchored → 反向 canonical。
+
+**反例**(本 session 修正):
+- 原 code `hoverClass = onClick ? 'cursor-pointer hover:bg-neutral-hover' : ''` → rich card 上 hover 多一層灰 bg 雙層強調;Type B pill 上 hover 加 `bg-neutral-hover` 跟 pill 底色近似造成視覺雜
+- 修為 `hoverClass = onClick ? 'cursor-pointer' : ''`
 
 **❌ 反例**:
 - Rich mode 無邊框 → 與一般 list item 無法區分,跟 MenuItem 混淆
