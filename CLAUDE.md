@@ -38,9 +38,11 @@
 
 | **M15** | **Product UI flow 必須 visual-audit coverable**(設計階段就要考慮)。任何 stakeholder-facing 的 product flow(prototype / exploration / product page / 多步驟 wizard / modal confirm flow 等)**必須**提供 visual-audit 可捕捉的 state snapshot — 每個 flow state 有對應 story / exploration scenario 用 **initial-state pattern**(`defaultOpen` / `useState(true)` / initial-open prop)或 `play()` interaction 讓 Playwright 能截圖。**禁止**留「必須靠真人點擊才能看到的 state」未截圖覆蓋。**違反 trigger**:stakeholder review 時要 live demo 才能看到某個 state / visual-audit 截到的只是 trigger button 而非 overlay。**為什麼**:(1)stakeholder gate(M6)需要完整 visual proof,不是 live demo 即興;(2)跨 session AI audit 必須能跑 visual-audit 才能驗;(3)regression 防護必須對每個 state 有 baseline snapshot。**實作**:新 prototype / exploration 必含 OpenSnapshot 類 stories(對齊 Dialog / Sheet / FileViewer 2026-04-22 canonical);/prototype skill + /product-ui-audit + /delivery-handoff 流程 Phase 強制包含 flow snapshot coverage 檢查。 | 2026-04-22 Sheet / FileViewer 過去只有 trigger button stories,visual-audit 跑 `--scope=component:Sheet` 只截到 trigger 未 open state,被 user 點破「能抓到點擊打開的 modal 嗎?」才補 OpenSnapshot。若 M15 存在,Sheet / FileViewer 新元件建立時就該有 OpenSnapshot,不等 audit 才補 |
 
+| **M16** | **訂 visual container canonical(bg / border)必同步訂 multi-instance gap canonical**。任何元件的**永久視覺層**(非 hover / focus 瞬時態)帶 `bg-*` / `border` / 任何視覺框架時,**必**同時在 spec 訂「多個連續排列時的最小 gap」canonical — 因為 consumer 在 stories / product 寫 `.map()` 時極易漏 gap 造成 bg 塊相連 / 邊框相黏(破壞 card 自立語意)。**核心公式**(item-anatomy SSOT「連續 item 貼邊合法性」):`item 永久視覺層有 bg/border → 連續排列必 gap;透明 item(hover 才 bg)→ 0 gap 合法`。**違反 trigger**:consumer stories / product code 連續 N 個元件視覺相連 = spec 缺 list-gap canonical,M16 violation。**實作**:(1)元件 spec 加「List wrapper canonical」節,列 gap 值 + rationale + 反例;(2)hook `check_item_list_gap.sh` grep consumer `map()` wrapper 無 gap 或加外框 → block;(3)audit Dim 加「consumer 層 list wrapper 是否正確消費 item gap canonical」。 | 2026-04-22 FileItem rich `border card` + compact `bg-neutral-3` 先前已訂 canonical,但 spec 只寫**單 item 視覺**沒寫**連續 item gap**,導致 file-upload.stories.tsx rich list 加 `border rounded-lg overflow-hidden` 強制邊框相黏、compact list 無 gap bg 塊連一大片。User 貼圖糾正才發現。若 M16 存在,訂 AR17/AR20 canonical 時同步訂 list-gap,hook 立刻攔截 |
+
 **判斷 meta-principle 是否漏寫的 test**:
 - 同類 bug 一年內被糾正 3 次 → meta-principle 漏寫或沒執行,檢討本清單
-- 某 bug 跟 15 條中任一條對不上 → 可能要新增第 16 條(跟 user 討論)
+- 某 bug 跟 16 條中任一條對不上 → 可能要新增第 17 條(跟 user 討論)
 
 **與失敗記憶索引的關係**:Meta-principle 是**上游**(預防)、失敗記憶索引是**下游**(事後記帳)。具體 bug 的歷史詳解移到 `.claude/skills/design-system-audit/references/historical-bugs.md`;CLAUDE.md 只留 meta-principle + 極高 signal 的 one-liner anchor。
 
@@ -217,6 +219,7 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 | **Token / 值**(padding / gap / height / color)| 對應 `tokens/{name}/spec.md` + `tokens/README.md` |
 | **Padding / spacing**(chrome vs 元件內 vs 精確幾何)| `# UI 開發規則` 的「Padding source 分層規則」+ `tokens/layoutSpace/layoutSpace.spec.md` |
 | **Row / item 結構**(prefix / content / suffix slot)| `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 SSOT) |
+| **連續 item list wrapper gap**(多 item `.map()` 是否要 gap?)| `patterns/element-anatomy/item-anatomy.spec.md`「連續 item 貼邊合法性」— 永久視覺層有 bg/border → 必 gap;透明 item → 0 gap 合法。元件專屬 gap 值查該元件 spec「List wrapper canonical」節(例 `components/FileItem/file-item.spec.md`) |
 | **Dismiss / inline action / overflow menu**| `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss 按鈕 canonical」+「Inline Action 設計規格」+「常用 icon canonical」 |
 | **按鈕排列 / 群組 / 分隔**| `patterns/action-bar/action-bar.spec.md` |
 | **Header 高度 / chrome padding**| `tokens/uiSize/uiSize.spec.md`(`--chrome-header-height`)+ `tokens/layoutSpace/layoutSpace.spec.md` |
@@ -340,7 +343,7 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 | 7 | Hook(`.claude/hooks/*.sh`) | 可機械化的 pre/post tool 自動檢查 |
 | 8 | Slash Command(`.claude/commands/*.md`) | 一次性單步 action(目前無 commands) |
 
-當前 9 skills:`/design-system-audit` / `/product-ui-audit` / `/prototype` / `/delivery-handoff` / `/component-quality-gate` / `/story-writing` / `/visual-audit` / `/performance-audit` / `/ux-audit`。當前 13 hooks:`pre_edit_spec_check` / `pre_new_component_spec` / `enforce_home_charter` / `check_ssot_consultation` / `check_story_anatomy` / `check_third_party_dom_verified` / `check_sync_update` / `check_token_hygiene` / `check_cva_default_sync` / `check_anatomy_section_numbering` / `check_sideoffset_canonical` / `block_prototype_imports` / `stop_tsc_sanity`。
+當前 9 skills:`/design-system-audit` / `/product-ui-audit` / `/prototype` / `/delivery-handoff` / `/component-quality-gate` / `/story-writing` / `/visual-audit` / `/performance-audit` / `/ux-audit`。當前 15 hooks:`pre_edit_spec_check` / `pre_new_component_spec` / `enforce_home_charter` / `check_ssot_consultation` / `check_story_anatomy` / `check_third_party_dom_verified` / `check_sync_update` / `check_token_hygiene` / `check_cva_default_sync` / `check_anatomy_section_numbering` / `check_sideoffset_canonical` / `check_avatar_hovercard` / `check_item_list_gap` / `block_prototype_imports` / `stop_tsc_sanity`。
 
 各 home 完整 scope / 「收什麼、不收什麼」細節 / 未採納能力(sub-agent / MCP / output-style)評估 → `.claude/skills/design-system-audit/references/rule-placement.md`。
 

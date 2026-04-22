@@ -27,7 +27,8 @@ const deleteBtnXs = <ItemInlineActionButton icon={Trash2} size="sm" aria-label="
 export const Rich = {
   name: 'Rich（上傳狀態）',
   render: () => (
-    <div className="flex flex-col max-w-md">
+    // Rich 永遠 border card → list wrapper `gap-2` 防邊框相黏(item-anatomy「連續 item 貼邊合法性」)
+    <div className="flex flex-col gap-2 max-w-md">
       <FileItem mode="rich" name="Alan Profile.png" status="uploading" progress={40}
         description="5.7 MB of 7.5MB" thumbnailSrc="https://i.pravatar.cc/80?u=alan" actions={deleteBtn} />
       <FileItem mode="rich" name="Alan Profile.png" status="completed"
@@ -41,7 +42,8 @@ export const Rich = {
 export const Compact = {
   name: 'Compact（上傳狀態）',
   render: () => (
-    <div className="flex flex-col max-w-md">
+    // Compact 上傳中/error 無 bg,completed 靜態加 bg-neutral-3 → 混場景保守 `gap-1` 讓靜態 bg 不相連
+    <div className="flex flex-col gap-1 max-w-md">
       <FileItem mode="compact" name="UXP T-Phone.csv" status="uploading" progress={60} actions={deleteBtnXs} />
       <FileItem mode="compact" name="UXP T-Phone.csv" status="error" description="There's something wrong" actions={deleteBtnXs} />
       <FileItem mode="compact" name="UXP T-Phone.csv" status="completed" actions={deleteBtnXs} />
@@ -57,7 +59,8 @@ export const HoverSwap = {
         <div className="text-caption text-fg-muted mb-2">
           ↓ 游標移入任一 row:completed 綠 ✓ 變 Download ↓,error 紅 ✗ 變 Retry ⟲
         </div>
-        <div className="flex flex-col border border-divider rounded-lg overflow-hidden">
+        {/* Rich border card list:無外框 + `gap-2`(item-anatomy「連續 item 貼邊合法性」) */}
+        <div className="flex flex-col gap-2">
           <FileItem mode="rich" name="Q1 營收報表.xlsx" status="completed"
             description="Uploaded to URL" thumbnailSrc="https://i.pravatar.cc/80?u=xls"
             onDownload={noop} actions={deleteBtn} />
@@ -71,7 +74,8 @@ export const HoverSwap = {
         <div className="text-caption text-fg-muted mb-2">
           同樣 pattern 在 compact mode:status slot 幾何與 Inline Action(16×16 icon)一致,center 自動對齊
         </div>
-        <div className="flex flex-col border border-divider rounded-lg overflow-hidden">
+        {/* Compact 上傳完成態屬 Type A upload manager,有 progress bar 無 bg → 0 gap 合法,但 error 有 bg 場景保守 `gap-1` */}
+        <div className="flex flex-col gap-1">
           <FileItem mode="compact" name="data-2024-q1.csv" status="completed"
             onDownload={noop} actions={deleteBtnXs} />
           <FileItem mode="compact" name="backup-failed.json" status="error"
@@ -83,9 +87,11 @@ export const HoverSwap = {
 }
 
 export const Clickable = {
-  name: '已上傳（點擊下載）',
+  name: '已上傳（點擊下載,Type B form attachment）',
   render: () => (
-    <div className="flex flex-col max-w-md border border-divider rounded-lg overflow-hidden">
+    // Type B form attachment(無 status)—— rich card + compact bg-neutral-3 混場景,list wrapper 無外框
+    // rich 必 gap-2 / compact bg 必 gap-1 → 混用取最大 `gap-2` 保守(file-item.spec「List wrapper canonical」)
+    <div className="flex flex-col gap-2 max-w-md">
       <FileItem mode="rich" name="報告.pdf" description="2.3 MB"
         thumbnailSrc="https://i.pravatar.cc/80?u=doc" onClick={noop} actions={deleteBtn} />
       <FileItem mode="rich" name="合約附件.docx" description="1.1 MB"

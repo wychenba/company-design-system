@@ -75,23 +75,116 @@ ProgressBar 底部對齊 avatar 底部。justify-between 自動分配 gap(有 de
 | compact(預設) | 消費 item-layout 公式(py 隨 size / density 變化,padding / gap 對齊 menu item 規格) |
 | rich | py 固定(高度由 avatar 決定,不走 row 公式),padding / gap 採 rich 專屬 token(具體值見 `file-item.tsx` cva) |
 
-## 邊框 / 背景(AR15-21 canonical,2026-04-21)
+## 邊框 / 背景(AR15-21 canonical,2026-04-21 · 2026-04-22 擴充)
 
 | Mode | 容器視覺 | Rationale |
 |------|---------|-----------|
-| **rich** | `border border-divider rounded-md bg-surface` | Rich mode 是「檔案 card」——Slack / Notion / Linear attachment 皆獨立 card 呈現;邊框讓每個 row 視覺上是自立單元 |
-| **compact + 有 progress**(上傳中) | 無背景、無邊框,只靠 progress bar 提供 affordance | 「正在發生」的動態狀態,progress 本身就是視覺焦點,不需額外邊框 |
-| **compact + 無 progress**(靜態檔案) | `bg-neutral-3 rounded-md` | 靜態清單(已上傳 / 歷史附件)背景色區隔出「檔案 row」邊界,跟純文字內容區分;hover 時 `bg-neutral-hover` 覆蓋 |
+| **rich**(所有 status) | `border border-divider rounded-md bg-surface` | Rich mode **永遠是「檔案 card」**,不因 status 改變——Slack / Notion / Linear attachment 皆獨立 card;邊框讓每個 row 視覺上是自立單元 |
+| **compact + 有 progress**(上傳中 / 類 Upload manager 完成態) | 無背景、無邊框,只靠 progress bar 提供 affordance | 「正在發生」/「剛發生」的動態 narrative,progress 本身就是視覺焦點 |
+| **compact + 無 progress**(form attachment 靜態態) | `bg-neutral-3 rounded-md` | 靜態清單(form / 訊息附件)背景色區隔出「檔案 row」邊界,跟純文字內容區分;hover 時 `bg-neutral-hover` 覆蓋 |
 
 **❌ 反例**:
 - Rich mode 無邊框 → 與一般 list item 無法區分,跟 MenuItem 混淆
 - Compact mode 靜態 item 無 bg → 純文字列,使用者不知這是「可點下載的檔案」
-- 外層 `<FileUpload list>` wrapper 加邊框 → 雙重邊框(list 邊框 + item 邊框)視覺干擾
+- 外層 list wrapper 加邊框 / `overflow-hidden` → 雙重邊框(list 邊框 + item card 邊框)視覺干擾;並強制邊框相黏破壞 card 自立性(2026-04-22 user 糾正)
+
+---
+
+## 可下載狀態 canonical(2 use case)
+
+**核心區分**:「檔案可下載」不是單一 state,而是 **2 種使用場景**,各自有 prop signature + 視覺節奏。
+
+### Type A — Upload manager(Google Drive / Dropbox 類上傳管理 box)
+
+**語意**:上傳流程的延續——完成後**仍保留 progress + status narrative**,使用者能回顧「這檔剛被上傳且已完成」。
+
+| 屬性 | 值 |
+|------|---|
+| `status` | `"completed"`(持續保留,不清除) |
+| Progress bar | 100% 完成條(不隱藏) |
+| Status icon | 綠 ✓(passive) |
+| hover 行為 | **status slot hover-swap**:✓ → Download ↓(icon button)觸發 `onDownload` |
+| Row-click | **亦可**(同 Type B):consumer 傳 `onClick` 讓整 row 可點 → 打開 FileViewer / 下載(與 hover-swap 並存,consumer 擇一或都用) |
+| Rich 背景 | `border card`(永遠) |
+| Compact 背景 | 無(progress bar 還在) |
+| 刪除按鈕 | optional(業務權限) |
+
+```tsx
+<FileItem
+  mode="rich"
+  name="report.pdf"
+  status="completed"
+  onDownload={() => download(id)}
+  actions={<Button size="xs" iconOnly variant="text" startIcon={Trash2} onClick={del} aria-label="刪除" />}
+/>
+```
+
+### Type B — Form attachment(表單 / 訊息附件靜態態)
+
+**語意**:附件列表——檔案「已經在那」,不再是 upload 動作的延續。
+
+| 屬性 | 值 |
+|------|---|
+| `status` | **`undefined`**(不傳;無 progress / 無 status icon) |
+| Progress bar | 無 |
+| Status icon | 無 |
+| hover 行為 | 整 row `hover:bg-neutral-hover` + cursor-pointer |
+| Row-click | **`onClick` 為主要 affordance** → download / FileViewer(consumer 決定) |
+| Rich 背景 | `border card`(永遠) |
+| Compact 背景 | `bg-neutral-3`(區隔「這是檔案 row」) |
+| 刪除按鈕 | optional(業務權限) |
+
+```tsx
+<FileItem
+  mode="compact"
+  name="report.pdf"
+  description="2.3 MB"
+  onClick={() => openViewer(id)}
+  actions={hasDeletePermission ? <ItemInlineActionButton icon={Trash2} size="sm" onClick={del} /> : undefined}
+/>
+```
+
+**選用判斷**:
+- 上傳剛發生 / 還在 upload box 情境 → Type A(保留 narrative)
+- 檔案進駐表單 / 留言 / 既有資料 → Type B(靜態)
+
+---
+
+## List wrapper canonical(多 item 間距)
+
+`FileItem` 連續排列時,**list wrapper 的 gap 取決於 item 是否有底色 / 邊框**(詳 `patterns/element-anatomy/item-anatomy.spec.md`「連續 item 貼邊合法性」)。
+
+| 情境 | List wrapper gap | 為什麼 |
+|------|----------------|--------|
+| **Rich**(任何 status,永遠有 border card) | `gap-2`(8px) | Card 邊框會相黏融合成一張大 card → 必 gap 讓每張 card 視覺自立 |
+| **Compact + bg-neutral-3**(Type B form attachment 靜態) | `gap-1`(4px) | 底色塊連續會合成一大塊 bg → 必 gap 讓 item 邊界清晰 |
+| **Compact + 有 progress**(Type A upload manager 動態) | 無 gap 要求(可 0) | 無 bg / 無 border,progress bar 各自獨立色,不會相連 |
+
+**List wrapper 本身的視覺**(2026-04-22 user 直指):
+- **不應該有外框**(無 `border` / 無 `rounded-*` / 無 `overflow-hidden`)
+- FileItem 各自 own 視覺(rich card / compact bg),list wrapper 只負責垂直排列 + gap
+
+```tsx
+// ✅ Rich list
+<div className="flex flex-col gap-2">
+  {files.map(f => <FileItem key={f.id} mode="rich" {...f} />)}
+</div>
+
+// ✅ Compact form attachment list(靜態,有 bg-neutral-3)
+<div className="flex flex-col gap-1">
+  {files.map(f => <FileItem key={f.id} mode="compact" {...f} />)}
+</div>
+
+// ❌ 反例:list wrapper 加 border + overflow-hidden 強制邊框相黏
+<div className="flex flex-col border rounded-lg overflow-hidden">
+  {files.map(f => <FileItem key={f.id} mode="rich" {...f} />)}
+</div>
+```
 
 **Clickable → 下載 / 預覽 canonical**(AR15):
 - FileItem 提供 `onClick` prop,consumer 傳入即進 clickable 模式(hover + cursor + keyboard)
-- `status="completed"` 的 item 若有 `onClick` → 預設 UX 是「開啟檢視 / 下載」(FileViewer / browser download)
-- consumer 決定具體行為,元件只提供 row 可點擊能力
+- Type A / Type B 都可以用 `onClick`(Type A 可跟 `onDownload` hover-swap 並存)
+- consumer 決定具體行為(download / FileViewer),元件只提供 row 可點擊能力
 
 ## ProgressBar
 

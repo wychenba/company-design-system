@@ -46,7 +46,9 @@ export const BulkImageUpload = {
           onUpload={(accepted) => setFiles((prev) => [...prev, ...accepted])}
         />
         {files.length > 0 && (
-          <div className="flex flex-col">
+          // Compact FileItem 上傳完成有 bg-neutral-3 靜態底色 → 必 `gap-1`(4px)防貼邊
+          // (見 file-item.spec.md「List wrapper canonical」+ item-anatomy「連續 item 貼邊合法性」)
+          <div className="flex flex-col gap-1">
             {files.map((f, i) => (
               <FileItem
                 key={`${f.name}-${i}`}
@@ -97,7 +99,9 @@ export const WithUploadedList = {
           }
         />
         {files.length > 0 && (
-          <div className="flex flex-col border border-divider rounded-lg overflow-hidden">
+          // Rich FileItem 自帶 border card → list wrapper **無外框**,`gap-2`(8px)防 card 邊框相黏
+          // (見 file-item.spec.md「List wrapper canonical」)
+          <div className="flex flex-col gap-2">
             {files.map((f, i) => (
               <FileItem
                 key={`${f.name}-${i}`}
