@@ -2,7 +2,7 @@ import * as React from 'react'
 import { X as XIcon, Info, CircleCheck, TriangleAlert, XCircle, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/design-system/components/Button/button'
-import { ItemPrefix } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ItemContent, ItemPrefix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * Notice — Toast / Alert 共用的視覺佈局層
@@ -99,18 +99,13 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
           </ItemPrefix>
         )}
 
-        <div className="flex flex-col min-w-0 flex-1">
-          <span className={cn('truncate', description && 'font-medium')}>
-            {title}
-          </span>
-          {description && (
-            // title → description 的 2px 間距 canonical(對齊 SelectionItem / item-anatomy Family 2)。
-            // 先前漏寫 → 標題與描述擠在一起(本次 AR 由 user 主動抓出)。
-            <span className="mt-[var(--item-gap-label-desc)] text-fg-secondary">
-              {description}
-            </span>
-          )}
-        </div>
+        {/* Title + description 消費 ItemContent primitive(SSOT)。
+            Label 有 desc 時 font-medium(Notice idiom:title 跟 desc 對照時 title 要更重)。 */}
+        <ItemContent
+          label={title}
+          description={description}
+          labelClassName={description ? 'font-medium' : undefined}
+        />
 
         {(endContent || dismissible) && (
           <div className="flex items-center gap-2 shrink-0 h-[1lh]">

@@ -222,8 +222,18 @@ export interface ItemContentProps extends Omit<React.HTMLAttributes<HTMLDivEleme
   label: React.ReactNode
   description?: React.ReactNode
   mode?: "scanning" | "reading"
-  descriptionTone?: "secondary" | "error" | "muted"
+  descriptionTone?: "secondary" | "error" | "muted" | "disabled"
   descriptionWrap?: boolean
+  /**
+   * Description 多行截斷(line-clamp-N)。0 / undefined = 不 clamp(自由 wrap)。
+   * 支援 1-3(Tailwind 標準 utilities)。
+   */
+  descriptionClamp?: 1 | 2 | 3
+  /**
+   * Description `break-words`(default `false`,僅在 consumer 需要時 opt-in)。
+   * 使用情境:SelectionItem / Steps 這類 description 可能塞長英文 token 需 break。
+   */
+  descriptionBreakWords?: boolean
   /**
    * Label truncate (default `true`, 對齊 row-item 大宗 idiom)。
    * Opt-out(`false`)for card-like consumers(e.g. NameCard label 允許 wrap)。
@@ -254,11 +264,14 @@ export const ItemContent = React.forwardRef<HTMLDivElement, ItemContentProps>(
       secondary: "text-fg-secondary",
       error: "text-error-text",
       muted: "text-fg-muted",
+      disabled: "text-fg-disabled",
     }[descriptionTone]
 
     // Typography mode — scanning 縮 desc 為 caption tier,reading 繼承 parent text-body
     const modeClass =
       mode === "scanning" ? "text-[length:var(--font-caption-size)] leading-compact" : ""
+
+    const clampClass = descriptionClamp ? `line-clamp-${descriptionClamp}` : ""
 
     return (
       <div
@@ -273,6 +286,8 @@ export const ItemContent = React.forwardRef<HTMLDivElement, ItemContentProps>(
               "mt-[var(--item-gap-label-desc)]",
               modeClass,
               toneClass,
+              clampClass,
+              descriptionBreakWords && "break-words",
               !descriptionWrap && "truncate",
               descriptionClassName,
             )}
