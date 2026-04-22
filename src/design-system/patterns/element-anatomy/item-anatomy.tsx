@@ -181,6 +181,87 @@ export const ItemLabel = React.forwardRef<
 ))
 ItemLabel.displayName = "ItemLabel"
 
+/**
+ * `<ItemContent>` — Row primitive 的 label + optional description 內容區(SSOT)。
+ *
+ * ── 存在的唯一理由 ──
+ * 封裝「flex-col + label + description + `mt-[var(--item-gap-label-desc)]` gap」結構,
+ * 避免 13+ 消費者各自 hard-code `mt-0.5`。改 token 一處,全 DS 同步。
+ *
+ * ── Consumer 偏離 canonical ──
+ * 消費端若有**確切合理理由**不用 `<ItemContent>` / 需自訂 label/desc 行為,必在
+ * 該元件 `spec.md` 明文寫下 rationale(對齊 item-anatomy canonical「偏離必明文」)。
+ * 合法偏離範例:
+ *   - MenuItem 的 `leading-compact + text-caption` scanning-mode typography
+ *     → MenuItem spec 明文 rationale + 消費 `--item-gap-label-desc` token 直接用
+ *   - SelectionItem 的 control slot 跟 block formula 綁定
+ *     → SelectionItem spec 明文 rationale
+ *
+ * ── Props ──
+ * - `label`:label 內容(ReactNode,必填)
+ * - `description`:description 內容(ReactNode,optional)
+ * - `descriptionTone`:desc 顏色語意
+ *   - `"secondary"`(預設):`text-fg-secondary`
+ *   - `"error"`:`text-error-text`
+ *   - `"muted"`:`text-fg-muted`
+ * - `descriptionWrap`:desc 多行 wrap(預設 true)/ false = truncate
+ * - `labelClassName` / `descriptionClassName`:escape hatches(明文 rationale 才用)
+ */
+
+export interface ItemContentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+  label: React.ReactNode
+  description?: React.ReactNode
+  descriptionTone?: "secondary" | "error" | "muted"
+  descriptionWrap?: boolean
+  labelClassName?: string
+  descriptionClassName?: string
+}
+
+export const ItemContent = React.forwardRef<HTMLDivElement, ItemContentProps>(
+  (
+    {
+      label,
+      description,
+      descriptionTone = "secondary",
+      descriptionWrap = true,
+      labelClassName,
+      descriptionClassName,
+      className,
+      ...props
+    },
+    ref,
+  ) => {
+    const toneClass = {
+      secondary: "text-fg-secondary",
+      error: "text-error-text",
+      muted: "text-fg-muted",
+    }[descriptionTone]
+
+    return (
+      <div
+        ref={ref}
+        className={cn("flex flex-col min-w-0 flex-1", className)}
+        {...props}
+      >
+        <span className={cn("truncate", labelClassName)}>{label}</span>
+        {description && (
+          <span
+            className={cn(
+              "mt-[var(--item-gap-label-desc)]",
+              toneClass,
+              !descriptionWrap && "truncate",
+              descriptionClassName,
+            )}
+          >
+            {description}
+          </span>
+        )}
+      </div>
+    )
+  },
+)
+ItemContent.displayName = "ItemContent"
+
 // ── Row size context ──────────────────────────────────────────────────────
 //
 // 作用:讓 row primitive(Sidebar / SelectMenu / Tree / DropdownMenu)只 propagate

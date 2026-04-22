@@ -4,6 +4,12 @@
   --layout-space-loose:  16px;
   --layout-space-tight:  12px;
   --layout-space-bottom: 48px; /* intentionally fixed — same in md and lg density (see spec) */
+
+  /* Item-level micro-gaps(2026-04-23 SSOT 化 — 原 hard-code mt-0.5 / gap-2 散落 13+ 消費者)
+     不隨 density 變化(micro-spacing,跟 field-height 同 invariant class)
+     Primary consumer:<ItemContent> primitive,consumer 不直接用 token */
+  --item-gap-label-desc:  2px;  /* label ↔ description 之間 */
+  --item-gap-content-bar: 8px;  /* content ↔ progress bar 之間(FileItem 等) */
 }
 
 [data-layout-space="lg"],
