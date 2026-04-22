@@ -224,6 +224,12 @@ export interface ItemContentProps extends Omit<React.HTMLAttributes<HTMLDivEleme
   mode?: "scanning" | "reading"
   descriptionTone?: "secondary" | "error" | "muted"
   descriptionWrap?: boolean
+  /**
+   * Label truncate (default `true`, 對齊 row-item 大宗 idiom)。
+   * Opt-out(`false`)for card-like consumers(e.g. NameCard label 允許 wrap)。
+   * World-class 對照:Material `ListItemText primaryTypographyProps.noWrap` default true。
+   */
+  labelTruncate?: boolean
   labelClassName?: string
   descriptionClassName?: string
 }
@@ -236,6 +242,7 @@ export const ItemContent = React.forwardRef<HTMLDivElement, ItemContentProps>(
       mode = "reading",
       descriptionTone = "secondary",
       descriptionWrap = true,
+      labelTruncate = true,
       labelClassName,
       descriptionClassName,
       className,
@@ -259,7 +266,7 @@ export const ItemContent = React.forwardRef<HTMLDivElement, ItemContentProps>(
         className={cn("flex flex-col min-w-0 flex-1", className)}
         {...props}
       >
-        <span className={cn("truncate", labelClassName)}>{label}</span>
+        <span className={cn(labelTruncate && "truncate", labelClassName)}>{label}</span>
         {description && (
           <span
             className={cn(

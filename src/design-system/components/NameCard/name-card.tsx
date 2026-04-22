@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { Avatar, type AvatarData } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
 import { DescriptionList, DescriptionItem } from '@/design-system/components/DescriptionList/description-list'
+import { ItemContent } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * NameCardDefaultActions — canonical 預設 action 組合
@@ -111,15 +112,18 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
             status={status}
             className="shrink-0"
           />
-          <div
-            className="flex flex-col justify-center min-w-0 flex-1"
+          {/* NameCard label 用 text-body-lg font-medium(card context 語意),非一般 item-row
+              body label。labelClassName escape hatch + labelTruncate=false(允許 wrap)明文
+              rationale — consumer 有合理理由偏離 ItemContent 預設 typography。 */}
+          <ItemContent
+            label={name}
+            description={subtitle}
+            labelTruncate={false}
+            labelClassName="text-body-lg font-medium text-foreground"
+            className="justify-center"
             style={{ minHeight: AVATAR_SIZE }}
-          >
-            <span className="text-body-lg font-medium text-foreground">{name}</span>
-            {subtitle && (
-              <span className="text-body text-fg-secondary mt-[var(--item-gap-label-desc)]">{subtitle}</span>
-            )}
-          </div>
+          />
+
         </div>
 
         {/* ── Action buttons ──
