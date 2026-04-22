@@ -12,3 +12,13 @@
   --layout-space-tight:  16px;
   --layout-space-bottom: 48px; /* intentionally fixed — same in md and lg density (see spec) */
 }
+
+/* 2026-04-22:md reset selector — subtree 宣告 `data-density="md"` / `data-layout-space="md"`
+   時必須能 reset 回 md default(對齊 uiSize md reset rationale,Meta-Pattern M3 Portal
+   subtree context drift) */
+[data-layout-space="md"],
+[data-density="md"] {
+  --layout-space-loose:  16px;
+  --layout-space-tight:  12px;
+  --layout-space-bottom: 48px;
+}

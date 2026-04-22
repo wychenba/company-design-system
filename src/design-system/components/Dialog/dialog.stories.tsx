@@ -5,6 +5,7 @@ import {
 import { Button } from '@/design-system/components/Button/button'
 import { Field, FieldLabel, FieldDescription } from '@/design-system/components/Field/field'
 import { Input } from '@/design-system/components/Input/input'
+import { Avatar } from '@/design-system/components/Avatar/avatar'
 
 const meta: Meta = {
   title: 'Design System/Components/Dialog/展示',
@@ -74,34 +75,58 @@ export const WithForm = {
 
 export const LongContent = {
   name: '長內容（body 捲動）',
-  render: () => (
-    <Dialog defaultOpen>
-      <DialogTrigger asChild>
-        <Button>開啟 Modal</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>成員列表</DialogTitle>
-        </DialogHeader>
-        {/* Body 放 list → variant="list":body px-loose 保留(item 對齊 header/footer)、pt/pb 移除、item 自己 py
-            item 用 Family 2 reading mode 節奏(py-2),border-divider 分隔 */}
-        <DialogBody variant="list">
-          <div className="flex flex-col">
-            {Array.from({ length: 30 }, (_, i) => (
-              <div key={i} className="py-2 text-body border-b border-divider last:border-b-0">
-                成員 {i + 1}
-              </div>
-            ))}
-          </div>
-        </DialogBody>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="tertiary">關閉</Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
+  render: () => {
+    // 30 avatar+title+description items(對應 user Image #3 期望 + item-anatomy Family 2
+    // reading mode:prefix avatar 40 + content title+description 2 行節奏)。
+    // 用於示範 overlay body 真正 scroll 情境,對齊 Material M3 Dialog list / Polaris
+    // ResourceList / Linear Cmd+K member picker。
+    const orgs = ['ACME Corp', 'Nebula Inc', 'Orion Labs', 'Polaris Co']
+    const names = [
+      'Alan Chen', 'Betty Wu', 'Charlie Lee', 'Diana Kim', 'Ethan Park', 'Fiona Lin',
+      'George Ho', 'Hana Yu', 'Ivan Sun', 'Julia Shen', 'Kevin Hsu', 'Lydia Cao',
+      'Mark Tseng', 'Nina Pan', 'Oscar Lo', 'Peggy Qin', 'Ray Tang', 'Sophia Fei',
+      'Tom Liang', 'Uma Jiang', 'Victor Ren', 'Wendy Xia', 'Xavier Ma', 'Yuki Du',
+      'Zach Feng', 'Amy Zhao', 'Brad Fan', 'Cathy Miao', 'Derek Qu', 'Elena Xu',
+    ]
+    return (
+      <Dialog defaultOpen>
+        <DialogTrigger asChild>
+          <Button>開啟 Modal</Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>成員列表</DialogTitle>
+          </DialogHeader>
+          {/* Body 放 list → variant="list":body px-loose 保留(item 對齊 header/footer)、pt/pb 移除、item 自己 py
+              item 用 Family 2 reading mode(prefix Avatar 40 + content title+description)
+              對應 user Image #3 期望 + item-anatomy canonical */}
+          <DialogBody variant="list">
+            <div className="flex flex-col">
+              {names.map((name, i) => (
+                <button
+                  key={name}
+                  className="flex items-center gap-3 py-3 hover:bg-neutral-hover text-left border-b border-divider last:border-b-0"
+                >
+                  <Avatar size={40} alt={name} color={(['primary', 'info', 'success', 'warning'] as const)[i % 4]} />
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="text-body font-medium truncate">{name}</span>
+                    <span className="text-caption text-fg-muted truncate">
+                      {orgs[i % orgs.length]} · EMP-{String(427 + i * 17).padStart(5, '0')}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="tertiary">關閉</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    )
+  },
 }
 
 export const Destructive = {

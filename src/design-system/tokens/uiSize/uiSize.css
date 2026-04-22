@@ -53,6 +53,25 @@
   --tab-height-lg: 3.5rem;      /* 56px */
 }
 
+/* 2026-04-22:md reset selector — 當祖先層級(e.g. html[data-density="lg"])已 cascading
+   lg overrides 下來,subtree 元件(Popover / DropdownMenu / Tooltip 等)宣告 `data-density="md"`
+   或 `data-ui-size="md"` 時必須能 reset 回 md default,否則 Portal 逃逸 + cascading
+   會讓 lock md 失效(Meta-Pattern M3 Portal subtree context drift 類)。 */
+[data-ui-size="md"],
+[data-density="md"] {
+  --field-height-sm: 1.75rem;   /* 28px — md default */
+  --field-height-md: 2rem;      /* 32px — md default */
+  --field-height-lg: 2.25rem;   /* 36px — md default */
+
+  --table-row-sm: 2rem;         /* 32px */
+  --table-row-md: 2.5rem;       /* 40px */
+  --table-row-lg: 3rem;         /* 48px */
+
+  --tab-height-sm: 2rem;        /* 32px */
+  --tab-height-md: 2.5rem;      /* 40px */
+  --tab-height-lg: 3rem;        /* 48px */
+}
+
 
 /* ── Tailwind Theme Bridge ──
    橋接成 spacing utility，讓 h-field-md / h-table-row-lg 等 class 可用 */
