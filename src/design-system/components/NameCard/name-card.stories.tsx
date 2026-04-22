@@ -28,7 +28,7 @@ function NameCardHover({ name, src, subtitle }: { name: string; src: string; sub
       </span>
       <HoverCardContent
         align="start"
-        className="bg-surface-raised rounded-lg border border-border overflow-hidden max-h-[var(--radix-hover-card-content-available-height)]"
+        className="bg-surface-raised rounded-lg border border-border overflow-hidden"
         style={{ boxShadow: 'var(--elevation-200)' }}
       >
         <NameCard

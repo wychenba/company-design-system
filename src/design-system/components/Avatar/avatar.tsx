@@ -249,11 +249,12 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
         </HoverCardTrigger>
         {/* HoverCardContent canonical(2026-04-23):
             - 無 inner padding(consumer NameCard 自帶 `px-4 py-3` chrome)
-            - max-height = Radix viewport-aware 變數 → NameCard 內部 body ScrollArea 捲動
-            breathing invariant 由 content 層負責(M16);若 consumer 傳非 NameCard content,
-            需自行確保 inner padding + 內部 body 捲動策略 */}
+            - `overflow-hidden` + `rounded-lg` → child(NameCard)圓角裁切
+            - **不設 max-height**:NameCard 自己消費 `--radix-hover-card-content-available-height`
+              (見 `components/NameCard/name-card.tsx`)自約束高度 + 內部 ScrollArea 處理捲動。
+              HoverCardContent 只提供外殼視覺,不 override NameCard 內部 chrome 結構 */}
         <HoverCardContent
-          className="bg-surface-raised rounded-lg border border-border overflow-hidden max-h-[var(--radix-hover-card-content-available-height)]"
+          className="bg-surface-raised rounded-lg border border-border overflow-hidden"
           style={{ boxShadow: 'var(--elevation-200)' }}
         >
           {hoverCard}

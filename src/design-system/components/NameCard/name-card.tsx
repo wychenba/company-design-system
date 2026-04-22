@@ -103,13 +103,20 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
     const hasScrollableBody = hasStatus || hasFields
 
     // Layout canonical(2026-04-23):Header + Actions 固定上,Body(status + fields)可捲動,
-    // View more 固定下。容器高度受父層約束(HoverCard 透過 `--radix-hover-card-content-available-height`
-    // 提供 viewport-aware 高度);standalone 時由 consumer 包 maxHeight 或 h-full container。
-    // 世界級對照:Slack / Linear / GitHub / Notion hover-profile popover 皆 header 固定 + body 捲動 + footer 固定。
+    // View more 固定下。**NameCard 自己約束高度**,不依賴 consumer HoverCardContent 設 flex:
+    //   - `max-h-[var(--radix-hover-card-content-available-height,...)]`:HoverCard / Popover
+    //     context 自動繼承 Radix viewport-aware 變數;standalone 落到 100vh fallback
+    //   - 內部 `flex flex-col + overflow-hidden`:Header(shrink-0)+ Body(flex-1 min-h-0 ScrollArea)
+    //     + Footer(shrink-0)三層 chrome
+    // 世界級對照:Slack / Linear / GitHub / Notion hover-profile popover 皆此 chrome pattern。
     return (
       <div
         ref={ref}
-        className={cn('w-[320px] flex flex-col max-h-full overflow-hidden', className)}
+        className={cn(
+          'w-[320px] flex flex-col overflow-hidden',
+          'max-h-[var(--radix-hover-card-content-available-height,var(--radix-popover-content-available-height,100vh))]',
+          className,
+        )}
         {...props}
       >
         {/* ── HEADER(固定): profile + actions ── */}
