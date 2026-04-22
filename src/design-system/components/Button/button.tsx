@@ -333,6 +333,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ? {}
         : { 'aria-pressed': pressed, 'data-state': pressed ? 'on' : 'off' }
 
+    // Chrome-unbounded marker(2026-04-22 v5 canonical):button 若無視覺邊界(text variant 或 dismiss),
+    // 標記 data-unbounded="true"。SurfaceHeader 透過 [&_[data-unbounded]]:my-[...] 套負 margin
+    // 讓 layout 佔位縮到 24(chrome-header-height 幾何)— button native size 與 touch target 不變。
+    // 詳 overlay-surface.spec.md「Chrome dismiss size canonical v5」
+    const unboundedAttr =
+      resolvedVariant === 'text' || dismiss ? { 'data-unbounded': 'true' } : {}
+
     const buttonEl = (
       <Comp
         className={cn(
@@ -352,6 +359,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         aria-busy={loading || undefined}
         aria-label={ariaLabel}
         {...toggleAttrs}
+        {...unboundedAttr}
         {...restProps}
       >
         {loading ? (

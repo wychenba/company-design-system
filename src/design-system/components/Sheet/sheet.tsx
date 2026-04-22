@@ -130,6 +130,7 @@ const SheetHeader = React.forwardRef<
   >
     <div className="flex-1 min-w-0">{children}</div>
     <SheetPrimitive.Close asChild>
+      {/* Dismiss X = native sm,SurfaceHeader 負 my trick 讓 layout 佔位 24 → chrome-header-height */}
       <Button data-dismiss iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" />
     </SheetPrimitive.Close>
   </SurfaceHeader>

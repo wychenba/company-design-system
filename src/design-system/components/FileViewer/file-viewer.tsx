@@ -380,6 +380,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           iconOnly
           dismiss
           size="sm"
+          data-dismiss
           startIcon={XIcon}
           aria-label="關閉檢視器"
           onClick={onClose}
@@ -449,6 +450,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
           iconOnly
           dismiss
           size="sm"
+          data-dismiss
           startIcon={XIcon}
           aria-label="關閉詳細資訊"
           onClick={onClose}

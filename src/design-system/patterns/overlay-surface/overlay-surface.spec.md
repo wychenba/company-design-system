@@ -253,50 +253,119 @@ chrome 邊 ─ hover bg 左邊 ─────── [ loose breathing ] ──�
 
 ---
 
-## Chrome dismiss size canonical(2026-04-22 v3 校準為 2 家族)
+## Chrome dismiss size canonical(2026-04-22 v5 最終:layout-slot 技巧,button native size 保留)
 
-**Chrome corner close X 依元件家族決定 size**,SurfaceHeader / SurfaceFooter 用 `min-h-[var(--chrome-header-height)]` 提供 48 / 56 的 fixed slot,sm button 置中於 slot 視覺自然 ✓:
+**User 設計 insight**:header 的 padding-based sizing 在 **unbounded button**(text variant / dismiss,無 bg/border)場景視覺 padding 過大;在 **bounded button** 則剛好。解法 = **保持 button native size 不變(touch target / 視覺 render 都是 sm 原尺寸),但 layout 佔位縮回 xs(24)** via 負 margin。
 
-| 家族 | size | 套用元件 | Rationale |
-|------|------|---------|-----------|
-| **Overlay family**(chrome slot 走 chrome-header-height)| **sm** | Dialog / Sheet / Popover / Coachmark(via Popover)/ FileViewer chrome + InfoPanel | SurfaceHeader 用 `min-h-chrome-header-height`(48/56),sm button (28/32) 置中於 slot 視覺 breathing (10-12px);header + footer 同 sm 視覺一致,title `text-body-lg` typography 統一 — **無元件特化**(Popover 已撤回 xs 特化 rationale) |
-| **Notification banner family** | **xs** | Notice / Alert / Toast(全部 inherit Notice)| Ephemeral notification banner,`px-4 py-3` 固定不隨 density(Notice primitive 聲明);不走 chrome-header-height canonical,dismiss 是邊角小 affordance,xs 視覺不搶眼不跟 content 競爭 |
+**Canonical**:button native size **保留 sm**,unbounded 的靠 CSS 負 margin 把 layout 佔位縮到 24。
 
-**一致性原則(M12)**:**Overlay family 全元件必一致 sm**(上 session 的 Popover xs 特化已撤回 — 過度細分 rationale,視覺不值得跨元件漂移)。跨家族(overlay vs notification)才可不同。
+| Button 類型 | native size | Touch target | Layout 佔位 | Header 高度 |
+|------------|-----------|-------------|-----------|-----------|
+| **Unbounded**(`data-dismiss` 的 button) | **sm**(28 md / 32 lg) | 28 md / 32 lg ✓ | **24**(via 負 my)| 24 + 2×tight = **48 md / 56 lg ✓** |
+| **Bounded**(primary / tertiary 的 button,無 `data-dismiss`) | sm 或 natural | natural | natural | button + 2×tight = **自然長** |
+
+**實作方式(SurfaceHeader CSS 負 margin trick + Button data-unbounded 自動標記)**:
+
+**Button 端**:`variant="text"` OR `dismiss` 任一成立時,Button 自動加 `data-unbounded="true"` 屬性(button.tsx L340):
+
+```tsx
+// button.tsx 內
+const unboundedAttr =
+  resolvedVariant === 'text' || dismiss ? { 'data-unbounded': 'true' } : {}
+```
+
+**SurfaceHeader 端**:CSS selector 對所有 `[data-unbounded]` 套負 margin(overlay-surface.tsx):
+
+```tsx
+const CHROME_UNBOUNDED_SLOT =
+  '[&_[data-unbounded]]:my-[calc((var(--field-height-xs)-var(--field-height-sm))/2)]'
+
+// SurfaceHeader 套用此 class → 自動對所有 unbounded button 套負 my
+// 公式 = (24 - sm) / 2,density-aware:
+//   md: (24 - 28) / 2 = -2px
+//   lg: (24 - 32) / 2 = -4px
+```
+
+**覆蓋範圍**:
+- Dismiss X(`<Button dismiss />`)→ data-unbounded ✓
+- Text variant action(`<Button variant="text" />` 如 Share / Refresh / Settings)→ data-unbounded ✓
+- 所有無視覺邊界的 button,不限 dismiss
+
+**為什麼用負 margin 而非 fixed wrapper / size="xs"**:
+- `size="xs"` 會縮小 button 本身,**touch target 也變 24**(違反 a11y 最小 24+ hit target,也違反 user 意圖「touch 仍 sm」)
+- `min-h-chrome-header-height` fixed wrapper 會鎖死高度,**bounded button 失去自然長高能力**(違反 user 意圖)
+- 負 margin:button render / touch target 不變,僅影響 parent flex layout 計算 → 剛好 user 想要的「layout 24,視覺 / 觸控 28」
+
+**Consumer 使用方式**:
+
+```tsx
+// Dialog / Sheet / Popover / Coachmark(透過 SurfaceHeader)
+<Button data-dismiss iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />
+// SurfaceHeader 自動套負 my,無需 consumer 手動 y 調整
+
+// Header 若塞 bounded button(primary sm)→ 該 button 無 `data-dismiss`,不套負 my → 自然長高
+<Button variant="primary" size="sm">套用</Button>
+
+// Notification banner(Notice / Alert / Toast):px-4 py-3 fixed,dismiss 用 xs 簡化(無 margin trick)
+<Button iconOnly dismiss size="xs" startIcon={X} aria-label="關閉通知" />
+```
+
+**Consumer 實際高度範例**:
+- Dialog header 只有 title + close X(sm + `data-dismiss`)→ layout 佔位 24 → header = 48 md / 56 lg ✓
+- Dialog header 有 refresh/share/close 全 data-dismiss sm → 全部 layout 佔位 24 → header 仍 48/56
+- Dialog header 塞 primary sm(無 data-dismiss)→ primary layout 佔 28 → header = 52 md(自然長)
+- Popover header 同 pattern:48 md / 56 lg
+
+**為什麼這樣合理**:
+- **Unbounded** 無視覺邊界:若用 sm/md(28/32),配合 2×tight 的 padding(12/16)會讓整個 header 看起來「空」(padding 大、button 沒框)。縮小佔位到 xs(24)+ padding = 48/56 = chrome-header-height,視覺 tight compact。
+- **Bounded** 有視覺邊界:button 本身 bg/border 佔視覺重量,padding 自然包住 button,header 長到 52+ 不顯得空。這也跟 footer 保持一致 — footer 通常放 primary/tertiary,自然高度。
+- **幾何閉合**:只有 header 全是 unbounded(Dialog 只有 title + close X 典型場景)時,header = chrome-header-height canonical,跟 Sidebar / page header / top bar 完美對齊。
 
 **Code canonical**:
 
 ```tsx
-// Overlay family(Dialog / Sheet / Popover / Coachmark / FileViewer chrome)
-<Button iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />
+// Overlay family:Dialog / Sheet / Popover / Coachmark / FileViewer chrome
+// Dismiss X 永遠 unbounded → 永遠 xs
+<Button iconOnly dismiss size="xs" startIcon={X} aria-label="關閉" />
 
-// Notification banner family(Notice / Alert / Toast)
+// 其他 header unbounded action(text variant)→ xs
+<Button iconOnly variant="text" size="xs" startIcon={Share2} aria-label="分享" />
+
+// Header bounded action(primary / tertiary)→ sm 或 natural
+<Button variant="primary" size="sm">套用</Button>
+
+// Notification banner family:Notice / Alert / Toast
+// dismiss 永遠 unbounded + notification px-4 py-3 固定 → 永遠 xs
 <Button iconOnly dismiss size="xs" startIcon={X} aria-label="關閉通知" />
 ```
 
-**Chrome 高度幾何(overlay family):**
-- SurfaceHeader / SurfaceFooter `min-h-[var(--chrome-header-height)]` + `items-center` + 無 py
-- sm button(28 md / 32 lg)置中於 48/56 slot → breathing top/bottom = (48-28)/2 = 10 md / (56-32)/2 = 12 lg
-- xs button(24 固定)置中於同 slot → breathing = (48-24)/2 = 12 / (56-24)/2 = 16
-- 多行 title(text-body-lg 包多行)可 overflow min-h,header 自然長高
-- **Dialog / Sheet / Popover / Coachmark chrome 高度 = `--chrome-header-height`**(48 md / 56 lg,token 聲明值)✓
+**SurfaceHeader / SurfaceFooter 實作**(padding-based,非 fixed-height):
+```tsx
+// 保持 py-tight,不用 min-h / fixed h
+'flex items-center gap-2 shrink-0 border-b border-divider',
+'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
+```
 
-**Header 其他 chrome action(非 dismiss)**:
-- Overlay family:size=sm 對齊 dismiss(action group 同 rhythm)
-- Notification family:close 左側的 refresh / share 也 xs + Separator 分群(見 Alert stories canonical)
+**Consumer 實際高度範例**:
+- Dialog header 只有 title + close X(xs): 24 + 2×12 = **48 md** / 24 + 2×16 = **56 lg**(= chrome-header-height ✓)
+- Dialog header 有 refresh/share/close 全 xs: 同上
+- Dialog footer 有 Cancel(tertiary sm) + OK(primary sm): 28 + 2×12 = 52 md(自然長)
+- Popover header 同 Dialog pattern:48 md / 56 lg
 
-**共通 rationale**(全家族):corner close X 屬 **action group region**(跟 footer 的 CTA 同一組 affordance 家族),必用 `<Button>` primitive(不自刻 `<button><X /></button>` 繞 DS token / a11y,不用 `ItemInlineActionButton` — 那是 row-content 內 inline 動作,語義、視覺尺寸、hover 幾何都不同)。
+**共通 rationale**(全 overlay + banner 家族):corner close X 屬 **action group region**,必用 `<Button>` primitive(不自刻 `<button><X /></button>` 繞 DS token / a11y,不用 `ItemInlineActionButton`)。
 
-**歷史撤回備忘(本 session)**:
-- ❌ v1「chrome dismiss 全 xs」(用 chrome-header-height 幾何閉合強套全家族)→ 錯:過度簡化
-- ❌ v2「三家族分類:modal sm / non-modal xs / banner xs」→ 錯:overlay 內部不必分化,popover xs 特化 rationale 不值得漂移
-- ✅ v3「overlay family 統一 sm + SurfaceHeader min-h-chrome-header-height」→ 對:uniform + geometry 同時成立
+**本 session 震盪歷史備忘(M12 FP 記憶)**:
+- ❌ v1「chrome dismiss 全 xs(DS-wide 統一)」→ 錯:過度簡化 rationale
+- ❌ v2「三家族 modal sm / non-modal xs / banner xs」→ 錯:overlay 內部不必分化
+- ❌ v3「overlay 統一 sm + min-h chrome-header-height 強鎖 48/56」→ 錯:強鎖會讓 bounded button 被鎖死 slot
+- ❌ v4「padding-based + unbounded=xs / bounded=natural」→ 錯:xs 縮小 button 連 touch target 也變 24(違反 a11y / user 意圖)
+- ✅ v5「padding-based + unbounded `data-dismiss` 套負 my(native size sm 不變)/ bounded natural」→ 對:button native size 與 touch target 保 sm,僅 layout 佔位縮回 24,48/56 chrome-header-height 自然達成
 
 **SSOT 關聯**:
 - `tokens/uiSize/uiSize.spec.md`「--chrome-header-height」+ `globals.css` 聲明(md=3rem / lg=3.5rem)
-- `tokens/layoutSpace/layoutSpace.spec.md`
+- `tokens/layoutSpace/layoutSpace.spec.md` tight = 12 md / 16 lg
 - `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical」
-- `components/Button/button.spec.md`「Dismiss 視覺類」
+- `components/Button/button.spec.md`「Dismiss 視覺類」+ unbounded / bounded 判斷
 
 ---
 

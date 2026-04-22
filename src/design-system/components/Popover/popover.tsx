@@ -88,8 +88,7 @@ const PopoverHeader = React.forwardRef<HTMLDivElement, PopoverHeaderProps>(
       <div className="flex-1 min-w-0">{children}</div>
       {!hideClose && (
         <PopoverPrimitive.Close asChild>
-          {/* Chrome close X = sm(overlay family canonical,統一 Dialog / Sheet / Popover / Coachmark)—
-              overlay-surface SurfaceHeader 用 min-h-chrome-header-height(48/56),sm button 28/32 自動置中 */}
+          {/* Dismiss X = native sm,SurfaceHeader 負 my trick 讓 layout 佔位 24 → chrome-header-height */}
           <Button data-dismiss iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" />
         </PopoverPrimitive.Close>
       )}
