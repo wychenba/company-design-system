@@ -778,7 +778,7 @@ const StepDescription = React.forwardRef<HTMLSpanElement, StepDescriptionProps>(
       <span
         ref={ref}
         className={cn(
-          'mt-0.5 leading-compact break-words',
+          'mt-[var(--item-gap-label-desc)] leading-compact break-words',
           disabled ? 'text-fg-disabled' : 'text-fg-secondary',
           className,
         )}

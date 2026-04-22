@@ -259,7 +259,7 @@ const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
           {description && (
             <span
               className={cn(
-                'mt-0.5 leading-compact',
+                'mt-[var(--item-gap-label-desc)] leading-compact',
                 descClampClass || 'break-words',
                 disabled ? 'text-fg-disabled' : 'text-fg-secondary',
               )}

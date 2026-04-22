@@ -13,7 +13,7 @@ import { useRowSize } from '@/design-system/patterns/element-anatomy/item-anatom
  * 間距固定,不隨 density 變（Empty 是展示性元件,不是工作區域元件）:
  *   icon → text = mb-4（16px）
  *   desc → action = mt-6（24px）
- *   title → desc = mt-0.5（2px,item-layout canonical）
+ *   title → desc = `var(--item-gap-label-desc)`（token,預設 2px,item-anatomy SSOT）
  *
  * Outer padding 由 consumer 容器決定(py-12 / py-6 / py-16 等）。
  */
@@ -70,7 +70,7 @@ const Empty = React.forwardRef<HTMLDivElement, EmptyProps>(
               // 在 menu 內自動對齊 menu items;standalone 時 fallback text-body
               descFont,
               (title || action) ? 'text-fg-secondary' : 'text-fg-muted',
-              title && 'mt-0.5',
+              title && 'mt-[var(--item-gap-label-desc)]',
             )}
           >
             {description}

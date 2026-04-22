@@ -179,14 +179,15 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       </div>
     )
 
-    // content row — label ↔ desc gap `mt-0.5` (2px) 對齊 item-anatomy「Label ↔ Desc 間距」canonical
-    // (同 Empty 的 title→description 實踐,DS-wide 一致)
+    // content row — label ↔ desc gap via `--item-gap-label-desc` token(預設 2px)
+    // SSOT: `tokens/layoutSpace/layoutSpace.css` + item-anatomy「Label ↔ Desc 間距」canonical
+    // 改 token 一處 → 全 DS 同步(Empty / Dialog / Notice / NameCard / SelectionItem 等)
     const contentRow = (
       <div className="flex items-start gap-2">
         <div className="flex flex-col min-w-0 flex-1">
           <span className="truncate">{name}</span>
           {showDesc && (
-            <span className={cn('mt-0.5', status === 'error' ? 'text-error-text' : 'text-fg-secondary')}>
+            <span className={cn('mt-[var(--item-gap-label-desc)]', status === 'error' ? 'text-error-text' : 'text-fg-secondary')}>
               {description}
             </span>
           )}

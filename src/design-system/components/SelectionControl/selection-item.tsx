@@ -200,7 +200,7 @@ const SelectionItem = React.forwardRef<HTMLDivElement, SelectionItemProps>(
           {description && (
             <p
               className={cn(
-                'mt-0.5 break-words',
+                'mt-[var(--item-gap-label-desc)] break-words',
                 descClampClass,
                 disabled ? 'text-fg-disabled' : 'text-fg-secondary',
               )}

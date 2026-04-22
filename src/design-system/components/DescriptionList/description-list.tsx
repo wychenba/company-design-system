@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils'
  * 不一時需要對齊格線才易讀 → 開 divided；短列表（< 4 rows）不需要。
  *
  * ── 間距 ──
- * vertical: label → value（同 item 內）: mt-0.5 (2px)
+ * vertical: label → value（同 item 內）: `var(--item-gap-label-desc)` token（預設 2px,item-anatomy SSOT）
  * horizontal: label ↔ value: gap-x-4（16px）最小間距
  * items 之間垂直 gap: layout-space-tight（density-aware）
  * divided horizontal 模式：每 item py-[var(--layout-space-tight)]（cell-like row 高度）
@@ -111,7 +111,7 @@ const DescriptionItem = React.forwardRef<HTMLDivElement, DescriptionItemProps>(
     return (
       <div ref={ref} className={cn('flex flex-col', className)} {...props}>
         <dt className="text-body text-fg-secondary">{label}</dt>
-        <dd className="text-body mt-0.5">{children}</dd>
+        <dd className="text-body mt-[var(--item-gap-label-desc)]">{children}</dd>
       </div>
     )
   },

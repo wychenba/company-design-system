@@ -117,7 +117,7 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
           >
             <span className="text-body-lg font-medium text-foreground">{name}</span>
             {subtitle && (
-              <span className="text-body text-fg-secondary mt-0.5">{subtitle}</span>
+              <span className="text-body text-fg-secondary mt-[var(--item-gap-label-desc)]">{subtitle}</span>
             )}
           </div>
         </div>

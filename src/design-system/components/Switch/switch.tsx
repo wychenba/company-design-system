@@ -186,8 +186,8 @@ const Switch = React.forwardRef<
           disabled ? 'cursor-not-allowed' : readOnly ? 'cursor-default' : 'cursor-pointer'
         )}
       >
-        {/* gap-0.5 (2px) 是 spec 的 label↔desc 標準間距,跟 SelectionItem 的 mt-0.5 對齊 */}
-        <span className="flex-1 min-w-0 flex flex-col gap-0.5">
+        {/* Label↔desc 標準間距 via `--item-gap-label-desc` token(SSOT,跟 SelectionItem / ItemContent 同源) */}
+        <span className="flex-1 min-w-0 flex flex-col gap-[var(--item-gap-label-desc)]">
           <span
             className={cn(
               // Reading mode 字級:lg → text-body-lg (16px),sm/md → text-body (14px)

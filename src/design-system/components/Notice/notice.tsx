@@ -105,7 +105,7 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
           {description && (
             // title → description 的 2px 間距 canonical(對齊 SelectionItem / item-anatomy Family 2)。
             // 先前漏寫 → 標題與描述擠在一起(本次 AR 由 user 主動抓出)。
-            <span className="mt-0.5 text-fg-secondary">
+            <span className="mt-[var(--item-gap-label-desc)] text-fg-secondary">
               {description}
             </span>
           )}

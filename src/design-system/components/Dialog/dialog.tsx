@@ -237,7 +237,7 @@ const DialogDescription = React.forwardRef<
   <DialogPrimitive.Description
     ref={ref}
     // title → description 的 2px 間距 canonical(item-anatomy Family 2)
-    className={cn("mt-0.5 text-body text-fg-secondary", className)}
+    className={cn("mt-[var(--item-gap-label-desc)] text-body text-fg-secondary", className)}
     {...props}
   />
 ))
