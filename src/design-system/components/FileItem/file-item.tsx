@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
 import { ProgressBar } from '@/design-system/components/ProgressBar/progress-bar'
-import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ItemContent, ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * FileItem — 檔案顯示 / 上傳進度
@@ -179,19 +179,15 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       </div>
     )
 
-    // content row — label ↔ desc gap via `--item-gap-label-desc` token(預設 2px)
-    // SSOT: `tokens/layoutSpace/layoutSpace.css` + item-anatomy「Label ↔ Desc 間距」canonical
-    // 改 token 一處 → 全 DS 同步(Empty / Dialog / Notice / NameCard / SelectionItem 等)
+    // content row — 消費 ItemContent primitive(封裝 label + desc + mt-gap token SSOT)
+    // 兩 mode 共用:primitive 改 → 兩 mode 同步,不需 grep
     const contentRow = (
       <div className="flex items-start gap-2">
-        <div className="flex flex-col min-w-0 flex-1">
-          <span className="truncate">{name}</span>
-          {showDesc && (
-            <span className={cn('mt-[var(--item-gap-label-desc)]', status === 'error' ? 'text-error-text' : 'text-fg-secondary')}>
-              {description}
-            </span>
-          )}
-        </div>
+        <ItemContent
+          label={name}
+          description={showDesc ? description : undefined}
+          descriptionTone={status === 'error' ? 'error' : 'secondary'}
+        />
         {suffix}
       </div>
     )
@@ -262,21 +258,11 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
         <span className="h-[1lh] shrink-0 flex items-center">
           <Paperclip size={ICON_PX} className="shrink-0 text-fg-muted" aria-hidden />
         </span>
+        {/* Compact 共用 contentRow(via ItemContent primitive SSOT)—— 先前 inline
+            hand-craft 導致 compact label↔desc gap 跟 rich 不同步。shared contentRow
+            保證兩 mode 修 primitive 一處全同步。 */}
         <div className="flex flex-col flex-1 min-w-0">
-          <div className="flex items-start gap-2">
-            <div className="flex flex-col min-w-0 flex-1">
-              <span className="truncate">{name}</span>
-              {showDesc && (
-                <span className="text-error-text">
-                  {description}
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2 shrink-0 h-[1lh]">
-              {statusSlot}
-              {actions}
-            </div>
-          </div>
+          {contentRow}
         </div>
 
         {/* ProgressBar: absolute 底部, left 對齊 label(跳過 icon + gap) */}
