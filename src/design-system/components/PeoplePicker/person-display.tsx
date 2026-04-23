@@ -1,4 +1,4 @@
-import type React from 'react'
+import * as React from 'react'
 import { EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
@@ -7,10 +7,50 @@ import { NameCard, NameCardDefaultActions } from '@/design-system/components/Nam
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
-export type PersonValue = string | { name: string; avatarUrl?: string; description?: string }
+// PersonValue 承載 NameCard 所需的完整資訊(optional)。DS 全域 person avatar 的
+// hoverCard NameCard 呈現一致(name / subtitle / status / statusMessage / fields / actions / View more)—
+// 消費者的 person 資料若有 rich info 可直接傳入,缺項則自然不 render 該 section。
+// 對齊 avatar.spec.md「person avatar hover → NameCard」DS-wide canonical。
+export interface PersonData {
+  name: string
+  avatarUrl?: string
+  /** 角色 / 部門 / ID 等 meta 單行(NameCard subtitle) */
+  description?: string
+  /** Presence 狀態(對齊 Avatar presence canonical) */
+  status?: 'online' | 'away' | 'busy' | 'offline'
+  /** Status 訊息(NameCard status section) */
+  statusMessage?: React.ReactNode
+  /** 結構化 info fields(NameCard info section) */
+  fields?: { label: string; value: string }[]
+  /** 跳至完整 profile 頁的 handler(hover NameCard 必含,不傳時 fallback noop placeholder) */
+  onViewProfile?: () => void
+}
 
-function resolvePerson(value: PersonValue): { name: string; avatarUrl?: string; description?: string } {
+export type PersonValue = string | PersonData
+
+function resolvePerson(value: PersonValue): PersonData {
   return typeof value === 'string' ? { name: value } : value
+}
+
+// buildPersonNameCard — DS 全域 person avatar hoverCard 的 canonical NameCard JSX 建構器。
+// 用一個 helper 避免每個 consumer 各自構造 NameCard 導致顯示的資訊不一致。
+// 缺項 prop 自然不 render(NameCard 內部 conditional)。
+function buildPersonNameCard(person: PersonData): React.ReactNode {
+  return (
+    <NameCard
+      name={person.name}
+      subtitle={person.description}
+      avatar={{ src: person.avatarUrl, alt: person.name }}
+      status={person.status}
+      statusMessage={person.statusMessage}
+      fields={person.fields}
+      actions={<NameCardDefaultActions />}
+      // onViewMore hover context 必含(avatar.spec.md canonical)。consumer 傳
+      // `onViewProfile` 則用真 handler,否則 noop placeholder(UI 仍渲染 View more
+      // footer,避免 preview 變死路)。
+      onViewMore={person.onViewProfile ?? (() => {})}
+    />
+  )
 }
 
 // ── Avatar Size ─────────────────────────────────────────────────────────────
@@ -32,7 +72,7 @@ function PersonAvatar({
   className = '',
   style,
 }: {
-  person: { name: string; avatarUrl?: string; description?: string }
+  person: PersonData
   size?: 'sm' | 'md' | 'lg'
   className?: string
   style?: React.CSSProperties
@@ -44,20 +84,7 @@ function PersonAvatar({
       size={AVATAR_PX[size]}
       className={className}
       style={style}
-      hoverCard={
-        <NameCard
-          name={person.name}
-          subtitle={person.description}
-          avatar={{ src: person.avatarUrl, alt: person.name }}
-          actions={<NameCardDefaultActions />}
-          // DS-wide canonical(2026-04-23):hover NameCard 必含 `onViewMore`
-          // (對齊 Slack / Linear / Notion / Figma / Gmail 「hover → view profile」
-          // 世界級 pattern — preview 必有 escape hatch 到完整資料)。
-          // 此處 noop 作 placeholder,consumer layer 透過 PersonValue 擴充或
-          // parent wrapper 覆寫為真 profile navigation handler。
-          onViewMore={() => {}}
-        />
-      }
+      hoverCard={buildPersonNameCard(person)}
     />
   )
 }
@@ -133,7 +160,16 @@ function MultiPersonDisplay({
               size="sm"
               // Tag.avatar 是 ReactNode(非 AvatarData object)——傳 <Avatar> 元素。
               // Tag 內部用 `w-4 h-4 rounded-full` 容器 slot,Avatar 填滿 object-cover。
-              avatar={<Avatar src={person.avatarUrl} alt={person.name} size={16} />}
+              // **hoverCard 必帶**(avatar.spec.md DS-wide canonical:所有 person avatar 必 hover → NameCard)。
+              // 跟 PersonAvatar 共用 `buildPersonNameCard` helper 確保顯示資訊一致。
+              avatar={
+                <Avatar
+                  src={person.avatarUrl}
+                  alt={person.name}
+                  size={16}
+                  hoverCard={buildPersonNameCard(person)}
+                />
+              }
               onDismiss={onRemove ? () => onRemove(value![resolvedMax + i]) : undefined}
             >
               {person.name}
@@ -146,4 +182,4 @@ function MultiPersonDisplay({
 }
 MultiPersonDisplay.displayName = 'MultiPersonDisplay'
 
-export { PersonDisplay, MultiPersonDisplay, PersonAvatar }
+export { PersonDisplay, MultiPersonDisplay, PersonAvatar, buildPersonNameCard, resolvePerson }

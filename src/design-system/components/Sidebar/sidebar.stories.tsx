@@ -73,7 +73,21 @@ const UserFooter = () => (
           <ItemAvatar
             alt="Alan Chen"
             color="blue"
-            hoverCard={<NameCard name="Alan Chen" subtitle="Design｜D-0042" actions={<NameCardDefaultActions />} onViewMore={() => {}} />}
+            hoverCard={
+              <NameCard
+                name="Alan Chen"
+                subtitle="Design｜D-0042｜EMP-1001"
+                avatar={{ alt: 'Alan Chen', color: 'blue' }}
+                status="online"
+                statusMessage="Out of Office: Back on Monday!"
+                actions={<NameCardDefaultActions />}
+                fields={[
+                  { label: 'ID', value: 'YHANAX' },
+                  { label: 'Employee number', value: '1234567' },
+                ]}
+                onViewMore={() => {}}
+              />
+            }
           />
           <span data-sidebar="menu-label" className="min-w-0 flex-1 truncate">Alan Chen</span>
         </button>

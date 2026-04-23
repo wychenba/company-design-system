@@ -38,14 +38,16 @@ export const Overview: Story = {
           strokeWidth 動態 scale = <span className="font-mono">max(2, size/10)</span>。
         </Desc>
         <div className="flex items-center gap-6 border border-border rounded-lg p-6">
+          {/* 只示範 canonical size:16 / 20 = field-inline(spec.md「Size canonical」)、
+              24 = 獨立預設、48 = Empty overlay 大圖。**不示範 32**(非獨立 canonical 值)。 */}
           <CircularProgress size={16} />
           <CircularProgress size={20} />
-          <CircularProgress size={24} />
-          <CircularProgress size={32} />
-          <CircularProgress value={60} size={24} />
-          <CircularProgress value={60} size={32} />
+          <CircularProgress />
+          <CircularProgress size={48} />
+          <CircularProgress value={60} />
+          <CircularProgress value={60} size={48} />
           <span className="text-caption text-fg-muted font-mono">
-            indeterminate 16/20/24/32 · determinate value=60 size=24/32
+            indeterminate 16 / 20 / 24(預設)/ 48(Empty) · determinate value=60 預設 / 48
           </span>
         </div>
       </div>
@@ -145,9 +147,9 @@ export const UsageInline: Story = {
           (見 spec「不設 status prop」)。
         </Desc>
         <div className="flex items-center gap-4">
-          <CircularProgress value={25} size={24} />
-          <CircularProgress value={60} size={24} affix="value" />
-          <CircularProgress value={90} size={24} affix="value" />
+          <CircularProgress value={25} />
+          <CircularProgress value={60} affix="value" />
+          <CircularProgress value={90} affix="value" />
         </div>
       </div>
     </div>

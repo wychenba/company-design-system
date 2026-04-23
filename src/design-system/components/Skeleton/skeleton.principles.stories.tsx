@@ -55,7 +55,7 @@ export const SkeletonVsCircularProgressRule: Story = {
         note="Button loading、form submitting、小區塊 inline 等待——當「會出現什麼」不確定,或根本不是內容佔位而是行為回饋時,用 CircularProgress(indeterminate)"
       >
         <div className="flex items-center gap-2 border border-border rounded-md px-3 py-2 w-72">
-          <CircularProgress size={16} />
+          <CircularProgress />
           <span className="text-body text-fg-muted">正在送出訂單...</span>
         </div>
         <Label>Stripe 結帳送出中:沒有「佈局」可佔位,只是行為回饋</Label>
@@ -140,7 +140,7 @@ export const DurationRule: Story = {
         note="長時間靜態 skeleton 會讓使用者以為網路斷線或系統卡住。此時改用 CircularProgress + 進度文案(「處理中,大約 10 秒」),或 ProgressBar"
       >
         <div className="flex items-center gap-2 border border-border rounded-md px-3 py-2 w-72">
-          <CircularProgress size={16} />
+          <CircularProgress />
           <span className="text-body text-fg-muted">分析中,這可能需要一分鐘...</span>
         </div>
         <Label>&gt; 5s 的長工作 → 改用 CircularProgress + 進度文字,告知使用者仍在處理</Label>

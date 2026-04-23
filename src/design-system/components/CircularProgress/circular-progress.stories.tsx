@@ -29,10 +29,11 @@ export const Default: Story = {
   name: '預設(indeterminate)',
   render: () => (
     <div className="flex items-center gap-6">
+      {/* 只示範 canonical size(spec.md「Size canonical」)— 16/20 inline、24 預設、48 Empty 大圖 */}
       <CircularProgress size={16} />
       <CircularProgress size={20} />
-      <CircularProgress size={24} />
-      <CircularProgress size={32} />
+      <CircularProgress />
+      <CircularProgress size={48} />
     </div>
   ),
 }

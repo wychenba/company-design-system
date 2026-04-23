@@ -172,7 +172,14 @@ export const HoverCardIntegrationRule: Story = {
             <NameCard
               name="Ada Chen"
               subtitle="Design Engineer · 台北"
+              avatar={{ alt: 'Ada Chen' }}
+              status="online"
+              statusMessage="Out of Office: Back on Monday!"
               actions={<NameCardDefaultActions />}
+              fields={[
+                { label: 'ID', value: 'YHANAX' },
+                { label: 'Employee number', value: '1234567' },
+              ]}
               onViewMore={() => {}}
             />
           }

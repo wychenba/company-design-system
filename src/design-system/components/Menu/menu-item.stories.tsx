@@ -5,10 +5,22 @@ import { Mail, Star, Bell, Settings, Plus, Folder, FileText, BarChart3 } from 'l
 import { MenuItem, MenuGroup, MenuFooter } from './menu-item'
 import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
 
-// DS-wide canonical:person avatar 必 hover → NameCard(含 onViewMore)。
-// 見 `avatar.spec.md`「Avatar HoverCard 原則」。demo helper:
+// DS-wide canonical:person avatar 必 hover → NameCard(含 status / statusMessage / fields
+// / actions / onViewMore,name-card.spec.md 重要資訊)。demo helper:
 const personHover = (name: string, subtitle?: string) => (
-  <NameCard name={name} subtitle={subtitle} actions={<NameCardDefaultActions />} onViewMore={() => {}} />
+  <NameCard
+    name={name}
+    subtitle={subtitle ?? 'Design｜D-0042｜EMP-1001'}
+    avatar={{ alt: name }}
+    status="online"
+    statusMessage="Out of Office: Back on Monday!"
+    actions={<NameCardDefaultActions />}
+    fields={[
+      { label: 'ID', value: 'YHANAX' },
+      { label: 'Employee number', value: '1234567' },
+    ]}
+    onViewMore={() => {}}
+  />
 )
 
 const meta: Meta<typeof MenuItem> = {

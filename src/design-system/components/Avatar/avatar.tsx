@@ -75,6 +75,27 @@ const STATUS_DOT_COLOR: Record<string, string> = {
   offline: 'var(--status-offline)',
 }
 
+// ── useDocumentTheme(2026-04-23) ──
+// 讀 `<html data-theme>` 並 observe mutation。用於 Avatar hoverCard NameCard:
+// Portal 後的 HoverCardContent 會繼承 trigger subtree theme(如 OverflowIndicator
+// dark tooltip 內部),造成 NameCard 被污染成 dark。顯式 bind app-level theme
+// 確保 NameCard 永遠跟 app 本身 theme 一致(light-in-light-app / dark-in-dark-app)。
+function useDocumentTheme(): string | null {
+  const [theme, setTheme] = React.useState<string | null>(() =>
+    typeof document !== 'undefined' ? document.documentElement.getAttribute('data-theme') : null,
+  )
+  React.useEffect(() => {
+    if (typeof document === 'undefined') return
+    const root = document.documentElement
+    const update = () => setTheme(root.getAttribute('data-theme'))
+    update()
+    const obs = new MutationObserver(update)
+    obs.observe(root, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => obs.disconnect()
+  }, [])
+  return theme
+}
+
 // ── Component ──
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -116,6 +137,7 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
   ({ size = 32, shape = 'circle', src, alt, icon: Icon, color = 'neutral', solid = false, status, badgeCount, hoverCard, className, style, ...props }, ref) => {
     const [imgError, setImgError] = React.useState(false)
+    const documentTheme = useDocumentTheme()
     const isFill = size === 'fill'
     // Fill 模式下 icon 用 60% 寬高、text 用 50cqi（container query inline-size）；
     // 數字模式下用既有 px 計算
@@ -251,9 +273,13 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
             - 無 inner padding(consumer NameCard 自帶 `px-4 py-3` chrome)
             - `overflow-hidden` + `rounded-lg` → child(NameCard)圓角裁切
             - **不設 max-height**:NameCard 自己消費 `--radix-hover-card-content-available-height`
-              (見 `components/NameCard/name-card.tsx`)自約束高度 + 內部 ScrollArea 處理捲動。
-              HoverCardContent 只提供外殼視覺,不 override NameCard 內部 chrome 結構 */}
+              自約束高度 + 內部 ScrollArea 處理捲動
+            - `data-theme={documentTheme}`:NameCard 永遠跟隨 **app-level theme**(從 `<html data-theme>`
+              動態讀),不受 trigger subtree theme 污染。範例:Avatar 位於 OverflowIndicator 的 dark
+              tooltip 內,其 Portal 會繼承該 subtree dark theme → NameCard 變全黑。顯式設回 app theme
+              確保 NameCard 永遠 light-in-light-app / dark-in-dark-app。 */}
         <HoverCardContent
+          data-theme={documentTheme ?? undefined}
           className="bg-surface-raised rounded-lg border border-border overflow-hidden"
           style={{ boxShadow: 'var(--elevation-200)' }}
         >

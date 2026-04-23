@@ -5,7 +5,21 @@ import { Tag } from '@/design-system/components/Tag/tag'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
 
-const personHover = (name: string) => <NameCard name={name} actions={<NameCardDefaultActions />} onViewMore={() => {}} />
+const personHover = (name: string) => (
+  <NameCard
+    name={name}
+    subtitle="Design｜D-0042｜EMP-1001"
+    avatar={{ alt: name }}
+    status="online"
+    statusMessage="Out of Office: Back on Monday."
+    actions={<NameCardDefaultActions />}
+    fields={[
+      { label: 'ID', value: 'YHANAX' },
+      { label: 'Employee number', value: '1234567' },
+    ]}
+    onViewMore={() => {}}
+  />
+)
 const P = { A: 'Alan Chen', B: 'Betty Wu', C: 'Charlie Lee' } as const
 import { H3, Desc, Td, Th, Swatch } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 

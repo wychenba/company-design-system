@@ -3,15 +3,10 @@ import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
-import { PersonDisplay, MultiPersonDisplay, type PersonValue } from './person-display'
+import { PersonDisplay, MultiPersonDisplay, buildPersonNameCard, resolvePerson, type PersonValue } from './person-display'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
-import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
-
-function resolvePerson(v: PersonValue): { name: string; avatarUrl?: string; description?: string } {
-  return typeof v === 'string' ? { name: v } : v
-}
 
 function personToMenuOption(person: PersonValue): SelectMenuOption {
   const p = resolvePerson(person)
@@ -20,21 +15,11 @@ function personToMenuOption(person: PersonValue): SelectMenuOption {
     label: p.name,
     description: p.description,
     // avatar 傳資料,MenuItem 內部用 Avatar 元件渲染。
-    // MenuItem 根據 description 有無自動決定 inline(24) / block(32/40) 尺寸。
-    // hoverCard:對齊 `avatar.spec.md`「Menu / Dropdown 的 assignee / owner」canonical —
-    // 下拉選單內的 person avatar 也必須 hover → NameCard(含 onViewMore)。
+    // hoverCard 共用 `buildPersonNameCard` helper(避免顯示資訊跟 PersonAvatar 不一致)。
     avatar: {
       src: p.avatarUrl,
       alt: p.name,
-      hoverCard: (
-        <NameCard
-          name={p.name}
-          subtitle={p.description}
-          avatar={{ src: p.avatarUrl, alt: p.name }}
-          actions={<NameCardDefaultActions />}
-          onViewMore={() => {}}
-        />
-      ),
+      hoverCard: buildPersonNameCard(p),
     },
   }
 }

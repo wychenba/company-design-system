@@ -42,11 +42,11 @@ export const IndeterminateVsDeterminateRule: Story = {
         note="CircularProgress 兩態合一(Material / Chakra 流派)。判斷法:consumer 能告訴使用者「完成了 X%」嗎?能 → determinate、不能 → indeterminate。選錯會讓使用者一直盯著 0% 以為壞掉,或看著旋轉以為是裝飾。"
       >
         <div className="flex flex-col items-center gap-2">
-          <CircularProgress size={32} aria-label="等待第三方驗證" />
+          <CircularProgress aria-label="等待第三方驗證" />
           <Label>✅ 第三方金流驗證:不知道要多久 → 不傳 value</Label>
         </div>
         <div className="flex flex-col items-center gap-2">
-          <CircularProgress size={32} value={65} affix="value" />
+          <CircularProgress value={65} affix="value" />
           <Label>✅ 檔案上傳:bytes 已知 → 傳 value={'{N}'}</Label>
         </div>
       </Rule>
@@ -56,7 +56,7 @@ export const IndeterminateVsDeterminateRule: Story = {
         note="value 永遠停在 0% 或隨機亂跳會讓使用者懷疑 app 壞掉。若操作本質不可量化,維持 indeterminate 到底,不要硬傳 value 假裝。"
       >
         <div className="flex flex-col items-center gap-2">
-          <CircularProgress size={32} value={0} />
+          <CircularProgress value={0} />
           <Label warn>❌ 生成報表中卻永遠卡 0% → 改用 indeterminate(不傳 value)</Label>
         </div>
       </Rule>
@@ -172,19 +172,12 @@ export const SizeMatchContextRule: Story = {
         <Label>Slack channel 載入更多訊息的 footer</Label>
       </Rule>
 
-      <Rule
-        title="32–48px — empty state 中央、full-screen overlay"
-        note="全頁或獨立 loading 區塊,需要足夠視覺重量讓使用者一眼看到。通常配說明文字,告知具體在做什麼"
-      >
-        <div className="flex items-center justify-center gap-3 border border-border rounded-lg p-8 w-96">
-          <CircularProgress size={48} aria-label="初始化專案" />
-          <div className="flex flex-col">
-            <span className="text-body">初始化新專案</span>
-            <span className="text-caption text-fg-muted">這可能需要 30 秒</span>
-          </div>
-        </div>
-        <Label>Figma 新檔案初始化、Jira 專案建立中</Label>
-      </Rule>
+      {/* 2026-04-23 移除「32–48px — empty state 中央、full-screen overlay」Rule:
+          原範例用 horizontal flex(progress + text inline)= 非 DS canonical 佈局。
+          全頁 / 延遲加載 overlay 應走 `<Empty icon={<CircularProgress size={48} />} />` compose
+          (見上方「延遲加載浮層 / 全頁 overlay — 用 Empty compose」Rule)。
+          32–48px 尺寸選擇已在 spec.md「Size」節 canonical 記錄,不需要 stories 層
+          另存示範;錯誤 layout 範例保留會誤導 consumer 手刻,故刪除。 */}
     </div>
   ),
 }
@@ -198,7 +191,7 @@ export const ForbiddenRule: Story = {
         note="語意鎖「正在載入、正在處理」。永遠旋轉的裝飾會讓 a11y 使用者(螢幕閱讀器)持續收到 loading 通知,也讓視覺使用者無法判斷何時結束"
       >
         <div className="flex items-center gap-2 border border-border rounded-lg p-3 w-72">
-          <CircularProgress size={20} />
+          <CircularProgress />
           <span className="text-body">歡迎使用本系統</span>
         </div>
         <Label warn>Welcome banner 裡無限轉的 CircularProgress → 使用者以為系統卡住</Label>
@@ -211,6 +204,9 @@ export const ForbiddenRule: Story = {
         <div className="flex flex-col gap-2 w-72">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex items-center gap-2 border border-border rounded-md px-3 py-2">
+              {/* size=16 = field-inline canonical(spec.md「Size canonical」表第一行;
+                  此範例 row 視覺語境為 inline list item)。但此例本身為反例(不該多個一起轉),
+                  故保留 16 展示「inline 語境下的錯誤使用」。 */}
               <CircularProgress size={16} />
               <span className="text-body text-fg-muted">載入項目 {i + 1}</span>
             </div>

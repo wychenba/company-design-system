@@ -4,9 +4,23 @@ import { Tag } from '@/design-system/components/Tag/tag'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
 
-/** Person avatar hover canonical helper — 對齊 avatar.spec.md DS-wide rule:person avatar 必 hover → NameCard,必含 onViewMore */
-const personHoverCard = (p: { name: string }) => (
-  <NameCard name={p.name} actions={<NameCardDefaultActions />} onViewMore={() => {}} />
+/** Person avatar hover canonical helper — 對齊 avatar.spec.md DS-wide rule:
+ *  person avatar 必 hover → NameCard,必含 status / statusMessage / fields / actions / onViewMore
+ *  (name-card.spec.md 重要資訊 canonical;consumer 的 person 資料全備則全 render) */
+const personHoverCard = (p: { name: string; role?: string; empId?: string }) => (
+  <NameCard
+    name={p.name}
+    subtitle={p.role ? `${p.role}｜${p.empId ?? 'EMP-0000'}` : 'Design｜D-0042｜EMP-1001'}
+    avatar={{ alt: p.name }}
+    status="online"
+    statusMessage="Out of Office: Back on Monday! For urgent matters please contact @Wei-Lun Cheng in the meantime."
+    actions={<NameCardDefaultActions />}
+    fields={[
+      { label: 'ID', value: 'YHANAX' },
+      { label: 'Employee number', value: '1234567' },
+    ]}
+    onViewMore={() => {}}
+  />
 )
 
 const meta: Meta<typeof OverflowIndicator> = {

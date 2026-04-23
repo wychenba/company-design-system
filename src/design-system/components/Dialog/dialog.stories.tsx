@@ -222,7 +222,13 @@ export const LongContent = {
                         name={m.name}
                         avatar={{ src: `https://i.pravatar.cc/80?u=${m.empNum}`, alt: m.name }}
                         subtitle={`${roles[i % roles.length]}｜${m.empId}`}
+                        status={(['online','busy','away','offline'] as const)[i % 4]}
+                        statusMessage="Out of Office: Back on Monday!"
                         actions={<NameCardDefaultActions />}
+                        fields={[
+                          { label: 'ID', value: m.empNum },
+                          { label: 'Employee number', value: m.empId },
+                        ]}
                         onViewMore={() => {}}
                       />
                     }
@@ -328,7 +334,13 @@ export const ListBody = {
                         name={m.name}
                         avatar={{ src: `https://i.pravatar.cc/80?u=${m.empNum}`, alt: m.name }}
                         subtitle={`${m.role}｜${m.empId}`}
+                        status={(['online','busy','away','offline'] as const)[i % 4]}
+                        statusMessage="Out of Office: Back on Monday!"
                         actions={<NameCardDefaultActions />}
+                        fields={[
+                          { label: 'ID', value: m.empNum },
+                          { label: 'Employee number', value: m.empId },
+                        ]}
                         onViewMore={() => {}}
                       />
                     }

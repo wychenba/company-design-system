@@ -67,7 +67,11 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
 
   const clampToPct = React.useCallback((scale: number): number => {
     const clamped = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale))
-    return Math.round(clamped * 100)
+    // Floor 而非 round:fit-to-page / fit-to-width 時 scale 是 float(e.g. 0.8356)。
+    // round(0.8356 * 100) = 84 → 實際 scale 0.84 → image 比 canvas 大 4px,垂直溢出破壞
+    // 對稱置中(user 抓:「上下邊距不對稱」)。Floor → 0.83 → image 比 canvas 小,永遠
+    // 完整可見 + 視覺 symmetric padding。代價是最多 ~1% 的空間餘量,視覺幾乎看不出。
+    return Math.floor(clamped * 100)
   }, [])
 
   // Image onLoad → 自動 fit-to-page(世界級開圖預設)
@@ -120,7 +124,11 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
         maxScale={MAX_SCALE}
         centerOnInit
         centerZoomedOut
-        limitToBounds={false}
+        // Teams 對標(2026-04-23):image viewer 走 chat-app lightbox 慣例 —
+        // drag 時 image 保持在 canvas bounds 內(zoom-fit 時 drag 無意義,zoom-in 時 drag pan 有限制)。
+        // `limitToBounds=true` 跟 Microsoft Teams / Slack / iOS Photos 等 chat-lightbox 互動一致,
+        // 避免 Figma-canvas 式「可 drag 到任意位置」的無界體驗混淆 viewer 語境。
+        limitToBounds={true}
         // Wheel zoom canonical:
         // - `step: 0.03` = 每 tick ~3% scale,對齊 Figma / Preview.app 細緻度
         //   (原 0.1 = 10% 太粗,接近 Google Slides 離散慣例)

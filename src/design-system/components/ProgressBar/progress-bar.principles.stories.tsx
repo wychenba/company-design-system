@@ -60,7 +60,7 @@ export const VsCircularProgressRule: Story = {
 
         <Frame>
           <div className="flex items-center gap-3">
-            <CircularProgress size={20} aria-label="驗證信用卡中" />
+            <CircularProgress aria-label="驗證信用卡中" />
             <div className="flex flex-col">
               <span className="text-body">驗證信用卡中...</span>
               <span className="text-caption text-fg-muted">連線至金流服務商</span>
@@ -256,7 +256,7 @@ export const DontRule: Story = {
       >
         <Frame>
           <div className="flex items-center gap-3">
-            <CircularProgress size={20} aria-label="計算中" />
+            <CircularProgress aria-label="計算中" />
             <span className="text-body">計算統計報表中...</span>
           </div>
         </Frame>
