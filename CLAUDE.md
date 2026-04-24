@@ -135,7 +135,7 @@
 - ❌ `# Meta-Pattern 預警` 新增條目卻未檢討舊條目合併(違反「上游加 = 下游減」)
 - ❌ `MEMORY.md` 條目 6 月無更新且現況已變(stale memory = drift source)
 - ❌ 同概念在 CLAUDE.md + spec.md + skill 三處都寫完整(違反 Rule-of-3,必選 SSOT)
-- ❌ 聲稱「持續 / 定期 / 自動」卻無 fire log / schedule trigger(違反 M18,Commit 5 上線後)
+- ❌ 聲稱「持續 / 定期 / 自動」卻無 fire log / schedule trigger — 光宣言無 instrumentation = 噪音,應寫進對應 hook(`stop_harvest_corrections.sh` / `session_start_governance_check.sh` / `log_governance_fires.sh`)
 
 ## Audit skill Phase F 強制「Self-improvement capture」
 
