@@ -206,20 +206,14 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       </div>
     )
 
-    // a11y: clickable row — 行是可點互動 surface 時補 button role + keyboard。
-    // 只在 consumer 傳入 onClick 時啟用,否則保持 presentational(純展示不搶焦點)。
-    const rowA11y = onClick
-      ? {
-          role: 'button' as const,
-          tabIndex: 0,
-          onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              onClick()
-            }
-          },
-        }
-      : {}
+    // a11y(2026-04-25 nested-interactive fix):FileItem row 含 inner interactive
+    // (hover-swap action button / ProgressBar / Avatar hoverCard trigger)。原本
+    // role='button' + tabIndex=0 整列可鍵盤點,與 inner buttons 構成 nested-interactive
+    // (axe serious)。移除 row 層 button semantic → mouse 仍可點(onClick 保留),
+    // 鍵盤 user 直接 tab 到 inner primary action。Trade-off:失去「整列 Enter 開啟」
+    // 但滿足 WCAG;世界級對照:Slack message row / Notion page row 同模式 — row 只
+    // mouse 點,inner 有 explicit 按鈕負責鍵盤。
+    const rowA11y = {}
 
     // Compact 靜態背景(AR20):無進度條 → 顯示 `bg-secondary`(= neutral-3)作「檔案已上傳 /
     // 靜態列表」視覺區隔,跟「上傳中(有 progress bar)」對照。hover 不改 bg(見上方
