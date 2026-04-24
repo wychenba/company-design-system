@@ -143,10 +143,10 @@ export const DivisionOfLaborRule: Story = {
         </Rule>
 
         <Rule
-          title="❌ 不在 FileUpload 裡自己畫「已選檔案清單」"
-          note="如果把 filename + 刪除按鈕塞進 FileUpload 內部,會和 FileItem 的 layout / typography / progress bar 規則重複實作,後續 FileItem 改 spec 就兩邊漂移。"
+          title="❌ 不在 FileUpload 裡自己重刻 FileItem primitives"
+          note="2026-04-24 canonical 更新:DS 提供 dual path — FileUpload 可 own list via `files` prop(內部 compose `<FileItem>`);OR consumer 自組 `{files.map(f => <FileItem ... />)}`。禁止的是「自畫 status icon / thumbnail / progress bar / row layout 等 FileItem primitives 視覺規格」。世界級(Material / Ant / Carbon)都 own list composing 自家 FileItem primitive。"
         >
-          <Label warn>⚠️ 看到想在 FileUpload 內顯示檔名時,改用外部 FileItem map</Label>
+          <Label warn>⚠️ 要顯示清單 → 傳 `files` prop(DS built-in)OR 自組 FileItem map;但不要自己重畫 FileItem 內部結構</Label>
         </Rule>
       </div>
     )
