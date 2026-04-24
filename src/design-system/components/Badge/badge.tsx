@@ -51,14 +51,19 @@ export interface BadgeProps
 }
 
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ variant, dot = false, count, max, className, ...props }, ref) => {
+  ({ variant, dot = false, count, max, className, role, ...props }, ref) => {
     const display = dot ? null : (
       max != null && count != null && count > max ? `${max}+` : `${count}`
     )
 
+    // a11y(2026-04-25 axe aria-prohibited-attr fix):
+    // span default 無 role → 不接 aria-label(WCAG 禁止)。Badge 是通知指示器,
+    // `role="status"` 語意正確(live region 可播報計數變化)且允許 aria-label。
+    // Consumer 可 override(傳 role="img" / role={undefined})。
     return (
       <span
         ref={ref}
+        role={role ?? 'status'}
         className={cn(badgeVariants({ variant, dot }), className)}
         {...props}
       >
