@@ -1,5 +1,4 @@
 ---
-# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
 component: CircularProgress
 family: null
 variants: {}

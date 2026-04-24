@@ -1,20 +1,19 @@
 ---
-# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
 component: Badge
 family: 3
 variants:
   critical:
-    when: "紅底白字（bg-notification）"
-    world-class: []
+    when: "最高優先級通知 — 錯誤計數 / 緊急徽章（Gmail 未讀 / iOS notification red dot）"
+    world-class: ["Polaris Badge tone=critical", "Material Badge error", "Ant Badge status=error / count"]
   high:
-    when: "藍底白字（bg-info）"
-    world-class: []
+    when: "高優先級通知 — 主要計數（Slack 訊息計數 / GitHub PR review badge）"
+    world-class: ["Polaris Badge tone=info", "Material Badge primary", "Atlassian Lozenge inProgress"]
   medium:
-    when: "淺藍底藍字（bg-info-subtle）"
-    world-class: []
+    when: "中優先級提示 — 次級計數（Linear issue count / Notion sidebar indicator）"
+    world-class: ["Polaris Badge tone=info subtle", "Ant Badge status=processing"]
   low:
-    when: "使用者切 tab 才看，不需搶注意力"
-    world-class: []
+    when: "低強度指示 — 使用者切 tab 才看（Slack sidebar 靜默標記 / VS Code tab modified dot）"
+    world-class: ["Polaris Badge tone=new", "GitHub subtle count"]
 sizes: {}
 ---
 

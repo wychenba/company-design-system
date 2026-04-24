@@ -1,35 +1,34 @@
 ---
-# Phase 1 auto-migrated(2026-04-24). TODO: Phase 2 fill world-class refs + when rationale.
 component: Tag
 family: 3
 variants:
   neutral:
-    when: "通用分類、草稿、無特定語義"
-    world-class: []
+    when: "通用分類、草稿、無特定語義（GitHub label default / Notion page tag untagged）"
+    world-class: ["Polaris Tag default", "Atlassian Tag standard", "Ant Tag default"]
   blue:
     when: "進行中、資訊提示、active 狀態（對應 --info）"
-    world-class: []
+    world-class: ["Atlassian Lozenge inProgress", "Jira status=in progress", "Linear status=in progress"]
   red:
     when: "錯誤、已封鎖、危險（對應 --error）"
-    world-class: []
+    world-class: ["Atlassian Lozenge removed", "Jira status=blocked", "Ant Tag color=red"]
   green:
     when: "成功、已完成、已核准（對應 --success）"
-    world-class: []
+    world-class: ["Atlassian Lozenge success", "Jira status=done", "GitHub label merged"]
   yellow:
     when: "警告、待審核、注意（對應 --warning）"
-    world-class: []
+    world-class: ["Atlassian Lozenge moved", "Jira status=review", "Ant Tag color=warning"]
   turquoise:
-    when: "分類色（無固定語義）"
-    world-class: []
+    when: "分類色（無固定語義）— 產品線 / 團隊區別標記"
+    world-class: ["GitHub label custom hex", "Notion tag color=teal", "Linear label color=turquoise"]
   purple:
-    when: "分類色（無固定語義）"
-    world-class: []
+    when: "分類色（無固定語義）— 產品線 / 團隊區別標記"
+    world-class: ["GitHub label custom hex", "Notion tag color=purple", "Linear label color=purple"]
   magenta:
-    when: "分類色（無固定語義）"
-    world-class: []
+    when: "分類色（無固定語義）— 產品線 / 團隊區別標記"
+    world-class: ["GitHub label custom hex", "Notion tag color=pink", "Linear label color=pink"]
   indigo:
-    when: "分類色（無固定語義）"
-    world-class: []
+    when: "分類色（無固定語義）— 產品線 / 團隊區別標記"
+    world-class: ["GitHub label custom hex", "Notion tag color=blue", "Linear label color=indigo"]
 sizes:
   sm:
     when: "form field-height 28 / compact chrome / dialog / panel context"
