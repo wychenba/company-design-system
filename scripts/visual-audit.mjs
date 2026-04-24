@@ -338,6 +338,15 @@ async function auditScenario(browser, scenario, opts = {}) {
       await page.waitForTimeout(200) // let tooltip dismiss
     }
 
+    // Detect Storybook error display(stale cache / module resolution failure)—
+    // 若 story load 失敗,Storybook 會顯示 error `<pre class="sb-errordisplay_code">`,
+    // screenshot 捕捉到的是錯誤 UI 而非真元件。必須 fail loud,不能 silently pass。
+    const errorCount = await page.locator('[class*="sb-errordisplay"]').count()
+    if (errorCount > 0) {
+      const msg = await page.locator('#error-message').textContent().catch(() => 'unknown')
+      return { id: scenario.id ?? scenario.url, file: scenario.file, error: `Storybook error display: ${String(msg).slice(0, 200)}` }
+    }
+
     const screenshotPath = join(OUT_DIR, scenario.file)
     await page.screenshot({ path: screenshotPath, fullPage: false })
 
