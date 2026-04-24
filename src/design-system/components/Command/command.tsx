@@ -7,7 +7,6 @@ import { Search } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Dialog, DialogContent } from "@/design-system/components/Dialog/dialog"
-import { ScrollArea } from "@/design-system/components/ScrollArea/scroll-area"
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -56,22 +55,24 @@ const CommandInput = React.forwardRef<
 CommandInput.displayName = CommandPrimitive.Input.displayName
 
 /**
- * CommandList — cmdk primitive 外包 ScrollArea 以跨 OS scrollbar 一致(2026-04-25)。
+ * CommandList — cmdk primitive 的 scroll container。
  *
- * Design:cmdk `List` 不再自己 `overflow-y-auto`;改由外層 `<ScrollArea>` Viewport
- * 做 scroll container。cmdk 內部對 selected-item 呼叫 `scrollIntoView({block:'nearest'})`,
- * 瀏覽器原生向上尋找 scrollable ancestor → 命中 ScrollArea.Viewport → 自動捲入
- * selected 項目 ✓(不需 MutationObserver sync)。
- *
- * 其他 scroll 區(DataTable / Sheet / Sidebar / DropdownMenu)亦走 ScrollArea。
+ * TODO(ScrollArea canonical):DS 其他 scroll 區(DataTable / Sheet / Sidebar / DropdownMenu)
+ * 已遷 ScrollArea 確保跨 OS 一致,但 cmdk 的 `List` primitive 內部用 ResizeObserver +
+ * `[cmdk-list-sizer]` 管理自己的 scroll 幾何,而 selected-item `scrollIntoView` 假設
+ * List 本身就是 scroll container。強行 wrap ScrollArea 會破壞 auto-scroll-to-selected。
+ * 後續方案:(a) 等 cmdk 支援 asChild/scrollParent prop;(b) 自寫 scroll sync hook。
+ * 目前暫用 native `overflow-y-auto`,承擔跨 OS scrollbar 視覺不一致的 known tech debt。
  */
 const CommandList = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
 >(({ className, ...props }, ref) => (
-  <ScrollArea className="max-h-[var(--menu-max-height,300px)]">
-    <CommandPrimitive.List ref={ref} className={cn("overflow-x-hidden", className)} {...props} />
-  </ScrollArea>
+  <CommandPrimitive.List
+    ref={ref}
+    className={cn("max-h-[var(--menu-max-height,300px)] overflow-y-auto overflow-x-hidden", className)}
+    {...props}
+  />
 ))
 
 CommandList.displayName = CommandPrimitive.List.displayName
