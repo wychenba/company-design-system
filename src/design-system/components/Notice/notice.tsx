@@ -30,7 +30,7 @@ import { ItemContent, ItemPrefix } from '@/design-system/patterns/element-anatom
  *   「Chrome dismiss size canonical」三家族分類(Modal sm / Non-modal xs / Notification xs)
  * - Close 左側可加 refresh / share(action group region),皆統一 xs
  * - `dismiss` prop 自動套 variant="text" + fg-muted override
- * SSOT:patterns/element-anatomy/item-anatomy.spec.md「Dismiss canonical — X close only」
+ * SSOT:patterns/element-anatomy/inline-action.spec.md「Dismiss canonical — X close only」
  *      + components/Alert/alert.spec.md「Chrome corner close X canonical」。
  */
 

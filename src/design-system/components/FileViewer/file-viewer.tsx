@@ -451,7 +451,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       >
         <h3 className="text-body-lg font-medium text-foreground">{labels.detailsHeading}</h3>
         {/* InfoPanel close 走 dismiss canonical `<Button iconOnly dismiss />`,對齊 button.spec.md
-            「Dismiss 視覺類」+ item-anatomy.spec.md「Dismiss canonical」。 */}
+            「Dismiss 視覺類」+ inline-action.spec.md「Dismiss canonical — X close only」。 */}
         <Button
           iconOnly
           dismiss

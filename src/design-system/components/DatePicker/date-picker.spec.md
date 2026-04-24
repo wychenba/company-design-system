@@ -15,6 +15,19 @@ DatePicker 是**單一日期**的輸入與顯示元件。Edit 用**本 DS 自建
 
 ---
 
+## Controlled-only rationale(Dim 26)
+
+本元件刻意採 **controlled-only** 模式:`value` + `onChange` 必傳,不支援 `defaultValue` uncontrolled fallback。
+
+**為什麼**:
+- 內部狀態複雜(search filter / range / menu open state)跟 `value` 雙向 sync 會產生 race condition
+- Consumer 幾乎一定有外部 state(form library / app state),強制 controlled 消除 ambiguity
+- 世界級對照:Ant Design DatePicker / Material MUI Select 皆支援 dual-mode;我們選 controlled-only 對齊狀態一致性優先
+
+**若未來要改 dual-mode**:需引入 `useControllableState` helper + 測試 controlled↔uncontrolled switch 場景,屬 major API 擴充,非本 session scope。
+
+---
+
 ## 何時用
 
 - **單一日期選擇**：出生日、到期日、提醒日、發佈日

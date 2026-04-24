@@ -10,6 +10,19 @@ Select 是**單選下拉的表單 control**——從 3+ 選項中挑恰好一個
 
 ---
 
+## Controlled-only rationale(Dim 26)
+
+本元件刻意採 **controlled-only** 模式:`value` + `onChange` 必傳,不支援 `defaultValue` uncontrolled fallback。
+
+**為什麼**:
+- 內部狀態複雜(search filter / range / menu open state)跟 `value` 雙向 sync 會產生 race condition
+- Consumer 幾乎一定有外部 state(form library / app state),強制 controlled 消除 ambiguity
+- 世界級對照:Ant Design DatePicker / Material MUI Select 皆支援 dual-mode;我們選 controlled-only 對齊狀態一致性優先
+
+**若未來要改 dual-mode**:需引入 `useControllableState` helper + 測試 controlled↔uncontrolled switch 場景,屬 major API 擴充,非本 session scope。
+
+---
+
 ## 何時用
 
 - **表單中節省垂直空間**：create user 的 role、profile settings 的 timezone、product form 的 category
