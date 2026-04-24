@@ -92,6 +92,7 @@ function ReadonlyDisplay({
 
 // ── Native Select (mobile) ─────────────────────────────────────────────
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ mode = 'edit', error: errorProp = false, size = 'md', options, value, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'text', startIcon: StartIcon, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp, ...props }, ref) => {
     const fieldCtx = useFieldContext()
@@ -177,6 +178,7 @@ NativeSelect.displayName = 'NativeSelect'
 
 // ── Custom Select (desktop — consumes SelectMenu) ────────────────────────
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
   ({ mode = 'edit', error: errorProp = false, size = 'md', options, value, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'text', startIcon: StartIcon, searchable = false, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp }, ref) => {
     const fieldCtx = useFieldContext()

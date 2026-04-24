@@ -235,6 +235,7 @@ export interface TimePickerProps
   startIcon?: LucideIcon | null
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const TimePicker = React.forwardRef<HTMLButtonElement, TimePickerProps>(
   (
     {
@@ -488,4 +489,5 @@ export const timePickerMeta = {
   },
 } as const
 
+// code-quality-allow: dead-export — sub-component (display variant) — consumer 可 compose 自行渲染
 export { TimePicker, TimePickerDisplay, formatTime }

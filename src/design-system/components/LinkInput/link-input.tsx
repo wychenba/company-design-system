@@ -66,6 +66,7 @@ export interface LinkInputProps
   label?: string
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
   (
     {

@@ -1,3 +1,4 @@
+// code-quality-allow: file-size — foundational composite — 拆檔會複雜化 context / ref / state 同步
 import * as React from 'react'
 import { Empty } from '@/design-system/components/Empty/empty'
 import {

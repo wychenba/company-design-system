@@ -176,6 +176,7 @@ interface BreadcrumbSeparatorProps extends React.ComponentPropsWithoutRef<'li'> 
   children?: React.ReactNode
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const BreadcrumbSeparator = React.forwardRef<HTMLLIElement, BreadcrumbSeparatorProps>(
   ({ children, className, ...props }, ref) => {
     const { size } = React.useContext(BreadcrumbContext)

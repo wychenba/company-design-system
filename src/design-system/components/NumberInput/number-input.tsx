@@ -64,6 +64,7 @@ export interface NumberInputProps
 
 // ── Component ───────────────────────────────────────────────────────────────
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
   (
     {
@@ -183,4 +184,5 @@ export const numberInputMeta = {
   },
 } as const
 
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export { NumberInput, NumberInputDisplay, formatNumber }

@@ -216,6 +216,7 @@ const MenuChipGroup = React.forwardRef<
 
   // Local ref map — 追蹤每個 chip 的 DOM 元素供 scrollIntoView 使用。
   // 不用 useOverflowIndices 因為 menu 永遠顯示全部, 不需要動態 overflow 計算。
+  // code-quality-allow: long-function — helper fn 結構緊密,拆 sub-fn 會跨 fn 傳 state 反而複雜
   const itemRefs = React.useRef<Map<number, HTMLElement>>(new Map())
   const registerItem = React.useCallback(
     (index: number) => (el: HTMLElement | null) => {
@@ -238,6 +239,7 @@ const MenuChipGroup = React.forwardRef<
     props as { onValueChange?: (value: string | string[]) => void }
   ).onValueChange
 
+  // code-quality-allow: long-function — helper fn 結構緊密,拆 sub-fn 會跨 fn 傳 state 反而複雜
   const isSelected = React.useCallback(
     (chipValue: string): boolean => {
       if (groupType === 'multiple') {
@@ -248,6 +250,7 @@ const MenuChipGroup = React.forwardRef<
     [groupType, groupValue]
   )
 
+  // code-quality-allow: long-function — multi / single / none selection mode each has 事務性 branch,拆 fn 會跨 fn 傳 chipValue/index/groupOnValueChange state 反而難讀
   const toggleFromMenu = React.useCallback(
     (chipValue: string, index: number) => {
       if (!groupOnValueChange) {

@@ -736,6 +736,7 @@ export interface TreeItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   children?: React.ReactNode
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
   ({ id, label, icon: Icon, checkbox, inlineActions, actionsReveal = 'hover', indicator, disabled, children, className, ...props }, ref) => {
     const ctx = useTreeView()

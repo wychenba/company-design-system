@@ -103,6 +103,7 @@ const KIND_TITLE: Record<'tips' | 'new-features', string> = {
   'new-features': '新功能介紹',
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
   (
     {

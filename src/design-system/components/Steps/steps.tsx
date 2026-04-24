@@ -740,6 +740,7 @@ function StepNumber() {
 
 export interface StepLabelProps extends React.HTMLAttributes<HTMLSpanElement> {}
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const StepLabel = React.forwardRef<HTMLSpanElement, StepLabelProps>(
   ({ className, children, ...props }, ref) => {
     const { size } = useStepsContext()

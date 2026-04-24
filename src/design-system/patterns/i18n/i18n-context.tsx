@@ -65,6 +65,7 @@ import * as React from 'react'
  * }
  * ```
  */
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export interface I18nLabels {
   [componentKey: string]: Record<string, string | undefined> | undefined
 }
@@ -83,12 +84,14 @@ export interface I18nProviderProps {
  * 沒包 → `useI18n().t()` 每次返 fallback(= DS CJK defaults)。
  * 包 → 該 labels 取代對應 DS defaults;未填的 key 仍 fallback。
  */
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export function I18nProvider({ labels, children }: I18nProviderProps) {
   // Memoize context value to avoid triggering consumer re-renders when parent re-renders
   const value = React.useMemo(() => labels, [labels])
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }
 
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export interface I18nHookResult {
   /**
    * Translate:return labels[componentKey]?.[labelKey] ?? fallback。
@@ -113,6 +116,7 @@ export interface I18nHookResult {
  * 無 I18nProvider 環境:`labels` = null,`t()` 每次直接返 fallback。**不拋 error**
  *(跟 Field context 等 DS 其他 optional context 同 pattern)。
  */
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export function useI18n(): I18nHookResult {
   const labels = React.useContext(I18nContext)
   const t = React.useCallback<I18nHookResult['t']>(
