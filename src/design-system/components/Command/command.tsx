@@ -25,6 +25,9 @@ const Command = React.forwardRef<
 Command.displayName = CommandPrimitive.displayName
 
 const CommandDialog = ({ children, ...props }: DialogProps) => {
+  // M2 verified 2026-04-25(cmdk/dist/index.js source):cmdk 於 DOM 上 emit
+  // `cmdk-group-heading=""` / `cmdk-group=""` / `cmdk-input-wrapper=""` / `cmdk-input=""` /
+  // `cmdk-item=""` attributes,下列 `[&_[cmdk-*]]:` attribute selectors 皆有對應真實 DOM。
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0 shadow-[var(--elevation-200)]">

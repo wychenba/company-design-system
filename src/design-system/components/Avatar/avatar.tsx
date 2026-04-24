@@ -75,11 +75,15 @@ const STATUS_DOT_COLOR: Record<string, string> = {
   offline: 'var(--status-offline)',
 }
 
-// ── useDocumentTheme(2026-04-23) ──
+// ── useDocumentTheme(2026-04-23;M3 Portal 逃脫防線,scope verified 2026-04-25)──
 // 讀 `<html data-theme>` 並 observe mutation。用於 Avatar hoverCard NameCard:
 // Portal 後的 HoverCardContent 會繼承 trigger subtree theme(如 OverflowIndicator
 // dark tooltip 內部),造成 NameCard 被污染成 dark。顯式 bind app-level theme
 // 確保 NameCard 永遠跟 app 本身 theme 一致(light-in-light-app / dark-in-dark-app)。
+//
+// 範圍 audit 2026-04-25:觀察對象是 `document.documentElement` 自有 DOM,非 3rd-party
+// lib 內部(不屬 M2 scope);attributeFilter 限定 `data-theme` 單一 attr,re-render 成本
+// 為每次全站 theme 切換 × Avatar 數量,可接受。
 function useDocumentTheme(): string | null {
   const [theme, setTheme] = React.useState<string | null>(() =>
     typeof document !== 'undefined' ? document.documentElement.getAttribute('data-theme') : null,
