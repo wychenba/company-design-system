@@ -7,6 +7,7 @@ import { Search } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Dialog, DialogContent } from "@/design-system/components/Dialog/dialog"
+import { ScrollArea } from "@/design-system/components/ScrollArea/scroll-area"
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -55,24 +56,25 @@ const CommandInput = React.forwardRef<
 CommandInput.displayName = CommandPrimitive.Input.displayName
 
 /**
- * CommandList — cmdk primitive 的 scroll container。
+ * CommandList — cmdk primitive 外包 ScrollArea 跨 OS scrollbar 一致。
  *
- * TODO(ScrollArea canonical):DS 其他 scroll 區(DataTable / Sheet / Sidebar / DropdownMenu)
- * 已遷 ScrollArea 確保跨 OS 一致,但 cmdk 的 `List` primitive 內部用 ResizeObserver +
- * `[cmdk-list-sizer]` 管理自己的 scroll 幾何,而 selected-item `scrollIntoView` 假設
- * List 本身就是 scroll container。強行 wrap ScrollArea 會破壞 auto-scroll-to-selected。
- * 後續方案:(a) 等 cmdk 支援 asChild/scrollParent prop;(b) 自寫 scroll sync hook。
- * 目前暫用 native `overflow-y-auto`,承擔跨 OS scrollbar 視覺不一致的 known tech debt。
+ * Verified against cmdk/dist/index.js(2026-04-25):cmdk selected-item auto-scroll
+ * 用標準 `Element.scrollIntoView({block:"nearest"})`,browser 向上找 nearest
+ * scrollable ancestor → 命中 ScrollArea.Viewport(`overflow:hidden scroll`)→ 自動
+ * 捲入 selected ✓。不需 MutationObserver sync。
+ *
+ * `cmdk-list-sizer` ResizeObserver 只量 offsetHeight 設 CSS var `--cmdk-list-height`
+ * (純測量,非 scroll logic),wrap 不影響。
+ *
+ * 跨 DS 一致:DataTable / Sheet / Sidebar / DropdownMenu / Command 皆走 ScrollArea。
  */
 const CommandList = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
 >(({ className, ...props }, ref) => (
-  <CommandPrimitive.List
-    ref={ref}
-    className={cn("max-h-[var(--menu-max-height,300px)] overflow-y-auto overflow-x-hidden", className)}
-    {...props}
-  />
+  <ScrollArea className="max-h-[var(--menu-max-height,300px)]">
+    <CommandPrimitive.List ref={ref} className={cn("overflow-x-hidden", className)} {...props} />
+  </ScrollArea>
 ))
 
 CommandList.displayName = CommandPrimitive.List.displayName
