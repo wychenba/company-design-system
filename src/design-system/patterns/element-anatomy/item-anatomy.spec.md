@@ -1,5 +1,8 @@
 # Item Anatomy 設計原則(Family 1 + Family 2 row 結構 SSOT)
 
+> **Foundational SSOT rationale**(2026-04-24 approved,cap 800):
+> 涵蓋 Family 1 + Family 2 跨多 row primitive(MenuItem / SidebarMenuButton / TreeItem / DropdownMenuItem / SelectMenu / FileItem 等 10+ 消費者)的結構 canonical、slot 規則、24px 閾值對齊公式、選擇狀態視覺、新 row primitive 建立指南。跨元件 scope 本質 > 單一元件,不可拆不失原則(前次 prune 嘗試搬 24px threshold / Recipe 到 references 後 user 確認違反 2-home canonical,restored)。
+
 ## 定位
 
 本 spec 是 design system **row anatomy(Family 1 + Family 2)的深度 SSOT**——包含:

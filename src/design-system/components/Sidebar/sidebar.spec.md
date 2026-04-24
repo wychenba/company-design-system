@@ -1,5 +1,8 @@
 # Sidebar 設計原則
 
+> **Foundational SSOT rationale**(2026-04-24 approved,cap 800):
+> Sidebar 有獨立 `sidebarMenuButtonVariants` cva(對齊 MenuItem 但獨立實作,同步風險見 item-anatomy.spec「SidebarMenuButton 獨立實作風險」)+ 20+ Sidebar-specific features SSOT(Chrome header/footer 高度 / Collapsible / Icon 模式 / SidebarTrigger 位置 / Mobile 行為 / 持久化 / 快捷鍵 / Group 收合 / Single selection / Inline actions / Keyboard shortcuts),scope > 單一 MenuItem consumer。Long-term 考慮 refactor 消費 menuItemVariants base(詳 `.claude/planning/row-primitive-consolidation.md`)— 若 refactor 成功,本 spec 可縮到 ~300。
+
 ## 定位
 
 **應用程式的主導覽外殼**——頁面固定的側邊導覽容器，支援展開 / 收合、桌機與行動裝置的不同形態、扁平選單與階層樹兩種內容。

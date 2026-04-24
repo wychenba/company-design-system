@@ -1,5 +1,8 @@
 # Color 設計原則
 
+> **Foundational SSOT rationale**(2026-04-24 approved,cap 800):
+> Token 系統 SSOT,涵蓋 primitive / semantic 兩層色彩架構、disabled 兩策略、Hover/Active 公式推導、新增語意色相 4-step 流程、neutral interaction 雙 family、nested theme。跨 30+ 元件消費,改一 token 影響全 DS。218 行語義色定義是純 token structural canonical 無法 reference out;不可拆不失原則。
+
 ## 架構流派定位
 
 業界四大世界級色彩 token 流派各有取捨。我們選擇 **Atlassian 流派**（semantic state token），並有意識地拒絕其他三個。理解這個選擇對日後維護至關重要。

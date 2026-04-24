@@ -26,6 +26,9 @@ FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 case "$FILE_PATH" in
   */CLAUDE.md)                          BUDGET=400;  TRANSITION=800; LABEL="CLAUDE.md" ;;
   */memory/*.md)                        BUDGET=100;  TRANSITION=100; LABEL="memory file" ;;
+  # Foundational SSOT specs(2026-04-24 升 cap 800 — spec 內部有 rationale section)
+  */item-anatomy.spec.md|*/color.spec.md|*/sidebar.spec.md|*/tree-view.spec.md)
+    BUDGET=500;  TRANSITION=800; LABEL="foundational SSOT spec.md" ;;
   *.spec.md)                            BUDGET=300;  TRANSITION=500; LABEL="spec.md" ;;
   *.claude/skills/*/SKILL.md)           BUDGET=250;  TRANSITION=400; LABEL="SKILL.md" ;;
   *) exit 0 ;;

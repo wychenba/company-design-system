@@ -92,7 +92,9 @@ Governance 自身遵循 SSOT + anti-bloat。3 層 pipeline 確保知識可壓縮
 | **L2 — Per-commit** | PostToolUse | `log_governance_fires.sh` → `.claude/logs/hook-fires.jsonl` |
 | **L3 — Periodic deep**(季度 / audit --deep) | `/knowledge-prune` skill(retire ≥ 5%)| Phase F report |
 
-**行數預算**(hook 攔):CLAUDE.md 400(過渡 800)/ spec 300(過渡 500)/ SKILL 250(過渡 400)/ memory 100。過渡期至 2026-07-24 收斂到 400。
+**行數預算**(hook 攔):CLAUDE.md 400(過渡 800)/ spec 300(過渡 500,**foundational SSOT 類 800**)/ SKILL 250(過渡 400)/ memory 100。過渡期至 2026-07-24 收斂到 400。
+
+**Foundational SSOT 類 spec**(cap 800,2026-04-24 加):涵蓋 cross-pattern 或 cross-component canonical 的 SSOT spec,scope 本質 > 單一元件,不可拆不失原則。該 spec 頂部 frontmatter 或首段必寫 `**foundational SSOT rationale**: {涵蓋 X / 為何不可拆}`。現況 4 檔:`item-anatomy.spec.md`(Family 1+2 SSOT)/ `color.spec.md`(token SSOT)/ `sidebar.spec.md`(Sidebar 獨立 cva + sidebar-specific 20+ features SSOT)/ `tree-view.spec.md`(TreeView 獨立 cva + tree-specific 20+ features SSOT)。
 
 ## 加規則前必過 3 題
 
