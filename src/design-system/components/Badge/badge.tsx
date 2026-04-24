@@ -75,10 +75,10 @@ export const badgeMeta = {
   component: 'Badge',
   family: 3,
   variants: {
-    critical: { purpose: 'TODO: Phase 2 fill' },
-    high: { purpose: 'TODO: Phase 2 fill' },
-    medium: { purpose: 'TODO: Phase 2 fill' },
-    low: { purpose: 'TODO: Phase 2 fill' },
+    critical: { purpose: '紅底白字（bg-notification）' },
+    high: { purpose: '藍底白字（bg-info）' },
+    medium: { purpose: '淺藍底藍字（bg-info-subtle）' },
+    low: { purpose: '使用者切 tab 才看，不需搶注意力' },
   },
   sizes: {
 

@@ -5,11 +5,11 @@ family: 4
 variants: {}
 sizes:
   sm:
-    when: "TODO: Phase 2 fill"
+    when: "form field-height 28 / compact chrome / dialog / panel context"
   md:
-    when: "TODO: Phase 2 fill"
+    when: "default general UI"
   lg:
-    when: "TODO: Phase 2 fill"
+    when: "text-body-lg（16px）"
 ---
 
 # Textarea 設計原則

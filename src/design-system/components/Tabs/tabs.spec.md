@@ -5,11 +5,11 @@ family: null
 variants: {}
 sizes:
   sm:
-    when: "TODO: Phase 2 fill"
+    when: "form field-height 28 / compact chrome / dialog / panel context"
   md:
-    when: "TODO: Phase 2 fill"
+    when: "default general UI"
   lg:
-    when: "TODO: Phase 2 fill"
+    when: "touch / prominent CTA / stakeholder-facing surface"
 ---
 
 # Tabs 設計原則

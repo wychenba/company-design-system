@@ -4,16 +4,16 @@ component: Badge
 family: 3
 variants:
   critical:
-    when: "TODO: Phase 2 fill"
+    when: "紅底白字（bg-notification）"
     world-class: []
   high:
-    when: "TODO: Phase 2 fill"
+    when: "藍底白字（bg-info）"
     world-class: []
   medium:
-    when: "TODO: Phase 2 fill"
+    when: "淺藍底藍字（bg-info-subtle）"
     world-class: []
   low:
-    when: "TODO: Phase 2 fill"
+    when: "使用者切 tab 才看，不需搶注意力"
     world-class: []
 sizes: {}
 ---

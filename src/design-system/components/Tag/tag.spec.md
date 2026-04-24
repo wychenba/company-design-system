@@ -4,39 +4,39 @@ component: Tag
 family: 3
 variants:
   neutral:
-    when: "TODO: Phase 2 fill"
+    when: "通用分類、草稿、無特定語義"
     world-class: []
   blue:
-    when: "TODO: Phase 2 fill"
+    when: "進行中、資訊提示、active 狀態（對應 --info）"
     world-class: []
   red:
-    when: "TODO: Phase 2 fill"
+    when: "錯誤、已封鎖、危險（對應 --error）"
     world-class: []
   green:
-    when: "TODO: Phase 2 fill"
+    when: "成功、已完成、已核准（對應 --success）"
     world-class: []
   yellow:
-    when: "TODO: Phase 2 fill"
+    when: "警告、待審核、注意（對應 --warning）"
     world-class: []
   turquoise:
-    when: "TODO: Phase 2 fill"
+    when: "分類色（無固定語義）"
     world-class: []
   purple:
-    when: "TODO: Phase 2 fill"
+    when: "分類色（無固定語義）"
     world-class: []
   magenta:
-    when: "TODO: Phase 2 fill"
+    when: "分類色（無固定語義）"
     world-class: []
   indigo:
-    when: "TODO: Phase 2 fill"
+    when: "分類色（無固定語義）"
     world-class: []
 sizes:
   sm:
-    when: "TODO: Phase 2 fill"
+    when: "form field-height 28 / compact chrome / dialog / panel context"
   md:
-    when: "TODO: Phase 2 fill"
+    when: "default general UI"
   lg:
-    when: "TODO: Phase 2 fill"
+    when: "touch / prominent CTA / stakeholder-facing surface"
 ---
 
 # Tag 設計原則
