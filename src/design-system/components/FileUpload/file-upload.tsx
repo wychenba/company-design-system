@@ -1,8 +1,10 @@
 import * as React from 'react'
-import { Upload as UploadIcon } from 'lucide-react'
+import { Upload as UploadIcon, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Empty } from '@/design-system/components/Empty/empty'
 import { CircularProgress } from '@/design-system/components/CircularProgress/circular-progress'
+import { FileItem } from '@/design-system/components/FileItem/file-item'
+import { Button } from '@/design-system/components/Button/button'
 
 /**
  * FileUpload — 拖放 / 點擊上傳區塊
@@ -30,6 +32,24 @@ import { CircularProgress } from '@/design-system/components/CircularProgress/ci
  * onReject: 被 maxSize / accept 擋下的檔案(提供錯誤訊息顯示機會)。
  */
 
+/**
+ * Uploaded / uploading file status item(for `files` prop)。
+ * Consumer 持 state(progress / status),FileUpload 只負責渲染。
+ */
+export interface FileUploadStatus {
+  id: string
+  name: string
+  /** bytes */
+  size?: number
+  /** Upload 進度(0-100)— uploading 時顯示 progress bar */
+  progress?: number
+  status?: 'uploading' | 'completed' | 'error'
+  /** Error 訊息 / size 等 description */
+  description?: React.ReactNode
+  /** Thumbnail URL for rich mode */
+  thumbnailSrc?: string
+}
+
 export interface FileUploadProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onDrop'> {
   onUpload?: (files: File[]) => void
   onReject?: (files: File[], reason: 'size' | 'type') => void
@@ -53,6 +73,21 @@ export interface FileUploadProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   description?: string
   /** 若傳入 children,覆寫預設 Empty 結構 */
   children?: React.ReactNode
+  /**
+   * Uploaded / uploading 檔案清單。傳入 → FileUpload 在 drop zone 下方渲染列表。
+   * 不傳 → 不顯示(consumer 可自行用 FileItem 組成,pre-2026-04-24 行為)。
+   * 每項有 status 狀態會對應 icon:
+   *   - `uploading`:CircularProgress(+ progress bar 若 progress 給)
+   *   - `completed`:綠色 ✓(success 狀態視覺確認)
+   *   - `error`:紅色 ✗(+ description 顯示錯誤訊息)
+   */
+  files?: FileUploadStatus[]
+  /** File list 每項顯示模式。Default: 'compact'(單行);'rich' = 含 thumbnail / size / progress bar */
+  fileListMode?: 'compact' | 'rich'
+  /** File list 移除 callback。有值 → 每項右側顯示 X dismiss button;無 → 不可移除(view-only) */
+  onRemove?: (id: string) => void
+  /** File list dismiss button ARIA label template。預設 `移除 {name}`。For i18n. */
+  removeAriaLabel?: (name: string) => string
 }
 
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
@@ -70,6 +105,10 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       title = 'Click or drag file here to upload', // i18n-allow: DS default; consumer override via title prop
       description = multiple ? 'Support for a single or bulk upload' : 'Support for a single file upload', // i18n-allow: DS default; consumer override via description prop
       children,
+      files,
+      fileListMode = 'compact',
+      onRemove,
+      removeAriaLabel = (name: string) => `移除 ${name}`, // i18n-allow: DS default; consumer override via removeAriaLabel prop
       className,
       onClick,
       ...props
@@ -111,9 +150,50 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     const state = disabled ? 'disabled' : loading ? 'loading' : isDragOver ? 'drag-over' : 'idle'
     const isBlocked = disabled || loading
 
+    const hasFiles = Array.isArray(files) && files.length > 0
+
+    const fileListNode = hasFiles ? (
+      <ul
+        className={cn(
+          // stack vertically with consistent gap;bg-surface 在容器外的 chrome / consumer bg 之上
+          'flex flex-col gap-2 w-full',
+          'mt-3',
+        )}
+        aria-label="Uploaded files"
+      >
+        {files!.map((f) => (
+          <li key={f.id} className="list-none">
+            <FileItem
+              mode={fileListMode}
+              name={f.name}
+              status={f.status}
+              progress={f.progress}
+              description={f.description ?? (f.size != null ? formatBytes(f.size) : undefined)}
+              thumbnailSrc={f.thumbnailSrc}
+              actions={
+                onRemove ? (
+                  <Button
+                    iconOnly
+                    dismiss
+                    size="xs"
+                    startIcon={X}
+                    aria-label={removeAriaLabel(f.name)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onRemove(f.id)
+                    }}
+                  />
+                ) : undefined
+              }
+            />
+          </li>
+        ))}
+      </ul>
+    ) : null
+
     return (
+      <div ref={ref} className={cn('w-full', hasFiles && 'flex flex-col')}>
       <div
-        ref={ref}
         role="button"
         tabIndex={isBlocked ? -1 : 0}
         aria-disabled={disabled || undefined}
@@ -191,10 +271,20 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
           )
         )}
       </div>
+      {fileListNode}
+      </div>
     )
   },
 )
 FileUpload.displayName = 'FileUpload'
+
+// ── helper: bytes formatter ───────────────────────────────────────────────
+function formatBytes(n: number): string {
+  if (n < 1024) return `${n} B`
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
+  if (n < 1024 * 1024 * 1024) return `${(n / (1024 * 1024)).toFixed(1)} MB`
+  return `${(n / (1024 * 1024 * 1024)).toFixed(1)} GB`
+}
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 
