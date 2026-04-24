@@ -13,7 +13,7 @@ description: UX behavior audit for design-system components and product UI. Chec
 
 本 skill 是稽核 6 維度的 **D4 UX 行為** canonical home。
 
-## 觸發時機(對齊 CLAUDE.md 稽核 6 維 + 2 模式)
+## 觸發時機(對齊 CLAUDE.md 稽核 canonical)
 
 | 情境 | 模式 | 本 skill 跑什麼 |
 |------|------|----------------|

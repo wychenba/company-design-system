@@ -175,7 +175,7 @@ P2(需討論):K 項
 
 ### Phase 5 — Visual audit(stakeholder-gate,mandatory on stakeholder-visible work)
 
-對齊 **CLAUDE.md 稽核三級 Tier 1 stakeholder-gate**:產品 UI 要給 stakeholder / end-user 看之前,**code + visual 雙層都要過**。Phase 1-4 是 code 層;本 Phase 補視覺層。
+對齊 **CLAUDE.md 稽核 canonical Tier 1 stakeholder-gate**:產品 UI 要給 stakeholder / end-user 看之前,**code + visual 雙層都要過**。Phase 1-4 是 code 層;本 Phase 補視覺層。
 
 **Input**:Phase 4 verify 過關的產品 UI(screens / routes / embedded widgets)
 

@@ -224,7 +224,7 @@ Storybook title 慣例(不與 Components/ 衝突):
 
 **Input**: Phase 3 完成 + Checkpoint 3 資源決策完畢的 exploration stories
 
-**核心原則**:Phase 3 寫的 exploration code 不該直接進 Phase 4 給 stakeholder 看——先 AI 自己掃 6 維,世界級設計師本人也會自我 review 才對外 present。對齊 **CLAUDE.md `# 稽核 6 維 + 2 模式 + 觸發 canonical` M6**(stakeholder-visible 產出 → 強制進階模式)。
+**核心原則**:Phase 3 寫的 exploration code 不該直接進 Phase 4 給 stakeholder 看——先 AI 自己掃 6 維,世界級設計師本人也會自我 review 才對外 present。對齊 **CLAUDE.md `# 稽核 canonical` M6**(stakeholder-visible 產出 → 強制進階模式)。
 
 **Process(6 維並行,對齊 6 維稽核 canonical)**:
 

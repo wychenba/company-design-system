@@ -18,7 +18,7 @@ Purpose: catch every bug class this project has shipped historically PLUS struct
 /delivery-handoff       產品 final 後的交付文件包
 ```
 
-## 對齊 CLAUDE.md `# 稽核 6 維 + 2 模式` — 本 skill 是 6 維的 D1 + D2 home
+## 對齊 CLAUDE.md `# 稽核 canonical` — 本 skill 是 6 維的 D1 + D2 home
 
 CLAUDE.md 定義 6 維:D1 設計語言 / D2 程式語言 / D3 效能 / D4 UX / D5 視覺 / D6 原則自檢。本 skill 的 22 audits 覆蓋 **D1 + D2**(spec hygiene / code correctness / SSOT / cva / naming / tokens / patterns)。**D3-D5 由對應 skill 處理**:
 
@@ -241,7 +241,7 @@ Per CLAUDE.md `## 命名必過三重 test`, when proposing ANY new naming (varia
 
 ### Phase 3.5 — 進階 6 維稽核 D3-D5(scope 依稽核模式)
 
-對齊 **CLAUDE.md `# 稽核 6 維 + 2 模式 + 觸發 canonical`**:本 skill 完成 Phase 1-3 後,已覆蓋 D1 設計語言 + D2 程式語言;D3 效能 / D4 UX / D5 視覺 需 chain 專門 skill。**進階模式必跑全 D3-D5**;高效模式可只跑 D5。
+對齊 **CLAUDE.md `# 稽核 canonical`**:本 skill 完成 Phase 1-3 後,已覆蓋 D1 設計語言 + D2 程式語言;D3 效能 / D4 UX / D5 視覺 需 chain 專門 skill。**進階模式必跑全 D3-D5**;高效模式可只跑 D5。
 
 **模式判定**:
 - **高效(default,Tier 2 daily)**:scope=changed,只跑 D5(visual)

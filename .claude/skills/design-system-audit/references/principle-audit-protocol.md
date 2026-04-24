@@ -2,7 +2,7 @@
 
 **此檔是 D6「設計原則自檢」的唯一執行 SSOT**。所有 audit skill(design-system-audit / component-quality-gate / prototype / product-ui-audit)的 D6 phase 都 chain 本檔,不重複寫邏輯。
 
-對齊 CLAUDE.md `# 稽核 6 維 + 2 模式` + `# 稽核 vs 執行 分權 canonical`。
+對齊 CLAUDE.md `# 稽核 canonical` + `# 稽核 vs 執行 分權 canonical`。
 
 ---
 
@@ -18,7 +18,7 @@
 
 ## D6 5 子維(含 scan mode 分類)
 
-**關鍵**:5 子維依「單 item 檢」vs「跨 item 比對」vs「predicate 自測」分三類。跨 item 比對的**必走 Phase 0 全掃再判**(對齊 CLAUDE.md `# 稽核 6 維 + 2 模式`「一致性類稽核必先全掃再判」),否則無法檢出矛盾 / 不一致。
+**關鍵**:5 子維依「單 item 檢」vs「跨 item 比對」vs「predicate 自測」分三類。跨 item 比對的**必走 Phase 0 全掃再判**(對齊 CLAUDE.md `# 稽核 canonical`「一致性類稽核必先全掃再判」),否則無法檢出矛盾 / 不一致。
 
 | # | 子維 | Scan mode | 掃什麼 | 怎麼掃 |
 |---|------|-----------|-------|-------|

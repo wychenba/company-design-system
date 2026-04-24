@@ -43,51 +43,70 @@
 **與失敗記憶索引的關係**:Meta-principle 是**上游**(預防)、失敗記憶索引是**下游**(事後記帳)。具體 bug 的歷史詳解移到 `.claude/skills/design-system-audit/references/historical-bugs.md`;CLAUDE.md 只留 meta-principle + 極高 signal 的 one-liner anchor。
 
 
-# 稽核 6 維 + 2 模式 + 觸發 canonical
+# 稽核 canonical
 
-稽核是 DS 品質的 gate。本節定義**稽核的維度**、**兩種模式切換條件**、**觸發時機**。搭配 `# Meta-Pattern 預警` M6 一起讀。
+稽核是 DS 品質的 gate。**任何 stakeholder-visible artifact(prototype / 元件 merge / 產品 demo)必已過 code + visual 雙層 audit**。搭配 `# Meta-Pattern 預警` M6 + M10 一起讀。
+
+## 3 層級(Tier)
+
+| Tier | 使用時機 | Scope | 實作 |
+|------|---------|-------|------|
+| **1. Stakeholder-gate**(mandatory) | prototype 比稿 / 元件 ready for merge / 產品 demo | scoped to artifact(單元件 / candidate stories / 產品 URL) | `/prototype` Phase 3.5 / `/component-quality-gate` Phase 4 Ship / `/product-ui-audit` Phase 5 強制 chain `/visual-audit` |
+| **2. Daily dev**(scoped 高效) | bug 修 / refactor / 文字改 | `git diff` 動到的 component + direct consumer | `scripts/visual-audit.mjs --scope=changed`(default);所有 audit skill 預設 |
+| **3. Periodic deep**(全 DS)| release cut / token 大改 / 季度健檢 | full DS-wide code + visual | `/design-system-audit --deep`(或 `--scope=all`);年度 2-4 次 |
 
 ## 6 維度
 
-| # | 維度 | 查什麼 | Canonical 來源 / skill |
-|---|------|--------|-----------------------|
-| D1 | **設計語言一致** | spec canonical / SSOT integrity / 跨元件一致 / pattern 遵循 | `/design-system-audit` / `/baseline-audit` |
-| D2 | **程式語言一致** | TypeScript types / import paths / cva patterns / prop 命名 | tsc + lint + `/design-system-audit` |
-| D3 | **元件效能** | render 次數 / memo / bundle size / unnecessary re-render | `/performance-audit`(新) |
-| D4 | **UX 行為** | keyboard nav / focus trap / a11y / animation timing / interaction canonical | `/ux-audit`(新) |
-| D5 | **視覺品質** | 對齊 / 韻律 / 對比 / 邊距 / 不貼邊 / typography hierarchy / 世界級對照 | `/visual-audit`(Layer A mechanical + Layer B AI) |
-| D6 | **設計原則自檢**(4 子維)| D6a 合理性(per-item)/ **D6b 一致性 + D6c 無矛盾(必 Phase 0 全掃再判)** / D6d 完整性 — 動 canonical substantive 的提議不自改 | SSOT:`.claude/skills/design-system-audit/references/principle-audit-protocol.md` |
+| # | 維度 | 查什麼 | Canonical / skill |
+|---|------|--------|-----------------|
+| D1 | **設計語言一致** | spec / SSOT / 跨元件一致 / pattern | `/design-system-audit` / `/baseline-audit` |
+| D2 | **程式語言一致** | TypeScript types / import paths / cva / prop 命名 | tsc + lint + `/design-system-audit` |
+| D3 | **元件效能** | render / memo / bundle size | `/performance-audit` |
+| D4 | **UX 行為** | keyboard / focus / a11y / animation / interaction | `/ux-audit` |
+| D5 | **視覺品質** | 對齊 / 韻律 / 對比 / 邊距 / 世界級對照 | `/visual-audit`(Layer A + B) |
+| D6 | **設計原則自檢**(4 子維)| D6a 合理性 / D6b-c 一致性+無矛盾(Phase 0 全掃)/ D6d 完整性 | `.claude/skills/design-system-audit/references/principle-audit-protocol.md` |
 
-## 2 模式
+## 觸發判定(誰對哪 Tier)
 
-| 模式 | 使用時機 | 速度 | scope |
-|------|---------|------|------|
-| **高效**(efficient)| 日常 dev(bug 修 / refactor / 文字改) | 秒級 | `git diff` 動到的檔 + 直接 consumer |
-| **進階**(advanced)| Stakeholder-visible 產出 / release cut / token 大改 / 季度健檢 | 分鐘級 | 視情境全 DS 或 full URL,**含完整截圖視覺驗證**(所有 state × size × density × theme 矩陣) |
-
-## 觸發時機(誰必跑、誰可略)
-
-| 情境 | 模式 | 說明 |
+| 情境 | Tier | 說明 |
 |------|------|------|
-| 新元件建立 | **進階強制** | Stakeholder 會看到,進階跑才出稿(M6) |
-| 元件新功能(新 prop / variant / state) | **進階強制** | 同上;若只動文檔(spec 文字改)可跳 Phase 4.5 |
-| 新產品頁 / 比稿 | **進階強制** | 給人看 = stakeholder gate |
-| 日常 dev(bug 修 / typo / 小 refactor) | 高效 | `git diff` scoped |
-| Release cut / token 大改 / 季度健檢 | **進階 + 全 DS scope** | 跨元件一致性必全掃 |
-| Spec-only 改(只動文字無 tsx) | 可略視覺 Phase | 視覺無變 |
+| 新元件 / 新 feature / 產品比稿 | **1 強制** | Stakeholder 會看到(M6) |
+| 日常 dev(bug fix / typo / 小 refactor) | **2** | scope=changed |
+| Release cut / token 大改 / 季度健檢 | **3** | scope=all,跨元件 consistency 必全掃 |
+| Spec-only 改(純文字)| 2 可跳視覺 | 視覺無變 |
 
-**Hook 強制**:`check_stakeholder_visual_audit.sh`(git pre-commit)偵測 diff 含新視覺檔(.tsx / .stories / .css)且未跑進階稽核 → block。
+**Hook 強制**:`check_stakeholder_visual_audit.sh` pre-commit 偵測 diff 含新視覺檔(.tsx / .stories / .css)且未跑 Tier 1 → block。
+
+**禁止**:
+- ❌ Stakeholder artifact 沒過 Tier 1 就 review
+- ❌ 日常改動硬跑 Tier 3(浪費時間 → developer 會跳)
+- ❌ Tier 3 無限期推遲(季度至少 1 次)
+
+**世界級對照**:Figma / Material / Polaris 都走相同 3-tier(stakeholder gate / daily / release sweep)。
 
 ## 一致性類稽核必「Phase 0 先全掃再判」
 
-一致性稽核**必先全 DS scope 掃一輪,再決定要修哪些 / 怎麼修**。個別元件單看必漏系統性 drift:
+一致性稽核**必先全 DS scope 掃一輪再判**。單元件看必漏系統 drift:
 
-**案例**(為什麼這條重要):
-- 只看 Notice 的 `title → description mt-0.5` 規則 → 漏檢查 Dialog / Tooltip / Coachmark 的相同規則
-- 只看 DateGrid today bar → 漏檢查整個 state-stacking 視覺是否完整
-- 只看 Checkbox disabled → 漏檢查 Radio / Switch / SelectionItem 的相同視覺
+- 只看 Notice 的 `title → description mt-0.5` → 漏 Dialog / Tooltip / Coachmark 同規則
+- 只看 DateGrid today bar → 漏整 state-stacking
+- 只看 Checkbox disabled → 漏 Radio / Switch / SelectionItem
 
 `/design-system-audit` / `/visual-audit` 的 consistency 類 phase **一律 Phase 0 = 全掃 → Phase 1+ = 判 → Phase F = 報告**。無例外。
+
+## Canonical 優先順序(衝突解決 ladder)
+
+任何 audit finding 按此優先級判違規:
+
+1. **WCAG mechanical floor**(最高)— a11y 法規:對比 / keyboard / ARIA。例外:WCAG 2.1 自帶豁免(incidental text / disabled UI / logotype / decorative),Layer A 掃描實作豁免不誤報
+2. **本 DS spec + CLAUDE.md canonical**(次高)— 元件 documented rationale 偏離 = `deviation ✓` 不算違規
+3. **世界級對照**(reference,非 canonical)— 本 DS 故意不跟世界級合法,spec 有 rationale → AI 不 flag
+
+**流程**:
+- Mechanical assertion → 查 rationale 欄位 → 有 = `deviation ✓`,無 = P0 violation
+- AI judgement → **必先讀元件 spec.md**,spec 當 hard constraint;世界級當 reference 不 override spec
+
+**為什麼**:WCAG 法規硬底;DS spec 是我們 design language 的存在意義;世界級是參考不是命令(mindset #1 允許「對齊 or 說得出為什麼」)。
 
 
 
@@ -289,7 +308,7 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 | **提設計建議 / 給 option A/B/C** | 本表對應 task 行找到「讀 Y」→ grep 所有可能 relevant 的家(patterns / 近親元件 spec / tokens / memory feedback / `# Meta-Pattern 預警` / skill references),**每個 option 必含「DS canonical(spec:line 或 token name)」+「世界級對照」兩件**;只給世界級 = 螺絲鬆(memory `feedback_recommendation_must_grep_ds`) |
 | **Tailwind / CSS 出怪事** | `# Tailwind 使用規則` + `# 失敗記憶索引` 技術陷阱 anchor |
 | **寫任何視覺 code 前** | `# SSOT 消費 canonical` 對照表列出查過的家 |
-| **Stakeholder-visible 產出**(新元件 / 新功能 / 新產品頁 / 比稿) | `# 稽核 6 維 + 2 模式 + 觸發 canonical` → 進階強制 |
+| **Stakeholder-visible 產出**(新元件 / 新功能 / 新產品頁 / 比稿) | `# 稽核 canonical` → Tier 1 強制 |
 | **稽核結論 = 修實作 or 改原則?** | `# 稽核 vs 執行 分權 canonical`(auto vs STOP 判斷公式 + 表) |
 | **跑 D6 設計原則稽核** | `.claude/skills/design-system-audit/references/principle-audit-protocol.md`(4 子維 scan + 判斷表 + FP 記憶) |
 | **User 糾正 AI 後** | `# 資訊治理 canonical`(判斷 home + 寫到 memory / CLAUDE.md / skill reference) |
@@ -645,52 +664,6 @@ Internal primitive vs public-facing 元件的分類 test 見 `components/README.
 - 能在 CLAUDE.md / spec.md / skill 某處清楚指一段當 canonical?→ 可以寫成規則
 - 偏離的元件能在自己 spec.md 說清楚為什麼?→ 可以寫成規則
 - 兩者任一做不到 → 這不是 canonical，是風格偏好，不要寫進 governance
-
-
-# 稽核三級 policy(stakeholder-gate / daily dev / periodic deep)
-
-**核心原則**:任何 stakeholder-visible artifact(prototype 比稿 / 元件 merge / 產品 demo)**必須已過 code + visual 雙層 audit**。日常 dev 用 scoped 高效稽核;DS-wide full audit 僅 release / token 大改 / 季度健檢才跑。
-
-| Tier | Trigger | Scope | 實作 |
-|------|---------|-------|------|
-| **1. Stakeholder-gate**(mandatory,code + visual) | prototype 比稿前 / 元件 ready for merge / 產品 demo 前 | scoped to 該 artifact(單元件 / candidate stories / 產品 URL) | `/prototype` Phase 3.5 / `/component-quality-gate` Phase 4 Ship / `/product-ui-audit` Phase 5 三個 skill 的 stakeholder gate 強制 chain `/visual-audit` |
-| **2. Daily dev**(高效 scoped) | 日常改動(spec wording / 單元件 tsx / 小 refactor) | `git diff` 動到的 component + direct consumer | `scripts/visual-audit.mjs --scope=changed`(default);所有 audit skill 預設此 scope |
-| **3. Periodic deep**(偶爾全掃) | Release cut / token 改動 / 大 refactor / 季度健檢 | full DS-wide code + visual | `/design-system-audit --deep`(或 CLI `--scope=all`);年度 2-4 次 |
-
-**實作對照**:
-- Scope CLI:`scripts/visual-audit.mjs` 支援 `--scope=changed | component:<name> | all` 和 `--urls=<csv>`(產品 app route)
-- Skill 強制 chain:`/prototype` `/component-quality-gate` `/product-ui-audit` 在 stakeholder-gate phase 必 auto invoke `/visual-audit`,不能跳
-- Daily 不阻塞:working tree 乾淨 + 無動 component → `--scope=changed` 返回 0 scenario,exit 0 不擋流程
-
-**禁止**:
-- ❌ Stakeholder-facing artifact 沒過 visual audit 就給 review(違反 Tier 1 鐵律)
-- ❌ 日常改動硬跑 full DS audit(浪費時間 + 真正要 gate 時 developer 會跳過)
-- ❌ 週期性 deep audit 被無限期推遲(季度至少 1 次,寫進 team ritual)
-
-**世界級對照**:Figma、Google Material、Shopify Polaris 都走相同三級 — stakeholder gate 強制、daily 高效、release 前 full sweep。
-
-## 稽核 Canonical 優先順序(衝突解決 ladder)
-
-任何 audit(code / visual / mechanical / AI judgement)發現 finding,按以下優先順序判定是否違規:
-
-1. **WCAG mechanical floor**(最高,不可違反)
-   - a11y 法規硬底:對比度、keyboard navigation、ARIA 正確性
-   - **例外**:WCAG 2.1 自帶豁免條款(incidental text / disabled UI / logotype / decorative image),Layer A 掃描要實作這些豁免,不把 disabled text 誤報
-2. **本 DS spec + CLAUDE.md canonical**(次高)
-   - `spec.md` / `CLAUDE.md` / `.claude/references/` 明示的規則
-   - 元件有 documented rationale 偏離 = `deviation ✓`(見「Consistency Audit 原則」),不算違規
-3. **世界級對照**(reference,可參考但**非 canonical**)
-   - Polaris / Material / Atlassian / Ant / Apple HIG 做法
-   - 本 DS 決定**故意不跟**世界級是合法的(mindset #1 要求「對齊 or 說得出為什麼不同」)。spec 有 rationale → AI 不 flag
-
-**衝突解決流程**:
-- Mechanical assertion(`visual-assertions.json` 幾何檢查)發現偏離 → 查 assertion 的 `rationale` 欄位 OR 對應 spec → 有 rationale = `deviation ✓`,無 rationale = P0 violation
-- AI judgement(`/visual-audit` Layer B)發現視覺問題 → **必先讀被稽核元件 spec.md**,spec canonical 當 hard constraint;世界級當 reference,不 override spec
-
-**為什麼順序這樣定**:
-- WCAG 是法規 / a11y floor,任何設計不能違反
-- 本 DS spec 是我們的 design language,就是 canonical(這也是整個 DS 存在的意義)
-- 世界級是參考,不是命令;mindset #1 允許「對齊 or 說得出為什麼不同」,spec 的 rationale 就是這個「為什麼」
 
 
 # 建立 UI 前必讀
