@@ -1,5 +1,8 @@
 # Form Validation 設計原則
 
+> **本 spec = 跨表單的 validation 方法論 rules,非 UI 元件 spec,不適用 Layout Family 分類**(Dim 16 豁免)。
+> 元件級 validation 視覺規格住在 `Field/field.spec.md`(Field wrapper chrome)+ 各 form control spec。
+
 表單層級的驗證行為規範。適用於所有包含 Field 元件的表單。
 
 ---

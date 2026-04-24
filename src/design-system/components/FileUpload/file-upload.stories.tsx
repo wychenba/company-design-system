@@ -73,62 +73,11 @@ export const BulkImageUpload = {
   },
 }
 
-// 搭配已上傳清單:Notion / Slack 附件 flow — 上傳後檔案出現在下方
-export const WithUploadedList = {
-  name: '搭配已上傳清單(Notion 附件)',
-  render: () => {
-    const [files, setFiles] = useState<{ name: string; description: string }[]>([
-      { name: '2026-Q1-planning.pdf', description: '2.3 MB' },
-      { name: 'design-review-notes.docx', description: '540 KB' },
-    ])
-    return (
-      <div className="max-w-lg flex flex-col gap-3">
-        <FileUpload
-          multiple
-          title="加入附件到這則留言"
-          description="任何檔案類型,最多 20 MB / 檔"
-          maxSize={20_000_000}
-          onUpload={(accepted) =>
-            setFiles((prev) => [
-              ...prev,
-              ...accepted.map((f) => ({
-                name: f.name,
-                description: `${(f.size / 1024 / 1024).toFixed(1)} MB`,
-              })),
-            ])
-          }
-        />
-        {files.length > 0 && (
-          // Rich FileItem 自帶 border card → list wrapper **無外框**,`gap-2`(8px)防 card 邊框相黏
-          // (見 file-item.spec.md「List wrapper canonical」)
-          <div className="flex flex-col gap-2">
-            {files.map((f, i) => (
-              <FileItem
-                key={`${f.name}-${i}`}
-                mode="rich"
-                name={f.name}
-                description={f.description}
-                thumbnailSrc={`https://i.pravatar.cc/80?u=${encodeURIComponent(f.name)}`}
-                actions={
-                  <Button
-                    variant="text"
-                    size="sm"
-                    iconOnly
-                    startIcon={X}
-                    aria-label={`移除 ${f.name}`}
-                    onClick={() => setFiles((prev) => prev.filter((_, j) => j !== i))}
-                  />
-                }
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    )
-  },
-}
+// WithUploadedList retired 2026-04-24(Dim 24 redundancy):教同樣「upload → list display」flow
+// WithFileList(DS-canonical built-in `files` prop),保留 display story 重複 principle。Consumer
+// 不傳 `files` 則自動回 pre-2026-04-24 consumer-composed pattern(無須 story 示範「不傳 prop」)。
 
-// New 2026-04-24:內建 `files` prop — FileUpload own success state display(DS canonical)
+// 2026-04-24 canonical:內建 `files` prop — FileUpload own success state display
 export const WithFileList = {
   name: '內建 files prop(DS canonical success state)',
   render: () => {
