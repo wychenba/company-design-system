@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Avatar, type AvatarData } from '@/design-system/components/Avatar/avatar'
 // Row primitive 共用常數——統一從 item-layout pattern module 引入
-import { ICON_SIZE, AVATAR_SIZE, ItemContent, itemPrefixAlignVariants } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ICON_SIZE, AVATAR_SIZE, ItemContent, itemPrefixAlignVariants, rowPaddingBySize } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * MenuItem — 所有 menu 類元件的共用視覺佈局層
@@ -39,11 +39,9 @@ const menuItemVariants = cva(
   ],
   {
     variants: {
-      size: {
-        sm: 'text-body leading-compact py-[calc((var(--field-height-sm)-1lh)/2)]',
-        md: 'text-body leading-compact py-[calc((var(--field-height-md)-1lh)/2)]',
-        lg: 'text-body-lg leading-compact py-[calc((var(--field-height-lg)-1lh)/2)]',
-      },
+      // 消費 rowPaddingBySize SSOT(item-anatomy.tsx 導出)
+      // 改一處 → 全 row primitive 自動同步(消除前 SidebarMenuButton 獨立實作 risk)
+      size: rowPaddingBySize,
     },
     defaultVariants: {
       size: 'md',

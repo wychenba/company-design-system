@@ -22,6 +22,7 @@ import {
   RowSizeProvider,
   ItemIcon,
   ItemInlineAction,
+  rowPaddingBySize,
   type InlineActionConfig,
 } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
@@ -656,11 +657,8 @@ const treeItemVariants = cva(
   ],
   {
     variants: {
-      size: {
-        sm: 'text-body leading-compact py-[calc((var(--field-height-sm)-1lh)/2)]',
-        md: 'text-body leading-compact py-[calc((var(--field-height-md)-1lh)/2)]',
-        lg: 'text-body-lg leading-compact py-[calc((var(--field-height-lg)-1lh)/2)]',
-      },
+      // 消費 rowPaddingBySize SSOT(item-anatomy.tsx)— drift risk 消除
+      size: rowPaddingBySize,
     },
     defaultVariants: {
       size: 'md',

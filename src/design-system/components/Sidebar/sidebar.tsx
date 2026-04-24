@@ -34,6 +34,7 @@ import {
   ItemInlineActionButton,
   RowSizeProvider,
   getUniformPrefixSlotStyle,
+  rowPaddingBySize,
   type RowSize,
   type InlineActionConfig,
 } from "@/design-system/patterns/element-anatomy/item-anatomy"
@@ -809,19 +810,13 @@ const sidebarMenuButtonVariants = cva(
   ],
   {
     variants: {
+      // size:消費 rowPaddingBySize SSOT(item-anatomy.tsx)+ Sidebar-specific collapsed height
+      // 前為 3 cva(menu / sidebar / tree)重複同一 py 公式,drift risk 已知。
+      // 改用 shared SSOT 後 formula 改一處全同步。
       size: {
-        sm: [
-          "text-body leading-compact py-[calc((var(--field-height-sm)-1lh)/2)]",
-          "group-data-[collapsible=icon]:!h-[var(--field-height-sm)]",
-        ],
-        md: [
-          "text-body leading-compact py-[calc((var(--field-height-md)-1lh)/2)]",
-          "group-data-[collapsible=icon]:!h-[var(--field-height-md)]",
-        ],
-        lg: [
-          "text-body-lg leading-compact py-[calc((var(--field-height-lg)-1lh)/2)]",
-          "group-data-[collapsible=icon]:!h-[var(--field-height-lg)]",
-        ],
+        sm: [rowPaddingBySize.sm, "group-data-[collapsible=icon]:!h-[var(--field-height-sm)]"],
+        md: [rowPaddingBySize.md, "group-data-[collapsible=icon]:!h-[var(--field-height-md)]"],
+        lg: [rowPaddingBySize.lg, "group-data-[collapsible=icon]:!h-[var(--field-height-lg)]"],
       },
       variant: {
         /** 預設 — 導覽 item,參與 single-selection */

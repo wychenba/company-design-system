@@ -110,6 +110,23 @@ export const INLINE_ACTION_HOVER_BG_SIZE: Record<RowSize, number> = {
   lg: 22,
 }
 
+/**
+ * `rowPaddingBySize` — Family 1+2 row primitive 的 size → padding + typography 公式 SSOT
+ *
+ * Formula(canonical):`py = (field-height - 1lh) / 2`,對齊 1em text 到 field-height center。
+ *
+ * **消費者**:menuItemVariants / sidebarMenuButtonVariants / treeItemVariants / 未來 row primitive
+ * **Rationale**:前先 3 cva 各自寫同一公式 → drift risk(item-anatomy.spec 有明文「SidebarMenuButton
+ * 獨立實作風險」)。抽本 export 後改**一處全同步**,risk 消失(對齊 Meta-Pattern M17「SSOT 必可傳播」)。
+ *
+ * 2026-04-24 D Phase 1+2 consolidation 建立。
+ */
+export const rowPaddingBySize: Record<RowSize, string> = {
+  sm: 'text-body leading-compact py-[calc((var(--field-height-sm)-1lh)/2)]',
+  md: 'text-body leading-compact py-[calc((var(--field-height-md)-1lh)/2)]',
+  lg: 'text-body-lg leading-compact py-[calc((var(--field-height-lg)-1lh)/2)]',
+}
+
 // ── Helper components ──────────────────────────────────────────────────────
 
 /**
