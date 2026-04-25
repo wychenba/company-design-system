@@ -373,6 +373,7 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
   if (parent) {
     // vertical line through element center to top/bottom
     const cx = rect.left + rect.width / 2
+    let anyRedlineDrawn = false  // 至少一條 redline 畫了 → 才畫 parent outline 作 context
     // top
     if (rect.top > parent.top) {
       const dist = rect.top - parent.top
@@ -380,6 +381,7 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
         root.appendChild(redLine(`left:${cx}px;top:${parent.top}px;width:2px;height:${dist}px;`))
         root.appendChild(tCapHorizontal(cx, parent.top))
         root.appendChild(tCapHorizontal(cx, rect.top))
+        anyRedlineDrawn = true
         if (dist >= LABEL_MIN_LINE) {
           root.appendChild(
             distanceLabel(dist, `${cx}px`, `${parent.top + dist / 2}px`, 'translate(-50%,-50%)'),
@@ -394,6 +396,7 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
         root.appendChild(redLine(`left:${cx}px;top:${rect.bottom}px;width:2px;height:${dist}px;`))
         root.appendChild(tCapHorizontal(cx, rect.bottom))
         root.appendChild(tCapHorizontal(cx, parent.bottom))
+        anyRedlineDrawn = true
         if (dist >= LABEL_MIN_LINE) {
           root.appendChild(
             distanceLabel(dist, `${cx}px`, `${rect.bottom + dist / 2}px`, 'translate(-50%,-50%)'),
@@ -409,6 +412,7 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
         root.appendChild(redLine(`left:${parent.left}px;top:${cy}px;width:${dist}px;height:2px;`))
         root.appendChild(tCapVertical(parent.left, cy))
         root.appendChild(tCapVertical(rect.left, cy))
+        anyRedlineDrawn = true
         if (dist >= LABEL_MIN_LINE) {
           root.appendChild(
             distanceLabel(dist, `${parent.left + dist / 2}px`, `${cy}px`, 'translate(-50%,-50%)'),
@@ -423,6 +427,7 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
         root.appendChild(redLine(`left:${rect.right}px;top:${cy}px;width:${dist}px;height:2px;`))
         root.appendChild(tCapVertical(rect.right, cy))
         root.appendChild(tCapVertical(parent.right, cy))
+        anyRedlineDrawn = true
         if (dist >= LABEL_MIN_LINE) {
           root.appendChild(
             distanceLabel(dist, `${rect.right + dist / 2}px`, `${cy}px`, 'translate(-50%,-50%)'),
@@ -430,16 +435,18 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
         }
       }
     }
-    // Parent content area outline(2026-04-25 v2)— 對齊 Figma idiom:redline 終點 = 此邊界。
-    // 不畫 parent outer border + padding(避免 user 誤以為 distance 算到 outer);只畫 content
-    // edge dashed line 標記「distance 量到這條線」。
-    root.appendChild(
-      makeDiv(
-        `position:absolute;left:${parent.left}px;top:${parent.top}px;
-         width:${parent.right - parent.left}px;height:${parent.bottom - parent.top}px;
-         border:1px dashed rgba(182,104,255,0.4);pointer-events:none;box-sizing:border-box;`,
-      ),
-    )
+    // Parent content area outline — 只在「至少一條 redline 畫了」才畫:
+    // - 有 redline → outline 標記 redline 終點 = parent content edge,有 context 意義
+    // - 全 redline 都被 MAX_LINE 過濾(huge parent)→ outline 純跨螢幕視覺噪音,不畫
+    if (anyRedlineDrawn) {
+      root.appendChild(
+        makeDiv(
+          `position:absolute;left:${parent.left}px;top:${parent.top}px;
+           width:${parent.right - parent.left}px;height:${parent.bottom - parent.top}px;
+           border:1px dashed rgba(182,104,255,0.4);pointer-events:none;box-sizing:border-box;`,
+        ),
+      )
+    }
   }
 
   // 3b. Sibling distance(Figma-style,只在 sibling 存在時畫)
