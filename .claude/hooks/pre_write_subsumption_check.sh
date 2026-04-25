@@ -36,9 +36,10 @@ cd "$PROJECT_DIR" || exit 0
 # ── Scope B: Meta-Pattern addition(Edit CLAUDE.md)── EARLY FIRE before new-file check
 case "$FILE_PATH" in
   */CLAUDE.md)
-    if [ "$TOOL_NAME" = "Edit" ] || [ "$TOOL_NAME" = "MultiEdit" ]; then
-      # Pull new_string content(+ edits[] for MultiEdit)
+    if [ "$TOOL_NAME" = "Edit" ] || [ "$TOOL_NAME" = "MultiEdit" ] || [ "$TOOL_NAME" = "Write" ]; then
+      # Pull new content(Write: tool_input.content / Edit: new_string / MultiEdit: edits[].new_string)
       NEW_CONTENT=$(echo "$INPUT" | jq -r '
+        (.tool_input.content // "") + "\n" +
         (.tool_input.new_string // "") + "\n" +
         ([.tool_input.edits[]? | .new_string] | join("\n"))
       ' 2>/dev/null || echo "")
