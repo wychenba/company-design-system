@@ -7,7 +7,7 @@ import { addons } from '@storybook/preview-api'
 import { measureElement } from './utils/dom-geometry'
 import { extractComputed } from './utils/computed-style'
 import { annotateWithTokens, extractSourceVars, extractAllAuthorDecls } from './utils/token-reverse-lookup'
-import { drawOverlay, clearOverlay } from './utils/overlay'
+import { drawOverlay, clearOverlay, toggleLabels } from './utils/overlay'
 import { EVENTS, type DevmodeMode, type ForceState, type InspectPayload } from './constants'
 
 let mode: DevmodeMode = 'off'
@@ -277,6 +277,16 @@ const onClick = (e: MouseEvent) => {
   emit(pinnedEl)
 }
 
+const isTypingTarget = (target: EventTarget | null): boolean => {
+  if (!target) return false
+  const el = target as HTMLElement
+  if (!el.tagName) return false
+  const tag = el.tagName.toLowerCase()
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return true
+  if (el.isContentEditable) return true
+  return false
+}
+
 const onKey = (e: KeyboardEvent) => {
   // Alt+I toggles inspect
   if (e.altKey && (e.key === 'i' || e.key === 'I')) {
@@ -288,6 +298,13 @@ const onKey = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && mode === 'pin') {
     pinnedEl = null
     setMode(isTouchDevice() ? 'off' : 'live')
+  }
+  // `H` toggles redline labels(對齊 Chrome `Ctrl+hold` idiom — 暫清 label 看視覺對齊)。
+  // 只在 inspect mode active 且 user 不在 input field 才響應(避免打字撞鍵)。
+  if ((e.key === 'h' || e.key === 'H') && mode !== 'off' && !e.altKey && !e.metaKey && !e.ctrlKey
+      && !isTypingTarget(e.target)) {
+    e.preventDefault()
+    toggleLabels()
   }
   // Arrow keys walk DOM tree(when pinned;Chrome DevTools idiom)
   if (mode === 'pin' && pinnedEl) {

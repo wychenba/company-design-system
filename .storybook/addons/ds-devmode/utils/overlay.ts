@@ -28,6 +28,17 @@ interface DrawOptions {
   sibling?: Element | null
 }
 
+// Labels-hidden state — toggled via `H` key(對齊 Chrome `Ctrl+hold` idiom 暫時清空 redline
+// 數字看視覺對齊)。Module-level state 跨 element re-pin 持續。
+let labelsHidden = false
+export function toggleLabels(): boolean {
+  labelsHidden = !labelsHidden
+  const root = document.getElementById(OVERLAY_ID)
+  if (root) root.setAttribute('data-labels-hidden', String(labelsHidden))
+  return labelsHidden
+}
+export function getLabelsHidden(): boolean { return labelsHidden }
+
 const ensureRoot = (): HTMLElement => {
   let root = document.getElementById(OVERLAY_ID) as HTMLElement | null
   if (root) return root
@@ -37,7 +48,17 @@ const ensureRoot = (): HTMLElement => {
     position: fixed; inset: 0; pointer-events: none; z-index: 2147483647;
     font: 11px -apple-system, 'SF Pro Text', system-ui, sans-serif;
   `
+  if (labelsHidden) root.setAttribute('data-labels-hidden', 'true')
   document.body.appendChild(root)
+  // CSS rule:`H` 鍵切到 hidden 時 fade 全 redline 數字 label(class `__ds-label`),保留
+  //   line + outline + hatch。inject 一次即可,後續 ensureRoot 不重複插。
+  const STYLE_ID = '__ds_devmode_overlay_style__'
+  if (!document.getElementById(STYLE_ID)) {
+    const style = document.createElement('style')
+    style.id = STYLE_ID
+    style.textContent = `#${OVERLAY_ID}[data-labels-hidden="true"] .__ds-label { display: none !important; }`
+    document.head.appendChild(style)
+  }
   return root
 }
 
@@ -54,14 +75,17 @@ const makeDiv = (cssText: string, text?: string) => {
 const HALO_LABEL = '0 0 0 2px #fff, 0 1px 4px rgba(0,0,0,0.4)'
 const HALO_OUTLINE = '0 0 0 2px rgba(255,255,255,0.85), 0 0 0 4px rgba(0,0,0,0.15)'
 
-const distanceLabel = (value: number, left: string, top: string, transform: string) =>
-  makeDiv(
+const distanceLabel = (value: number, left: string, top: string, transform: string) => {
+  const d = makeDiv(
     `position:absolute;left:${left};top:${top};transform:${transform};
      background:#EC4436;color:#fff;padding:2px 7px;border-radius:3px;
      font-weight:700;font-size:11px;line-height:1.4;
      box-shadow:${HALO_LABEL};white-space:nowrap;z-index:1;`,
     String(Math.round(value)),
   )
+  d.className = '__ds-label'
+  return d
+}
 
 // Distance line — 2px solid + white halo box-shadow(取代 dashed 1px,visibility 強化)
 // 1px dashed 在 retina + busy bg 幾乎看不見;2px solid + halo 任何 bg 上都清楚。
@@ -395,6 +419,7 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
        box-shadow:0 2px 6px rgba(0,0,0,0.2);pointer-events:none;white-space:nowrap;`,
       label,
     )
+    badge.className = '__ds-label'
     // diamond icon
     const icon = makeDiv(
       `width:8px;height:8px;background:#fff;transform:rotate(45deg);display:inline-block;margin-right:2px;`,

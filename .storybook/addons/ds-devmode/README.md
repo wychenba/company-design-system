@@ -41,6 +41,7 @@
 | Pin 後 hover 別元素 | 顯 sibling distance(Figma-style)|
 | `Esc` | Unpin(back to Live;touch 回 Off) |
 | `↑↓←→` | 已 pin 時走 DOM tree |
+| `H` | Toggle redline labels(暫清數字看視覺對齊;對齊 Chrome `Ctrl+hold` idiom)|
 
 ## 你會看到什麼(範例)
 
