@@ -308,4 +308,22 @@ const MenuFooter = React.forwardRef<HTMLDivElement, MenuFooterProps>(
 )
 MenuFooter.displayName = 'MenuFooter'
 
+// Story auto-compile metadata — Phase 1+2 migration
+export const menuItemMeta = {
+  component: 'MenuItem',
+  family: 1,
+  variants: {},
+  sizes: {
+    sm: {},
+    md: {},
+    lg: {},
+  },
+  defaultSize: 'md',
+  states: ['default', 'hover', 'selected', 'focus-visible', 'disabled'],
+  tokens: {
+    bg: ['bg-neutral-hover', 'bg-neutral-selected'],
+    fg: ['text-fg-muted', 'text-fg-disabled'],
+  },
+} as const
+
 export { MenuItem, MenuGroup, MenuFooter, menuItemVariants }

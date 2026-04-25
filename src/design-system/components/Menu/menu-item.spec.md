@@ -1,3 +1,13 @@
+---
+component: MenuItem
+family: 1
+variants: {}
+sizes:
+  sm: {}
+  md: {}
+  lg: {}
+---
+
 # MenuItem 設計原則
 
 ## 定位

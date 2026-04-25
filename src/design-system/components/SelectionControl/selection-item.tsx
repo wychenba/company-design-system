@@ -240,4 +240,21 @@ const SelectionItem = React.forwardRef<HTMLDivElement, SelectionItemProps>(
 )
 SelectionItem.displayName = 'SelectionItem'
 
+// Story auto-compile metadata — Phase 1+2 migration
+export const selectionItemMeta = {
+  component: 'SelectionItem',
+  family: 2,
+  variants: {},
+  sizes: {
+    sm: {},
+    md: {},
+    lg: {},
+  },
+  defaultSize: 'md',
+  states: ['default', 'hover', 'selected', 'focus-visible', 'disabled'],
+  tokens: {
+    fg: ['text-foreground', 'text-fg-secondary', 'text-fg-disabled'],
+  },
+} as const
+
 export { SelectionItem }

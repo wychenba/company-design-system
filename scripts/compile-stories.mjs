@@ -42,8 +42,21 @@ function toKebab(name) {
 
 function compileOne(componentName) {
   const lowerKebab = toKebab(componentName)
-  const specPath = `${COMPONENTS_DIR}/${componentName}/${lowerKebab}.spec.md`
-  const tsxPath = `${COMPONENTS_DIR}/${componentName}/${lowerKebab}.tsx`
+  const folderDir = `${COMPONENTS_DIR}/${componentName}`
+  let specPath = `${folderDir}/${lowerKebab}.spec.md`
+  let tsxPath = `${folderDir}/${lowerKebab}.tsx`
+
+  // Multi-primitive folder convention(e.g. Menu/menu-item, SelectionControl/selection-item)—
+  // spec/tsx 檔名用 primitive 而非 folder kebab。Fall back:find *.spec.md in folder
+  // (exclude stories.tsx types),match same stem tsx。
+  if (!fs.existsSync(specPath) && fs.existsSync(folderDir)) {
+    const specFiles = fs.readdirSync(folderDir).filter(f => f.endsWith('.spec.md'))
+    if (specFiles.length === 1) {
+      const stem = specFiles[0].replace(/\.spec\.md$/, '')
+      specPath = `${folderDir}/${specFiles[0]}`
+      tsxPath = `${folderDir}/${stem}.tsx`
+    }
+  }
 
   if (!fs.existsSync(specPath) || !fs.existsSync(tsxPath)) {
     return { component: componentName, skipped: true, reason: 'spec or tsx missing' }

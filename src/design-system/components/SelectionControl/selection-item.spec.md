@@ -1,3 +1,13 @@
+---
+component: SelectionItem
+family: 2
+variants: {}
+sizes:
+  sm: {}
+  md: {}
+  lg: {}
+---
+
 # SelectionItem 設計原則
 
 ## 定位
