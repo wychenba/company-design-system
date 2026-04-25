@@ -32,18 +32,27 @@ const makeDiv = (cssText: string, text?: string) => {
   return d
 }
 
+// Visibility halo — 2px white shadow ring around elements ensures redlines /
+// outlines remain readable on any bg(white / dark / busy / colored)。
+// World-class 對照:Chrome ruler / Figma annotation / Photoshop guides 3+。
+const HALO_LABEL = '0 0 0 2px #fff, 0 1px 4px rgba(0,0,0,0.4)'
+const HALO_OUTLINE = '0 0 0 2px rgba(255,255,255,0.85), 0 0 0 4px rgba(0,0,0,0.15)'
+
 const distanceLabel = (value: number, left: string, top: string, transform: string) =>
   makeDiv(
     `position:absolute;left:${left};top:${top};transform:${transform};
-     background:#EC4436;color:#fff;padding:1px 6px;border-radius:3px;
-     font-weight:600;font-size:11px;line-height:1.4;
-     box-shadow:0 0 0 1px rgba(0,0,0,0.1);white-space:nowrap;`,
+     background:#EC4436;color:#fff;padding:2px 7px;border-radius:3px;
+     font-weight:700;font-size:11px;line-height:1.4;
+     box-shadow:${HALO_LABEL};white-space:nowrap;z-index:1;`,
     String(Math.round(value)),
   )
 
+// Distance line — 2px solid + white halo box-shadow(取代 dashed 1px,visibility 強化)
+// 1px dashed 在 retina + busy bg 幾乎看不見;2px solid + halo 任何 bg 上都清楚。
 const redLine = (cssText: string) =>
   makeDiv(
-    `position:absolute;background:repeating-linear-gradient(to right,#EC4436 0 4px,transparent 4px 7px);
+    `position:absolute;background:#EC4436;
+     box-shadow:0 0 0 1px rgba(255,255,255,0.85);
      ${cssText}`,
   )
 
@@ -86,7 +95,7 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
     makeDiv(
       `position:absolute;left:${b.left - 1}px;top:${b.top - 1}px;
        width:${b.width}px;height:${b.height}px;
-       border:1px solid #00A8B3;box-shadow:0 0 0 1px rgba(0,168,179,0.3);
+       border:2px solid #00A8B3;box-shadow:0 0 0 2px rgba(255,255,255,0.85), 0 0 0 4px rgba(0,168,179,0.25);
        box-sizing:content-box;pointer-events:none;`,
     ),
   )
@@ -100,7 +109,7 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
       const yBot = Math.min(a.bottom, b.bottom)
       const y = yTop <= yBot ? (yTop + yBot) / 2 : (a.top + a.bottom + b.top + b.bottom) / 4
       root.appendChild(
-        redLine(`left:${a.right}px;top:${y}px;width:${gap}px;height:1px;`),
+        redLine(`left:${a.right}px;top:${y}px;width:${gap}px;height:2px;`),
       )
       root.appendChild(
         distanceLabel(gap, `${a.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'),
@@ -114,7 +123,7 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
       const yBot = Math.min(a.bottom, b.bottom)
       const y = yTop <= yBot ? (yTop + yBot) / 2 : (a.top + a.bottom + b.top + b.bottom) / 4
       root.appendChild(
-        redLine(`left:${b.right}px;top:${y}px;width:${gap}px;height:1px;`),
+        redLine(`left:${b.right}px;top:${y}px;width:${gap}px;height:2px;`),
       )
       root.appendChild(
         distanceLabel(gap, `${b.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'),
@@ -132,8 +141,9 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
       const x = xLeft <= xRight ? (xLeft + xRight) / 2 : (a.left + a.right + b.left + b.right) / 4
       root.appendChild(
         makeDiv(
-          `position:absolute;left:${x}px;top:${a.bottom}px;width:1px;height:${gap}px;
-           background:repeating-linear-gradient(to bottom,#EC4436 0 4px,transparent 4px 7px);
+          `position:absolute;left:${x}px;top:${a.bottom}px;width:2px;height:${gap}px;
+           background:#EC4436;
+           box-shadow:0 0 0 1px rgba(255,255,255,0.85);
            pointer-events:none;`,
         ),
       )
@@ -150,8 +160,9 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
       const x = xLeft <= xRight ? (xLeft + xRight) / 2 : (a.left + a.right + b.left + b.right) / 4
       root.appendChild(
         makeDiv(
-          `position:absolute;left:${x}px;top:${b.bottom}px;width:1px;height:${gap}px;
-           background:repeating-linear-gradient(to bottom,#EC4436 0 4px,transparent 4px 7px);
+          `position:absolute;left:${x}px;top:${b.bottom}px;width:2px;height:${gap}px;
+           background:#EC4436;
+           box-shadow:0 0 0 1px rgba(255,255,255,0.85);
            pointer-events:none;`,
         ),
       )
@@ -183,7 +194,7 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
   const outline = makeDiv(
     `position:absolute;left:${rect.left - 1}px;top:${rect.top - 1}px;
      width:${rect.width}px;height:${rect.height}px;
-     border:1px solid #B668FF;box-shadow:0 0 0 1px rgba(182,104,255,0.3);
+     border:2px solid #B668FF;box-shadow:0 0 0 2px rgba(255,255,255,0.85), 0 0 0 4px rgba(182,104,255,0.25);
      box-sizing:content-box;`,
   )
   root.appendChild(outline)
@@ -226,16 +237,14 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
     const cx = rect.left + rect.width / 2
     // top
     if (rect.top > parent.top) {
-      root.appendChild(redLine(`left:${cx}px;top:${parent.top}px;width:1px;height:${rect.top - parent.top}px;
-        background:repeating-linear-gradient(to bottom,#EC4436 0 4px,transparent 4px 7px);`))
+      root.appendChild(redLine(`left:${cx}px;top:${parent.top}px;width:2px;height:${rect.top - parent.top}px;`))
       root.appendChild(
         distanceLabel(rect.top - parent.top, `${cx}px`, `${parent.top + (rect.top - parent.top) / 2}px`, 'translate(-50%,-50%)'),
       )
     }
     // bottom
     if (rect.bottom < parent.bottom) {
-      root.appendChild(redLine(`left:${cx}px;top:${rect.bottom}px;width:1px;height:${parent.bottom - rect.bottom}px;
-        background:repeating-linear-gradient(to bottom,#EC4436 0 4px,transparent 4px 7px);`))
+      root.appendChild(redLine(`left:${cx}px;top:${rect.bottom}px;width:2px;height:${parent.bottom - rect.bottom}px;`))
       root.appendChild(
         distanceLabel(
           parent.bottom - rect.bottom,
@@ -248,14 +257,14 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
     const cy = rect.top + rect.height / 2
     // left
     if (rect.left > parent.left) {
-      root.appendChild(redLine(`left:${parent.left}px;top:${cy}px;width:${rect.left - parent.left}px;height:1px;`))
+      root.appendChild(redLine(`left:${parent.left}px;top:${cy}px;width:${rect.left - parent.left}px;height:2px;`))
       root.appendChild(
         distanceLabel(rect.left - parent.left, `${parent.left + (rect.left - parent.left) / 2}px`, `${cy}px`, 'translate(-50%,-50%)'),
       )
     }
     // right
     if (rect.right < parent.right) {
-      root.appendChild(redLine(`left:${rect.right}px;top:${cy}px;width:${parent.right - rect.right}px;height:1px;`))
+      root.appendChild(redLine(`left:${rect.right}px;top:${cy}px;width:${parent.right - rect.right}px;height:2px;`))
       root.appendChild(
         distanceLabel(
           parent.right - rect.right,
