@@ -56,6 +56,44 @@ const redLine = (cssText: string) =>
      ${cssText}`,
   )
 
+/**
+ * T-cap(短 perpendicular line)在 distance line 兩端,讓起終點 unambiguous。
+ * World-class:Figma / Sketch / Zeplin / Adobe XD / CAD 5+ 家共識。
+ *
+ * Horizontal distance line(width=W,height=2px):兩端各加 vertical 短 stub
+ * Vertical distance line(width=2px,height=H):兩端各加 horizontal 短 stub
+ *
+ * cap-length = 8px(視覺平衡,不擋元素也不太短)
+ */
+const T_CAP = 8
+
+const tCapVertical = (centerX: number, centerY: number) =>
+  makeDiv(
+    `position:absolute;left:${centerX - 1}px;top:${centerY - T_CAP / 2}px;
+     width:2px;height:${T_CAP}px;background:#EC4436;
+     box-shadow:0 0 0 1px rgba(255,255,255,0.85);pointer-events:none;`,
+  )
+
+const tCapHorizontal = (centerX: number, centerY: number) =>
+  makeDiv(
+    `position:absolute;left:${centerX - T_CAP / 2}px;top:${centerY - 1}px;
+     width:${T_CAP}px;height:2px;background:#EC4436;
+     box-shadow:0 0 0 1px rgba(255,255,255,0.85);pointer-events:none;`,
+  )
+
+/**
+ * Dimension extension line(從元素邊延伸的短 perpendicular line)。
+ * CAD / drafting / Chrome DevTools 慣例,讓「測量從哪元素邊出發」一目了然。
+ * 比 distance line 更細(1px,半透明)避免 noise,但仍 visible halo。
+ */
+const EXTENSION_LEN = 6
+const extensionLine = (cssText: string) =>
+  makeDiv(
+    `position:absolute;background:rgba(236,68,54,0.5);
+     box-shadow:0 0 0 1px rgba(255,255,255,0.7);
+     ${cssText}`,
+  )
+
 const paddingHatch = (left: number, top: number, width: number, height: number) => {
   if (width <= 0 || height <= 0) return null
   return makeDiv(
@@ -100,7 +138,7 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
     ),
   )
 
-  // Horizontal axis(左 / 右)
+  // Horizontal axis(左 / 右)— T-caps + extension lines + main line + label
   if (b.left >= a.right) {
     // B 在 A 右邊
     const gap = b.left - a.right
@@ -108,12 +146,23 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
       const yTop = Math.max(a.top, b.top)
       const yBot = Math.min(a.bottom, b.bottom)
       const y = yTop <= yBot ? (yTop + yBot) / 2 : (a.top + a.bottom + b.top + b.bottom) / 4
-      root.appendChild(
-        redLine(`left:${a.right}px;top:${y}px;width:${gap}px;height:2px;`),
-      )
-      root.appendChild(
-        distanceLabel(gap, `${a.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'),
-      )
+      // Main horizontal line
+      root.appendChild(redLine(`left:${a.right}px;top:${y}px;width:${gap}px;height:2px;`))
+      // T-caps at both endpoints
+      root.appendChild(tCapVertical(a.right, y))
+      root.appendChild(tCapVertical(b.left, y))
+      // Extension lines from element edges(若 measurement y 不在 element vertical 範圍內才畫)
+      if (y < a.top || y > a.bottom) {
+        const eyTop = Math.min(a.bottom, y)
+        const eyBot = Math.max(a.bottom, y)
+        root.appendChild(extensionLine(`left:${a.right - 1}px;top:${eyTop}px;width:2px;height:${eyBot - eyTop}px;`))
+      }
+      if (y < b.top || y > b.bottom) {
+        const eyTop = Math.min(b.top, y)
+        const eyBot = Math.max(b.top, y)
+        root.appendChild(extensionLine(`left:${b.left - 1}px;top:${eyTop}px;width:2px;height:${eyBot - eyTop}px;`))
+      }
+      root.appendChild(distanceLabel(gap, `${a.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'))
     }
   } else if (b.right <= a.left) {
     // B 在 A 左邊
@@ -122,16 +171,24 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
       const yTop = Math.max(a.top, b.top)
       const yBot = Math.min(a.bottom, b.bottom)
       const y = yTop <= yBot ? (yTop + yBot) / 2 : (a.top + a.bottom + b.top + b.bottom) / 4
-      root.appendChild(
-        redLine(`left:${b.right}px;top:${y}px;width:${gap}px;height:2px;`),
-      )
-      root.appendChild(
-        distanceLabel(gap, `${b.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'),
-      )
+      root.appendChild(redLine(`left:${b.right}px;top:${y}px;width:${gap}px;height:2px;`))
+      root.appendChild(tCapVertical(b.right, y))
+      root.appendChild(tCapVertical(a.left, y))
+      if (y < a.top || y > a.bottom) {
+        const eyTop = Math.min(a.top, y)
+        const eyBot = Math.max(a.top, y)
+        root.appendChild(extensionLine(`left:${a.left - 1}px;top:${eyTop}px;width:2px;height:${eyBot - eyTop}px;`))
+      }
+      if (y < b.top || y > b.bottom) {
+        const eyTop = Math.min(b.bottom, y)
+        const eyBot = Math.max(b.bottom, y)
+        root.appendChild(extensionLine(`left:${b.right - 1}px;top:${eyTop}px;width:2px;height:${eyBot - eyTop}px;`))
+      }
+      root.appendChild(distanceLabel(gap, `${b.right + gap / 2}px`, `${y}px`, 'translate(-50%,-50%)'))
     }
   }
 
-  // Vertical axis(上 / 下)
+  // Vertical axis(上 / 下)— T-caps + extension lines + main line + label
   if (b.top >= a.bottom) {
     // B 在 A 下方
     const gap = b.top - a.bottom
@@ -142,14 +199,22 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
       root.appendChild(
         makeDiv(
           `position:absolute;left:${x}px;top:${a.bottom}px;width:2px;height:${gap}px;
-           background:#EC4436;
-           box-shadow:0 0 0 1px rgba(255,255,255,0.85);
-           pointer-events:none;`,
+           background:#EC4436;box-shadow:0 0 0 1px rgba(255,255,255,0.85);pointer-events:none;`,
         ),
       )
-      root.appendChild(
-        distanceLabel(gap, `${x}px`, `${a.bottom + gap / 2}px`, 'translate(-50%,-50%)'),
-      )
+      root.appendChild(tCapHorizontal(x, a.bottom))
+      root.appendChild(tCapHorizontal(x, b.top))
+      if (x < a.left || x > a.right) {
+        const exLeft = Math.min(a.right, x)
+        const exRight = Math.max(a.right, x)
+        root.appendChild(extensionLine(`left:${exLeft}px;top:${a.bottom - 1}px;height:2px;width:${exRight - exLeft}px;`))
+      }
+      if (x < b.left || x > b.right) {
+        const exLeft = Math.min(b.left, x)
+        const exRight = Math.max(b.left, x)
+        root.appendChild(extensionLine(`left:${exLeft}px;top:${b.top - 1}px;height:2px;width:${exRight - exLeft}px;`))
+      }
+      root.appendChild(distanceLabel(gap, `${x}px`, `${a.bottom + gap / 2}px`, 'translate(-50%,-50%)'))
     }
   } else if (b.bottom <= a.top) {
     // B 在 A 上方
@@ -161,14 +226,22 @@ function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
       root.appendChild(
         makeDiv(
           `position:absolute;left:${x}px;top:${b.bottom}px;width:2px;height:${gap}px;
-           background:#EC4436;
-           box-shadow:0 0 0 1px rgba(255,255,255,0.85);
-           pointer-events:none;`,
+           background:#EC4436;box-shadow:0 0 0 1px rgba(255,255,255,0.85);pointer-events:none;`,
         ),
       )
-      root.appendChild(
-        distanceLabel(gap, `${x}px`, `${b.bottom + gap / 2}px`, 'translate(-50%,-50%)'),
-      )
+      root.appendChild(tCapHorizontal(x, b.bottom))
+      root.appendChild(tCapHorizontal(x, a.top))
+      if (x < a.left || x > a.right) {
+        const exLeft = Math.min(a.left, x)
+        const exRight = Math.max(a.left, x)
+        root.appendChild(extensionLine(`left:${exLeft}px;top:${a.top - 1}px;height:2px;width:${exRight - exLeft}px;`))
+      }
+      if (x < b.left || x > b.right) {
+        const exLeft = Math.min(b.right, x)
+        const exRight = Math.max(b.right, x)
+        root.appendChild(extensionLine(`left:${exLeft}px;top:${b.bottom - 1}px;height:2px;width:${exRight - exLeft}px;`))
+      }
+      root.appendChild(distanceLabel(gap, `${x}px`, `${b.bottom + gap / 2}px`, 'translate(-50%,-50%)'))
     }
   }
 }
@@ -231,13 +304,15 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
   if (pad.right >= 10)
     root.appendChild(paddingLabel(pad.right, rect.right - pad.right / 2, rect.top + rect.height / 2))
 
-  // 3. Distance to parent (red lines + labels)
+  // 3. Distance to parent (red lines + T-caps + labels)
   if (parent) {
     // vertical line through element center to top/bottom
     const cx = rect.left + rect.width / 2
     // top
     if (rect.top > parent.top) {
       root.appendChild(redLine(`left:${cx}px;top:${parent.top}px;width:2px;height:${rect.top - parent.top}px;`))
+      root.appendChild(tCapHorizontal(cx, parent.top))
+      root.appendChild(tCapHorizontal(cx, rect.top))
       root.appendChild(
         distanceLabel(rect.top - parent.top, `${cx}px`, `${parent.top + (rect.top - parent.top) / 2}px`, 'translate(-50%,-50%)'),
       )
@@ -245,6 +320,8 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
     // bottom
     if (rect.bottom < parent.bottom) {
       root.appendChild(redLine(`left:${cx}px;top:${rect.bottom}px;width:2px;height:${parent.bottom - rect.bottom}px;`))
+      root.appendChild(tCapHorizontal(cx, rect.bottom))
+      root.appendChild(tCapHorizontal(cx, parent.bottom))
       root.appendChild(
         distanceLabel(
           parent.bottom - rect.bottom,
@@ -258,6 +335,8 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
     // left
     if (rect.left > parent.left) {
       root.appendChild(redLine(`left:${parent.left}px;top:${cy}px;width:${rect.left - parent.left}px;height:2px;`))
+      root.appendChild(tCapVertical(parent.left, cy))
+      root.appendChild(tCapVertical(rect.left, cy))
       root.appendChild(
         distanceLabel(rect.left - parent.left, `${parent.left + (rect.left - parent.left) / 2}px`, `${cy}px`, 'translate(-50%,-50%)'),
       )
@@ -265,6 +344,8 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
     // right
     if (rect.right < parent.right) {
       root.appendChild(redLine(`left:${rect.right}px;top:${cy}px;width:${parent.right - rect.right}px;height:2px;`))
+      root.appendChild(tCapVertical(rect.right, cy))
+      root.appendChild(tCapVertical(parent.right, cy))
       root.appendChild(
         distanceLabel(
           parent.right - rect.right,
