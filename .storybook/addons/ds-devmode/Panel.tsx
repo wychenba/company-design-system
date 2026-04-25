@@ -367,11 +367,14 @@ const Section: React.FC<{
 }
 
 const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
-  const { distancesToParent, padding, margin, rect } = payload
+  const { distancesToParent, padding, margin, border, rect } = payload
   const w = Math.round(rect.width)
   const h = Math.round(rect.height)
-  const iw = Math.max(0, w - padding.left - padding.right)
-  const ih = Math.max(0, h - padding.top - padding.bottom)
+  // Content size = rect - border - padding(對齊 Chrome DevTools box model 第 4 層 inner-most)。
+  // 之前未扣 border → 有 border 元件(Tag / FileItem rich / Input)content size 偏大 2px,
+  // 跟 Storybook addon-measure(扣 border)對不上;修正使我們 = Chrome = addon-measure 三方一致。
+  const iw = Math.max(0, w - padding.left - padding.right - border.left - border.right)
+  const ih = Math.max(0, h - padding.top - padding.bottom - border.top - border.bottom)
   // Margin layer container — Chrome 4-rect box model:margin → border → padding → content
   const marginOuter: React.CSSProperties = {
     position: 'relative',
@@ -403,7 +406,11 @@ const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
           </>
         )}
         <div style={styles.borderBox}>
-          <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px' }}>Border</span>
+          <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px' }}>
+            {border.top || border.right || border.bottom || border.left
+              ? `Border ${border.top}/${border.right}/${border.bottom}/${border.left}`
+              : 'Border'}
+          </span>
           <span style={{ ...styles.edgeLabel, color: '#0065EA' }}>{padding.left}</span>
           <div style={styles.paddingBox}>
             <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px', color: '#0065EA' }}>
@@ -414,7 +421,10 @@ const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
             <span style={{ ...styles.edgeLabel, position: 'absolute', top: 4, left: '50%', transform: 'translateX(-50%)', color: '#0065EA' }}>
               {padding.top}
             </span>
-            <span style={{ color: 'var(--sb-fg, #1F2532)', fontWeight: 500 }}>{`${iw} × ${ih}`}</span>
+            <span style={{ color: 'var(--sb-fg, #1F2532)', fontWeight: 500, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+              <span>{`${iw} × ${ih}`}</span>
+              <span style={{ fontSize: 9, color: 'var(--sb-fg-muted, #65727F)', fontWeight: 400 }}>content</span>
+            </span>
             {/* Padding bottom — center 下方 */}
             <span style={{ ...styles.edgeLabel, position: 'absolute', bottom: 4, left: '50%', transform: 'translateX(-50%)', color: '#0065EA' }}>
               {padding.bottom}
@@ -423,7 +433,7 @@ const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
           <span style={{ ...styles.edgeLabel, color: '#0065EA' }}>{padding.right}</span>
         </div>
         <div style={{ position: 'absolute', bottom: 6, right: 10, fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>
-          border-box
+          {w} × {h} <span style={{ opacity: 0.7 }}>(border-box)</span>
         </div>
       </div>
     </div>
