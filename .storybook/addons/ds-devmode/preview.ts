@@ -224,8 +224,18 @@ const computeSiblingDistance = (
 }
 
 const emit = (el: Element, sibling: Element | null = null) => {
+  // Defensive:storybook 切 story 會 unmount 舊 subtree → pinnedEl detached。
+  // detached element 的 getBoundingClientRect 全 0 + matches() 拋錯,直接清空 overlay 並
+  // 重置 pin state(否則 panel 顯 0 × 0 的 ghost,user 困惑)。
+  if (!el.isConnected) {
+    if (pinnedEl === el) pinnedEl = null
+    if (siblingHoverEl === el) siblingHoverEl = null
+    if (hoverEl === el) hoverEl = null
+    clearOverlay()
+    return
+  }
   const payload = build(el)
-  if (sibling && sibling !== el) {
+  if (sibling && sibling.isConnected && sibling !== el) {
     payload.siblingDistance = computeSiblingDistance(el.getBoundingClientRect(), sibling.getBoundingClientRect())
   }
   channel.emit(EVENTS.INSPECT, payload)
@@ -233,7 +243,7 @@ const emit = (el: Element, sibling: Element | null = null) => {
     element: el,
     mode: mode === 'pin' ? 'pin' : 'live',
     label: payload.id ? `#${payload.id}` : payload.className ? `.${String(payload.className).split(/\s+/)[0]}` : payload.tag,
-    sibling,
+    sibling: sibling && sibling.isConnected ? sibling : null,
   })
 }
 
