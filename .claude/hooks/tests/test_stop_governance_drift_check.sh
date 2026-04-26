@@ -65,7 +65,8 @@ yes '.' | head -850 > CLAUDE.md
 git add CLAUDE.md
 git commit -q -m "huge"
 run_hook
-if [ "$EXIT" = "0" ] && echo "$STDOUT" | grep -q "transition cap" && echo "$STDOUT" | grep -q "REQUIRED"; then
+LOG="$TMP_PROJ/.claude/logs/governance-drift.jsonl"
+if [ "$EXIT" = "0" ] && [ -f "$LOG" ] && grep -q "transition cap" "$LOG"; then
   echo "  PASS  Test 2 transition-cap warn injected"; PASS=$((PASS+1))
 else
   echo "  FAIL  Test 2 (exit=$EXIT, output=${STDOUT:0:200})"
@@ -83,7 +84,8 @@ yes '.' | head -650 > CLAUDE.md
 git add CLAUDE.md
 git commit -q -m "warn"
 run_hook
-if [ "$EXIT" = "0" ] && echo "$STDOUT" | grep -q "strong-warn"; then
+LOG="$TMP_PROJ/.claude/logs/governance-drift.jsonl"
+if [ "$EXIT" = "0" ] && [ -f "$LOG" ] && grep -q "strong-warn" "$LOG"; then
   echo "  PASS  Test 3 strong-warn injected"; PASS=$((PASS+1))
 else
   echo "  FAIL  Test 3 (exit=$EXIT, output=${STDOUT:0:200})"
@@ -101,7 +103,8 @@ git commit -q -m "init claude.md"
 echo "$(git rev-parse HEAD)" > .claude/logs/.stop-drift-last-head
 yes '.' | head -650 > CLAUDE.md
 run_hook
-if [ "$EXIT" = "0" ] && echo "$STDOUT" | grep -q "strong-warn"; then
+LOG="$TMP_PROJ/.claude/logs/governance-drift.jsonl"
+if [ "$EXIT" = "0" ] && [ -f "$LOG" ] && grep -q "strong-warn" "$LOG"; then
   echo "  PASS  Test 4 unstaged edit warning"; PASS=$((PASS+1))
 else
   echo "  FAIL  Test 4 (exit=$EXIT, output=${STDOUT:0:200})"

@@ -91,11 +91,12 @@ fi
 # 沒 warning → silent exit
 [ -z "$WARNINGS" ] && exit 0
 
-# Inject warning to next-turn context
-cat <<EOJSON
-{"hookSpecificOutput":{"hookEventName":"Stop","additionalContext":$(jq -Rs . <<<"⚠️ Governance drift detected after this turn:${WARNINGS}
-
-Action: 下一輪 user response 前考慮 invoke 對應 skill(/knowledge-prune / /codify-corrections),不 silent defer。對齊 M14 + M19。")}}
-EOJSON
+# Stop hooks 的 JSON schema 不接受 hookSpecificOutput.additionalContext
+# (只 SessionStart/PostToolUse/UserPromptSubmit 接受)→ silent log-to-file
+mkdir -p "$PROJECT_DIR/.claude/logs" 2>/dev/null
+printf '{"ts":"%s","warnings":%s}\n' \
+  "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  "$(printf '%b' "$WARNINGS" | jq -Rs .)" \
+  >> "$PROJECT_DIR/.claude/logs/governance-drift.jsonl" 2>/dev/null || true
 
 exit 0

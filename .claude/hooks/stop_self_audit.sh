@@ -104,19 +104,13 @@ fi
 # Silent if nothing
 [ -z "$WARNINGS" ] && exit 0
 
-# Inject MAXIMUM-strength warning to next-turn context
-# (Stop hook 無法 BLOCK exit code,但用 STRONG language 強制下輪 priority address)
-cat <<EOJSON
-{"hookSpecificOutput":{"hookEventName":"Stop","additionalContext":$(jq -Rs . <<<"🚨 BLOCKER — Self-audit detected violations:${WARNINGS}
-
-⛔ MANDATORY action(下輪 must 在做其他事前 address):
-1. 對每個 violation 採取 corrective action OR 明確解釋為何不適用
-2. **禁止** silent skip / defer / 「等 user 確認」(M19 違反)
-3. CI(.github/workflows/ci.yml)會 fail push if any threshold breached — 不靠 local discipline
-4. Verify 失敗 → 撤回 prior claim,重做不再 claim done 直到實跑
-
-對齊 M14(自動 integrate)+ M19(trigger phrase auto pipeline)mechanical 落地。
-本 hook 是 last-line warn 防線;CI 是 hard block;兩者 defense-in-depth。")}}
-EOJSON
+# Stop hooks 的 JSON schema 不接受 hookSpecificOutput.additionalContext
+# (only SessionStart/PostToolUse/UserPromptSubmit do)。改 silent log-to-file
+# + exit 0 — 警告寫 .claude/logs/self-audit-warnings.jsonl,user 不被打擾。
+mkdir -p "$PROJECT_DIR/.claude/logs" 2>/dev/null
+printf '{"ts":"%s","warnings":%s}\n' \
+  "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  "$(printf '%b' "$WARNINGS" | jq -Rs .)" \
+  >> "$PROJECT_DIR/.claude/logs/self-audit-warnings.jsonl" 2>/dev/null || true
 
 exit 0

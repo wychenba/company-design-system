@@ -62,18 +62,14 @@ fi
 # Silent if all green
 [ -z "$WARNINGS" ] && exit 0
 
-# Inject MAXIMUM-strength self-improve prompt(forces AI to act WITHOUT user asking)
-cat <<EOJSON
-{"hookSpecificOutput":{"hookEventName":"Stop","additionalContext":$(jq -Rs . <<<"🤖 META SELF-AUDIT — Best-practice score ${CURRENT_SCORE}/100(prev ${PREV_SCORE}):${WARNINGS}
-
-⛔ MANDATORY self-improve(下輪 must address before user reply):
-1. 識別哪 dimension 退化 + root cause
-2. 採取 corrective action(prune / refactor / fix / add test)
-3. 跑 \`node scripts/score-infra-best-practice.mjs\` 確認 score 升回 ≥ 80
-4. **禁止** silent skip / 等 user 提醒 — 本 hook 設計就是讓你自問自答
-
-對齊 user mandate「我可以再也不用問你」+ M14 mechanical 落地 + M19 auto-pipeline。
-本 hook 是 final-line:integrated mechanism for AI 永遠 self-improve without prompting。")}}
-EOJSON
+# Stop hooks 的 JSON schema 不接受 hookSpecificOutput.additionalContext
+# (only SessionStart/PostToolUse/UserPromptSubmit do)。改 silent log-to-file
+# + exit 0 — score regression 寫 .claude/logs/score-history.jsonl,user 不被打擾。
+mkdir -p "$PROJECT_DIR/.claude/logs" 2>/dev/null
+printf '{"ts":"%s","score":%s,"prev":%s,"warnings":%s}\n' \
+  "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  "$CURRENT_SCORE" "$PREV_SCORE" \
+  "$(printf '%b' "$WARNINGS" | jq -Rs .)" \
+  >> "$PROJECT_DIR/.claude/logs/score-history.jsonl" 2>/dev/null || true
 
 exit 0
