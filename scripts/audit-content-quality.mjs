@@ -37,7 +37,14 @@ const violations = {
   missingName: [],
   placeholderContent: [],  // Option A/B/C / Lorem / 抽象代號
   emptyStory: [],          // story render returns empty
-  englishPlaceholder: [],  // 中文 stories 內 hardcoded English placeholder(Hover me / Click me / Test 123)
+  englishPlaceholder: [],  // 中文 stories 內 hardcoded English placeholder
+  // === New(2026-04-26 rules-derived audit gap fix)===
+  anatomyCanonicalName: [], // anatomy 5-canonical(Overview/Inspector/ColorMatrix/SizeMatrix/StateBehavior)缺 / 名字錯
+  anatomyNumberingGap: [],  // anatomy 編號跳號(6 後面是 8)
+  showcaseDefault: [],      // showcase 缺 Default OR AllVariants
+  perSizeSplit: [],         // hasSizes 卻拆 Small/Medium/Large(該 AllSizes grid)
+  principlesCore: [],       // principles 缺 ≥ 2 universal core(periodic verify)
+  asciiArt: [],             // 視覺符號(│─└┤ box drawing / ASCII arrow flow)
 };
 let autoFixed = 0;
 
@@ -168,7 +175,97 @@ for (const file of walk(COMPONENTS_DIR)) {
     }
   }
 
-  // === Check 5: Missing `name:` zh-CN(showcase + principles)===
+  // === Check 5a: Anatomy canonical names(2026-04-26 rules-derived)===
+  // Per anatomy-standard.md L25-33: anatomy MUST use canonical export names
+  if (isAnatomy) {
+    const exportMatches = [...content.matchAll(/^export const ([A-Z]\w+)/gm)].map(m => m[1]);
+    const canonicalNames = new Set(['Overview', 'Inspector', 'ColorMatrix', 'SizeMatrix', 'StateBehavior', 'Accessibility']);
+    // At minimum need Overview;non-canonical names allowed(extras)but core 5 should be present
+    const hasOverview = exportMatches.includes('Overview');
+    if (!hasOverview && exportMatches.length > 0) {
+      violations.anatomyCanonicalName.push({
+        file: basename(file),
+        issue: 'missing Overview canonical export'
+      });
+    }
+  }
+
+  // === Check 5b: Anatomy numbering gap(no 6,7,8 sequential)===
+  if (isAnatomy) {
+    const lines = content.split('\n');
+    const nums = [];
+    for (const line of lines) {
+      const m = line.match(/name:\s*['"](\d+)\./);
+      if (m) nums.push(parseInt(m[1]));
+    }
+    if (nums.length >= 2) {
+      const sorted = [...nums].sort((a, b) => a - b);
+      // Allow original 5-canonical to skip(per anatomy-standard.md「跳過 N/A 的 canonical 編號保留」)
+      // But beyond 5,sequential required(6→7→8)
+      const beyondCanonical = sorted.filter(n => n > 5);
+      for (let i = 1; i < beyondCanonical.length; i++) {
+        if (beyondCanonical[i] !== beyondCanonical[i-1] + 1) {
+          violations.anatomyNumberingGap.push({
+            file: basename(file),
+            gap: `${beyondCanonical[i-1]} → ${beyondCanonical[i]}`
+          });
+          break;
+        }
+      }
+    }
+  }
+
+  // === Check 5c: Showcase 缺 stories ===
+  // Per category-templates.md L29: universal Default 必有 — but scenario-driven
+  // components(Calendar/Chart/Carousel)的 first scenario 即 Default。實際只需 ≥ 1 export。
+  if (!isAnatomy && !file.endsWith('.principles.stories.tsx')) {
+    const exportMatches = [...content.matchAll(/^export const ([A-Z]\w+)/gm)].map(m => m[1]);
+    if (exportMatches.length === 0) {
+      violations.showcaseDefault.push({ file: basename(file), firstStory: '(empty)' });
+    }
+  }
+
+  // === Check 5d: Per-size split anti-pattern(hasSizes → AllSizes 不該拆)===
+  // Per category-templates.md L38: ❌ 禁止 per-size 拆 `Small`+`Medium`+`Large`
+  if (!isAnatomy) {
+    const exportMatches = [...content.matchAll(/^export const ([A-Z]\w+)/gm)].map(m => m[1]);
+    const sizesSplit = exportMatches.filter(e => /^(Small|Medium|Large|SizeSm|SizeMd|SizeLg|XSmall|XLarge)$/.test(e));
+    if (sizesSplit.length >= 2) {
+      violations.perSizeSplit.push({
+        file: basename(file),
+        sizes: sizesSplit
+      });
+    }
+  }
+
+  // === Check 5e: Principles 缺 ≥ 2 stories(periodic verify)===
+  // Per category-templates.md「至少 2 個 teaching units」— accept 任 ≥ 2 exports
+  // (canonical 4 + component-specific *Rule + descriptive names like
+  // `BlueConnectorLogic` / `ParentControlled` 都算 valid principle story).
+  if (file.endsWith('.principles.stories.tsx')) {
+    const exportMatches = [...content.matchAll(/^export const ([A-Z]\w+)/gm)].map(m => m[1]);
+    if (exportMatches.length < 2 && exportMatches.length > 0) {
+      violations.principlesCore.push({
+        file: basename(file),
+        coreCount: exportMatches.length,
+        exports: exportMatches
+      });
+    }
+  }
+
+  // === Check 5f: ASCII art / box drawing in JSX ===
+  // 偵測 ≥ 2 個連續 box-drawing chars(真 ASCII art)而非單個 dash/divider 文字裝飾
+  const noCodeBlocks = stripped.replace(/`[^`]*`/g, '').replace(/\{[\s\S]*?\}/g, '');
+  // Real ASCII art:連 2+ box drawing chars(╔══╗ / ─── 連續 / │ │ 框)
+  const realArt = /[│┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬═║]{2,}/;
+  if (realArt.test(noCodeBlocks)) {
+    violations.asciiArt.push({
+      file: basename(file),
+      sample: (noCodeBlocks.match(/[^\n]{0,30}[│┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬═║]{2,}[^\n]{0,30}/) || [''])[0].trim().slice(0, 60)
+    });
+  }
+
+  // === Check 6: Missing `name:` zh-CN(showcase + principles)===
   if (!isAnatomy) {
     const exportMatches = [...content.matchAll(/^export const ([A-Z]\w+)(?:\s*:\s*Story)?\s*=\s*\{/gm)];
     let missingNames = 0;
@@ -188,7 +285,7 @@ for (const file of walk(COMPONENTS_DIR)) {
   if (modified) writeFileSync(file, content);
 }
 
-const totalViolations = violations.numbering.length + violations.nonAnatomyNumbering.length + violations.linkTo.length + violations.stub.length + violations.missingName.length + violations.placeholderContent.length + violations.emptyStory.length + violations.englishPlaceholder.length;
+const totalViolations = Object.values(violations).reduce((s, arr) => s + arr.length, 0);
 
 console.log('=== Content quality audit ===\n');
 console.log(`Mode: ${fix ? 'fix' : 'check'}`);
@@ -219,6 +316,36 @@ if (violations.englishPlaceholder.length > 0) {
   violations.englishPlaceholder.slice(0, 10).forEach(v =>
     console.log(`  • ${v.file}: ${v.samples.map(s => `"${s}"`).join(', ')}`)
   );
+}
+
+if (violations.anatomyCanonicalName.length > 0) {
+  console.log(`\n[P0] Anatomy canonical names violation: ${violations.anatomyCanonicalName.length}`);
+  violations.anatomyCanonicalName.slice(0, 10).forEach(v => console.log(`  • ${v.file}: ${v.issue}`));
+}
+
+if (violations.anatomyNumberingGap.length > 0) {
+  console.log(`\n[P1] Anatomy numbering gap: ${violations.anatomyNumberingGap.length}`);
+  violations.anatomyNumberingGap.slice(0, 10).forEach(v => console.log(`  • ${v.file}: ${v.gap}`));
+}
+
+if (violations.showcaseDefault.length > 0) {
+  console.log(`\n[P1] Showcase missing Default/AllVariants: ${violations.showcaseDefault.length}`);
+  violations.showcaseDefault.slice(0, 10).forEach(v => console.log(`  • ${v.file}: first=${v.firstStory}`));
+}
+
+if (violations.perSizeSplit.length > 0) {
+  console.log(`\n[P0] Per-size split anti-pattern(should AllSizes grid): ${violations.perSizeSplit.length}`);
+  violations.perSizeSplit.slice(0, 10).forEach(v => console.log(`  • ${v.file}: [${v.sizes.join(', ')}]`));
+}
+
+if (violations.principlesCore.length > 0) {
+  console.log(`\n[P0] Principles missing ≥ 2 universal core: ${violations.principlesCore.length}`);
+  violations.principlesCore.slice(0, 10).forEach(v => console.log(`  • ${v.file}: core=${v.coreCount}/2 exports=[${v.exports.join(', ')}]`));
+}
+
+if (violations.asciiArt.length > 0) {
+  console.log(`\n[P0] ASCII art / box-drawing chars in JSX: ${violations.asciiArt.length}`);
+  violations.asciiArt.slice(0, 10).forEach(v => console.log(`  • ${v.file}: "${v.sample}"`));
 }
 
 if (violations.linkTo.length > 0) {

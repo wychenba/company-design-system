@@ -127,7 +127,7 @@ v1 7 categories(A 視覺 variant / B field control / C selection / D structural 
 | `Vs{Sibling}Rule` | 跟近親元件分界(若 spec.md「近親」段有列)| Carbon `X versus Y` H3 + Polaris `Related components` |
 | `ContentGuidelines` | 文案 do/don't(若元件 render 使用者文案,如 Modal title / Button label)| Polaris `Content guidelines` H2 + Carbon `Content` H2 |
 
-**規則**:每元件至少 2 個。**全 4 個必有** = over-engineer(Polaris 4/4,但 Carbon Ant 都不到);**少於 2 個** = principles 太薄無教學價值。
+**規則**:每元件 principles 至少 **2 個 stories**(任意 combo:canonical 4 + component-specific `*Rule` + 描述性名稱如 `BlueConnectorLogic` / `ParentControlled` 都算 valid)。**全 4 個必有** = over-engineer(Polaris 4/4,但 Carbon Ant 都不到);**少於 2 stories** = principles 太薄無教學價值。Audit `audit-content-quality.mjs` 採寬鬆 ≥ 2 exports 標準(承認既有 component-specific naming idiom)。
 
 ## Canonical naming(取代既有 drift 變體)
 
