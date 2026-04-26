@@ -8,7 +8,7 @@
 
 **核心特徵**:**只在 user invoke 時載入**(不佔每 session context);流程包含 checkpoint 讓 user 介入決策。
 
-## 當前居民(18 skills,2026-04-25)
+## 當前居民(19 skills,2026-04-26)
 
 **Audit / Quality(6)**:
 | Skill | Invoke 時機 | Scope |
@@ -33,12 +33,13 @@
 | `story-writing/` | 「寫 story / 補 anatomy / principles story」 | 6-story 結構 + 範例品質 |
 | `story-auto-compile-migrate/` | 「migrate 元件到 auto-compile」/ auto-chained by audit Dim 23 | 批次加 `componentMeta` export + spec YAML frontmatter(Phase 1+2 migration) |
 
-**Governance(5)**:
+**Governance(6)**:
 | `knowledge-prune/` | 季度 / CLAUDE.md > 800 / MEMORY.md > 20 / audit 報 sprawl | 治理冗贅深度 prune |
 | `governance-health/` | 月度 / auto-chain by audit | continuous metric monitor + auto-propose |
 | `propose-options/` | 給 option A/B/C 前必走 M18 4-Q gate | M8 benchmark / M17 SSOT / Rule-of-3 / M10 下游 |
 | `scan-similar-bugs/` | 修 bug 後 M10 mechanical exhaustive scan | DS-wide 同類 bug 全清 |
 | `codify-corrections/` | user 糾正後 codify 到正確 home(memory / CLAUDE.md / spec / hook) | 跨 home 路由 |
+| `ensure-canonical/` | user 說「確保 X 一定要 / 永不漂移」trigger phrase(M19)| 自動規劃 5-layer defense-in-depth(canonical+hook+skill+audit+verify),至少 3 層落地 |
 
 ## 這裡**不收**(反例 + 正確去處)
 
