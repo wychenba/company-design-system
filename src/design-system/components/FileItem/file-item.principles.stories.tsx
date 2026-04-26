@@ -30,10 +30,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 FileItem ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 FileItem 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -53,6 +58,38 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 不用 FileItem 做純連結展示（已上傳檔案）"
+        note="FileItem 承載上傳狀態、進度、錯誤。靜態檔名列表改用 LinkInput 或純 <a> 連結。Google Drive 的「最近開啟」是檔案卡片，不用 FileItem"
+      >
+        <Label warn>靜態檔名 → LinkInput / &lt;a&gt;，FileItem 只用上傳流程</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 FileItem 做下載進度"
+        note="FileItem 專為上傳設計。下載進度改用自訂 progress component 或瀏覽器原生下載 UI。Figma 的資源下載不用 FileItem"
+      >
+        <Label warn>下載進度 → 自訂或瀏覽器原生，FileItem 只管上傳</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 FileItem 做相片 / 影片 gallery"
+        note="Gallery 需要 grid 佈局、大圖縮圖。FileItem 是清單單行。改用 grid / Carousel。Instagram 的相簿是 grid，不是 FileItem"
+      >
+        <Label warn>Gallery → grid / Carousel，FileItem 是上傳清單</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 FileItem 表達資料夾階層"
+        note="FileItem 是平面列表。資料夾樹改用 TreeView。OneDrive 的資料夾結構用 TreeView，檔案列表用 FileItem"
+      >
+        <Label warn>資料夾樹 → TreeView，FileItem 是平面清單</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -235,37 +272,3 @@ export const ActionsRule: Story = {
   ),
 }
 
-export const WhenNotToUse: Story = {
-  name: '何時不用',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 不用 FileItem 做純連結展示（已上傳檔案）"
-        note="FileItem 承載上傳狀態、進度、錯誤。靜態檔名列表改用 LinkInput 或純 <a> 連結。Google Drive 的「最近開啟」是檔案卡片，不用 FileItem"
-      >
-        <Label warn>靜態檔名 → LinkInput / &lt;a&gt;，FileItem 只用上傳流程</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 FileItem 做下載進度"
-        note="FileItem 專為上傳設計。下載進度改用自訂 progress component 或瀏覽器原生下載 UI。Figma 的資源下載不用 FileItem"
-      >
-        <Label warn>下載進度 → 自訂或瀏覽器原生，FileItem 只管上傳</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 FileItem 做相片 / 影片 gallery"
-        note="Gallery 需要 grid 佈局、大圖縮圖。FileItem 是清單單行。改用 grid / Carousel。Instagram 的相簿是 grid，不是 FileItem"
-      >
-        <Label warn>Gallery → grid / Carousel，FileItem 是上傳清單</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 FileItem 表達資料夾階層"
-        note="FileItem 是平面列表。資料夾樹改用 TreeView。OneDrive 的資料夾結構用 TreeView，檔案列表用 FileItem"
-      >
-        <Label warn>資料夾樹 → TreeView，FileItem 是平面清單</Label>
-      </Rule>
-    </div>
-  ),
-}

@@ -36,10 +36,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Input ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Input 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -59,6 +64,48 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 不用 Input 輸入需要格式化的數值"
+        note="Input 是 identity formatter（value → value）。金額、數量、百分比用 NumberInput。Stripe 的金額欄會自動加千分位，不是 Input"
+      >
+        <div className="flex gap-4 flex-col">
+          <div>
+            <Input placeholder="金額" />
+            <Label warn>❌ 無法格式化 → 改用 NumberInput</Label>
+          </div>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Input 做日期選擇"
+        note="日期需要 picker UI + locale-aware 顯示。改用 DatePicker。Notion 的日期欄都是 calendar picker"
+      >
+        <div>
+          <Label warn>日期用 DatePicker，自動提供 calendar 互動 + locale 格式</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Input variant='bare' 在表單主區域"
+        note="bare 是 toolbar inline edit 專用（適合外層已有 affordance）。表單需要明確 field chrome → 用 variant='default'。Notion 的 property inline edit 用 bare"
+      >
+        <div>
+          <Input variant="bare" placeholder="搜尋..." />
+          <Label warn>❌ 表單用 default，bare 只用 toolbar</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Input startIcon 表達狀態（有效 / 無效）"
+        note="startIcon 是「欄位用途」識別符（郵件、搜尋、網址）。狀態用邊框 + help text。Stripe 信卡欄的有效狀態由邊框顏色傳達"
+      >
+        <Label warn>startIcon = 欄位身份，狀態由邊框 + help text 傳達</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -250,47 +297,3 @@ export const DataTypeRule: Story = {
   ),
 }
 
-export const WhenNotToUse: Story = {
-  name: '何時不用',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 不用 Input 輸入需要格式化的數值"
-        note="Input 是 identity formatter（value → value）。金額、數量、百分比用 NumberInput。Stripe 的金額欄會自動加千分位，不是 Input"
-      >
-        <div className="flex gap-4 flex-col">
-          <div>
-            <Input placeholder="金額" />
-            <Label warn>❌ 無法格式化 → 改用 NumberInput</Label>
-          </div>
-        </div>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 Input 做日期選擇"
-        note="日期需要 picker UI + locale-aware 顯示。改用 DatePicker。Notion 的日期欄都是 calendar picker"
-      >
-        <div>
-          <Label warn>日期用 DatePicker，自動提供 calendar 互動 + locale 格式</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 Input variant='bare' 在表單主區域"
-        note="bare 是 toolbar inline edit 專用（適合外層已有 affordance）。表單需要明確 field chrome → 用 variant='default'。Notion 的 property inline edit 用 bare"
-      >
-        <div>
-          <Input variant="bare" placeholder="搜尋..." />
-          <Label warn>❌ 表單用 default，bare 只用 toolbar</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 Input startIcon 表達狀態（有效 / 無效）"
-        note="startIcon 是「欄位用途」識別符（郵件、搜尋、網址）。狀態用邊框 + help text。Stripe 信卡欄的有效狀態由邊框顏色傳達"
-      >
-        <Label warn>startIcon = 欄位身份，狀態由邊框 + help text 傳達</Label>
-      </Rule>
-    </div>
-  ),
-}

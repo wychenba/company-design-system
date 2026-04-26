@@ -49,10 +49,17 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Breadcrumb ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── 最後一項 ────────────────────────────────────────────────────────────────
+
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsTabsRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Breadcrumb 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -70,13 +77,9 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsTabsRule: Story = {
-  name: '定位：位置指示 vs 檢視切換',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsTabsRule — 原 VsTabsRule */}
+      <div>
       <Rule
         title="Breadcrumb — 「你在哪裡」的階層位置"
         note="表達 parent-child 關係,使用者看 breadcrumb 知道「我從哪一層走到這裡」,點前面任一層可回到上層"
@@ -173,10 +176,9 @@ export const VsTabsRule: Story = {
         <Label warn>↑ 只有一層,不需要 breadcrumb。直接用 page title</Label>
       </Rule>
     </div>
+    </div>
   ),
 }
-
-// ── 最後一項 ────────────────────────────────────────────────────────────────
 
 export const LastItemRule: Story = {
   name: '最後一項是位置標示，不是 link',

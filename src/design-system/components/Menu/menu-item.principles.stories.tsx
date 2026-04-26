@@ -10,10 +10,16 @@ type Story = StoryObj
 
 // ── WhenToUse — 何時使用 Menu ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsItemAnatomyRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Menu 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -34,19 +40,16 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsItemAnatomyRule: Story = {
-  name: 'MenuItem vs item-anatomy',
-  render: () => (
-    <div className="prose prose-sm max-w-prose">
+      {/* vs 近親 — VsItemAnatomyRule — 原 VsItemAnatomyRule */}
+      <div className="prose prose-sm max-w-prose">
       <p>MenuItem 是 Family 1(menu)的具體實作;item-anatomy 是 Family 1+2 的 cross-element SSOT。</p>
       <ul>
         <li><strong>MenuItem(本元件)</strong>—runtime 元件,實裝 Family 1 row</li>
         <li><strong>item-anatomy.spec.md</strong>—canonical doc,跨 MenuItem / Row / FileItem 共通的 anatomy 規則</li>
       </ul>
       <p className="text-fg-muted">judgment 改:動 item-anatomy.spec(SSOT);實作改:動 menu-item.tsx。</p>
+    </div>
     </div>
   ),
 }

@@ -36,10 +36,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Rating ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Rating 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -53,6 +58,59 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ readOnly 不加 aria-label"
+        note="純視覺的星星螢幕閱讀器讀不出「4.7 分」。readOnly Rating 的 aria-label 必填，描述「幾星、共幾星、幾則評論」。"
+      >
+        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
+          <Rating value={4.5} readOnly precision="half" size="md" aria-label="平均評分 4.5 星，共 5 星" />
+          <Label>✅ `aria-label=&quot;平均評分 4.5 星，共 5 星&quot;`</Label>
+        </div>
+        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
+          <Rating value={4.5} readOnly precision="half" size="md" />
+          <Label warn>❌ 無 aria-label，螢幕閱讀器讀不出分數</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ 換成 Heart / ThumbsUp 做愛心 / like"
+        note="愛心是 binary（喜歡 / 不喜歡），不是 graded 1–5。使用者對「五顆愛心」的期待是『有 5 顆愛心那麼喜歡』= 量化——但 like 本身就是二元，語意衝突。"
+      >
+        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
+          <Button variant="text" iconOnly startIcon={Heart} aria-label="收藏" />
+          <Label>✅ binary like → Button + pressed</Label>
+        </div>
+        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
+          <Rating defaultValue={3} max={5} size="md" icon={Heart} aria-label="誤用 Heart" />
+          <Label warn>❌ Rating 換 Heart → 把 binary 變成 graded，語意衝突</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ 用 Rating 做 progress bar"
+        note="Rating 的語意是『給分』,用『填了 4 顆星』表達『完成 4/5 步』會讓使用者誤以為是評分而非進度。進度有具體 % 用 ProgressBar(linear)或 CircularProgress(circular,有 value),不定進度用 CircularProgress(無 value,indeterminate)。"
+      >
+        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
+          <div className="text-caption text-fg-secondary font-medium">完成 4/5 步</div>
+          <Rating value={4} readOnly size="md" aria-label="誤用範例" />
+          <Label warn>❌ 使用者會以為「這個任務被評 4 星」→ 改 ProgressBar</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ max 超過 7"
+        note="超過 7 顆使用者無法「一眼看出是幾星」——必須一顆顆數。這違背 Rating 快速掃視的本質。若需要更細分度（0–100），改用 Slider。"
+      >
+        <div className="flex flex-col gap-2 w-[400px] p-4 border border-border rounded-md">
+          <Rating value={7} readOnly max={10} size="md" aria-label="10 星量表" />
+          <Label warn>❌ 10 星量表無法快速掃視 → 超過 7 改用 Slider</Label>
+        </div>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -246,58 +304,3 @@ export const RatingVsAlternatives: Story = {
   ),
 }
 
-export const WhenNotToUse: Story = {
-  name: '禁止事項',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ readOnly 不加 aria-label"
-        note="純視覺的星星螢幕閱讀器讀不出「4.7 分」。readOnly Rating 的 aria-label 必填，描述「幾星、共幾星、幾則評論」。"
-      >
-        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
-          <Rating value={4.5} readOnly precision="half" size="md" aria-label="平均評分 4.5 星，共 5 星" />
-          <Label>✅ `aria-label=&quot;平均評分 4.5 星，共 5 星&quot;`</Label>
-        </div>
-        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
-          <Rating value={4.5} readOnly precision="half" size="md" />
-          <Label warn>❌ 無 aria-label，螢幕閱讀器讀不出分數</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="❌ 換成 Heart / ThumbsUp 做愛心 / like"
-        note="愛心是 binary（喜歡 / 不喜歡），不是 graded 1–5。使用者對「五顆愛心」的期待是『有 5 顆愛心那麼喜歡』= 量化——但 like 本身就是二元，語意衝突。"
-      >
-        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
-          <Button variant="text" iconOnly startIcon={Heart} aria-label="收藏" />
-          <Label>✅ binary like → Button + pressed</Label>
-        </div>
-        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
-          <Rating defaultValue={3} max={5} size="md" icon={Heart} aria-label="誤用 Heart" />
-          <Label warn>❌ Rating 換 Heart → 把 binary 變成 graded，語意衝突</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="❌ 用 Rating 做 progress bar"
-        note="Rating 的語意是『給分』,用『填了 4 顆星』表達『完成 4/5 步』會讓使用者誤以為是評分而非進度。進度有具體 % 用 ProgressBar(linear)或 CircularProgress(circular,有 value),不定進度用 CircularProgress(無 value,indeterminate)。"
-      >
-        <div className="flex flex-col gap-2 w-[320px] p-4 border border-border rounded-md">
-          <div className="text-caption text-fg-secondary font-medium">完成 4/5 步</div>
-          <Rating value={4} readOnly size="md" aria-label="誤用範例" />
-          <Label warn>❌ 使用者會以為「這個任務被評 4 星」→ 改 ProgressBar</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="❌ max 超過 7"
-        note="超過 7 顆使用者無法「一眼看出是幾星」——必須一顆顆數。這違背 Rating 快速掃視的本質。若需要更細分度（0–100），改用 Slider。"
-      >
-        <div className="flex flex-col gap-2 w-[400px] p-4 border border-border rounded-md">
-          <Rating value={7} readOnly max={10} size="md" aria-label="10 星量表" />
-          <Label warn>❌ 10 星量表無法快速掃視 → 超過 7 改用 Slider</Label>
-        </div>
-      </Rule>
-    </div>
-  ),
-}

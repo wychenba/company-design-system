@@ -63,10 +63,15 @@ function Example({
 
 // ── WhenToUse — 何時使用 Steps ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Steps 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -86,6 +91,19 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div className="prose prose-sm max-w-prose space-y-4">
+      <p>Steps 表達線性進度,以下情境改用其他元件:</p>
+      <ul className="list-disc list-inside space-y-1 text-fg-secondary">
+        <li><strong>平行視圖切換</strong> → Tabs / SegmentedControl。Asana 的檢視模式用 SegmentedControl</li>
+        <li><strong>選擇器（選一個值）</strong> → Select / RadioGroup / SegmentedControl。Steps 只顯示進度</li>
+        <li><strong>時間軸或歷史紀錄</strong> → Timeline（未來）。時序事件和進度語義不同</li>
+        <li><strong>超過 7 步的流程</strong> → ProgressBar + 計數。Steps 會視覺過長</li>
+        <li><strong>使用者可自由跳步</strong> → Tabs。Steps 暗示線性順序,可跳步改用 Tabs</li>
+      </ul>
+    </div>
     </div>
   ),
 }
@@ -282,18 +300,3 @@ export const LinearBackClickDoesNotMutate: Story = {
 }
 
 
-export const WhenNotToUse: Story = {
-  name: '何時不用',
-  render: () => (
-    <div className="prose prose-sm max-w-prose space-y-4">
-      <p>Steps 表達線性進度,以下情境改用其他元件:</p>
-      <ul className="list-disc list-inside space-y-1 text-fg-secondary">
-        <li><strong>平行視圖切換</strong> → Tabs / SegmentedControl。Asana 的檢視模式用 SegmentedControl</li>
-        <li><strong>選擇器（選一個值）</strong> → Select / RadioGroup / SegmentedControl。Steps 只顯示進度</li>
-        <li><strong>時間軸或歷史紀錄</strong> → Timeline（未來）。時序事件和進度語義不同</li>
-        <li><strong>超過 7 步的流程</strong> → ProgressBar + 計數。Steps 會視覺過長</li>
-        <li><strong>使用者可自由跳步</strong> → Tabs。Steps 暗示線性順序,可跳步改用 Tabs</li>
-      </ul>
-    </div>
-  ),
-}

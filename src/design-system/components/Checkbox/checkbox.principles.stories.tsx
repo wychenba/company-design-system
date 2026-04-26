@@ -32,37 +32,35 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-// ── WhenToUse — 何時使用 Checkbox ──────────────────────
+// ── UsageGuidance — 何時用 / 何時不用 / vs 近親元件(合併 WhenToUse + VsSwitchRule + CheckboxVsRadioRule) ──
 
-export const WhenToUse: Story = {
-  name: '何時使用',
-  render: () => (
-    <div className="prose prose-sm max-w-prose">
-      <p>適合 Checkbox 的真實業務場景(點擊跳轉「展示」頁範例):</p>
-      <ul className="space-y-1">
-        <li>
-          <LinkTo kind="Design System/Components/Checkbox/展示" name="垂直 Group"><span className="text-primary hover:underline font-medium cursor-pointer">垂直 Group</span></LinkTo>
-        </li>
-        <li>
-          <LinkTo kind="Design System/Components/Checkbox/展示" name="水平排列"><span className="text-primary hover:underline font-medium cursor-pointer">水平排列</span></LinkTo>
-        </li>
-      </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
-    </div>
-  ),
-}
-
-export const VsSwitchRule: Story = {
-  name: '與 Switch 的分界',
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => {
     const [agree, setAgree] = React.useState(false)
     const [notif, setNotif] = React.useState<'checked' | 'unchecked'>('unchecked')
     const [bluetooth, setBluetooth] = React.useState(true)
     const [wifi, setWifi] = React.useState(true)
+    const [selected, setSelected] = React.useState('credit')
+    const [perms, setPerms] = React.useState({ read: true, write: false, admin: false })
     return (
       <div>
         <Rule
-          title="Checkbox — 表單內、隨 submit 才生效、可反悔"
+          title="何時用 — 真實業務場景"
+          note="適合 Checkbox 的場景(點擊跳轉「展示」頁範例);判斷不確定時對照 spec.md「何時用 / 何時不用」段。"
+        >
+          <ul className="space-y-1">
+            <li>
+              <LinkTo kind="Design System/Components/Checkbox/展示" name="垂直 Group"><span className="text-primary hover:underline font-medium cursor-pointer">垂直 Group</span></LinkTo>
+            </li>
+            <li>
+              <LinkTo kind="Design System/Components/Checkbox/展示" name="水平排列"><span className="text-primary hover:underline font-medium cursor-pointer">水平排列</span></LinkTo>
+            </li>
+          </ul>
+        </Rule>
+
+        <Rule
+          title="vs Switch — Checkbox 是表單內、隨 submit 才生效、可反悔"
           note="勾選不代表立刻生效——使用者按「儲存」前都可以反悔。心智模型是「選擇 / 同意」，視覺語言強調「尚未確定」"
         >
           <div className="border border-border rounded-lg p-4 space-y-3">
@@ -118,25 +116,7 @@ export const VsSwitchRule: Story = {
         </Rule>
 
         <Rule
-          title="Fallback 判斷法"
-          note="不確定時問：這個值旁邊有 submit / cancel button 嗎？有 → Checkbox；沒有、是獨立 inline control → Switch"
-        >
-          <Label>完整情境對照表見 checkbox.spec.md「與 Switch 的分界」</Label>
-        </Rule>
-      </div>
-    )
-  },
-}
-
-export const CheckboxVsRadioRule: Story = {
-  name: 'Checkbox vs Radio',
-  render: () => {
-    const [selected, setSelected] = React.useState('credit')
-    const [perms, setPerms] = React.useState({ read: true, write: false, admin: false })
-    return (
-      <div>
-        <Rule
-          title="Checkbox — 獨立 toggle（多選 或 單一 agreement）"
+          title="vs Radio — Checkbox 是獨立 toggle(多選 或 單一 agreement)"
           note="每個 Checkbox 是獨立 boolean——可同時勾多個。也用於單一「我同意 X」agreement"
         >
           <div className="space-y-2">
@@ -187,10 +167,10 @@ export const CheckboxVsRadioRule: Story = {
         </Rule>
 
         <Rule
-          title="❌ 單一 toggle 用 Radio"
-          note="Radio 必須在 RadioGroup 內，且至少兩個選項。單一「我同意條款」用 Checkbox"
+          title="判斷法 — 這個值旁邊有 submit / cancel button 嗎?"
+          note="有 → Checkbox;沒有、是獨立 inline control → Switch。Radio 必須在 RadioGroup 內,且至少兩個選項;單一「我同意條款」用 Checkbox。"
         >
-          <Label warn>（Radio 元件層級禁止單獨使用——在 TypeScript 層強制）</Label>
+          <Label>完整情境對照表見 checkbox.spec.md「與 Switch 的分界」</Label>
         </Rule>
       </div>
     )

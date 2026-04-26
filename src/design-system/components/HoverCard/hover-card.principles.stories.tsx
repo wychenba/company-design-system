@@ -31,10 +31,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 HoverCard ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsTooltipRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 HoverCard 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -55,13 +60,9 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsTooltipRule: Story = {
-  name: '與 Tooltip 的分界（SSOT）',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsTooltipRule — 原 VsTooltipRule */}
+      <div>
       <Rule
         title="HoverCard — 內容可互動、滑鼠移到浮層上不消失"
         note="適合放按鈕、連結、需要選取的文字。使用者 hover trigger → 浮層出現 → 滑鼠移到浮層上繼續停留並點擊按鈕 / 連結都沒問題"
@@ -118,6 +119,7 @@ export const VsTooltipRule: Story = {
           </div>
         </div>
       </Rule>
+    </div>
     </div>
   ),
 }

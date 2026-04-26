@@ -42,12 +42,17 @@ const categoryOptions = [
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-// ── WhenToUse — 何時使用 Combobox ──────────────────────
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
 
-export const WhenToUse: Story = {
-  name: '何時使用',
-  render: () => (
-    <div className="prose prose-sm max-w-prose">
+export const UsageGuidance: Story = {
+  name: '使用指引',
+  render: () => {
+    const [tags, setTags] = React.useState(['electronics', 'food'])
+    return (
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Combobox 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -68,7 +73,60 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+        <Rule
+          title="Combobox 的 sweet spot — 多選 + 空間受限 + 選項數 6+"
+          note="Tag / 分類 / 協作成員 / 通知訂閱。使用者快速加選、移除,label 自帶語意不需描述"
+        >
+          <Combobox options={categoryOptions} value={tags} onChange={setTags} />
+        </Rule>
+
+        <Rule
+          title="❌ 單選:用 Select"
+          note="Combobox 永遠多選——單選塞進來使用者每次要手動先移除舊 Tag 再選新的,多餘的互動"
+        >
+          <Combobox options={categoryOptions} value={['electronics']} onChange={() => {}} />
+          <Label warn>↑ 只選一個 electronics → 應該用 Select,一次點擊完成切換</Label>
+        </Rule>
+
+        <Rule
+          title="❌ 2-5 個選項且需要全可見 + description:用 Checkbox stack"
+          note="權限授予、條款勾選、通知類型選擇——選項需要完整閱讀(含描述),決策後同意。Combobox 藏選項強迫多次點擊對比。完整對照見 select.spec.md「與 RadioGroup 的分界」(Combobox vs Checkbox stack 同構)"
+        >
+          <Combobox
+            options={[
+              { value: 'terms', label: '服務條款' },
+              { value: 'privacy', label: '隱私政策' },
+              { value: 'marketing', label: '行銷訊息' },
+            ]}
+            value={['terms']}
+            onChange={() => {}}
+          />
+          <Label warn>↑ 條款勾選是「完整閱讀後同意」→ 用 Checkbox stack 全露內容</Label>
+        </Rule>
+
+        <Rule
+          title="❌ 階層結構(父/子節點):用 TreeView"
+          note="Combobox 是平面選項。部門 / 權限 / 資料夾等樹狀結構需要 TreeView 的展開收合互動"
+        >
+          <Combobox
+            options={[
+              { value: 'eng', label: 'Engineering' },
+              { value: 'eng-fe', label: '— Frontend' },
+              { value: 'eng-be', label: '— Backend' },
+              { value: 'design', label: 'Design' },
+            ]}
+            value={['eng-fe']}
+            onChange={() => {}}
+          />
+          <Label warn>↑ 用縮排偽造階層 → 沒有展開收合、不能按父節點全選、破壞資料結構</Label>
+        </Rule>
+      </div>
+    </div>
+    )
+  },
 }
 
 export const WrapRule: Story = {
@@ -113,64 +171,6 @@ export const WrapRule: Story = {
             </div>
           </div>
           <Label warn>↑ 每 row 高度不同 → 掃視節奏被破壞。Table 用單行 + +N 指示器</Label>
-        </Rule>
-      </div>
-    )
-  },
-}
-
-export const WhenNotToUse: Story = {
-  name: '何時用 Combobox vs 近親元件',
-  render: () => {
-    const [tags, setTags] = React.useState(['electronics', 'food'])
-    return (
-      <div>
-        <Rule
-          title="Combobox 的 sweet spot — 多選 + 空間受限 + 選項數 6+"
-          note="Tag / 分類 / 協作成員 / 通知訂閱。使用者快速加選、移除，label 自帶語意不需描述"
-        >
-          <Combobox options={categoryOptions} value={tags} onChange={setTags} />
-        </Rule>
-
-        <Rule
-          title="❌ 單選：用 Select"
-          note="Combobox 永遠多選——單選塞進來使用者每次要手動先移除舊 Tag 再選新的，多餘的互動"
-        >
-          <Combobox options={categoryOptions} value={['electronics']} onChange={() => {}} />
-          <Label warn>↑ 只選一個 electronics → 應該用 Select，一次點擊完成切換</Label>
-        </Rule>
-
-        <Rule
-          title="❌ 2-5 個選項且需要全可見 + description：用 Checkbox stack"
-          note="權限授予、條款勾選、通知類型選擇——選項需要完整閱讀（含描述），決策後同意。Combobox 藏選項強迫多次點擊對比。完整對照見 select.spec.md「與 RadioGroup 的分界」(Combobox vs Checkbox stack 同構)"
-        >
-          <Combobox
-            options={[
-              { value: 'terms', label: '服務條款' },
-              { value: 'privacy', label: '隱私政策' },
-              { value: 'marketing', label: '行銷訊息' },
-            ]}
-            value={['terms']}
-            onChange={() => {}}
-          />
-          <Label warn>↑ 條款勾選是「完整閱讀後同意」→ 用 Checkbox stack 全露內容</Label>
-        </Rule>
-
-        <Rule
-          title="❌ 階層結構（父/子節點）：用 TreeView"
-          note="Combobox 是平面選項。部門 / 權限 / 資料夾等樹狀結構需要 TreeView 的展開收合互動"
-        >
-          <Combobox
-            options={[
-              { value: 'eng', label: 'Engineering' },
-              { value: 'eng-fe', label: '— Frontend' },
-              { value: 'eng-be', label: '— Backend' },
-              { value: 'design', label: 'Design' },
-            ]}
-            value={['eng-fe']}
-            onChange={() => {}}
-          />
-          <Label warn>↑ 用縮排偽造階層 → 沒有展開收合、不能按父節點全選、破壞資料結構</Label>
         </Rule>
       </div>
     )

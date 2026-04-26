@@ -126,10 +126,15 @@ const renderMainNav = (_activeId?: string) => (
 
 // ── WhenToUse — 何時使用 Sidebar ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Sidebar 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -146,6 +151,19 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div className="prose prose-sm max-w-prose space-y-4">
+      <p>Sidebar 是垂直持久導覽,以下情境改用其他元件:</p>
+      <ul className="list-disc list-inside space-y-1 text-fg-secondary">
+        <li><strong>頁面頂部水平導覽</strong> → 自訂 Nav / NavigationMenu。Netflix 的頂部導覽用自訂組件</li>
+        <li><strong>同層內容切換</strong> → Tabs。Slack 的 channel 內容切換用 Tabs，不用 Sidebar</li>
+        <li><strong>暫時性側面板</strong> → Sheet / Drawer。Notion 的 filter panel 用 Sheet</li>
+        <li><strong>跨頁搜尋 / 快速跳轉</strong> → Command palette。Figma 的快速搜尋用 Command</li>
+        <li><strong>少於 3 項導覽</strong> → 頂部 tab bar。Sidebar 視覺成本對小 app 過高</li>
+      </ul>
+    </div>
     </div>
   ),
 }
@@ -478,18 +496,3 @@ export const ActiveState: Story = {
 }
 
 
-export const WhenNotToUse: Story = {
-  name: '何時不用',
-  render: () => (
-    <div className="prose prose-sm max-w-prose space-y-4">
-      <p>Sidebar 是垂直持久導覽,以下情境改用其他元件:</p>
-      <ul className="list-disc list-inside space-y-1 text-fg-secondary">
-        <li><strong>頁面頂部水平導覽</strong> → 自訂 Nav / NavigationMenu。Netflix 的頂部導覽用自訂組件</li>
-        <li><strong>同層內容切換</strong> → Tabs。Slack 的 channel 內容切換用 Tabs，不用 Sidebar</li>
-        <li><strong>暫時性側面板</strong> → Sheet / Drawer。Notion 的 filter panel 用 Sheet</li>
-        <li><strong>跨頁搜尋 / 快速跳轉</strong> → Command palette。Figma 的快速搜尋用 Command</li>
-        <li><strong>少於 3 項導覽</strong> → 頂部 tab bar。Sidebar 視覺成本對小 app 過高</li>
-      </ul>
-    </div>
-  ),
-}

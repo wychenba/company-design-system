@@ -51,10 +51,15 @@ const noop = () => {}
 
 // ── WhenToUse — 何時使用 FileUpload ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse / DropzoneVsButtonRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 FileUpload 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -71,6 +76,84 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 不移除 dashed border(改成 solid)"
+        note="dashed 是世界級 dropzone 共識(Ant / Polaris / GitHub / Figma 皆然),視覺語意是「暫時、可放下」。solid border 暗示「永久邊界」,使用者會猶豫是否能拖入。"
+      >
+        <Label warn>⚠️ dashed border 是 affordance,不是裝飾——不可換成 solid</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不加 scale / shadow 等裝飾性 drag-over 信號"
+        note="drag-over 只用顏色(border-primary + bg-primary-subtle)傳達狀態。加 scale 會讓區塊在拖放瞬間晃動、使用者滑鼠與 drop target 錯位;加 shadow 和元件 elevation 體系衝突。"
+      >
+        <div className="flex flex-col gap-2">
+          <div className="border-2 border-dashed border-primary bg-primary-subtle rounded-md px-6 py-10 text-center text-caption text-fg-muted">
+            ✓ 僅改顏色(dashed primary + primary-subtle)
+          </div>
+          <div className="border-2 border-dashed border-primary bg-primary-subtle rounded-md px-6 py-10 text-center text-caption text-fg-muted scale-105 shadow-[var(--elevation-200)]">
+            ✗ scale + shadow — 視覺噪音,與 elevation 系統衝突
+          </div>
+        </div>
+        <Label warn>⚠️ state 信號只走 color,不走 motion / elevation</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 FileUpload 做非檔案觸發"
+        note="「點擊開啟浮層」是 Popover / Dialog 的職責,不是 FileUpload。FileUpload = 檔案專用,避免 semantic 錯位。"
+      >
+        <Label warn>⚠️ 需要點擊開浮層 → 改用 Popover / Dialog,不要把 FileUpload 客製成選單</Label>
+      </Rule>
+    </div>
+
+      {/* vs 近親 — DropzoneVsButtonRule — 原 DropzoneVsButtonRule */}
+      <div>
+      <Rule
+        title="✅ 獨立上傳頁 / 主要動作 — 用 FileUpload dropzone"
+        note="拖放有價值(圖片、批次檔案、主要互動)且有足夠空間時才划算。對照:Figma 首頁 Import、Dropbox 上傳頁、Gmail compose 的附件區。"
+      >
+        <FileUpload
+          multiple
+          accept="image/*"
+          title="匯入設計檔案"
+          description="拖曳或點擊選取"
+          onUpload={noop}
+        />
+      </Rule>
+
+      <Rule
+        title="✅ 表單內 inline field — 用小 Button + hidden input"
+        note="form 裡和其他 field 並列時,大 dropzone 會破壞欄位節奏。對照:Jira issue 附件按鈕、Stripe 發票上傳欄位——小按鈕不喧賓奪主。"
+      >
+        <div className="flex flex-col gap-3 w-full">
+          <Field>
+            <FieldLabel>申請人姓名</FieldLabel>
+            <Input placeholder="王小明" />
+          </Field>
+          <Field>
+            <FieldLabel>申請人身分證</FieldLabel>
+            <div className="flex items-center gap-2">
+              <Input className="flex-1" placeholder="A123456789" />
+              <Button variant="tertiary" size="md" startIcon={Paperclip}>
+                附上照片
+              </Button>
+            </div>
+          </Field>
+        </div>
+        <Label>↑ 「附上照片」內部是 `&lt;input type="file" hidden /&gt;` + button.onClick</Label>
+      </Rule>
+
+      <Rule
+        title="❌ form 裡塞大 dropzone"
+        note="上下欄位高度落差太大,使用者視覺節奏被打斷——這是 form field 不該出現的體積。"
+      >
+        <Label warn>⚠️ form 內 inline 上傳欄位,不要用 FileUpload</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -180,55 +263,6 @@ export const DivisionOfLaborRule: Story = {
   },
 }
 
-export const DropzoneVsButtonRule: Story = {
-  name: '大 Dropzone vs 小 Button + hidden input',
-  render: () => (
-    <div>
-      <Rule
-        title="✅ 獨立上傳頁 / 主要動作 — 用 FileUpload dropzone"
-        note="拖放有價值(圖片、批次檔案、主要互動)且有足夠空間時才划算。對照:Figma 首頁 Import、Dropbox 上傳頁、Gmail compose 的附件區。"
-      >
-        <FileUpload
-          multiple
-          accept="image/*"
-          title="匯入設計檔案"
-          description="拖曳或點擊選取"
-          onUpload={noop}
-        />
-      </Rule>
-
-      <Rule
-        title="✅ 表單內 inline field — 用小 Button + hidden input"
-        note="form 裡和其他 field 並列時,大 dropzone 會破壞欄位節奏。對照:Jira issue 附件按鈕、Stripe 發票上傳欄位——小按鈕不喧賓奪主。"
-      >
-        <div className="flex flex-col gap-3 w-full">
-          <Field>
-            <FieldLabel>申請人姓名</FieldLabel>
-            <Input placeholder="王小明" />
-          </Field>
-          <Field>
-            <FieldLabel>申請人身分證</FieldLabel>
-            <div className="flex items-center gap-2">
-              <Input className="flex-1" placeholder="A123456789" />
-              <Button variant="tertiary" size="md" startIcon={Paperclip}>
-                附上照片
-              </Button>
-            </div>
-          </Field>
-        </div>
-        <Label>↑ 「附上照片」內部是 `&lt;input type="file" hidden /&gt;` + button.onClick</Label>
-      </Rule>
-
-      <Rule
-        title="❌ form 裡塞大 dropzone"
-        note="上下欄位高度落差太大,使用者視覺節奏被打斷——這是 form field 不該出現的體積。"
-      >
-        <Label warn>⚠️ form 內 inline 上傳欄位,不要用 FileUpload</Label>
-      </Rule>
-    </div>
-  ),
-}
-
 export const ErrorFeedbackRule: Story = {
   name: 'accept + maxSize + onReject 三配套',
   render: () => {
@@ -277,38 +311,3 @@ export const ErrorFeedbackRule: Story = {
   },
 }
 
-export const WhenNotToUse: Story = {
-  name: '視覺禁止事項',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 不移除 dashed border(改成 solid)"
-        note="dashed 是世界級 dropzone 共識(Ant / Polaris / GitHub / Figma 皆然),視覺語意是「暫時、可放下」。solid border 暗示「永久邊界」,使用者會猶豫是否能拖入。"
-      >
-        <Label warn>⚠️ dashed border 是 affordance,不是裝飾——不可換成 solid</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不加 scale / shadow 等裝飾性 drag-over 信號"
-        note="drag-over 只用顏色(border-primary + bg-primary-subtle)傳達狀態。加 scale 會讓區塊在拖放瞬間晃動、使用者滑鼠與 drop target 錯位;加 shadow 和元件 elevation 體系衝突。"
-      >
-        <div className="flex flex-col gap-2">
-          <div className="border-2 border-dashed border-primary bg-primary-subtle rounded-md px-6 py-10 text-center text-caption text-fg-muted">
-            ✓ 僅改顏色(dashed primary + primary-subtle)
-          </div>
-          <div className="border-2 border-dashed border-primary bg-primary-subtle rounded-md px-6 py-10 text-center text-caption text-fg-muted scale-105 shadow-[var(--elevation-200)]">
-            ✗ scale + shadow — 視覺噪音,與 elevation 系統衝突
-          </div>
-        </div>
-        <Label warn>⚠️ state 信號只走 color,不走 motion / elevation</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 FileUpload 做非檔案觸發"
-        note="「點擊開啟浮層」是 Popover / Dialog 的職責,不是 FileUpload。FileUpload = 檔案專用,避免 semantic 錯位。"
-      >
-        <Label warn>⚠️ 需要點擊開浮層 → 改用 Popover / Dialog,不要把 FileUpload 客製成選單</Label>
-      </Rule>
-    </div>
-  ),
-}

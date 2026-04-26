@@ -31,10 +31,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Avatar ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / IdentityVsIconRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Avatar 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -55,13 +60,9 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const IdentityVsIconRule: Story = {
-  name: 'Avatar 代表身份,Icon 代表概念',
-  render: () => (
-    <div>
+      {/* vs 近親 — IdentityVsIconRule — 原 IdentityVsIconRule */}
+      <div>
       <Rule
         title="Avatar — 代表實體（人、組織、專案、App）"
         note="留言者頭像、團隊成員、workspace logo、app 身份。視覺上 identity 是唯一的、可被辨識的。作為列表 row 的 prefix 時透過 MenuItem 的 avatar slot 消費(而非手刻 flex row)"
@@ -112,6 +113,7 @@ export const IdentityVsIconRule: Story = {
           </div>
         </div>
       </Rule>
+    </div>
     </div>
   ),
 }

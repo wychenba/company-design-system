@@ -38,10 +38,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Button ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Button 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -55,6 +60,58 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 不用 Button 做標籤或指示器"
+        note="Button 語義是「可點擊動作」。如果只是顯示狀態、不需使用者互動，用 Badge 或 Tag 代替。Jira 的「已解決」標籤、Stripe 的「active」指示不會設計成按鈕"
+      >
+        <div className="flex gap-2 items-center">
+          <Button variant="primary" size="sm">Active</Button>
+          <Label warn>❌ 當標籤用 → 下方才對</Label>
+        </div>
+        <div className="flex gap-2 items-center mt-3">
+          <Badge count={1} />
+          <Label>✅ Badge 表達計數 / 狀態</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ 不用多個 primary 按鈕搶焦點"
+        note="Primary 語義是「這個畫面最重要的動作」。多個 primary 時使用者無法判斷優先順序，改用 primary + secondary + tertiary。Notion 對話框永遠只有一個藍色按鈕"
+      >
+        <div>
+          <div className="mb-4">
+            <Button variant="primary">保存</Button>
+            <Button variant="primary" className="ml-2">另存新檔</Button>
+            <Label warn>❌ 兩個都搶焦點</Label>
+          </div>
+          <div>
+            <Button variant="primary">保存</Button>
+            <Button variant="secondary" className="ml-2">另存新檔</Button>
+            <Label>✅ 主次分明</Label>
+          </div>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 primary + danger 做可反悔的操作"
+        note="primary + danger 語義是「立即不可逆」。如移至垃圾桶還能復原，改用 secondary + danger。Linear 的刪除先確認"
+      >
+        <div>
+          <div className="mb-4">
+            <Button variant="primary" danger startIcon={Trash2}>刪除</Button>
+            <Label warn>❌ 風險高，無法復原</Label>
+          </div>
+          <div>
+            <Button variant="secondary" danger startIcon={Trash2}>移至垃圾桶</Button>
+            <div><Label>✅ secondary + danger，後續可復原</Label></div>
+          </div>
+        </div>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -310,57 +367,3 @@ export const OrderRule: Story = {
   ),
 }
 
-export const WhenNotToUse: Story = {
-  name: '何時不用',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 不用 Button 做標籤或指示器"
-        note="Button 語義是「可點擊動作」。如果只是顯示狀態、不需使用者互動，用 Badge 或 Tag 代替。Jira 的「已解決」標籤、Stripe 的「active」指示不會設計成按鈕"
-      >
-        <div className="flex gap-2 items-center">
-          <Button variant="primary" size="sm">Active</Button>
-          <Label warn>❌ 當標籤用 → 下方才對</Label>
-        </div>
-        <div className="flex gap-2 items-center mt-3">
-          <Badge count={1} />
-          <Label>✅ Badge 表達計數 / 狀態</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="❌ 不用多個 primary 按鈕搶焦點"
-        note="Primary 語義是「這個畫面最重要的動作」。多個 primary 時使用者無法判斷優先順序，改用 primary + secondary + tertiary。Notion 對話框永遠只有一個藍色按鈕"
-      >
-        <div>
-          <div className="mb-4">
-            <Button variant="primary">保存</Button>
-            <Button variant="primary" className="ml-2">另存新檔</Button>
-            <Label warn>❌ 兩個都搶焦點</Label>
-          </div>
-          <div>
-            <Button variant="primary">保存</Button>
-            <Button variant="secondary" className="ml-2">另存新檔</Button>
-            <Label>✅ 主次分明</Label>
-          </div>
-        </div>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 primary + danger 做可反悔的操作"
-        note="primary + danger 語義是「立即不可逆」。如移至垃圾桶還能復原，改用 secondary + danger。Linear 的刪除先確認"
-      >
-        <div>
-          <div className="mb-4">
-            <Button variant="primary" danger startIcon={Trash2}>刪除</Button>
-            <Label warn>❌ 風險高，無法復原</Label>
-          </div>
-          <div>
-            <Button variant="secondary" danger startIcon={Trash2}>移至垃圾桶</Button>
-            <div><Label>✅ secondary + danger，後續可復原</Label></div>
-          </div>
-        </div>
-      </Rule>
-    </div>
-  ),
-}

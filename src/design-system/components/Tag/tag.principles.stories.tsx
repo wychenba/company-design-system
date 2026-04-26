@@ -30,10 +30,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Tag ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsBadgeRule / SubtleVsSolidRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Tag 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -48,13 +53,9 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsBadgeRule: Story = {
-  name: 'Tag vs Badge（分類 vs 通知）',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsBadgeRule — 原 VsBadgeRule */}
+      <div>
       <Rule
         title="Tag — 分類標籤、狀態標記、多選已選值"
         note="承載語意(類別 / 狀態),通常有 variant 色彩區分。較大、可含 icon / dismiss button、適合放語意內容"
@@ -99,48 +100,9 @@ export const VsBadgeRule: Story = {
         <Label warn>↑ Badge 不設計來放文字 label 做分類 → 用 Tag</Label>
       </Rule>
     </div>
-  ),
-}
 
-export const VariantNotSemanticRule: Story = {
-  name: 'Variant 色彩不自動承載語意',
-  render: () => (
-    <div>
-      <Rule
-        title="Variant 是「顏色」,不是「語意」"
-        note="red 不一定代表「錯誤」,green 不一定代表「成功」。語意由消費端的內容和上下文決定。世界級 DS(Atlassian/Polaris)都採這個架構——避免強綁語意後 categorical color 不夠用的困境"
-      >
-        <div className="flex items-center gap-2 flex-wrap">
-          <Tag variant="red">紅色標籤</Tag>
-          <Tag variant="green">綠色分類</Tag>
-          <Tag variant="blue">藍色狀態</Tag>
-          <Tag variant="turquoise">青色</Tag>
-          <Tag variant="purple">紫色</Tag>
-          <Tag variant="magenta">洋紅</Tag>
-          <Tag variant="indigo">靛藍</Tag>
-        </div>
-        <Label>↑ 9 種 variant,色彩意義由 consumer 上下文決定</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 只靠 variant 色傳達狀態（color-blind 失效）"
-        note="「這個 Tag 是紅色 → 錯誤」這種單靠顏色的語意對 color-blind 使用者失效。必須用 label 文字明確傳達"
-      >
-        <div className="flex items-center gap-2">
-          <Tag variant="red" />
-          <Tag variant="green" />
-          <Tag variant="yellow" />
-        </div>
-        <Label warn>↑ 沒 label 的純色 Tag → color-blind 看不出差異。必須寫文字「已封鎖 / 已完成 / 待審核」</Label>
-      </Rule>
-    </div>
-  ),
-}
-
-export const SubtleVsSolidRule: Story = {
-  name: 'Subtle vs Solid 選擇',
-  render: () => (
-    <div>
+      {/* vs 近親 — SubtleVsSolidRule — 原 SubtleVsSolidRule */}
+      <div>
       <Rule
         title="Subtle（預設）— 淺底深字，適合一般分類 / 狀態"
         note="視覺重量較輕,不搶頁面焦點。99% 場景用 subtle"
@@ -178,6 +140,42 @@ export const SubtleVsSolidRule: Story = {
           <Tag variant="purple" solid>家具</Tag>
         </div>
         <Label warn>↑ 所有 Tag solid → 互相爭奪注意力 → 都不重要</Label>
+      </Rule>
+    </div>
+    </div>
+  ),
+}
+
+export const VariantNotSemanticRule: Story = {
+  name: 'Variant 色彩不自動承載語意',
+  render: () => (
+    <div>
+      <Rule
+        title="Variant 是「顏色」,不是「語意」"
+        note="red 不一定代表「錯誤」,green 不一定代表「成功」。語意由消費端的內容和上下文決定。世界級 DS(Atlassian/Polaris)都採這個架構——避免強綁語意後 categorical color 不夠用的困境"
+      >
+        <div className="flex items-center gap-2 flex-wrap">
+          <Tag variant="red">紅色標籤</Tag>
+          <Tag variant="green">綠色分類</Tag>
+          <Tag variant="blue">藍色狀態</Tag>
+          <Tag variant="turquoise">青色</Tag>
+          <Tag variant="purple">紫色</Tag>
+          <Tag variant="magenta">洋紅</Tag>
+          <Tag variant="indigo">靛藍</Tag>
+        </div>
+        <Label>↑ 9 種 variant,色彩意義由 consumer 上下文決定</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 只靠 variant 色傳達狀態（color-blind 失效）"
+        note="「這個 Tag 是紅色 → 錯誤」這種單靠顏色的語意對 color-blind 使用者失效。必須用 label 文字明確傳達"
+      >
+        <div className="flex items-center gap-2">
+          <Tag variant="red" />
+          <Tag variant="green" />
+          <Tag variant="yellow" />
+        </div>
+        <Label warn>↑ 沒 label 的純色 Tag → color-blind 看不出差異。必須寫文字「已封鎖 / 已完成 / 待審核」</Label>
       </Rule>
     </div>
   ),

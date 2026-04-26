@@ -25,10 +25,16 @@ const Rule: React.FC<{ title: string; note: string; children: React.ReactNode }>
 // ── 原則 1:Calendar vs DatePicker ─────────────────────────────────────────
 // ── WhenToUse — 何時使用 Calendar ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── 原則 2:Event color 是類別語意,不是 severity ─────────────────────────────
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse / VsDatePicker(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Calendar 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -43,13 +49,21 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsDatePicker: Story = {
-  name: 'Calendar vs DatePicker',
-  render: () => (
-    <div className="space-y-6">
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div className="space-y-4 text-body text-fg-secondary max-w-3xl">
+      <div className="text-body-lg font-medium text-foreground">何時不用 Calendar</div>
+      <ul className="list-disc pl-5 space-y-2">
+        <li><b>選單一日期</b>(Due date / Birthday)→ 用 <code>DatePicker</code></li>
+        <li><b>選日期範圍</b>(訂單 from-to)→ 用 <code>DatePicker mode="range"</code></li>
+        <li><b>任務看板</b>(非時間軸 view)→ 用 <code>DataTable</code> + status column</li>
+        <li><b>時段可用性</b>(會議訂房 slot picker)→ 獨立 time-slot picker(未來 primitive)</li>
+        <li><b>Mini month widget</b>(sidebar 小月曆)→ 用 <code>DateGrid</code>(不 fullscreen)</li>
+      </ul>
+    </div>
+
+      {/* vs 近親 — VsDatePicker — 原 VsDatePicker */}
+      <div className="space-y-6">
       <Rule
         title="Calendar 是「看事件」的 page canvas,DatePicker 是「選日期」的 form control"
         note="名字相近,職責完全不同。Calendar 是行事曆檢視(月 / 週 / 日 view);DatePicker 是欄位,選單一日期寫入 form state。"
@@ -75,10 +89,10 @@ export const VsDatePicker: Story = {
         </div>
       </Rule>
     </div>
+    </div>
   ),
 }
 
-// ── 原則 2:Event color 是類別語意,不是 severity ─────────────────────────────
 export const ColorSemantic: Story = {
   name: 'Event color 類別語意',
   render: () => (
@@ -124,18 +138,3 @@ export const MvpScope: Story = {
 }
 
 // ── 原則 4:What NOT to put in Calendar ─────────────────────────────────────────
-export const WhenNotToUse: Story = {
-  name: '何時不用',
-  render: () => (
-    <div className="space-y-4 text-body text-fg-secondary max-w-3xl">
-      <div className="text-body-lg font-medium text-foreground">何時不用 Calendar</div>
-      <ul className="list-disc pl-5 space-y-2">
-        <li><b>選單一日期</b>(Due date / Birthday)→ 用 <code>DatePicker</code></li>
-        <li><b>選日期範圍</b>(訂單 from-to)→ 用 <code>DatePicker mode="range"</code></li>
-        <li><b>任務看板</b>(非時間軸 view)→ 用 <code>DataTable</code> + status column</li>
-        <li><b>時段可用性</b>(會議訂房 slot picker)→ 獨立 time-slot picker(未來 primitive)</li>
-        <li><b>Mini month widget</b>(sidebar 小月曆)→ 用 <code>DateGrid</code>(不 fullscreen)</li>
-      </ul>
-    </div>
-  ),
-}

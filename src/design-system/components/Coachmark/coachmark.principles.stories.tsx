@@ -68,10 +68,15 @@ const DemoMedia = ({
 
 // ── WhenToUse — 何時使用 Coachmark ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse / VsPopoverRule / VsDialogRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Coachmark 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -86,13 +91,59 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsPopoverRule: Story = {
-  name: 'Coachmark vs Popover',
-  render: () => (
-    <div>
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 不用 Coachmark 做錯誤提示"
+        note="錯誤訊息是使用者動作的回饋(表單驗證失敗、API 錯誤、權限不足)— 應該用 Notice / Alert / Toast 呈現事件。Coachmark 是主動推送教學,語意完全相反"
+      >
+        <div className="flex items-center gap-2 p-3 border border-error/30 bg-error/5 rounded-md text-caption">
+          <AlertCircle className="w-4 h-4 text-error" />
+          <span className="text-foreground">這是錯誤訊息的樣子 — 應該用 Notice / Alert / Toast,不是 Coachmark</span>
+        </div>
+        <Label warn>錯誤 → Notice / Alert / Toast;Coachmark 只用於主動推送教學</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Coachmark 做確認框"
+        note="確認破壞性動作必須阻斷流程(Dialog)。Coachmark 是 non-modal,使用者可忽略 — 讓破壞性動作變成「可忽略」等於沒確認"
+      >
+        <Label warn>刪除 / 取消訂閱 / 重置資料 → Dialog(必須阻斷),不用 Coachmark</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不強迫完成 tour(無 Skip 選項)"
+        note="使用者的本能是「我想自己試試」。沒 Skip = 綁架,使用者找關閉方式或直接關閉整個頁面。永遠提供 Skip 反而提升完成率 — 信任使用者會選擇"
+      >
+        <Label warn>❌ 只提供 Next 沒有 Skip — 使用者 frustration 增加,產品印象變差</Label>
+      </Rule>
+
+      <Rule
+        title="❌ Description 塞超過 3 行"
+        note="Coachmark 是快速提示不是完整教學。長文案使用者不讀,反而浪費了「主動彈出」的機會。長內容:拆多步 / 改 Dialog / 連結到文件"
+      >
+        <Label warn>❌ 5+ 行 description — 使用者掃一眼就點 Skip</Label>
+        <Label>✅ 2-3 行精準說明,需要深入 → 「了解更多」連結到 help doc</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 在 Coachmark 內放 nested Popover / Dialog"
+        note="浮層嵌套浮層 = 層級混亂 + 焦點管理崩壞 + Esc 不知道關哪個。複雜互動結束 tour 後再開啟;tour 的角色是「指向功能」不是「讓使用者在 tour 內完成任務」"
+      >
+        <Label warn>❌ Coachmark 內放 Popover / Dialog — 焦點管理崩壞</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 自包視覺 token(bg / shadow / radius)"
+        note="Coachmark 是 Popover 的 composition — 浮層視覺完全繼承 Popover。自己寫 bg-* / shadow-* 會讓 Coachmark 和其他浮層漂移,改 Popover 視覺時 Coachmark 不跟進"
+      >
+        <Label warn>❌ 在 Coachmark 外殼加 className=&quot;bg-*&quot; / shadow-*;視覺改動一律改 Popover</Label>
+      </Rule>
+    </div>
+
+      {/* vs 近親 — VsPopoverRule — 原 VsPopoverRule */}
+      <div>
       <Rule
         title="Popover — 使用者主動點擊才出現的互動面板"
         note="filter、設定、快速切換等補充 UI。使用者知道自己要什麼、主動點擊 trigger。典型案例:Jira filter、Linear view settings、Notion 頁面設定"
@@ -140,13 +191,9 @@ export const VsPopoverRule: Story = {
         <Label>兩者都是 elevation-200 浮層,density 鎖 md,視覺語言一致</Label>
       </Rule>
     </div>
-  ),
-}
 
-export const VsDialogRule: Story = {
-  name: 'Coachmark vs Dialog',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsDialogRule — 原 VsDialogRule */}
+      <div>
       <Rule
         title="Coachmark — non-modal 輔助,使用者可忽略繼續主流程"
         note="onboarding 的精神是「幫忙介紹但不強迫」。使用者點 Skip / 按 Esc / 點擊別處都能關閉,不影響主流程。這是尊重使用者自主探索的設計選擇"
@@ -202,6 +249,7 @@ export const VsDialogRule: Story = {
         <Label>Coachmark:新功能介紹、onboarding tour、版本更新提示</Label>
         <Label>Dialog:刪除確認、建立 project 表單、付款資訊輸入、多步 wizard</Label>
       </Rule>
+    </div>
     </div>
   ),
 }
@@ -340,56 +388,3 @@ export const MediaContentRule: Story = {
   ),
 }
 
-export const WhenNotToUse: Story = {
-  name: '禁止事項',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 不用 Coachmark 做錯誤提示"
-        note="錯誤訊息是使用者動作的回饋(表單驗證失敗、API 錯誤、權限不足)— 應該用 Notice / Alert / Toast 呈現事件。Coachmark 是主動推送教學,語意完全相反"
-      >
-        <div className="flex items-center gap-2 p-3 border border-error/30 bg-error/5 rounded-md text-caption">
-          <AlertCircle className="w-4 h-4 text-error" />
-          <span className="text-foreground">這是錯誤訊息的樣子 — 應該用 Notice / Alert / Toast,不是 Coachmark</span>
-        </div>
-        <Label warn>錯誤 → Notice / Alert / Toast;Coachmark 只用於主動推送教學</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 Coachmark 做確認框"
-        note="確認破壞性動作必須阻斷流程(Dialog)。Coachmark 是 non-modal,使用者可忽略 — 讓破壞性動作變成「可忽略」等於沒確認"
-      >
-        <Label warn>刪除 / 取消訂閱 / 重置資料 → Dialog(必須阻斷),不用 Coachmark</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不強迫完成 tour(無 Skip 選項)"
-        note="使用者的本能是「我想自己試試」。沒 Skip = 綁架,使用者找關閉方式或直接關閉整個頁面。永遠提供 Skip 反而提升完成率 — 信任使用者會選擇"
-      >
-        <Label warn>❌ 只提供 Next 沒有 Skip — 使用者 frustration 增加,產品印象變差</Label>
-      </Rule>
-
-      <Rule
-        title="❌ Description 塞超過 3 行"
-        note="Coachmark 是快速提示不是完整教學。長文案使用者不讀,反而浪費了「主動彈出」的機會。長內容:拆多步 / 改 Dialog / 連結到文件"
-      >
-        <Label warn>❌ 5+ 行 description — 使用者掃一眼就點 Skip</Label>
-        <Label>✅ 2-3 行精準說明,需要深入 → 「了解更多」連結到 help doc</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 在 Coachmark 內放 nested Popover / Dialog"
-        note="浮層嵌套浮層 = 層級混亂 + 焦點管理崩壞 + Esc 不知道關哪個。複雜互動結束 tour 後再開啟;tour 的角色是「指向功能」不是「讓使用者在 tour 內完成任務」"
-      >
-        <Label warn>❌ Coachmark 內放 Popover / Dialog — 焦點管理崩壞</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 自包視覺 token(bg / shadow / radius)"
-        note="Coachmark 是 Popover 的 composition — 浮層視覺完全繼承 Popover。自己寫 bg-* / shadow-* 會讓 Coachmark 和其他浮層漂移,改 Popover 視覺時 Coachmark 不跟進"
-      >
-        <Label warn>❌ 在 Coachmark 外殼加 className=&quot;bg-*&quot; / shadow-*;視覺改動一律改 Popover</Label>
-      </Rule>
-    </div>
-  ),
-}

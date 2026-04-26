@@ -29,10 +29,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 TreeView ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 TreeView 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -53,13 +58,9 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const WhenNotToUse: Story = {
-  name: '何時用 TreeView vs 近親元件',
-  render: () => (
-    <div>
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
       <Rule
         title="TreeView 的 sweet spot — 階層資料 + 任意多層 + 展開收合"
         note="檔案資料夾、組織架構、專案 / 子專案 / 任務。每個 node 有 children 就可展開,沒有就是 leaf"
@@ -108,6 +109,7 @@ export const WhenNotToUse: Story = {
       >
         <Label warn>2 層 nav 用 Sidebar 的 Sub Menu 足夠,不需要 TreeView 的遞迴 overhead</Label>
       </Rule>
+    </div>
     </div>
   ),
 }

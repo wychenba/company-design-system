@@ -1,3 +1,6 @@
+// @principles-rationale: Merged WhenToUse + VsHoverCardRule + NotForEssentialInfoRule
+// into a single `UsageGuidance` story (3 sections) per 2026-04-26 user mandate to
+// consolidate decision-related stories. NeedsTooltipRule kept as separate principle.
 import React from 'react'
 import LinkTo from '@storybook/addon-links/react'
 import type { Meta, StoryObj } from '@storybook/react'
@@ -30,10 +33,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Tooltip ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsHoverCardRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Tooltip 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -47,6 +55,48 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* vs 近親 — VsHoverCardRule — 原 VsHoverCardRule */}
+      <div>
+      <Rule
+        title="Tooltip — 純文字、不可互動、離開 trigger 即消失"
+        note="適合一句話的提示。滑鼠離開 trigger → tooltip 立刻消失，移到浮層上也消失。使用者無法點擊 tooltip 內容"
+      >
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="tertiary" size="sm" iconOnly startIcon={Info} aria-label="說明" />
+          </TooltipTrigger>
+          <TooltipContent>這個設定會影響所有專案的預設值</TooltipContent>
+        </Tooltip>
+        <Label>↑ 純文字說明、滑鼠離開即消失</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 需要放互動元素（按鈕 / 連結）：用 HoverCard"
+        note="Tooltip 不能包含可點擊元素——使用者滑鼠離開 trigger 就消失，來不及點到浮層內的按鈕。需要互動內容（NameCard、link preview、action）必須用 HoverCard。完整分界 SSOT 在 hover-card.spec.md"
+      >
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="tertiary" size="sm">Ada Chen</Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <div className="flex flex-col gap-1">
+              <span>Ada Chen</span>
+              <button className="text-primary">→ 查看 profile</button>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+        <Label warn>↑ tooltip 裡放「查看 profile」按鈕 → 滑鼠離開就消失，點不到 → 改用 HoverCard</Label>
+      </Rule>
+
+      <Rule
+        title="判斷法：「使用者會想移到浮層上做事嗎？」"
+        note="需要 → HoverCard（停留行為可互動）；不需要，純看一句話 → Tooltip"
+      >
+        <Label>完整對照見 hover-card.spec.md「與 Tooltip 的分界」（SSOT owner）</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -100,51 +150,6 @@ export const NeedsTooltipRule: Story = {
           <TooltipContent>非常長的專案名稱會被截斷顯示完整版</TooltipContent>
         </Tooltip>
         <Label>↑ 只在 `text-overflow: ellipsis` 觸發時才顯示 tooltip</Label>
-      </Rule>
-    </div>
-  ),
-}
-
-export const VsHoverCardRule: Story = {
-  name: 'Tooltip vs HoverCard',
-  render: () => (
-    <div>
-      <Rule
-        title="Tooltip — 純文字、不可互動、離開 trigger 即消失"
-        note="適合一句話的提示。滑鼠離開 trigger → tooltip 立刻消失，移到浮層上也消失。使用者無法點擊 tooltip 內容"
-      >
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="tertiary" size="sm" iconOnly startIcon={Info} aria-label="說明" />
-          </TooltipTrigger>
-          <TooltipContent>這個設定會影響所有專案的預設值</TooltipContent>
-        </Tooltip>
-        <Label>↑ 純文字說明、滑鼠離開即消失</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 需要放互動元素（按鈕 / 連結）：用 HoverCard"
-        note="Tooltip 不能包含可點擊元素——使用者滑鼠離開 trigger 就消失，來不及點到浮層內的按鈕。需要互動內容（NameCard、link preview、action）必須用 HoverCard。完整分界 SSOT 在 hover-card.spec.md"
-      >
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="tertiary" size="sm">Ada Chen</Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <div className="flex flex-col gap-1">
-              <span>Ada Chen</span>
-              <button className="text-primary">→ 查看 profile</button>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-        <Label warn>↑ tooltip 裡放「查看 profile」按鈕 → 滑鼠離開就消失，點不到 → 改用 HoverCard</Label>
-      </Rule>
-
-      <Rule
-        title="判斷法：「使用者會想移到浮層上做事嗎？」"
-        note="需要 → HoverCard（停留行為可互動）；不需要，純看一句話 → Tooltip"
-      >
-        <Label>完整對照見 hover-card.spec.md「與 Tooltip 的分界」（SSOT owner）</Label>
       </Rule>
     </div>
   ),

@@ -25,10 +25,15 @@ type Story = StoryObj<typeof TimePicker>
  */
 // ── WhenToUse — 何時使用 TimePicker ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 TimePicker 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -48,6 +53,18 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div className="prose prose-sm max-w-prose space-y-4">
+      <p>TimePicker 只管時間,以下情境改用其他元件:</p>
+      <ul className="list-disc list-inside space-y-1 text-fg-secondary">
+        <li><strong>同時選日期和時間</strong> → DatePicker + TimePicker 並列。Jira 的 due date 用 DatePicker，time 用 TimePicker</li>
+        <li><strong>時間範圍（from-to）</strong> → 兩個 TimePicker 並列。Google Calendar 的 event time 是兩個 picker</li>
+        <li><strong>純文字時間輸入</strong> → Input + validation。開發者工具用 Input</li>
+        <li><strong>倒數計時或相對時間</strong> → 自訂計時器。TimePicker 是 wall-clock time（09:30），不是 duration</li>
+      </ul>
+    </div>
     </div>
   ),
 }
@@ -111,17 +128,3 @@ export const RuleClearNoLabelButton: Story = {
 }
 
 
-export const WhenNotToUse: Story = {
-  name: '何時不用',
-  render: () => (
-    <div className="prose prose-sm max-w-prose space-y-4">
-      <p>TimePicker 只管時間,以下情境改用其他元件:</p>
-      <ul className="list-disc list-inside space-y-1 text-fg-secondary">
-        <li><strong>同時選日期和時間</strong> → DatePicker + TimePicker 並列。Jira 的 due date 用 DatePicker，time 用 TimePicker</li>
-        <li><strong>時間範圍（from-to）</strong> → 兩個 TimePicker 並列。Google Calendar 的 event time 是兩個 picker</li>
-        <li><strong>純文字時間輸入</strong> → Input + validation。開發者工具用 Input</li>
-        <li><strong>倒數計時或相對時間</strong> → 自訂計時器。TimePicker 是 wall-clock time（09:30），不是 duration</li>
-      </ul>
-    </div>
-  ),
-}

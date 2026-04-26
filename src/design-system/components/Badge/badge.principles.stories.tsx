@@ -32,10 +32,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Badge ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / DotVsCountRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Badge 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -49,6 +54,84 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* vs 近親 — DotVsCountRule — 原 DotVsCountRule */}
+      <div>
+      <Rule
+        title="Count — 數字本身有意義（3 vs 30 觸發不同 urgency）"
+        note="未讀訊息 / 錯誤數 / 購物車品項——使用者會根據數字決定行動優先序"
+      >
+        <div className="flex items-center gap-4">
+          <Button
+            variant="tertiary"
+            size="sm"
+            iconOnly
+            startIcon={MessageSquare}
+            aria-label="訊息 (3)"
+            overlayBadge={<Badge count={3} variant="critical" />}
+          />
+          <Button
+            variant="tertiary"
+            size="sm"
+            iconOnly
+            startIcon={MessageSquare}
+            aria-label="訊息 (42)"
+            overlayBadge={<Badge count={42} variant="critical" />}
+          />
+          <Button
+            variant="tertiary"
+            size="sm"
+            iconOnly
+            startIcon={MessageSquare}
+            aria-label="訊息 (150+)"
+            overlayBadge={<Badge count={150} max={99} variant="critical" />}
+          />
+          <Label>3 vs 42 vs 99+ 觸發不同 urgency 感</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="Dot — 存在性指示（「有新東西」即訊號）"
+        note="新功能提示、unsaved changes、在線狀態——具體數量不重要或無意義。Dot overlay 的 canonical:**只疊在 iconOnly button / 單一 icon / avatar 上**(容器本身就是單一視覺重心)。text + icon button 的右上角離 icon 太遠,dot 會像飄在空中的裝飾,語義不成立。"
+      >
+        <div className="flex items-center gap-4">
+          <Button
+            variant="tertiary"
+            size="sm"
+            iconOnly
+            startIcon={Settings}
+            aria-label="設定(有新功能)"
+            overlayBadge={<Badge dot variant="critical" aria-label="有新功能" />}
+          />
+          <Label>「設定有新功能」—— iconOnly Button `overlayBadge` prop,dot 中心貼齒輪 icon 的 top-right corner(不是按鈕角)</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ text + icon button 右上疊 dot"
+        note="按鈕寬度遠大於 icon,dot 跑到按鈕右邊緣,離 icon 太遠視覺上不連結。使用者不會把 dot 和齒輪 icon 的「有新功能」語義配對起來"
+      >
+        <div className="flex items-center gap-4">
+          {/* ❌ anti-pattern demo intentionally kept: text+icon Button + overlay dot —— 整個 Rule 的主軸就是
+              「dot 飄在 button chrome 角不是 icon 角」,此處保留 old `relative + absolute` pattern 作為
+              視覺反例,讓讀者看到 dot 為何離 icon 很遠 */}
+          <div className="relative inline-flex">
+            <Button variant="tertiary" size="sm" startIcon={Settings}>設定</Button>
+            <Badge dot variant="critical" className="absolute -top-1 -right-1" aria-label="有新功能" />
+          </div>
+          <Label warn>↑ dot 飄在「設定」文字右上角的空處,跟齒輪 icon 毫無視覺連結</Label>
+        </div>
+        <Label>改法:(a) 按鈕改 iconOnly + dot 疊 icon 角落、(b) 移除 dot 改用內部文字 badge(目前 DS 無 text-only badge,屬 tech debt)、(c) 移到 text 後 inline 小字「設定(新)」</Label>
+      </Rule>
+
+      <Rule
+        title="判斷法：「使用者想知道『有沒有』還是『多少』？」"
+        note="知道有就夠 → dot / 需要數量判斷 urgency → count"
+      >
+        <Label>若 count 永遠顯示 99+(threshold 失去區別力),改用 dot 或升高 max</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -195,87 +278,6 @@ export const ContrastFloorRule: Story = {
           <Badge count={128} variant="low" className="absolute -top-1 -right-1" />
         </div>
         <Label>↑ tertiary Archive + low badge(灰底灰字)—— 「有 128 筆被歸檔」passive 展示,不誘導 click</Label>
-      </Rule>
-    </div>
-  ),
-}
-
-export const DotVsCountRule: Story = {
-  name: 'Dot vs Count 選擇',
-  render: () => (
-    <div>
-      <Rule
-        title="Count — 數字本身有意義（3 vs 30 觸發不同 urgency）"
-        note="未讀訊息 / 錯誤數 / 購物車品項——使用者會根據數字決定行動優先序"
-      >
-        <div className="flex items-center gap-4">
-          <Button
-            variant="tertiary"
-            size="sm"
-            iconOnly
-            startIcon={MessageSquare}
-            aria-label="訊息 (3)"
-            overlayBadge={<Badge count={3} variant="critical" />}
-          />
-          <Button
-            variant="tertiary"
-            size="sm"
-            iconOnly
-            startIcon={MessageSquare}
-            aria-label="訊息 (42)"
-            overlayBadge={<Badge count={42} variant="critical" />}
-          />
-          <Button
-            variant="tertiary"
-            size="sm"
-            iconOnly
-            startIcon={MessageSquare}
-            aria-label="訊息 (150+)"
-            overlayBadge={<Badge count={150} max={99} variant="critical" />}
-          />
-          <Label>3 vs 42 vs 99+ 觸發不同 urgency 感</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="Dot — 存在性指示（「有新東西」即訊號）"
-        note="新功能提示、unsaved changes、在線狀態——具體數量不重要或無意義。Dot overlay 的 canonical:**只疊在 iconOnly button / 單一 icon / avatar 上**(容器本身就是單一視覺重心)。text + icon button 的右上角離 icon 太遠,dot 會像飄在空中的裝飾,語義不成立。"
-      >
-        <div className="flex items-center gap-4">
-          <Button
-            variant="tertiary"
-            size="sm"
-            iconOnly
-            startIcon={Settings}
-            aria-label="設定(有新功能)"
-            overlayBadge={<Badge dot variant="critical" aria-label="有新功能" />}
-          />
-          <Label>「設定有新功能」—— iconOnly Button `overlayBadge` prop,dot 中心貼齒輪 icon 的 top-right corner(不是按鈕角)</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="❌ text + icon button 右上疊 dot"
-        note="按鈕寬度遠大於 icon,dot 跑到按鈕右邊緣,離 icon 太遠視覺上不連結。使用者不會把 dot 和齒輪 icon 的「有新功能」語義配對起來"
-      >
-        <div className="flex items-center gap-4">
-          {/* ❌ anti-pattern demo intentionally kept: text+icon Button + overlay dot —— 整個 Rule 的主軸就是
-              「dot 飄在 button chrome 角不是 icon 角」,此處保留 old `relative + absolute` pattern 作為
-              視覺反例,讓讀者看到 dot 為何離 icon 很遠 */}
-          <div className="relative inline-flex">
-            <Button variant="tertiary" size="sm" startIcon={Settings}>設定</Button>
-            <Badge dot variant="critical" className="absolute -top-1 -right-1" aria-label="有新功能" />
-          </div>
-          <Label warn>↑ dot 飄在「設定」文字右上角的空處,跟齒輪 icon 毫無視覺連結</Label>
-        </div>
-        <Label>改法:(a) 按鈕改 iconOnly + dot 疊 icon 角落、(b) 移除 dot 改用內部文字 badge(目前 DS 無 text-only badge,屬 tech debt)、(c) 移到 text 後 inline 小字「設定(新)」</Label>
-      </Rule>
-
-      <Rule
-        title="判斷法：「使用者想知道『有沒有』還是『多少』？」"
-        note="知道有就夠 → dot / 需要數量判斷 urgency → count"
-      >
-        <Label>若 count 永遠顯示 99+(threshold 失去區別力),改用 dot 或升高 max</Label>
       </Rule>
     </div>
   ),

@@ -75,20 +75,23 @@ function InlineHoverExample() {
 
 // ── WhenToUse — 何時使用 NameCard ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── 觸發情境 ───────────────────────────────────────────────────────────────
+
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsAvatarRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適用情境見<LinkTo kind="Design System/Components/NameCard/展示" name="Default"><span className="text-primary hover:underline font-medium cursor-pointer">展示頁</span></LinkTo>的真實業務場景範例。</p>
       <p>判斷時對照 spec.md「何時用 / 何時不用」段落。</p>
     </div>
-  ),
-}
 
-export const VsAvatarRule: Story = {
-  name: '定位：人員詳情卡 vs 名字展示',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsAvatarRule — 原 VsAvatarRule */}
+      <div>
       <Rule
         title="NameCard — 「hover 展開詳情」的人員資訊卡"
         note="@mention、PR reviewer、留言者 avatar 等場景:使用者看到頭像想知道「這人是誰」,hover 彈出 NameCard。卡內有 status、action button（Chat / Call）、結構化欄位、View more"
@@ -115,10 +118,9 @@ export const VsAvatarRule: Story = {
         <Label warn>（範例省略）navigation 用 link,不要 hover 才給 profile 入口</Label>
       </Rule>
     </div>
+    </div>
   ),
 }
-
-// ── 觸發情境 ───────────────────────────────────────────────────────────────
 
 export const TriggerContextRule: Story = {
   name: '何時配 HoverCard、何時放頁面內',

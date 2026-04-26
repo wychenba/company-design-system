@@ -35,10 +35,18 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Chip ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
-  render: () => (
-    <div className="prose prose-sm max-w-prose">
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse / VsSegmentedRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
+  render: () => {
+    const [langs, setLangs] = React.useState<string[]>(['js', 'ts'])
+    const [period, setPeriod] = React.useState('week')
+    return (
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Chip 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -56,18 +64,11 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsSegmentedRule: Story = {
-  name: '定位：多選濾鏡 vs 互斥檢視',
-  render: () => {
-    const [langs, setLangs] = React.useState<string[]>(['js', 'ts'])
-    const [period, setPeriod] = React.useState('week')
-    return (
+      {/* vs 近親元件 — 原 VsSegmentedRule */}
       <div>
         <Rule
-          title="Chip — 多選濾鏡（可選任意數量）"
+          title="vs 近親元件 — Chip 是多選濾鏡(可選任意數量)"
           note="Material Design Filter Chip 的實作:一排獨立 pill,可勾選任意組合。典型場景:技術文章列表的語言標籤濾鏡、商品列表的類別篩選、搜尋結果的多維度過濾"
         >
           <div>
@@ -84,7 +85,7 @@ export const VsSegmentedRule: Story = {
         </Rule>
 
         <Rule
-          title="❌ 互斥單選(同時只能選一個) → 應該用 SegmentedControl"
+          title="vs 近親元件 — 互斥單選(同時只能選一個)用 SegmentedControl"
           note="2–5 個互斥選項、視覺要表達「連體」關係,用 SegmentedControl。Chip 各自獨立的視覺反而模糊了「只能選一個」的語意"
         >
           <div>
@@ -104,7 +105,7 @@ export const VsSegmentedRule: Story = {
         </Rule>
 
         <Rule
-          title="❌ 純顯示、不可互動 → 應該用 Tag"
+          title="vs 近親元件 — 純顯示、不可互動用 Tag"
           note="Chip 是 control(選擇 / 未選),Tag 是 label(資訊標記)。商品卡上「新品 / 熱銷」是 Tag 不是 Chip"
         >
           <div className="flex items-center gap-2">
@@ -114,6 +115,24 @@ export const VsSegmentedRule: Story = {
           <Label>↑ 純顯示用 Tag,不要誤用 Chip</Label>
         </Rule>
       </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="何時不用 / 替代元件 — 加 dismiss X(再點一次 deselect 就是 dismiss)"
+        note="Filter chip 的「移除這個 filter」由 toggle(再點一次)承擔。加 X 等於同一動作有兩個 affordance,違反 Hicks's Law。Material 3 / Atlassian / Polaris filter chips 都不提供 X"
+      >
+        <Label warn>（範例省略）Chip 型別不提供 onDismiss,設計上就擋住這個錯用</Label>
+      </Rule>
+
+      <Rule
+        title="何時不用 / 替代元件 — Chip 單獨使用,沒有 ChipGroup 包覆"
+        note="Chip 的選擇狀態由 Radix ToggleGroup 管理,沒 ChipGroup 會失去 keyboard navigation / a11y / state sync"
+      >
+        <Label warn>（範例省略）Chip 必須在 ChipGroup 內,對齊 RadioGroup / SegmentedControl 的結構</Label>
+      </Rule>
+    </div>
+    </div>
     )
   },
 }
@@ -209,23 +228,3 @@ export const SelectedStyleRule: Story = {
 
 // ── 禁止 ────────────────────────────────────────────────────────────────
 
-export const WhenNotToUse: Story = {
-  name: '禁止：Chip 不做的事',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 加 dismiss X — 再點一次 deselect 就是 dismiss"
-        note="Filter chip 的「移除這個 filter」由 toggle(再點一次)承擔。加 X 等於同一動作有兩個 affordance,違反 Hicks's Law。Material 3 / Atlassian / Polaris filter chips 都不提供 X"
-      >
-        <Label warn>（範例省略）Chip 型別不提供 onDismiss,設計上就擋住這個錯用</Label>
-      </Rule>
-
-      <Rule
-        title="❌ Chip 單獨使用，沒有 ChipGroup 包覆"
-        note="Chip 的選擇狀態由 Radix ToggleGroup 管理,沒 ChipGroup 會失去 keyboard navigation / a11y / state sync"
-      >
-        <Label warn>（範例省略）Chip 必須在 ChipGroup 內,對齊 RadioGroup / SegmentedControl 的結構</Label>
-      </Rule>
-    </div>
-  ),
-}

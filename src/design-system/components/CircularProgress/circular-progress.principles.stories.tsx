@@ -33,78 +33,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-export const IndeterminateVsDeterminateRule: Story = {
-  name: 'Indeterminate vs Determinate',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 UsageScenarioRule / WhenNotToUse / IndeterminateVsDeterminateRule / CircularVsSkeletonRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div>
-      <Rule
-        title="不知道時長 → 不傳 value(indeterminate);能量化進度 → 傳 value(determinate)"
-        note="CircularProgress 兩態合一(Material / Chakra 流派)。判斷法:consumer 能告訴使用者「完成了 X%」嗎?能 → determinate、不能 → indeterminate。選錯會讓使用者一直盯著 0% 以為壞掉,或看著旋轉以為是裝飾。"
-      >
-        <div className="flex flex-col items-center gap-2">
-          <CircularProgress aria-label="等待第三方驗證" />
-          <Label>✅ 第三方金流驗證:不知道要多久 → 不傳 value</Label>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-          <CircularProgress value={65} affix="value" />
-          <Label>✅ 檔案上傳:bytes 已知 → 傳 value={'{N}'}</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="Determinate 若無法量化會變假進度"
-        note="value 永遠停在 0% 或隨機亂跳會讓使用者懷疑 app 壞掉。若操作本質不可量化,維持 indeterminate 到底,不要硬傳 value 假裝。"
-      >
-        <div className="flex flex-col items-center gap-2">
-          <CircularProgress value={0} />
-          <Label warn>❌ 生成報表中卻永遠卡 0% → 改用 indeterminate(不傳 value)</Label>
-        </div>
-      </Rule>
-    </div>
-  ),
-}
-
-export const CircularVsSkeletonRule: Story = {
-  name: 'CircularProgress vs Skeleton',
-  render: () => (
-    <div>
-      <Rule
-        title="CircularProgress — 行為回饋(不可預期時長、不知佈局)"
-        note="Button 送出中、API 等待、upload 進行中——沒有「資料形狀」可以佔位,只是告訴使用者「正在處理,請稍候」"
-      >
-        <Button variant="primary" loading>處理付款中</Button>
-        <Label>Stripe 結帳:只需要「在做事」的訊號,不需要佔位</Label>
-      </Rule>
-
-      <Rule
-        title="Skeleton — 內容佔位(佈局已知、等資料填入)"
-        note="List / table / card grid 初次載入——佈局結構確定,只差資料。用 Skeleton 讓版面先定型,避免資料回來時跳動"
-      >
-        <div className="flex items-center gap-3 w-72 border border-border rounded-lg p-3">
-          <Skeleton className="h-10 w-10 rounded-full" />
-          <div className="flex flex-col gap-2 flex-1">
-            <Skeleton className="h-4 w-3/5" />
-            <Skeleton className="h-3 w-1/3" />
-          </div>
-        </div>
-        <Label>Linear 成員列表:佈局已定,等資料填入</Label>
-      </Rule>
-
-      <Rule
-        title="判準"
-        note="要描述「佈局」還是「行為」?描述佈局 → Skeleton;描述行為 → CircularProgress"
-      >
-        <Label>能畫出最終樣貌 → Skeleton</Label>
-        <Label>只知道「在進行」 → CircularProgress(indeterminate)</Label>
-      </Rule>
-    </div>
-  ),
-}
-
-export const UsageScenarioRule: Story = {
-  name: '使用情境',
-  render: () => (
-    <div>
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 UsageScenarioRule */}
+      <div>
       <Rule
         title="✅ Button loading — 使用者觸發動作後的即時回饋"
         note="表單送出、API 呼叫、執行動作中,Button 的 loading prop 內部自動渲染 CircularProgress。是最常見的消費場景"
@@ -141,51 +78,9 @@ export const UsageScenarioRule: Story = {
         </div>
       </Rule>
     </div>
-  ),
-}
 
-export const SizeMatchContextRule: Story = {
-  name: 'Size 對應使用情境',
-  render: () => (
-    <div>
-      <Rule
-        title="16px — Button 內、Field endAction、Tag 內(inline 小空間)"
-        note="inline 元素內部,尺寸對齊旁邊的 text / icon。不能更大,會撐破容器。多數情境由 Button / Input 內部程式化決定(consumer 不需手傳)"
-      >
-        <Button variant="tertiary" loading>送出</Button>
-        <Input
-          loading
-          defaultValue="驗證中..."
-          placeholder="驗證 email..."
-          className="w-60"
-        />
-      </Rule>
-
-      <Rule
-        title="24px(預設)— row primitive 的 loading footer、card 內 inline loading"
-        note="中等尺寸,放在 row / card 內容區,視覺重量足夠吸引注意但不喧賓奪主"
-      >
-        <div className="flex items-center justify-center gap-2 border border-border rounded-lg p-4 w-72">
-          <CircularProgress size={24} />
-          <span className="text-body text-fg-muted">載入更多留言...</span>
-        </div>
-        <Label>Slack channel 載入更多訊息的 footer</Label>
-      </Rule>
-
-      {/* 2026-04-23 移除「32–48px — empty state 中央、full-screen overlay」Rule:
-          原範例用 horizontal flex(progress + text inline)= 非 DS canonical 佈局。
-          全頁 / 延遲加載 overlay 應走 `<Empty icon={<CircularProgress size={48} />} />` compose
-          (見上方「延遲加載浮層 / 全頁 overlay — 用 Empty compose」Rule)。
-          32–48px 尺寸選擇已在 spec.md「Size」節 canonical 記錄,不需要 stories 層
-          另存示範;錯誤 layout 範例保留會誤導 consumer 手刻,故刪除。 */}
-    </div>
-  ),
-}
-
-export const WhenNotToUse: Story = {
-  name: '禁止事項',
-  render: () => (
-    <div>
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
       <Rule
         title="❌ 不用 CircularProgress 當常駐視覺裝飾"
         note="語意鎖「正在載入、正在處理」。永遠旋轉的裝飾會讓 a11y 使用者(螢幕閱讀器)持續收到 loading 通知,也讓視覺使用者無法判斷何時結束"
@@ -248,5 +143,105 @@ export const WhenNotToUse: Story = {
         </div>
       </Rule>
     </div>
+
+      {/* vs 近親 — IndeterminateVsDeterminateRule — 原 IndeterminateVsDeterminateRule */}
+      <div>
+      <Rule
+        title="不知道時長 → 不傳 value(indeterminate);能量化進度 → 傳 value(determinate)"
+        note="CircularProgress 兩態合一(Material / Chakra 流派)。判斷法:consumer 能告訴使用者「完成了 X%」嗎?能 → determinate、不能 → indeterminate。選錯會讓使用者一直盯著 0% 以為壞掉,或看著旋轉以為是裝飾。"
+      >
+        <div className="flex flex-col items-center gap-2">
+          <CircularProgress aria-label="等待第三方驗證" />
+          <Label>✅ 第三方金流驗證:不知道要多久 → 不傳 value</Label>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <CircularProgress value={65} affix="value" />
+          <Label>✅ 檔案上傳:bytes 已知 → 傳 value={'{N}'}</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="Determinate 若無法量化會變假進度"
+        note="value 永遠停在 0% 或隨機亂跳會讓使用者懷疑 app 壞掉。若操作本質不可量化,維持 indeterminate 到底,不要硬傳 value 假裝。"
+      >
+        <div className="flex flex-col items-center gap-2">
+          <CircularProgress value={0} />
+          <Label warn>❌ 生成報表中卻永遠卡 0% → 改用 indeterminate(不傳 value)</Label>
+        </div>
+      </Rule>
+    </div>
+
+      {/* vs 近親 — CircularVsSkeletonRule — 原 CircularVsSkeletonRule */}
+      <div>
+      <Rule
+        title="CircularProgress — 行為回饋(不可預期時長、不知佈局)"
+        note="Button 送出中、API 等待、upload 進行中——沒有「資料形狀」可以佔位,只是告訴使用者「正在處理,請稍候」"
+      >
+        <Button variant="primary" loading>處理付款中</Button>
+        <Label>Stripe 結帳:只需要「在做事」的訊號,不需要佔位</Label>
+      </Rule>
+
+      <Rule
+        title="Skeleton — 內容佔位(佈局已知、等資料填入)"
+        note="List / table / card grid 初次載入——佈局結構確定,只差資料。用 Skeleton 讓版面先定型,避免資料回來時跳動"
+      >
+        <div className="flex items-center gap-3 w-72 border border-border rounded-lg p-3">
+          <Skeleton className="h-10 w-10 rounded-full" />
+          <div className="flex flex-col gap-2 flex-1">
+            <Skeleton className="h-4 w-3/5" />
+            <Skeleton className="h-3 w-1/3" />
+          </div>
+        </div>
+        <Label>Linear 成員列表:佈局已定,等資料填入</Label>
+      </Rule>
+
+      <Rule
+        title="判準"
+        note="要描述「佈局」還是「行為」?描述佈局 → Skeleton;描述行為 → CircularProgress"
+      >
+        <Label>能畫出最終樣貌 → Skeleton</Label>
+        <Label>只知道「在進行」 → CircularProgress(indeterminate)</Label>
+      </Rule>
+    </div>
+    </div>
   ),
 }
+
+export const SizeMatchContextRule: Story = {
+  name: 'Size 對應使用情境',
+  render: () => (
+    <div>
+      <Rule
+        title="16px — Button 內、Field endAction、Tag 內(inline 小空間)"
+        note="inline 元素內部,尺寸對齊旁邊的 text / icon。不能更大,會撐破容器。多數情境由 Button / Input 內部程式化決定(consumer 不需手傳)"
+      >
+        <Button variant="tertiary" loading>送出</Button>
+        <Input
+          loading
+          defaultValue="驗證中..."
+          placeholder="驗證 email..."
+          className="w-60"
+        />
+      </Rule>
+
+      <Rule
+        title="24px(預設)— row primitive 的 loading footer、card 內 inline loading"
+        note="中等尺寸,放在 row / card 內容區,視覺重量足夠吸引注意但不喧賓奪主"
+      >
+        <div className="flex items-center justify-center gap-2 border border-border rounded-lg p-4 w-72">
+          <CircularProgress size={24} />
+          <span className="text-body text-fg-muted">載入更多留言...</span>
+        </div>
+        <Label>Slack channel 載入更多訊息的 footer</Label>
+      </Rule>
+
+      {/* 2026-04-23 移除「32–48px — empty state 中央、full-screen overlay」Rule:
+          原範例用 horizontal flex(progress + text inline)= 非 DS canonical 佈局。
+          全頁 / 延遲加載 overlay 應走 `<Empty icon={<CircularProgress size={48} />} />` compose
+          (見上方「延遲加載浮層 / 全頁 overlay — 用 Empty compose」Rule)。
+          32–48px 尺寸選擇已在 spec.md「Size」節 canonical 記錄,不需要 stories 層
+          另存示範;錯誤 layout 範例保留會誤導 consumer 手刻,故刪除。 */}
+    </div>
+  ),
+}
+

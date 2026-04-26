@@ -58,10 +58,15 @@ const CATEGORY_OPTIONS = [
 
 // ── WhenToUse — 何時使用 DataTable ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 DataTable 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -81,6 +86,38 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 不用 DataTable 顯示 key-value 屬性列表"
+        note="DataTable 是多 row 集合語義。單一實體的屬性應用 DescriptionList（如用戶詳情頁面）。Jira issue detail page 的 5 個屬性用 DescriptionList，不用 Table"
+      >
+        <Label warn>改用 DescriptionList：項目名 / 狀態 / 優先級 / 指派人 / 建立日期</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 DataTable 表達階層結構（部門 / 資料夾）"
+        note="DataTable 是平面 row。階層結構（可展開收合）改用 TreeView。Notion 的資料庫可以 expand row，但階層樹用 TreeView"
+      >
+        <Label warn>階層結構用 TreeView，支援無限深度展開 / 收合</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 DataTable 做超過 3 層的巢狀分組"
+        note="DataTable 的分組能力有限。需要複雜群組 header + 合併 cell → 用自訂 grid 或引入 AG Grid。Stripe billing 的 invoices 表最多 2 層分組"
+      >
+        <Label warn>複雜分組用自訂 layout 或專門 grid library</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 DataTable 做試算表（公式、跨 cell 選取）"
+        note="DataTable 是資料展示，不支援 Excel 功能。需要試算表能力 → AG Grid Enterprise / Handsontable。Airtable 確實像表，但 DataTable 不是設計來做這個"
+      >
+        <Label warn>試算表功能用專門 library，不往 DataTable 塞</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -263,37 +300,3 @@ export const NotSpreadsheetRule: Story = {
   ),
 }
 
-export const WhenNotToUse: Story = {
-  name: '何時不用',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 不用 DataTable 顯示 key-value 屬性列表"
-        note="DataTable 是多 row 集合語義。單一實體的屬性應用 DescriptionList（如用戶詳情頁面）。Jira issue detail page 的 5 個屬性用 DescriptionList，不用 Table"
-      >
-        <Label warn>改用 DescriptionList：項目名 / 狀態 / 優先級 / 指派人 / 建立日期</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 DataTable 表達階層結構（部門 / 資料夾）"
-        note="DataTable 是平面 row。階層結構（可展開收合）改用 TreeView。Notion 的資料庫可以 expand row，但階層樹用 TreeView"
-      >
-        <Label warn>階層結構用 TreeView，支援無限深度展開 / 收合</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 DataTable 做超過 3 層的巢狀分組"
-        note="DataTable 的分組能力有限。需要複雜群組 header + 合併 cell → 用自訂 grid 或引入 AG Grid。Stripe billing 的 invoices 表最多 2 層分組"
-      >
-        <Label warn>複雜分組用自訂 layout 或專門 grid library</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 DataTable 做試算表（公式、跨 cell 選取）"
-        note="DataTable 是資料展示，不支援 Excel 功能。需要試算表能力 → AG Grid Enterprise / Handsontable。Airtable 確實像表，但 DataTable 不是設計來做這個"
-      >
-        <Label warn>試算表功能用專門 library，不往 DataTable 塞</Label>
-      </Rule>
-    </div>
-  ),
-}

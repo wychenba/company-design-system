@@ -30,10 +30,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Switch ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsCheckboxRule / ReadonlyVsDisabledRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Switch 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -41,6 +46,33 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* vs 近親 — ReadonlyVsDisabledRule — 原 ReadonlyVsDisabledRule */}
+      <div>
+      <Rule
+        title="Readonly 保留正常顏色(可讀)/ Disabled 降透明度(弱化)"
+        note="兩者都鎖定互動,但視覺訊號不同:readonly 告訴使用者「這個值就是這樣,你看得清」;disabled 告訴使用者「這個 field 目前不可用」(弱化暗示低優先)"
+      >
+        <div className="grid grid-cols-2 gap-4">
+          <div className="border border-dashed border-divider rounded-md p-3">
+            <div className="text-caption text-fg-muted mb-2">Readonly ON(顏色正常)</div>
+            <Switch readOnly defaultChecked />
+          </div>
+          <div className="border border-dashed border-divider rounded-md p-3">
+            <div className="text-caption text-fg-muted mb-2">Disabled ON(opacity 降低)</div>
+            <Switch disabled defaultChecked />
+          </div>
+        </div>
+      </Rule>
+
+      <Rule
+        title="使用場景對照"
+        note="Readonly:表單 readonly 呈現、DataTable cell 非編輯態——值重要、視覺不能弱化。Disabled:外部條件造成暫時不可用(方案限制、權限不足)——傳達「現在用不到」"
+      >
+        <Label>兩者都 `pointer-events-none` + 不在 tab order 內,互動鎖定一致,差別在視覺訊號</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -143,32 +175,3 @@ export const DisabledOpacityRule: Story = {
   ),
 }
 
-export const ReadonlyVsDisabledRule: Story = {
-  name: 'Readonly vs Disabled 的視覺區分',
-  render: () => (
-    <div>
-      <Rule
-        title="Readonly 保留正常顏色(可讀)/ Disabled 降透明度(弱化)"
-        note="兩者都鎖定互動,但視覺訊號不同:readonly 告訴使用者「這個值就是這樣,你看得清」;disabled 告訴使用者「這個 field 目前不可用」(弱化暗示低優先)"
-      >
-        <div className="grid grid-cols-2 gap-4">
-          <div className="border border-dashed border-divider rounded-md p-3">
-            <div className="text-caption text-fg-muted mb-2">Readonly ON(顏色正常)</div>
-            <Switch readOnly defaultChecked />
-          </div>
-          <div className="border border-dashed border-divider rounded-md p-3">
-            <div className="text-caption text-fg-muted mb-2">Disabled ON(opacity 降低)</div>
-            <Switch disabled defaultChecked />
-          </div>
-        </div>
-      </Rule>
-
-      <Rule
-        title="使用場景對照"
-        note="Readonly:表單 readonly 呈現、DataTable cell 非編輯態——值重要、視覺不能弱化。Disabled:外部條件造成暫時不可用(方案限制、權限不足)——傳達「現在用不到」"
-      >
-        <Label>兩者都 `pointer-events-none` + 不在 tab order 內,互動鎖定一致,差別在視覺訊號</Label>
-      </Rule>
-    </div>
-  ),
-}

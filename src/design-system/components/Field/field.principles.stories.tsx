@@ -32,10 +32,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Field ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsDescriptionListRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Field 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -55,6 +60,59 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* vs 近親 — VsDescriptionListRule — 原 VsDescriptionListRule */}
+      <div>
+      <Rule
+        title="Field — 表單輸入（可編輯）"
+        note="使用者要輸入 / 修改 / 提交的 form 場景。含 required、error、focus、驗證等 form state 機制"
+      >
+        <div className="max-w-sm">
+          <FieldGroup>
+            <Field>
+              <FieldLabel>Email</FieldLabel>
+              <Input defaultValue="user@example.com" />
+            </Field>
+            <Field>
+              <FieldLabel>時區</FieldLabel>
+              <Select
+                options={[{ value: 'tw', label: '台北 (UTC+8)' }]}
+                value="tw"
+                onChange={() => {}}
+              />
+            </Field>
+          </FieldGroup>
+        </div>
+        <Label>↑ 可編輯的 profile settings</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 唯讀展示：用 DescriptionList"
+        note="「查看使用者資料」「訂單明細」這類純展示場景不該用 Field + readonly mode——DescriptionList 的 `dl / dt / dd` HTML 語義更適合唯讀屬性列表,a11y 也更清楚"
+      >
+        <div className="max-w-sm">
+          <FieldGroup>
+            <Field orientation="horizontal">
+              <FieldLabel>Email</FieldLabel>
+              <Input mode="readonly" defaultValue="user@example.com" />
+            </Field>
+            <Field orientation="horizontal">
+              <FieldLabel>建立時間</FieldLabel>
+              <Input mode="readonly" defaultValue="2026-04-18" />
+            </Field>
+          </FieldGroup>
+        </div>
+        <Label warn>↑ 純展示用 Field + readonly → 浪費 Field 的 input 邏輯。改用 DescriptionList</Label>
+      </Rule>
+
+      <Rule
+        title="判斷法：「使用者會編輯這些值嗎？」"
+        note="會 → Field(含 readonly mode);永遠不會(純展示/唯讀資料)→ DescriptionList"
+      >
+        <Label>完整對照見 field.spec.md「何時不用」+ description-list.spec.md「vs Field 系統」</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -220,58 +278,3 @@ export const NotForFormActionsRule: Story = {
   ),
 }
 
-export const VsDescriptionListRule: Story = {
-  name: '與 DescriptionList 的分界',
-  render: () => (
-    <div>
-      <Rule
-        title="Field — 表單輸入（可編輯）"
-        note="使用者要輸入 / 修改 / 提交的 form 場景。含 required、error、focus、驗證等 form state 機制"
-      >
-        <div className="max-w-sm">
-          <FieldGroup>
-            <Field>
-              <FieldLabel>Email</FieldLabel>
-              <Input defaultValue="user@example.com" />
-            </Field>
-            <Field>
-              <FieldLabel>時區</FieldLabel>
-              <Select
-                options={[{ value: 'tw', label: '台北 (UTC+8)' }]}
-                value="tw"
-                onChange={() => {}}
-              />
-            </Field>
-          </FieldGroup>
-        </div>
-        <Label>↑ 可編輯的 profile settings</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 唯讀展示：用 DescriptionList"
-        note="「查看使用者資料」「訂單明細」這類純展示場景不該用 Field + readonly mode——DescriptionList 的 `dl / dt / dd` HTML 語義更適合唯讀屬性列表,a11y 也更清楚"
-      >
-        <div className="max-w-sm">
-          <FieldGroup>
-            <Field orientation="horizontal">
-              <FieldLabel>Email</FieldLabel>
-              <Input mode="readonly" defaultValue="user@example.com" />
-            </Field>
-            <Field orientation="horizontal">
-              <FieldLabel>建立時間</FieldLabel>
-              <Input mode="readonly" defaultValue="2026-04-18" />
-            </Field>
-          </FieldGroup>
-        </div>
-        <Label warn>↑ 純展示用 Field + readonly → 浪費 Field 的 input 邏輯。改用 DescriptionList</Label>
-      </Rule>
-
-      <Rule
-        title="判斷法：「使用者會編輯這些值嗎？」"
-        note="會 → Field(含 readonly mode);永遠不會(純展示/唯讀資料)→ DescriptionList"
-      >
-        <Label>完整對照見 field.spec.md「何時不用」+ description-list.spec.md「vs Field 系統」</Label>
-      </Rule>
-    </div>
-  ),
-}

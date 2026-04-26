@@ -28,10 +28,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Alert ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsToastVsDialogRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Alert 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -52,13 +57,9 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsToastVsDialogRule: Story = {
-  name: 'Alert vs Toast vs Dialog',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsToastVsDialogRule — 原 VsToastVsDialogRule */}
+      <div>
       <Rule
         title="Alert — 持久性通知、嵌入頁面、不阻斷"
         note="使用者主動 dismiss 或處理才消失。適合:方案即將到期、帳號未驗證、系統維護、複雜動作的前置警告"
@@ -101,6 +102,7 @@ export const VsToastVsDialogRule: Story = {
       >
         <Label>三種訊號各司其職——別混用</Label>
       </Rule>
+    </div>
     </div>
   ),
 }

@@ -42,10 +42,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Separator ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Separator 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -62,6 +67,31 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 不用 Separator 元件做元件固定結構的邊框"
+        note="Dialog / Sidebar header-footer 的邊界用 CSS border，不用 Separator 元件。Separator 只用 consumer 手動放置的分隔。Notion dialog 的 header bottom 邊界是 CSS，不是 Separator"
+      >
+        <Label warn>固定結構邊界 → CSS border-divider，不用元件</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 --border token 做分隔線"
+        note="分隔線一律用 --divider（較淡），--border 只用控件邊框。Jira menu 項目間的線用 --divider"
+      >
+        <Label warn>分隔線 → --divider，--border 只用容器邊框</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Separator 做裝飾性邊框"
+        note="輪廓邊框（Input / Card / DataTable 邊線）用 CSS border-border，不用 Separator。Separator 有 role 語意，裝飾邊不需要"
+      >
+        <Label warn>裝飾邊框 → CSS border-border，Separator 只用分隔內容</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -222,30 +252,3 @@ export const NotAsBorderRule: Story = {
   ),
 }
 
-export const WhenNotToUse: Story = {
-  name: '何時不用',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 不用 Separator 元件做元件固定結構的邊框"
-        note="Dialog / Sidebar header-footer 的邊界用 CSS border，不用 Separator 元件。Separator 只用 consumer 手動放置的分隔。Notion dialog 的 header bottom 邊界是 CSS，不是 Separator"
-      >
-        <Label warn>固定結構邊界 → CSS border-divider，不用元件</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 --border token 做分隔線"
-        note="分隔線一律用 --divider（較淡），--border 只用控件邊框。Jira menu 項目間的線用 --divider"
-      >
-        <Label warn>分隔線 → --divider，--border 只用容器邊框</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 Separator 做裝飾性邊框"
-        note="輪廓邊框（Input / Card / DataTable 邊線）用 CSS border-border，不用 Separator。Separator 有 role 語意，裝飾邊不需要"
-      >
-        <Label warn>裝飾邊框 → CSS border-border，Separator 只用分隔內容</Label>
-      </Rule>
-    </div>
-  ),
-}

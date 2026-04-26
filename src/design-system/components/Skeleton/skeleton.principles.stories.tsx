@@ -33,10 +33,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Skeleton ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse / SkeletonVsCircularProgressRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Skeleton 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -57,13 +62,56 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const SkeletonVsCircularProgressRule: Story = {
-  name: 'Skeleton vs CircularProgress',
-  render: () => (
-    <div>
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 不用 Skeleton 做裝飾"
+        note="Skeleton 是 loading 語意,不是視覺裝飾元件。把它當灰色色塊用會混淆使用者對「載入中」的認知"
+      >
+        <div className="flex items-center gap-3 border border-border rounded-lg p-3 w-72">
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <span className="text-body">分隔用的灰色圓點</span>
+        </div>
+        <Label warn>Skeleton 不是 decoration — 裝飾用 bg-muted div,不要用 Skeleton</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不要 nested skeleton"
+        note="Skeleton 裡包 Skeleton 視覺上會疊加 animation,造成閃爍感。如果需要複合結構,用多個並列 Skeleton 各自模擬一塊"
+      >
+        <div className="border border-border rounded-lg p-3 w-72">
+          <Skeleton className="h-20 w-full p-3">
+            <Skeleton className="h-4 w-1/2" />
+          </Skeleton>
+        </div>
+        <Label warn>外層 Skeleton 包內層 Skeleton → 動畫疊加閃爍</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不要 mix 資料跟 skeleton 在同一 row"
+        note="同一個 row 裡一半顯示真實資料、一半顯示 skeleton,視覺上會像「半載入」狀態,使用者不知道這筆資料到底算不算讀完。Row 是原子單位,要嘛全 skeleton 要嘛全真實"
+      >
+        <div className="flex items-center gap-3 border border-border rounded-lg p-3 w-72">
+          <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary text-on-emphasis text-body font-medium">陳</div>
+          <div className="flex flex-col gap-2 flex-1">
+            <span className="text-body">陳小明</span>
+            <Skeleton className="h-3 w-24" />
+          </div>
+        </div>
+        <Label warn>Avatar + name 已載,email 還在 skeleton → 使用者困惑「這筆好了沒」</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Skeleton 取代 Empty 或 Error"
+        note="確定沒有資料 → Empty;載入失敗 → Alert + 重試按鈕。Skeleton 的語意是「還沒來」,不是「沒有」也不是「壞了」"
+      >
+        <Label warn>Skeleton 無錯誤語意 → 使用者會一直等,不會重試</Label>
+      </Rule>
+    </div>
+
+      {/* vs 近親 — SkeletonVsCircularProgressRule — 原 SkeletonVsCircularProgressRule */}
+      <div>
       <Rule
         title="Skeleton — 佈局已知,等資料填入即成最終樣貌"
         note="初次載入 list / table / card grid 時使用。Skeleton 的形狀貼近真實內容,資料回來後版面不跳動,使用者預期不被打破"
@@ -98,6 +146,7 @@ export const SkeletonVsCircularProgressRule: Story = {
         <Label>佈局已知 → Skeleton(內容佔位)</Label>
         <Label>佈局未知 → CircularProgress(行為回饋)</Label>
       </Rule>
+    </div>
     </div>
   ),
 }
@@ -179,53 +228,3 @@ export const DurationRule: Story = {
   ),
 }
 
-export const WhenNotToUse: Story = {
-  name: '禁止事項',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 不用 Skeleton 做裝飾"
-        note="Skeleton 是 loading 語意,不是視覺裝飾元件。把它當灰色色塊用會混淆使用者對「載入中」的認知"
-      >
-        <div className="flex items-center gap-3 border border-border rounded-lg p-3 w-72">
-          <Skeleton className="h-8 w-8 rounded-full" />
-          <span className="text-body">分隔用的灰色圓點</span>
-        </div>
-        <Label warn>Skeleton 不是 decoration — 裝飾用 bg-muted div,不要用 Skeleton</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不要 nested skeleton"
-        note="Skeleton 裡包 Skeleton 視覺上會疊加 animation,造成閃爍感。如果需要複合結構,用多個並列 Skeleton 各自模擬一塊"
-      >
-        <div className="border border-border rounded-lg p-3 w-72">
-          <Skeleton className="h-20 w-full p-3">
-            <Skeleton className="h-4 w-1/2" />
-          </Skeleton>
-        </div>
-        <Label warn>外層 Skeleton 包內層 Skeleton → 動畫疊加閃爍</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不要 mix 資料跟 skeleton 在同一 row"
-        note="同一個 row 裡一半顯示真實資料、一半顯示 skeleton,視覺上會像「半載入」狀態,使用者不知道這筆資料到底算不算讀完。Row 是原子單位,要嘛全 skeleton 要嘛全真實"
-      >
-        <div className="flex items-center gap-3 border border-border rounded-lg p-3 w-72">
-          <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary text-on-emphasis text-body font-medium">陳</div>
-          <div className="flex flex-col gap-2 flex-1">
-            <span className="text-body">陳小明</span>
-            <Skeleton className="h-3 w-24" />
-          </div>
-        </div>
-        <Label warn>Avatar + name 已載,email 還在 skeleton → 使用者困惑「這筆好了沒」</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 Skeleton 取代 Empty 或 Error"
-        note="確定沒有資料 → Empty;載入失敗 → Alert + 重試按鈕。Skeleton 的語意是「還沒來」,不是「沒有」也不是「壞了」"
-      >
-        <Label warn>Skeleton 無錯誤語意 → 使用者會一直等,不會重試</Label>
-      </Rule>
-    </div>
-  ),
-}

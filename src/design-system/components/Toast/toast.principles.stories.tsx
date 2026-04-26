@@ -29,10 +29,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Toast ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsAlertVsDialogRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Toast 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -44,13 +49,9 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsAlertVsDialogRule: Story = {
-  name: 'Toast vs Alert vs Dialog',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsAlertVsDialogRule — 原 VsAlertVsDialogRule */}
+      <div>
       <Rule
         title="Toast — 短暫自動消失、非阻斷、不保留"
         note="操作結果回饋(儲存成功、已複製、訊息已送出)。使用者不需要看到也沒關係——不該阻斷流程。自動消失(預設 4000ms)"
@@ -99,6 +100,7 @@ export const VsAlertVsDialogRule: Story = {
         </Button>
         <Label warn>↑ 破壞性動作靠 Toast action 確認 → 4 秒消失 / 點錯只能救 → 用 Dialog 聚焦確認</Label>
       </Rule>
+    </div>
     </div>
   ),
 }

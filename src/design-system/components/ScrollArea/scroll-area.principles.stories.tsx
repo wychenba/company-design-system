@@ -58,10 +58,15 @@ const StripeRows = ({ count = 5 }: { count?: number }) => (
 
 // ── WhenToUse — 何時使用 ScrollArea ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 ScrollArea 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -79,15 +84,11 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const ScrollAreaVsNative: Story = {
-  name: 'ScrollArea vs Native scroll',
-  render: () => (
-    <div>
+      {/* vs Native scroll — 原 ScrollAreaVsNative */}
+      <div>
       <Rule
-        title="整頁捲動 → 保持 native document scroll"
+        title="vs Native scroll — 整頁捲動保持 native document scroll"
         note="瀏覽器的 document 層級捲動是 OS 慣例——保留 native 讓使用者得到 reader mode / pull-to-refresh / 鍵盤快速鍵等原生能力。ScrollArea 是 sub-region 工具,不為整頁服務。"
       >
         <div className="w-[320px]">
@@ -114,6 +115,46 @@ export const ScrollAreaVsNative: Story = {
           <Label>✅ Sidebar nav(sub-region):ScrollArea 跨 OS 一致</Label>
         </div>
       </Rule>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <Rule
+        title="❌ 錯誤 — 巢狀 ScrollArea,使用者分不清在捲哪一層"
+        note="當外層與內層都是 ScrollArea 時,滑鼠滾輪捲動的目標不明確(外層?內層?),焦點管理也會崩壞——使用者體驗破碎,a11y 使用者尤其混亂。"
+      >
+        <div className="w-[320px]">
+          <ScrollArea className="h-[220px] border border-error/40 rounded-md bg-surface p-3">
+            <div className="text-body font-medium mb-2">外層 ScrollArea</div>
+            <ScrollArea className="h-[120px] border border-error/40 rounded-md bg-canvas">
+              <div className="p-2">
+                {NOTION_PAGES.slice(0, 8).map((p) => (
+                  <div key={p} className="px-2 py-1 text-caption">{p}</div>
+                ))}
+              </div>
+            </ScrollArea>
+            <div className="mt-2 text-caption">外層繼續內容...</div>
+            {NOTION_PAGES.map((p) => <div key={p} className="text-caption py-1">{p}</div>)}
+          </ScrollArea>
+          <Label warn>滾輪捲動哪一層? 焦點跳到哪? 混亂</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="✅ 正確 — 需要巢狀結構時拆成 Tabs / Accordion / Sheet"
+        note="把第二層內容換成展開/收合的 Tabs 或 Accordion,或推進新的 Sheet / Dialog 呈現——同一個視覺層級只有一個捲動軸,使用者心智清晰。"
+      >
+        <div className="w-[320px]">
+          <ScrollArea className="h-[220px] border border-success/40 rounded-md bg-surface">
+            <div className="p-3">
+              <div className="text-body font-medium mb-2">單層 ScrollArea</div>
+              {NOTION_PAGES.map((p) => (
+                <div key={p} className="px-2 py-1.5 text-body hover:bg-neutral-hover rounded">{p}</div>
+              ))}
+            </div>
+          </ScrollArea>
+          <Label>單一捲動軸,心智清晰</Label>
+        </div>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -229,51 +270,6 @@ export const SolvesDataTableBug: Story = {
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
           <Label>✅ ScrollArea + horizontal ScrollBar — 跨 OS 一致</Label>
-        </div>
-      </Rule>
-    </div>
-  ),
-}
-
-export const WhenNotToUse: Story = {
-  name: '不巢狀 ScrollArea',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 錯誤 — 巢狀 ScrollArea,使用者分不清在捲哪一層"
-        note="當外層與內層都是 ScrollArea 時,滑鼠滾輪捲動的目標不明確(外層?內層?),焦點管理也會崩壞——使用者體驗破碎,a11y 使用者尤其混亂。"
-      >
-        <div className="w-[320px]">
-          <ScrollArea className="h-[220px] border border-error/40 rounded-md bg-surface p-3">
-            <div className="text-body font-medium mb-2">外層 ScrollArea</div>
-            <ScrollArea className="h-[120px] border border-error/40 rounded-md bg-canvas">
-              <div className="p-2">
-                {NOTION_PAGES.slice(0, 8).map((p) => (
-                  <div key={p} className="px-2 py-1 text-caption">{p}</div>
-                ))}
-              </div>
-            </ScrollArea>
-            <div className="mt-2 text-caption">外層繼續內容...</div>
-            {NOTION_PAGES.map((p) => <div key={p} className="text-caption py-1">{p}</div>)}
-          </ScrollArea>
-          <Label warn>滾輪捲動哪一層? 焦點跳到哪? 混亂</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="✅ 正確 — 需要巢狀結構時拆成 Tabs / Accordion / Sheet"
-        note="把第二層內容換成展開/收合的 Tabs 或 Accordion,或推進新的 Sheet / Dialog 呈現——同一個視覺層級只有一個捲動軸,使用者心智清晰。"
-      >
-        <div className="w-[320px]">
-          <ScrollArea className="h-[220px] border border-success/40 rounded-md bg-surface">
-            <div className="p-3">
-              <div className="text-body font-medium mb-2">單層 ScrollArea</div>
-              {NOTION_PAGES.map((p) => (
-                <div key={p} className="px-2 py-1.5 text-body hover:bg-neutral-hover rounded">{p}</div>
-              ))}
-            </div>
-          </ScrollArea>
-          <Label>單一捲動軸,心智清晰</Label>
         </div>
       </Rule>
     </div>

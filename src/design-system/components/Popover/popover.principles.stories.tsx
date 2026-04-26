@@ -63,10 +63,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Popover ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsDialogRule / VsDropdownMenuRule / VsTooltipRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Popover 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -75,13 +80,9 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsDialogRule: Story = {
-  name: 'Popover vs Dialog',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsDialogRule — 原 VsDialogRule */}
+      <div>
       <Rule
         title="Popover — non-modal 輕量浮層,使用者可 ignore 繼續主流程"
         note="篩選 / 設定 / 快速切換等補充 UI。背景仍可 scroll、可 click,使用者不需要「處理完」才能繼續工作。典型案例:Jira filter panel、Linear view settings、GitHub file tree 的 branch switcher"
@@ -135,13 +136,9 @@ export const VsDialogRule: Story = {
         <Label>Dialog:建立 project、刪除確認、付款資訊輸入、多步驟 wizard</Label>
       </Rule>
     </div>
-  ),
-}
 
-export const VsDropdownMenuRule: Story = {
-  name: 'Popover vs DropdownMenu',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsDropdownMenuRule — 原 VsDropdownMenuRule */}
+      <div>
       <Rule
         title="DropdownMenu — 固定結構的操作選單(一排 item list)"
         note="語意是「從清單中選一個動作」。鍵盤可上下導覽、Enter 觸發,MenuItem 結構統一。典型案例:Gmail 右鍵選單、Figma layer context menu、GitHub 檔案的 ⋯ 選單"
@@ -193,13 +190,9 @@ export const VsDropdownMenuRule: Story = {
         <Label warn>一排可點選動作應該用 DropdownMenu;Popover 的內容應該是自由組合不只單一 list</Label>
       </Rule>
     </div>
-  ),
-}
 
-export const VsTooltipRule: Story = {
-  name: 'Popover vs Tooltip',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsTooltipRule — 原 VsTooltipRule */}
+      <div>
       <Rule
         title="Tooltip — hover 觸發,純文字輔助說明"
         note="解釋 icon 按鈕含義、欄位說明、快捷鍵提示。使用者 hover 看到、移開就消失,內容不可互動。典型案例:Figma toolbar icon tooltip、Slack 按鈕功能提示、Gmail 的快捷鍵說明"
@@ -246,6 +239,7 @@ export const VsTooltipRule: Story = {
       >
         <Label warn>純文字提示應該 hover 就出現 → 用 Tooltip(不要用 Popover)</Label>
       </Rule>
+    </div>
     </div>
   ),
 }

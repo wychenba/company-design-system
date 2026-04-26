@@ -34,10 +34,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Tabs ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Tabs 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -51,6 +56,50 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 單一 tab 的 Tabs"
+        note="只有一個 trigger 沒有切換語意——應該直接顯示內容，不需要 tabs"
+      >
+        <Tabs defaultValue="a">
+          <TabsList>
+            <TabsTrigger value="a">唯一選項</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <Label warn>↑ 這個 Tabs 沒有意義，直接顯示內容</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 等分 / fullWidth 的 Tabs"
+        note="Tabs label 長度天然不均（「總覽」2 字 vs「成員管理與權限設定」8 字），強制等分會視覺失衡。需要等分選項改用 SegmentedControl"
+      >
+        <div className="w-full">
+          <SegmentedControl defaultValue="a" fullWidth>
+            <SegmentedControlItem value="day">日</SegmentedControlItem>
+            <SegmentedControlItem value="week">週</SegmentedControlItem>
+            <SegmentedControlItem value="month">月</SegmentedControlItem>
+          </SegmentedControl>
+          <Label>↑ 需要等分？改用 SegmentedControl</Label>
+        </div>
+      </Rule>
+
+      <Rule
+        title="❌ 用 Tabs 做頁面層級路由切換"
+        note="Tabs 是「同一上下文底下切換 view」，不是頁面導覽。路由層級切換應該用 navigation / breadcrumb，URL 要跟著變"
+      >
+        <Tabs defaultValue="home">
+          <TabsList>
+            <TabsTrigger value="home">首頁</TabsTrigger>
+            <TabsTrigger value="products">產品列表</TabsTrigger>
+            <TabsTrigger value="about">關於我們</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <Label warn>↑ 這些是獨立頁面，不該用 Tabs</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -209,49 +258,3 @@ export const TriggerSlots: Story = {
 
 // ── 禁止事項 ──────────────────────────────────────────────────────────────────
 
-export const WhenNotToUse: Story = {
-  name: '常見誤用',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 單一 tab 的 Tabs"
-        note="只有一個 trigger 沒有切換語意——應該直接顯示內容，不需要 tabs"
-      >
-        <Tabs defaultValue="a">
-          <TabsList>
-            <TabsTrigger value="a">唯一選項</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <Label warn>↑ 這個 Tabs 沒有意義，直接顯示內容</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 等分 / fullWidth 的 Tabs"
-        note="Tabs label 長度天然不均（「總覽」2 字 vs「成員管理與權限設定」8 字），強制等分會視覺失衡。需要等分選項改用 SegmentedControl"
-      >
-        <div className="w-full">
-          <SegmentedControl defaultValue="a" fullWidth>
-            <SegmentedControlItem value="day">日</SegmentedControlItem>
-            <SegmentedControlItem value="week">週</SegmentedControlItem>
-            <SegmentedControlItem value="month">月</SegmentedControlItem>
-          </SegmentedControl>
-          <Label>↑ 需要等分？改用 SegmentedControl</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="❌ 用 Tabs 做頁面層級路由切換"
-        note="Tabs 是「同一上下文底下切換 view」，不是頁面導覽。路由層級切換應該用 navigation / breadcrumb，URL 要跟著變"
-      >
-        <Tabs defaultValue="home">
-          <TabsList>
-            <TabsTrigger value="home">首頁</TabsTrigger>
-            <TabsTrigger value="products">產品列表</TabsTrigger>
-            <TabsTrigger value="about">關於我們</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <Label warn>↑ 這些是獨立頁面，不該用 Tabs</Label>
-      </Rule>
-    </div>
-  ),
-}

@@ -62,10 +62,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Sheet ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsDialogRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Sheet 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -77,13 +82,9 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsDialogRule: Story = {
-  name: 'Sheet vs Dialog',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsDialogRule — 原 VsDialogRule */}
+      <div>
       <Rule
         title="Sheet — 從邊緣滑入,側邊工作流程 / 複雜表單 / 長時間編輯"
         note="使用者在主頁看清單、點擊某一項 → Sheet 從右側滑入編輯。Sheet 較輕、較長,讓使用者可以「看到 context 同時編輯」。典型案例:Jira issue drawer、Linear issue detail、Stripe customer detail panel、Notion database 單列展開編輯"
@@ -160,6 +161,66 @@ export const VsDialogRule: Story = {
         <Label>Sheet:建立 issue、編輯成員、filter 面板、detail drawer</Label>
         <Label>Dialog:刪除確認、放棄變更、登入、付款確認</Label>
       </Rule>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotSheetRule */}
+      <Rule
+        title="何時不用 / 替代元件 — 短確認 / 不可逆動作 → Dialog"
+        note="「刪除 / 登出 / 放棄變更」這類要使用者完全停下做決定的場景,用 Dialog 的居中 modal 強制聚焦。Sheet 側滑視覺不夠強,使用者可能點旁邊就跳過"
+      >
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="primary" danger startIcon={Trash2}>刪除帳號</Button>
+          </DialogTrigger>
+          <DialogContent autoHeight maxWidth="420px">
+            <DialogHeader>
+              <DialogTitle>確定要刪除帳號?</DialogTitle>
+            </DialogHeader>
+            <DialogBody>
+              <p className="text-body">所有資料將於 30 天後永久移除,此動作無法復原。</p>
+            </DialogBody>
+            <DialogFooter>
+              <Button variant="tertiary">取消</Button>
+              <Button variant="primary" danger>確認刪除</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <Label>↑ 短決策應該用 Dialog(Sheet 太長太輕)</Label>
+      </Rule>
+
+      <Rule
+        title="何時不用 / 替代元件 — 輕量提示 / 設定 mini panel → Popover"
+        note="filter 條件、快速切換設定、小型操作面板 — 不需要 Sheet 的龐大篇幅。Popover 附在 trigger 旁邊、更輕量、使用者可忽略繼續主流程"
+      >
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="tertiary" startIcon={Filter}>篩選</Button>
+          </PopoverTrigger>
+          <PopoverContent align="start">
+            <PopoverBody>
+              <div className="grid">
+                <Checkbox defaultChecked label="進行中" />
+                <Checkbox label="已完成" />
+              </div>
+            </PopoverBody>
+          </PopoverContent>
+        </Popover>
+        <Label>↑ 少量選項 + 輕量補充 UI → Popover(別用 Sheet 的整面篇幅)</Label>
+      </Rule>
+
+      <Rule
+        title="何時不用 / 替代元件 — Mobile 大量內容、沉浸編輯 → full Dialog 或專屬頁面"
+        note="Sheet 在 mobile 預設占 75% 寬,若內容複雜需全螢幕,改用 fullscreen Dialog 或導航到獨立頁面。Mobile 上硬塞大量欄位到 right Sheet 會變得難滑、難看"
+      >
+        <Label>↑ 手機上大量欄位 + 複雜表單 → 獨立頁面或 fullscreen Dialog</Label>
+      </Rule>
+
+      <Rule
+        title="何時不用 / 替代元件 — 短暫回饋(成功 / 失敗)→ Toast"
+        note="「已儲存」「刪除失敗」這類短暫非阻斷的回饋,用 Toast 自動消失。Sheet 需要使用者明確關閉,給短訊息用 Sheet 是過度阻斷"
+      >
+        <Label>↑ 操作結果回饋 → Toast(不用 Sheet 讓使用者手動關)</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -306,67 +367,3 @@ export const HeaderFooterStructureRule: Story = {
   ),
 }
 
-export const WhenNotSheetRule: Story = {
-  name: '何時不用 Sheet',
-  render: () => (
-    <div>
-      <Rule
-        title="短確認 / 不可逆動作 → Dialog"
-        note="「刪除 / 登出 / 放棄變更」這類要使用者完全停下做決定的場景,用 Dialog 的居中 modal 強制聚焦。Sheet 側滑視覺不夠強,使用者可能點旁邊就跳過"
-      >
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="primary" danger startIcon={Trash2}>刪除帳號</Button>
-          </DialogTrigger>
-          <DialogContent autoHeight maxWidth="420px">
-            <DialogHeader>
-              <DialogTitle>確定要刪除帳號?</DialogTitle>
-            </DialogHeader>
-            <DialogBody>
-              <p className="text-body">所有資料將於 30 天後永久移除,此動作無法復原。</p>
-            </DialogBody>
-            <DialogFooter>
-              <Button variant="tertiary">取消</Button>
-              <Button variant="primary" danger>確認刪除</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        <Label>↑ 短決策應該用 Dialog(Sheet 太長太輕)</Label>
-      </Rule>
-
-      <Rule
-        title="輕量提示 / 設定 mini panel → Popover"
-        note="filter 條件、快速切換設定、小型操作面板 — 不需要 Sheet 的龐大篇幅。Popover 附在 trigger 旁邊、更輕量、使用者可忽略繼續主流程"
-      >
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="tertiary" startIcon={Filter}>篩選</Button>
-          </PopoverTrigger>
-          <PopoverContent align="start">
-            <PopoverBody>
-              <div className="grid">
-                <Checkbox defaultChecked label="進行中" />
-                <Checkbox label="已完成" />
-              </div>
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
-        <Label>↑ 少量選項 + 輕量補充 UI → Popover(別用 Sheet 的整面篇幅)</Label>
-      </Rule>
-
-      <Rule
-        title="Mobile 大量內容、使用者需要沉浸編輯 → full Dialog 或專屬頁面"
-        note="Sheet 在 mobile 預設占 75% 寬,若內容複雜需全螢幕,改用 fullscreen Dialog 或導航到獨立頁面。Mobile 上硬塞大量欄位到 right Sheet 會變得難滑、難看"
-      >
-        <Label>↑ 手機上大量欄位 + 複雜表單 → 獨立頁面或 fullscreen Dialog</Label>
-      </Rule>
-
-      <Rule
-        title="短暫回饋(成功 / 失敗)→ Toast"
-        note="「已儲存」「刪除失敗」這類短暫非阻斷的回饋,用 Toast 自動消失。Sheet 需要使用者明確關閉,給短訊息用 Sheet 是過度阻斷"
-      >
-        <Label>↑ 操作結果回饋 → Toast(不用 Sheet 讓使用者手動關)</Label>
-      </Rule>
-    </div>
-  ),
-}

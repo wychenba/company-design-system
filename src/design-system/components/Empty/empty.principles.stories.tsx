@@ -40,10 +40,15 @@ const Frame = ({ children, className }: { children: React.ReactNode; className?:
 
 // ── WhenToUse — 何時使用 Empty ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Empty 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -63,6 +68,38 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 不用 Empty 做載入中狀態"
+        note="Empty 是「確定沒有」。載入中 → Skeleton / CircularProgress。Notion 首次開啟資料庫時先 Skeleton，載完才變 Empty 或有資料"
+      >
+        <Label warn>載入中 → Skeleton / CircularProgress，不是 Empty</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Empty 做錯誤或失敗狀態"
+        note="Empty 是中性提示。錯誤改用 Alert + 重試按鈕。Stripe 付款失敗用 Alert，不用 Empty"
+      >
+        <Label warn>錯誤狀態 → Alert + 重試，Empty 是中性</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Empty 做整頁級 404 / 無權限"
+        note="整頁錯誤需要完整頁面佈局（navigation + hero 錯誤訊息）。Empty 是容器內提示。GitHub 的 404 頁是整頁設計"
+      >
+        <Label warn>整頁 404 → 專屬錯誤頁面設計，Empty 只用容器內</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Empty 表達 disabled 狀態"
+        note="Disabled 是「禁用元件」的視覺，不是「沒內容」的提示。改用禁用該元件本身。Toggle off 的搜尋結果不用 Empty，而是禁用 SearchInput"
+      >
+        <Label warn>禁用 → disable 元件本身，不用 Empty</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -277,37 +314,3 @@ export const CopyRule: Story = {
   ),
 }
 
-export const WhenNotToUse: Story = {
-  name: '何時不用',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 不用 Empty 做載入中狀態"
-        note="Empty 是「確定沒有」。載入中 → Skeleton / CircularProgress。Notion 首次開啟資料庫時先 Skeleton，載完才變 Empty 或有資料"
-      >
-        <Label warn>載入中 → Skeleton / CircularProgress，不是 Empty</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 Empty 做錯誤或失敗狀態"
-        note="Empty 是中性提示。錯誤改用 Alert + 重試按鈕。Stripe 付款失敗用 Alert，不用 Empty"
-      >
-        <Label warn>錯誤狀態 → Alert + 重試，Empty 是中性</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 Empty 做整頁級 404 / 無權限"
-        note="整頁錯誤需要完整頁面佈局（navigation + hero 錯誤訊息）。Empty 是容器內提示。GitHub 的 404 頁是整頁設計"
-      >
-        <Label warn>整頁 404 → 專屬錯誤頁面設計，Empty 只用容器內</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 Empty 表達 disabled 狀態"
-        note="Disabled 是「禁用元件」的視覺，不是「沒內容」的提示。改用禁用該元件本身。Toggle off 的搜尋結果不用 Empty，而是禁用 SearchInput"
-      >
-        <Label warn>禁用 → disable 元件本身，不用 Empty</Label>
-      </Rule>
-    </div>
-  ),
-}

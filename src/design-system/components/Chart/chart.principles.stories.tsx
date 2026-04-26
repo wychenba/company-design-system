@@ -136,10 +136,15 @@ const groupedCategoriesConfig = {
 
 // ── WhenToUse — 何時使用 Chart ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Chart 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -156,6 +161,48 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 硬寫色值:<Bar fill='#3b82f6' />"
+        note="繞過 ChartConfig + --chart-* token 系統,dark mode 切換時不跟著反轉,brand 色改動時也無法一次更新。"
+      >
+        <Label warn>
+          ✗ &lt;Bar fill="#3b82f6" /&gt; &nbsp;&nbsp; ✓ &lt;Bar fill="var(--color-{'{key}'})" /&gt; (搭配 ChartConfig)
+        </Label>
+      </Rule>
+
+      <Rule
+        title="❌ 自訂 Tooltip / Legend 視覺"
+        note="一律用 ChartTooltipContent / ChartLegendContent,確保跨圖表視覺一致。需要微調格式化(數字千分位、單位)時用 formatter prop,不要自己寫一份 tooltip 元件。"
+      >
+        <Label warn>
+          ✗ content={'{'}(props) ={'>'} &lt;div className="bg-white shadow-xl"&gt;...&lt;/div&gt;{'}'} &nbsp;&nbsp;
+          ✓ content={'{'}&lt;ChartTooltipContent formatter={'{'}(v) ={'>'} `${'$'}{'{'}v{'}'}`{'}'} /&gt;{'}'}
+        </Label>
+      </Rule>
+
+      <Rule
+        title="❌ 在 chart 裡放 Button / Input 等互動元件"
+        note="Chart 是 passive 視覺化層,互動(篩選、時間範圍切換)屬於 chart 外的 toolbar — 用 action-bar pattern + SegmentedControl / Select / DatePicker 建構。Chart 內部只有 tooltip / legend 這類 hover 級的 passive 互動。"
+      >
+        <Label warn>
+          ✗ 在 BarChart 裡疊加 &lt;Button&gt;篩選&lt;/Button&gt; &nbsp;&nbsp;
+          ✓ Chart 上方用 action-bar pattern 放置控制項
+        </Label>
+      </Rule>
+
+      <Rule
+        title="❌ 使用 shadcn 預設的 HSL chart token"
+        note="shadcn 預設 --chart-1..5 走 HSL palette,本 DS 改用 oklch palette(blue-6 / purple-6 / green-6 / yellow-7 / deep-orange-6)。若用 shadcn 預設會與本 DS 其他色彩不同調。"
+      >
+        <Label warn>
+          本 DS 的 --chart-1..5 定義在 tokens/color/semantic.css,不要覆寫為 shadcn 範例程式碼內的 HSL 值。
+        </Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -318,51 +365,6 @@ export const FiveCategoryLimitRule: Story = {
           </ChartContainer>
           <Label>Top 4 部門 + 其他(PM / 客服 / HR)= 5 類,每類可辨</Label>
         </div>
-      </Rule>
-    </div>
-  ),
-}
-
-export const WhenNotToUse: Story = {
-  name: '禁止事項',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 硬寫色值:<Bar fill='#3b82f6' />"
-        note="繞過 ChartConfig + --chart-* token 系統,dark mode 切換時不跟著反轉,brand 色改動時也無法一次更新。"
-      >
-        <Label warn>
-          ✗ &lt;Bar fill="#3b82f6" /&gt; &nbsp;&nbsp; ✓ &lt;Bar fill="var(--color-{'{key}'})" /&gt; (搭配 ChartConfig)
-        </Label>
-      </Rule>
-
-      <Rule
-        title="❌ 自訂 Tooltip / Legend 視覺"
-        note="一律用 ChartTooltipContent / ChartLegendContent,確保跨圖表視覺一致。需要微調格式化(數字千分位、單位)時用 formatter prop,不要自己寫一份 tooltip 元件。"
-      >
-        <Label warn>
-          ✗ content={'{'}(props) ={'>'} &lt;div className="bg-white shadow-xl"&gt;...&lt;/div&gt;{'}'} &nbsp;&nbsp;
-          ✓ content={'{'}&lt;ChartTooltipContent formatter={'{'}(v) ={'>'} `${'$'}{'{'}v{'}'}`{'}'} /&gt;{'}'}
-        </Label>
-      </Rule>
-
-      <Rule
-        title="❌ 在 chart 裡放 Button / Input 等互動元件"
-        note="Chart 是 passive 視覺化層,互動(篩選、時間範圍切換)屬於 chart 外的 toolbar — 用 action-bar pattern + SegmentedControl / Select / DatePicker 建構。Chart 內部只有 tooltip / legend 這類 hover 級的 passive 互動。"
-      >
-        <Label warn>
-          ✗ 在 BarChart 裡疊加 &lt;Button&gt;篩選&lt;/Button&gt; &nbsp;&nbsp;
-          ✓ Chart 上方用 action-bar pattern 放置控制項
-        </Label>
-      </Rule>
-
-      <Rule
-        title="❌ 使用 shadcn 預設的 HSL chart token"
-        note="shadcn 預設 --chart-1..5 走 HSL palette,本 DS 改用 oklch palette(blue-6 / purple-6 / green-6 / yellow-7 / deep-orange-6)。若用 shadcn 預設會與本 DS 其他色彩不同調。"
-      >
-        <Label warn>
-          本 DS 的 --chart-1..5 定義在 tokens/color/semantic.css,不要覆寫為 shadcn 範例程式碼內的 HSL 值。
-        </Label>
       </Rule>
     </div>
   ),

@@ -39,10 +39,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 Dialog ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Dialog 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -60,13 +65,9 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const WhenNotToUse: Story = {
-  name: '何時用 Dialog vs 近親元件',
-  render: () => (
-    <div>
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
       <Rule
         title="Dialog 的 sweet spot — 需要使用者聚焦的操作流程、阻斷背景互動"
         note="建立 / 編輯複雜表單、破壞性動作確認、重要公告。Overlay + 居中 modal 強制使用者完成或取消才能回到頁面"
@@ -165,6 +166,7 @@ export const WhenNotToUse: Story = {
           </DialogContent>
         </Dialog>
       </Rule>
+    </div>
     </div>
   ),
 }

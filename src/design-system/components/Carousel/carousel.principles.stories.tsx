@@ -57,10 +57,15 @@ const cityGradients = [
 
 // ── WhenToUse — 何時使用 Carousel ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 Carousel 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -71,6 +76,63 @@ export const WhenToUse: Story = {
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 不用 Carousel 做命名視圖切換"
+        note="『訂單 / 顧客 / 產品』每塊結構完全不同,該用 Tabs——Carousel 把它們壓成順序性的同類視覺,使用者會困惑為什麼要按順序看。"
+      >
+        <Label warn>
+          電商後台「訂單 / 顧客 / 產品」→ 應使用 Tabs;carousel 的順序性暗示錯誤
+        </Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不用 Carousel 做資料表格"
+        note="表格需要 columns / sorting / filtering / row selection——這些全是 DataTable 的 affordance,carousel 提供不了。把 rows 包進 CarouselItem 是結構性誤用。"
+      >
+        <Label warn>
+          訂單列表應該用 DataTable,不能用 carousel 讓使用者「一次看一筆」
+        </Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不預設啟用 auto-play"
+        note="違反 WCAG 2.2.2 Pause, Stop, Hide——超過 5 秒自動變動的內容必須可暫停。使用者常需要時間閱讀 testimonial 文字、看清產品細節,自動跳過打斷閱讀。Polaris / Material 皆建議不使用 auto-playing carousel。"
+      >
+        <Label warn>
+          若專案必須 auto-play,consumer 自行引入 embla-autoplay 並**同時提供暫停按鈕**,spec 不預設處理
+        </Label>
+      </Rule>
+
+      <Rule
+        title="❌ Active dot 不要只靠顏色區分"
+        note="色弱使用者無法靠色相辨識。本 DS 的 active dot 加寬至 24px(4 倍 inactive 寬度),是 Ant Design / Swiper 的世界級慣例——寬度變化更容易被感知。"
+      >
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <span className="text-caption text-fg-muted">✅</span>
+            <div className="bg-foreground px-4 py-3 rounded-md flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+              <span className="w-6 h-1.5 rounded-full bg-white" />
+              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+            </div>
+            <span className="text-footnote text-fg-muted">寬度變化</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-caption text-error">❌</span>
+            <div className="bg-foreground px-4 py-3 rounded-md flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+              <span className="w-1.5 h-1.5 rounded-full bg-info" />
+              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+            </div>
+            <Label warn>只靠顏色</Label>
+          </div>
+        </div>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -294,66 +356,6 @@ export const ItemCountLimit: Story = {
             ))}
           </div>
           <Label>8 張商品總覽用 Grid · 一眼看全 · 可直接點任一項</Label>
-        </div>
-      </Rule>
-    </div>
-  ),
-}
-
-export const WhenNotToUse: Story = {
-  name: '禁止事項',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 不用 Carousel 做命名視圖切換"
-        note="『訂單 / 顧客 / 產品』每塊結構完全不同,該用 Tabs——Carousel 把它們壓成順序性的同類視覺,使用者會困惑為什麼要按順序看。"
-      >
-        <Label warn>
-          電商後台「訂單 / 顧客 / 產品」→ 應使用 Tabs;carousel 的順序性暗示錯誤
-        </Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不用 Carousel 做資料表格"
-        note="表格需要 columns / sorting / filtering / row selection——這些全是 DataTable 的 affordance,carousel 提供不了。把 rows 包進 CarouselItem 是結構性誤用。"
-      >
-        <Label warn>
-          訂單列表應該用 DataTable,不能用 carousel 讓使用者「一次看一筆」
-        </Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不預設啟用 auto-play"
-        note="違反 WCAG 2.2.2 Pause, Stop, Hide——超過 5 秒自動變動的內容必須可暫停。使用者常需要時間閱讀 testimonial 文字、看清產品細節,自動跳過打斷閱讀。Polaris / Material 皆建議不使用 auto-playing carousel。"
-      >
-        <Label warn>
-          若專案必須 auto-play,consumer 自行引入 embla-autoplay 並**同時提供暫停按鈕**,spec 不預設處理
-        </Label>
-      </Rule>
-
-      <Rule
-        title="❌ Active dot 不要只靠顏色區分"
-        note="色弱使用者無法靠色相辨識。本 DS 的 active dot 加寬至 24px(4 倍 inactive 寬度),是 Ant Design / Swiper 的世界級慣例——寬度變化更容易被感知。"
-      >
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="text-caption text-fg-muted">✅</span>
-            <div className="bg-foreground px-4 py-3 rounded-md flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              <span className="w-6 h-1.5 rounded-full bg-white" />
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-            </div>
-            <span className="text-footnote text-fg-muted">寬度變化</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-caption text-error">❌</span>
-            <div className="bg-foreground px-4 py-3 rounded-md flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              <span className="w-1.5 h-1.5 rounded-full bg-info" />
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-            </div>
-            <Label warn>只靠顏色</Label>
-          </div>
         </div>
       </Rule>
     </div>

@@ -57,88 +57,31 @@ const Label = ({
 
 // ── Stories ──────────────────────────────────────────────────────
 
-// ── WhenToUse — 何時使用 Accordion ──────────────────────
+// ── UsageGuidance — 何時用 / 何時不用 / vs 近親元件(合併 WhenToUse + AccordionVsTabsRule) ──
 
-export const WhenToUse: Story = {
-  name: '何時使用',
-  render: () => (
-    <div className="prose prose-sm max-w-prose">
-      <p>適合 Accordion 的真實業務場景(點擊跳轉「展示」頁範例):</p>
-      <ul className="space-y-1">
-        <li>
-          <LinkTo kind="Design System/Components/Accordion/展示" name="FAQ"><span className="text-primary hover:underline font-medium cursor-pointer">FAQ</span></LinkTo>
-        </li>
-        <li>
-          <LinkTo kind="Design System/Components/Accordion/展示" name="設定分組"><span className="text-primary hover:underline font-medium cursor-pointer">設定分組</span></LinkTo>
-        </li>
-        <li>
-          <LinkTo kind="Design System/Components/Accordion/展示" name="進階選項可隱藏"><span className="text-primary hover:underline font-medium cursor-pointer">進階選項可隱藏</span></LinkTo>
-        </li>
-      </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
-    </div>
-  ),
-}
-
-export const TypeRule: Story = {
-  name: 'single vs multiple',
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
     <div>
       <Rule
-        title='single + collapsible — FAQ / 使用教學'
-        note='讀者一段一段看,同時看多段反而混亂。collapsible 讓使用者可把展開的再收起,回到乾淨的「全部收合」狀態。'
+        title="何時用 — 真實業務場景"
+        note="適合 Accordion 的場景(點擊跳轉「展示」頁範例);判斷不確定時對照 spec.md「何時用 / 何時不用」段。"
       >
-        <Accordion type='single' collapsible>
-          <AccordionItem value='q1'>
-            <AccordionTrigger>如何取消訂閱?</AccordionTrigger>
-            <AccordionContent>
-              於「設定 → 帳單」點選取消。取消後資料保留 90 天供復用。
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value='q2'>
-            <AccordionTrigger>資料可以匯出嗎?</AccordionTrigger>
-            <AccordionContent>
-              所有方案支援 CSV / JSON 匯出;企業方案另支援 API 批次匯出。
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-        <Label>參考:Stripe Pricing FAQ、Notion Help Center</Label>
+        <ul className="space-y-1">
+          <li>
+            <LinkTo kind="Design System/Components/Accordion/展示" name="FAQ"><span className="text-primary hover:underline font-medium cursor-pointer">FAQ</span></LinkTo>
+          </li>
+          <li>
+            <LinkTo kind="Design System/Components/Accordion/展示" name="設定分組"><span className="text-primary hover:underline font-medium cursor-pointer">設定分組</span></LinkTo>
+          </li>
+          <li>
+            <LinkTo kind="Design System/Components/Accordion/展示" name="進階選項可隱藏"><span className="text-primary hover:underline font-medium cursor-pointer">進階選項可隱藏</span></LinkTo>
+          </li>
+        </ul>
       </Rule>
 
       <Rule
-        title='multiple — 設定頁 / 工作 context(需同時比對)'
-        note='使用者會同時打開「通知偏好」與「安全設定」對照;強制收合前一個反而阻礙工作。'
-      >
-        <Accordion type='multiple' defaultValue={['notifications']}>
-          <AccordionItem value='notifications'>
-            <AccordionTrigger>通知偏好</AccordionTrigger>
-            <AccordionContent>Email 每日摘要、@提及立即通知。</AccordionContent>
-          </AccordionItem>
-          <AccordionItem value='security'>
-            <AccordionTrigger>安全與登入</AccordionTrigger>
-            <AccordionContent>兩步驟驗證:已啟用。</AccordionContent>
-          </AccordionItem>
-        </Accordion>
-        <Label>參考:Jira Project Settings、Linear Workspace Settings</Label>
-      </Rule>
-
-      <Rule
-        title='判斷法 — 「使用者會不會想同時看兩段?」'
-        note='會 → multiple;不會 / 同時看反而混亂 → single。不確定時預設 single + collapsible(較保守,視覺負擔小)。'
-      >
-        <Label>single(推薦預設):FAQ、教學、說明文件</Label>
-        <Label>multiple:Settings、多段 form、工作 context panel</Label>
-      </Rule>
-    </div>
-  ),
-}
-
-export const AccordionVsTabsRule: Story = {
-  name: 'Accordion vs Tabs',
-  render: () => (
-    <div>
-      <Rule
-        title='Tabs — 互斥平行視圖(看 A 就不看 B)'
+        title="vs Tabs — Tabs 是互斥平行視圖(看 A 就不看 B)"
         note='三個 tab 是「同一層級的平行視角」,使用者每次只需一個。切換等於「換視角」,兩個視角不會同時需要。'
       >
         <div className='border border-border rounded-lg p-4'>
@@ -200,6 +143,59 @@ export const AccordionVsTabsRule: Story = {
         <Label warn>
           ⚠️ 平行視圖應該用 Tabs——Accordion 是「多段獨立內容」,不是「多個視角」
         </Label>
+      </Rule>
+    </div>
+  ),
+}
+
+export const TypeRule: Story = {
+  name: 'single vs multiple',
+  render: () => (
+    <div>
+      <Rule
+        title='single + collapsible — FAQ / 使用教學'
+        note='讀者一段一段看,同時看多段反而混亂。collapsible 讓使用者可把展開的再收起,回到乾淨的「全部收合」狀態。'
+      >
+        <Accordion type='single' collapsible>
+          <AccordionItem value='q1'>
+            <AccordionTrigger>如何取消訂閱?</AccordionTrigger>
+            <AccordionContent>
+              於「設定 → 帳單」點選取消。取消後資料保留 90 天供復用。
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value='q2'>
+            <AccordionTrigger>資料可以匯出嗎?</AccordionTrigger>
+            <AccordionContent>
+              所有方案支援 CSV / JSON 匯出;企業方案另支援 API 批次匯出。
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+        <Label>參考:Stripe Pricing FAQ、Notion Help Center</Label>
+      </Rule>
+
+      <Rule
+        title='multiple — 設定頁 / 工作 context(需同時比對)'
+        note='使用者會同時打開「通知偏好」與「安全設定」對照;強制收合前一個反而阻礙工作。'
+      >
+        <Accordion type='multiple' defaultValue={['notifications']}>
+          <AccordionItem value='notifications'>
+            <AccordionTrigger>通知偏好</AccordionTrigger>
+            <AccordionContent>Email 每日摘要、@提及立即通知。</AccordionContent>
+          </AccordionItem>
+          <AccordionItem value='security'>
+            <AccordionTrigger>安全與登入</AccordionTrigger>
+            <AccordionContent>兩步驟驗證:已啟用。</AccordionContent>
+          </AccordionItem>
+        </Accordion>
+        <Label>參考:Jira Project Settings、Linear Workspace Settings</Label>
+      </Rule>
+
+      <Rule
+        title='判斷法 — 「使用者會不會想同時看兩段?」'
+        note='會 → multiple;不會 / 同時看反而混亂 → single。不確定時預設 single + collapsible(較保守,視覺負擔小)。'
+      >
+        <Label>single(推薦預設):FAQ、教學、說明文件</Label>
+        <Label>multiple:Settings、多段 form、工作 context panel</Label>
       </Rule>
     </div>
   ),

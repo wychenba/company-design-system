@@ -46,10 +46,15 @@ const Img = ({ seed, ratio }: { seed: string; ratio: number }) => {
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時用 vs 不用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / WhenNotToUse(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div>
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div>
       <Rule
         title="✅ 使用 — 防止圖片未載入時的 layout 坍塌(CLS)"
         note="圖片 src 還沒 ready 時,若容器高度為 0,頁面 layout 會在載入後跳動(Cumulative Layout Shift 問題)。AspectRatio 鎖死比例 → 載入前後位置完全相同"
@@ -108,6 +113,54 @@ export const WhenToUse: Story = {
         </div>
         <Label warn>↑ 固定尺寸 img 不需要 AspectRatio 包裝</Label>
       </Rule>
+    </div>
+
+      {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
+      <div>
+      <Rule
+        title="❌ 不用於 flex / grid layout"
+        note="AspectRatio 是 container 鎖比例,不是佈局工具。多個元素並排用 flex / grid,不用 AspectRatio 排版"
+      >
+        <div className="w-[400px] border border-dashed border-error rounded-md p-4">
+          <AspectRatio ratio={4 / 1} className="bg-muted rounded-md flex items-center justify-around">
+            <div className="text-caption">Nike Pegasus 41</div>
+            <div className="text-caption">Adidas UltraBoost</div>
+            <div className="text-caption">New Balance 990</div>
+          </AspectRatio>
+        </div>
+        <Label warn>↑ 用 AspectRatio 當橫排容器是誤用 → 用 flex gap-2</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不放不該鎖比例的 content"
+        note="文字 / 表單 / 按鈕等隨內容高度的 content 放進 AspectRatio,會強制裁切或留大片空白,違背語意"
+      >
+        <div className="w-[320px] border border-dashed border-error rounded-md p-2">
+          <AspectRatio ratio={1} className="bg-muted rounded-md p-4">
+            <div className="text-body font-bold mb-1">表單標題</div>
+            <div className="text-caption text-fg-muted mb-2">這裡有一些說明文字,長度不固定。</div>
+            <input className="border border-border rounded-md px-2 py-1 w-full" placeholder="輸入內容" />
+          </AspectRatio>
+        </div>
+        <Label warn>↑ 表單內容不該鎖 1/1 比例</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 不重疊多層 AspectRatio"
+        note="巢狀 AspectRatio 意義不明 — 外層比例與內層比例衝突時,結果無法預測"
+      >
+        <div className="w-[320px] border border-dashed border-error rounded-md p-2">
+          <AspectRatio ratio={16 / 9} className="bg-muted rounded-md overflow-hidden">
+            <AspectRatio ratio={1} className="bg-primary-subtle">
+              <div className="w-full h-full flex items-center justify-center text-caption">
+                內層 1/1 被外層 16/9 壓縮
+              </div>
+            </AspectRatio>
+          </AspectRatio>
+        </div>
+        <Label warn>↑ 巢狀 AspectRatio 語意混亂,一律只包一層</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -260,53 +313,3 @@ export const PlaceholderAndSkeleton: Story = {
   ),
 }
 
-export const WhenNotToUse: Story = {
-  name: '禁止事項',
-  render: () => (
-    <div>
-      <Rule
-        title="❌ 不用於 flex / grid layout"
-        note="AspectRatio 是 container 鎖比例,不是佈局工具。多個元素並排用 flex / grid,不用 AspectRatio 排版"
-      >
-        <div className="w-[400px] border border-dashed border-error rounded-md p-4">
-          <AspectRatio ratio={4 / 1} className="bg-muted rounded-md flex items-center justify-around">
-            <div className="text-caption">Nike Pegasus 41</div>
-            <div className="text-caption">Adidas UltraBoost</div>
-            <div className="text-caption">New Balance 990</div>
-          </AspectRatio>
-        </div>
-        <Label warn>↑ 用 AspectRatio 當橫排容器是誤用 → 用 flex gap-2</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不放不該鎖比例的 content"
-        note="文字 / 表單 / 按鈕等隨內容高度的 content 放進 AspectRatio,會強制裁切或留大片空白,違背語意"
-      >
-        <div className="w-[320px] border border-dashed border-error rounded-md p-2">
-          <AspectRatio ratio={1} className="bg-muted rounded-md p-4">
-            <div className="text-body font-bold mb-1">表單標題</div>
-            <div className="text-caption text-fg-muted mb-2">這裡有一些說明文字,長度不固定。</div>
-            <input className="border border-border rounded-md px-2 py-1 w-full" placeholder="輸入內容" />
-          </AspectRatio>
-        </div>
-        <Label warn>↑ 表單內容不該鎖 1/1 比例</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 不重疊多層 AspectRatio"
-        note="巢狀 AspectRatio 意義不明 — 外層比例與內層比例衝突時,結果無法預測"
-      >
-        <div className="w-[320px] border border-dashed border-error rounded-md p-2">
-          <AspectRatio ratio={16 / 9} className="bg-muted rounded-md overflow-hidden">
-            <AspectRatio ratio={1} className="bg-primary-subtle">
-              <div className="w-full h-full flex items-center justify-center text-caption">
-                內層 1/1 被外層 16/9 壓縮
-              </div>
-            </AspectRatio>
-          </AspectRatio>
-        </div>
-        <Label warn>↑ 巢狀 AspectRatio 語意混亂,一律只包一層</Label>
-      </Rule>
-    </div>
-  ),
-}

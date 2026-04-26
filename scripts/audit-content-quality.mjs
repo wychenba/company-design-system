@@ -242,12 +242,20 @@ for (const file of walk(COMPONENTS_DIR)) {
     }
   }
 
-  // === Check 5e: Principles ≥ 1 decision-related story(2026-04-26 v3 integrated)===
-  // 對齊 Polaris/Material/Ant 共識:ONE integrated `UsageGuidance` 已足夠(80% 元件)
-  // Legacy(WhenToUse / WhenNotToUse / Vs*Rule)接受 + ≥ 2 exports total。
+  // === Check 5e: Principles ≥ 1 decision story(v3 integrated 2026-04-26)===
+  // 對齊 Polaris/Material/Ant:ONE integrated `UsageGuidance` 已足夠
+  // 接受 (a) UsageGuidance 單一 OR (b) legacy WhenToUse/WhenNotToUse/Vs*Rule ≥ 1
+  // OR (c) 任 ≥ 2 exports total
   if (file.endsWith('.principles.stories.tsx')) {
     const exportMatches = [...content.matchAll(/^export const ([A-Z]\w+)/gm)].map(m => m[1]);
-    if (exportMatches.length < 2 && exportMatches.length > 0) {
+    const hasIntegrated = exportMatches.includes('UsageGuidance');
+    const hasLegacy = exportMatches.some(e =>
+      e === 'WhenToUse' || e === 'WhenNotToUse' || e === 'WhatItIs' || e === 'UsageScenarioRule' ||
+      /^Vs[A-Z]/.test(e) || /[A-Z][a-z]+Vs[A-Z]/.test(e) ||
+      /^(Forbidden|Donts|Pitfalls|Prohibitions|NonGoals|VisualDonts)/.test(e)
+    );
+    const valid = hasIntegrated || hasLegacy || exportMatches.length >= 2;
+    if (!valid && exportMatches.length > 0) {
       violations.principlesCore.push({
         file: basename(file),
         coreCount: exportMatches.length,

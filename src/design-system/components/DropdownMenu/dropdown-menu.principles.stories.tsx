@@ -45,10 +45,15 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── WhenToUse — 何時使用 DropdownMenu ──────────────────────
 
-export const WhenToUse: Story = {
-  name: '何時使用',
+// ── UsageGuidance — 整合何時用 / 何時不用 / vs 近親(Polaris/Material/Ant 共識)
+// 合併自舊 WhenToUse / VsSelectMenuRule / GroupVsSeparatorRule(2026-04-26 v3 canonical)
+
+export const UsageGuidance: Story = {
+  name: '使用指引',
   render: () => (
-    <div className="prose prose-sm max-w-prose">
+    <div className="flex flex-col gap-12">
+      {/* 何時用 — 原 WhenToUse */}
+      <div className="prose prose-sm max-w-prose">
       <p>適合 DropdownMenu 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
@@ -69,13 +74,9 @@ export const WhenToUse: Story = {
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
     </div>
-  ),
-}
 
-export const VsSelectMenuRule: Story = {
-  name: 'DropdownMenu vs SelectMenu（執行 vs 選值）',
-  render: () => (
-    <div>
+      {/* vs 近親 — VsSelectMenuRule — 原 VsSelectMenuRule */}
+      <div>
       <Rule
         title="DropdownMenu — 執行動作，選完即關閉"
         note="典型場景：卡片右上角 ⋮ 三點選單（複製、刪除、分享）。使用者選一個動作、立即執行、選單消失。value 不保留（沒有「選中狀態」）"
@@ -118,6 +119,81 @@ export const VsSelectMenuRule: Story = {
       >
         <Label>完整判斷詳見 dropdown-menu.spec.md「與 SelectMenu 的區別」</Label>
       </Rule>
+    </div>
+
+      {/* vs 近親 — GroupVsSeparatorRule — 原 GroupVsSeparatorRule */}
+      <div>
+      <Rule
+        title="DropdownMenuGroup — 包裝同類 items 自動分隔（推薦 default）"
+        note="相鄰 Group 之間自動出現 border-divider 分隔線,不需手動加 Separator。對齊 MenuGroup 的 auto-separation 理念,consumer 零手動"
+      >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="tertiary">帳號選單</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>我的帳號</DropdownMenuLabel>
+              <DropdownMenuItem>個人資料</DropdownMenuItem>
+              <DropdownMenuItem>設定</DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>團隊</DropdownMenuLabel>
+              <DropdownMenuItem>切換 workspace</DropdownMenuItem>
+              <DropdownMenuItem>邀請成員</DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuGroup>
+              <DropdownMenuItem className="text-error">登出</DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Label>↑ 三個 DropdownMenuGroup 自動透過 border-divider 分隔,無需手動 Separator</Label>
+      </Rule>
+
+      <Rule
+        title="DropdownMenuSeparator — 明確手動插入分隔（特殊強調場景）"
+        note="Group 內部需要子分組、或強調某個分隔位置時使用。例:單一 Group 內最後一個破壞性動作前想明確加視覺分隔"
+      >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="tertiary">檔案操作</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuGroup>
+              <DropdownMenuItem>複製</DropdownMenuItem>
+              <DropdownMenuItem>剪下</DropdownMenuItem>
+              <DropdownMenuItem>貼上</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-error">永久刪除</DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Label>↑ 同一 Group 內,手動 Separator 在刪除前強調視覺切分</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 用多個 Separator 手動模擬 Group"
+        note="既然 DropdownMenuGroup 自動處理,寫多個 Separator 就是重複勞動 + 容易漏掉或放錯位置"
+      >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="tertiary">❌ 手動 Separator</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>我的帳號</DropdownMenuLabel>
+            <DropdownMenuItem>個人資料</DropdownMenuItem>
+            <DropdownMenuItem>設定</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel>團隊</DropdownMenuLabel>
+            <DropdownMenuItem>切換 workspace</DropdownMenuItem>
+            <DropdownMenuItem>邀請成員</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-error">登出</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Label warn>↑ 功能等價但每個分隔都要手寫 → 用 Group 更精確表達「語意分組」</Label>
+      </Rule>
+    </div>
     </div>
   ),
 }
@@ -227,84 +303,6 @@ export const DestructiveRule: Story = {
         note="刪除 / 取消訂閱等放在選單底部、用 separator 隔開——減少使用者誤觸的可能"
       >
         <Label>見上方範例的 Separator 位置（刪除與其他動作中間）</Label>
-      </Rule>
-    </div>
-  ),
-}
-
-export const GroupVsSeparatorRule: Story = {
-  name: 'Group 自動分隔 vs Separator 手動分隔',
-  render: () => (
-    <div>
-      <Rule
-        title="DropdownMenuGroup — 包裝同類 items 自動分隔（推薦 default）"
-        note="相鄰 Group 之間自動出現 border-divider 分隔線,不需手動加 Separator。對齊 MenuGroup 的 auto-separation 理念,consumer 零手動"
-      >
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="tertiary">帳號選單</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>我的帳號</DropdownMenuLabel>
-              <DropdownMenuItem>個人資料</DropdownMenuItem>
-              <DropdownMenuItem>設定</DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>團隊</DropdownMenuLabel>
-              <DropdownMenuItem>切換 workspace</DropdownMenuItem>
-              <DropdownMenuItem>邀請成員</DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuGroup>
-              <DropdownMenuItem className="text-error">登出</DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Label>↑ 三個 DropdownMenuGroup 自動透過 border-divider 分隔,無需手動 Separator</Label>
-      </Rule>
-
-      <Rule
-        title="DropdownMenuSeparator — 明確手動插入分隔（特殊強調場景）"
-        note="Group 內部需要子分組、或強調某個分隔位置時使用。例:單一 Group 內最後一個破壞性動作前想明確加視覺分隔"
-      >
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="tertiary">檔案操作</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <DropdownMenuItem>複製</DropdownMenuItem>
-              <DropdownMenuItem>剪下</DropdownMenuItem>
-              <DropdownMenuItem>貼上</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-error">永久刪除</DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Label>↑ 同一 Group 內,手動 Separator 在刪除前強調視覺切分</Label>
-      </Rule>
-
-      <Rule
-        title="❌ 用多個 Separator 手動模擬 Group"
-        note="既然 DropdownMenuGroup 自動處理,寫多個 Separator 就是重複勞動 + 容易漏掉或放錯位置"
-      >
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="tertiary">❌ 手動 Separator</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>我的帳號</DropdownMenuLabel>
-            <DropdownMenuItem>個人資料</DropdownMenuItem>
-            <DropdownMenuItem>設定</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel>團隊</DropdownMenuLabel>
-            <DropdownMenuItem>切換 workspace</DropdownMenuItem>
-            <DropdownMenuItem>邀請成員</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-error">登出</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Label warn>↑ 功能等價但每個分隔都要手寫 → 用 Group 更精確表達「語意分組」</Label>
       </Rule>
     </div>
   ),
