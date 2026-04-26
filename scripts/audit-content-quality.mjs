@@ -194,7 +194,9 @@ for (const file of walk(COMPONENTS_DIR)) {
     }
   }
 
-  // === Check 5b: Anatomy numbering gap(no 6,7,8 sequential)===
+  // === Check 5b: Anatomy numbering gap(全範圍 sequential 1→N,不允 N/A skip)===
+  // 2026-04-26 改:user 反饋「跳號難看」— 之前允 1-5 canonical skip 已撤,
+  // 改全 sequential。N/A section 用 @anatomy-rationale 註解 + 不開 export(自然不佔號)。
   if (isAnatomy) {
     const lines = content.split('\n');
     const nums = [];
@@ -203,15 +205,12 @@ for (const file of walk(COMPONENTS_DIR)) {
       if (m) nums.push(parseInt(m[1]));
     }
     if (nums.length >= 2) {
-      const sorted = [...nums].sort((a, b) => a - b);
-      // Allow original 5-canonical to skip(per anatomy-standard.md「跳過 N/A 的 canonical 編號保留」)
-      // But beyond 5,sequential required(6→7→8)
-      const beyondCanonical = sorted.filter(n => n > 5);
-      for (let i = 1; i < beyondCanonical.length; i++) {
-        if (beyondCanonical[i] !== beyondCanonical[i-1] + 1) {
+      const uniqueSorted = [...new Set(nums)].sort((a, b) => a - b);
+      for (let i = 1; i < uniqueSorted.length; i++) {
+        if (uniqueSorted[i] !== uniqueSorted[i-1] + 1) {
           violations.anatomyNumberingGap.push({
             file: basename(file),
-            gap: `${beyondCanonical[i-1]} → ${beyondCanonical[i]}`
+            gap: `${uniqueSorted[i-1]} → ${uniqueSorted[i]}`
           });
           break;
         }

@@ -123,7 +123,7 @@ export const Inspector: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '3. 尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -157,7 +157,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '4. 狀態行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -210,7 +210,7 @@ export const StateBehavior: Story = {
 }
 
 export const FullWidthMatrix: Story = {
-  name: '6. fullWidth 行為',
+  name: '5. fullWidth 行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -252,7 +252,7 @@ export const FullWidthMatrix: Story = {
 }
 
 export const IconOnlyMatrix: Story = {
-  name: '7. iconOnly(group-level)',
+  name: '6. iconOnly(group-level)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

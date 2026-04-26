@@ -147,7 +147,7 @@ export const Inspector: InspectorStory = {
     },
   },
   args: {
-    name: '8. Ada Chen',
+    name: '7. Ada Chen',
     subtitle: 'Design Engineer · Engineering',
     status: 'online',
     withStatusMessage: true,
@@ -200,7 +200,7 @@ export const Inspector: InspectorStory = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SectionMatrix: Story = {
-  name: '6. Section 組合(minimal → full)',
+  name: '5. Section 組合(minimal → full)',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -353,7 +353,7 @@ export const ColorMatrix: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const HoverCardIntegration: Story = {
-  name: '7. HoverCard 整合(觸發行為)',
+  name: '6. HoverCard 整合(觸發行為)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -364,9 +364,9 @@ export const HoverCardIntegration: Story = {
         </Desc>
         <div className="border border-border rounded-lg p-6 flex items-center gap-8">
           {[
-            { name: '9. Ada Chen', subtitle: 'Design Engineer', status: 'online' as const },
-            { name: '10. Alice Wang', subtitle: 'Frontend Engineer', status: 'busy' as const },
-            { name: '11. Bob Chen', subtitle: 'PM, Growth', status: 'away' as const },
+            { name: '8. Ada Chen', subtitle: 'Design Engineer', status: 'online' as const },
+            { name: '9. Alice Wang', subtitle: 'Frontend Engineer', status: 'busy' as const },
+            { name: '10. Bob Chen', subtitle: 'PM, Growth', status: 'away' as const },
           ].map(p => (
             <HoverCard key={p.name}>
               <HoverCardTrigger asChild>
@@ -421,7 +421,7 @@ export const HoverCardIntegration: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '4. 狀態行為',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

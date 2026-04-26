@@ -31,11 +31,11 @@ interface Product {
 }
 
 const SAMPLE_DATA: Product[] = [
-  { name: '12. Wireless Headphones', category: 'electronics', stock: 'in_stock', price: 2490, available: true, launchDate: '2026-01-15' },
-  { name: '13. Office Chair', category: 'furniture', stock: 'low_stock', price: 8900, available: true, launchDate: '2025-11-02' },
-  { name: '14. Green Tea 100 Bags', category: 'food', stock: 'in_stock', price: 350, available: true, launchDate: '2026-03-20' },
-  { name: '15. USB-C Hub', category: 'electronics', stock: 'out_of_stock', price: 1290, available: false, launchDate: '2025-12-01' },
-  { name: '16. Linen Shirt', category: 'clothing', stock: 'in_stock', price: 1580, available: true, launchDate: '2026-02-14' },
+  { name: '10. Wireless Headphones', category: 'electronics', stock: 'in_stock', price: 2490, available: true, launchDate: '2026-01-15' },
+  { name: '11. Office Chair', category: 'furniture', stock: 'low_stock', price: 8900, available: true, launchDate: '2025-11-02' },
+  { name: '12. Green Tea 100 Bags', category: 'food', stock: 'in_stock', price: 350, available: true, launchDate: '2026-03-20' },
+  { name: '13. USB-C Hub', category: 'electronics', stock: 'out_of_stock', price: 1290, available: false, launchDate: '2025-12-01' },
+  { name: '14. Linen Shirt', category: 'clothing', stock: 'in_stock', price: 1580, available: true, launchDate: '2026-02-14' },
 ]
 
 const STATUS_OPTIONS = [
@@ -165,7 +165,7 @@ export const Inspector: Story = {
 }
 
 export const ColumnTypes: Story = {
-  name: '6. Column Type 自動渲染',
+  name: '4. Column Type 自動渲染',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -210,7 +210,7 @@ export const ColumnTypes: Story = {
 }
 
 export const RowHeightMatrix: Story = {
-  name: '7. Row Height Tier(閱讀 vs 掃描模式)',
+  name: '5. Row Height Tier(閱讀 vs 掃描模式)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -248,7 +248,7 @@ export const RowHeightMatrix: Story = {
 }
 
 export const AlignmentRule: Story = {
-  name: '8. 對齊規則(跨產業共識)',
+  name: '6. 對齊規則(跨產業共識)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -286,7 +286,7 @@ export const AlignmentRule: Story = {
 }
 
 export const Features: Story = {
-  name: '9. 功能特性(排序 / 虛擬捲動)',
+  name: '7. 功能特性(排序 / 虛擬捲動)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -459,7 +459,7 @@ export const ColorMatrix: Story = {
 }
 
 export const EmptyState: Story = {
-  name: '10. 空狀態',
+  name: '8. 空狀態',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -478,7 +478,7 @@ export const EmptyState: Story = {
 }
 
 export const BorderedProp: Story = {
-  name: '11. bordered prop(預設 true)',
+  name: '9. bordered prop(預設 true)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [

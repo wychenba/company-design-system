@@ -177,7 +177,7 @@ export const SizeMatrix: Story = {
 
 /** Mode / error 狀態 matrix */
 export const ModeMatrix: Story = {
-  name: '6. 模式對照',
+  name: '5. 模式對照',
   render: () => (
     <div className="flex flex-col gap-3 w-60">
       <TimePicker value="09:00" onChange={() => {}} placeholder="edit(預設)" aria-label="edit mode demo" />
@@ -192,7 +192,7 @@ export const ModeMatrix: Story = {
 
 /** Panel 精度:showSeconds 三欄 vs 兩欄 / minuteStep 粒度 */
 export const PrecisionMatrix: Story = {
-  name: '7. 精度對照',
+  name: '6. 精度對照',
   render: () => (
     <div className="flex flex-col gap-3 w-80">
       <div>

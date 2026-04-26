@@ -115,7 +115,7 @@ export const SizeMatrix: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: '6. Mode 對照(edit / readonly / disabled)',
+  name: '5. Mode 對照(edit / readonly / disabled)',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>
@@ -244,7 +244,7 @@ export const ColorMatrix: Story = {
 }
 
 export const RowsResizeMatrix: Story = {
-  name: '7. Rows 與 Resize',
+  name: '6. Rows 與 Resize',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>

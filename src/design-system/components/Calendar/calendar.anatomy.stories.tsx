@@ -189,7 +189,7 @@ export const ColorMatrix: Story = {
 
 // ── 5. 狀態行為 ─────────────────────────────────────────────────────────────
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '4. 狀態行為',
   render: () => (
     <div className="h-screen p-4 bg-canvas">
       <div className="mb-2 text-body text-fg-muted space-y-1">
