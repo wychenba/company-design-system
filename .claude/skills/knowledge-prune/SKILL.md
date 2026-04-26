@@ -1,6 +1,6 @@
 ---
 name: knowledge-prune
-description: Prune governance sprawl across CLAUDE.md / specs / skills / hooks / memory / settings. Finds duplicate rules (Rule-of-3), dead hooks (6mo 0 fire via `.claude/logs/hook-fires-per-hook.jsonl`), stale memories, over-concrete bug case studies that should abstract to meta, and contradictions across homes. Enforces per-file budget (CLAUDE.md ≤ 400 lines, spec ≤ 300, SKILL ≤ 250, memory ≤ 100) and retire rate ≥ 5% / quarter. Invoke via /knowledge-prune quarterly or when CLAUDE.md > 800 / MEMORY.md > 20 entries / audit Phase F reports sprawl. Auto-chained by /design-system-audit --deep Phase 4.5.
+description: Prune governance sprawl across CLAUDE.md / specs / skills / hooks / memory / settings. Finds duplicate rules (Rule-of-3), dead hooks (6mo 0 fire via `.claude/logs/hook-fires-per-hook.jsonl`), stale memories, over-concrete bug case studies that should abstract to meta, and contradictions across homes. Enforces per-file budget (CLAUDE.md target ≤ 200 / transition ≤ 400, spec ≤ 300, SKILL ≤ 250, memory ≤ 100) and retire rate ≥ 5% / quarter. Invoke via /knowledge-prune quarterly or when CLAUDE.md > 800 / MEMORY.md > 20 entries / audit Phase F reports sprawl. Auto-chained by /design-system-audit --deep Phase 4.5.
 ---
 
 # Knowledge Prune — 治理反膨脹 skill
@@ -9,7 +9,7 @@ description: Prune governance sprawl across CLAUDE.md / specs / skills / hooks /
 
 **對齊 CLAUDE.md `# 資訊治理 canonical`**:本 skill 是 L3(Periodic deep)實作。L1(pre-write hook)+ L2(fire log)自動執行,L3 需人決策 canonical retire,走 checkpoint。
 
-**對齊 `# 稽核 vs 執行 分權 canonical`**:動 canonical substantive meaning → **STOP 提議**;對齊 / 清 duplicate / 回填 pointer → **AUTO**。
+**對齊 CLAUDE.md `# 稽核 canonical`「Audit-vs-execute 分權」**:動 canonical substantive meaning → **STOP 提議**;對齊 / 清 duplicate / 回填 pointer → **AUTO**。
 
 ## When to run
 
@@ -37,7 +37,7 @@ description: Prune governance sprawl across CLAUDE.md / specs / skills / hooks /
 ```
 Home              Size           Over-budget?
 ─────────────────────────────────────────────
-CLAUDE.md         N lines        [≤400 / transition 800]
+CLAUDE.md         N lines        [target ≤ 200 / transition ≤ 400 / hard cap 800]
 MEMORY.md         N entries      [≤20]
 spec.md total     N files        per-file ≤300
 SKILL.md total    N files        per-file ≤250

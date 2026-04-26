@@ -26,8 +26,10 @@ FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 [ -f "$FILE_PATH" ] || exit 0
 
 # Only check governance files
+# CLAUDE.md L34 SSOT: target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800
+# 本 hook 在 transition 觸發 P1 warning,hard cap 觸發 P0 block
 case "$FILE_PATH" in
-  */CLAUDE.md)                          BUDGET=400;  TRANSITION=800; LABEL="CLAUDE.md" ;;
+  */CLAUDE.md)                          BUDGET=400;  TRANSITION=800; LABEL="CLAUDE.md" ;;  # warn at transition (400), block at hard cap (800); target 200
   */memory/*.md)                        BUDGET=100;  TRANSITION=100; LABEL="memory file" ;;
   # Super-foundational SSOT spec(item-anatomy = Family 1+2 跨 10+ 消費者 SSOT,唯一例外)
   */item-anatomy.spec.md)

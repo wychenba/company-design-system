@@ -13,7 +13,7 @@ paths:
 | 層 | 檔案 | Canonical | Hook | Audit Dim |
 |---|------|-----------|------|-----------|
 | 1 展示 | `*.stories.tsx` | trait-based v2 | `check_story_category.sh` | 29 |
-| 2 設計規格 | `*.anatomy.stories.tsx` | 6-canonical(Overview / Inspector / ColorMatrix / SizeMatrix / StateBehavior / Accessibility)| `check_story_anatomy.sh` + `check_anatomy_section_numbering.sh` | 13 |
+| 2 設計規格 | `*.anatomy.stories.tsx` | 6-canonical(Overview / Inspector / ColorMatrix / SizeMatrix / StateBehavior / Accessibility)| `check_story_anatomy.sh` | 13 |
 | 3 設計原則 | `*.principles.stories.tsx` | Polaris-aligned ≥ 2 of {WhenToUse / WhenNotToUse / Vs*Rule / ContentGuidelines};v3 預設整合 `UsageGuidance` 單一 export(Polaris/Material/Ant 共識) | `check_principles_canonical.sh` | 30 |
 
 ## Title 命名

@@ -22,14 +22,15 @@ function listFiles(dir, pattern) {
 
 const dimensions = [];
 
-// === D1: CLAUDE.md size(Anthropic target ≤ 200,本 commit 對齊外部 benchmark)===
+// === D1: CLAUDE.md size(Anthropic target ≤ 200,對齊 CLAUDE.md L34 SSOT)===
+// CLAUDE.md L34 SSOT: target ≤ 200 / transition ≤ 400 / hard cap 800
 // Anthropic best-practices: "target under 200 lines" + warns "Bloated CLAUDE.md
-// causes Claude to ignore actual instructions". Updated formula:
-//   ≤ 200 → 100,201-400 → 70,401-600 → 40,> 600 → 10
+// causes Claude to ignore actual instructions". Updated formula(對齊 hard cap 800):
+//   ≤ 200 → 100,201-400 → 70(transition acceptable),401-800 → 40(approaching hard cap),> 800 → 10
 {
   const lines = safeWc('CLAUDE.md');
-  const score = lines <= 200 ? 100 : lines <= 400 ? 70 : lines <= 600 ? 40 : 10;
-  dimensions.push({ dim: 'D1 CLAUDE.md size(Anthropic target ≤ 200)', value: `${lines} lines`, score, max: 100 });
+  const score = lines <= 200 ? 100 : lines <= 400 ? 70 : lines <= 800 ? 40 : 10;
+  dimensions.push({ dim: 'D1 CLAUDE.md size(Anthropic target ≤ 200 / hard cap 800)', value: `${lines} lines`, score, max: 100 });
 }
 
 // === D2: Skill SKILL.md size discipline ===

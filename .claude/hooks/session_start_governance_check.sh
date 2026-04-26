@@ -15,7 +15,7 @@
 #     so Claude reads it as must-address-first instruction)
 #
 # Checks + thresholds:
-#   1. CLAUDE.md line count     — soft 800  / hard 1000
+#   1. CLAUDE.md line count     — soft 400 / hard 800(CLAUDE.md L34 SSOT: transition 400 / hard cap 800)
 #   2. Days since last prune    — soft 90   / hard 180
 #   3. user-corrections pending — soft 20   / hard 40
 #   4. Benchmarks freshness     — auto-fetch at 30 days(no hard tier)

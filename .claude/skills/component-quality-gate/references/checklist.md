@@ -25,7 +25,7 @@
 ---
 
 ## Phase 2 — Code(`{name}.tsx`)
-> 規則定義:`.claude/rules/ui-development.md` / `# shadcn 元件規範` / `# Tailwind 使用規則` / `# Token 命名原則` / `# 元件 Props 命名原則`
+> 規則定義:`.claude/rules/ui-development.md`(含「shadcn 元件規範」/「Tailwind 5 條核心」/「Token 命名 4 條硬規則」/「元件 Props 命名」)
 
 - [ ] 以 shadcn 為基底,forwardRef / displayName / asChild / ...props spread 齊全
 - [ ] variants 用 cva(),不條件拼字串(或 documented 例外:style-prop variant → object map / 結構性 variant → if-branches)
@@ -44,13 +44,13 @@
 ---
 
 ## Phase 3 — Stories(展示 / 設計規格 / 設計原則)
-> 規則定義:`.claude/skills/story-writing/`(完整 workflow) + CLAUDE.md `# Story`(high-level)
+> 規則定義:`.claude/skills/story-writing/`(完整 workflow) + `.claude/rules/story-rules.md`(high-level)
 
 - [ ] 範例選擇原則的自我檢查清單全部打勾(詳見 `.claude/skills/story-writing/references/self-check.md`)
 - [ ] 設計規格 5 個 story 齊全(總覽 / 檢閱器 / 色彩對照 / 尺寸對照 / 狀態行為)
 - [ ] TOKEN_MAP / SIZE_SPECS 資料與 cva() 定義完全一致
 - [ ] Rule note 傳達原則(「為什麼」),不只結論(「是什麼」)
-- [ ] Storybook title 對齊命名規則;元件放對 `Components/` vs `Internal/`(見 CLAUDE.md `# Story` → 「Internal vs Components 判斷 test」)
+- [ ] Storybook title 對齊命名規則;元件放對 `Components/` vs `Internal/`(見 `.claude/rules/story-rules.md` → 「Internal vs Components 三 test」)
 - [ ] 每個重要規則有正確範例;常見誤用有錯誤範例(對比呈現)
 
 ---

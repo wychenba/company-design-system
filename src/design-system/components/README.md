@@ -51,7 +51,7 @@
 - **Public**(Components/):有預設視覺,consumer 直接 `<X>` 就能用 — Storybook title `Design System/Components/{Name}`
 - **Internal primitive**(Internal/):無預設視覺,必被 wrapper 元件包 — Storybook title `Design System/Internal/{Name}`
 
-判斷 test 見 CLAUDE.md `# Story` → 「Internal vs Components 判斷 test」。
+判斷 test 見 `.claude/rules/story-rules.md` → 「Internal vs Components 三 test」。
 
 ## 建立前必 Read
 

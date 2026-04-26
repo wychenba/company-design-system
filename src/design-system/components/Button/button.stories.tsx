@@ -137,7 +137,7 @@ export const Danger: Story = {
 // ── icon slots(start / end 對照,對齊 Polaris)──────────────────────────
 
 export const WithIcon: Story = {
-  // Manual story 拆分原則(CLAUDE.md `# Story`)— startIcon / endIcon 同 slot rule
+  // Manual story 拆分原則(.claude/rules/story-rules.md)— startIcon / endIcon 同 slot rule
   // (LucideIcon prop slot,size 由元件控)→ 合併對照 grid。
   name: 'Icon Slots',
   args: { size: 'sm' },

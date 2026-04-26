@@ -95,7 +95,7 @@ description: Create-phase workflow for building a new design-system component fr
 
 1. **結構**:`forwardRef + cva + VariantProps + cn() + { Component, componentVariants } export`
 2. **cva 適用法**:className variant 用 cva;style prop variant 用 object map;結構 variant 用 conditional rendering(見 cva-patterns.md)
-3. **Props 命名**:按 CLAUDE.md `# Props 命名原則`:
+3. **Props 命名**:按 `.claude/rules/ui-development.md`「元件 Props 命名」:
    - 行為 → `onDismiss` / `onClose` / `onClear` / `onRemove`(語意分層,見 CLAUDE.md)
    - Slot icon → `startIcon` / `endIcon`(type `LucideIcon`)
    - Slot media → `avatar`(type `ReactNode`)

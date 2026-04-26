@@ -9,16 +9,16 @@
 1. **設計師 / PM 讀 spec**:詳盡解剖學(anatomy 圖標示每個 slot)、每個數值的 token 來源、每個 variant × state 的色彩組合、每個 size 的尺寸藍圖 — **檢閱方便性必須超越 Figma**,不需切工具,一頁看完
 2. **工程師讀 code**:依規格資訊能直接開發出一模一樣的 tsx,不靠設計師協助 — token name / Tailwind class / padding / gap / typography 全部在規格上,Inspect 面板即時 resolve 出 px 值
 
-因此 canonical 5 story 不是裝飾,是**兩個 audience 各自需要的資訊分層**:
+因此 6-canonical / 6 件套 story(含 Accessibility 第 6 章,2026-04-24+)不是裝飾,是**兩個 audience 各自需要的資訊分層**:
 - `Overview` = anatomy 圖 + variant 一覽 + props 速查(「這元件長什麼樣」)
 - `Inspector` = 即時預覽 + inspect 面板(「各 prop 切換時 token 怎麼變」,超越 Figma 的互動檢閱)
 - `ColorMatrix` = variant × state 色彩矩陣(「每格色彩 token 是哪個」)
 - `SizeMatrix` = size × variant 尺寸藍圖(「每格尺寸 token 是哪個」)
 - `StateBehavior` = 互動狀態前後對照(「hover / active / disabled 怎麼變」)
 
-5 個分層任一缺口 = 規格不完整 = Figma inspect 的替代目標沒達到。這就是為什麼 canonical 5 不是 5 個 random story,而是「足以 100% 還原元件」的最小必要切片。
+任一分層缺口 = 規格不完整 = Figma inspect 的替代目標沒達到。這就是為什麼 6-canonical(含 Accessibility)不是 N 個 random story,而是「足以 100% 還原元件 + 對齊世界級 a11y 章程」的最小必要切片。
 
-## Canonical `export const` 名稱 + 中文顯示名(五件套)
+## Canonical `export const` 名稱 + 中文顯示名(6 件套)
 
 每個 `.anatomy.stories.tsx` 的 `export const` 識別名稱必須用英文、中文 story 顯示名必須**強制 `name:` 覆寫**,且兩者**一字不差對齊**以下 canonical:
 
@@ -45,9 +45,9 @@ export const Overview = {
 - **強制編號**:Storybook sidebar 不依 `export` 順序,改依 story `name` 字母排序。中文無字母序,sidebar 會亂序;加編號前綴強制排序 canonical 化,順序跟 anatomy-standard 這份文件一致
 - **世界級對照**:Polaris(Anatomy / Variants / States)/ Material(Anatomy / Guidelines)/ Atlassian(Examples / Code) 的 Storybook 皆為每個 story 明確標題,從不靠 identifier 帶出 sidebar 名稱
 
-### Canonical 是**預設 5 section 都要建**,N/A 是嚴格例外
+### Canonical 是**預設 6 section 都要建**(含 Accessibility),N/A 是嚴格例外
 
-**canonical 5 section = 每個 Components/(public)元件預設都該有**。N/A 不是「省工豁免」,是嚴格例外 — 必須是「建了毫無意義 / 反而有害」才算 N/A。下方判斷標準**從嚴**。
+**6-canonical section = 每個 Components/(public)元件預設都該有**(Accessibility 第 6 章 2026-04-24+ 加入,對齊 Material / Polaris / Atlassian)。N/A 不是「省工豁免」,是嚴格例外 — 必須是「建了毫無意義 / 反而有害」才算 N/A。下方判斷標準**從嚴**。
 
 **判斷預設 applicable**(採 Polaris / Material / Atlassian 世界級 baseline):
 - **Inspector**:**幾乎所有 public 元件都 applicable**。只要元件有 ≥ 2 props,就該有 Inspector 讓 designer 切 props 看 render + token 對照。拒絕 Inspector 的唯一理由 = 元件 props < 2(極罕見,例 Separator / Skeleton 無互動 prop)
@@ -56,7 +56,7 @@ export const Overview = {
 - **StateBehavior**:applicable 如元件有任何互動 state(hover / selected / disabled / loading / error / focus)。純靜態 indicator(Badge / Tag)才 N/A
 - **Accessibility**(2026-04-24 加,對齊 Material / Polaris / Atlassian 專章):applicable 如元件有任何鍵盤互動 / ARIA / focus 管理。內含:ARIA props 對照表 / Keyboard map(Tab/Enter/Esc/arrow)/ Focus order 圖 / WCAG AA 對比 snapshot。純視覺 indicator(Badge / Tag / Separator)才 N/A。**Migration strategy**:existing 元件**不 retroactively backfill**;新元件 / 重大修改時建;`/design-system-audit` 稽核發現缺 → flag + 補
 
-**嚴格警告**:曾經被誤用「applicable-where-meaningful」放行大量元件跳 Inspector,造成 anatomy 紙本文件不如世界級。**2026-04-21 audit 重修:policy 改回「預設全建,N/A 要硬 rationale」**。N/A 不是省工通行證。
+**嚴格警告**:曾經被誤用「applicable-where-meaningful」放行大量元件跳 Inspector,造成 anatomy 紙本文件不如世界級。**2026-04-21 audit 重修:policy 改回「6-canonical 預設全建(含 Accessibility),N/A 要硬 rationale」**。N/A 不是省工通行證。
 
 ### 允許的偏離(CLAUDE.md「Consistency Audit 原則」公式)
 
@@ -85,19 +85,19 @@ import type { Meta, StoryObj } from '@storybook/react'
    - 中文 `name:` 必須用編號前綴 + 中文描述:`'6. 標準比例'` / `'6. 佈局矩陣'` / `'6. 色彩綁定規則'`
    - ❌ 不准用素顏型 `'色彩綁定規則'`(破壞編號連續性)
    - ❌ 不准帶括號 context `'6. Orientation(horizontal / vertical)'` — 括號寫在 story 標題本體,不影響 sidebar 文字
-2. **缺 canonical 5 某一項(N/A)**:**必須在元件 spec.md 寫一段 rationale**,格式:「本元件無 `{SectionName}` story,因為 {原因}」。典型原因:
+2. **缺 6-canonical 某一項(N/A)**:**必須在元件 spec.md 寫一段 rationale**,格式:「本元件無 `{SectionName}` story,因為 {原因}」。典型原因:
    - Badge / Tag:純視覺 indicator,無互動狀態 → 不需 StateBehavior
    - Chart:色彩來自 ChartConfig 不來自元件 variant → 不需 ColorMatrix
    - Separator / Skeleton / CircularProgress / Avatar:無 size tier(自由 number)→ 不需 SizeMatrix(或 SizeMatrix 改為「範圍展示」)
    - Notice / Alert:固定單一 size(Material Banner / Polaris Banner 共識) → 不需 SizeMatrix
-3. **保留 canonical 編號**:若有 Overview(1) + ColorMatrix(3) + StateBehavior(5),**編號保持 3 和 5**,不重編為 2 和 3 — 這讓讀者在 sidebar 一眼看出「這個元件跳過了 2 和 4」而非誤以為 canonical 就只有 3 個 section
+3. **保留 canonical 編號**:若有 Overview(1) + ColorMatrix(3) + StateBehavior(5),**編號保持 3 和 5**,不重編為 2 和 3 — 這讓讀者在 sidebar 一眼看出「這個元件跳過了 2 和 4」而非誤以為 canonical 就只有 3 個 section(6-canonical 模型同理)
 4. **同概念改名**:不允許(如 `VisualTokens` 取代 `ColorMatrix` / `StyleMatrix` 取代 `ColorMatrix`)一律改回 canonical
 
 **`/design-system-audit` Dimension 13 強制 grep 比對**:
 - `export const` 名稱 ≠ canonical → violation
 - 無 `name:` 覆寫(依賴 identifier) → violation
 - `name:` 值 ≠ canonical 中文(含編號前綴) → violation
-- 缺 canonical 5 某項且 spec.md 無 rationale → violation
+- 缺 6-canonical 某項且 spec.md 無 rationale → violation
 
 ## 1. 元件總覽
 

@@ -65,7 +65,7 @@ Root cause (推測): [判斷 why 發生]
 「[draft]」
 
 放哪一節 (按「規則分層」判斷):
-- 若跨元件 → # UI 開發規則 / # Spec 規則 / # Story
+- 若跨元件 → `.claude/rules/ui-development.md` / `.claude/rules/spec-rules.md` / `.claude/rules/story-rules.md`
 - 若技術陷阱 → # 失敗記憶索引 + 根原位置 section
 - 若純風格 → # 命名與語言一致性
 

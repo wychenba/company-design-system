@@ -1578,7 +1578,7 @@ export const IconActionPrimitiveDecision = {
         <Desc>
           同一 action row(suffix slot / chrome corner)<strong>所有 icon action 必用相同 primitive</strong>——
           不混 Inline Action + Button iconOnly。混用會造成 box 尺寸不一致,gap token 視覺被吃掉(參考
-          <code className="font-mono"> # UI 開發規則 </code>「同 flex 列的互動 slot 幾何鐵律」)。
+          <code className="font-mono"> .claude/rules/ui-development.md </code>「同 flex 列的互動 slot 幾何鐵律」)。
         </Desc>
         <div className="flex flex-col gap-3 max-w-xl">
           <div className="flex items-center gap-3 px-3 py-2 rounded-md border border-border bg-surface">

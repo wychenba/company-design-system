@@ -2,7 +2,7 @@
 # Tests for check_story_slot_split.sh
 #
 # Drives PreToolUse Edit/Write payloads on stdin and verifies block vs pass
-# for Manual story 拆分原則(CLAUDE.md `# Story` Polaris/Carbon idiom)。
+# for Manual story 拆分原則(.claude/rules/story-rules.md Polaris/Carbon idiom)。
 #
 # Usage: bash test_check_story_slot_split.sh
 

@@ -2,7 +2,7 @@
 
 世界級 DS(Polaris / Material / Atlassian / Ant / Carbon / Storybook 官方)的 Storybook story 結構**不是** category-based prescription(「button-likes 必有 5 stories」),是**trait-based**——元件依自身能力宣告 traits,required stories 由 trait 衍生。本 doc 是本 DS canonical typology v2,取代 v1 7-category。
 
-對應 CLAUDE.md `# Story`「拆分原則」+ M8 world-class benchmark。
+對應 `.claude/rules/story-rules.md`「拆分原則」+ M8 world-class benchmark。
 
 ## 為什麼 v2 trait-based(取代 v1 category-based)
 
@@ -98,7 +98,7 @@ v1 7 categories(A 視覺 variant / B field control / C selection / D structural 
 
 ## Cross-link
 
-- CLAUDE.md `# Story`「拆分原則」— canonical 上游 one-liner
+- `.claude/rules/story-rules.md`「拆分原則」— canonical 上游 one-liner
 - `/story-writing` SKILL.md Phase 0 — write-time mapping
 - Hook `check_story_category.sh` — pre-write enforcement(攔不符 trait core)
 - `/design-system-audit` Dim 29 — periodic verify

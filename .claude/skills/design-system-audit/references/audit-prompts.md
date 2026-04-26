@@ -13,8 +13,8 @@ Working directory: /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@g
 
 1. `CLAUDE.md` 的 `# Meta-Pattern 預警`(**M1-M9** meta-principles,含 M8 Benchmark-First / M9 Predicate Self-Test 2026-04-22)
 2. `CLAUDE.md` 的 `# SSOT 消費 canonical`(做 X 前必查 Y 對照表)
-3. `CLAUDE.md` 的 `# 稽核 vs 執行 分權 canonical`(flag 是提議,不是 auto-fix)
-4. `CLAUDE.md` 的 `# Spec 規則` 的「Scope 預設」節(Field 家族 / pure wrapper / semantic token 自動 scope 豁免)
+3. `CLAUDE.md` 的 `# 稽核 canonical`「Audit-vs-execute 分權」(flag 是提議,不是 auto-fix)
+4. `.claude/rules/spec-rules.md` 的「Scope 預設」節(Field 家族 / pure wrapper / semantic token 自動 scope 豁免)
 5. 每個 Consistency 類 dim:flag violation 前**必先 grep 元件 spec.md 整個檔案**找 rationale;有任何一段明文(`##`/`###`/「為什麼」/「rationale」/「對照」)觸及 deviation 原因 → 不是 violation 是 `deviation ✓`
 6. **Consistency 類 dim(含 D6b/D6c/D6e)必走 Phase 0 全掃再判**(CLAUDE.md `# 稽核 6 維` 規則 + `principle-audit-protocol.md` D6 scan)— 單元件看無法檢出系統性 drift / 跨 item 矛盾 / predicate membership drift
 
@@ -183,7 +183,7 @@ End: `N .tsx files checked, M violations.` Under 400 words. Don't fix.
 ## 5. Token 消費紀律
 
 **Type**: Absolute
-**Canonical source**: `.claude/rules/ui-development.md` + `# Tailwind 使用規則` → 禁止清單 (hex / rgb / shadow-md/sm / raw px 等)
+**Canonical source**: `.claude/rules/ui-development.md`「Tailwind 5 條核心」 → 禁止清單 (hex / rgb / shadow-md/sm / raw px 等)
 **Rationale home**: N/A — tokens bypass breaks dark mode / density / brand-swap
 
 ```
@@ -348,7 +348,7 @@ End: `N files checked, M a11y gaps, top offenders: [list]`. Under 500 words. Don
 ## 11. Story 三層齊全
 
 **Type**: Consistency
-**Canonical source**: CLAUDE.md `# Story` 三層定位 (Components: 展示 + anatomy + principles;Internal: 展示 + anatomy)
+**Canonical source**: `.claude/rules/story-rules.md` 三層定位 (Components: 展示 + anatomy + principles;Internal: 展示 + anatomy)
 **Rationale home**: Storybook title classification (`Internal/` → principles optional by design). Components missing a layer without Internal classification = violation
 
 ```
@@ -372,11 +372,11 @@ End: `N component folders checked, M missing layers.` Under 400 words. Don't fix
 ## 12. Story 人話範例
 
 **Type**: Absolute
-**Canonical source**: CLAUDE.md `# Story` → 範例最高準則 + 禁止清單 (「人」test + 舉一反三 test)
+**Canonical source**: `.claude/rules/story-rules.md` → 範例最高準則 + 禁止清單 (「人」test + 舉一反三 test)
 **Rationale home**: N/A — Lorem ipsum / Option A/B / Variant X / ASCII art have no legitimate use
 
 ```
-Your job: audit all .stories.tsx + .principles.stories.tsx for placeholder / abstract text per CLAUDE.md `# Story` → 範例選擇原則 → 明確禁止.
+Your job: audit all .stories.tsx + .principles.stories.tsx for placeholder / abstract text per `.claude/rules/story-rules.md` → 範例選擇原則 → 明確禁止.
 
 Flag:
 - Placeholder: `Option A/B/C`, `Lorem ipsum`, `foo/bar`, `Item 1/2/3`
@@ -397,17 +397,17 @@ End: `N files checked, V violations.` Under 600 words. Don't fix.
 ## 13. Anatomy Figma-inspect 完整度 + Canonical `export const` 命名 + 中文 `name:` 覆寫
 
 **Type**: Consistency
-**Canonical source**: `/story-writing` anatomy-standard.md → canonical 5 件套 (`Overview / Inspector / ColorMatrix / SizeMatrix / StateBehavior`) + 強制中文 `name:` 覆寫(含編號前綴)
-**Rationale home**: element .spec.md — replacing/omitting a canonical 5 section requires a rationale paragraph explaining why (e.g., "Badge 無互動狀態,不需 StateBehavior"). Renaming identifier is never allowed.
+**Canonical source**: `/story-writing` anatomy-standard.md → 6 件套 (`Overview / Inspector / ColorMatrix / SizeMatrix / StateBehavior / Accessibility`) + 強制中文 `name:` 覆寫(含編號前綴)
+**Rationale home**: element .spec.md — replacing/omitting a 6-canonical section requires a rationale paragraph explaining why (e.g., "Badge 無互動狀態,不需 StateBehavior"). Renaming identifier is never allowed. **`*.anatomy.stories.tsx` 檔頭 `// @anatomy-rationale:` 註解列出 N/A sections + 一行原因 → legitimately N/A,不報為 violation**(對齊 hook `check_story_anatomy.sh` 同源處理)。
 
 ```
 Your job: audit .anatomy.stories.tsx against `/story-writing` anatomy-standard.md on THREE layers, enforcing CLAUDE.md 「Consistency Audit 原則」.
 
 **Layer 1 — Canonical `export const` names** (一字不差, in order):
-1. `Overview` / 2. `Inspector` / 3. `ColorMatrix` / 4. `SizeMatrix` / 5. `StateBehavior`
-Additional `export const` 6+ allowed (component-specific, no rationale required).
-Replacing canonical 5 with different identifier → VIOLATION regardless of rationale.
-Missing canonical 5 → requires rationale paragraph in .spec.md.
+1. `Overview` / 2. `Inspector` / 3. `ColorMatrix` / 4. `SizeMatrix` / 5. `StateBehavior` / 6. `Accessibility`(互動元件強制,純視覺 indicator N/A)
+Additional `export const` 7+ allowed (component-specific, no rationale required).
+Replacing 6-canonical with different identifier → VIOLATION regardless of rationale.
+Missing 6-canonical → requires rationale paragraph in .spec.md OR `// @anatomy-rationale:` 檔頭註解列出 N/A sections + 一行原因(legitimate 偏離)。
 
 **Layer 2 — Mandatory `name:` 中文覆寫(含編號前綴,一字不差)**:
 1. `Overview`     → `name: '1. 元件總覽'`
@@ -415,7 +415,8 @@ Missing canonical 5 → requires rationale paragraph in .spec.md.
 3. `ColorMatrix`  → `name: '3. 色彩對照表'`
 4. `SizeMatrix`   → `name: '4. 尺寸對照表'`
 5. `StateBehavior`→ `name: '5. 狀態行為'`
-6+ (extras)      → `name: '6. {中文描述}'` / `'7. {中文描述}'` (編號連續,中文命名)
+6. `Accessibility`→ `name: '6. 無障礙與鍵盤'`
+7+ (extras)      → `name: '7. {中文描述}'` / `'8. {中文描述}'` (編號連續,中文命名)
 
 依賴 `export const` identifier 讓 Storybook sidebar 顯示英文 = VIOLATION(sidebar 中英混雜)。
 素顏型 `name: '元件總覽'`(無編號) = VIOLATION(Storybook sidebar 字母序亂)。
@@ -431,7 +432,7 @@ Missing canonical 5 → requires rationale paragraph in .spec.md.
 **For each `src/design-system/components/*/*.anatomy.stories.tsx`**:
 1. Grep `^export const ([A-Za-z]+)` — Layer 1 identifier list
 2. For each export, grep its `name:` field value — Layer 2 中文覆寫
-3. Check canonical 5 presence + rationale in .spec.md for any missing
+3. Check 6-canonical presence + rationale in .spec.md OR `// @anatomy-rationale:` 檔頭註解 for any missing(若 .anatomy.stories.tsx 檔頭有 `// @anatomy-rationale:` 註解,列出 N/A sections 和理由 — 視為 legitimate 偏離,不報為 violation。Hook `check_story_anatomy.sh` 同源處理。)
 
 Report format:
 - `ComponentName L1: missing [Inspector, ColorMatrix] — no rationale in spec.md`
@@ -441,7 +442,7 @@ Report format:
 - `ComponentName L2: 素顏型無編號 '元件總覽'`
 - `ComponentName L2: extra story 6 name='6. Orientation(horizontal)' 含英文 context`
 - `ComponentName L3: density dual values in SizeMatrix column`
-- `ComponentName: canonical 5 + name 覆寫完整 + extras [StandardRatios='6. 標準比例'] — OK`
+- `ComponentName: 6-canonical + name 覆寫完整 + extras [StandardRatios='7. 標準比例'] — OK`
 - `ComponentName: missing StateBehavior — rationale found at badge.spec.md:L45 ✓`
 
 End: `N checked, L1 V1 violations, L2 V2 violations, L3 V3 content issues. Top 5 worst: [list]`. Under 900 words. Don't fix.

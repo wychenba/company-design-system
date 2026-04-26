@@ -215,7 +215,7 @@ if [ -n "$VIOLATIONS" ]; then
     echo "     教學),檔首加 // @anatomy-exempt: <reason>"
     echo "  3. 若僅某一行屬合理例外,加 // @anatomy-exempt-next 到該行前"
     echo ""
-    echo "參考:CLAUDE.md 「# 建立 UI 前必讀」自我檢查腳本段"
+    echo "參考:.claude/rules/ui-development.md「建立 UI 前必讀」自我檢查腳本段"
     echo "      src/design-system/patterns/element-anatomy/item-anatomy.spec.md"
   } >&2
   exit 2

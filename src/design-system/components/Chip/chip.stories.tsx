@@ -56,7 +56,7 @@ export const States: Story = {
 }
 
 // ── With icon ────────────────────────────────────────────────────────────────
-// Manual story 拆分原則(CLAUDE.md `# Story`):startIcon / endIcon 同 slot rule
+// Manual story 拆分原則(.claude/rules/story-rules.md):startIcon / endIcon 同 slot rule
 // (LucideIcon prop slot,size 由元件控)→ 合併為 WithIcon 對照 grid。
 // 對齊 Polaris pattern(單一 `icon` prop + Controls 切方向)。
 
