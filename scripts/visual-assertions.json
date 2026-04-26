@@ -2,7 +2,7 @@
   "$schema-note": "scripts/visual-audit.mjs 消費此檔。每個 scenario 含:id(Storybook id)或 url(外部) / file(輸出 png 檔名) / 可選 assertions[](DOM 幾何測量陣列) / 可選 rationale(scenario-level 合理偏離說明,對齊 CLAUDE.md 稽核 canonical 優先順序 ladder)。assertion 內也可加 rationale 欄位讓個別檢查宣告合理偏離。id 從 curl http://localhost:6006/index.json 取得真實值。",
   "scenarios": [
     {
-      "id": "design-system-components-datepicker-展示--basic",
+      "id": "design-system-components-datepicker-展示--default",
       "file": "datepicker-basic.png"
     },
     {
@@ -14,27 +14,27 @@
       "file": "datepicker-sizes.png"
     },
     {
-      "id": "design-system-components-calendar-展示--團隊行事曆",
+      "id": "design-system-components-calendar-展示--team-calendar",
       "file": "calendar-event-team.png"
     },
     {
-      "id": "design-system-components-calendar-展示--內容發佈月曆",
+      "id": "design-system-components-calendar-展示--content-publishing-schedule",
       "file": "calendar-event-publishing.png"
     },
     {
-      "id": "design-system-components-calendar-展示--空行事曆",
+      "id": "design-system-components-calendar-展示--empty-calendar",
       "file": "calendar-event-empty.png"
     },
     {
-      "id": "design-system-components-timepicker-展示--會議時段",
+      "id": "design-system-components-timepicker-展示--meeting-slot",
       "file": "timepicker-meeting.png"
     },
     {
-      "id": "design-system-components-timepicker-展示--店家營業時間",
+      "id": "design-system-components-timepicker-展示--shop-business-hours",
       "file": "timepicker-shop-hours.png"
     },
     {
-      "id": "design-system-components-timepicker-展示--航班起飛時間",
+      "id": "design-system-components-timepicker-展示--flight-departure-time",
       "file": "timepicker-flight.png"
     },
     {
@@ -67,7 +67,7 @@
       "file": "rating-in-field.png"
     },
     {
-      "id": "design-system-components-rating-展示--size-variants",
+      "id": "design-system-components-rating-展示--all-sizes",
       "file": "rating-sizes.png"
     },
     {
@@ -146,7 +146,7 @@
       "rationale": "Interactive state capture — play() focus 觸發 iconOnly Button 自動 tooltip(Radix warm-up + content render 需 ~1000ms),補靜態 snapshot 看不到 tooltip 的 gap"
     },
     {
-      "id": "design-system-components-dialog-展示--basic",
+      "id": "design-system-components-dialog-展示--default",
       "file": "dialog-basic.png"
     },
     {
@@ -226,7 +226,7 @@
       "file": "fileitem-state-behavior.png"
     },
     {
-      "id": "design-system-components-dropdownmenu-展示--basic",
+      "id": "design-system-components-dropdownmenu-展示--default",
       "file": "dropdownmenu-basic.png"
     },
     {
@@ -320,11 +320,11 @@
       "file": "input-modes.png"
     },
     {
-      "id": "design-system-components-linkinput-展示--basic",
+      "id": "design-system-components-linkinput-展示--default",
       "file": "linkinput-basic.png"
     },
     {
-      "id": "design-system-components-namecard-展示--basic",
+      "id": "design-system-components-namecard-展示--default",
       "file": "namecard-basic.png"
     },
     {
@@ -412,7 +412,7 @@
       "file": "treeview-file-browser.png"
     },
     {
-      "id": "design-system-internal-menu-展示--basic",
+      "id": "design-system-internal-menu-展示--default",
       "file": "menu-menuitem-basic.png"
     },
     {
