@@ -768,31 +768,15 @@ CSS 變數在定義元素上解析。`:root` 的 `--foreground: var(--color-neut
 ## 禁止事項
 
 ```tsx
-// ❌ 不要使用 Tailwind 原始色
-<div className="bg-blue-500 text-gray-700" />
+// ❌ Tailwind 原始色 / 硬寫色碼      // ✅ semantic / primitive 對應場景
+<div className="bg-blue-500" />        <div className="bg-canvas" />
+<div className="bg-[#1677FF]" />       <div className="bg-primary hover:bg-primary-hover" />
+<div className="bg-[var(--color-blue-6)]" />  // ❌ semantic 場景用 primitive
+// ✅ Tag / Avatar 例外:可直接用 primitive(色不代表語義)
 
-// ❌ 不要硬寫色碼
-<div className="bg-[#1677FF]" />
-
-// ❌ 不要在語義場景直接使用 primitive token
-<div className="bg-[var(--color-blue-6)]" />  // 語義場景改用 bg-primary（semantic）
-// ✅ Tag / Avatar 可以直接使用 primitive（它們的色彩不代表語義）
-
-// ❌ 不要在深色容器上硬寫 text-white 給子元件——用 data-theme="dark"
-<TooltipContent>
-  <Tag className="text-white" />  // 改用 data-theme="dark" wrapper
-</TooltipContent>
-```
-
-```tsx
-// ✅ 正確
-<div className="bg-canvas" />
-<div className="bg-primary hover:bg-primary-hover" />
-<div className="bg-primary-subtle text-primary" />
-<div className="bg-error" />
-<span className="bg-notification text-white">3</span>
-// ✅ Tag / Avatar 直接用 primitive
-<Tag style={{ backgroundColor: 'var(--color-blue-1)', color: 'var(--color-blue-7)' }} />
+// ❌ 深色容器硬寫 text-white         // ✅ 用 data-theme="dark" wrapper
+<TooltipContent><Tag className="text-white" /></TooltipContent>
+<div data-theme="dark"><Tag /></div>
 ```
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)

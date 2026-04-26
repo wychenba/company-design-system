@@ -12,9 +12,9 @@
 每條規則展開請讀後面對應章節(`# Spec 規則`、`# UI 開發規則`、`# Story`、`# 命名與語言一致性` 等)。
 
 
-# Meta-Pattern 預警(17 條大原則)
+# Meta-Pattern 預警(19 條大原則)
 
-**mindset #6 的具體化**。每條能吸收數十個具體 bug,是失敗記憶索引的上游。接到任務先過這 17 條,再跑 `# 任務導航表`。
+**mindset #6 的具體化**。每條吸收數十個具體 bug,是失敗記憶索引上游。任務前先過這 19 條,再跑 `# 任務導航表`。
 
 | # | Meta-Principle | 能吸收的 bug 類型(舉例,非窮舉) |
 |---|---|---|
@@ -208,31 +208,28 @@ Stack:Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 D
 
 # 遇不確定時的協議(Ambiguity Protocol)
 
-**最常發生的錯誤是「AI 憑直覺造新 pattern」**(延伸 mindset #2 + #5)。無明確前例時強制 3 步,禁止跳步 / 憑感覺往前:
+**最常錯誤:AI 憑直覺造新 pattern**(延伸 mindset #2 + #5)。無前例時強制 3 步,禁跳步:
 
-1. **grep 既有 pattern**(30 秒):命名 → 同類元件值;設計決策 → 最近親 spec;token → 對應 spec;pattern → `ls patterns/`。找到就沿用,不合理進 Step 3
-2. **讀近親 spec.md**:檢查設計決策可類推?SSOT anchor 有談?禁止事項隱含規則?可類推直接套用並寫反向引用
-3. **仍不確定停下問**:「找到的 pattern:A/B;傾向 A 因 X,B 也合理;偏好?」
+1. **grep 既有**(30 秒)— 命名/決策/token/pattern 任一找到就沿用
+2. **讀近親 spec.md** — 可類推套用並寫反向引用
+3. **仍不確定停下問**「找到 A/B,傾向 A 因 X,偏好?」
 
-**禁止**:跳 grep 憑記憶造值 / 兩選項隨便挑 / 發明新 suffix/prefix / 留「TODO 待確認」照樣往前。
-
-**可跳過**(非「無前例」):bug 修復 / 純機械勞動(import / typo / 格式)/ user 明確指示。
+**禁**:跳 grep 憑記憶 / 隨便挑 / 發明 suffix-prefix / 留 TODO 往前。**可跳**:bug 修 / 機械勞動(import/typo)/ user 明確指示。
 
 
-# 失敗記憶索引(meta anchors only)
+# 失敗記憶索引(技術沉默陷阱 only)
 
-**本索引只留純技術沉默陷阱** — 設計判斷類 bug 已被 Meta-Pattern M1-M17 吸收(上表),具體事件歷史詳 `design-system-audit/references/historical-bugs.md`(含「Meta-Pattern M1-M17 origins」節)。
+設計判斷類已被 M1-M19 吸收;具體歷史詳 `design-system-audit/references/historical-bugs.md`。
 
-| 技術陷阱 | 一行 anchor | 詳細位置 |
+| 技術陷阱 | 一行 anchor | 位置 |
 |--------|-----------|---------|
-| Tailwind v4 `[--foo]` 必 `var()` | 不被自動包 var,silent 失效 | `# Tailwind 使用規則` |
-| tailwind-merge 自訂 utility 註冊 | 不註冊 → group 誤判 strip | `# Tailwind 使用規則` |
-| 元件自包 Provider | shadcn 原版 Sidebar 帶 TooltipProvider 劫持全站 | `# shadcn 元件規範` |
+| Tailwind v4 `[--foo]` 必 `var()` | silent 失效 | `# Tailwind 使用規則` |
+| tailwind-merge 自訂 utility 必註冊 | 否則 group 誤判 strip | `# Tailwind 使用規則` |
+| 元件自包 Provider | shadcn Sidebar 帶 TooltipProvider 劫持全站 | `# shadcn 元件規範` |
 | 清 unused imports 後 runtime | tsc 不充分,需 storybook | `# UI 開發規則` |
-| shadcn compat alias 回流 | `bg-popover` / `text-muted-foreground` 等 | hook `check_token_hygiene.sh` |
-| Tailwind `shadow-md/lg` 繞 elevation token | dark mode 不聯動 | hook `check_token_hygiene.sh` |
+| shadcn compat alias 回流 / `shadow-md` 繞 elevation | dark mode 不聯動 | hook `check_token_hygiene.sh` |
 
-**規則**:新 bug 能歸 Meta-Pattern → 回填 historical-bugs.md「M1-M17 origins」節,不寫本索引;不能歸 → 本表 1 行 + 詳細 pointer;條目 > 10 條 = meta-principle 漏寫(跟 user 討論新增 M18)。
+**規則**:新 bug 歸 Meta-Pattern → 填 historical-bugs.md;不歸 → 本表 1 行;> 10 條 = 漏寫,新增 M20。
 
 
 # 命名與語言一致性(Meta 規則)
