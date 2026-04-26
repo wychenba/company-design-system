@@ -20,7 +20,7 @@ export default meta
 type Story = StoryObj<typeof DatePicker>
 
 /* ── 基本用法 ── */
-export const Basic: Story = {
+export const Default: Story = {
   name: '基本用法',
   render: () => {
     const [value, setValue] = React.useState('2026-04-02')

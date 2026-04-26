@@ -93,6 +93,39 @@ if [ "$PRIM" -ge 2 ]; then
   豁免:檔首加 // @story-split-rationale: <理由>"
 fi
 
+# Anti-pattern 4: Naming canonical drift(2026-04-26 跨元件統一)
+if echo "$FULL" | grep -qE '^export const Variants(\b|:|\s|=)'; then
+  VIOLATIONS="${VIOLATIONS}
+[命名漂移] export const Variants
+  Canonical: AllVariants(對齊 Button / Tag / Toast / Badge)
+  改名:Variants → AllVariants"
+fi
+if echo "$FULL" | grep -qE '^export const Basic(\b|:|\s|=)'; then
+  VIOLATIONS="${VIOLATIONS}
+[命名漂移] export const Basic
+  Canonical: Default(default story)
+  改名:Basic → Default"
+fi
+if echo "$FULL" | grep -qE '^export const (DisabledState|DisabledGroup)(\b|:|\s|=)'; then
+  VIOLATIONS="${VIOLATIONS}
+[命名漂移] export const DisabledState / DisabledGroup
+  Canonical: Disabled(對齊 Button / Slider / Tabs)
+  改名:DisabledState → Disabled / DisabledGroup → Disabled"
+fi
+if echo "$FULL" | grep -qE '^export const SizeVariants(\b|:|\s|=)'; then
+  VIOLATIONS="${VIOLATIONS}
+[命名漂移] export const SizeVariants
+  Canonical: AllSizes(對齊 Button / Tag / Avatar / Tabs)
+  改名:SizeVariants → AllSizes"
+fi
+# Chinese export name(JS convention 違反)
+if echo "$FULL" | grep -qE '^export const [^a-zA-Z_$]'; then
+  VIOLATIONS="${VIOLATIONS}
+[命名漂移] export const 中文名
+  JS convention:export name 必英文 PascalCase。中文 name 用 \`name: '中文標題'\` 屬性
+  範例:export const TeamCalendar: Story = { name: '團隊行事曆', ... }"
+fi
+
 # Emit block on violations
 if [ -n "$VIOLATIONS" ]; then
   {

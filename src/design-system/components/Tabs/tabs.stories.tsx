@@ -29,7 +29,7 @@ export const Default: Story = {
   ),
 }
 
-export const Sizes: Story = {
+export const AllSizes: Story = {
   render: () => (
     <div className="flex flex-col gap-8 w-[600px]">
       {(['sm', 'md', 'lg'] as const).map((size) => (

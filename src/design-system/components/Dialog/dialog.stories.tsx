@@ -84,7 +84,7 @@ const meta: Meta = {
 }
 export default meta
 
-export const Basic = {
+export const Default = {
   name: '基本',
   render: () => (
     <Dialog>

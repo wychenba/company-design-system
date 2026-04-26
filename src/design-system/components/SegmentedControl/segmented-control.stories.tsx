@@ -65,7 +65,7 @@ export const IconOnly: Story = {
   },
 }
 
-export const Sizes: Story = {
+export const AllSizes: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       {(['xs', 'sm', 'md', 'lg'] as const).map((size) => (

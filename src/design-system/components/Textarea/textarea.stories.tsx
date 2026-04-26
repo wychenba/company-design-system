@@ -52,7 +52,7 @@ export const Error: Story = {
   ),
 }
 
-export const Sizes: Story = {
+export const AllSizes: Story = {
   render: () => (
     <div className="max-w-md flex flex-col gap-4">
       <div>

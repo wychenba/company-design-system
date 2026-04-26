@@ -133,7 +133,7 @@ export const Colors = {
 
 const SIZES = [20, 24, 32, 40] as const
 
-export const Sizes = {
+export const AllSizes = {
   name: '尺寸',
   render: () => (
     <div className="flex flex-col gap-6">

@@ -44,7 +44,7 @@ function NameCardHover({ name, src, subtitle }: { name: string; src: string; sub
   )
 }
 
-export const Basic = {
+export const Default = {
   name: 'Hover 展開 NameCard',
   render: () => (
     <div className="p-16 flex flex-col gap-6">

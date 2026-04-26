@@ -162,7 +162,7 @@ export const ColumnTypes: Story = {
 }
 
 /* ── 三種尺寸 ── */
-export const Sizes: Story = {
+export const AllSizes: Story = {
   name: '尺寸',
   render: () => (
     <div className="flex flex-col gap-8">

@@ -42,7 +42,7 @@ const MenuContainer = ({ children, width = 320 }: { children: React.ReactNode; w
 
 // ── 基本 ──
 
-export const Basic: Story = {
+export const Default: Story = {
   name: '基本',
   render: () => (
     <MenuContainer><MenuGroup>
@@ -187,7 +187,7 @@ export const Creatable: Story = {
 
 // ── 尺寸比較 ──
 
-export const Sizes: Story = {
+export const AllSizes: Story = {
   name: '尺寸比較',
   render: () => (
     <div className="flex flex-col gap-6">

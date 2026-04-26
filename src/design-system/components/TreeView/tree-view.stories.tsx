@@ -262,7 +262,7 @@ export const DragAndDrop: Story = {
 
 // ── Size Comparison ─────────────────────────────────────────────────────
 
-export const Sizes: Story = {
+export const AllSizes: Story = {
   name: 'Size 對比（sm / md / lg）',
   render: () => (
     <div className="flex gap-8 items-start">

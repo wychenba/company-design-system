@@ -82,7 +82,7 @@ export const Horizontal: Story = {
 }
 
 /* ── Disabled ── */
-export const DisabledGroup: Story = {
+export const Disabled: Story = {
   name: 'Disabled',
   render: () => (
     <div className="grid max-w-sm">

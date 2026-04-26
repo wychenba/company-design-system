@@ -45,7 +45,7 @@ export const Range: Story = {
 
 // ── Sizes(容器對齊)───────────────────────────────────────────────────
 
-export const SizesAlignment: Story = {
+export const SizeAlignment: Story = {
   name: '容器尺寸對齊(視覺不變,高度跟 Field 對齊)',
   render: () => (
     <div className="w-[360px] flex flex-col gap-6">

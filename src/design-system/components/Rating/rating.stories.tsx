@@ -113,7 +113,7 @@ export const InField: Story = {
 }
 
 /* ── 尺寸對照 ── */
-export const SizeVariants: Story = {
+export const AllSizes: Story = {
   name: '尺寸對照',
   render: () => (
     <div className="flex flex-col gap-6 w-[520px]">
@@ -143,7 +143,7 @@ export const SizeVariants: Story = {
 }
 
 /* ── Disabled 狀態 ── */
-export const DisabledState: Story = {
+export const Disabled: Story = {
   name: 'Disabled 狀態',
   render: () => (
     <div className="flex flex-col gap-4 w-[420px]">

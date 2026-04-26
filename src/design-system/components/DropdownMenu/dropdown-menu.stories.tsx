@@ -18,7 +18,7 @@ export default meta
 
 // ── 基本 ──
 
-export const Basic: StoryObj = {
+export const Default: StoryObj = {
   name: '基本',
   render: () => (
     <DropdownMenu>
@@ -290,7 +290,7 @@ export const ItemHover: StoryObj = {
 
 // ── 尺寸 ──
 
-export const Sizes: StoryObj = {
+export const AllSizes: StoryObj = {
   name: '尺寸',
   render: () => (
     <div className="flex items-center gap-4">

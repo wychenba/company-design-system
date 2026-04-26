@@ -98,7 +98,7 @@ export const InteractiveEllipsis: Story = {
 
 // ── Sizes (配對 page title) ────────────────────────────────────────────────
 
-export const Sizes: Story = {
+export const AllSizes: Story = {
   name: 'Sizes(配對 page title)',
   render: () => (
     <div className="flex flex-col gap-10">

@@ -18,7 +18,7 @@ export default meta
 type Story = StoryObj<typeof Badge>
 
 /* ── 四個層級 ── */
-export const Variants: Story = {
+export const AllVariants: Story = {
   name: '四個層級',
   render: () => (
     <div className="flex flex-col gap-6">

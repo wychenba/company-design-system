@@ -31,7 +31,8 @@ type Story = StoryObj<typeof TimePicker>
  * 會議排程 — 會議時間常以 15 分鐘為粒度,minuteStep=15 是世界級慣例
  * (Google Calendar / Outlook / Notion Calendar 預設皆是 15)。
  */
-export const 會議時段: Story = {
+export const MeetingSlot: Story = {
+  name: '會議時段',
   render: () => {
     const [start, setStart] = React.useState<string>('09:00')
     const [end, setEnd] = React.useState<string>('10:00')
@@ -54,7 +55,8 @@ export const 會議時段: Story = {
  * 航班時刻 — HH:mm 格式,不需要秒。
  * 對照:Google Flights / Expedia / KAYAK 時間選擇都是分鐘粒度。
  */
-export const 航班起飛時間: Story = {
+export const FlightDepartureTime: Story = {
+  name: '航班起飛時間',
   render: () => {
     const [time, setTime] = React.useState<string>('14:35')
     return (
@@ -70,7 +72,8 @@ export const 航班起飛時間: Story = {
  * 營業時間 — 兩個 TimePicker 組合達成 range 語意(MVP 不內建 Range;
  * 對齊 Ant composition 思路,見 spec「為何無 Range」段)。
  */
-export const 店家營業時間: Story = {
+export const ShopBusinessHours: Story = {
+  name: '店家營業時間',
   render: () => {
     const [open, setOpen] = React.useState<string>('10:00')
     const [close, setClose] = React.useState<string>('22:00')
@@ -91,7 +94,8 @@ export const 店家營業時間: Story = {
  * 精確 log 時間 — 需要秒時啟用 showSeconds,format 自動升級到 HH:mm:ss。
  * 對照:DevTools timeline / Datadog event timestamp 都秒級。
  */
-export const 事件發生時間: Story = {
+export const EventTimestamp: Story = {
+  name: '事件發生時間',
   render: () => {
     const [time, setTime] = React.useState<string>('14:35:22')
     return (
@@ -107,7 +111,8 @@ export const 事件發生時間: Story = {
  * 上下班 disabled 示例:半夜 0-6 點不可選(`disabledTime` 動態禁)。
  * 對照:HR 排班系統 / 打卡 App 的時段限制。
  */
-export const 員工上班時段設定: Story = {
+export const EmployeeShiftSchedule: Story = {
+  name: '員工上班時段設定',
   render: () => {
     const [clockIn, setClockIn] = React.useState<string>('09:00')
     return (

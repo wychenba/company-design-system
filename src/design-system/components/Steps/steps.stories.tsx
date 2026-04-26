@@ -141,7 +141,7 @@ export const Default: Story = {
 
 // ── Sizes ────────────────────────────────────────────────────────────────
 
-export const Sizes: Story = {
+export const AllSizes: Story = {
   name: '尺寸(sm / md / lg)',
   render: () => (
     <div className="flex gap-12">

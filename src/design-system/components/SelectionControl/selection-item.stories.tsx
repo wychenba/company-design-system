@@ -137,7 +137,7 @@ export const WithPrefixAvatarBlock: Story = {
    Story 5:Sizes 對照(sm / md / lg)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export const Sizes: Story = {
+export const AllSizes: Story = {
   name: '尺寸對照',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">

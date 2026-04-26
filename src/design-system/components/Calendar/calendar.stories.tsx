@@ -27,7 +27,8 @@ const thisMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(
  * 團隊行事曆 — Notion / Google Calendar 替代品情境
  * 本月會議 / deadline / 休假,多事件類型用 color 區隔。
  */
-export const 團隊行事曆: Story = {
+export const TeamCalendar: Story = {
+  name: '團隊行事曆',
   render: () => {
     const events: CalendarEvent[] = [
       { id: '1', title: 'Design review', start: `${thisMonth}-05`, end: `${thisMonth}-05`, color: 'blue' },
@@ -55,7 +56,8 @@ export const 團隊行事曆: Story = {
 /**
  * 內容發佈排程 — Blog / 影片發布月曆
  */
-export const 內容發佈月曆: Story = {
+export const ContentPublishingSchedule: Story = {
+  name: '內容發佈月曆',
   render: () => {
     const events: CalendarEvent[] = [
       { id: 'p1', title: '週五 newsletter', start: `${thisMonth}-02`, end: `${thisMonth}-02`, color: 'blue' },
@@ -75,7 +77,8 @@ export const 內容發佈月曆: Story = {
 /**
  * 空行事曆 — 無事件時 calendar 本身是空 canvas,不強制顯示 empty state
  */
-export const 空行事曆: Story = {
+export const EmptyCalendar: Story = {
+  name: '空行事曆',
   render: () => (
     <div className="h-screen p-4 bg-canvas">
       <Calendar events={[]} onCreateEvent={() => alert('加第一個事件')} />

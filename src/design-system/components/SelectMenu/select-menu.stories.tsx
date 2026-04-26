@@ -141,7 +141,7 @@ const SizesDemo = () => {
   )
 }
 
-export const Sizes: StoryObj = {
+export const AllSizes: StoryObj = {
   name: '尺寸',
   render: () => <SizesDemo />,
 }
