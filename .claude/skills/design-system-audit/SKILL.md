@@ -156,8 +156,12 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
    - `npx vite build 2>&1 | tail -3` — must show `✓ built in`
    - `lsof -i :6006 -t` OR `npm run build-storybook 2>&1 | tail -3` — storybook must build clean
    - `grep -rE '\.stories\.tsx$' src/design-system/components` + syntax-check each via quick `npx tsc --noEmit <file>` sample — catches stories that index but type-fail
-4. **If any baseline fails**: do NOT run the 20 dimensions yet. Audit quality assumes the code compiles. Report build status and ask user whether to fix build first OR proceed anyway (audit on broken code has limited value — many dimensions can't run meaningfully)
-5. Create TaskList entries for each audit you plan to run
+4. **Mechanical content-quality baseline**(2026-04-26 整合,16 cat 涵蓋本 conv 發現的所有 storybook drift):
+   - `node scripts/audit-content-quality.mjs --check` — must show `✅ No content drift detected`(16 categories:anatomy numbering / non-anatomy numbering / LinkTo missing / stub pattern / missing zh-CN name / placeholder content / empty render / English placeholder / anatomy canonical names / numbering gap / showcase missing / per-size split / principles ≥ 2 / ASCII art / abstract names / thin description)
+   - `node scripts/extract-canonical-rules.mjs` — must show `✅ All extracted rule keywords covered`(rules-vs-audit coverage gap detection)
+   - **violation 在 Phase 0 出現**:Phase 1 開跑前先列入 P0 待修(mechanical 不 judgment)
+5. **If any baseline fails**: do NOT run the 20 dimensions yet. Audit quality assumes the code compiles. Report build status and ask user whether to fix build first OR proceed anyway (audit on broken code has limited value — many dimensions can't run meaningfully)
+6. Create TaskList entries for each audit you plan to run
 
 ### Phase 1 — Parallel audit execution
 
