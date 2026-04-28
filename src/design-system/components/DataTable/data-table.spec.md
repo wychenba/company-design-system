@@ -391,7 +391,7 @@ preserveSelectionOnFilter?: boolean   // default false
 - header checkbox `aria-label="Select all visible rows"`
 - 鍵盤:`Space` toggle / `Shift+Space` 擴 range / `Cmd/Ctrl+A` 選全可見 / `Esc` clear
 - Selection 變更可選 `aria-live="polite"` 通知(consumer-implemented)
-- **Single mode 視覺 v1**:沿用 Checkbox(behavior 正確 — replace selection;header checkbox 抑制)。Radio 完整整合(對齊 Material / Polaris world-class)需 RadioGroup root 包整 table,複雜度過高,列 future enhancement。
+- **Multi mode 用 Checkbox / Single mode 用 Radio**(對齊 Material DataGrid / Polaris IndexTable 共識,same-row consistency 全 sm)。Single mode 內部 wrap `RadioGroupPrimitive.Root` 提供 context,header checkbox 抑制(single 無「全選」概念)。
 
 ### 九、L2 禁止事項
 

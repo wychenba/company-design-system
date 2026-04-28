@@ -96,6 +96,9 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     const liveRole = isCritical ? 'alert' : 'status'
     const liveLevel = isCritical ? 'assertive' : 'polite'
 
+    // placement="fixed" 用 loose px(density-aware)讓 Alert 嵌在更大佈局內時跟周圍
+   // loose-padding 元素(Toolbar / BulkActionBar / DataTable 等)左右對齊。
+    // py 維持 py-3 fixed(notification banner family canonical,垂直不隨 density)。
     const noticeEl = (
       <Notice
         variant={variant}
@@ -105,6 +108,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         dismissible={dismissible}
         onDismiss={onDismiss}
         iconClassName={iconClassName}
+        className={placement === 'fixed' ? 'px-[var(--layout-space-loose)]' : undefined}
       />
     )
 

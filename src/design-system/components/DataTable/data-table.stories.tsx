@@ -1,10 +1,11 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createColumnHelper } from '@tanstack/react-table'
-import { Pencil, Trash2, MoreVertical } from 'lucide-react'
+import { Pencil, Trash2, MoreVertical, Search, Filter, Eye, Download } from 'lucide-react'
 import { DataTable } from './data-table'
 import { Button } from '@/design-system/components/Button/button'
 import { Empty } from '@/design-system/components/Empty/empty'
+import { Input } from '@/design-system/components/Input/input'
 import { BulkActionBar } from '@/design-system/components/BulkActionBar/bulk-action-bar'
 import { Alert } from '@/design-system/components/Alert/alert'
 import './column-types' // ColumnMeta declaration merging
@@ -396,31 +397,52 @@ export const WithBulkActions: Story = {
   render: () => {
     const [selection, setSelection] = React.useState<string[]>([])
     const [allSelected, setAllSelected] = React.useState(false)
+    const [search, setSearch] = React.useState('')
     const TOTAL = 5370
-    const VISIBLE = sampleData.length
+    const filteredData = React.useMemo(
+      () => search ? sampleData.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase())) : sampleData,
+      [search]
+    )
+    const VISIBLE = filteredData.length
     const showHint = !allSelected
-      ? selection.length === VISIBLE && TOTAL > VISIBLE  // 本頁全選 + dataset 有更多 → 顯示「擴 dataset」hint
-      : true  // dataset 全選 → hint 切「清除」CTA
+      ? selection.length === VISIBLE && VISIBLE > 0 && TOTAL > VISIBLE
+      : true
+
     return (
-      <div className="flex flex-col border border-border rounded-md overflow-hidden">
-        {/* Toolbar 永遠保留(filter / sort / search / + 新增 — selection 期間仍可用)*/}
-        <div className="flex items-center justify-between px-3 py-2 border-b border-divider bg-surface">
-          <div className="text-body text-fg-secondary">商品 · {sampleData.length} 筆 · 篩選 / 搜尋(consumer 自組 toolbar)</div>
+      // 父層:純 composition area,填滿 parent 寬高(無 outer chrome)
+      // 各元件獨立並排,各自 own padding canonical 自然對齊
+      <div className="flex flex-col w-full h-[600px]">
+        {/* Toolbar — 獨立元件,自帶 px-loose py-tight */}
+        <div className="flex items-center gap-2 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-b border-divider bg-canvas">
+          <div className="flex-1 max-w-sm">
+            <Input
+              size="sm"
+              placeholder="搜尋商品 / SKU"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              startIcon={Search}
+            />
+          </div>
+          <Button variant="text" size="sm" iconOnly startIcon={Filter} aria-label="篩選" />
+          <Button variant="text" size="sm" iconOnly startIcon={Eye} aria-label="欄位顯示" />
           <Button variant="primary" size="sm">+ 新增商品</Button>
+          <Button variant="text" size="sm" iconOnly startIcon={MoreVertical} aria-label="更多" />
         </div>
 
+        {/* DataTable — 獨立元件,height="100%" + flex-1 撐滿剩餘空間 */}
         <DataTable
           columns={baseColumns}
-          data={sampleData}
-          height="auto"
+          data={filteredData}
+          height="100%"
           bordered={false}
           selectable
           selection={selection}
           onSelectionChange={setSelection}
           getRowId={(row) => row.sku}
+          className="flex-1 min-h-0"
         />
 
-        {/* Inline composition:Alert hint banner 黏 BulkActionBar 上方,接在 table 下方 */}
+        {/* Alert hint banner — 獨立元件,placement=fixed 自帶 loose px(對齊周圍元素)*/}
         {showHint && (
           <Alert
             variant="info"
@@ -453,19 +475,20 @@ export const WithBulkActions: Story = {
             }
           />
         )}
+
+        {/* BulkActionBar — 獨立元件,自帶 px-loose py-tight */}
         {selection.length > 0 && (
-          <div className="border-t border-divider">
-            <BulkActionBar
-              selection={selection}
-              onClear={() => { setSelection([]); setAllSelected(false) }}
-              actions={
-                <>
-                  <Button variant="tertiary" size="sm">下載</Button>
-                  <Button variant="tertiary" size="sm" danger>移除</Button>
-                </>
-              }
-            />
-          </div>
+          <BulkActionBar
+            className="border-t border-divider"
+            selection={selection}
+            onClear={() => { setSelection([]); setAllSelected(false) }}
+            actions={
+              <>
+                <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
+                <Button variant="tertiary" size="sm" startIcon={Trash2} danger>移除</Button>
+              </>
+            }
+          />
         )}
       </div>
     )
@@ -509,8 +532,8 @@ export const SelectionSingleMode: Story = {
       <div className="flex flex-col gap-2 max-w-4xl">
         <p className="text-caption text-fg-muted">
           <code>selectable=&quot;single&quot;</code>:每次只選一個,點新 row 自動清舊 row。
-          Header checkbox 抑制(single 沒「全選」概念)。<br />
-          <span className="text-fg-muted italic">v1 視覺仍用 Checkbox(行為正確);Radio 完整整合是 future enhancement。</span>
+          視覺用 <strong>Radio</strong>(對齊 Material DataGrid / Polaris IndexTable 共識),
+          header checkbox 抑制(single 沒「全選」概念)。
         </p>
         <div className="text-caption font-mono text-fg-muted">selected: {selection[0] ?? '(none)'}</div>
         <DataTable

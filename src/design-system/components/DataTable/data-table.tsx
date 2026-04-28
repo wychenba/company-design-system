@@ -26,6 +26,8 @@ import { DatePickerDisplay } from '@/design-system/components/DatePicker/date-pi
 import { PersonDisplay, MultiPersonDisplay, type PersonValue } from '@/design-system/components/PeoplePicker/person-display'
 import { LinkInputDisplay } from '@/design-system/components/LinkInput/link-input'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
+import { RadioGroupItem } from '@/design-system/components/RadioGroup/radio-group'
+import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
 import { useControllable } from '@/design-system/hooks/use-controllable'
 
 // ── Variants ─────────────────────────────────────────────────────────────────
@@ -348,15 +350,15 @@ function DataTableInner<TData>(
   }
 
   const cellEl = (cell: ReturnType<typeof rows[number]['getVisibleCells']>[number], isLastInRow = false) => {
-    // L2 selection:__select__ 欄自訂 render(row checkbox)
+    // L2 selection:__select__ 欄自訂 render
+    // multi 模式 → Checkbox(可多選)
+    // single 模式 → Radio(單選 visual,對齊 Material DataGrid / Polaris IndexTable canonical)
     if (enabled && cell.column.id === SELECT_COL_ID) {
       const rowId = cell.row.id
       const rowOriginal = cell.row.original
       const isDisabled = isRowSelectable ? !isRowSelectable(rowOriginal) : false
-      const isChecked = selectionSet.has(rowId)
       const ariaLabel = getRowAriaLabel?.(rowOriginal) ?? 'Select row'
-      // Shift-click 需從 mousedown event 取 shiftKey;Radix Checkbox onCheckedChange 不帶 event
-      // 改用 onClick 攔截 + 自己 handle toggle
+      const checkboxSize = size === 'lg' ? 'lg' : 'md'
       return (
         <div
           key={cell.id}
@@ -364,25 +366,35 @@ function DataTableInner<TData>(
           className="flex items-center justify-center shrink-0"
           style={{ width: cell.column.getSize(), ...cellPadding }}
         >
-          <Checkbox
-            size={size === 'lg' ? 'lg' : 'md'}
-            checked={isChecked}
-            disabled={isDisabled}
-            aria-label={ariaLabel}
-            onClick={(e) => {
-              e.stopPropagation()
-              if (isDisabled) return
-              e.preventDefault()  // 攔截 Radix 內部 toggle,自己 toggle 帶 shiftKey
-              toggleRow(rowId, rowOriginal, { shiftKey: e.shiftKey })
-            }}
-            onKeyDown={(e) => {
-              // Space:Radix 已處理 toggle,但要帶 shiftKey 區間選 → 攔截
-              if (e.key === ' ' && mode === 'multi' && !isDisabled) {
-                e.preventDefault()
+          {mode === 'single' ? (
+            <RadioGroupItem
+              size={checkboxSize}
+              value={rowId}
+              disabled={isDisabled}
+              aria-label={ariaLabel}
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <Checkbox
+              size={checkboxSize}
+              checked={selectionSet.has(rowId)}
+              disabled={isDisabled}
+              aria-label={ariaLabel}
+              onClick={(e) => {
+                e.stopPropagation()
+                if (isDisabled) return
+                e.preventDefault()  // 攔截 Radix 內部 toggle,自己 toggle 帶 shiftKey
                 toggleRow(rowId, rowOriginal, { shiftKey: e.shiftKey })
-              }
-            }}
-          />
+              }}
+              onKeyDown={(e) => {
+                // Space:Radix 已處理 toggle,但要帶 shiftKey 區間選 → 攔截
+                if (e.key === ' ' && !isDisabled) {
+                  e.preventDefault()
+                  toggleRow(rowId, rowOriginal, { shiftKey: e.shiftKey })
+                }
+              }}
+            />
+          )}
         </div>
       )
     }
@@ -640,7 +652,9 @@ function DataTableInner<TData>(
     )
   }
 
-  return (
+  // Single mode 用 RadioGroup wrap 整 table(Radix RadioGroup 用 context 傳遞 value/onValueChange)
+  // Multi mode 不需 wrap(Checkbox 各自 controlled,不靠 context)
+  const tableContent = (
     <div
       ref={(el) => { tableRef.current = el; if (typeof ref === 'function') ref(el); else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = el }}
       data-table-size={size}
@@ -729,6 +743,18 @@ function DataTableInner<TData>(
       </div>
     </div>
   )
+
+  if (enabled && mode === 'single') {
+    return (
+      <RadioGroupPrimitive.Root
+        value={selection[0] ?? ''}
+        onValueChange={(v) => v && setSelection([v])}
+      >
+        {tableContent}
+      </RadioGroupPrimitive.Root>
+    )
+  }
+  return tableContent
 }
 
 export const DataTable = React.forwardRef(DataTableInner) as <TData>(
