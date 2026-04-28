@@ -54,6 +54,8 @@ NameCard 是**三層 chrome 結構**(2026-04-23 canonical):
 
 **取消「精簡版」變體**:NameCard 只有**一種結構**,consumer 未傳的 section 自動不 render 但結構位置一致(無 `minimal` prop 或變體 split)。世界級對照:Slack / GitHub / LinkedIn hover-profile 皆單一結構(chrome pattern + conditional sections),不分「簡版/full 版」。
 
+**DS-wide 預設展示一致 canonical**:任何 PersonData 來源(table seller / picker member / dialog reviewer / 任何 person avatar)展示 NameCard 時,**`description` / `status` / `statusMessage` / `fields` 4 個 section 預設都應提供**,讓 hover 出 NameCard 時資訊量一致(不可某處精簡某處詳細)。Consumer sample / mock data 也須遵守 — sparse `{ name, avatarUrl }` 資料 = bug,違反一致呈現原則。實作上:DS 內所有 stories / sample 用 `PersonData[]` 完整定義(對齊 name-card.stories.tsx 的「Default」展示)。
+
 Section 之間用 `border-t border-divider` 分隔(見 `separator.spec.md`「元件固定結構 → CSS border-t/b」)。詳細 class / padding token 見 `name-card.tsx`。
 
 **View more 按鈕 padding**:固定 `py-3`(12px),比 Body `py-3` 同位 — 讓 footer 有明顯呼吸空間,不跟 body section 邊界混淆。

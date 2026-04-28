@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { PeoplePicker } from './people-picker'
+import type { PersonData } from './person-display'
 import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
@@ -9,11 +10,13 @@ const meta: Meta = {
 export default meta
 type Story = StoryObj
 
-const SAMPLE_PEOPLE = [
-  { name: 'Ada Chen', avatarUrl: 'https://i.pravatar.cc/80?img=1' },
-  { name: 'Alice Wang', avatarUrl: 'https://i.pravatar.cc/80?img=5' },
-  { name: 'Bob Chen', avatarUrl: 'https://i.pravatar.cc/80?img=12' },
-  { name: 'Diana Lin', avatarUrl: 'https://i.pravatar.cc/80?img=20' },
+// Person sample data canonical:對齊 NameCard 預設呈現(name + subtitle + status + statusMessage + fields)
+// avatar.spec.md DS-wide canonical:所有 person avatar hover 必出 NameCard,展示資訊不可精簡
+const SAMPLE_PEOPLE: PersonData[] = [
+  { name: 'Ada Chen', avatarUrl: 'https://i.pravatar.cc/128?img=1', description: 'Engineering｜Taipei｜EMP-2001', status: 'online', statusMessage: '今日 OnCall。', fields: [{ label: 'ID', value: 'ADA001' }, { label: '部門', value: 'Platform' }, { label: '時區', value: 'TST (GMT+8)' }] },
+  { name: 'Alice Wang', avatarUrl: 'https://i.pravatar.cc/128?img=5', description: 'Engineering｜Tokyo｜EMP-2002', status: 'busy', statusMessage: '深度工作中,12:00 後可聊。', fields: [{ label: 'ID', value: 'AW002' }, { label: '部門', value: 'Platform' }, { label: '時區', value: 'JST (GMT+9)' }] },
+  { name: 'Bob Chen', avatarUrl: 'https://i.pravatar.cc/128?img=12', description: 'Engineering｜Singapore｜EMP-2003', status: 'online', statusMessage: '可線上協助。', fields: [{ label: 'ID', value: 'BC003' }, { label: '部門', value: 'Infrastructure' }, { label: '時區', value: 'SGT (GMT+8)' }] },
+  { name: 'Diana Lin', avatarUrl: 'https://i.pravatar.cc/128?img=20', description: 'Engineering｜Sydney｜EMP-2004', status: 'away', statusMessage: '已離開辦公室,週一回。', fields: [{ label: 'ID', value: 'DL004' }, { label: '部門', value: 'Mobile' }, { label: '時區', value: 'AEST (GMT+10)' }] },
 ]
 
 export const Overview: Story = {

@@ -31,12 +31,14 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
   <p className={`text-footnote leading-normal ${warn ? 'text-error font-medium' : 'text-fg-muted'}`}>{children}</p>
 )
 
+// 對齊 NameCard 預設呈現:name + subtitle + status + statusMessage + fields
+// avatar.spec.md DS-wide canonical:所有 person avatar hover 必出 NameCard,展示資訊不可精簡
 const team: PersonValue[] = [
-  { name: 'Alice Chen', avatarUrl: 'https://i.pravatar.cc/64?img=1' },
-  { name: 'Bob Lin', avatarUrl: 'https://i.pravatar.cc/64?img=2' },
-  { name: 'Carol Wu', avatarUrl: 'https://i.pravatar.cc/64?img=3' },
-  { name: 'David Lee', avatarUrl: 'https://i.pravatar.cc/64?img=4' },
-  { name: 'Emma Yang', avatarUrl: 'https://i.pravatar.cc/64?img=5' },
+  { name: 'Alice Chen', avatarUrl: 'https://i.pravatar.cc/128?img=1', description: 'Design｜Taipei｜EMP-3001', status: 'online', statusMessage: '可線上 review。', fields: [{ label: 'ID', value: 'AC001' }, { label: '部門', value: 'Product Design' }, { label: '時區', value: 'TST (GMT+8)' }] },
+  { name: 'Bob Lin', avatarUrl: 'https://i.pravatar.cc/128?img=2', description: 'Engineering｜Tokyo｜EMP-3002', status: 'busy', statusMessage: '深度工作,2hr 後再回。', fields: [{ label: 'ID', value: 'BL002' }, { label: '部門', value: 'Frontend' }, { label: '時區', value: 'JST (GMT+9)' }] },
+  { name: 'Carol Wu', avatarUrl: 'https://i.pravatar.cc/128?img=3', description: 'Engineering｜Singapore｜EMP-3003', status: 'online', statusMessage: '今日 OnCall。', fields: [{ label: 'ID', value: 'CW003' }, { label: '部門', value: 'Backend' }, { label: '時區', value: 'SGT (GMT+8)' }] },
+  { name: 'David Lee', avatarUrl: 'https://i.pravatar.cc/128?img=4', description: 'Product｜Hong Kong｜EMP-3004', status: 'away', statusMessage: '會議中,15:00 後可聊。', fields: [{ label: 'ID', value: 'DL004' }, { label: '部門', value: 'Product' }, { label: '時區', value: 'HKT (GMT+8)' }] },
+  { name: 'Emma Yang', avatarUrl: 'https://i.pravatar.cc/128?img=5', description: 'Design｜Sydney｜EMP-3005', status: 'offline', statusMessage: '已下線,明早 9:00 上線。', fields: [{ label: 'ID', value: 'EY005' }, { label: '部門', value: 'Design Systems' }, { label: '時區', value: 'AEST (GMT+10)' }] },
 ]
 
 // ── UsageGuidance — 何時用 / 何時不用 / vs 近親元件(合併 WhenToUse + VsSelectRule + VsComboboxRule) ──
