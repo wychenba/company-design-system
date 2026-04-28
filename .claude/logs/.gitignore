@@ -1,4 +1,5 @@
 *.jsonl
 *.jsonl.*
+last-inject-ts.txt
 !.gitignore
 !.gitkeep
