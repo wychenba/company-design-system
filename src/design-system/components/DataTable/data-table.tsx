@@ -77,6 +77,14 @@ export interface DataTableProps<TData>
   getRowAriaLabel?: (row: TData) => string
   /** Filter 後 hidden selected rows 是否保留(default false,對齊 Material/AG Grid 共識) */
   preserveSelectionOnFilter?: boolean
+
+  // ── L3 Column visibility(顯示隱藏)──
+  /** 欄位顯隱(controlled),Record<columnId, boolean>;true / undefined = 顯示 */
+  columnVisibility?: Record<string, boolean>
+  /** 預設顯隱(uncontrolled) */
+  defaultColumnVisibility?: Record<string, boolean>
+  /** 顯隱變更 callback */
+  onColumnVisibilityChange?: (next: Record<string, boolean>) => void
 }
 
 // ── Type → Display ──────────────────────────────────────────────────────────
@@ -180,11 +188,19 @@ function DataTableInner<TData>(
     selection: selectionProp, defaultSelection, onSelectionChange,
     selectable = false, isRowSelectable, getRowId, getRowAriaLabel,
     preserveSelectionOnFilter = false,
+    columnVisibility: columnVisibilityProp, defaultColumnVisibility, onColumnVisibilityChange,
     className, ...props
   }: DataTableProps<TData>,
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
   const [sorting, setSorting] = React.useState<SortingState>(tableOptions?.state?.sorting as SortingState ?? [])
+
+  // ── L3 Column visibility state(controllable)──
+  const [columnVisibility, setColumnVisibility] = useControllable<Record<string, boolean>>({
+    value: columnVisibilityProp,
+    defaultValue: defaultColumnVisibility ?? {},
+    onChange: onColumnVisibilityChange,
+  })
 
   // ── L2 Selection state ──
   const enabled = selectable !== false
@@ -205,6 +221,7 @@ function DataTableInner<TData>(
       size: 40,
       enableSorting: false,
       enableResizing: false,
+      enableHiding: false,  // selection col 不能藏(L3 column visibility)
       header: 'Select',  // header cell 由下方自訂 render 取代
       cell: () => null,  // body cell 由下方自訂 render 取代
     }
@@ -220,8 +237,12 @@ function DataTableInner<TData>(
 
   const table = useReactTable({
     data, columns: columnsWithSelection,
-    state: { sorting, columnPinning: { left: effectivePinnedLeft, right: pinnedRightColumns ?? [] }, ...tableOptions?.state },
+    state: { sorting, columnVisibility, columnPinning: { left: effectivePinnedLeft, right: pinnedRightColumns ?? [] }, ...tableOptions?.state },
     onSortingChange: setSorting,
+    onColumnVisibilityChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(columnVisibility) : updater
+      setColumnVisibility(next)
+    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getRowId: getRowId,

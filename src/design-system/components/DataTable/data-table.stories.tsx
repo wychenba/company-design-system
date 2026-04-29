@@ -8,6 +8,7 @@ import { Empty } from '@/design-system/components/Empty/empty'
 import { Input } from '@/design-system/components/Input/input'
 import { BulkActionBar } from '@/design-system/components/BulkActionBar/bulk-action-bar'
 import { Alert } from '@/design-system/components/Alert/alert'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/design-system/components/DropdownMenu/dropdown-menu'
 import './column-types' // ColumnMeta declaration merging
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
@@ -413,6 +414,7 @@ export const WithBulkActions: Story = {
     const [selection, setSelection] = React.useState<string[]>([])
     const [allSelected, setAllSelected] = React.useState(false)
     const [search, setSearch] = React.useState('')
+    const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>({})
     const TOTAL = 5370
     const filteredData = React.useMemo(
       () => search ? sampleData.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase())) : sampleData,
@@ -440,7 +442,30 @@ export const WithBulkActions: Story = {
           </div>
           <div className="flex items-center gap-2">
             <Button variant="text" size="sm" iconOnly startIcon={Filter} aria-label="篩選" />
-            <Button variant="text" size="sm" iconOnly startIcon={Eye} aria-label="欄位顯示" />
+            {/* L3 column visibility:Eye 按鈕 → DropdownMenu checkbox 切顯隱(__select__ 自動排除,enableHiding=false)*/}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="text" size="sm" iconOnly startIcon={Eye} aria-label="欄位顯示" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>顯示欄位</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {baseColumns.map((col) => {
+                  const id = (col as any).accessorKey ?? (col as any).id
+                  const headerLabel = typeof (col as any).header === 'string' ? (col as any).header : id
+                  const checked = columnVisibility[id] !== false
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={id}
+                      checked={checked}
+                      onCheckedChange={(c) => setColumnVisibility(prev => ({ ...prev, [id]: c }))}
+                    >
+                      {headerLabel}
+                    </DropdownMenuCheckboxItem>
+                  )
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="primary" size="sm" startIcon={Plus}>新增商品</Button>
             <Button variant="text" size="sm" iconOnly startIcon={MoreVertical} aria-label="更多" />
           </div>
@@ -457,6 +482,8 @@ export const WithBulkActions: Story = {
             selectable
             selection={selection}
             onSelectionChange={setSelection}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={setColumnVisibility}
             getRowId={(row) => row.sku}
           />
         </div>
