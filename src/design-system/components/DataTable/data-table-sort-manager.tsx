@@ -1,3 +1,4 @@
+// same-row-mixed-allow: header chrome corner buttons(refresh/close)跟 row inline actions(drag/trash)不在同 row
 import * as React from 'react'
 import { Plus, Trash2, X as XIcon, RotateCcw, GripVertical } from 'lucide-react'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'

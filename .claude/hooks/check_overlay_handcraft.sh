@@ -84,6 +84,21 @@ if [ "$CB_COUNT" -ge 2 ] && [ "$CBG_COUNT" -eq 0 ]; then
   fi
 fi
 
+# ── Check 5: Same-row consistency 違反(同 row 混 ItemInlineActionButton + Button iconOnly)──
+# 對齊 inline-action.spec.md L152「Same-row consistency rule:同 action row 所有 icon action 必同一類」。
+# Pattern:同檔出現 <ItemInlineActionButton 與 <Button.*iconOnly,且非 menu primitive impl(menu 內 Button 為合法 chrome)。
+HAS_INLINE=$(grep -c '<ItemInlineActionButton' "$FILE_PATH" 2>/dev/null | head -1)
+HAS_BTN_ICON=$(grep -cE '<Button[^>]*iconOnly' "$FILE_PATH" 2>/dev/null | head -1)
+HAS_INLINE=${HAS_INLINE:-0}
+HAS_BTN_ICON=${HAS_BTN_ICON:-0}
+IS_MENU_PRIMITIVE2=$(echo "$FILE_PATH" | grep -cE '(DropdownMenu|SelectMenu|Combobox|Menu)/.*\.tsx$' | head -1)
+IS_MENU_PRIMITIVE2=${IS_MENU_PRIMITIVE2:-0}
+if [ "$HAS_INLINE" -ge 1 ] && [ "$HAS_BTN_ICON" -ge 1 ] && [ "$IS_MENU_PRIMITIVE2" -eq 0 ]; then
+  if ! grep -qE 'same-row-mixed-allow:' "$FILE_PATH" 2>/dev/null; then
+    VIOLATIONS="${VIOLATIONS}\n⚠️ 同檔混用 <ItemInlineActionButton>(${HAS_INLINE}) + <Button.*iconOnly>(${HAS_BTN_ICON}):\n  → 違反 inline-action.spec.md L152 Same-row consistency rule(同 row icon action 必同一類)。\n  → Box size 不一致(InlineAction 16+18 vs Button text sm 28)會 gap 斷裂。\n  → 修法:row 內 icon action 全 ItemInlineActionButton(對齊 size=md / 16+18 hover bg)。\n  Escape hatch:加 \`// same-row-mixed-allow: <reason>\` 在檔頭(若 chrome corner action group 跟 row 不同 row,可分開)。"
+  fi
+fi
+
 # ── Check 4: Panel-style Popover + MenuItem co-occur(2026-04-29) ──
 # Pattern:同檔出現 <PopoverHeader> 且 <MenuItem>(不是 DropdownMenu / SelectMenu primitive 自身)
 # → panel-style popover 不該硬塞 menu specialization。MenuItem 預設 `px-3` 不對齊 panel chrome
