@@ -192,10 +192,14 @@ const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
           menuItemVariants({ size }),
           !disabled && !selected && 'hover:bg-neutral-hover',
           !disabled && selected && 'bg-neutral-selected',
-          disabled && 'pointer-events-none text-fg-disabled cursor-default',
+          // disabled 用 cursor-not-allowed(對齊 Button + Material/Polaris/Atlassian);
+          // pointer-events-none 會讓 cursor 失效,改用 aria-disabled + onClick guard
+          disabled && 'text-fg-disabled cursor-not-allowed',
           className,
         )}
-        {...props}
+        onClick={disabled ? undefined : props.onClick}
+        onKeyDown={disabled ? undefined : props.onKeyDown}
+        {...Object.fromEntries(Object.entries(props).filter(([k]) => k !== 'onClick' && k !== 'onKeyDown'))}
       >
         {/* Prefix 對齊容器 */}
         {hasPrefix && (

@@ -59,6 +59,15 @@ if [ -n "$HITS" ]; then
   fi
 fi
 
+# ── Check 2.5: Raw row handcraft (px-loose + py + rounded-md + hover:bg-neutral-hover) ──
+# Pattern:`<div className="...flex...gap-2 px-loose py-1.5 rounded-md hover:bg-neutral-hover">`
+# = 自刻 MenuItem-like row 違反 mindset #2(MenuItem primitive 自帶這些 + size canonical + a11y)
+ROW_PATTERN='<div className="[^"]*flex[^"]*gap-[12][^"]*px-\[var\(--layout-space-loose\)\][^"]*hover:bg-neutral-hover[^"]*rounded'
+ROW_HITS=$(grep -nE "$ROW_PATTERN" "$FILE_PATH" 2>/dev/null | head -3)
+if [ -n "$ROW_HITS" ] && ! grep -qE 'menu-item-handcraft-allow:' "$FILE_PATH" 2>/dev/null; then
+  VIOLATIONS="${VIOLATIONS}\n⚠️ 自刻 row(MenuItem-like)違反 mindset #2:\n${ROW_HITS}\n  → 改用 <MenuItem startIcon={...} endContent={...} disabled={...}>label</MenuItem>\n  Why:MenuItem 自帶 SelectionItem py 公式 + size canonical + a11y(role=option, aria-disabled, aria-selected) + cursor-not-allowed disabled。\n  Escape hatch:加 \`// menu-item-handcraft-allow: <reason>\` 在檔頭。"
+fi
+
 # ── Check 2: Raw <Checkbox> count > 1 not in <CheckboxGroup> ──
 # 同 root cause(自刻 SelectionItem 包 Checkbox 而非消費 CheckboxGroup primitive)。
 # 對齊 checkbox.spec.md「群組模式(CheckboxGroup)」canonical line 225:

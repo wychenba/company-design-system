@@ -60,7 +60,7 @@ const buttonVariants = cva(
     'whitespace-nowrap font-medium',
     'border border-transparent',
     'transition-colors duration-150',
-    'cursor-pointer select-none',
+    'cursor-pointer select-none disabled:cursor-not-allowed',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
     'disabled:pointer-events-none',
     'rounded-md',

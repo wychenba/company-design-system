@@ -13,6 +13,8 @@ import { BulkActionBar } from '@/design-system/components/BulkActionBar/bulk-act
 import { Alert } from '@/design-system/components/Alert/alert'
 import { Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverFooter, PopoverTitle } from '@/design-system/components/Popover/popover'
 import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
+import { MenuItem } from '@/design-system/components/Menu/menu-item'
+import { ButtonDivider } from '@/design-system/components/Button/button-group'
 import './column-types' // ColumnMeta declaration merging
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
@@ -490,20 +492,28 @@ export const WithBulkActions: Story = {
                 <Button variant="text" size="sm" iconOnly startIcon={Eye} aria-label="欄位顯示" />
               </PopoverTrigger>
               <PopoverContent align="end" className="w-72 p-0">
-                {/* B 派(Notion-style)Eye-toggle column visibility:
-                    Header(title + refresh-when-dirty + auto close X)
-                    Search(per Q2 對稱原則:pt-tight 省 pb,list py-2 自帶下方氣息)
-                    List([⋮⋮ drag] | [⊙ lock or empty] | label | [👁️/〰️ Eye toggle right])
-                    Footer(tertiary sm) */}
+                {/* B 派(Notion-style)消費 MenuItem primitive:
+                    locked → startIcon=Lock(取代 drag,單 slot 對齊 ref)
+                    unlocked → startIcon=GripVertical(A.4 phase 接 DnD)
+                    endContent = Eye/EyeOff toggle Button
+                    disabled = locked(Button disabled 自帶 cursor-not-allowed) */}
                 <PopoverHeader>
-                  <PopoverTitle>欄位顯示</PopoverTitle>
-                  {Object.values(columnVisibility).some(v => v === false) && (
-                    <Button
-                      variant="text" size="sm" iconOnly startIcon={RotateCcw}
-                      aria-label="恢復預設"
-                      onClick={() => setColumnVisibility({})}
-                    />
-                  )}
+                  {/* PopoverHeader children 全被包進 flex-1 div → 多 children 必自帶 flex
+                      對齊 Alert/Dialog header chrome corner canonical(inline-action.spec.md L162):
+                      title 占左,refresh + ButtonDivider 接 close X 形成「reset action 群 | dismiss」分群 */}
+                  <div className="flex items-center gap-1 w-full min-w-0">
+                    <PopoverTitle className="flex-1">欄位顯示</PopoverTitle>
+                    {Object.values(columnVisibility).some(v => v === false) && (
+                      <>
+                        <Button
+                          variant="text" size="sm" iconOnly startIcon={RotateCcw}
+                          aria-label="恢復預設"
+                          onClick={() => setColumnVisibility({})}
+                        />
+                        <ButtonDivider />
+                      </>
+                    )}
+                  </div>
                 </PopoverHeader>
                 {/* Q2 對稱:控件 wrapper pt-tight 省 pb,list py-2 + item py-1.5 接管下方 */}
                 <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)]">
@@ -530,23 +540,23 @@ export const WithBulkActions: Story = {
                         const visible = columnVisibility[id] !== false
                         const locked = id === 'sku' // demo:SKU 為 primary identifier 鎖定不可隱藏
                         return (
-                          <div
+                          <MenuItem
                             key={id}
-                            className="flex items-center gap-2 px-[var(--layout-space-loose)] py-1.5 rounded-md hover:bg-neutral-hover"
+                            startIcon={locked ? Lock : GripVertical}
+                            disabled={locked}
+                            onClick={locked ? undefined : () => setColumnVisibility(prev => ({ ...prev, [id]: !visible }))}
+                            endContent={
+                              <Button
+                                variant="text" size="sm" iconOnly
+                                startIcon={visible ? Eye : EyeOff}
+                                aria-label={visible ? '隱藏此欄' : '顯示此欄'}
+                                disabled={locked}
+                                onClick={(e) => { e.stopPropagation(); setColumnVisibility(prev => ({ ...prev, [id]: !visible })) }}
+                              />
+                            }
                           >
-                            {/* drag handle slot — A.4 phase 接 DnD,先 placeholder */}
-                            <GripVertical size={14} className="text-fg-muted shrink-0 cursor-grab" aria-hidden />
-                            {/* lock indicator(若 locked) */}
-                            {locked && <Lock size={14} className="text-fg-disabled shrink-0" aria-hidden />}
-                            <span className={`flex-1 text-body ${locked ? 'text-fg-disabled' : ''}`}>{headerLabel}</span>
-                            <Button
-                              variant="text" size="sm" iconOnly
-                              startIcon={visible ? Eye : EyeOff}
-                              aria-label={visible ? '隱藏此欄' : '顯示此欄'}
-                              disabled={locked}
-                              onClick={() => setColumnVisibility(prev => ({ ...prev, [id]: !visible }))}
-                            />
-                          </div>
+                            {headerLabel}
+                          </MenuItem>
                         )
                       })}
                   </div>
