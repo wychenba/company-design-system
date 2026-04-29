@@ -35,12 +35,17 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
 
   # Detect claim keywords
   CLAIM_RE='(verified|all green|all pass|0 errors|完成|全部 done|全綠|沒問題|tsc 0|永遠合規|不留待辦|done\.|complete\.|✅)'
-  if echo "$LAST_ASSISTANT" | grep -qiE "$CLAIM_RE"; then
+  # 撤回 escape:assistant 已明確撤回 / 認錯 → 不 trigger gap
+  RETRACT_RE='(撤回 claim|false claim|沒修好|未驗證|撤回)'
+  if echo "$LAST_ASSISTANT" | grep -qiE "$CLAIM_RE" && ! echo "$LAST_ASSISTANT" | grep -qiE "$RETRACT_RE"; then
     # Check if any verify-class tool_use happened recent turns
     # (look for npx tsc / bash test / compile-stories / npm run / audit invocations)
     VERIFY_RE='(npx tsc|bash .claude/hooks/tests|compile-stories|npm run build|npm run test|design-system-audit|visual-audit)'
     if ! tail -200 "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE "$VERIFY_RE"; then
       WARNINGS="${WARNINGS}\n  • Claim-verify gap:你說 verified / done / 完成 等,但本 turn 無 tsc / test / audit 真執行。下輪實跑驗證或撤回 claim。"
+      # 標記 CRITICAL — Mechanism 1 升 BLOCKER(2026-04-30 升級):AI claim done 但無驗證
+      # = 100+ 次重複 failure mode。不再 silent log,exit `decision: block` 強制 turn 不結束。
+      CRITICAL_CLAIM_VERIFY=1
     fi
   fi
 fi
@@ -104,13 +109,36 @@ fi
 # Silent if nothing
 [ -z "$WARNINGS" ] && exit 0
 
-# Stop hooks 的 JSON schema 不接受 hookSpecificOutput.additionalContext
-# (only SessionStart/PostToolUse/UserPromptSubmit do)。改 silent log-to-file
-# + exit 0 — 警告寫 .claude/logs/self-audit-warnings.jsonl,user 不被打擾。
+# 永遠 log warnings(下 turn 透過 inject_pending_self_audit 看到)
 mkdir -p "$PROJECT_DIR/.claude/logs" 2>/dev/null
 printf '{"ts":"%s","warnings":%s}\n' \
   "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
   "$(printf '%b' "$WARNINGS" | jq -Rs .)" \
   >> "$PROJECT_DIR/.claude/logs/self-audit-warnings.jsonl" 2>/dev/null || true
+
+# ── BLOCKER upgrade(2026-04-30):Mechanism 1 claim-verify gap 升 block ──
+# Anthropic Stop hook 接受 stdout JSON `{"decision":"block","reason":...}` 強制 turn
+# 不結束,AI 必先處理 reason 再能完成。這修補 100+ 次重複 failure:AI claim done →
+# 下 turn user 才發現未修 → 我重發現 → 補修。
+#
+# 防 infinite loop:同一 claim hash 已 block 過 1 次 → 該 turn 不再 block(降 warn)。
+# 假設同一 claim hash:assistant text 末 200 char 的 sha256 prefix。
+if [ "${CRITICAL_CLAIM_VERIFY:-0}" = "1" ] && [ -n "$LAST_ASSISTANT" ]; then
+  CLAIM_HASH=$(echo "$LAST_ASSISTANT" | tail -c 200 | shasum -a 256 | cut -c1-16)
+  LAST_BLOCKED_FILE="$PROJECT_DIR/.claude/logs/.last-blocked-claim.txt"
+  LAST_BLOCKED=""
+  [ -f "$LAST_BLOCKED_FILE" ] && LAST_BLOCKED=$(cat "$LAST_BLOCKED_FILE" 2>/dev/null || echo "")
+
+  if [ "$CLAIM_HASH" != "$LAST_BLOCKED" ]; then
+    # 第一次 block,記 hash 防 loop
+    echo "$CLAIM_HASH" > "$LAST_BLOCKED_FILE" 2>/dev/null || true
+    REASON=$(printf '%s' \
+      "🚨 CLAIM-VERIFY GAP BLOCKER:你 claim「verified / done / 完成」但本 turn 沒跑 tsc / test / audit / visual 真驗證。立刻 (a) 跑 npx tsc -b + 對應驗證指令,OR (b) 在本 turn 明確撤回 claim(打「撤回 claim」/「未驗證」)。否則 turn 不結束。" \
+      "本機制 = M20 100+ 次 failure mode 升 BLOCKER(原 silent inject → block)。")
+    # Anthropic Stop hook decision:block 格式
+    printf '{"decision":"block","reason":%s}\n' "$(printf '%s' "$REASON" | jq -Rs .)"
+    exit 0
+  fi
+fi
 
 exit 0
