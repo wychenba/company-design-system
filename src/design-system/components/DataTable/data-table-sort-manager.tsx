@@ -191,10 +191,10 @@ function SortRow({
         {...listeners}
       />
       <div className="flex-1 min-w-0">
-        <Select size="sm" options={optionsForRow} value={sort.id} onChange={onChangeId} />
+        <Select size="md" options={optionsForRow} value={sort.id} onChange={onChangeId} />
       </div>
       <div className="w-32 shrink-0">
-        <Select size="sm" options={DIRECTION_OPTIONS} value={sort.desc ? 'desc' : 'asc'} onChange={onChangeDir} />
+        <Select size="md" options={DIRECTION_OPTIONS} value={sort.desc ? 'desc' : 'asc'} onChange={onChangeDir} />
       </div>
       {/* Trash 走 ItemInlineActionButton(same-row consistency:同 row 不混 Inline Action + Button)*/}
       <ItemInlineActionButton icon={Trash2} size="md" aria-label="刪除" onClick={onRemove} />

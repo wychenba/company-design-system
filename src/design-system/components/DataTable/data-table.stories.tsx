@@ -584,7 +584,7 @@ export const WithBulkActions: Story = {
                     (layoutSpace.spec.md 規則 3 補充:List 場景 inline → block 累加) */}
                 <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)]">
                   <Input
-                    size="sm"
+                    size="md"
                     placeholder="搜尋欄位…"
                     value={columnSearch}
                     onChange={(e) => setColumnSearch(e.target.value)}

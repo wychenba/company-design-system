@@ -253,14 +253,14 @@ function FilterRow({
         {...listeners}
       />
       <div className="w-40 shrink-0">
-        <Select size="sm" options={fieldOptions} value={condition.id} onChange={onChangeField} />
+        <Select size="md" options={fieldOptions} value={condition.id} onChange={onChangeField} />
       </div>
       <div className="w-28 shrink-0">
-        <Select size="sm" options={operatorOptions} value={condition.operator} onChange={onChangeOperator} />
+        <Select size="md" options={operatorOptions} value={condition.operator} onChange={onChangeOperator} />
       </div>
       <div className="flex-1 min-w-0">
         <Input
-          size="sm"
+          size="md"
           value={String(condition.value ?? '')}
           onChange={(e) => onChangeValue(e.target.value)}
           placeholder="輸入值…"
