@@ -8,6 +8,7 @@ import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandS
 import { Command as CommandPrimitive } from 'cmdk'
 import { MenuItem, MenuFooter } from '@/design-system/components/Menu/menu-item'
 import { Empty } from '@/design-system/components/Empty/empty'
+import { OVERLAY_SIDE_OFFSET } from '@/design-system/tokens/elevation/overlay-geometry'
 import { getMenuListMinHeight } from '@/design-system/components/Field/field-types'
 import { RowSizeProvider } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
@@ -234,7 +235,7 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
           minWidth: minWidth ?? 'var(--radix-popover-trigger-width)',
         }}
         align={align}
-        sideOffset={8}
+        sideOffset={OVERLAY_SIDE_OFFSET}
         onOpenAutoFocus={onOpenAutoFocus}
       >
         <Command shouldFilter={searchable} className="bg-transparent">

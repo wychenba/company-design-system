@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import type { AvatarData } from "@/design-system/components/Avatar/avatar"
 import { MenuItem } from "@/design-system/components/Menu/menu-item"
 import { ScrollArea } from "@/design-system/components/ScrollArea/scroll-area"
+import { OVERLAY_SIDE_OFFSET, OVERLAY_COLLISION_PADDING } from "@/design-system/tokens/elevation/overlay-geometry"
 import {
   RowSizeProvider,
   useRowSize,
@@ -121,7 +122,7 @@ interface DropdownMenuContentProps
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   DropdownMenuContentProps
->(({ className, size = 'md', sideOffset = 8, collisionPadding = 8, align = 'start', minWidth, maxHeight, children, ...props }, ref) => (
+>(({ className, size = 'md', sideOffset = OVERLAY_SIDE_OFFSET, collisionPadding = OVERLAY_COLLISION_PADDING, align = 'start', minWidth, maxHeight, children, ...props }, ref) => (
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuPrimitive.Content
       ref={ref}
@@ -162,7 +163,7 @@ const DropdownMenuSubContent = React.forwardRef<
   return (
     <DropdownMenuPrimitive.SubContent
       ref={ref}
-      sideOffset={8}
+      sideOffset={OVERLAY_SIDE_OFFSET}
       className={cn(floatingLayerClass, 'py-2', className)}
       style={{ boxShadow: 'var(--elevation-200)', minWidth: 180 }}
       {...props}

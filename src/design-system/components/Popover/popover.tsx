@@ -5,6 +5,7 @@ import { X as XIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SurfaceHeader, SurfaceBody, SurfaceFooter } from "@/design-system/patterns/overlay-surface/overlay-surface"
 import { Button } from "@/design-system/components/Button/button"
+import { OVERLAY_SIDE_OFFSET, OVERLAY_COLLISION_PADDING } from "@/design-system/tokens/elevation/overlay-geometry"
 
 /**
  * Popover — Radix Popover + 設計系統 token
@@ -46,7 +47,7 @@ const handlePopoverOpenAutoFocus = (e: Event) => {
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ className, align = "center", sideOffset = 8, collisionPadding = 8, onOpenAutoFocus, ...props }, ref) => (
+>(({ className, align = "center", sideOffset = OVERLAY_SIDE_OFFSET, collisionPadding = OVERLAY_COLLISION_PADDING, onOpenAutoFocus, ...props }, ref) => (
   <PopoverPrimitive.Portal>
     <PopoverPrimitive.Content
       ref={ref}

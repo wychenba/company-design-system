@@ -2,6 +2,7 @@ import * as React from "react"
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
 
 import { cn } from "@/lib/utils"
+import { OVERLAY_SIDE_OFFSET } from "@/design-system/tokens/elevation/overlay-geometry"
 
 /**
  * HoverCard — hover 顯示可互動內容的浮層（行為 primitive）
@@ -22,7 +23,7 @@ const HoverCardTrigger = HoverCardPrimitive.Trigger
 const HoverCardContent = React.forwardRef<
   React.ElementRef<typeof HoverCardPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content>
->(({ className, align = "center", sideOffset = 8, collisionPadding = 12, ...props }, ref) => (
+>(({ className, align = "center", sideOffset = OVERLAY_SIDE_OFFSET, collisionPadding = 12, ...props }, ref) => (
   // HoverCardPrimitive.Portal(2026-04-23):把 Content 搬到 `document.body`。
   // 不 Portal 時 Content 會 DOM-nested 在 trigger subtree,如 trigger 位於 OverflowIndicator
   // `data-theme="dark"` tooltip 內部 → Avatar 自帶 HoverCard 的 Content 也卡在 dark subtree,

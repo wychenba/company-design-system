@@ -43,9 +43,11 @@ elevation-100 < elevation-200，數字越大浮起越高。
 
 ## 浮層間距（sideOffset）
 
-所有從觸發元件彈出的浮層（Tooltip、Popover、SelectMenu、Dropdown 等）與觸發元件的間距統一 **8px**（`sideOffset={8}`）。
+所有從觸發元件彈出的浮層（Tooltip、Popover、SelectMenu、Dropdown、HoverCard、Coachmark）與觸發元件的間距統一 **8px**（`sideOffset={8}`）。
 
 不因浮層類型或位置而異——一致的間距讓使用者建立穩定的空間預期。
+
+**SSOT** → `tokens/elevation/overlay-geometry.ts` exports `OVERLAY_SIDE_OFFSET = 8` / `OVERLAY_COLLISION_PADDING = 8`。所有 primitive `default` 必 import 該 const(M17 SSOT 必可傳播);Radix `sideOffset` 接 number 不接 CSS var,因此用 JS const 共用,改值只動一處全部聯動。
 
 | 浮層類型 | sideOffset | 說明 |
 |---------|-----------|------|

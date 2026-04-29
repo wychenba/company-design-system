@@ -2,6 +2,7 @@ import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "@/lib/utils"
+import { OVERLAY_SIDE_OFFSET, OVERLAY_COLLISION_PADDING } from "@/design-system/tokens/elevation/overlay-geometry"
 
 const TooltipProvider = TooltipPrimitive.Provider
 
@@ -12,7 +13,7 @@ const TooltipTrigger = TooltipPrimitive.Trigger
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 8, collisionPadding = 8, style, children, ...props }, ref) => (
+>(({ className, sideOffset = OVERLAY_SIDE_OFFSET, collisionPadding = OVERLAY_COLLISION_PADDING, style, children, ...props }, ref) => (
   // collisionPadding default 8px:避免 tooltip 貼 viewport 邊(Radix avoidCollisions 預設 true 但 padding 0 會貼邊)
   // 對齊 HoverCard canonical 避免 viewport edge clipping
   <TooltipPrimitive.Portal>

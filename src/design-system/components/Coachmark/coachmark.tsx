@@ -11,6 +11,7 @@ import {
 } from '@/design-system/components/Popover/popover'
 import { Button } from '@/design-system/components/Button/button'
 import { AspectRatio } from '@/design-system/components/AspectRatio/aspect-ratio'
+import { OVERLAY_SIDE_OFFSET } from '@/design-system/tokens/elevation/overlay-geometry'
 
 /**
  * Coachmark — 功能介紹 / onboarding tour 的浮層卡片
@@ -123,7 +124,7 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
       doneLabel = '知道了', // i18n-allow: DS default; consumer override via doneLabel prop
       side = 'bottom',
       align = 'center',
-      sideOffset = 8,
+      sideOffset = OVERLAY_SIDE_OFFSET,
       className,
       ...props
     },
