@@ -428,7 +428,9 @@ const CHROME_UNBOUNDED_SLOT =
 
 ## Control + List 視覺對稱原則(2026-04-29 codified)
 
-Overlay body「控件(search/select/control row)+ list」混合場景:控件 wrapper `pt-[var(--layout-space-tight)]` **省 pb**,list 沿用 `py-2`,item 沿用 `py-1.5`(SelectionItem 公式)。
+**Scope**:overlay body 內**僅 1 個控件 + 1 個 list** 的典型(search-above-list / dropdown-with-search-filter)。多 control / 多 list / 含 form fields 走一般 layout-space 規則,不適用本則。
+
+控件 wrapper `pt-[var(--layout-space-tight)]` **省 pb**,list 沿用 `py-2`,item 沿用 `py-1.5`(SelectionItem 公式)。
 
 **視覺**:控件上 12md / 下 list-pt 8 + item-py 6 = 14md → **2px 視覺差 ≤ 閾值,視覺對稱**。
 
