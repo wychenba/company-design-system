@@ -55,6 +55,10 @@ run_test "Test 4: claim+retract escape → no block" 0 "$T4"
 T5='{"message":{"role":"assistant","content":[{"type":"text","text":"我來看看這個 bug 是怎麼回事"}]}}'
 run_test "Test 5: no claim → no block" 0 "$T5"
 
+# Test 6: claim-denial「明確不 claim verified」preemptive denial → no block
+T6='{"message":{"role":"assistant","content":[{"type":"text","text":"我這次明確不 claim verified,只 tsc 過,實際 browser 行為要 user 驗"}]}}'
+run_test "Test 6: preemptive claim denial → no block" 0 "$T6"
+
 # Cleanup state file
 rm -f "$PROJECT_DIR/.claude/logs/.last-blocked-claim.txt" 2>/dev/null
 

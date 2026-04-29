@@ -35,8 +35,11 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
 
   # Detect claim keywords
   CLAIM_RE='(verified|all green|all pass|0 errors|完成|全部 done|全綠|沒問題|tsc 0|永遠合規|不留待辦|done\.|complete\.|✅)'
-  # 撤回 escape:assistant 已明確撤回 / 認錯 → 不 trigger gap
-  RETRACT_RE='(撤回 claim|false claim|沒修好|未驗證|撤回)'
+  # 撤回 escape:assistant 已明確撤回 / 認錯 / 預先聲明否定 → 不 trigger gap
+  # 包含 claim-denial patterns(「不 claim」「沒 claim」「明確不」)避免 false positive:
+  # 例 AI 寫「我這次明確不 claim verified」regex 仍會 match `verified`,但 denial 已在
+  # 同 sentence 表達 — 不該 block。
+  RETRACT_RE='(撤回 claim|false claim|沒修好|未驗證|未驗 真實|撤回|不 claim|沒 claim|明確不|明確未|not yet verified)'
   if echo "$LAST_ASSISTANT" | grep -qiE "$CLAIM_RE" && ! echo "$LAST_ASSISTANT" | grep -qiE "$RETRACT_RE"; then
     # Check if any verify-class tool_use happened recent turns
     # (look for npx tsc / bash test / compile-stories / npm run / audit invocations)
