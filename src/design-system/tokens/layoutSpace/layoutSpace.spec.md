@@ -289,7 +289,7 @@ document.documentElement.setAttribute('data-layout-space', 'lg')
 ## Notes
 
 - **不抽 universal LayoutBody / FormLayout primitive**:world-class(Material / Polaris / Atlassian / Carbon / Mantine)都「每元件 own variant + 共享 token」;規則 1-6 universal,角色 scope-relative 易誤封裝。獨特 chrome 已在 `overlay-surface.spec.md` + `action-bar.spec.md`
-- **Body `flush` API catalog**(2026-05-01,對齊 Polaris flush):overlay-class `flush?: boolean` — false 預設(chrome padded)/ true(`py-2` 無 horizontal,items 自帶 px-loose)。支援 multi-row(search + list 等):consumer 把 controls 包 div 自帶 4 邊明寫 padding(`px-loose pt-tight pb-2`),pb-2 + item 自帶 py(4)= tight 12 視覺。**注意**:body py-2 是 body 邊界 padding(非 siblings 之間 gap),sibling spacing 須由各自 padding 累加而成。實作:Dialog / Sheet / Popover
+- **Body `flush` API catalog**(2026-05-01,對齊 Polaris flush):overlay-class `flush?: boolean` — false 預設(chrome padded)/ true(`py-2` 無 horizontal,items 自帶 px-loose)。flush 解的是「list-as-region 需要 hover bg flush 邊 + items 自帶 px」場景。支援 multi-row(search + list 等)— **走規則 3 親疏判 + flex gap-tight 即可**,不需 padding 累加 magic。實作:Dialog / Sheet / Popover
 - **v1 → v6**(2026-04-30):block-adjacent 機械 → 親疏判 + bundled-family 分權 + region 二分(bounded/unbounded)+ 多 region 限制。詳 git + memory `feedback_layout_v6_canonical.md`
 
 ---

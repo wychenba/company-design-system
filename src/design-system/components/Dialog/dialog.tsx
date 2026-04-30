@@ -172,17 +172,19 @@ interface DialogBodyProps extends React.ComponentPropsWithoutRef<typeof ScrollAr
    * `flush=false`(預設):body chrome padded(`px-loose pt-tight pb-bottom`),
    * 適合 form / 一般 / 混合內容
    *
-   * Pattern(search + list):
+   * Pattern(search + list)— 直接走規則 3 親疏判,gap-tight 完事:
    * ```tsx
    * <DialogBody flush>
-   *   <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-2">
-   *     <Input search />  // wrapper 4 邊明寫 padding;pb-2(8)+ item 自帶 py-1(4)= tight 12
+   *   <div className="flex flex-col gap-[var(--layout-space-tight)]">
+   *     <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)]">
+   *       <Input search />
+   *     </div>
+   *     {items.map(item => <MenuItem className="px-[var(--layout-space-loose)] rounded-md" />)}
    *   </div>
-   *   {items.map(item => <MenuItem className="px-[var(--layout-space-loose)] rounded-md" />)}
    * </DialogBody>
    * ```
-   * **Note**:body py-2 是 body 邊界 padding(body 上邊到第一 child / 最後 child 到 body 下邊),
-   * **不是 sibling 之間 gap**。search → first item gap 由 search wrapper pb + item 自帶 py 累加決定,consumer 須明寫。
+   * search ↔ list 跨範疇相關(search 驅動 list)→ 規則 3 = tight,套 gap-tight 即可,
+   * 不需 padding 累加 magic。
    *
    * 詳 `tokens/layoutSpace/layoutSpace.spec.md` 規則 3 補充 + 規則 4 + Notes flush catalog
    */
