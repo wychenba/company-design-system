@@ -470,12 +470,14 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       </div>
 
       {/* Panel body — header(shrink-0)上常駐 + body 走 ScrollArea(高度小時內容可捲動)。
-          padding/gap 套 inner wrapper(ScrollArea Viewport 是 lib 內部 layout,outer 只 sizing)。
-          原本 bug:body div 沒 overflow-y → 高度不夠時 content 被 cut off。 */}
+          padding 對齊 layoutSpace 規則 4「block → 容器底(無 action buttons)= loose」,
+          pt-tight(緊跟 header 邊界)/ pb-loose(底部呼吸)— InfoPanel 無 action buttons
+          所以**不**用 bottom(48px),改用 loose(16/24)。 */}
       <ScrollArea className="flex-1 min-h-0">
         <div className={cn(
           'flex flex-col gap-4',
-          'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
+          'px-[var(--layout-space-loose)]',
+          'pt-[var(--layout-space-tight)] pb-[var(--layout-space-loose)]',
         )}>
         {/* 說明 — 用 DS Field + FieldLabel + Textarea(2026-04-20 B12 決策:
             FileViewer 一律消費 DS Field 家族,不手刻 `<span>label` + raw control) */}

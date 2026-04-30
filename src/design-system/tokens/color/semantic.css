@@ -35,8 +35,11 @@
    │  --canvas        頁面最底層（HTML body 背景）                       │
    │  --surface       非遮蓋型容器（card、sidebar、table 等）             │
    │                  dark mode 使用半透明，可疊加在 canvas 上            │
-   │  --surface-raised 遮蓋型浮層（modal、popover、dropdown）             │
+   │  --surface-raised 遮蓋型浮層（modal、popover、dropdown、lightbox）  │
    │                  必須不透明，避免底層內容透出                        │
+   │                  **含 overlay 內 chrome**：FileViewer toolbar /     │
+   │                  filmstrip / sidebar、Dialog footer 等 raised       │
+   │                  surface 都套此 token（不用 canvas、不用 surface）  │
    │  --overlay       backdrop 遮罩（dialog 背後的半透明黑）              │
    └─────────────────────────────────────────────────────────────────────┘
 
