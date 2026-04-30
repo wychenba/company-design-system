@@ -6,172 +6,192 @@ Layout Space 定義頁面與容器的巨觀間距 token,隨 density 自動縮放
 
 | Token | md | lg | 語意 |
 |-------|----|----|------|
-| `--layout-space-loose` | 16px | 24px | 主間距:容器水平 padding、inline 之間 gap、block 呼吸空間 |
-| `--layout-space-tight` | 12px | 16px | 緊湊間距:Header → inline、與 block 相鄰 |
-| `--layout-space-bottom` | 48px | 48px | 結論留白:內容到 action buttons |
+| `--layout-space-loose` | 16px | 24px | 主間距:容器水平 padding、parallel 元素 gap、bounded region 呼吸空間 |
+| `--layout-space-tight` | 12px | 16px | 緊湊間距:Header → element、functional 交互的元素之間 |
+| `--layout-space-bottom` | 48px | 48px | 結論留白:內容到 action buttons / Dialog-class 大容器底部 |
 
-**為什麼 bottom 不隨 density 變**:48px 是「結論前的留白」— content 到 action buttons 的視覺暫停。跟 density 無關(不論 compact 或 comfortable,使用者都需要「表單結束了」的節奏)。
+**為什麼 bottom 不隨 density 變**:48px 是「結論前的留白」— content 到 action buttons 的視覺暫停。跟 density 無關(不論 compact 或 comfortable,使用者都需要「commitment 前」的節奏)。
 
 ---
 
-## 元件角色:`block` 與 `inline`
+## 元件角色:`region` / `element`(scope-relative)
 
-**沒有元件級固定分類** — `block` / `inline` 是元件在「該層 layout」裡扮演的角色,不是元件本質。同一元件放不同層 layout 角色不同。CSS display 跟此分類無關。
+**沒有元件級固定分類** — 角色是元件在「該層 layout」裡扮演的,不是元件本質。CSS `display` 跟此分類**無關**(避免撞名,2026-04 從 v1 `block` / `inline` 改為 `region` / `element`)。
 
-### Scope-relative 判斷
+| 角色 | 定義 |
+|------|------|
+| **region** | 寬高占主要空間(寬度撐滿、高度通常 flex-1 撐剩餘)/ 視覺畫布 / 該層展示主角 |
+| **element** | 局部塊 / 控件感 / 寬高自然 |
+
+### region 子分類
+
+| 子類 | 條件 | 視覺邏輯 |
+|-----|------|---------|
+| **bounded** | 有視覺邊界:底色 / 邊框 / 明確上下分隔線(Card / Table with borders / Panel with chrome)| 邊界清楚,容器靠 outer padding 給 spacing |
+| **unbounded** | 無視覺邊界:純 vertical collection,**靠 list 自帶 py + item 自帶高度**撐起視覺平衡(Cmd+K menu / Sidebar nav / unstyled list)| 邊界由 list 自帶 py 完成,outer padding = 0 才視覺對稱 |
+
+### 判斷 3 題(scope-relative)
 
 每進一層 layout container 重新判斷該層的子元件:
 
-| 情境 | 元件 | 該層角色 | 為什麼 |
-|------|------|---------|------|
-| Page body 直接放 Table | Table | block | 該層 = page-body,Table 占滿是畫布 |
-| Field 內包 Textarea | Field(整體) | inline | 對 form 而言 Field 是 row;Textarea 是 Field 的 internal control,不獨立分類 |
-| Card 內 mini Table | Table | 看 Card 怎 layout | Card chrome 是包裝 |
-| `placement="fixed"` Alert 在 page 底 | Alert | chrome band | 角色 ≈ Toolbar / Footer,非 inline notification |
+1. 該層占主要空間嗎?(寬+高占主導 → region;局部 → element)
+2. 視覺重量是「畫布」還是「控件」?
+3. 是該層展示主角,還是一塊區段?
 
-**判斷 3 題**(對該層該位置回答):
-1. 它在該層占滿容器寬度嗎?
-2. 它在該層的視覺重量是「畫布」還是「控件」?
-3. 跟該層的相鄰元件之間,你期待 loose 還是 tight?(tight = block 角色)
+任何元件(list / table / code block / image / form section / chart / sidebar)都套同邏輯。例:
+- Page body 直接放 Table → Table = bounded region(該層展示主角 + 有 borders)
+- Cmd+K menu list → list = unbounded region(主角 + 無 chrome,自帶 py)
+- InfoPanel 內 DescriptionList → element(只是一塊,不主導)
+- Field 內 Textarea → 不獨立分類(Field 整體才是該層的 element)
 
-**不要把角色寫進元件 spec**,寫進該層 layout 的 pattern / consumer code。
+---
+
+## 親疏 3 級(替代 v1 簡單 block-adjacent)
+
+判斷兩元素的 spacing 規則前,先確定它們屬哪一級:
+
+| 級別 | 條件 | layout rule? |
+|------|------|------------|
+| **同範疇 / bundled component family** | 元件 spec 寫成 bundle 並定 inter-component spacing(FileUpload+FileList、Pagination 內部、Toolbar+ButtonGroup) | 元件 spec own,layout rule **跳過** |
+| **跨範疇 + 直接 functional 交互 / 依賴** | search → filter list / heading → labeled content / toolbar → table / form section heading → fields | 規則 3 = **tight** |
+| **跨範疇 + parallel / independent** | form fields stack(parallel inputs)/ unrelated sections / 兩個獨立 functional groups | 規則 3 = **loose** |
+
+「**Bundled component family**」客觀判斷:**有沒有 spec 文件把這些 components 寫成 bundle 並定義它們之間 spacing**(不是「同種類 component instance 多個」)。
+
+「**Functional 交互 / 依賴**」具體:操作後在畫面上有交互(value 驅動 display)/ labeling(命名 / 描述 group identity)/ context dependency。
 
 ---
 
 ## 6 條 Layout 規則
 
-### 規則 1:水平 padding
+### 規則 1:水平 padding(3 patterns 並存)
 
-任何內容左右 padding = `loose`。**`block` 元件本身的左右 padding 也是 `loose`**(讓內容邊緣跟 inline 元件對齊,視覺對稱)。
+| Pattern | padding 寫哪 | 適用場景 |
+|---------|------------|---------|
+| **A. 元件自帶**(`px-loose` on root) | 元件 root | 有視覺邊界(border / bg / shadow / chrome):Sidebar / SurfaceHeader / Toolbar / Card / Panel |
+| **B. 父層管**(consumer 或 wrapper) | 父層 div | 純 layout primitive 無邊界:Table / DescriptionList / DataTable(naked structure)|
+| **C. Item 自帶**(each item `px-loose`,list naked)| 每個 item | List with hover row,hover bg 需 flush 容器邊界:Cmd+K menu / DropdownMenu items / Sidebar nav |
 
-```
-✓ <Container px-loose>      ✓ <Table mx-loose>
-  [Inline element]              ╔══════╗
-                                ║ rows ║
-                                ╚══════╝
-```
+任何內容左右 padding 最終 = `loose`(對齊 inline 元件邊緣);**寫哪看元件本質**,不是 either-or。
+
+Pattern C 的視覺邏輯見 `overlay-surface.spec.md`「Hover bg 貼邊 chrome」(hover bg 0 gutter 貼邊 + content 由 item-px 推進)。
 
 ### 規則 2:頂部(Header → 第一個元素)
 
-| 第一個元素 | Header → 該元素 | 為什麼 |
-|---|---|---|
-| `block`(table / editor) | `loose` | 視覺重、需要呼吸空間 |
-| `inline`(input / button / alert) | `tight` | 元素輕、header 邊界已提供分離 |
+| 第一個元素 | Header → 該元素 |
+|-----------|--------------|
+| **bounded region**(table / card / panel)| `loose` |
+| **unbounded region**(自帶 py 的 list / nav stack)| **0**(讓 list 自帶 py 撐 spacing) |
+| **element**(input / button / alert) | `tight` |
 
-### 規則 3:元素間 gap
+### 規則 3:元素間 gap(**只看親疏,role 無關**)
 
-**核心**:跟 `block` 相鄰一律 `tight`(避免「double spacing」感,因為 block 自帶視覺重量已是分隔)。只有 `inline ↔ inline` 用 `loose`。
+| 親疏 | gap |
+|------|-----|
+| **同範疇 / bundled** | 元件 spec own(跳此 rule)|
+| **跨範疇 + functional 交互** | `tight` |
+| **跨範疇 + parallel** | `loose` |
 
-| 轉場 | 間距 |
-|---|---|
-| `inline ↔ inline` | `loose` |
-| `inline → block` / `block → inline` | `tight` |
-| `block ↔ block` | `tight` |
+**核心**:gap 只看親疏不看 role(原 v1「block-adjacent 一律 tight」過機械,違 Gestalt proximity)。
 
-#### Caveat:`flex-col gap-*` 單值容器
-
-CSS `gap` 只能套單一值,form 含混合元件時:
-
-| Form 組成 | 統一 gap | rationale |
-|----------|---------|----------|
-| 全 `inline` | `loose` | 所有 transition 都 inline ↔ inline |
-| 混合 `inline` + `block` | `loose`(保守) | inline ↔ inline 用 tight 太緊(視覺貼邊感)>> block-adjacent 微 loose 視覺差(< 4px md density) |
-| 全 `block` | `tight` | 所有 transition 都 block-adjacent |
-
-**禁止**:單純因為 form 含一個 `block` 就把 container 整體 `tight`(會讓多數 inline ↔ inline 視覺擠壓)。
-
-#### 補充:List 場景的 inline → block 累加(2026-04-29)
-
-List 通常無邊框 / 底色,「block 視覺重量」由 list item 的 py 提供(非 border / bg)。inline → list 的 gap 計算需累加:**list-`py-2`(8)+ item-`py-1.5`(6)= 14 ≈ tight(12)**,維持「inline → block」對稱(2px ≤ 視覺閾值)。
-
-**實作**:控件 wrapper `pt-[var(--layout-space-tight)]` 上方,**省 pb**(讓 list-pt + item-py 自然累加生對稱視覺距離)。
-
-**典型場景**:overlay body 「1 control + 1 list」(search-above-list / dropdown-with-search-filter / column visibility panel)。
-**N/A**:form fields stack(走 inline ↔ inline = `loose`,本表既有);多 control / 多 list / 含 form fields 走一般 layout-space 規則。
+世界級對齊:Material 3 / Polaris / Apple HIG / Atlassian 都按「relationship not type」決定 spacing。
 
 ### 規則 4:底部
 
-| 情境 | 間距 |
-|---|---|
-| 最後一個內容 → action buttons | `bottom`(48px) |
-| `block` → 容器底 / viewport 底 / 底部 chrome band(無 action buttons) | `loose` |
-| `inline` → 容器底 / viewport 底 | `tight` |
+| 情境 | gap |
+|------|-----|
+| **任何最後內容 → action buttons**(role 無關)| `bottom`(48)|
+| **bounded region → 容器底 / 底部 chrome band**(無 action buttons)| `loose` |
+| **unbounded region → 容器底** | **0**(list 自帶 py 撐)|
+| **element → 容器底**(generic fallback)| `tight` |
 
-**「底部 chrome band」定義**:Alert 提示、BulkActionBar、Status bar、Footer 等附著於容器底部的 chrome elements。它們算「容器底邊」的一部分,table → 它們的距離 = `block → 容器底`。
+**Dialog-class 大容器**:元件 spec 自帶 `pb-*` 規則(如 Dialog body `pb-bottom`)→ 元件 spec own,layout rule 跳過。
 
-### 規則 5:橫排 Input Gap(固定,不隨 density 變)
+「Dialog-class」客觀判斷:**該元件 spec 自帶 `pb-*` canonical 即是**(eg `dialog.spec.md:70` 寫 `pb-bottom`)。
+
+「**底部 chrome band**」定義:Alert / BulkActionBar / Status bar / Footer 等附著於容器底部的 chrome elements。
+
+### 規則 5:橫排 Input Gap(固定不隨 density)
 
 橫排並列的 input fields **固定 gap,不走 layout-space token**:
 
 | 關聯性 | Gap | 範例 |
 |---|---|---|
-| 緊密相關(同一組值的起迄) | `gap-2`(8px) | Sleep start ↔ Sleep end |
-| 非緊密(不同組值並列) | `gap-4`(16px) | Sleep 時段 ↔ Work 時段 |
+| 緊密相關(同一組值的起迄)| `gap-2`(8) | Sleep start ↔ Sleep end |
+| 非緊密(不同組值並列)| `gap-4`(16) | Sleep 時段 ↔ Work 時段 |
 
 **為什麼固定**:這是 field 級 micro-spacing,跟容器級 macro-spacing 是不同維度。Field gap 由**內容語意**決定(緊密 vs 獨立),不由 density 決定。
 
-### 規則 1.1:Chrome inline padding canonical(2026-04-29 codified)
+### 規則 6:Chrome 水平左右 padding(規則 1 specialization)
 
-規則 1 specialization。**所有 chrome 表面**(SurfaceHeader / SurfaceFooter / SurfaceBody / Sidebar header / FileViewer toolbar + panel header + body / app top bar / page header)inline padding 統一 `px-[var(--layout-space-loose)]`(md=16 / lg=24,density-aware)。
+**所有 chrome 表面**(SurfaceHeader / SurfaceFooter / SurfaceBody / Sidebar header / FileViewer toolbar+filmstrip+InfoPanel header / app top bar / page header)**水平左右** padding 統一 `px-[var(--layout-space-loose)]`(md=16 / lg=24,density-aware)。
 
-**為何 loose 而非 tight**:Chrome 是 surface 視覺邊界 + 內容呼吸區;`tight`(12/16)足夠 inline list item,chrome 需更穩定 anchor 讓 title / dismiss / actions 不貼邊。
+**為何 loose 而非 tight**:Chrome 是 surface 視覺邊界 + 內容呼吸區;`tight` 足夠 inline list item,chrome 需更穩定 anchor 讓 title / dismiss / actions 不貼邊。
 
-**M8 8 家世界級對照**(default density 共識 16px):
-
-| DS / Lib | Chrome inline padding |
-|---------|----------------------|
-| Material 3 Top App Bar | 16dp |
-| Carbon UI Shell Header | 16px(`$spacing-05`)|
-| Polaris Page Header | space-400(16px) |
-| Atlassian Page Header | space.200(16px) |
-| Apple HIG macOS Toolbar | 16-20pt |
-| Linear / Notion top bar | 16px(實測)|
-| GitHub Primer PageHeader | 16-24px |
-| Figma toolbar | 16px |
+**M8 8 家世界級對照**(default density 共識 16px):Material 3 Top App Bar 16dp / Carbon UI Shell 16px / Polaris Page Header 16px / Atlassian Page Header 16px / Apple HIG macOS Toolbar 16-20pt / Linear / Notion / GitHub Primer / Figma 全 16px。
 
 **禁止**:硬寫 `px-4` / 自創值(`px-5`)/ 用 tight 當 chrome inline / 同 surface header/body/footer inline padding 不一致(三層左邊界必對齊)。
 
-**Verify(grep 2026-04-29)**:13+ chrome 處全用 `px-[var(--layout-space-loose)]`,無 drift。
+---
 
-### 規則 6:容器 padding 持有方
+## 心智模型(三步推理)
 
-**容器負責 padding,元件本身不加 margin 推開容器**。同一個元件在不同容器中行為一致,間距控制權在容器端。
+1. **判角色**:region(bounded / unbounded)/ element
+2. **判範疇**:
+   - 同範疇 / bundled → 元件 spec 管,跳過 layout rule
+   - 跨範疇 → 看 functional 交互 → 相關(tight)/ 不相關(loose)
+3. **套規則**:
+   - 規則 2/4 看 role + bounded/unbounded + 方位 + 是否 action button
+   - 規則 3 只看親疏(同範疇跳過 / 相關 tight / 不相關 loose)
 
 ---
 
 ## 典型容器範例
 
-### Form 情境(Field stack + footer,FormLayout 適用)
+### Form 情境(Field stack 在 Dialog 內)
 
 ```
 ┌────────────────────────────────────┐
-│  Title                        [X]  │
+│  Title                        [X]  │  ← SurfaceHeader (chrome, py-tight)
 ├────────────────────────────────────┤
-│← tight(12) ──────────────────────→│ ← Header → inline(規則 2)
+│← tight ─────────────────────────→ │  ← Header → element (規則 2)
 │  ← loose → [Name input]   ← loose →│
-│← loose gap ──────────────────────→│ ← inline ↔ inline(規則 3)
+│← loose gap ─────────────────────→ │  ← 跨範疇 parallel form fields (規則 3 不相關)
 │  ← loose → [Description]  ← loose →│
-│← tight(12) ──────────────────────→│ ← inline → block(規則 3)
-│╔══════════════════════════════════╗│
-│║← loose → DataTable       ← loose →║│ ← block(規則 1 內 px = loose)
-│╚══════════════════════════════════╝│
-│← bottom(48) ────────────────────→│ ← 內容 → action buttons(規則 4)
-│  ← loose → [Cancel] [Save] ← loose →│
+│← loose ─────────────────────────→ │
+│  ← loose → [Other field]  ← loose →│
+│← bottom 48 ────────────────────→  │  ← Dialog body pb-bottom (元件 spec own)
+├────────────────────────────────────┤  ← SurfaceFooter border-t
+│  ← loose → [Cancel] [Save] ← loose →│  ← Footer (chrome, py-tight)
 └────────────────────────────────────┘
 ```
 
-### Page 情境(全頁 list / dashboard,FormLayout 不適用)
+### Page 情境(全頁 list / dashboard)
 
 ```
 ┌────────────────────────────────────┐
-│ ← loose → [Toolbar items] ← loose →│ ← Toolbar(自帶 py-tight,規則 3 提供 → table 間距)
+│ ← loose → [Toolbar items] ← loose →│  ← Toolbar(自帶 py-tight,跨範疇 functional → table 規則 3 tight)
 │╔══════════════════════════════════╗│
-│║← loose → DataTable       ← loose →║│ ← block(規則 1)
+│║← loose → DataTable       ← loose →║│  ← bounded region(規則 1 內 px = loose)
 │╚══════════════════════════════════╝│
-│← loose(16) ──────────────────────→│ ← block → 底部 chrome band / viewport(規則 4)
-│ ← loose → [Alert hint]    ← loose →│ ← 底部 chrome band(扮演 chrome 角色)
+│← loose ─────────────────────────→  │  ← bounded region → 底部 chrome band(規則 4)
+│ ← loose → [Alert hint]    ← loose →│  ← 底部 chrome band
 │ ← loose → [BulkActionBar] ← loose →│
 └────────────────────────────────────┘
+```
+
+### Unbounded list-as-region(Cmd+K menu / Sidebar nav)
+
+```
+┌─────────────────┐
+│  ← Header chrome │
+├─────────────────┤  ← border-b
+│ ← list py-2 ──→ │  ← list 自帶 py (上)
+│ ← item py-1.5 → │  ← item 自帶 py
+│ ← item py-1.5 → │
+│ ← item py-1.5 → │
+│ ← list py-2 ──→ │  ← list 自帶 py (下)
+└─────────────────┘  ← unbounded region → 容器底 = 0(list 自帶 py 撐)
 ```
 
 ### 橫排 Input Gap(規則 5)
@@ -203,18 +223,34 @@ document.documentElement.setAttribute('data-layout-space', 'lg')
 
 ## 為什麼不建 FormLayout primitive
 
-之前曾考慮 `<FormLayout>` 自動套規則 1-4。後來確認**不建**:
+之前曾考慮 `<FormLayout>` 自動套規則 1-4。確認**不建**:
 
 - 規則 1-6 是 universal — Form / Page / Dashboard / Dialog / Card 全部吃同樣,不該為「form」單獨封裝
-- 角色判斷是 scope-relative 業務情境,自動偵測會把固定假設寫死(eg 假設 Textarea 一律 block 是錯的)
+- 角色判斷是 scope-relative 業務情境,自動偵測會把固定假設寫死(eg 假設 Textarea 一律 element 是錯的)
 - Consumer 直接套 className 反而透明、易 debug
 
-**真正獨特、值得封裝的只有 action-button footer chrome**(border-t + px-loose + py-tight + 內部 button group canonical),已在 `overlay-surface.spec.md`(SurfaceFooter)+ `action-bar.spec.md` 處理。Footer 上方那 48px(`--layout-space-bottom`)是 body 自己的 `pb-bottom`,不屬 footer chrome。一般 layout 直接套規則 1-6 的 className 即可。
+**真正獨特、值得封裝的只有 action-button footer chrome**(border-t + px-loose + py-tight + 內部 button group canonical),已在 `overlay-surface.spec.md`(SurfaceFooter)+ `action-bar.spec.md` 處理。Footer 上方那 48px(`--layout-space-bottom`)是 body 自己的 `pb-bottom`,不屬 footer chrome。
+
+## v1 → v6 演化
+
+- v1(2026-03):block / inline 二分,規則 3「block-adjacent 一律 tight」機械
+- v6(2026-04-30):
+  - 命名換 region / element(避 CSS display 撞名)
+  - region 加 bounded / unbounded 子分類
+  - 規則 3 改「親疏 3 級」(同範疇 / 跨範疇相關 / 跨範疇不相關),元件 role 無關
+  - 加「同範疇 / bundled component family → 元件 spec own」分權層
+  - 規則 1 加 padding 3 patterns(元件自帶 / 父層管 / item 自帶)
+  - 規則 4 加「Dialog-class 大容器元件 spec own」例外處理
+  - 規則 2/4 加 unbounded region = 0(list 自帶 py 撐)
+
+---
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護。
 
 - `description-list.spec.md`
 - `empty.spec.md`
 - `overlay-surface.spec.md`
+- `dialog.spec.md`
+- `file-viewer.spec.md`

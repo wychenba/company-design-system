@@ -470,12 +470,12 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       </div>
 
       {/* Panel body — header(shrink-0)上常駐 + body 走 ScrollArea(高度小時內容可捲動)。
-          padding 對齊 layoutSpace 規則 4「block → 容器底(無 action buttons)= loose」,
-          pt-tight(緊跟 header 邊界)/ pb-loose(底部呼吸)— InfoPanel 無 action buttons
-          所以**不**用 bottom(48px),改用 loose(16/24)。 */}
+          padding 對齊 layoutSpace v6 規則 4「bounded region → 容器底(無 action buttons)= loose」。
+          gap 對齊 v6 規則 3「跨範疇 parallel = loose」(說明 vs 檔案資訊兩個獨立 functional sections,
+          屬「跨範疇 + 不相關」)— 從 gap-4 寫死改為 token-aware loose。 */}
       <ScrollArea className="flex-1 min-h-0">
         <div className={cn(
-          'flex flex-col gap-4',
+          'flex flex-col gap-[var(--layout-space-loose)]',
           'px-[var(--layout-space-loose)]',
           'pt-[var(--layout-space-tight)] pb-[var(--layout-space-loose)]',
         )}>
