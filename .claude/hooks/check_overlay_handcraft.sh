@@ -116,6 +116,23 @@ if [ "$HAS_POP_HEADER" -ge 1 ] && [ "$HAS_MENU_ITEM" -ge 1 ] && [ "$IS_MENU_PRIM
   fi
 fi
 
+# ── Check 6: Overlay body 重新引入 flush / 等價 boolean variant(2026-05-01)──
+# 對齊 patterns/overlay-surface/overlay-surface.spec.md「List-as-region in overlay body」。
+# 2026-05-01 移除 flush(rationale:Material/Atlassian/Mantine/shadcn 主流不做 universal LayoutBody flush;
+# variant 不解決底層脆弱 — 加 1 row search/banner 就破功)。
+# 防止未來 silent re-introduction:DialogBody / SheetBody / PopoverBody tsx 內出現
+# `flush?: boolean` / `flush = false` / `naked?: boolean` / `bare?: boolean` / `noPadding?: boolean` 同類 boolean 變體。
+# Scope:`components/(Dialog|Sheet|Popover)/*.tsx`(非 stories)。
+IS_OVERLAY_BODY_TSX=$(echo "$FILE_PATH" | grep -cE 'components/(Dialog|Sheet|Popover)/[^/]+\.tsx$' | head -1)
+IS_OVERLAY_BODY_TSX=${IS_OVERLAY_BODY_TSX:-0}
+if [ "$IS_OVERLAY_BODY_TSX" -ge 1 ] && ! echo "$FILE_PATH" | grep -qE '\.stories\.tsx$'; then
+  STRIPPED_PROPS_PATTERN='(flush|naked|bare|stripped|unpadded|noPadding|paddingless)\??:\s*boolean'
+  STRIPPED_HITS=$(grep -nE "$STRIPPED_PROPS_PATTERN" "$FILE_PATH" 2>/dev/null | head -3)
+  if [ -n "$STRIPPED_HITS" ] && ! grep -qE 'overlay-body-stripped-variant-allow:' "$FILE_PATH" 2>/dev/null; then
+    VIOLATIONS="${VIOLATIONS}\n⚠️ Overlay body 重新引入 stripped-padding boolean variant(2026-05-01 已移除):\n${STRIPPED_HITS}\n  → list-as-region in overlay body canonical = consumer 用 className override:\n    <DialogBody className=\"!px-0 !pt-0 !pb-0\"><div className=\"py-2\">{items}</div></DialogBody>\n  Why removed:Material/Atlassian/Mantine/shadcn 主流不做 universal LayoutBody flush;\n  variant 不解決底層脆弱(加 1 row search/banner 就破功)+ 把 1 surface decision 拆兩 API。\n  詳 overlay-surface.spec.md「List-as-region in overlay body」+ memory feedback_layout_v6_canonical.md\n  Escape hatch:加 \`// overlay-body-stripped-variant-allow: <reason>\` 在檔頭(必含 ≥3 家世界級對照 + multi-row hold 保證)。"
+  fi
+fi
+
 if [ -n "$VIOLATIONS" ]; then
   ESCAPED=$(printf "%b" "$VIOLATIONS" | jq -Rs .)
   cat <<EOJSON
