@@ -172,19 +172,22 @@ interface DialogBodyProps extends React.ComponentPropsWithoutRef<typeof ScrollAr
    * `flush=false`(預設):body chrome padded(`px-loose pt-tight pb-bottom`),
    * 適合 form / 一般 / 混合內容
    *
-   * Pattern(search + list)— 直接走規則 3 親疏判,gap-tight 完事:
+   * Pattern(search + list)— 直接套 layoutSpace 規則 3 補充 line 85:
    * ```tsx
    * <DialogBody flush>
-   *   <div className="flex flex-col gap-[var(--layout-space-tight)]">
-   *     <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)]">
-   *       <Input search />
-   *     </div>
+   *   <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)]">
+   *     <Input search />  // search wrapper:pt-tight 上方,pb 省
+   *   </div>
+   *   <div className="py-2">  // list-as-region 自帶 py-2 outer(canonical menu group pattern)
    *     {items.map(item => <MenuItem className="px-[var(--layout-space-loose)] rounded-md" />)}
    *   </div>
    * </DialogBody>
    * ```
-   * search ↔ list 跨範疇相關(search 驅動 list)→ 規則 3 = tight,套 gap-tight 即可,
-   * 不需 padding 累加 magic。
+   * search → first item 視覺距離 = 0(wrapper pb 省)+ 8(list pt-2)+ 4(item pt)
+   * = **12 ≈ tight ✓**(規則 3 補充 line 85 公式)
+   *
+   * **Note**:flush body 自己 py-2 是 body 邊界 padding,跟 list 自帶 py-2 outer
+   * 是兩個不同 wrapper 各司其職。list canonical 結構必有自己 outer py-2(menu group / list-as-region 通用)。
    *
    * 詳 `tokens/layoutSpace/layoutSpace.spec.md` 規則 3 補充 + 規則 4 + Notes flush catalog
    */
