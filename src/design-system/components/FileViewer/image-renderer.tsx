@@ -44,6 +44,12 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
   const imgRef = React.useRef<HTMLImageElement | null>(null)
   const containerRef = React.useRef<HTMLDivElement | null>(null)
   const [loaded, setLoaded] = React.useState(false)
+  // Q2 RWD:track「user 最後一次的 zoom 意圖」— fit-page / fit-width 自動 reflow,manual 不動。
+  // 對齊 Apple Photos / Drive canonical:resize 時若 user 在 fit mode → recompute,manual zoom → 維持。
+  const lastFitModeRef = React.useRef<FitMode | 'manual'>('fit-page')
+  // 區分「user wheel/pinch」vs「programmatic centerView」— lib onTransform 兩者都觸發,
+  // 用 flag 防 programmatic 的 onTransform 誤標 mode = manual。
+  const programmaticZoomRef = React.useRef(false)
 
   // 宣告 capability — shell 用此決定 toolbar 內容。
   React.useEffect(() => {
@@ -80,11 +86,41 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
     const scale = computeFitScale('fit-page')
     if (scale == null) return
     const pct = clampToPct(scale)
+    lastFitModeRef.current = 'fit-page'
     // 等 transform 就緒再更新(避免 initialScale=1 → fit 過程跳兩段)
     requestAnimationFrame(() => {
       onZoomChange(pct)
     })
   }, [computeFitScale, clampToPct, onZoomChange])
+
+  // Q2 RWD:container resize 時若在 fit mode 重算 — 對齊 Apple Photos / Drive canonical
+  React.useEffect(() => {
+    if (!loaded) return
+    const container = containerRef.current
+    if (!container) return
+    const obs = new ResizeObserver(() => {
+      const mode = lastFitModeRef.current
+      if (mode === 'manual') return  // manual zoom 不自動覆蓋
+      const scale = computeFitScale(mode)
+      if (scale == null) return
+      onZoomChange(clampToPct(scale))
+    })
+    obs.observe(container)
+    return () => obs.disconnect()
+  }, [loaded, computeFitScale, clampToPct, onZoomChange])
+
+  // Q3 雙擊 toggle fit ↔ 100%(對齊 Apple Photos / Preview.app / Imgur / PhotoSwipe canonical)
+  const handleDoubleClick = React.useCallback(() => {
+    if (!loaded) return
+    const fitScale = computeFitScale('fit-page')
+    if (fitScale == null) return
+    const fitPct = clampToPct(fitScale)
+    // 在 fit-page 附近(±5pt)→ 跳 100% natural;否則 → 回 fit-page
+    const atFit = Math.abs(zoom - fitPct) < 5
+    const targetPct = atFit ? 100 : fitPct
+    lastFitModeRef.current = atFit ? 'manual' : 'fit-page'  // 跳 100% = manual,回 fit = fit mode
+    onZoomChange(targetPct)
+  }, [loaded, zoom, computeFitScale, clampToPct, onZoomChange])
 
   // 外部 zoom 變動(preset / ± / 打字 / fit request)→ centerView 重定位
   // library canonical `centerView` 同時處理 scale + 置中 + animation + bounds。
@@ -94,7 +130,12 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
     const currentScale = api.state.scale
     const targetScale = zoom / 100
     if (Math.abs(currentScale - targetScale) < 0.005) return
+    // 標記 programmatic — onTransform 期間不要被誤標 manual mode
+    programmaticZoomRef.current = true
     api.centerView(targetScale, 200)
+    // 動畫 ~200ms + buffer 後解 flag
+    const t = setTimeout(() => { programmaticZoomRef.current = false }, 280)
+    return () => clearTimeout(t)
   }, [zoom, loaded])
 
   // Fit request(toolbar 菜單點 fit-width / fit-page)→ 算 scale emit 回 shell
@@ -102,20 +143,26 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
     if (!fitRequest || !loaded) return
     const scale = computeFitScale(fitRequest.fit)
     if (scale == null) return
+    lastFitModeRef.current = fitRequest.fit  // 記 fit mode 給 ResizeObserver 用
     onZoomChange(clampToPct(scale))
   }, [fitRequest, loaded, computeFitScale, clampToPct, onZoomChange])
 
-  // 內部 wheel / pinch zoom → 同步回 shell
+  // 內部 wheel / pinch zoom → 同步回 shell + 標記為 manual mode(打破 fit auto-reflow)
+  // programmatic centerView 期間 lib 也會 fire onTransform → 用 flag 跳過,避免誤標 manual。
   const handleTransformed = React.useCallback(
     (_ref: ReactZoomPanPinchRef, state: { scale: number }) => {
+      if (programmaticZoomRef.current) return  // programmatic update,不標 manual
       const nextZoom = Math.round(state.scale * 100)
-      if (nextZoom !== zoom) onZoomChange(nextZoom)
+      if (nextZoom !== zoom) {
+        lastFitModeRef.current = 'manual'
+        onZoomChange(nextZoom)
+      }
     },
     [zoom, onZoomChange],
   )
 
   return (
-    <div ref={containerRef} className="w-full h-full overflow-hidden">
+    <div ref={containerRef} className="w-full h-full overflow-hidden" onDoubleClick={handleDoubleClick}>
       <TransformWrapper
         // any-allow: react-zoom-pan-pinch TransformWrapper ref type not exported; API surface stable per lib docs
         ref={apiRef as any}
@@ -136,7 +183,9 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
         // 註:原本用 `smoothStep: 0.005` 但當前 lib type 不含該 key;若需 trackpad 細緻,
         // 升級 react-zoom-pan-pinch 到有此 prop 的版本或切到 `smoothScroll` API
         wheel={{ step: 0.03 }}
-        doubleClick={{ mode: 'reset' }}
+        // Q3 雙擊改自定 handler:lib `mode: 'reset'` 永遠 reset 到 initialScale=1 → 100%,
+        // 失去 fit ↔ 100% toggle UX(Apple Photos / Drive canonical)。disabled lib 預設 + 自定 onDoubleClick。
+        doubleClick={{ disabled: true }}
         onTransform={handleTransformed}
       >
         {/* 2026-04-23 debug fix:contentClass 不設 `!w-full !h-full`。

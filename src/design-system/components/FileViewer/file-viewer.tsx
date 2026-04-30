@@ -889,10 +889,15 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
           {...props}
         >
           {/* 鎖 dark subtree。Density 繼承 page(不另設 data-density)。
-              header 高度透過 `--chrome-header-height` 自動 density-aware(md=48 / lg=56)。 */}
+              header 高度透過 `--chrome-header-height` 自動 density-aware(md=48 / lg=56)。
+              ── Q1 mask 透明度(2026-04-30)──
+              outer **不**設 bg → Overlay(`bg-overlay` α45/α65)透出 image 周圍區域,
+              對齊 Notion / Dropbox / Slack lightbox idiom 跟 Dialog mask 同 token 一致。
+              chrome(Toolbar / Filmstrip / InfoPanel)各自有 `bg-surface` 維持 opaque
+              dark surface,不繼承透明。 */}
           <div
             data-theme="dark"
-            className="w-full h-full flex flex-col bg-canvas text-foreground"
+            className="w-full h-full flex flex-col text-foreground"
           >
             {/* Accessible title — 視覺隱藏但 screen reader 讀得到 */}
             <DialogPrimitive.Title className="sr-only">
@@ -918,7 +923,7 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
                 對齊 Google Photos / Dropbox lightbox / PhotoSwipe world-class canonical */}
             <div className="flex-1 min-h-0 flex">
               <div
-                className="relative flex-1 min-w-0 bg-canvas"
+                className="relative flex-1 min-w-0"
                 onMouseMove={handleViewportMouseMove}
                 onMouseLeave={handleViewportMouseLeave}
                 // Backdrop click-to-close(對齊 Google Drive / Dropbox lightbox / Apple Photos canonical):
