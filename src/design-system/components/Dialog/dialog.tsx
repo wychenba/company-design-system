@@ -151,65 +151,44 @@ const DialogHeader = React.forwardRef<
 ))
 DialogHeader.displayName = "DialogHeader"
 
-// DialogBody: flex-1 ScrollArea + inner padding(對齊 overlay-surface SSOT + ScrollArea canonical)
+// DialogBody: flex-1 ScrollArea + chrome padding(對齊 overlay-surface SSOT + ScrollArea canonical)
 // 捲軸必用 ScrollArea(跨 OS 一致、不吃寬度)— 不自寫 overflow-y-auto。
 // padding 搬進 viewport inner div:px-loose / pt-tight / pb-bottom(Dialog 「大容器」底部多一拍呼吸)。
 // data-dialog-body:讓 DialogContent onOpenAutoFocus 找得到 body 第一個有意義互動元素(避免 focus 到 close X)
 //
-// **`flush`**(2026-05-01 rename,前 `variant="list"` 對齊 Polaris flush API):
-// body 為單一 unbounded list-as-region 場景 — body **`py-2`** 無 horizontal padding,
-// list item 自己 **`px-[var(--layout-space-loose)] rounded-md`** → hover bg flush chrome 邊
-// (Linear / Cmd+K idiom)+ content 對齊 header title 位置。
-// 對齊 layoutSpace v6「unbounded list-as-region」概念 + Polaris `flush` API canonical。
-interface DialogBodyProps extends React.ComponentPropsWithoutRef<typeof ScrollArea> {
-  /**
-   * `flush=true`:body 變**裸**(無 padding)— 為 unbounded list-as-region 場景。
-   * - body 不套 chrome padding 也**不套 py-2**(2026-05-01 修正)
-   * - **list 自帶 py-2 outer wrapper**(consumer 包 `<div py-2>` 包 items)
-   * - items 自帶 `px-loose rounded-md`(對齊 chrome 邊 + hover bg flush)
-   *
-   * `flush=false`(預設):body chrome padded(`px-loose pt-tight pb-bottom`),
-   * 適合 form / 一般 / 混合內容
-   *
-   * Pattern(search + list)— 直接套 layoutSpace 規則 3 補充 line 85:
-   * ```tsx
-   * <DialogBody flush>
-   *   <div className="px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)]">
-   *     <Input search />  // search wrapper:pt-tight 上方,pb 省
-   *   </div>
-   *   <div className="py-2">  // list-as-region 自帶 py-2 outer(canonical menu group pattern)
-   *     {items.map(item => <MenuItem className="px-[var(--layout-space-loose)] rounded-md" />)}
-   *   </div>
-   * </DialogBody>
-   * ```
-   * search → first item 視覺距離 = 0(wrapper pb 省)+ 8(list pt-2)+ 4(item pt)
-   * = **12 ≈ tight ✓**(規則 3 補充 line 85 公式)
-   *
-   * **設計原則**:flush body 是**裸容器**(無 padding),padding 屬內部 wrapper(list 自帶 py-2 outer + search wrapper 各自 own)。原本 body py-2 設計 intent 就是「list 上下 padding」,但實作層面屬 list outer 而非 body — 此 thread (2026-05-01) 修正混淆。
-   *
-   * 詳 `tokens/layoutSpace/layoutSpace.spec.md` 規則 3 補充 + 規則 4 + Notes flush catalog
-   */
-  flush?: boolean
-}
+// ── List-as-region 場景(menu group / Cmd+K)──
+// 不再提供 `flush` variant(2026-05-01 移除,先前曾叫 `variant="list"`)。
+// **canonical pattern** = consumer 自管 list outer wrapper + 用 `className` override 撤掉 chrome padding:
+// ```tsx
+// <DialogBody className="!px-0 !pt-0 !pb-0">
+//   <div className="py-2">  {/* list outer wrapper 自帶 py-2(menu group canonical)*/}
+//     {items.map(item => <MenuItem className="px-[var(--layout-space-loose)] rounded-md" />)}
+//   </div>
+// </DialogBody>
+// ```
+// **rationale**:flush 只為 list-only body 省一行 className,但 (a) 多一個 row(search / banner)
+// 就破功 → 保留 chrome padding 反而更穩,(b) 加新 variant 不解決底層脆弱(consumer 仍要管 list py
+// 且 item px-loose),反而把 1 個 surface decision 拆兩 API。世界級主流(Material/Atlassian/Mantine/
+// shadcn)無 universal LayoutBody flush variant,Polaris flush API 只用於極窄 scope。
+// 詳 `tokens/layoutSpace/layoutSpace.spec.md`「List-as-region in overlay body」節
 // `className` forward 到 **inner content div**(非外層 ScrollArea wrapper)——
 // consumer `<DialogBody className="flex flex-col gap-X">` 期望作用於 children 排列;
 // 套在 ScrollArea 上會 0 效果(children 住 inner div),曾造成 modal form field 完全貼邊。
-const DialogBody = React.forwardRef<HTMLDivElement, DialogBodyProps>(
-  ({ className, children, flush = false, ...props }, ref) => (
-    <ScrollArea ref={ref} data-dialog-body className="flex-1 min-h-0" {...props}>
-      <div
-        className={cn(
-          flush
-            ? "" // 裸 body,**無 padding** — list py 屬 list outer wrapper(consumer 包 `<div py-2>`)而非 body
-            : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
-          className,
-        )}
-      >
-        {children}
-      </div>
-    </ScrollArea>
-  ),
-)
+const DialogBody = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof ScrollArea>
+>(({ className, children, ...props }, ref) => (
+  <ScrollArea ref={ref} data-dialog-body className="flex-1 min-h-0" {...props}>
+    <div
+      className={cn(
+        "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  </ScrollArea>
+))
 DialogBody.displayName = "DialogBody"
 
 // DialogFooter: SurfaceFooter wrap 加 data-dialog-footer(autoFocus fallback target)

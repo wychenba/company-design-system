@@ -45,7 +45,7 @@ function NotificationSettings() {
         <DialogHeader>
           <DialogTitle>通知設定</DialogTitle>
         </DialogHeader>
-        <DialogBody flush>
+        <DialogBody className="!px-0 !pt-0 !pb-0">
           <div className="flex flex-col py-2">
             {items.map((n) => (
               // item-anatomy Family 2:[content: title + desc(--item-gap-label-desc-scanning gap)] [ItemSuffix: Switch]
@@ -197,10 +197,11 @@ export const LongContent = {
           <DialogHeader>
             <DialogTitle>成員列表</DialogTitle>
           </DialogHeader>
-          {/* Body 放 list → flush:body px-loose + py-2,item 自己 px=0(hover bg flush body padded edge)
-              item 用 Family 2 reading mode(prefix Avatar 40 + content title+description)
-              對應 user Image #16 期望 + overlay-surface.spec.md 規則 3.1 hover bg context 判斷 */}
-          <DialogBody flush>
+          {/* Body 放 list canonical(2026-05-01):body 撤 chrome padding(`!px-0 !pt-0 !pb-0`)+ list outer
+              wrapper 自帶 `py-2`(menu group 8px breathing)+ item 自帶 `px-loose rounded-md`
+              (hover bg flush 到 chrome 邊,unbounded list-as-region pattern)。
+              item 用 Family 2 reading mode(prefix Avatar 40 + content title+description)。 */}
+          <DialogBody className="!px-0 !pt-0 !pb-0">
             <div role="list" className="flex flex-col py-2">
               {members.map((m, i) => (
                 // item-anatomy Family 2:[prefix Avatar 40] [content: title + description(--item-gap-label-desc-scanning gap)]
@@ -293,7 +294,11 @@ export const Destructive = {
  * - GitHub Primer ActionList in Dialog:body 0 vertical padding
  *
  * **共識**:overlay body 裝 list 時,**body 不加 vertical padding**;list item 自己的
- * py 是節奏源。我方採同 pattern,用 `<DialogBody flush>` 一鍵切換。
+ * py 是節奏源。我方 canonical(2026-05-01):`<DialogBody className="!px-0 !pt-0 !pb-0">`
+ * 配 list outer wrapper(`<div className="py-2">`)+ item 自帶 `px-loose rounded-md`。
+ * 不加 `flush` variant — 對齊 Material/Atlassian/Mantine/shadcn 主流(無 universal flush);
+ * Polaris 有 flush API 但 scope 極窄。原因:加 1 row(search/banner)就破功 → 不如保留
+ * chrome padding;新增 prop 不解決底層脆弱(consumer 仍要管 list py + item px-loose)。
  *
  * 以下三個 item-size 範例對應不同 list-item tier(item-anatomy Family 1 reading mode):
  */
@@ -310,7 +315,7 @@ export const ListBody = {
           <DialogHeader>
             <DialogTitle>成員列表</DialogTitle>
           </DialogHeader>
-          <DialogBody flush>
+          <DialogBody className="!px-0 !pt-0 !pb-0">
             <div role="list" className="flex flex-col py-2">
               {[
                 { name: 'Alan Chen', role: 'Design', empId: 'D-0042', empNum: 'EMP-1001' },
@@ -320,7 +325,7 @@ export const ListBody = {
                 { name: 'Ethan Park', role: 'Engineering', empId: 'E-0210', empNum: 'EMP-1005' },
                 { name: 'Fiona Lin', role: 'Design', empId: 'D-0098', empNum: 'EMP-1006' },
               ].map((m, i) => (
-                // flush canonical v3:item `px-2 rounded-md` → content 在 hover bg 內有 breathing
+                // list-as-region canonical:item `px-loose rounded-md` → hover bg flush 到 chrome 邊
                 <div
                   key={m.empNum}
                   role="listitem"
@@ -381,13 +386,14 @@ export const ListBody = {
           <DialogHeader>
             <DialogTitle>選擇標籤</DialogTitle>
           </DialogHeader>
-          <DialogBody flush>
+          <DialogBody className="!px-0 !pt-0 !pb-0">
             <div role="list" className="flex flex-col py-2">
               {['Bug', 'Feature', 'Improvement', 'Research', 'Documentation', 'Refactor', 'Test'].map((t) => (
                 // 小 item 純文字 label → 用 **MenuItem** primitive(世界級 Linear Cmd+K / Polaris OptionList
                 // / Atlassian Modal+Menu 共通 pattern:menu-like 內容在 dialog 內用 menu primitive)
                 // className 覆蓋 px-3 為 px-loose → 對齊 dialog header/footer(tailwind-merge 吃掉預設 px-3)
-                // dialog body flush 已 py-2 = menu no-group wrap 的 8px breathing,MenuItem 不需再外包 py-2
+                // list outer wrapper 已 `py-2`(menu group 8px breathing)+ body 撤 chrome padding,
+                // MenuItem 不需再外包 py-2
                 <MenuItem key={t} className="px-[var(--layout-space-loose)]">
                   {t}
                 </MenuItem>

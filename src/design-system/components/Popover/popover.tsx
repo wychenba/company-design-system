@@ -101,30 +101,14 @@ PopoverHeader.displayName = "PopoverHeader"
 // PopoverBody / PopoverFooter: wrap SurfaceBody / SurfaceFooter with data-popover-*
 // attributes so handlePopoverOpenAutoFocus 可正確定位 body 內第一個 interactive 元素
 //
-// `flush`(2026-05-01,對齊 Polaris flush API + Dialog/Sheet canonical):
-// - flush=true:body `py-2` 無 horizontal padding,item 自帶 `px-loose rounded-md`
-//   hover bg flush chrome 內邊(unbounded list-as-region 用)
-// - flush=false(預設):SurfaceBody primitive 預設 padding(px-loose py-tight)
-interface PopoverBodyProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** Body unbounded list-only 模式 — 對齊 DialogBody / SheetBody flush API */
-  flush?: boolean
-}
-const PopoverBody = React.forwardRef<HTMLDivElement, PopoverBodyProps>(
-  ({ className, flush = false, children, ...props }, ref) =>
-    flush ? (
-      <div
-        ref={ref}
-        data-popover-body
-        className={className}  // 裸 body,無 padding — list py 屬 list outer wrapper
-        {...props}
-      >
-        {children}
-      </div>
-    ) : (
-      <SurfaceBody ref={ref} data-popover-body className={className} {...props}>
-        {children}
-      </SurfaceBody>
-    ),
+// ── List-as-region 場景(menu / Cmd+K / nav)──
+// 不再提供 `flush` variant(2026-05-01 移除,對齊 DialogBody / SheetBody canonical)。
+// consumer 用 SurfaceBody className override 撤掉 chrome padding + 自管 list outer wrapper:
+// `<PopoverBody className="!px-0 !py-0"><div className="py-2">{items}</div></PopoverBody>`
+// 或乾脆不用 PopoverBody,直接 PopoverContent > 自管 list 結構(naked popover)。
+// 詳 DialogBody comment + `tokens/layoutSpace/layoutSpace.spec.md`「List-as-region in overlay body」
+const PopoverBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ ...props }, ref) => <SurfaceBody ref={ref} data-popover-body {...props} />,
 )
 PopoverBody.displayName = "PopoverBody"
 

@@ -137,40 +137,33 @@ const SheetHeader = React.forwardRef<
 ))
 SheetHeader.displayName = "SheetHeader"
 
-// ── SheetBody:flex-1 ScrollArea + inner padding(對齊 DialogBody + ScrollArea canonical) ──
+// ── SheetBody:flex-1 ScrollArea + chrome padding(對齊 DialogBody + ScrollArea canonical) ──
 // 捲軸必用 ScrollArea(跨 OS 一致、不吃寬度)— 不自寫 overflow-y-auto。
 // padding 搬進 viewport inner div:px-loose / pt-tight / pb-bottom。
 // data-sheet-body:讓 SheetContent onOpenAutoFocus 找得到 body 第一個互動元素
-// `flush={true}`(2026-05-01 rename 前 variant="list",對齊 Polaris flush API):
-// body 為 unbounded list-as-region — body py-2 無 horizontal padding,list item 自帶 px-loose
-// 對齊 DialogBody canonical + layoutSpace v6 unbounded region rule
-interface SheetBodyProps extends React.ComponentPropsWithoutRef<typeof ScrollArea> {
-  /**
-   * `flush=true`:body 為單一 unbounded list-as-region(menu / nav / settings list)
-   * `flush=false`(預設):body chrome padded(`px-loose pt-tight pb-bottom`),form / 一般 / 混合
-   * 詳 DialogBody flush prop + tokens/layoutSpace/layoutSpace.spec.md
-   */
-  flush?: boolean
-}
+//
+// ── List-as-region 場景(menu / nav / settings list)──
+// 不再提供 `flush` variant(2026-05-01 移除)。canonical = consumer 用 className override:
+// `<SheetBody className="!px-0 !pt-0 !pb-0"><div className="py-2">{items}</div></SheetBody>`
+// 詳 DialogBody comment + `tokens/layoutSpace/layoutSpace.spec.md`「List-as-region in overlay body」
 // `className` forward 到 **inner content div**(非外層 ScrollArea wrapper)——
 // consumer `<SheetBody className="flex flex-col gap-X">` 期望作用於 children 排列;
 // 套在 ScrollArea 上會 0 效果(children 住 inner div),曾造成 Sheet form field 完全貼邊。
-const SheetBody = React.forwardRef<HTMLDivElement, SheetBodyProps>(
-  ({ className, children, flush = false, ...props }, ref) => (
-    <ScrollArea ref={ref} data-sheet-body className="flex-1 min-h-0" {...props}>
-      <div
-        className={cn(
-          flush
-            ? "" // 裸 body,無 padding — list py 屬 list outer wrapper 而非 body(同 DialogBody flush)
-            : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
-          className,
-        )}
-      >
-        {children}
-      </div>
-    </ScrollArea>
-  ),
-)
+const SheetBody = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof ScrollArea>
+>(({ className, children, ...props }, ref) => (
+  <ScrollArea ref={ref} data-sheet-body className="flex-1 min-h-0" {...props}>
+    <div
+      className={cn(
+        "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  </ScrollArea>
+))
 SheetBody.displayName = "SheetBody"
 
 // ── SheetFooter:SurfaceFooter wrap 加 data-sheet-footer(autoFocus fallback target)──

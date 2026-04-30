@@ -57,196 +57,111 @@ Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 
 
 ---
 
-## Body 放 List 時的 padding canonical(2026-04-22 新增)
+## List-as-region in overlay body(2026-05-01 canonical,取代 v4 flush API)
 
-當 overlay body(Dialog / Sheet / Popover)**只放一個 list**(contact picker / settings menu / command palette 類)時,**上下 padding 必對稱**,list 本身**不加**上下 padding — list 內每個 item 自己的 py 就是節奏來源。
+當 overlay body(Dialog / Sheet / Popover)**內容是一個 unbounded list**(contact picker / settings menu / command palette / nav)時 — body 不該有 chrome padding,讓 list 自管視覺節奏。
 
-### 世界級對照
+### 為什麼**不**做成 body variant(`flush`)
 
-| DS | Body pad vs List handling |
-|----|-----|
-| Material M3 Dialog with List | Body 移除 pt/pb,list 內 item 自己 py-3 |
-| Polaris Modal with ResourceList | Body padding 僅 px(水平),list 接頂接底 |
-| Atlassian Dialog + OptionList | Body padding 全移除,list 直接貼 Body 邊界 |
-| Linear Cmd+K | Body padding 0,list item pad 密集 |
-| Notion @mention list | Body padding 極小(`p-1`),item 自己有 py |
-| VS Code Quick Pick | Body 零 padding,item padding dense |
+2026-05-01 移除 `<DialogBody flush>` / `<SheetBody flush>` / `<PopoverBody flush>` variant。原因:
 
-**共識**:overlay body 裝 list 時,**body 不再加 vertical padding**,list 自己的 item padding 負責視覺節奏;body 水平 padding 保留(視覺 gutter)或根據 list item 自己有 px。
+1. **Variant 不解決底層脆弱**:flush 只省一行 chrome padding override;consumer 仍要管 list outer `py-2` + item `px-loose rounded-md` — 加 1 row search/banner 就破功(body 反而沒 chrome padding,更難排版)。
+2. **世界級主流不做 universal flush**:Material M3 / Atlassian Dialog / Mantine Modal / shadcn Dialog 都讓 consumer 用 className override 處理。Polaris 有 flush API 但 scope 極窄(只 ResourceList in Modal)。Mainstream 把這個 case 歸 consumer 自管。
+3. **Single API surface**:body 一律 chrome padded,list-only 場景用 `className="!px-0 !pt-0 !pb-0"` override + 自管 list outer wrapper — surface 概念清楚,不雙路徑。
 
-### Canonical(我們 DS)
+### Canonical pattern
 
-**規則 1 — body 放 list 時移除 body 的 pt/pb**:
-- 消費者一律用 `<DialogBody flush>` / `<SheetBody flush>`(2026-04-22 canonical,已 ship)
-- Body 保留 `px-loose`(list item 左右對齊 header title 與 footer button),僅移除 `pt` / `pb`
-- **禁止 hand-craft `className="!py-0"` override**(違反 mindset #2「不憑直覺發明」——有 prop 不用自刻)
+```tsx
+<DialogBody className="!px-0 !pt-0 !pb-0">    {/* body 撤 chrome padding */}
+  <div className="py-2">                       {/* list outer wrapper:menu group 8px breathing */}
+    {items.map(item => (
+      <MenuItem key={item.id} className="px-[var(--layout-space-loose)]">{item.label}</MenuItem>
+      // 或 hand-craft Family 2 row(prefix+content)時:
+      // <div className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)] rounded-md hover:bg-neutral-hover">
+    ))}
+  </div>
+</DialogBody>
+```
 
-**規則 2 — list 本身不加上下 padding**:
-- `<div className="flex flex-col">` wrap list items(不加 `py-*`)
-- 第一個 item 的 pt = 其他 items 的 pt(平等);最後一個 item 的 pb = 其他 items 的 pb
-- 禁止 list 外再 wrap `py-2` / `py-4` 等(重複 padding 造成上下過鬆)
+**3 條 invariant**(unique 解):
+1. **Hover bg 貼邊 chrome**:item `px-loose` 讓 hover bg 鋪滿 chrome 內邊(Linear / Cmd+K idiom)
+2. **Content 對齊 header title**:item content 左 = chrome `px-loose` 起點 = header title 左 X 軸對齊
+3. **Content 在 hover bg 內有 breathing**:item `px-loose rounded-md` → content 離 bg 邊緣 loose 距離
 
-**規則 3 — list item 本身有 py,由 item 決定節奏**:
-- 小 item(icon + label):item `py-1.5`(6px 垂直,符合 MenuItem canonical)
-- 中 item(icon + title + description 2 行):item `py-2`(8px 垂直)
-- 大 item(avatar + title + description):item `py-3`(12px 垂直,符合 FileItem rich)
-- **Item `px=0`**(2026-04-22 v2 revision):item 不加水平 padding,hover bg 寬度 = body padded area,
-  flush 到 body padded 邊緣。世界級 overlay list(Material M3 Dialog / Polaris Modal + ResourceList / Linear Cmd+K)
-  都採此 pattern:body 有 gutter,item hover bg 貼滿 gutter 內邊(容器內貼邊合理;chrome 外殼仍保留 loose 呼吸)
-- Item size 對齊 `patterns/element-anatomy/item-anatomy.spec.md`(Family 1 Menu item / Family 2 List item)
-
-**規則 3.1 — Overlay list 的三 invariant(2026-04-22 v4 user Image #30 最終校準)**:
-
-**3 個 invariant 同時成立,缺一不可**:
-1. **Hover bg 貼邊 chrome**:hover bg 左右邊緣 flush chrome 外殼內邊(Linear / Cmd+K idiom;無 chrome-to-bg gutter)
-2. **Content 對齊 header / footer**:content(avatar / text)左邊位置 = `SurfaceHeader` 的 `px-loose` 位置 = loose from chrome(垂直對齊 title)
-3. **Content 在 hover bg 內有 breathing**:content 離 hover bg 邊緣有 loose 距離,**不觸 bg 邊**(本條是 DS-wide「視覺容器 breathing invariant」的 overlay list 應用;上游 canonical 見 `patterns/element-anatomy/element-anatomy.spec.md`)
-
-**幾何推導**(三 invariant 的 unique 解):
+幾何:
 ```
 chrome 邊 ─ hover bg 左邊 ─────── [ loose breathing ] ─────── content 左邊
   (x=0)     (x=0, flush chrome)                           (x=loose, 對齊 header)
 ```
-→ body 必 `py-2`(無水平 padding)+ item 必 `px-[var(--layout-space-loose)] rounded-md`
 
-**為什麼這是 unique 解**:
-- 若 body 有水平 padding → hover bg 左邊 = body padded 內邊 ≠ chrome 邊,違反 invariant 1
-- 若 item px < loose → content 位置 < loose,違反 invariant 2
-- 若 item px = loose 但 body 有 padding → invariant 1 違反
+### 世界級對照(Linear-family canonical;≥5 家)
 
-**世界級對照**(≥5 家,hover-bg-flush + content-aligned 組合):
-- **Linear Cmd+K**:body padding 0,item padding loose,hover bg flush chrome 邊 ✓
-- **Notion page list**:同 Linear 模式 ✓
-- **Slack channel list**:同 ✓
-- **Raycast / Spotlight**:macOS quick palette,同 ✓
-- **VS Code Quick Pick**:同 ✓
-- Material M3 / Polaris Modal + List:**不同**(有 body horizontal padding,hover bg inset from chrome)—
-  是另一個合法家族(鬆散版),本 DS 選 Linear 家族為 canonical
+| DS | Body padding | Item padding | Hover bg flush chrome? |
+|----|---|---|---|
+| Linear Cmd+K | 0 | loose | ✓ |
+| Notion page list | 0 | loose | ✓ |
+| Slack channel list | 0 | loose | ✓ |
+| Raycast / Spotlight | 0 | loose | ✓ |
+| VS Code Quick Pick | 0 | loose | ✓ |
+| Material M3 / Polaris Modal+List | px only | item inset | ✗(另一合法家族,鬆散版)|
 
-**本 DS canonical 實作**:
-- `DialogBody flush` / `SheetBody flush` tsx 已 hardcode `py-2`(no horizontal padding)
-- Item consumer 一律 `py-* px-[var(--layout-space-loose)] rounded-md`
-- Item content 用 `gap-3` 排 avatar / title / description,不再加 horizontal padding
+本 DS 選 Linear-family。
 
-**M11 state walk hover 檢查**(三 invariant 必同時 ✓):
-1. hover bg 左右邊 = chrome 邊(截圖比 chrome border 位置)?
-2. content 左邊 = header title 左邊(截圖垂直線)?
-3. content 離 hover bg 邊 ≥ loose?
+### When list 上方有 search / banner(multi-row)
 
----
+list 不再是 body 唯一 region → **不該撤 body chrome padding**(撤了反而 search row 沒呼吸)。直接用預設 `<DialogBody>`(chrome padded),list 自管 outer wrapper。
 
-### 規則 3.2 — Menu 移植到 Dialog body flush(2026-04-22 新增)
-
-**When menu-like 內容放進 Dialog / Sheet body**(短文字選項 / single-click commit 情境),
-用 `MenuItem` primitive,不自刻 `<button>` hand-craft。
-
-**世界級 benchmark**:
-- **Linear Cmd+K**:`Command.Item` inside modal palette
-- **Polaris Modal + OptionList**:`OptionList.Option` inside Modal
-- **Atlassian Modal + Menu**:Menu primitive inside Modal
-- **Notion / Raycast / VS Code Quick Pick**:同 pattern
-
-**共通 canonical**:menu primitive 在 modal body 內,**horizontal padding 對齊 modal chrome padding**(= align header/footer),wrap layer 提供 vertical breathing(py-2,不重複加)。
-
-**本 DS 實作**:
 ```tsx
-<DialogBody flush>  {/* 提供 py-2 = menu no-group wrap 的 8px breathing */}
-  {options.map(o => (
-    {/* MenuItem 預設 px-3 → className 覆寫為 px-loose 對齊 dialog header title
-        tailwind-merge 吃掉預設 px-3(cn() 自動處理,不用 !important) */}
-    <MenuItem key={o.value} className="px-[var(--layout-space-loose)]" onSelect={...}>
-      {o.label}
-    </MenuItem>
-  ))}
+<DialogBody>  {/* 預設 chrome padding */}
+  <Input search />                              {/* search row */}
+  <div className="mt-tight py-2 -mx-loose">     {/* list outer:撤 body 水平 padding 讓 item flush chrome */}
+    {items.map(...)}
+  </div>
 </DialogBody>
 ```
 
-**為什麼不用 `py-2` 在外層 wrap**:
-- DialogBody flush 已 `py-2`(= menu no-group wrap 的 canonical 8px breathing)
-- MenuItem 自己 py 是 item-height 節奏(`(field-height - 1lh) / 2`),不是 wrap 節奏
-- 兩者不衝突、不重複
+(此 case 罕見,優先考慮:這個 flow 該用 `Combobox` / `SelectMenu` 而非 Dialog)
 
-**MenuGroup 情境(多 group)**:
-每個 MenuGroup 自帶 `py-2` + 相鄰 group 間 border-divider(對齊 item-anatomy.spec.md「Group auto-separation」)。當 DialogBody 外層 py-2 + MenuGroup 自己 py-2,第一個 group 上方會有 `8 + 8 = 16px` — 這是合理的(group 本身需要呼吸,不是浪費)。
+### Menu 移植到 Dialog body(short text options / single-click commit)
+
+用 `MenuItem` primitive,不自刻 `<button>` hand-craft:
+
+```tsx
+<DialogBody className="!px-0 !pt-0 !pb-0">
+  <div className="py-2">
+    {options.map(o => (
+      // MenuItem 預設 px-3 → className override 為 px-loose 對齊 dialog header
+      <MenuItem key={o.value} className="px-[var(--layout-space-loose)]" onSelect={...}>
+        {o.label}
+      </MenuItem>
+    ))}
+  </div>
+</DialogBody>
+```
 
 **何時該用 MenuItem vs hand-craft**:
 | 情境 | 選 | 理由 |
 |------|----|------|
-| 純文字 / icon + label 選項(scanning mode)| **MenuItem** | Family 1 menu rhythm,世界級 canonical |
-| avatar + title + description(reading mode)| hand-craft Family 2 結構 | MenuItem 是 scanning typography,reading mode desc leading/size 不同 |
-| 要做 `<Command>` 搜尋 | SelectMenu(cmdk-based)| 跟 dialog 獨立 primitive |
+| 純文字 / icon + label 選項(scanning mode)| MenuItem | Family 1 menu rhythm |
+| avatar + title + description(reading mode)| hand-craft Family 2 結構 | MenuItem 是 scanning typography |
+| 要做 `<Command>` 搜尋 | SelectMenu(cmdk-based)| dialog 內用獨立 primitive |
 
 **更高層設計判斷**:
-- **單擊即生效** → 用 `DropdownMenu` / `SelectMenu`(浮層),**不用 Dialog**
-- **暫存選擇 + Save CTA 才 commit** → 用 `Dialog + MenuItem`(本 pattern)
-- 見 `components/Dialog/dialog.spec.md`「何時不用」表(與 DropdownMenu / Popover 分界)
+- 單擊即生效 → `DropdownMenu` / `SelectMenu`(浮層),**不用 Dialog**
+- 暫存選擇 + Save CTA 才 commit → `Dialog + MenuItem`(本 pattern)
 
-**Consumer 範例**:
+### M11 state walk hover 檢查(三 invariant 必同時 ✓)
 
-```tsx
-// ✅ canonical(2026-04-22 v3):Dialog 放 contact picker
-<Dialog>
-  <DialogContent>
-    <DialogHeader>...</DialogHeader>
-    <DialogBody flush>  {/* body:px-[calc(loose-8)] + py-2 */}
-      <div className="flex flex-col">
-        {contacts.map(c => (
-          {/* item `px-2 rounded-md` → content 在 hover bg 內有 8px breathing */}
-          <button className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover">
-            <Avatar size={40} />  {/* Family 2 block mode avatar */}
-            <div>
-              {c.name}
-              {/* title(body)+ desc(caption)= scanning token;desc 色 fg-secondary */}
-              <p className="mt-[var(--item-gap-label-desc-scanning)] text-caption text-fg-secondary">{c.role}｜{c.empId}</p>
-            </div>
-          </button>
-        ))}
-      </div>
-    </DialogBody>
-  </DialogContent>
-</Dialog>
-```
-
-**常見違規(M12 FP 記憶)**:
-- ❌ 寫 "hover bg 必 flush" / "hover bg 必 inset" = 把 bg 邊位置(variance)誤升級成 strict rule(震盪 anti-pattern)
-- ❌ item `px=0` 讓 content 直接觸 hover bg 邊(Image #24 pattern)= 違反 content-inside-bg 真 invariant
-- ✅ 真實 invariant = 「content 必在 bg 內有 padding」,bg 邊位置留給 DS 一致性選擇
-
-**規則 4 — 對稱**:
-- 對稱 pt=pb(避免「頂貼邊、底留空」非對稱斷裂)
-- 例外:scrollable list(>= viewport 80%) 可接受 pb 略大於 pt(breathing tail)— 但需 rationale
+1. hover bg 左右邊 = chrome 邊?
+2. content 左邊 = header title 左邊?
+3. content 離 hover bg 邊 ≥ loose?
 
 ### ❌ 禁止
 
-- Body 外層 `py-4` + list 再 `py-2` + items 各 `py-2`(三層堆疊過鬆,Image 3 類 FileItem rich 就會太高)
-- Body `py-loose(寬)` + list 沒 flush → 頂底留白大於 item 本身,視覺結構斷裂
-- 不對稱 padding(頂 tight / 底 loose)無 rationale
-
-### Consumer 範例
-
-```tsx
-// ✅ canonical(2026-04-22 v4,Image #30):Dialog 放 contact picker
-// 三 invariant 同時成立:hover bg flush chrome + content 對齊 header + content 在 bg 內有 loose breathing
-<Dialog>
-  <DialogContent>
-    <DialogHeader>...</DialogHeader>
-    <DialogBody flush>  {/* body:`py-2` only(no horizontal padding)*/}
-      <div className="flex flex-col">
-        {contacts.map(c => (
-          {/* item `px-[var(--layout-space-loose)] rounded-md`:content 對齊 header title + hover bg flush chrome + loose breathing */}
-          <button className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)] rounded-md hover:bg-neutral-hover">
-            <Avatar size={40} /> {/* Family 2 block mode avatar */}
-            <div>
-              {c.name}
-              {/* title(body)+ desc(caption)= scanning token;desc 色 fg-secondary */}
-              <p className="mt-[var(--item-gap-label-desc-scanning)] text-caption text-fg-secondary">{c.role}｜{c.empId}</p>
-            </div>
-          </button>
-        ))}
-      </div>
-    </DialogBody>
-  </DialogContent>
-</Dialog>
+- 重新引入 `flush` variant prop(或 `variant="list"` / `density="list"`)
+- Item `px=0` 讓 content 直接觸 hover bg 邊(content-inside-bg breathing 違反)
+- list outer 重複 `py-4` + item 各自 `py-2`(過鬆)
+- 不對稱 padding 無 rationale
 ```
 
 ### SurfaceFooter

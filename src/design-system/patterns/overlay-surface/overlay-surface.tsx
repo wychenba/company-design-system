@@ -35,8 +35,10 @@ import { cn } from '@/lib/utils'
  * 分隔線: `border-{b|t} border-divider`
  *
  * ── Body ──
- * Body 仍 padding-based(content area),`px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]`,
- * Dialog / Sheet body 有 flush 時 py 由 consumer override(見 dialog.tsx)。
+ * Body padding-based(content area),`px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]`。
+ * Dialog / Sheet body 走 ScrollArea + chrome padding(`px-loose pt-tight pb-bottom`)。
+ * List-as-region 場景(menu / Cmd+K)由 consumer 用 className override 撤 chrome padding +
+ * 自管 list outer wrapper(詳 overlay-surface.spec.md「List-as-region in overlay body」)。
  */
 
 // Chrome-slot layout trick(2026-04-22 v5,user intent 精確實作):
