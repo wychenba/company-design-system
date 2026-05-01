@@ -26,6 +26,43 @@ originSessionId: 7fa6c876-f1f7-4537-8cb3-1c97212e5a80
 
 **Visual baseline drift identified**(non-action):tag-all-variants.png 0.789% diff 是預存 baseline drift(Chromium build version / OS font rendering 差異),非 my refactor 造成 — stash test 確認
 
+## 2026-05-01 second pass(同 session 延伸):4 題建議全 audit + 部分 fix
+
+User 問題:之前 audit 那麼多次怎麼都沒發現問題 → 4 題 fix plan(1 一律不加序號 / 2 strict naming / 3 三批 P1 / 4 i18n relocate / 5 5 spec deep benchmark)。
+
+**完成的 phase**:
+
+A. **第 2 題 audit prompt v3 同步 + 6 元件補 CompositionRules**(`701c52a`):
+   - 找到 root cause:audit-prompts.md Dim 30 寫 v2 schema,category-templates.md 已升 v3(UsageGuidance 整合),M3 漏改一處
+   - audit prompt 重寫對齊 v3
+   - Command / Menu / Notice / OverflowIndicator / SelectMenu / SelectionControl 6 元件補 `CompositionRules` story(對齊 Polaris Related / Material Use within 慣例)
+   - 真實 P0 從 false-positive 56 修正為 true 6,全修完歸零
+
+B. **第 4 題 i18n relocate 到 lib/ + 新建 home charter**(`9349e7e`):
+   - patterns/i18n → lib/i18n(M8 ≥3 家對照:Material/Polaris/Ant/Carbon 共識「i18n 是 utility 非 visual pattern」)
+   - 新建 `src/design-system/lib/` home + README charter
+   - patterns/README.md 純化(只收 visual primitive)+ 加 cross-cutting 反例指向 lib/
+
+C-1. **Silent drift scan(audit Dim 20 重 frame)+ FileItem 真 bug**(`31b148b`):
+   - audit Dim 20 原命題「hardcoded 25-30 = M17 違反」實況檢查為 false:多數是 token explainer / SSOT cross-reference
+   - 真違反是「spec 內部 + spec/tsx 不一致 silent drift」audit 沒這條 dim
+   - FileItem Avatar size:spec L45 + tsx L21 doc 寫 56,實際 const = 48,fix 對齊
+   - 4 元件 silent drift scan 部分完成(Menu / Button / Steps 多 SSOT ref 合理 / TimePicker spec 寫死 28/32/36 應 token formula)
+
+**未完成 — 留下次 session pickup**:
+
+C-1 後續:TimePicker / 其他元件 spec 寫死值改 token formula(work ~5h)
+C-2:7-維度 5 元件補缺(Field / NumberInput / AspectRatio / HoverCard / Empty)work ~5h
+C-3:41 元件 trait stories metadata migration(`/story-auto-compile-migrate` skill 一鍵)work ~30min
+D:5 spec deep benchmark(typography / radius / opacity / form-validation / command)work ~10h
+
+**第 1 題裁示已執行**(`26eb9f6`):audit-prompts.md L412-424 anatomy 序號 canonical flip — 素顏型為標準,帶編號為 VIOLATION(對齊 codebase 現實 267/267 條素顏)
+
+## Self-improvement capture(2026-05-01 second pass)
+
+- **New canonical gap**: audit Dim 20「hardcoded inline px」grep 太窄,真有價值的是「silent drift scan(spec 內部值矛盾 / spec vs tsx 不一致)」— next session 升級 audit prompt
+- **New canonical gap**: M3「改一處看三處」應 mechanical(grep canonical schema 名 ≥ 3 個 home 同步)— audit prompt 跟 category-templates 脫節 1 個版本就是 M3 漏網案例
+
 **False positives identified**(audit agent 報但實際無問題):
 - Dim 28 Story 拆分 — MenuItem/SegmentedControl 只有 `WithStartIcon` 沒 `WithEndIcon`,不違反 same-slot rule。FP
 
