@@ -2,12 +2,31 @@ import React from 'react'
 import { useChannel } from '@storybook/manager-api'
 import { EVENTS, type InspectPayload, type DevmodeMode, type ForceState } from './constants'
 
+/**
+ * Theme-aware text color(2026-05-01 修):
+ * Storybook 8 用 `--sb-color-*` namespace,我們原 code 用 `--sb-fg` / `--sb-fg-muted`
+ * 永遠 fallback 到 hard-coded `#1F2532` (dark)→ dark theme bg 上 invisible
+ * (user 抓到此 bug,先前 #65727F canonicalize 不夠,fallback 本身就有問題)。
+ *
+ * 解法:自定 `--dm-fg` / `--dm-fg-muted` CSS variables,透過 `<style>` tag 注入
+ * `@media (prefers-color-scheme: dark)` rule 切換 → 純 CSS,無 React state,
+ * 切 OS theme 自動 reflow。fallback 仍保留 `#1F2532` / `#65727F`(light theme)。
+ */
+const ThemeStyleInjector: React.FC = () => (
+  <style>{`
+    .ds-devmode-root { --dm-fg: #1F2532; --dm-fg-muted: #65727F; }
+    @media (prefers-color-scheme: dark) {
+      .ds-devmode-root { --dm-fg: #E5E8EB; --dm-fg-muted: #9AA3AC; }
+    }
+  `}</style>
+)
+
 const styles: Record<string, React.CSSProperties> = {
   root: {
     padding: '12px 16px',
     fontSize: 11,  // 對齊 Chrome Styles panel 11px(原 12 偏鬆,精簡 + 資訊密度提升)
     fontFamily: '-apple-system, "SF Pro Text", system-ui, sans-serif',
-    color: 'var(--sb-fg, #1F2532)',
+    color: 'var(--dm-fg, #1F2532)',
     height: '100%',
     overflowY: 'auto',
     boxSizing: 'border-box',
@@ -20,7 +39,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: '0.04em',
-    color: 'var(--sb-fg-muted, #65727F)',
+    color: 'var(--dm-fg-muted, #65727F)',
     margin: '8px 0 4px',  // 從 12 6 緊湊到 8 4
   },
   badge: {
@@ -70,13 +89,13 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: 'var(--sb-fg-muted, #65727F)',
+    color: 'var(--dm-fg-muted, #65727F)',
     fontSize: 11,
     minWidth: 120,
     minHeight: 40,
   },
   edgeLabel: {
-    color: 'var(--sb-fg-muted, #65727F)',
+    color: 'var(--dm-fg-muted, #65727F)',
     fontSize: 10,
     lineHeight: 1,
   },
@@ -91,7 +110,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '3px 10px',
     cursor: 'pointer',
     background: active ? 'rgba(0,101,234,0.15)' : 'transparent',
-    color: active ? '#0065EA' : 'var(--sb-fg, #1F2532)',
+    color: active ? '#0065EA' : 'var(--dm-fg, #1F2532)',
     border: 0,
     fontWeight: active ? 600 : 400,
     fontFamily: 'inherit',
@@ -114,7 +133,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 8,
   },
   codeLn: {
-    color: 'var(--sb-fg-muted, #65727F)',
+    color: 'var(--dm-fg-muted, #65727F)',
     userSelect: 'none',
   },
   tokenChip: {
@@ -130,13 +149,13 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     background: 'transparent',
     border: 0,
-    color: 'var(--sb-fg-muted, #65727F)',
+    color: 'var(--dm-fg-muted, #65727F)',
     padding: 2,
     borderRadius: 3,
     fontSize: 12,
   },
   empty: {
-    color: 'var(--sb-fg-muted, #65727F)',
+    color: 'var(--dm-fg-muted, #65727F)',
     fontSize: 12,
     padding: '24px 0',
     textAlign: 'center',
@@ -244,7 +263,7 @@ const renderAuthorRaw = (raw: string, resolved: string, tokensByProp: TokenByPro
         >
           {tokenName}
         </span>
-        {fallback ? <>, <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>{fallback}</span></> : null}
+        {fallback ? <>, <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>{fallback}</span></> : null}
         )
       </span>
     )
@@ -256,8 +275,8 @@ const renderAuthorRaw = (raw: string, resolved: string, tokensByProp: TokenByPro
   return (
     <>
       <span style={{ fontFamily: '"SF Mono", Menlo, monospace' }}>{parts}</span>
-      <span style={{ color: 'var(--sb-fg-muted, #65727F)', margin: '0 6px' }}>→</span>
-      <strong style={{ color: '#1F2532' }}>{resolved}</strong>
+      <span style={{ color: 'var(--dm-fg-muted, #65727F)', margin: '0 6px' }}>→</span>
+      <strong style={{ color: 'var(--dm-fg, #1F2532)' }}>{resolved}</strong>
     </>
   )
 }
@@ -293,7 +312,7 @@ const renderValue = (
         <span>{v}</span>
         <span
           title={`同值 token candidates(speculative,author 沒寫 var()):${hit.tokens.join(', ')}`}
-          style={{ marginLeft: 6, fontSize: 10, color: 'var(--sb-fg-muted, #65727F)', fontStyle: 'italic' }}
+          style={{ marginLeft: 6, fontSize: 10, color: 'var(--dm-fg-muted, #65727F)', fontStyle: 'italic' }}
         >
           ⓘ {allTokens}
         </span>
@@ -354,7 +373,7 @@ const Section: React.FC<{
             <div key={k} style={styles.codeRow}>
               <span style={styles.codeLn}>{i + 1}</span>
               <span>
-                <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>{k}</span>
+                <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>{k}</span>
                 {': '}
                 {renderValue(k, v, tokenByProp)}
                 {';'}
@@ -433,7 +452,7 @@ const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
             <span style={{ ...styles.edgeLabel, position: 'absolute', top: 4, left: '50%', transform: 'translateX(-50%)', color: '#558B2F' }}>
               {padding.top}
             </span>
-            <span style={{ color: 'var(--sb-fg, #1F2532)', fontWeight: 500 }}>{`${iw} × ${ih}`}</span>
+            <span style={{ color: 'var(--dm-fg, #1F2532)', fontWeight: 500 }}>{`${iw} × ${ih}`}</span>
             {/* Padding bottom — center 下方 */}
             <span style={{ ...styles.edgeLabel, position: 'absolute', bottom: 4, left: '50%', transform: 'translateX(-50%)', color: '#558B2F' }}>
               {padding.bottom}
@@ -441,7 +460,7 @@ const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
           </div>
           <span style={{ ...styles.edgeLabel, color: '#558B2F' }}>{padding.right}</span>
         </div>
-        <div style={{ position: 'absolute', bottom: 6, right: 10, fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>
+        <div style={{ position: 'absolute', bottom: 6, right: 10, fontSize: 10, color: 'var(--dm-fg-muted, #65727F)' }}>
           border-box
         </div>
       </div>
@@ -471,43 +490,43 @@ const AutoLayoutSection: React.FC<{ autoLayout: NonNullable<InspectPayload['auto
       <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '4px 12px', fontSize: 11, padding: '6px 0' }}>
         {isFlex && autoLayout.flexDirection && (
           <>
-            <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>direction</span>
+            <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>direction</span>
             <code>{autoLayout.flexDirection}</code>
           </>
         )}
         {autoLayout.gap && autoLayout.gap !== 'normal' && autoLayout.gap !== '0px' && (
           <>
-            <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>gap</span>
+            <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>gap</span>
             <code>{autoLayout.gap}</code>
           </>
         )}
         {autoLayout.justifyContent && autoLayout.justifyContent !== 'normal' && (
           <>
-            <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>justify</span>
+            <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>justify</span>
             <code>{autoLayout.justifyContent}</code>
           </>
         )}
         {autoLayout.alignItems && autoLayout.alignItems !== 'normal' && (
           <>
-            <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>align</span>
+            <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>align</span>
             <code>{autoLayout.alignItems}</code>
           </>
         )}
         {isFlex && autoLayout.flexWrap && autoLayout.flexWrap !== 'nowrap' && (
           <>
-            <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>wrap</span>
+            <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>wrap</span>
             <code>{autoLayout.flexWrap}</code>
           </>
         )}
         {!isFlex && autoLayout.gridTemplateColumns && autoLayout.gridTemplateColumns !== 'none' && (
           <>
-            <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>columns</span>
+            <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>columns</span>
             <code style={{ wordBreak: 'break-all' }}>{autoLayout.gridTemplateColumns}</code>
           </>
         )}
         {!isFlex && autoLayout.gridTemplateRows && autoLayout.gridTemplateRows !== 'none' && (
           <>
-            <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>rows</span>
+            <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>rows</span>
             <code style={{ wordBreak: 'break-all' }}>{autoLayout.gridTemplateRows}</code>
           </>
         )}
@@ -546,7 +565,8 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
   }
 
   return (
-    <div style={styles.root}>
+    <div className="ds-devmode-root" style={styles.root}>
+      <ThemeStyleInjector />
       <div style={styles.modeRow}>
         <strong style={{ fontSize: 12 }}>DS Devmode</strong>
         <div style={styles.toggle} role="group" aria-label="Inspect mode">
@@ -554,7 +574,7 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
           <button style={styles.toggleBtn(mode === 'live')} onClick={() => setModeAndBroadcast('live')}>Live</button>
           <button style={styles.toggleBtn(mode === 'pin')} onClick={() => setModeAndBroadcast('pin')} disabled={!payload}>Pin</button>
         </div>
-        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>
+        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--dm-fg-muted, #65727F)' }}>
           Alt+I toggle · Esc unpin · ↑↓←→ DOM · <b style={{ color: '#EC4436' }}>hover 別元素 = 量距</b> · H 暫清 · 觸控 tap pin
         </span>
       </div>
@@ -573,14 +593,14 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
         <>
           {/* Element tree breadcrumb(Chrome DevTools 風)*/}
           {payload.breadcrumb && payload.breadcrumb.length > 1 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap', marginBottom: 8, fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap', marginBottom: 8, fontSize: 10, color: 'var(--dm-fg-muted, #65727F)' }}>
               {payload.breadcrumb.map((crumb, i) => {
                 const isLast = i === payload.breadcrumb.length - 1
                 const label = `${crumb.tag}${crumb.id ? `#${crumb.id}` : ''}${crumb.className ? `.${String(crumb.className).split(/\s+/).filter(Boolean)[0]}` : ''}`
                 return (
                   <React.Fragment key={i}>
                     {i > 0 && <span>›</span>}
-                    <span style={{ color: isLast ? 'var(--sb-fg, #1F2532)' : undefined, fontWeight: isLast ? 600 : 400 }}>
+                    <span style={{ color: isLast ? 'var(--dm-fg, #1F2532)' : undefined, fontWeight: isLast ? 600 : 400 }}>
                       {label}
                     </span>
                   </React.Fragment>
@@ -598,16 +618,16 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
               // <details> let user 展開看全。對齊 Chrome Styles panel 同 idiom。
               if (classes.length <= 5) {
                 return (
-                  <code style={{ fontSize: 11, color: 'var(--sb-fg-muted, #65727F)', wordBreak: 'break-all' }}>
+                  <code style={{ fontSize: 11, color: 'var(--dm-fg-muted, #65727F)', wordBreak: 'break-all' }}>
                     .{classes.join(' .')}
                   </code>
                 )
               }
               return (
-                <details style={{ fontSize: 11, color: 'var(--sb-fg-muted, #65727F)', flex: 1, minWidth: 0 }}>
+                <details style={{ fontSize: 11, color: 'var(--dm-fg-muted, #65727F)', flex: 1, minWidth: 0 }}>
                   <summary style={{ cursor: 'pointer', listStyle: 'none', wordBreak: 'break-all' }}>
                     <code>.{classes.slice(0, 5).join(' .')}</code>
-                    <span style={{ color: 'var(--sb-fg-muted, #65727F)', marginLeft: 4 }}>(+{classes.length - 5} more)</span>
+                    <span style={{ color: 'var(--dm-fg-muted, #65727F)', marginLeft: 4 }}>(+{classes.length - 5} more)</span>
                   </summary>
                   <code style={{ display: 'block', wordBreak: 'break-all', marginTop: 4, paddingLeft: 4, borderLeft: '2px solid rgba(128,128,128,0.2)' }}>
                     .{classes.slice(5).join(' .')}
@@ -643,7 +663,7 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
           {/* Force pseudo-class state(Chrome 「:hov」force state idiom) */}
           {mode === 'pin' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
-              <span style={{ fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>:state</span>
+              <span style={{ fontSize: 10, color: 'var(--dm-fg-muted, #65727F)' }}>:state</span>
               <div style={styles.toggle} role="group" aria-label="Force pseudo-class state">
                 <button style={styles.toggleBtn(forceState === 'none')} onClick={() => setForceStateAndBroadcast('none')}>none</button>
                 <button style={styles.toggleBtn(forceState === 'hover')} onClick={() => setForceStateAndBroadcast('hover')}>:hover</button>
@@ -655,7 +675,7 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
 
           <div style={styles.sectionHead}>
             <span>Layer properties</span>
-            <span style={{ fontSize: 11, color: 'var(--sb-fg-muted, #65727F)', fontWeight: 400 }}>
+            <span style={{ fontSize: 11, color: 'var(--dm-fg-muted, #65727F)', fontWeight: 400 }}>
               {Math.round(payload.rect.width)} × {Math.round(payload.rect.height)}
             </span>
           </div>
@@ -666,7 +686,7 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
               「Distance to selected」idiom。*/}
           {payload.siblingDistance && (
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '4px 12px', fontSize: 11, padding: '8px 0', marginTop: 8, borderTop: '1px solid rgba(128,128,128,0.15)' }}>
-              <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>Sibling distance</span>
+              <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>Sibling distance</span>
               <span style={{ color: '#EC4436', fontWeight: 600 }}>
                 {payload.siblingDistance.horizontal !== null && `H: ${Math.round(payload.siblingDistance.horizontal)}px`}
                 {payload.siblingDistance.horizontal !== null && payload.siblingDistance.vertical !== null && '  ·  '}
@@ -682,7 +702,7 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
               <button style={styles.toggleBtn(view === 'list')} onClick={() => setView('list')}>List</button>
               <button style={styles.toggleBtn(view === 'code')} onClick={() => setView('code')}>Code</button>
             </div>
-            <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>CSS</span>
+            <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--dm-fg-muted, #65727F)' }}>CSS</span>
           </div>
 
           {/* Author CSS — 完整顯示 author 寫的所有 properties(對齊 user 底線「完整顯示原本 css」)*/}
@@ -709,20 +729,20 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
                   <div key={`${d.property}-${i}`} style={styles.codeRow}>
                     <span style={styles.codeLn}>{i + 1}</span>
                     <span>
-                      <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>{d.property}</span>
+                      <span style={{ color: 'var(--dm-fg-muted, #65727F)' }}>{d.property}</span>
                       {': '}
                       {d.tokens.length > 0
                         ? renderAuthorRaw(d.rawValue, d.resolved, { tokens: d.tokens, resolved: d.resolved, source: 'author', raw: d.rawValue })
                         : d.rawValue !== d.resolved
                         ? <>
                             <span style={{ fontFamily: '"SF Mono", Menlo, monospace' }}>{d.rawValue}</span>
-                            <span style={{ color: 'var(--sb-fg-muted, #65727F)', margin: '0 6px' }}>→</span>
+                            <span style={{ color: 'var(--dm-fg-muted, #65727F)', margin: '0 6px' }}>→</span>
                             <strong>{d.resolved}</strong>
                           </>
                         : <span>{d.rawValue}</span>}
                       {';'}
                       {d.fromSelector !== 'inline' && (
-                        <span title={`from rule: ${d.fromSelector}`} style={{ marginLeft: 6, fontSize: 9, color: 'var(--sb-fg-muted, #65727F)' }}>
+                        <span title={`from rule: ${d.fromSelector}`} style={{ marginLeft: 6, fontSize: 9, color: 'var(--dm-fg-muted, #65727F)' }}>
                           ← .{d.fromSelector.split(/\s+/).find(s => s.startsWith('.'))?.slice(1).split(':')[0] || d.fromSelector.slice(0, 20)}
                         </span>
                       )}
