@@ -87,10 +87,28 @@ for f in src/design-system/tokens/color/color.spec.md \
 done
 
 # ── Mechanism 3: Repeated-topic detector(session-scope, M13/M19 trigger)──
-# NOTE(2026-05-01): threshold 提高 + tail 縮小 + dedup,降 noisy warning
-# 之前每 turn 都因 session 累計 warning fire(永不消減),user 一直被
-# inject 困擾。現:tail -200 只看 last ~5-10 turn / threshold 提高 /
-# 同 warning content 已 inject 過 ≥ 3 次 → skip 寫。
+#
+# Threshold rationale(對齊 ≥ 3 家世界級 governance system,M8 binding)─────
+#
+# | 工具 | Threshold 哲學 | 對應本 hook |
+# |------|---------------|-------------|
+# | Bugsnag | occurrence count = 5 before alerting | trigger ≥ 5 |
+# | PagerDuty | time-window dedup = 5 min | dedup window 30m(below) |
+# | Datadog Watchdog | mean + 2σ outlier detection | TODO: dynamic threshold(baseline) |
+# | ESLint | max-warnings = 10 | topic > 10 |
+# | Sentry | alert frequency = 10 events/hour | topic > 10 |
+# | SonarQube | cognitive complexity = 15(較寬)| topic upper bound reference |
+#
+# Current threshold(fixed,對齊 Bugsnag/ESLint/Sentry minimum 共識):
+# - Trigger phrase: ≥ 5(對齊 Bugsnag occurrence count 5)
+# - Topic repeat: > 10(對齊 ESLint max-warnings 10 + Sentry alert freq 10)
+# - Dedup count: ≥ 5(對齊 Bugsnag occurrence count 5;同 warning fired
+#   ≥ 5 次 still 沒解 = 該 user 主動處理,inject 第 6 次仍無效)
+#
+# TODO: When `.claude/logs/self-audit-baseline-counts.jsonl` 累積 ≥ 100 samples,
+# 改 dynamic threshold = baseline mean + 2σ(對齊 Datadog Watchdog 哲學)。
+# Baseline capture mechanism 在本檔結尾(每 turn 寫 trigger/topic count
+# 不論 fire 與否,讓 future analysis 有 ground truth distribution)。
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
   # Extract user message texts from transcript(縮 500→200,只看最近 turns)
   USER_MSGS=$(tail -200 "$TRANSCRIPT_PATH" 2>/dev/null | \
@@ -101,8 +119,6 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
   TRIGGER_COUNT=$(echo "$USER_MSGS" | grep -ciE "$TRIGGER_RE" 2>/dev/null)
   TRIGGER_COUNT=${TRIGGER_COUNT:-0}
 
-  # Threshold 5(偏敏感,catch 真 trigger pattern) — user 「ensure / 確保」
-  # 重複 ≥ 5 次 = 強 signal 該 invoke /ensure-canonical pipeline
   if [ "$TRIGGER_COUNT" -ge 5 ]; then
     WARNINGS="${WARNINGS}\n  • User trigger-phrase 累計 ${TRIGGER_COUNT} 次(M19 strong signal)。確認 /ensure-canonical 5-layer 全做完;若有任一 layer skip = 違反 M19。"
   fi
@@ -113,26 +129,37 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
     sort | uniq -c | sort -rn | head -3)
   TOP_COUNT=$(echo "$TOPIC_KEYWORDS" | head -1 | awk '{print $1}')
 
-  # Threshold 8(偏敏感 — topic 重複 ≥ 8x = 真未落地 signal)
-  if [ -n "$TOP_COUNT" ] && [ "$TOP_COUNT" -gt 8 ]; then
+  if [ -n "$TOP_COUNT" ] && [ "$TOP_COUNT" -gt 10 ]; then
     TOP_TOPIC=$(echo "$TOPIC_KEYWORDS" | head -1 | awk '{print $2}')
     WARNINGS="${WARNINGS}\n  • Topic「${TOP_TOPIC}」repeated ${TOP_COUNT}x — likely user 第 N 次提示同主題,可能 prior turns 落地不徹底。"
   fi
+
+  # ── Baseline capture(每 turn always log trigger/topic counts,不論 fire)
+  # 為 future dynamic threshold(mean + 2σ)累積 ground truth distribution。
+  BASELINE_FILE="$PROJECT_DIR/.claude/logs/self-audit-baseline-counts.jsonl"
+  mkdir -p "$(dirname "$BASELINE_FILE")" 2>/dev/null
+  printf '{"ts":"%s","trigger":%d,"topic":%d,"fired":%s}\n' \
+    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    "${TRIGGER_COUNT:-0}" \
+    "${TOP_COUNT:-0}" \
+    "$([ -n "$WARNINGS" ] && echo true || echo false)" \
+    >> "$BASELINE_FILE" 2>/dev/null || true
 fi
 
 # Silent if nothing
 [ -z "$WARNINGS" ] && exit 0
 
-# Dedup(2026-05-01):若同樣 warning content 已連續寫 ≥ 3 次 entry,skip 本次
-# 寫入 — 避免 inject 一直 echo 老 warning(user 一直被困擾)
+# Dedup(2026-05-01):若同樣 warning content 已連續寫 ≥ 5 次 entry,skip 本次
+# 寫入 — 對齊 Bugsnag occurrence count = 5 哲學:同 warning fired ≥ 5 次仍沒解
+# = 該 user 主動處理,inject 第 6 次仍無效。避免 inject 一直 echo 老 warning。
 if [ -f "$PROJECT_DIR/.claude/logs/self-audit-warnings.jsonl" ]; then
   WARN_HASH=$(printf '%b' "$WARNINGS" | shasum -a 256 2>/dev/null | cut -c1-16)
-  RECENT_HASHES=$(tail -3 "$PROJECT_DIR/.claude/logs/self-audit-warnings.jsonl" 2>/dev/null | \
+  RECENT_HASHES=$(tail -5 "$PROJECT_DIR/.claude/logs/self-audit-warnings.jsonl" 2>/dev/null | \
     jq -r '.warnings // empty' 2>/dev/null | \
     while IFS= read -r w; do printf '%s' "$w" | shasum -a 256 2>/dev/null | cut -c1-16; done)
   DEDUP_COUNT=$(echo "$RECENT_HASHES" | grep "^${WARN_HASH}$" 2>/dev/null | wc -l | tr -d ' ')
   DEDUP_COUNT=${DEDUP_COUNT:-0}
-  if [ "$DEDUP_COUNT" -ge 3 ]; then
+  if [ "$DEDUP_COUNT" -ge 5 ]; then
     exit 0
   fi
 fi
