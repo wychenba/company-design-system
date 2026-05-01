@@ -98,7 +98,8 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
 
   # Detect M13/M19-style trigger phrases repeated across turns
   TRIGGER_RE='(確保|永遠|不留待辦|不能漂移|沒例外|ensure|always|never|world-class|世界級)'
-  TRIGGER_COUNT=$(echo "$USER_MSGS" | grep -ciE "$TRIGGER_RE" 2>/dev/null || echo 0)
+  TRIGGER_COUNT=$(echo "$USER_MSGS" | grep -ciE "$TRIGGER_RE" 2>/dev/null)
+  TRIGGER_COUNT=${TRIGGER_COUNT:-0}
 
   # Threshold 3 → 8(降 false positive,每 turn 自然會講「ensure / 確保」)
   if [ "$TRIGGER_COUNT" -ge 8 ]; then
@@ -128,7 +129,8 @@ if [ -f "$PROJECT_DIR/.claude/logs/self-audit-warnings.jsonl" ]; then
   RECENT_HASHES=$(tail -3 "$PROJECT_DIR/.claude/logs/self-audit-warnings.jsonl" 2>/dev/null | \
     jq -r '.warnings // empty' 2>/dev/null | \
     while IFS= read -r w; do printf '%s' "$w" | shasum -a 256 2>/dev/null | cut -c1-16; done)
-  DEDUP_COUNT=$(echo "$RECENT_HASHES" | grep -c "^${WARN_HASH}$" 2>/dev/null || echo 0)
+  DEDUP_COUNT=$(echo "$RECENT_HASHES" | grep "^${WARN_HASH}$" 2>/dev/null | wc -l | tr -d ' ')
+  DEDUP_COUNT=${DEDUP_COUNT:-0}
   if [ "$DEDUP_COUNT" -ge 3 ]; then
     exit 0
   fi
