@@ -6,7 +6,7 @@ originSessionId: 7fa6c876-f1f7-4537-8cb3-1c97212e5a80
 ---
 ## Current state(2026-05-01)
 
-**DS scope**: 60 components + 4 patterns + 7 token families. All have spec / showcase / anatomy / principles stories. Build baseline green(tsc -b 0 real errors / audit-content-quality clean / compile-stories 60/60 aligned).
+**DS scope**: 60 components + 4 patterns + 7 token families. All have spec / showcase / anatomy / principles stories. Build baseline green(tsc -b 0 real errors / build-storybook exit 0 / 52s built — 2026-05-01 verified).
 
 **Skills(18+)** + **Hooks(26)** — see `.claude/skills/README.md` + `.claude/hooks/README.md` censuses。
 
@@ -22,7 +22,7 @@ originSessionId: 7fa6c876-f1f7-4537-8cb3-1c97212e5a80
 4. **`docs(spec)`**(`4af1397`): Dim 3 SSOT reciprocal — re-run `add-reciprocal-pointers.mjs`,9 spec 補 13 inbound back-pointers
 5. **`refactor(Select)`**(`0ae347a`): Dim 17 prop value cross-component collision — `Select.display='text'` rename `'plain'`(避撞 `Button.variant='text'`);P0 menu-item.stories.tsx Default label 改真實業務情境
 
-**Validation**:tsc 0 real errors / audit-content-quality clean / compile-stories 60/60 aligned / visual-audit Tag stash test 證實 my refactor 0-pixel-impact
+**Validation**:tsc -b exit 0 / build-storybook exit 0(52s)/ visual-audit Tag stash test 證實 my refactor 0-pixel-impact。**Memory 自我修正(2026-05-01)**:之前 entry 寫「audit-content-quality / compile-stories」NPM scripts 是 hallucination — 實際 `package.json` 無此兩 script,只有 `build` / `build-storybook` / `visual-audit` / `devmode:test` / `hooks:test`
 
 **Visual baseline drift identified**(non-action):tag-all-variants.png 0.789% diff 是預存 baseline drift(Chromium build version / OS font rendering 差異),非 my refactor 造成 — stash test 確認
 
