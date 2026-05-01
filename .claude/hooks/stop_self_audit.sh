@@ -87,16 +87,21 @@ for f in src/design-system/tokens/color/color.spec.md \
 done
 
 # ── Mechanism 3: Repeated-topic detector(session-scope, M13/M19 trigger)──
+# NOTE(2026-05-01): threshold 提高 + tail 縮小 + dedup,降 noisy warning
+# 之前每 turn 都因 session 累計 warning fire(永不消減),user 一直被
+# inject 困擾。現:tail -200 只看 last ~5-10 turn / threshold 提高 /
+# 同 warning content 已 inject 過 ≥ 3 次 → skip 寫。
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
-  # Extract user message texts from transcript
-  USER_MSGS=$(tail -500 "$TRANSCRIPT_PATH" 2>/dev/null | \
+  # Extract user message texts from transcript(縮 500→200,只看最近 turns)
+  USER_MSGS=$(tail -200 "$TRANSCRIPT_PATH" 2>/dev/null | \
     jq -r 'select(.message.role=="user") | .message.content // empty | if type=="string" then . else (.[]? | .text // empty) end' 2>/dev/null)
 
   # Detect M13/M19-style trigger phrases repeated across turns
   TRIGGER_RE='(確保|永遠|不留待辦|不能漂移|沒例外|ensure|always|never|world-class|世界級)'
   TRIGGER_COUNT=$(echo "$USER_MSGS" | grep -ciE "$TRIGGER_RE" 2>/dev/null || echo 0)
 
-  if [ "$TRIGGER_COUNT" -ge 3 ]; then
+  # Threshold 3 → 8(降 false positive,每 turn 自然會講「ensure / 確保」)
+  if [ "$TRIGGER_COUNT" -ge 8 ]; then
     WARNINGS="${WARNINGS}\n  • User trigger-phrase 累計 ${TRIGGER_COUNT} 次(M19 strong signal)。確認 /ensure-canonical 5-layer 全做完;若有任一 layer skip = 違反 M19。"
   fi
 
@@ -106,7 +111,8 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
     sort | uniq -c | sort -rn | head -3)
   TOP_COUNT=$(echo "$TOPIC_KEYWORDS" | head -1 | awk '{print $1}')
 
-  if [ -n "$TOP_COUNT" ] && [ "$TOP_COUNT" -gt 5 ]; then
+  # Threshold 5 → 15(governance topic 一次 session 自然會多次提)
+  if [ -n "$TOP_COUNT" ] && [ "$TOP_COUNT" -gt 15 ]; then
     TOP_TOPIC=$(echo "$TOPIC_KEYWORDS" | head -1 | awk '{print $2}')
     WARNINGS="${WARNINGS}\n  • Topic「${TOP_TOPIC}」repeated ${TOP_COUNT}x — likely user 第 N 次提示同主題,可能 prior turns 落地不徹底。"
   fi
@@ -114,6 +120,19 @@ fi
 
 # Silent if nothing
 [ -z "$WARNINGS" ] && exit 0
+
+# Dedup(2026-05-01):若同樣 warning content 已連續寫 ≥ 3 次 entry,skip 本次
+# 寫入 — 避免 inject 一直 echo 老 warning(user 一直被困擾)
+if [ -f "$PROJECT_DIR/.claude/logs/self-audit-warnings.jsonl" ]; then
+  WARN_HASH=$(printf '%b' "$WARNINGS" | shasum -a 256 2>/dev/null | cut -c1-16)
+  RECENT_HASHES=$(tail -3 "$PROJECT_DIR/.claude/logs/self-audit-warnings.jsonl" 2>/dev/null | \
+    jq -r '.warnings // empty' 2>/dev/null | \
+    while IFS= read -r w; do printf '%s' "$w" | shasum -a 256 2>/dev/null | cut -c1-16; done)
+  DEDUP_COUNT=$(echo "$RECENT_HASHES" | grep -c "^${WARN_HASH}$" 2>/dev/null || echo 0)
+  if [ "$DEDUP_COUNT" -ge 3 ]; then
+    exit 0
+  fi
+fi
 
 # 永遠 log warnings(下 turn 透過 inject_pending_self_audit 看到)
 mkdir -p "$PROJECT_DIR/.claude/logs" 2>/dev/null
