@@ -1,5 +1,8 @@
 *.jsonl
 *.jsonl.*
 last-inject-ts.txt
+.last-blocked-claim.txt
+.stop-drift-last-head
+.last-prune
 !.gitignore
 !.gitkeep
