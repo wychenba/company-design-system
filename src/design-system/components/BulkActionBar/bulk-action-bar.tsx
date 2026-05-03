@@ -16,6 +16,7 @@ import { ButtonDivider } from '@/design-system/components/Button/button-group'
 
 // ── i18n labels ─────────────────────────────────────────────────────────────
 
+// code-quality-allow: dead-export — public API per spec.md(consumer i18n override hook)
 export interface BulkActionBarLabels {
   count: (n: number) => string
   clear: string
@@ -23,6 +24,7 @@ export interface BulkActionBarLabels {
   toolbarAriaLabel: string
 }
 
+// code-quality-allow: dead-export — public API per spec.md(consumer spread + override)
 export const BULK_ACTION_BAR_DEFAULT_LABELS: BulkActionBarLabels = {
   count: (n) => `已選 ${n} 項`,
   clear: '清除選取',

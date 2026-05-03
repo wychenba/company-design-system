@@ -289,6 +289,16 @@ DatePicker 套 `React.forwardRef` + `displayName`,但**不 `...props` spread DOM
 
 ---
 
+## A11y 預設
+
+- Trigger:`role="combobox"` + `aria-haspopup="dialog"` + `aria-expanded={open}` + 必含 accessible name(`aria-label` / 或外層 `<label>` / 或 fieldCtx label)
+- Popover content:`role="dialog"` + `aria-label="日期選擇"`(Range:`"日期區間選擇"`)
+- DateGrid 鍵盤:Arrow keys 切日 / PageUp/Down 切月 / Home/End 行首尾(react-day-picker v9 內建)
+- Trigger 鍵盤:Space / Enter open;Esc close + focus return to trigger(Radix Popover 內建)
+- Range 雙 trigger:`activeEnd` state 指向當前編輯端,`aria-expanded` 對應只當該 trigger active 時 true
+
+---
+
 ## 相關
 
 - `../Input/input.spec.md` — 純文字 YYYY-MM-DD（不需 picker 互動的場景）

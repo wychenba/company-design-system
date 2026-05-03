@@ -1,4 +1,5 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
+// code-quality-allow: file-size — foundational composite(DatePicker single + Range + showTime + format/ISO helpers + TimePickerSidePanel sub-components),拆 sub-file 會 (a) 增 cross-file context binding 複雜度 (b) M21 過度抽象(每 helper 1 consumer)。等 inline filter UI 真接入第 2 consumer 再拆。
 import * as React from 'react'
 import { X, Calendar as CalendarIcon, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -266,11 +267,10 @@ export interface DatePickerProps
   needConfirm?: boolean
 }
 
-// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
-//
 // Trigger uses `<div role="combobox" tabIndex={...}>` instead of `<button>` —
 // 對齊 Combobox / Select / TimePicker 同 pattern,避免 ItemInlineAction(內部 button)
 // 構成 nested-interactive(axe serious)。Radix Popover asChild 仍處理 Enter/Space 鍵盤觸發。
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
   (
     {

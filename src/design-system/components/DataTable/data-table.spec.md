@@ -23,6 +23,10 @@ TanStack Table 負責邏輯，DataTable 負責視覺與互動。
 
 **Layout Family**：非上述 family — composite / multi-section（多區塊組合，自 own layout）。
 
+### 檔案結構(2026-05-03 split matrix)
+
+12 file,每個過 M21 / M17 / Rule-of-3 三 test:`data-table.tsx`(主,foundational)/ `data-table-filter-panel.tsx` + `data-table-sort-manager.tsx`(panel state 隔離)/ `column-types.ts` + `filter-operators.ts`(✓ Rule-of-3 SSOT,3+ consumer)/ `filter-tree.ts`(pure data + eval,test isolation)/ `lib/column-meta.ts`(Internal SSOT,消 5 處 `(col as any)`)+ stories/spec/css。**M21 retract**:`filter-value-picker.tsx` 1 consumer → 已 inline 回 panel。
+
 ---
 
 ## 何時用

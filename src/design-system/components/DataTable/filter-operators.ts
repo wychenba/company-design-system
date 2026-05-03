@@ -64,8 +64,6 @@ export const DATE_RELATIVE_OPTIONS = [
   { value: 'past_30_days',  label: '過去 30 天' },
 ] as const
 
-export type DateRelativeOption = (typeof DATE_RELATIVE_OPTIONS)[number]['value']
-
 // ── Per-columnType op definitions ───────────────────────────────────────
 
 const STRING_OPS: OperatorSpec[] = [
@@ -207,14 +205,3 @@ export function getValueShape(
 export function getOperatorSpec(columnType: ColumnType, op: string): OperatorSpec | null {
   return OPERATOR_REGISTRY[columnType]?.find((o) => o.op === op) ?? null
 }
-
-/** All op keys across all columnTypes(for hook-free TypeScript-level enforce) */
-export type OperatorKey =
-  | 'contains' | 'does_not_contain' | 'is' | 'is_not'
-  | 'starts_with' | 'ends_with'
-  | 'equals' | 'not_equals' | 'gt' | 'gte' | 'lt' | 'lte'
-  | 'is_before' | 'is_after' | 'is_on_or_before' | 'is_on_or_after'
-  | 'is_between' | 'is_relative'
-  | 'has_any_of' | 'has_all_of' | 'has_none_of'
-  | 'is_true' | 'is_false'
-  | 'is_set' | 'is_not_set'

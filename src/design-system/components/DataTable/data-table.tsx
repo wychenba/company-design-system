@@ -431,6 +431,7 @@ function DataTableInner<TData>(
     return null
   }
 
+  // code-quality-allow: long-function — cell render 含 selection / pinned / type-aware formatter 三邏輯,拆會增 prop drilling
   const cellEl = (cell: ReturnType<typeof rows[number]['getVisibleCells']>[number], isLastInRow = false) => {
     // L2 selection:__select__ 欄自訂 render
     // multi 模式 → Checkbox(可多選)
@@ -602,6 +603,7 @@ function DataTableInner<TData>(
   }, [isRowSelectable, mode, selectionSet, rows, visibleIdToRow, setSelection])
 
   // ── Cmd+A / Esc 鍵盤 handler(table-level)──
+  // code-quality-allow: long-function — single keyboard dispatch covering Cmd+A / Esc / Arrow / Space + selection state mutations,拆 sub-handler 會切散 keyboard mode coherence
   const tableKeyboardHandler = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (!enabled) return
@@ -623,6 +625,7 @@ function DataTableInner<TData>(
   )
 
   // ── Header cell ──
+  // code-quality-allow: long-function — header render 含 selection tri-state / sort indicator / column dropdown / pinned / divider 五邏輯,拆 sub-fn 會切散 column type-aware rendering coherence
   const headerCellEl = (header: ReturnType<typeof table.getHeaderGroups>[number]['headers'][number], showDivider: boolean) => {
     // L2 selection:__select__ 欄自訂 render(tri-state header checkbox)
     if (enabled && header.column.id === SELECT_COL_ID) {
@@ -676,7 +679,7 @@ function DataTableInner<TData>(
           role={canSort ? 'button' : undefined}
           tabIndex={canSort ? 0 : undefined}
           onClick={sortHandler}
-          // code-quality-allow: any-event — TanStack getToggleSortingHandler 內部會 narrow,接受 KeyboardEvent
+          // any-allow: event-cast — TanStack getToggleSortingHandler 內部會 narrow,接受 KeyboardEvent
           onKeyDown={canSort ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sortHandler?.(e as any) } } : undefined}
           className={cn(
             'flex items-center min-w-0 flex-1 gap-1 outline-none',

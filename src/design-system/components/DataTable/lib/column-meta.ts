@@ -1,6 +1,10 @@
 /**
  * column-meta — TanStack ColumnDef typed accessor helpers.
  *
+ * **Scope:Internal-only — DataTable 自用,非 public API**(本檔不 re-export 出
+ * `data-table-filter-panel.tsx` / `data-table.tsx`,consumer 透過 panel / sort-manager
+ * 間接使用)。M21 (a) classification:lib/ folder 慣例 = internal helper。
+ *
  * 為什麼存在:`ColumnDef<T, V>` 是 discriminated union(AccessorKey / AccessorFn /
  * Display / Group),每個 variant 有不同欄位,直接 `col.id` 在型別上不安全。
  * 既有 consumer 用 `(col as any).id` cast,3+ 處 hard-code = M17 違反。

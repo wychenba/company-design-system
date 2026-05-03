@@ -84,6 +84,7 @@ interface TimeColumnProps {
   withDivider?: boolean
 }
 
+// code-quality-allow: long-function — column 含 scroll-into-view useEffect / WAI-ARIA listbox 鍵盤 handler / 視覺 state 計算,拆 sub-fn 會切散 listbox accessibility 邏輯
 function TimeColumn({ values, selected, disabledSet, label, onSelect, withDivider }: TimeColumnProps) {
   const listRef = React.useRef<HTMLDivElement>(null)
 

@@ -152,7 +152,7 @@ function isConditionEqual(a: FilterCondition, b: FilterCondition): boolean {
  *     getFilteredRowModel: getFilteredRowModel(),
  *   })
  */
-// code-quality-allow: any-row — TanStack row.original 是 generic,filter eval 跨 type 必走 any
+// any-allow: row-generic — TanStack row.original 是 generic,filter eval 跨 type 必走 any
 export function evaluateTree(tree: FilterTree, row: any): boolean {
   if (tree.children.length === 0) return true
 
@@ -171,7 +171,7 @@ export function evaluateTree(tree: FilterTree, row: any): boolean {
   return tree.conjunction === 'and' ? meaningful.every(Boolean) : meaningful.some(Boolean)
 }
 
-// code-quality-allow: any-row
+// any-allow: row-generic
 function evaluateGroup(group: FilterGroup, row: any): boolean {
   const completed = group.children.filter(isConditionComplete)
   if (completed.length === 0) return true
@@ -179,7 +179,7 @@ function evaluateGroup(group: FilterGroup, row: any): boolean {
   return group.conjunction === 'and' ? results.every(Boolean) : results.some(Boolean)
 }
 
-// code-quality-allow: any-row
+// any-allow: row-generic
 function evaluateCondition(cond: FilterCondition, row: any): boolean {
   if (!cond.field || !cond.op) return true
   const cellValue = row?.[cond.field]
@@ -267,6 +267,3 @@ export function dataTableFilterMatch(cellValue: unknown, filterValue: unknown): 
   }
   return String(cellValue ?? '').toLowerCase().includes(String(filterValue ?? '').toLowerCase())
 }
-
-/** Internal — also used by panel ConditionRow rendering when judging value-picker disable */
-export { isConditionComplete }
