@@ -286,6 +286,7 @@
   /* Border / Divider */
   --border:               var(--color-neutral-5);  /* 元件標準邊框 */
   --border-hover:         var(--color-neutral-6);  /* input、checkbox、radio hover 邊框 */
+  --border-opaque:        var(--color-neutral-5-opaque);  /* 視覺等同 --border 但不跟 bg compositing(disabled 灰底 / 任何非白底場景需 alpha-immune divider 用)— 對齊 Ant colorBorderSecondary solid idiom */
   --divider:              var(--color-neutral-4);  /* 分隔線，比 border 更淡 */
   --ring:                 var(--primary);           /* focus ring */
 

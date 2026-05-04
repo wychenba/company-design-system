@@ -92,15 +92,14 @@ const FieldControlGroup = React.forwardRef<HTMLDivElement, FieldControlGroupProp
           '[&>*:not(:first-child):not(:last-child)]:rounded-none',
           '[&>*:first-child:not(:last-child)]:rounded-r-none',
           '[&>*:last-child:not(:first-child)]:rounded-l-none',
-          // K12 fix(2026-05-04 v6 — opaque token cleanest fix,user 提議):FCG 內 disabled cell border:
-          //   ✓ 保留 global `bg-disabled`(neutral-2 灰底,disabled state 視覺主要承載)
-          //   ✓ 用 `--color-neutral-5-opaque`(solid color)取代 `--border`(alpha)
-          //   v4 用 border-border / v5 用 border-divider — 兩者皆 alpha 會跟 cell bg 做 compositing
-          //   → 灰底上略深(物理對比結果,世界級 Ant/Bootstrap 不嘗試補償只接受)
-          //   v6 改用 opaque variant(`color-mix(black 15%, white)` = solid #D9D9D9,token 系統明文設計)
-          //   → divider 不分 bg 永遠同色(white bg 跟 grey bg 上看起來一致)
-          //   → 解決「灰底 divider 比較深」perception,且不破壞 cell state inheritance
-          '[&>*[data-field-mode="disabled"]]:border-[var(--color-neutral-5-opaque)]',
+          // K12 fix(2026-05-04 v7 — semantic token):FCG 內 disabled cell border 用 `--border-opaque`:
+          //   ✓ 保留 global `bg-disabled`(neutral-2 灰底)— disabled state 視覺主要承載
+          //   ✓ 用 SEMANTIC `--border-opaque`(視覺等同 --border 但不跟 bg compositing)
+          //   v6 直接消費 primitive `--color-neutral-5-opaque` 違反 token 4 規則「禁 primitive 色名作 utility」,
+          //   v7 升 semantic alias `--border-opaque` 在 semantic.css(其 primitive 後盾仍是 neutral-5-opaque)
+          //   → 對齊 Ant Design colorBorderSecondary solid idiom(table 外框 / row divider 用 solid,跟 input alpha border 視覺層級分)
+          //   → 解決 alpha border 在 grey bg 上 composite 略深 perception(physical 對比問題)
+          '[&>*[data-field-mode="disabled"]]:border-[var(--border-opaque)]',
           className,
         )}
         data-field-control-group=""
