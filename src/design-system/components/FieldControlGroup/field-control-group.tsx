@@ -92,13 +92,13 @@ const FieldControlGroup = React.forwardRef<HTMLDivElement, FieldControlGroupProp
           '[&>*:not(:first-child):not(:last-child)]:rounded-none',
           '[&>*:first-child:not(:last-child)]:rounded-r-none',
           '[&>*:last-child:not(:first-child)]:rounded-l-none',
-          // K12 fix(2026-05-04 v4 — Ant Space.Compact idiom 對齊):FCG 內 disabled cell:
+          // K12 fix(2026-05-04 v5):FCG 內 disabled cell border:
           //   ✓ 保留 global `bg-disabled`(neutral-2 灰底,disabled state 視覺主要承載)
-          //   ✓ 強制 border `border-border`(同 edit cell,group divider 整合性)
-          //   Disabled cells 進 FCG 後視覺:bg-disabled 灰底 + 0.15 alpha border。
-          //   接受「border on gray bg 略深於 border on white bg」是物理對比結果,世界級 Ant/Bootstrap 共識。
-          //   不嘗試 bg-transparent / border-divider 補償(會破壞「disabled 有底色」的 user 設計意圖)
-          '[&>*[data-field-mode="disabled"]]:border-border',
+          //   ✓ 用 `border-divider`(9% alpha,token 明文「比 border 更淡」)取代 `border-border`(15%)
+          //   v4 用 border-border 在灰底上視覺顯深(0.15 alpha 在 grey bg 對比放大);
+          //   改用 divider token(專為「分隔線比邊框淡」設計)直接降低 disabled 灰底 divider 視覺重量
+          //   World-class 對齊 Bootstrap input-group / Ant Space.Compact disabled 用淡色 idiom
+          '[&>*[data-field-mode="disabled"]]:border-divider',
           className,
         )}
         data-field-control-group=""
