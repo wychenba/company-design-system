@@ -89,48 +89,29 @@ Tailwind utility 透過 `@theme inline` 橋接 semantic token，元件寫 `bg-pr
 |--------------------|------|
 | `text-foreground`  | 主要文字（一般資訊）|
 | `text-fg-secondary`| 次要資訊、helper text |
-| `text-fg-muted`    | placeholder、caption、弱化 icon(**non-disabled**)|
-| `text-fg-disabled` | disabled 文字 + **disabled 元件內所有文字 / placeholder / icon**(K2,2026-05-04)|
+| `text-fg-muted`    | placeholder、caption、弱化 icon(**non-disabled only**)|
+| `text-fg-disabled` | disabled 文字 + **disabled 元件內所有文字 / placeholder / icon**(state 勝 emphasis,M24)|
 
 文字色一律使用 neutral alpha token，疊加在任何背景都能維持對比。
 弱化 icon hover 後變 `text-fg-secondary`。
-
-**Disabled state precedence canonical(K2,2026-05-04 升 SSOT)**:disabled 顯著性**優於** muted。當元件處於 disabled state,內部所有文字載體(label / value / placeholder / icon stroke)**統一切 `text-fg-disabled`**,**不**繼續用 `text-fg-muted`。
-
-| 場景 | Token | 範例 |
-|--|--|--|
-| 一般 placeholder(非 disabled)| `text-fg-muted`(neutral-7)| `<Input placeholder="輸入名稱..." />` |
-| Caption / helper text | `text-fg-muted` | FieldDescription |
-| 弱化 icon(非 disabled)| `text-fg-muted` | Search icon prefix |
-| Disabled element 內所有文字 | `text-fg-disabled`(neutral-6)| `<Input disabled placeholder="..." />` placeholder + label 都 fg-disabled |
-| Disabled element 內 icon | `text-fg-disabled` | StartIcon / chevron / dismiss |
-
-**為什麼 precedence**:disabled 是 state(語意較強,語義載體),muted 是 visual emphasis(裝飾性)。state 與 emphasis 衝突時,state 勝。否則 disabled element 內 placeholder 用 muted,user 看到 placeholder 比 element 本身對比更高(因為 muted 比 disabled 略深),違反「disabled 整體輕量」視覺意圖。
-
-**實作 SSOT**:
-- `field-wrapper.tsx` `bareInputStyles` 加 `group-data-[field-mode=disabled]/field:placeholder:text-fg-disabled`(K10,2026-05-04)
-- 各 Field 元件 wrapper 加 `data-field-mode={resolvedMode}`(已 done)
-- `<Input>` / `<Textarea>` 自帶 `disabled:placeholder:text-fg-disabled`(parallel)
-- `<Select>` `ReadonlyDisplay` 看 `resolvedMode === 'disabled'` 決定 emptyColor(K10/K14)
-
-**禁止**:`<span className="text-fg-muted">{placeholder}</span>` 不分 mode 套(已 grep 修 select.tsx 3 處 + textarea / bareInputStyles)。
 
 
 
 ## Disabled 狀態
 
 
-disabled 元件內的所有子元素必須呈現 disabled 狀態：
+disabled 元件內的所有子元素必須呈現 disabled 狀態:
 
 | 元素類型 | Disabled 處理 |
 |---|---|
-| 文字 | `text-fg-disabled` |
-| Icon（stroke） | `text-fg-disabled` |
-| 圖片 / Avatar | `opacity-disabled`——圖片無法套用語義色，用透明度弱化 |
+| 文字 / placeholder / Icon stroke | `text-fg-disabled`(state 勝 emphasis,M24)|
+| 圖片 / Avatar | `opacity-disabled`——圖片無法套用語義色,用透明度弱化 |
 | Checkbox / Radio | 元件自身的 disabled 樣式 |
-| 背景色 | `bg-disabled`（如適用） |
+| 背景色 | `bg-disabled`(如適用) |
 
-**判斷標準：disabled 元件內不應有任何元素呈現可互動 affordance。**
+**判斷標準**:disabled 元件內不應有任何元素呈現可互動 affordance。
+
+**State precedence(M24,2026-05-04 升 SSOT)**:disabled 是 state,muted 是 emphasis decoration。disabled element 內 placeholder 用 muted = state 弱於 decoration → 違反語意層級。實作:`field-wrapper.tsx bareInputStyles` 加 `group-data-[field-mode=disabled]/field:placeholder:text-fg-disabled`,Select 等 ReadonlyDisplay 看 `resolvedMode === 'disabled'` 決定。詳 M24 + `.claude/memory/feedback_disabled_state_overlay_scroll_chain.md`。
 
 ### 兩種 disabled 策略:何時用哪個
 
