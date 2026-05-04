@@ -185,18 +185,18 @@ function SortRow({
     <div ref={setNodeRef} style={style} className="flex items-center gap-2">
       <ItemInlineActionButton
         icon={GripVertical}
-        size="md"
+        size="sm"
         aria-label="拖曳重排"
         className="cursor-grab active:cursor-grabbing"
         {...attributes}
         {...listeners}
       />
       <div className="flex-1 min-w-0">
-        <Select size="md" options={optionsForRow} value={sort.id} onChange={onChangeId} />
+        <Select size="sm" options={optionsForRow} value={sort.id} onChange={onChangeId} />
       </div>
       <div className="w-32 shrink-0">
         {/* minRows={2} — 升冪/降冪只 2 選項,顯式縮 menu 高度(Q5) */}
-        <Select size="md" options={DIRECTION_OPTIONS} value={sort.desc ? 'desc' : 'asc'} onChange={onChangeDir} minRows={2} />
+        <Select size="sm" options={DIRECTION_OPTIONS} value={sort.desc ? 'desc' : 'asc'} onChange={onChangeDir} minRows={2} />
       </div>
       {/* Trash 用 text Button(Q4 對齊 filter panel)— form-control row 必 Field 同高 */}
       <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={onRemove} />

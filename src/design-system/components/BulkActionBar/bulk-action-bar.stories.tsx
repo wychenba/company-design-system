@@ -24,10 +24,10 @@ export const Default: Story = {
         onClear={() => setSelection([])}
         actions={
           <>
-            <Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>
-            <Button variant="tertiary" size="sm" startIcon={TagIcon}>加標籤</Button>
-            <Button variant="tertiary" size="sm" startIcon={MoveRight}>移動</Button>
-            <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+            <Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>
+            <Button variant="tertiary" size="md" startIcon={TagIcon}>加標籤</Button>
+            <Button variant="tertiary" size="md" startIcon={MoveRight}>移動</Button>
+            <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
           </>
         }
       />
@@ -47,8 +47,8 @@ export const WithFilterHidden: Story = {
         hiddenByFilter={2}
         actions={
           <>
-            <Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>
-            <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+            <Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>
+            <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
           </>
         }
       />
@@ -108,8 +108,8 @@ export const WithExtendDatasetHint: Story = {
           onClear={() => { setSelection([]); setAllSelected(false) }}
           actions={
             <>
-              <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
-              <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+              <Button variant="tertiary" size="md" startIcon={Download}>下載</Button>
+              <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
             </>
           }
         />
@@ -125,7 +125,7 @@ export const EmptySelectionHidden: Story = {
     <div className="text-caption text-fg-muted">
       selection=[] → BulkActionBar 回傳 null,<strong>不佔 layout</strong>(對齊禁止事項 #3)
       <div className="mt-3 border border-dashed border-border-muted p-3">
-        <BulkActionBar selection={[]} actions={<Button variant="tertiary" size="sm">Action</Button>} />
+        <BulkActionBar selection={[]} actions={<Button variant="tertiary" size="md">Action</Button>} />
         ↑ 這裡 BulkActionBar 完全不渲染
       </div>
     </div>

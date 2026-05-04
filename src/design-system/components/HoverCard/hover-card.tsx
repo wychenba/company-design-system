@@ -40,6 +40,8 @@ const HoverCardContent = React.forwardRef<
       collisionPadding={collisionPadding}
       className={cn(
         "z-50 outline-none",
+        // 2026-05-04 viewport-aware max-h SSOT(對齊 Popover):header/footer 永遠 in-viewport,body 壓縮 scroll
+        "max-h-[var(--radix-hover-card-content-available-height,100vh)] flex flex-col overflow-hidden",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",

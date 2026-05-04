@@ -752,8 +752,8 @@ export const WithBulkActions: Story = {
                 onClear={() => { setSelection([]); setAllSelected(false) }}
                 actions={
                   <>
-                    <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
-                    <Button variant="tertiary" size="sm" startIcon={Trash2} danger>移除</Button>
+                    <Button variant="tertiary" size="md" startIcon={Download}>下載</Button>
+                    <Button variant="tertiary" size="md" startIcon={Trash2} danger>移除</Button>
                   </>
                 }
               />

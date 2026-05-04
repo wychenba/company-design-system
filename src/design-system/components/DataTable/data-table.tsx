@@ -675,6 +675,11 @@ function DataTableInner<TData>(
     // Indicator inline collapse:已套才顯;未套不顯(任何混雜組合不推 — 對齊 AG Grid / Notion)
     const canSort = header.column.getCanSort()
     const sortDir = header.column.getIsSorted() // false | 'asc' | 'desc'
+    // **A fix(2026-05-04)**:multi-sort(≥2)hide header arrow + 取消排序 option
+    //   理由:無 order 編號的單個 arrow 在 multi-sort 下是 partial info → 反而混淆
+    //   user 走 SortManager panel 看完整 priority(SSOT)
+    //   1 sort 仍秀 arrow(完整資訊);0 sort 自然不秀(canSort && sortDir 短路)
+    const isMultiSort = (table.getState().sorting?.length ?? 0) > 1
     const SortIcon = sortDir === 'asc' ? ArrowUp : ArrowDown // 未套不渲染;套用後二擇一
     const sortHandler = canSort ? header.column.getToggleSortingHandler() : undefined
     return (
@@ -705,7 +710,7 @@ function DataTableInner<TData>(
           <TruncateCell className={cn('min-w-0', align === 'right' && 'text-right', align === 'center' && 'text-center')}>
             {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
           </TruncateCell>
-          {canSort && sortDir && (
+          {canSort && sortDir && !isMultiSort && (
             <SortIcon size={14} aria-hidden className="shrink-0 text-fg-secondary" />
           )}
         </div>
@@ -729,7 +734,7 @@ function DataTableInner<TData>(
                 <>
                   <DropdownMenuItem startIcon={ArrowUp} onClick={() => header.column.toggleSorting(false, false)}>升冪排序</DropdownMenuItem>
                   <DropdownMenuItem startIcon={ArrowDown} onClick={() => header.column.toggleSorting(true, false)}>降冪排序</DropdownMenuItem>
-                  {sortDir && <DropdownMenuItem startIcon={XIcon} onClick={() => header.column.clearSorting()}>取消排序</DropdownMenuItem>}
+                  {sortDir && !isMultiSort && <DropdownMenuItem startIcon={XIcon} onClick={() => header.column.clearSorting()}>取消排序</DropdownMenuItem>}
                   <DropdownMenuSeparator />
                 </>
               )}

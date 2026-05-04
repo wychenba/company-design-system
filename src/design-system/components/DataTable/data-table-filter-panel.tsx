@@ -117,11 +117,28 @@ const newCondition = (firstCol: FilterColumn | undefined): FilterCondition => ({
   value: '',
 })
 
+// **G fix(2026-05-04)**:initial-mount 用 — field 不預選,user 自選後 op/value 才 enable
+//   Disabled state(field='')→ op + value 在 FilterRow 內走 `disabled={!hasField}` 自動連動
+const newEmptyCondition = (): FilterCondition => ({
+  kind: 'cond',
+  id: newId(),
+  field: '',
+  op: '',
+  value: '',
+})
+
 const newGroup = (firstCol: FilterColumn | undefined): FilterGroup => ({
   kind: 'group',
   id: newId(),
   conjunction: 'or',                                // group 內 default OR(對齊 ref 圖)
   children: [newCondition(firstCol)],
+})
+
+const newEmptyGroup = (): FilterGroup => ({
+  kind: 'group',
+  id: newId(),
+  conjunction: 'or',
+  children: [newEmptyCondition()],
 })
 
 // ── Internal — FilterValuePicker(value-picker switcher per ValueShape)──
@@ -159,7 +176,7 @@ function FilterValuePicker({
   className,
 }: FilterValuePickerProps) {
   if (!shape || disabled) {
-    return <Input size="md" value="" onChange={() => {}} placeholder="輸入值…" disabled aria-label={ariaLabel} className={className} />
+    return <Input size="sm" value="" onChange={() => {}} placeholder="輸入值…" disabled aria-label={ariaLabel} className={className} />
   }
 
   switch (shape) {
@@ -169,7 +186,7 @@ function FilterValuePicker({
     case 'text':
       return (
         <Input
-          size="md"
+          size="sm"
           value={String(value ?? '')}
           onChange={(e) => onChange(e.target.value)}
           placeholder="輸入值…"
@@ -181,7 +198,7 @@ function FilterValuePicker({
     case 'number':
       return (
         <NumberInput
-          size="md"
+          size="sm"
           value={typeof value === 'number' ? value : null}
           onChange={(v) => onChange(v ?? '')}
           placeholder="輸入數字…"
@@ -193,7 +210,7 @@ function FilterValuePicker({
     case 'date_single':
       return (
         <DatePicker
-          size="md"
+          size="sm"
           value={typeof value === 'string' ? value : null}
           onChange={(v) => onChange(v ?? '')}
           aria-label={ariaLabel}
@@ -204,7 +221,7 @@ function FilterValuePicker({
     case 'date_range':
       return (
         <DatePickerRange
-          size="md"
+          size="sm"
           value={Array.isArray(value) && value.length === 2
             ? (value as [string | null, string | null])
             : null}
@@ -223,7 +240,7 @@ function FilterValuePicker({
       }))
       return (
         <Select
-          size="md"
+          size="sm"
           options={opts}
           groups={DATE_RELATIVE_GROUPS as unknown as Array<{ key: string; label: string }>}
           value={String(value ?? '')}
@@ -242,7 +259,7 @@ function FilterValuePicker({
       }))
       return (
         <Select
-          size="md"
+          size="sm"
           options={opts}
           value={String(value ?? '')}
           onChange={(v) => onChange(v)}
@@ -261,7 +278,7 @@ function FilterValuePicker({
       const arr = Array.isArray(value) ? (value as string[]) : []
       return (
         <Combobox
-          size="md"
+          size="sm"
           options={opts}
           value={arr}
           onChange={(v) => onChange(v)}
@@ -275,7 +292,7 @@ function FilterValuePicker({
     case 'datetime_single':
       return (
         <DatePicker
-          size="md"
+          size="sm"
           showTime
           value={typeof value === 'string' ? value : null}
           onChange={(v) => onChange(v ?? '')}
@@ -287,7 +304,7 @@ function FilterValuePicker({
     case 'datetime_range':
       return (
         <DatePickerRange
-          size="md"
+          size="sm"
           showTime
           value={Array.isArray(value) && value.length === 2
             ? (value as [string | null, string | null])
@@ -304,7 +321,7 @@ function FilterValuePicker({
     case 'person_multi':
       return (
         <Input
-          size="md"
+          size="sm"
           value={typeof value === 'string' ? value : ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder="(person picker 預留)"
@@ -363,8 +380,24 @@ function DataTableFilterPanelInner<TData>({
   )
   const firstCol = filterableColumns[0]
 
-  // 2026-05-04 撤回 auto-create effect:user 期待真空 = 只顯 CTA(對齊「Filter records → + Add filter」
-  // 世界級 idiom Notion / Airtable / Linear)。若需要預填,consumer 自管 prefilledColumnId 或外面 setValue。
+  // **G fix(2026-05-04 v2)**:initial-mount 預設 1 empty row(field 未選 → op+value 自動 disabled)
+  //   useRef gate → 只 mount 一次;user 後續手動刪光 → 不 re-add → 維持「全清 = empty CTA only」UX
+  //   Two states clearly separated:
+  //     (a) Initial mount with empty value → auto-add 1 empty row(讓 user 看到 row shape,不必先點 CTA)
+  //     (b) User explicitly deletes all → empty CTA only(無 row,respect user intent)
+  const initialMountDoneRef = React.useRef(false)
+  React.useEffect(() => {
+    if (initialMountDoneRef.current) return
+    initialMountDoneRef.current = true
+    if (filterableColumns.length === 0) return
+    if (value.children.length > 0) return
+    if (value.mode === 'flat') {
+      onChange({ ...value, children: [newEmptyCondition()] } as FilterTreeFlat)
+    } else {
+      onChange({ ...value, children: [newEmptyGroup()] } as FilterTreeNested)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterableColumns.length])
 
   // Prefill from cell ⌄ menu「Filter by this」
   React.useEffect(() => {
@@ -595,7 +628,7 @@ function ConjunctionLabel({
   return (
     <div className="w-20 shrink-0">
       <Select
-        size="md"
+        size="sm"
         options={CONJ_OPTIONS}
         value={conjunction}
         onChange={(v) => onChange(v as Conjunction)}
@@ -646,7 +679,7 @@ function FilterRow({
       <FieldControlGroup block className="flex-1 min-w-0">
         <Select
           className="!w-[160px] flex-shrink-0"
-          size="md"
+          size="sm"
           options={fieldOptions}
           value={condition.field}
           onChange={onChangeField}
@@ -655,7 +688,7 @@ function FilterRow({
         />
         <Select
           className="!w-[120px] flex-shrink-0"
-          size="md"
+          size="sm"
           options={operatorOptions}
           value={condition.op}
           onChange={onChangeOp}

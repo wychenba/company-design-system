@@ -83,9 +83,14 @@ export const SurfaceBody = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
+  // 2026-05-04 viewport-aware scroll canonical:
+  //   parent(PopoverContent / HoverCardContent / Dialog / Sheet)是 flex flex-col + max-h + overflow-hidden
+  //   header / footer shrink-0;Body flex-1 min-h-0 overflow-y-auto → 視窗太小時 body 內 scroll
+  //   非 flex-col parent 內 flex-1/min-h-0 no-op,backward compat
   <div
     ref={ref}
     className={cn(
+      'flex-1 min-h-0 overflow-y-auto',
       'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
       className,
     )}
