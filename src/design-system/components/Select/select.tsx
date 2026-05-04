@@ -26,6 +26,14 @@ export interface SelectOption {
   tagVariant?: string
   /** 代表 value 的 prefix icon。觸發器和 dropdown 都會顯示。顏色跟 label 同(foreground) */
   icon?: LucideIcon
+  /** 分組 key — 對應 SelectProps.groups[].key,有 groups 時必填(SelectMenu canonical) */
+  group?: string
+}
+
+/** 分組設定 — 對齊 SelectMenuGroupConfig SSOT */
+export interface SelectGroupConfig {
+  key: string
+  label: string
 }
 
 function SelectDisplay({ value, options, size }: { value?: string | null; options?: SelectOption[]; size?: 'sm' | 'md' | 'lg' }) {
@@ -45,6 +53,8 @@ export interface SelectProps
   error?: boolean
   size?: 'sm' | 'md' | 'lg'
   options: SelectOption[]
+  /** 分組顯示(對齊 SelectMenu groups SSOT)。option.group 對應 groups[].key */
+  groups?: SelectGroupConfig[]
   value?: string | null
   onChange?: (value: string) => void
   placeholder?: string
@@ -53,6 +63,8 @@ export interface SelectProps
   startIcon?: LucideIcon
   /** 啟用搜尋（desktop 時 field 變 input，打字即篩選） */
   searchable?: boolean
+  /** Menu list 最小列數(空狀態 / 選項少時的視覺一致 reserve)。預設 3 — 選項 < 3 時顯式縮(如 And/Or 兩選項) */
+  minRows?: number
 }
 
 // ── Icon / size helpers ─────────────────────────────────────────────────────
@@ -180,7 +192,7 @@ NativeSelect.displayName = 'NativeSelect'
 
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
-  ({ mode = 'edit', error: errorProp = false, size = 'md', options, value, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'plain', startIcon: StartIcon, searchable = false, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp, 'aria-label': ariaLabel }, ref) => {
+  ({ mode = 'edit', error: errorProp = false, size = 'md', options, groups, value, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'plain', startIcon: StartIcon, searchable = false, minRows, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp, 'aria-label': ariaLabel }, ref) => {
     const fieldCtx = useFieldContext()
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
@@ -266,6 +278,7 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
         value: opt.value,
         label: opt.label,
         icon: isTextDisplay ? opt.icon : undefined,
+        group: opt.group,
       })),
       [filteredOptions, isTextDisplay]
     )
@@ -330,10 +343,12 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
     return (
       <SelectMenu
         options={menuOptions}
+        groups={groups}
         value={value ?? null}
         onValueChange={handleValueChange}
         searchable={false}
         size={size}
+        minRows={minRows}
         open={open}
         onOpenChange={setOpen}
         renderLabel={renderLabel}

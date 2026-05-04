@@ -48,20 +48,34 @@ export interface OperatorSpec {
   valueShape: ValueShape
 }
 
-// ── Date Relative Options(11 個常用集) ───────────────────────────────
+// ── Date Relative Options(13 個,含分組)───────────────────────────────
+// 群組順序 + 排列對齊 Linear / Notion / ClickUp 共識:Past → Current → Future
+// 群內排列:由遠到近(Past:30 → 7 → 月 → 週 → 昨;Future:明 → 週 → 月 → 7 → 30)
+//          中間語義 anchor today/this 排於 Current
+
+export const DATE_RELATIVE_GROUPS = [
+  { key: 'past',    label: '過去' },
+  { key: 'current', label: '目前' },
+  { key: 'future',  label: '未來' },
+] as const
 
 export const DATE_RELATIVE_OPTIONS = [
-  { value: 'today',         label: '今天' },
-  { value: 'yesterday',     label: '昨天' },
-  { value: 'tomorrow',      label: '明天' },
-  { value: 'this_week',     label: '本週' },
-  { value: 'last_week',     label: '上週' },
-  { value: 'next_week',     label: '下週' },
-  { value: 'this_month',    label: '本月' },
-  { value: 'last_month',    label: '上月' },
-  { value: 'next_month',    label: '下月' },
-  { value: 'past_7_days',   label: '過去 7 天' },
-  { value: 'past_30_days',  label: '過去 30 天' },
+  // Past
+  { value: 'past_30_days',  label: '過去 30 天', group: 'past' },
+  { value: 'past_7_days',   label: '過去 7 天',  group: 'past' },
+  { value: 'last_month',    label: '上月',       group: 'past' },
+  { value: 'last_week',     label: '上週',       group: 'past' },
+  { value: 'yesterday',     label: '昨天',       group: 'past' },
+  // Current
+  { value: 'today',         label: '今天',       group: 'current' },
+  { value: 'this_week',     label: '本週',       group: 'current' },
+  { value: 'this_month',    label: '本月',       group: 'current' },
+  // Future
+  { value: 'tomorrow',      label: '明天',       group: 'future' },
+  { value: 'next_week',     label: '下週',       group: 'future' },
+  { value: 'next_month',    label: '下月',       group: 'future' },
+  { value: 'next_7_days',   label: '未來 7 天',  group: 'future' },
+  { value: 'next_30_days',  label: '未來 30 天', group: 'future' },
 ] as const
 
 // ── Per-columnType op definitions ───────────────────────────────────────

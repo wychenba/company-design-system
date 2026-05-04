@@ -8,7 +8,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import { Button } from '@/design-system/components/Button/button'
 import { Select, type SelectOption } from '@/design-system/components/Select/select'
-import { SurfaceHeader, SurfaceBody, SurfaceFooter } from '@/design-system/patterns/overlay-surface/overlay-surface'
+import { SurfaceHeader, SurfaceBody } from '@/design-system/patterns/overlay-surface/overlay-surface'
 import { ButtonDivider } from '@/design-system/components/Button/button-group'
 import { PopoverTitle, PopoverClose } from '@/design-system/components/Popover/popover'
 import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
@@ -105,26 +105,24 @@ export function DataTableSortManager<TData>({
   return (
     <div className={cn('w-[480px]', className)}>
       <SurfaceHeader>
-        <div className="flex items-center gap-1 w-full min-w-0">
-          <PopoverTitle className="flex-1">排序</PopoverTitle>
-          {onReset && sorting.length > 0 && (
-            <>
-              <Button variant="text" size="sm" iconOnly startIcon={RotateCcw} aria-label="重置" onClick={onReset} />
-              <ButtonDivider />
-            </>
-          )}
-          {onClose && (
-            <PopoverClose asChild>
-              <Button data-dismiss iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" onClick={onClose} />
-            </PopoverClose>
-          )}
-        </div>
+        <PopoverTitle className="flex-1">排序</PopoverTitle>
+        {onReset && sorting.length > 0 && (
+          <>
+            <Button variant="text" size="sm" iconOnly startIcon={RotateCcw} aria-label="重置" onClick={onReset} />
+            {onClose && <ButtonDivider />}
+          </>
+        )}
+        {onClose && (
+          <PopoverClose asChild>
+            <Button data-dismiss iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" onClick={onClose} />
+          </PopoverClose>
+        )}
       </SurfaceHeader>
 
+      {/* Body — 條件 list + inline 加排序 CTA(對齊 filter panel canonical Q3+Q6,2026-05-04)
+          無條件時 CTA 直接顯示,不需要 Empty 大區塊 */}
       <SurfaceBody className="flex flex-col gap-2">
-        {sorting.length === 0 ? (
-          <div className="text-body text-fg-muted py-2">尚未設定排序條件</div>
-        ) : (
+        {sorting.length > 0 && (
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={sorting.map(s => s.id)} strategy={verticalListSortingStrategy}>
               {sorting.map((sort, index) => {
@@ -144,19 +142,19 @@ export function DataTableSortManager<TData>({
             </SortableContext>
           </DndContext>
         )}
-      </SurfaceBody>
 
-      <SurfaceFooter className="justify-start">
-        <Button
-          variant="tertiary"
-          size="sm"
-          startIcon={Plus}
-          onClick={addSort}
-          disabled={sorting.length >= sortableColumns.length}
-        >
-          加排序
-        </Button>
-      </SurfaceFooter>
+        <div>
+          <Button
+            variant="text"
+            size="sm"
+            startIcon={Plus}
+            onClick={addSort}
+            disabled={sorting.length >= sortableColumns.length}
+          >
+            加排序
+          </Button>
+        </div>
+      </SurfaceBody>
     </div>
   )
 }
@@ -193,10 +191,11 @@ function SortRow({
         <Select size="md" options={optionsForRow} value={sort.id} onChange={onChangeId} />
       </div>
       <div className="w-32 shrink-0">
-        <Select size="md" options={DIRECTION_OPTIONS} value={sort.desc ? 'desc' : 'asc'} onChange={onChangeDir} />
+        {/* minRows={2} — 升冪/降冪只 2 選項,顯式縮 menu 高度(Q5) */}
+        <Select size="md" options={DIRECTION_OPTIONS} value={sort.desc ? 'desc' : 'asc'} onChange={onChangeDir} minRows={2} />
       </div>
-      {/* Trash 走 ItemInlineActionButton(same-row consistency:同 row 不混 Inline Action + Button)*/}
-      <ItemInlineActionButton icon={Trash2} size="md" aria-label="刪除" onClick={onRemove} />
+      {/* Trash 用 text Button(Q4 對齊 filter panel)— form-control row 必 Field 同高 */}
+      <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={onRemove} />
     </div>
   )
 }

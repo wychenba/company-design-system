@@ -143,6 +143,7 @@ Panel 展開後的 column picker 結構:
 - Panel 內 padding = `--layout-space-tight`(12px @ md density)
 - **三欄(時 / 分 / 秒)各欄 `w-12`(48px)固定,非 flex-1 均分**(對齊 Ant / Google 世界級慣例 `@benchmark-unverified` visual measurement)。**分隔「:」移除**(AR8 canonical — Ant TimePicker / Google Calendar 同樣不加 `:`,靠 column 間距自明 `@benchmark-unverified` visual)
 - Scrollable list 用 **`<ScrollArea>`**(對齊 DS 跨 OS 一致 overlay 捲軸 canonical);不 raw `overflow-y-auto`
+- **Scroll-into-view**:mount = `behavior:'auto'`(避閃爍),後續 `value` 變更 = `behavior:'smooth'`(對齊 iOS / Material / Ant timepicker idiom)。SSOT 在 `time-columns.tsx` `TimeColumn` useEffect
 - 每 item **`h-field-sm`(28px @ md / 32px @ lg)對齊 DatePicker date cell**(跨 picker 視覺一致)
 - List 高 `h-[216px]`(容納約 7 個 item 置中)
 

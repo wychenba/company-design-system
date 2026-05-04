@@ -407,7 +407,7 @@ ValueShape ↔ DS picker 對照(canonical 2026-05-02):
 | `number` | `<NumberInput>` | |
 | `date_single` | `<DatePicker>` | |
 | `date_range` | `<DatePickerRange>` | Ant-style split-input |
-| `date_relative` | `<Select>` 11 option | today / this_week / last_30_days ... |
+| `date_relative` | `<Select groups>` 13 option × 3 group | 過去 / 目前 / 未來(對齊 Linear / Notion idiom 2026-05-04) |
 | `datetime_single` | `<DatePicker showTime>` | `meta.includeTime=true` 時 promote |
 | `datetime_range` | `<DatePickerRange showTime>` | 同上 |
 | `select_multi` | `<Combobox>` | |
@@ -415,12 +415,15 @@ ValueShape ↔ DS picker 對照(canonical 2026-05-02):
 
 ### 四、UI canonical
 
-- 第 1 row conjunction 是靜態 `Where` label(不可 toggle)
-- field 未選 → operator + value picker disabled
-- 同 group 共用 conjunction(toggle 任一 row → flip 整 group)— 對齊業界共識,避免 boolean ambiguity
-- 開啟 panel 自動 add 1 條空 row(對齊 ClickUp,不顯「尚未設定」字串)
-- Header refresh icon:`value !== defaultValue`(deep-equal)→ 顯示 reset
-- Trigger button checked(`aria-pressed`):`value` 有 ≥ 1 active condition → on(獨立於 refresh,語意不同 — refresh 看 default,checked 看「資料是否被篩過」)
+- 第 1 row conjunction 是靜態 `Where` label(`px-3` 對齊下方 Field value 起點 = 12px)
+- field 未選 → operator + value picker disabled;同 group 共用 conjunction(toggle 任一 → flip 整 group)
+- **空狀態**:無 condition → 只顯 inline `+ 加篩選` CTA(對齊 Notion / Airtable / Linear,**禁止** auto-create 空 row)
+- **CTA 位置**:緊貼最後一條 row(text variant 輕量,**廢 SurfaceFooter**),條件與「加入」屬同一語境
+- **Trash / 刪除**:row 是 form-control row → text Button(non Inline Action,違 item-anatomy canonical)
+- **And/Or Select** `minRows={2}`(2 選項顯式縮 menu 高度);**Where padding** `px-3` align Field
+- Header refresh icon:`value !== defaultValue` 顯;ButtonDivider 串接 close X(對齊欄位顯示 chrome canonical)
+- **Relative date 群組**:`DATE_RELATIVE_GROUPS` Past / Current / Future,走 `<Select groups>`
+- Trigger button checked(`aria-pressed`):`value` 有 ≥ 1 active condition → on(語意:資料被篩,獨立於 refresh)
 
 ### 五、Filterable column 判定
 

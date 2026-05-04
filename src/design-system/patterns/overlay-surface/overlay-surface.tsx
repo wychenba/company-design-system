@@ -56,11 +56,14 @@ export const SurfaceHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
+  // min-h: var(--field-height-xs) = 24px(md)→ header inner ≥ 24,加 py-tight 12×2 = 48 chrome-header-height ✓
+  // 防止「只剩 title(20px line-height)」case 塌成 44px,跟「title + close(24)」case 不一致(M5 state 疊加 canonical)
   <div
     ref={ref}
     className={cn(
       'flex items-center gap-2 shrink-0 border-b border-divider',
       'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
+      'min-h-[calc(var(--field-height-xs)+var(--layout-space-tight)*2)]',
       CHROME_UNBOUNDED_SLOT,
       className,
     )}
@@ -88,11 +91,13 @@ export const SurfaceFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
+  // 同 SurfaceHeader min-h 對稱 — chrome footer 與 header 視覺重量一致
   <div
     ref={ref}
     className={cn(
       'flex items-center justify-end gap-2 shrink-0 border-t border-divider',
       'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
+      'min-h-[calc(var(--field-height-xs)+var(--layout-space-tight)*2)]',
       className,
     )}
     {...props}

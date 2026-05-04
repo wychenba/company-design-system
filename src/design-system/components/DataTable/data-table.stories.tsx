@@ -134,7 +134,7 @@ type Story = StoryObj
 
 /* ── Column Types ── */
 export const ColumnTypes: Story = {
-  name: 'Column Types',
+  name: '欄位型別',
   render: () => {
     interface TypeDemo {
       name: string
@@ -210,7 +210,7 @@ export const NumberAlignment: Story = {
 
 /* ── 行高模式 — autoRowHeight prop(每 row 內容驅動高度) ── */
 export const RowAutoHeight: Story = {
-  name: 'Row 行高 — autoRowHeight',
+  name: '自動行高',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -253,7 +253,7 @@ export const EmptyState: Story = {
 /* ── Container 高度模式 — height prop(table 容器約束) ── */
 // Bordered showcase retired — anatomy.BorderedProp 已 canonical 涵蓋(prop table + 何時用 false 的 rationale + 對照),showcase 純重複
 export const ContainerHeight: Story = {
-  name: 'Container 高度 — height prop',
+  name: '容器高度',
   render: () => {
     const manyRows = React.useMemo(() => generateLargeData(50), [])
     return (
@@ -285,7 +285,7 @@ export const ContainerHeight: Story = {
 
 /* ── Row Actions ── */
 export const RowActions: Story = {
-  name: 'Row Actions',
+  name: '列操作',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -324,7 +324,7 @@ export const RowActions: Story = {
 
 /* ── Pinned Columns ── */
 export const PinnedColumns: Story = {
-  name: 'Pinned Columns',
+  name: '欄位釘選',
   render: () => {
     const manyRows = React.useMemo(() => generateLargeData(50), [])
     return (
@@ -372,7 +372,7 @@ export const PinnedColumns: Story = {
 
 /* ── Inline Edit（視覺模式）── */
 export const InlineEdit: Story = {
-  name: 'Inline Edit',
+  name: '就地編輯',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -396,7 +396,7 @@ export const InlineEdit: Story = {
 
 /* ── 虛擬捲動（大量資料）── */
 export const VirtualScroll: Story = {
-  name: '虛擬捲動',
+  name: '大量資料',
   render: () => {
     const largeData = React.useMemo(() => generateLargeData(10000), [])
     return (
@@ -501,7 +501,8 @@ export const WithBulkActions: Story = {
     return (
       // 撐滿 parent(layout=fullscreen);
       // toolbar 自帶 py = toolbar→table 間距(無父 gap);table→底部 chrome group = loose(footer 呼吸 canonical)
-      <div className="flex flex-col w-full h-screen bg-canvas">
+      // relative — chrome group(absolute bottom)的 positioning context(Q7 fix)
+      <div className="relative flex flex-col w-full h-screen bg-canvas">
         {/* Toolbar — 左 search / 右 ops(Gmail / Linear / Notion idiom)*/}
         <div className="flex items-center justify-between gap-2 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
           <div className="flex-1 max-w-sm">
@@ -706,14 +707,17 @@ export const WithBulkActions: Story = {
           />
         </div>
 
-        {/* 底部 chrome group:Alert hint(全選提示)+ BulkActionBar — wrapper mb-loose 已提供間距 */}
+        {/* 底部 chrome group(Q7 fix 2026-05-04):從 flex-flow 抽出改 absolute bottom overlay,
+            避免 mount/unmount 時推擠 table 區域,虛擬列重新計算引起的「展開動畫」感受。
+            對齊 Linear / Asana / Gmail 浮動 BulkActionBar canonical(不佔 flex 流) */}
         {(showHint || selection.length > 0) && (
-          <div className="flex flex-col">
+          <div className="absolute left-0 right-0 bottom-0 flex flex-col pointer-events-none">
             {showHint && (
               <Alert
                 variant="neutral"
                 placement="fixed"
                 dismissible={false}
+                className="pointer-events-auto"
                 title={
                   allSelected ? (
                     <>
@@ -745,6 +749,7 @@ export const WithBulkActions: Story = {
               <BulkActionBar
                 selection={selection}
                 onClear={() => { setSelection([]); setAllSelected(false) }}
+                className="pointer-events-auto"
                 actions={
                   <>
                     <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
@@ -762,7 +767,7 @@ export const WithBulkActions: Story = {
 
 /* ── L2 Selection — Shift-click + 鍵盤(Cmd+A / Esc)── */
 export const SelectionKeyboardAndShift: Story = {
-  name: '區間選取與鍵盤操作',
+  name: '範圍選取與鍵盤',
   render: () => {
     const [selection, setSelection] = React.useState<string[]>([])
     const data = generateLargeData(15)
@@ -834,6 +839,169 @@ export const SelectionDisabledRows: Story = {
           onSelectionChange={setSelection}
           getRowId={(row) => row.sku}
           isRowSelectable={(row) => row.stock !== 'Out of stock'}
+        />
+      </div>
+    )
+  },
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   進階篩選(Filter Panel)— 2026-05-04 從 data-table-filter-panel.stories.tsx
+   inline 過來,sidebar 收斂於 DataTable/展示 同一層(Q1 canonical)
+   ──────────────────────────────────────────────────────────────────────────── */
+
+const FILTER_COLUMNS = [
+  col.accessor('sku',      { header: 'SKU',      meta: { type: 'string', filterable: true } }),
+  col.accessor('name',     { header: '名稱',     meta: { type: 'string', filterable: true } }),
+  col.accessor('category', { header: '類別',     meta: {
+    type: 'select', filterable: true,
+    options: [
+      { value: 'Electronics', label: 'Electronics' },
+      { value: 'Furniture', label: 'Furniture' },
+      { value: 'Food', label: 'Food' },
+      { value: 'Lifestyle', label: 'Lifestyle' },
+    ],
+  }}),
+  col.accessor('stock',     { header: '庫存',     meta: { type: 'select', filterable: true,
+    options: [
+      { value: 'In stock', label: 'In stock' },
+      { value: 'Low stock', label: 'Low stock' },
+      { value: 'Out of stock', label: 'Out of stock' },
+    ],
+  }}),
+  col.accessor('updatedAt', { header: '更新時間', meta: { type: 'date', filterable: true, includeTime: true } }),
+] as const
+
+/* ── 進階篩選 — 空狀態 ── */
+export const FilterPanelEmpty: Story = {
+  name: '進階篩選 — 空狀態',
+  render: () => {
+    const [value, setValue] = React.useState<FilterTree>(() => createEmptyFilterTree('flat'))
+    return (
+      <div className="w-full max-w-[680px]">
+        <DataTableFilterPanel
+          mode="flat"
+          columns={[...FILTER_COLUMNS]}
+          value={value}
+          onChange={setValue}
+
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 進階篩選 — 已填條件 ── */
+export const FilterPanelWithConditions: Story = {
+  name: '進階篩選 — 已填條件',
+  render: () => {
+    const [value, setValue] = React.useState<FilterTree>(() => ({
+      mode: 'flat', conjunction: 'and',
+      children: [
+        { kind: 'cond', id: 'c1', field: 'name',     op: 'contains', value: 'phone' },
+        { kind: 'cond', id: 'c2', field: 'category', op: 'is',       value: ['Electronics'] },
+        { kind: 'cond', id: 'c3', field: 'stock',    op: 'is',       value: ['In stock'] },
+      ],
+    }))
+    return (
+      <div className="w-full max-w-[680px]">
+        <DataTableFilterPanel
+          mode="flat"
+          columns={[...FILTER_COLUMNS]}
+          value={value}
+          onChange={setValue}
+
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 進階篩選 — 巢狀群組 ── */
+export const FilterPanelNested: Story = {
+  name: '進階篩選 — 巢狀群組',
+  render: () => {
+    const [value, setValue] = React.useState<FilterTree>(() => ({
+      mode: 'nested', conjunction: 'or',
+      children: [
+        {
+          kind: 'group', id: 'g1', conjunction: 'and',
+          children: [
+            { kind: 'cond', id: 'c1', field: 'category', op: 'is', value: ['Electronics'] },
+            { kind: 'cond', id: 'c2', field: 'stock',    op: 'is', value: ['In stock'] },
+          ],
+        },
+        {
+          kind: 'group', id: 'g2', conjunction: 'and',
+          children: [
+            { kind: 'cond', id: 'c3', field: 'category', op: 'is', value: ['Furniture'] },
+            { kind: 'cond', id: 'c4', field: 'stock',    op: 'is', value: ['Low stock'] },
+          ],
+        },
+      ],
+    }))
+    return (
+      <div className="w-full max-w-[680px]">
+        <DataTableFilterPanel
+          mode="nested"
+          columns={[...FILTER_COLUMNS]}
+          value={value}
+          onChange={setValue}
+
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 進階篩選 — 相對時間群組 ── */
+export const FilterPanelRelativeDate: Story = {
+  name: '進階篩選 — 相對時間群組',
+  render: () => {
+    const [value, setValue] = React.useState<FilterTree>(() => ({
+      mode: 'flat', conjunction: 'and',
+      children: [
+        { kind: 'cond', id: 'c1', field: 'updatedAt', op: 'is_relative', value: 'past_7_days' },
+      ],
+    }))
+    return (
+      <div className="w-full max-w-[680px]">
+        <p className="text-caption text-fg-muted mb-3">時間下拉分 過去 / 目前 / 未來 三組（Linear/Notion 共識）。</p>
+        <DataTableFilterPanel
+          mode="flat"
+          columns={[...FILTER_COLUMNS]}
+          value={value}
+          onChange={setValue}
+
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 進階篩選 — 已改動(refresh icon)── */
+export const FilterPanelModified: Story = {
+  name: '進階篩選 — 已改動',
+  render: () => {
+    const initial: FilterTree = {
+      mode: 'flat', conjunction: 'and',
+      children: [{ kind: 'cond', id: 'c1', field: 'category', op: 'is', value: ['Electronics'] }],
+    }
+    const modified: FilterTree = {
+      mode: 'flat', conjunction: 'and',
+      children: [{ kind: 'cond', id: 'c1', field: 'category', op: 'is', value: ['Furniture'] }],
+    }
+    const [value, setValue] = React.useState<FilterTree>(modified)
+    return (
+      <div className="w-full max-w-[680px]">
+        <p className="text-caption text-fg-muted mb-3">值偏離 default 時 header 出現 ↻ — 點擊 reset 回 default。</p>
+        <DataTableFilterPanel
+          mode="flat"
+          columns={[...FILTER_COLUMNS]}
+          value={value}
+          defaultValue={initial}
+          onChange={setValue}
+
         />
       </div>
     )
