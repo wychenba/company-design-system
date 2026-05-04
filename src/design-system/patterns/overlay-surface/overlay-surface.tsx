@@ -52,18 +52,28 @@ import { cn } from '@/lib/utils'
 //   lg: (24 - 32) / 2 = -4px
 const CHROME_UNBOUNDED_SLOT = '[&_[data-unbounded]]:my-[calc((var(--field-height-xs)-var(--field-height-sm))/2)]'
 
+/**
+ * Lightweight chrome canonical(2026-05-04 Q10 重思):
+ *   Popover 派輕量 chrome = `min-h-10` (40px) + `!py-2` (8×2=16) → inner 24 匹配 unbounded slot trick
+ *   比 Dialog/Sheet (48 chrome-header-height) 輕一級,對齊 Linear/Notion/Figma popover header idiom
+ *   Title text-body 14 (line-height 20) 在 24 inner slot 內垂直置中 + button slot 24 也剛好
+ *   消費者 = `<SurfaceHeader className={LIGHTWEIGHT_CHROME_HEADER}>`(任何 popover 內 panel)
+ */
+export const LIGHTWEIGHT_CHROME_HEADER = 'min-h-10 !py-2'
+export const LIGHTWEIGHT_CHROME_FOOTER = 'min-h-10 !py-2'
+
 export const SurfaceHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  // min-h: var(--field-height-xs) = 24px(md)→ header inner ≥ 24,加 py-tight 12×2 = 48 chrome-header-height ✓
-  // 防止「只剩 title(20px line-height)」case 塌成 44px,跟「title + close(24)」case 不一致(M5 state 疊加 canonical)
+  // Padding-based(預設) — Dialog/Sheet 用 body-lg title (16/24)，自然撐 max(24 title, 24 button slot) = 24
+  // → header = 24 + py-tight 12×2 = 48 chrome-header-height ✓ 穩定無需 min-h
+  // Popover 等輕量 chrome 走 PopoverHeader override(min-h-10 + py-2 = 40,內 24 匹配 button slot)
   <div
     ref={ref}
     className={cn(
       'flex items-center gap-2 shrink-0 border-b border-divider',
       'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
-      'min-h-[calc(var(--field-height-xs)+var(--layout-space-tight)*2)]',
       CHROME_UNBOUNDED_SLOT,
       className,
     )}
@@ -91,13 +101,11 @@ export const SurfaceFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  // 同 SurfaceHeader min-h 對稱 — chrome footer 與 header 視覺重量一致
   <div
     ref={ref}
     className={cn(
       'flex items-center justify-end gap-2 shrink-0 border-t border-divider',
       'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
-      'min-h-[calc(var(--field-height-xs)+var(--layout-space-tight)*2)]',
       className,
     )}
     {...props}

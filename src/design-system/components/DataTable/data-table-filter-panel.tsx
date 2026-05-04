@@ -10,7 +10,7 @@ import { Combobox } from '@/design-system/components/Combobox/combobox'
 import { Input } from '@/design-system/components/Input/input'
 import { NumberInput } from '@/design-system/components/NumberInput/number-input'
 import { DatePicker, DatePickerRange } from '@/design-system/components/DatePicker/date-picker'
-import { SurfaceHeader, SurfaceBody } from '@/design-system/patterns/overlay-surface/overlay-surface'
+import { SurfaceHeader, SurfaceBody, LIGHTWEIGHT_CHROME_HEADER } from '@/design-system/patterns/overlay-surface/overlay-surface'
 import { PopoverTitle, PopoverClose } from '@/design-system/components/Popover/popover'
 import { ButtonDivider } from '@/design-system/components/Button/button-group'
 import type { ColumnType } from './column-types'
@@ -458,7 +458,7 @@ function DataTableFilterPanelInner<TData>({
     // 寬度策略:desktop 680px;mobile 縮到 viewport 內留 32px 邊(避溢出 popover 切右半)。
     // 對齊 Notion / Airtable 的 advanced filter 在 mobile 走 full-width 邊處理。
     <div ref={ref} className={cn('w-[min(680px,calc(100vw-2rem))]', className)}>
-      <SurfaceHeader>
+      <SurfaceHeader className={LIGHTWEIGHT_CHROME_HEADER}>
         <PopoverTitle className="flex-1">篩選</PopoverTitle>
         {/* Refresh icon — 只在 value ≠ defaultValue 時顯示(對齊 sort modified-from-default UX)
             含 ButtonDivider 對齊「欄位顯示」+「排序」chrome corner action canonical(2026-05-04) */}

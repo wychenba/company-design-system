@@ -4,7 +4,7 @@ import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { X as XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { SurfaceHeader, SurfaceBody, SurfaceFooter } from "@/design-system/patterns/overlay-surface/overlay-surface"
+import { SurfaceHeader, SurfaceBody, SurfaceFooter, LIGHTWEIGHT_CHROME_HEADER } from "@/design-system/patterns/overlay-surface/overlay-surface"
 import { Button } from "@/design-system/components/Button/button"
 import { OVERLAY_SIDE_OFFSET, OVERLAY_COLLISION_PADDING } from "@/design-system/tokens/elevation/overlay-geometry"
 
@@ -83,15 +83,20 @@ interface PopoverHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const PopoverHeader = React.forwardRef<HTMLDivElement, PopoverHeaderProps>(
   ({ className, children, hideClose = false, ...props }, ref) => (
+    // Popover lightweight chrome canonical(2026-05-04 重思 Q10):
+    //   min-h-10 (40px) + !py-2 (8×2=16) → inner content area = 24 (匹配 unbounded slot trick)
+    //   比 Dialog/Sheet (48 px) 輕一級,對齊 Linear/Notion/Figma popover header idiom
+    //   Title text-body 14 (line-height 20) 在 24 slot 內垂直置中
+    //   `!py-2` override SurfaceHeader 的 `py-[var(--layout-space-tight)]`(12)
     <SurfaceHeader
       ref={ref}
-      className={cn("justify-between", className)}
+      className={cn("justify-between", LIGHTWEIGHT_CHROME_HEADER, className)}
       {...props}
     >
       <div className="flex-1 min-w-0">{children}</div>
       {!hideClose && (
         <PopoverPrimitive.Close asChild>
-          {/* Dismiss X = native sm,SurfaceHeader 負 my trick 讓 layout 佔位 24 → chrome-header-height */}
+          {/* Dismiss X = native sm,SurfaceHeader 負 my trick 讓 layout 佔位 24 → 匹配 inner 24 */}
           <Button data-dismiss iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" />
         </PopoverPrimitive.Close>
       )}
