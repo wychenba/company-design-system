@@ -92,14 +92,12 @@ const FieldControlGroup = React.forwardRef<HTMLDivElement, FieldControlGroupProp
           '[&>*:not(:first-child):not(:last-child)]:rounded-none',
           '[&>*:first-child:not(:last-child)]:rounded-r-none',
           '[&>*:last-child:not(:first-child)]:rounded-l-none',
-          // K12 fix(2026-05-04 v3 — 完美 divider canonical):FCG 內 disabled cell 同時 override bg+border:
-          //   1. `bg-transparent` 取代 global `bg-disabled` — disabled cell 內部 bg 跟 edit cell 一致(白底),
-          //      避免 cell 邊界 bg 色差自動產生「視覺分隔線」(灰白交界即使 border 透明也 visible)
-          //   2. `border-border` 強制保留 group integrity — divider 跟 edit-edit divider 視覺完全一致
-          //   disabled state 改靠 `cursor-not-allowed` + 灰文字(M24 fg-disabled)+ readonly 行為呈現,不靠 bg
-          //   FCG 本身已是 framing,內部 cells 不需 bg 區分 disabled state
-          //   World-class 對照:Linear / Notion / Airtable filter row partial-disabled / Ant Space.Compact 共識
-          '[&>*[data-field-mode="disabled"]]:bg-transparent',
+          // K12 fix(2026-05-04 v4 — Ant Space.Compact idiom 對齊):FCG 內 disabled cell:
+          //   ✓ 保留 global `bg-disabled`(neutral-2 灰底,disabled state 視覺主要承載)
+          //   ✓ 強制 border `border-border`(同 edit cell,group divider 整合性)
+          //   Disabled cells 進 FCG 後視覺:bg-disabled 灰底 + 0.15 alpha border。
+          //   接受「border on gray bg 略深於 border on white bg」是物理對比結果,世界級 Ant/Bootstrap 共識。
+          //   不嘗試 bg-transparent / border-divider 補償(會破壞「disabled 有底色」的 user 設計意圖)
           '[&>*[data-field-mode="disabled"]]:border-border',
           className,
         )}
