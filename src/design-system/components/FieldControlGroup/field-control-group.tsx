@@ -87,22 +87,23 @@ const FieldControlGroup = React.forwardRef<HTMLDivElement, FieldControlGroupProp
         className={cn(
           block ? 'flex w-full' : 'inline-flex',
           'items-stretch',
-          // outer frame:border + rounded + overflow-hidden(clip cell corners)
+          // outer frame:static border + rounded + overflow-hidden(clip cell corners)
+          //   ⚠️ outer 不套 hover/focus state — state 全 cell-level(派 A UX 一致)
           'border border-border rounded-md overflow-hidden bg-surface',
-          // outer state:hover/focus-within 換 outer ring(group-level signal)
-          'hover:border-border-hover',
-          'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-focus-ring has-[:focus-visible]:ring-offset-0 has-[:focus-visible]:border-border-hover',
-          // cells:lose border / rounded(讓 outer frame 主導),保留 own bg(edit white / disabled gray / Button primary)
-          //   regression(2026-05-04 中段):用 `!bg-transparent` 殺 Button 的 primary bg
-          //   修法:cells 保留 own bg。bg 色差(edit white vs disabled gray)在 boundary 是 visual cue,
-          //         world-class Material OutlinedInput 同理(adornment + input 各自 bg)
+          // cells:lose own border/rounded(let outer frame dominate),保留 own bg
           '[&>*]:!border-0 [&>*]:!rounded-none',
-          // disabled cells 仍由 field-wrapper own cva 套 bg-disabled — 不需 FCG override
+          '[&>*]:relative [&>*]:z-[2]',
+          // suppress native browser focus outline(Safari black ring on inner select etc)
+          '[&_*]:focus-visible:outline-none',
           // internal divider:::before pseudo on cells[2..]
-          '[&>*+*]:relative',
-          "[&>*+*]:before:content-[''] [&>*+*]:before:absolute [&>*+*]:before:left-0 [&>*+*]:before:top-0 [&>*+*]:before:bottom-0 [&>*+*]:before:w-px [&>*+*]:before:bg-border [&>*+*]:before:pointer-events-none",
-          // cell error state:box-shadow inset ring red(--error token,verified semantic.css)
-          '[&>*[data-error]]:shadow-[inset_0_0_0_1px_var(--error)]',
+          "[&>*+*]:before:content-[''] [&>*+*]:before:absolute [&>*+*]:before:left-0 [&>*+*]:before:top-0 [&>*+*]:before:bottom-0 [&>*+*]:before:w-px [&>*+*]:before:bg-border [&>*+*]:before:pointer-events-none [&>*+*]:before:z-[1]",
+          // cell-level state visuals via box-shadow inset(派 A UX 對齊):
+          //   hover → border-hover ring(該 cell only)
+          //   focus-within → ring color(DS focus,2px inset)
+          //   error → error ring
+          '[&>*:hover]:shadow-[inset_0_0_0_1px_var(--border-hover)] [&>*:hover]:z-[3]',
+          '[&>*:focus-within]:shadow-[inset_0_0_0_2px_var(--ring)] [&>*:focus-within]:z-[3]',
+          '[&>*[data-error]]:shadow-[inset_0_0_0_1px_var(--error)] [&>*[data-error]]:z-[3]',
           className,
         )}
         data-field-control-group=""
