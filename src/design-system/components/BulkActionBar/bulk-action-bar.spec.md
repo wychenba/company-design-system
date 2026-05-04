@@ -79,6 +79,14 @@ traits:
 | **default**(footer 浮層 / page-bottom 區段)| **md** | 視覺 weight 對齊 Dialog footer commit 系 / page primary-button bar(md)/ Linear/Notion/Asana world-class 共識 |
 | **top-toolbar 變體**(未來)| sm | 覆蓋 sm-density toolbar / GitHub-style;variant prop 驅動 override |
 
+#### Count text color canonical(2026-05-04 升 SSOT)
+
+| 元素 | Token / weight | 理由 |
+|--|--|--|
+| **count(`已選 N 項`)** | `text-foreground` + `font-medium` | state-bearing 主資訊(user 在 selection mode + N items),非裝飾 → primary foreground。對齊 Linear / Notion / Carbon / Polaris 共識;muted 化會弱化 state signal |
+| **`hiddenByFilter` suffix(`· M 個被 filter 隱藏`)** | `text-fg-muted` + `font-normal` | 次資訊,視覺層次低於 count |
+| **clear X icon** | dismiss md(自動 fg-muted)| chrome dismiss canonical |
+
 ### 不含 page-level primary / 不含 hint banner
 
 - **page-level Submit / Save**:跟 selection 無關,consumer 自擺,不耦合 BulkActionBar 生命週期

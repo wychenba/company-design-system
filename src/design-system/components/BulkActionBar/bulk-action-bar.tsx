@@ -102,11 +102,15 @@ const BulkActionBar = React.forwardRef<HTMLDivElement, BulkActionBarProps>(
           />
         )}
 
-        {/* count + filter hidden inline */}
-        <span className="text-body text-fg-secondary tabular-nums">
+        {/* count + filter hidden inline
+            color canonical(2026-05-04):count = primary foreground + medium weight
+            理由:count 是 state-bearing 主資訊(「你在 selection mode + N items」),非裝飾
+            World-class 共識:Linear/Notion/Carbon/Polaris 均用 primary foreground;muted 化弱化 state signal
+            hiddenByFilter suffix 維持 muted(這是次資訊,視覺層次正確) */}
+        <span className="text-body text-foreground font-medium tabular-nums">
           {labels.count(selection.length)}
           {hiddenByFilter !== undefined && hiddenByFilter > 0 && (
-            <span className="text-fg-muted"> {labels.hiddenSuffix(hiddenByFilter)}</span>
+            <span className="text-fg-muted font-normal"> {labels.hiddenSuffix(hiddenByFilter)}</span>
           )}
         </span>
 
