@@ -52,28 +52,13 @@ Tabs 用於在**同一個上下文底下切換平行的視圖**——每個 tab 
 
 ## Tabs 與 SegmentedControl 的分界
 
-兩者都能「切換下方顯示的內容」，**「切 view vs 切 value」是過度簡化的二分法**——SegmentedControl 切換下方表單欄位、chart 維度、list 排序都是正當用法。真正的分界用以下三個角度，**任何一個明確傾向哪邊就選哪邊**：
+兩者都能「切換下方顯示的內容」，**「切 view vs 切 value」是過度簡化**——SegmentedControl 切表單欄位 / chart 維度 / list 排序都正當。三角度判斷（任何一個明確傾向就選）：
 
-### 1. 切換對象的規模
+1. **規模**：Tabs 切一整塊 container（含自己的 header / toolbar / 多 section,子頁規模);SegmentedControl 切局部變體(單一 chart 維度 / list 排序 / form 條件欄位,單 control 承載量)
+2. **角色**：Tabs 是 **container 結構元件**(跨父容器寬度、頂部 underline、與 header border 對齊,section 導覽 anchor);SegmentedControl 是 **control 元件**(pill 尺寸、可塞 toolbar / Field / form row、與 Button / Input 並排)
+3. **生命週期**：Tabs 切換不進表單狀態(頂多 URL hash);SegmentedControl 值常綁 form state / URL param / 持久化
 
-- **Tabs**：切換的是一整塊 container——可能包含它自己的 header、toolbar、多個 section。每個 view 是獨立的子頁規模
-- **SegmentedControl**：切換的是局部內容的變體——單一 chart 的資料維度、單一 list 的排序方式、單一 form 的條件欄位。規模 = 一個 control 能承載的量
-
-### 2. 視覺與結構角色
-
-- **Tabs**：是 **container 的結構元件**。跨越整個父容器寬度、頂部 underline、與 header border 對齊——它是 section 的導覽 anchor，頁面裡不能有兩組 Tabs 互相搶戲
-- **SegmentedControl**：是 **control 元件**。pill 尺寸、可塞進 toolbar / Field / form row、能跟 Button / Input 並排而不違和
-
-### 3. 值的生命週期
-
-- **Tabs**：切換通常**不進表單狀態、不會被送出**——純粹是 view 的路徑（頂多存在 URL hash 裡）
-- **SegmentedControl**：選值常常**綁在 form state / URL param / 會被持久化**——它是一個 control 的當前值
-
-### Fallback 判斷
-
-邊界模糊時：
-- 把它跟 Input / Button / Checkbox 並排不違和 → **SegmentedControl**
-- 必須佔據自己的一整行作為 section header → **Tabs**
+**Fallback**:跟 Input / Button / Checkbox 並排不違和 → SegmentedControl;必須佔一整行作 section header → Tabs。
 
 ### 常見灰色地帶
 
@@ -115,25 +100,14 @@ TabsContent ← 對應被選中的 trigger
 
 ### 對標對象與故意的偏離
 
-Tabs trigger 對標 **item-layout pattern 的橫向變體**，但有三處刻意偏離：
+Tabs trigger = **item-layout 橫向變體 + Button 高度系統**。對標 item-layout 的:slot gap-2 / startIcon-label-suffix 三格固定 / suffix 可組合容器。對標 Button 的:固定高度 token(`--tab-height-*`)/ icon size 查表 / suffix wrapper gap-1。
 
-| 偏離 | 做法 | 理由 |
-|------|------|------|
-| 不用 `h-[1lh]` 對齊 prefix | 固定高度 `h-[var(--tab-height-*)]` + `items-center` | Tabs 是固定高度容器（像 Button），不是內容撐高的 row；prefix 靠 flex 置中即可 |
-| 不提供 `<ItemIcon>` / `<ItemLabel>` helper | 直接接受 `LucideIcon` prop、label 用裸 `<span>` | Tabs trigger 單行文字、slot 固定三格，沒有複雜 prefix mixing 場景，不需要 typed helper |
-| label 不包 `<span className="px-1">`（與 Button 不同） | 裸 `<span>` | trigger 的 selected underline 必須 fit content——若 label 有 px-1，underline 會比視覺文字多 8px 顯得鬆散 |
+三處刻意偏離 item-layout:
+- **固定高度** `h-[var(--tab-height-*)]` + `items-center`(非 `h-[1lh]`)— Tabs 是 Button 樣的固定容器,非內容撐高 row
+- **無 `<ItemIcon>` / `<ItemLabel>` helper**,直接吃 `LucideIcon` prop + 裸 `<span>` label — slot 固定三格,無複雜 prefix mixing
+- **label 不包 `<span>` padding wrapper**(對比 Button 設計) — selected underline 必須 fit content,label 有橫向 padding 會讓 underline 多 8px 鬆散
 
-**共同點（才是真正對標 item-layout 的部分）**：
-- slot 間 gap-2 的橫向節奏
-- startIcon / label / suffix 三格固定順序
-- suffix 作為可組合容器（目前 badge + endIcon，未來可擴充）
-
-**與 Button 共享的部分**：
-- 固定高度 token 系統（`--tab-height-*` 對應 `--field-height-*` 的語義結構）
-- Icon size 查表（sm/md=16, lg=20）
-- suffix wrapper `gap-1`
-
-> **結論**：Tabs 不完全屬於 item-layout，也不完全屬於 Button，而是「item-layout 的橫向 inline 變體 + Button 的高度系統」。未來若有人在 row primitive 和 Tabs 之間發現設計漂移，以 **item-anatomy.spec.md 為主**；若在 inline 高度 / icon size / suffix 結構發現漂移，以 **button.tsx 為主**。
+**漂移歸屬**:row primitive 漂移以 `item-anatomy.spec.md` 為主;inline 高度 / icon size / suffix 結構漂移以 `button.tsx` 為主。
 
 ---
 
