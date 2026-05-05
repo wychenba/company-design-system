@@ -3,7 +3,7 @@ import { type VariantProps } from 'class-variance-authority'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
+import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, nakedCellPrefixSlot } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { ItemInlineAction, type InlineActionConfig } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { CircularProgress } from '@/design-system/components/CircularProgress/circular-progress'
@@ -122,11 +122,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           data-field-mode="display"
         >
           {StartIcon && (
-            <StartIcon
-              size={iconSize}
-              className={cn('shrink-0 pointer-events-none', iconColor)}
-              aria-hidden
-            />
+            <span className={nakedCellPrefixSlot}>
+              <StartIcon
+                size={iconSize}
+                className={cn('pointer-events-none', iconColor)}
+                aria-hidden
+              />
+            </span>
           )}
           <span
             className={cn(
@@ -161,11 +163,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         aria-busy={loading || undefined}
       >
         {StartIcon && (
-          <StartIcon
-            size={iconSize}
-            className={cn('shrink-0 pointer-events-none', iconColor)}
-            aria-hidden
-          />
+          <span className={nakedCellPrefixSlot}>
+            <StartIcon
+              size={iconSize}
+              className={cn('pointer-events-none', iconColor)}
+              aria-hidden
+            />
+          </span>
         )}
         <input
           ref={ref}

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
+import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign, nakedCellSuffixSlot } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { PersonDisplay, MultiPersonDisplay, buildPersonNameCard, resolvePerson, type PersonValue } from './person-display'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
@@ -187,11 +187,9 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
             : <PersonDisplay value={value as PersonValue} size={size} />
         }
       </span>
-      <ChevronDown
-        size={iconSize}
-        className="shrink-0 text-fg-muted"
-        aria-hidden
-      />
+      <span className={nakedCellSuffixSlot}>
+        <ChevronDown size={iconSize} className="text-fg-muted" aria-hidden />
+      </span>
     </div>
   )
 

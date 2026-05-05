@@ -26,6 +26,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { columnTypeDefaults, type ColumnType } from './column-types'
 import { resolveCellComponent } from './cell-registry'
+import { nakedCellHoverRing } from '@/design-system/components/Field/field-wrapper'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { RadioGroupItem } from '@/design-system/components/RadioGroup/radio-group'
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
@@ -499,18 +500,11 @@ function DataTableInner<TData>(
 
   // 注入 checkbox column(L2 selection;L4 row drag handle 不佔 column,absolute 浮在 row 左 border)
   // 順序:[__select__?, ...consumer columns]
-  // **Last-column flex-fill canonical**(2026-05-05 user E rule + Notion/Airtable 對照):
-  //   最後一個 consumer column 預設 `enableResizing: false`(consumer 沒顯式設過時),配合下方
-  //   cell 樣式「!canResize → flex: 1 1 0%」自動撐滿容器右緣(對齊 Notion / Airtable canonical:
-  //   table 永遠撐滿 container,最後 column 吃剩餘寬;user 顯式 resize=true 才 fixed width)。
+  // **Column resizable canonical**(2026-05-05 user E rule):per-column `enableResizing` flag
+  //   決定 width 行為(getCanResize=true → fixed / false → flex 1 1 0%)。**無 auto-default**
+  //   "last column !resizable" — consumer 顯式設(對齊 user 拒絕「autoFillLastColumn」決策)。
   const columnsWithSelection = React.useMemo(() => {
-    const consumerColsAuto = columns.map((c, idx) => {
-      if (idx === columns.length - 1 && c.enableResizing === undefined) {
-        return { ...c, enableResizing: false }
-      }
-      return c
-    })
-    if (!enabled) return consumerColsAuto
+    if (!enabled) return columns
     const selectCol: ColumnDef<TData, any> = {
       id: SELECT_COL_ID,
       size: 40,
@@ -520,7 +514,7 @@ function DataTableInner<TData>(
       header: 'Select',  // header cell 由下方自訂 render 取代
       cell: () => null,  // body cell 由下方自訂 render 取代
     }
-    return [selectCol, ...consumerColsAuto]
+    return [selectCol, ...columns]
   }, [columns, enabled])
 
   // pinned-left 自動加 __select__(__select__ 永遠最左)
@@ -957,7 +951,7 @@ function DataTableInner<TData>(
           align === 'center' && 'justify-center text-center',
           inlineEdit && !isLastInRow && !isEditingThisCell && 'border-r border-divider',
           indicator && 'gap-2',
-          onEditableCellClick && 'cursor-pointer',
+          onEditableCellClick && ['cursor-pointer', nakedCellHoverRing],  // editable display:hover ring SSOT(同 Field naked editing focus 同 token / 同 outline straddle)
           isEditingThisCell && 'z-10',
         )}
         style={{
@@ -1165,7 +1159,12 @@ function DataTableInner<TData>(
         role="columnheader"
         aria-sort={sortDir === 'asc' ? 'ascending' : sortDir === 'desc' ? 'descending' : 'none'}
         className={cn(
-          'group relative flex items-center text-fg-secondary text-body font-normal shrink-0 overflow-hidden select-none',
+          // **Inline action canonical**(2026-05-05 v2):header 用 `flex items-center gap-2`
+          // (= 8px,inline-action.spec.md SSOT),more action 為 inline shrink-0 sibling 而非
+          // absolute → hover 顯時佔位 → label 自動讓出空間給 sort + more,**不再重疊**(對齊
+          // user 圖示質疑 + Notion / Airtable header layout 共識)。
+          // cell padding 12px 由外層 cellPadding style 提供 → more 距 cell 右邊 = 12px。
+          'group relative flex items-center gap-2 text-fg-secondary text-body font-normal shrink-0 overflow-hidden select-none',
           align === 'right' && 'justify-end',
           align === 'center' && 'justify-center',
         )}
@@ -1191,12 +1190,13 @@ function DataTableInner<TData>(
             <SortIcon size={14} aria-hidden className="shrink-0 text-fg-secondary" />
           )}
         </div>
-        {/* 右區:⌄ menu(hover/focus-within 才顯)— C2 fix(2026-05-05):absolute positioning
-            退出 layout flow,header label 可用滿欄寬而不被 chevron 佔位推擠。
-            開啟後仍可見(has-[[data-state=open]])因 cursor 已移到 menu。對齊 Notion / Linear /
-            Airtable column header pattern。
+        {/* 右區:⌄ menu(hover/focus-within 才顯,佔位)
+            **Layout canonical**(2026-05-05 v2 user E rule):inline `shrink-0` 跟 sort/label 並排,
+            `gap-2`(8px,inline-action.spec.md:80 SSOT)分隔。`opacity-0 group-hover:opacity-100`
+            讓 hover 才視覺出現但**永遠佔位**(layout space 保留 = label 自動 truncate 讓位給 sort + more,
+            不再重疊;對齊 Notion / Airtable header layout)。
             ItemInlineActionButton asChild-compatible,size="md" 因 header 不在 RowSizeProvider。 */}
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
+        <div className="shrink-0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <ItemInlineActionButton

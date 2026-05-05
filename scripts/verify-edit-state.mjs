@@ -46,9 +46,9 @@ async function captureEdit(storyId, cellIdx, label) {
 }
 
 // fixed mode editing
-await captureEdit('design-system-components-datatable-展示--inline-edit-interactive', 1, 'fixed')   // Product (string single-line)
-await captureEdit('design-system-components-datatable-展示--inline-edit-interactive', 6, 'fixed')   // Price (currency right-align)
-await captureEdit('design-system-components-datatable-展示--inline-edit-interactive', 2, 'fixed')   // Category (select)
+await captureEdit('design-system-components-datatable-展示--inline-edit', 1, 'fixed')   // Product (string single-line)
+await captureEdit('design-system-components-datatable-展示--inline-edit', 6, 'fixed')   // Price (currency right-align)
+await captureEdit('design-system-components-datatable-展示--inline-edit', 2, 'fixed')   // Category (select)
 
 // autoRow editing
 await captureEdit('design-system-components-datatable-展示--row-auto-height-inline-edit', 1, 'autoRow')  // Product wrap

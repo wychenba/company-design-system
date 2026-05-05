@@ -107,5 +107,7 @@ declare module '@tanstack/react-table' {
      * Esc cancel / blur or Enter commit。Commit 觸發 `onCellCommit`。
      */
     editable?: boolean | ((row: TData) => boolean)
+    /** Person/multiPerson edit mode: people pool for picker(2026-05-05 v4 type-augmentation)。 */
+    people?: Array<{ name: string; avatarUrl?: string; description?: string }>
   }
 }

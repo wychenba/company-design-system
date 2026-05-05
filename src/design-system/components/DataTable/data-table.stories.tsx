@@ -411,30 +411,7 @@ export const PinnedColumns: Story = {
 }
 
 /* ── Inline Edit（視覺模式）── */
-export const InlineEdit: Story = {
-  name: '就地編輯',
-  render: () => (
-    <div className="flex flex-col gap-8">
-      <div>
-        <h3 className="text-body font-bold text-foreground mb-2">Inline Edit 視覺模式</h3>
-        <p className="text-caption text-fg-muted mb-3">Cell 間有垂直分隔線，select 類欄位顯示 ChevronDown / Calendar 指示器。</p>
-        <DataTable
-          columns={columnsWithPrice}
-          data={sampleData}
-          height="auto"
-          inlineEdit
-          rowActions={() => (
-            <>
-              <Button variant="text" size="xs" iconOnly startIcon={MoreVertical} aria-label="更多操作" />
-            </>
-          )}
-        />
-      </div>
-    </div>
-  ),
-}
-
-/* ── 互動式 Inline Edit (per-column meta.editable + onCellCommit) ── */
+/* ── Inline Edit canonical(2026-05-05 v3 user 統一):單一 story 覆蓋全 11 cell type ── */
 const CATEGORY_OPTIONS = [
   { value: 'Electronics', label: 'Electronics' },
   { value: 'Furniture', label: 'Furniture' },
@@ -446,65 +423,70 @@ const STOCK_OPTIONS = [
   { value: 'Low stock', label: 'Low stock' },
   { value: 'Out of stock', label: 'Out of stock' },
 ]
+// 11 cell type 全覆蓋 sample(對齊 cell-registry types):string / number / currency /
+// date / time / select / multiSelect / person / multiPerson / boolean / url。
+const TAG_OPTIONS = [
+  { value: 'urgent', label: '緊急' },
+  { value: 'review', label: '待審' },
+  { value: 'archived', label: '已封存' },
+]
+const SAMPLE_PEOPLE: Array<{ name: string; avatarUrl: string; description?: string }> = [
+  { name: 'Alice Chen', avatarUrl: 'https://i.pravatar.cc/48?u=alice', description: 'Design' },
+  { name: 'Bob Lin', avatarUrl: 'https://i.pravatar.cc/48?u=bob', description: 'Engineering' },
+  { name: 'Charlie Wu', avatarUrl: 'https://i.pravatar.cc/48?u=charlie', description: 'Product' },
+  { name: 'Diana Huang', avatarUrl: 'https://i.pravatar.cc/48?u=diana', description: 'Marketing' },
+]
 interface EditableProduct {
   sku: string
   name: string
+  qty: number
   category: string
   stock: string
+  tags: string[]
+  owner: { name: string; avatarUrl: string; description?: string } | null
+  reviewers: Array<{ name: string; avatarUrl: string; description?: string }>
   inStock: boolean
   url: string
   price: number
-  updatedAt: string
+  releaseDate: string
+  reminderTime: string
 }
-const editableSampleData: EditableProduct[] = sampleData.slice(0, 4).map((p) => ({
+const editableSampleData: EditableProduct[] = sampleData.slice(0, 4).map((p, i) => ({
   sku: p.sku,
   name: p.name,
+  qty: 100 + i * 12,
   category: p.category,
   stock: p.stock,
+  tags: i === 0 ? ['urgent'] : i === 1 ? ['review', 'urgent'] : i === 2 ? [] : ['archived'],
+  owner: SAMPLE_PEOPLE[i],
+  reviewers: i % 2 === 0 ? [SAMPLE_PEOPLE[(i + 1) % 4], SAMPLE_PEOPLE[(i + 2) % 4]] : [SAMPLE_PEOPLE[(i + 3) % 4]],
   inStock: p.stock === 'In stock',
   url: 'https://shop.example.com/' + p.sku.toLowerCase(),
   price: p.price ?? 0,
-  updatedAt: p.updatedAt,
+  releaseDate: `2025-0${(i % 9) + 1}-15`,
+  reminderTime: `0${9 + i}:30`,
 }))
 
-export const InlineEditInteractive: Story = {
-  name: '就地編輯 — 互動式 (per-column editable)',
+export const InlineEdit: Story = {
+  name: '就地編輯',
   render: () => {
     const [data, setData] = React.useState(editableSampleData)
     const editCol = createColumnHelper<EditableProduct>()
     const editableColumns = React.useMemo(
       () => [
         editCol.accessor('sku', { header: 'SKU', size: 100, meta: { type: 'string' } }),  // 唯讀
-        editCol.accessor('name', {
-          header: 'Product',
-          size: 280,
-          meta: { type: 'string', editable: true },  // 可編
-        }),
-        editCol.accessor('category', {
-          header: 'Category',
-          size: 140,
-          meta: { type: 'select', options: CATEGORY_OPTIONS, editable: true },
-        }),
-        editCol.accessor('stock', {
-          header: 'Stock',
-          size: 130,
-          meta: { type: 'select', options: STOCK_OPTIONS, editable: true },
-        }),
-        editCol.accessor('inStock', {
-          header: 'In Stock',
-          size: 90,
-          meta: { type: 'boolean', editable: true },  // 直接 toggle
-        }),
-        editCol.accessor('url', {
-          header: 'URL',
-          size: 180,
-          meta: { type: 'url', editable: true },  // hover Pencil → edit
-        }),
-        editCol.accessor('price', {
-          header: 'Price',
-          size: 110,
-          meta: { type: 'currency', prefix: '$', editable: true },
-        }),
+        editCol.accessor('name', { header: 'Product (string)', size: 200, meta: { type: 'string', editable: true } }),
+        editCol.accessor('qty', { header: 'Qty (number)', size: 110, meta: { type: 'number', editable: true } }),
+        editCol.accessor('category', { header: 'Category (select)', size: 150, meta: { type: 'select', options: CATEGORY_OPTIONS, editable: true } }),
+        editCol.accessor('stock', { header: 'Stock (select)', size: 140, meta: { type: 'select', options: STOCK_OPTIONS, editable: true } }),
+        editCol.accessor('tags', { header: 'Tags (multiSelect)', size: 180, meta: { type: 'multiSelect', options: TAG_OPTIONS, editable: true } }),
+        editCol.accessor('owner', { header: 'Owner (person)', size: 160, meta: { type: 'person', people: SAMPLE_PEOPLE, editable: true } }),
+        editCol.accessor('reviewers', { header: 'Reviewers (multiPerson)', size: 180, meta: { type: 'multiPerson', people: SAMPLE_PEOPLE, editable: true } }),
+        editCol.accessor('inStock', { header: 'In (boolean)', size: 90, meta: { type: 'boolean', editable: true } }),
+        editCol.accessor('url', { header: 'URL', size: 180, meta: { type: 'url', editable: true } }),
+        editCol.accessor('price', { header: 'Price (currency)', size: 130, meta: { type: 'currency', prefix: '$', editable: true } }),
+        editCol.accessor('releaseDate', { header: 'Release (date)', size: 140, meta: { type: 'date', editable: true } }),
+        editCol.accessor('reminderTime', { header: 'Reminder (time)', size: 130, meta: { type: 'time', editable: true } }),
       ],
       []
     )
@@ -514,7 +496,8 @@ export const InlineEditInteractive: Story = {
     return (
       <div>
         <p className="text-caption text-fg-muted mb-3">
-          name / category / stock / inStock / url / price 可編。SKU 唯讀。boolean = 點 Checkbox 即時 toggle;url = hover cell 顯示 Pencil → click 編輯;其他 type click cell 進 edit mode → Enter/blur commit / Esc cancel。
+          11 cell type 全覆蓋:string / number / currency / date / time / select / multiSelect / person / multiPerson / boolean / url。
+          SKU 唯讀;boolean=點 Checkbox 即時 toggle;url=hover cell 顯示 Pencil → click;其他 click cell 進 edit → Enter/blur commit / Esc cancel。
         </p>
         <DataTable
           columns={editableColumns}

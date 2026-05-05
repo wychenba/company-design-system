@@ -3,7 +3,7 @@ import { X, ChevronDown } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
+import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, nakedCellSuffixSlot, nakedCellPrefixSlot } from '@/design-system/components/Field/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
@@ -144,7 +144,7 @@ function CustomSelectTriggerContent({
   if (searchable && open) {
     return (
       <>
-        {StartIcon && <StartIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />}
+        {StartIcon && <span className={nakedCellPrefixSlot}><StartIcon size={iconSize} className="text-fg-muted pointer-events-none" aria-hidden /></span>}
         <input
           ref={inputRef as React.RefObject<HTMLInputElement>}
           value={search}
@@ -160,8 +160,8 @@ function CustomSelectTriggerContent({
   if (isTextDisplay) {
     return (
       <>
-        {StartIcon && <StartIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />}
-        {!StartIcon && SelectedIcon && value && <SelectedIcon size={iconSize} className="shrink-0 pointer-events-none" aria-hidden />}
+        {StartIcon && <span className={nakedCellPrefixSlot}><StartIcon size={iconSize} className="text-fg-muted pointer-events-none" aria-hidden /></span>}
+        {!StartIcon && SelectedIcon && value && <span className={nakedCellPrefixSlot}><SelectedIcon size={iconSize} className="pointer-events-none" aria-hidden /></span>}
         <span className={cn('flex-1 min-w-0 truncate', !value && 'text-fg-muted')}>
           {value ? selectedLabel : (placeholder ?? '選擇…')}
         </span>
@@ -213,7 +213,7 @@ function ReadonlyDisplay({
   if (isTextDisplay) {
     return (
       <div className={cn(fieldWrapperStyles({ mode: resolvedMode, variant, size: sz }), className)} data-field-mode={resolvedMode}>
-        {StartIcon && <StartIcon size={iconSize} className={cn('shrink-0 pointer-events-none', iconColor)} aria-hidden />}
+        {StartIcon && <span className={nakedCellPrefixSlot}><StartIcon size={iconSize} className={cn('pointer-events-none', iconColor)} aria-hidden /></span>}
         <span className={cn('flex-1 min-w-0 truncate', resolvedMode === 'disabled' && 'text-fg-disabled')}>
           {value ? label : <span className={emptyColorCls}>{emptyText}</span>}
         </span>
@@ -278,7 +278,11 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
       <SelectClearButton size={size ?? 'md'} onClear={() => onChange?.('')} />
     ) : null
 
-    const chevronEl = <ChevronDown size={iconSize} className="shrink-0 text-fg-muted pointer-events-none relative z-10" aria-hidden />
+    const chevronEl = (
+      <span className={cn(nakedCellSuffixSlot, 'relative z-10 pointer-events-none')}>
+        <ChevronDown size={iconSize} className="text-fg-muted" aria-hidden />
+      </span>
+    )
     const selectedOpt = options?.find(o => o.value === value)
     const label = selectedOpt?.label ?? value
     const nativeTagVariant = selectedOpt?.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral' | undefined
@@ -302,8 +306,8 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
       <div className={cn(fieldWrapperStyles({ mode: 'edit', variant: variant, size }),
         error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
         data-field-mode="edit" data-error={error ? '' : undefined}>
-        {StartIcon && <StartIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />}
-        {!StartIcon && SelectedOptIcon && value && <SelectedOptIcon size={iconSize} className="shrink-0 pointer-events-none" aria-hidden />}
+        {StartIcon && <span className={nakedCellPrefixSlot}><StartIcon size={iconSize} className="text-fg-muted pointer-events-none" aria-hidden /></span>}
+        {!StartIcon && SelectedOptIcon && value && <span className={nakedCellPrefixSlot}><SelectedOptIcon size={iconSize} className="pointer-events-none" aria-hidden /></span>}
         {selectEl}
         {clearEl}
         {chevronEl}
@@ -386,7 +390,11 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
       <SelectClearButton size={size ?? 'md'} onClear={() => onChange?.('')} stopPropagation />
     ) : null
 
-    const chevronEl = <ChevronDown size={iconSize} className={cn('shrink-0 text-fg-muted transition-transform', open && 'rotate-180')} aria-hidden />
+    const chevronEl = (
+      <span className={nakedCellSuffixSlot}>
+        <ChevronDown size={iconSize} className={cn('text-fg-muted transition-transform', open && 'rotate-180')} aria-hidden />
+      </span>
+    )
 
     const triggerContent = (
       <CustomSelectTriggerContent

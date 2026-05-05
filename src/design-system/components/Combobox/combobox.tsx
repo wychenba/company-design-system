@@ -2,7 +2,7 @@ import * as React from 'react'
 import { X, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
+import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign, nakedCellSuffixSlot } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
@@ -264,7 +264,7 @@ function NativeCombobox({
           )} onRemove={handleRemove} trailing={value.length === 0 ? selectDropdown : undefined} />
       </div>
       {value.length > 0 && selectDropdown}
-      <div className={cn('flex items-center gap-2 shrink-0 relative z-10 pointer-events-none', wrap && 'self-start')}
+      <div className={cn(nakedCellSuffixSlot, 'gap-2 relative z-10 pointer-events-none', wrap && 'self-start')}
         style={wrap ? { height: tagHeight } : undefined}>
         {showClear && (
           <span className="pointer-events-auto">
@@ -369,7 +369,7 @@ function CustomCombobox({
           <span className="text-fg-muted">{placeholder ?? emptyPlaceholder}</span>
         )}
       </div>
-      <div className={cn('flex items-center gap-2 shrink-0 relative z-10 pointer-events-none', wrap && 'self-start')}
+      <div className={cn(nakedCellSuffixSlot, 'gap-2 relative z-10 pointer-events-none', wrap && 'self-start')}
         style={wrap ? { height: tagHeight } : undefined}>
         {showClear && (
           <span className="pointer-events-auto">
