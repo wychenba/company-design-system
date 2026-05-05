@@ -2,7 +2,7 @@ import * as React from 'react'
 import { type VariantProps } from 'class-variance-authority'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { FieldMode } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldChrome } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { ItemInlineAction, type InlineActionConfig } from '@/design-system/patterns/element-anatomy/item-anatomy'
@@ -12,17 +12,18 @@ import { CircularProgress } from '@/design-system/components/CircularProgress/ci
 
 export interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
-    Omit<VariantProps<typeof fieldWrapperStyles>, 'mode'> {
+    Omit<VariantProps<typeof fieldWrapperStyles>, 'mode' | 'variant'> {
   /** Field display mode */
   mode?: FieldMode
   /**
-   * Visual chrome variant(正交於 mode):
+   * Visual chrome(正交於 mode);Phase B1(2026-05-05)從 `variant` 改名 `chrome`,對齊 FieldContext.chrome 透傳。
    * - `'default'`(預設)— Field wrapper 完整 chrome:bg-surface + 明顯 border + hover/focus 回饋。適用表單、Field 內嵌。
-   * - `'bare'` — 透明 chrome,hover / focus 才出現 border。適用 Toolbar inline editing(如 FileViewer zoom input / chart config toolbar / rich text toolbar number input)。保留 padding / typography / height,只拿掉背景和常態 border。
+   * - `'bare'` — 透明 chrome,hover / focus 才出現 border。適用 Toolbar inline editing(如 FileViewer zoom input / chart config toolbar / rich text toolbar number input)+ DataTable cell-as-input。保留 padding / typography / height,只拿掉背景和常態 border。
    *
+   * 透傳:在 `<Field chrome="bare">` 內自動繼承 context.chrome;per-prop override context。
    * 世界級對照(bare):VS Code settings input / Figma toolbar number / Notion prop input。
    */
-  variant?: 'default' | 'bare'
+  chrome?: FieldChrome
   /** Error 狀態（正交於 mode）。border-error + aria-invalid。 */
   error?: boolean
   /** 左側靜態 icon — 輔助理解 input 用途（如 Search）。fg-muted。 */
@@ -69,8 +70,8 @@ export interface InputProps
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
-      mode = 'edit',
-      variant = 'default',
+      mode: modeProp,
+      chrome: chromeProp,
       error = false,
       size,
       startIcon: StartIcon,
@@ -81,6 +82,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       className,
       disabled,
       readOnly,
+      value,
       id: idProp,
       'aria-describedby': ariaDescribedByProp,
       'aria-errormessage': ariaErrorMessageProp,
@@ -88,27 +90,60 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    // ── FieldContext 自動讀取(在 <Field> 內時,invalid / disabled 由 context 接管) ──
+    // ── FieldContext 自動讀取(在 <Field> 內時,invalid / disabled / mode / chrome 由 context 接管) ──
     const fieldCtx = useFieldContext()
+    // chrome 透傳:per-prop override context;context 沒值則 'default'
+    const chrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
+    // mode resolve order(Phase B1 2026-05-05):
+    //   prop > fieldCtx.mode > (readOnly → 'readonly') > (disabled → 'disabled') > 'edit'
     // loading 期間 input 保持可編輯(Ant Input.Search 派,UX「邊改邊讀」)
     // 只用 aria-busy + endAction Spinner 標示狀態,不動 mode
-    const resolvedMode = disabled
-      ? 'disabled'
-      : readOnly
-        ? 'readonly'
-        : fieldCtx?.disabled
-          ? 'disabled'
-          : mode
+    const resolvedMode: FieldMode = modeProp
+      ?? fieldCtx?.mode
+      ?? (readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')
     const isEditable = resolvedMode === 'edit'
+    const isDisplay = resolvedMode === 'display'
     // error 合併:自身 error prop OR Field context invalid
     const resolvedError = error || (fieldCtx?.invalid ?? false)
     const iconSize = size === 'lg' ? 20 : 16
     const iconColor = resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted'
 
+    // ── display mode:純展示,渲染 <span> 取代 <input> ──
+    // 對齊 Carbon read-only / PatternFly inline-edit hidden-input / Cloudscape display-mode
+    if (isDisplay) {
+      const displayValue = value != null && value !== '' ? String(value) : null
+      return (
+        <div
+          className={cn(
+            fieldWrapperStyles({ mode: 'display', variant: chrome, size }),
+            autoWidth && 'inline-flex w-auto',
+            className,
+          )}
+          data-field-mode="display"
+        >
+          {StartIcon && (
+            <StartIcon
+              size={iconSize}
+              className={cn('shrink-0 pointer-events-none', iconColor)}
+              aria-hidden
+            />
+          )}
+          <span
+            className={cn(
+              bareInputStyles,
+              displayValue == null && 'text-fg-muted',
+            )}
+          >
+            {displayValue ?? EMPTY_DISPLAY}
+          </span>
+        </div>
+      )
+    }
+
     return (
       <div
         className={cn(
-          fieldWrapperStyles({ mode: resolvedMode, variant, size }),
+          fieldWrapperStyles({ mode: resolvedMode, variant: chrome, size }),
           isEditable && resolvedError && [
             'border-error hover:border-error-hover',
             'focus-within:border-error focus-within:hover:border-error',
@@ -132,6 +167,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           type="text"
           id={idProp ?? fieldCtx?.id}
+          value={value as string | number | readonly string[] | undefined}
           readOnly={resolvedMode === 'readonly'}
           disabled={resolvedMode === 'disabled'}
           aria-invalid={resolvedError || undefined}
@@ -161,14 +197,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 )
 Input.displayName = 'Input'
 
-// ── Display ─────────────────────────────────────────────────────────────────
-// Table cell 和 Form readonly 共用的格式化顯示。
-
-function InputDisplay({ value }: { value?: string | null }) {
-  if (!value) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
-  return <>{value}</>
-}
-InputDisplay.displayName = 'InputDisplay'
+// Phase B1(2026-05-05):InputDisplay 退場。改用 `<Input mode="display" value={...} />`
+// 對齊 Carbon read-only / PatternFly inline-edit hidden-input / Cloudscape display-mode 統一 mode 模型。
 
 // Story auto-compile metadata — Phase 1 mechanical migration(2026-04-24)
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
@@ -189,4 +219,4 @@ export const inputMeta = {
   },
 } as const
 
-export { Input, InputDisplay }
+export { Input }

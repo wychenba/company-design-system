@@ -62,11 +62,11 @@ export const UsageGuidance: Story = {
 
       <Section title="何時不用 + 替代方案">
         <Rule
-          title="❌ 不用 Input variant='bare' 在表單主區域"
-          note="bare 是 toolbar inline edit 專用(適合外層已有 affordance)。表單需要明確 field chrome → 用 variant='default'。Notion 的 property inline edit 用 bare"
+          title="❌ 不用 Input chrome='bare' 在表單主區域"
+          note="bare 是 toolbar inline edit 專用(適合外層已有 affordance)。表單需要明確 field chrome → 用 chrome='default'。Notion 的 property inline edit 用 bare"
         >
           <div>
-            <Input variant="bare" placeholder="搜尋..." />
+            <Input chrome="bare" placeholder="搜尋..." />
             <Label warn>❌ 表單用 default,bare 只用 toolbar</Label>
           </div>
         </Rule>

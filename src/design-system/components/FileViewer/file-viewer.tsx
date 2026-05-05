@@ -54,7 +54,7 @@ import type {
  * ── 實作基礎 ──
  * 自建 composite,消費 DS primitives:
  *   - Radix DialogPrimitive(焦點 trap / Esc / aria-modal,保有 shadcn 結構優勢)
- *   - `<Empty>` / `<Button>` / `<Input variant="bare">` / `<AspectRatio>` / `<Textarea>` / `<DropdownMenu>`
+ *   - `<Empty>` / `<Button>` / `<Input chrome="bare">` / `<AspectRatio>` / `<Textarea>` / `<DropdownMenu>`
  *   - `patterns/horizontal-overflow`(filmstrip 溢出捲動)
  * 不用 DS 的 `<Dialog>` wrapper:因為 FileViewer 需要 edge-to-edge fullscreen
  * (無 viewport inset / 無 rounded-lg / 無 maxWidth),Dialog 的這些預設都要覆寫。
@@ -161,7 +161,7 @@ interface ZoomInputProps {
  *
  * ── 消費 DS primitive ──
  *   - `<Button>` iconOnly size="sm" 作 ±按鈕
- *   - `<Input variant="bare" size="sm">` 作 %輸入(Toolbar inline editing canonical)
+ *   - `<Input chrome="bare" size="sm">` 作 %輸入(Toolbar inline editing canonical)
  *   - Input `endAction` slot 提供 ⌄ chevron 觸發 DropdownMenu
  *   - `<DropdownMenu>` 作 preset + fit 選單(取代原先 Popover + 手刻 button list)
  *

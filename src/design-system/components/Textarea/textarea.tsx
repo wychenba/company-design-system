@@ -1,18 +1,20 @@
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import type { FieldMode } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldChrome } from '@/design-system/components/Field/field-types'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 
 /**
  * Textarea — 多行文字輸入
  *
  * ── 定位 ────────────────────────────────────────────────────────────────
- * 多行版本的 Input，edit / readonly / disabled 三態與 Input 邏輯一致。
+ * 多行版本的 Input，edit / display / readonly / disabled 四態與 Input 邏輯一致(Phase B1 2026-05-05)。
  * 不同於 Input：
  *   - 沒有固定 field-height（高度由 rows 或 min-h 決定）
  *   - 沒有 startIcon / endAction（textarea 慣例不放 icon）
  *   - readonly 呈現保留邊框與 padding，只改底色，讓多行文字有合理閱讀區
+ *   - display 渲染 <div> + white-space:pre-wrap 保留多行文本
  *
  * ── Padding 規則 ───────────────────────────────────────────────────────
  * 多行內容必須有上下內距才能閱讀舒適。不沿用 Input 的 items-center，
@@ -26,6 +28,8 @@ import { useFieldContext } from '@/design-system/components/Field/field-context'
  * 預設 rows={3}。消費者可透過 rows prop 調整，或透過 min-h-* className 覆寫。
  */
 
+// Phase B1(2026-05-05):新增 chrome variant(default / bare),mode×chrome 的 chrome 規則由
+// compoundVariants 決定,鏡射 fieldWrapperStyles 對齊 canonical(Phase D 將整併進 fieldWrapperStyles)。
 const textareaVariants = cva(
   [
     'w-full rounded-md',
@@ -41,15 +45,15 @@ const textareaVariants = cva(
   {
     variants: {
       mode: {
-        edit: [
-          'bg-surface border border-border',
-          'hover:border-border-hover',
-          'focus-visible:border-primary focus-visible:hover:border-primary',
-        ],
-        // 純展示:無 input chrome,無 affordance(對齊 fieldWrapperStyles display mode)
-        display: 'bg-transparent border border-transparent',
-        readonly: 'bg-disabled border border-transparent',
-        disabled: 'bg-disabled border border-transparent cursor-not-allowed text-fg-disabled',
+        edit: '',
+        display: '',
+        readonly: '',
+        disabled: '',
+      },
+      // chrome 對齊 fieldWrapperStyles.variant(default / bare)。
+      variant: {
+        default: '',
+        bare: '',
       },
       size: {
         sm: 'text-body',
@@ -57,8 +61,61 @@ const textareaVariants = cva(
         lg: 'text-body-lg',
       },
     },
+    compoundVariants: [
+      // default chrome × mode
+      {
+        mode: 'edit',
+        variant: 'default',
+        className: [
+          'bg-surface border border-border',
+          'hover:border-border-hover',
+          'focus-visible:border-primary focus-visible:hover:border-primary',
+        ],
+      },
+      {
+        mode: 'display',
+        variant: 'default',
+        className: 'bg-transparent border border-transparent',
+      },
+      {
+        mode: 'readonly',
+        variant: 'default',
+        className: 'bg-disabled border border-transparent',
+      },
+      {
+        mode: 'disabled',
+        variant: 'default',
+        className: 'bg-disabled border border-transparent cursor-not-allowed text-fg-disabled',
+      },
+      // bare chrome × mode(對齊 fieldWrapperStyles bare 規則)
+      {
+        mode: 'edit',
+        variant: 'bare',
+        className: [
+          'bg-transparent border border-transparent',
+          'hover:border-border',
+          'focus-visible:border-primary focus-visible:hover:border-primary',
+        ],
+      },
+      {
+        mode: 'display',
+        variant: 'bare',
+        className: 'bg-transparent border border-transparent',
+      },
+      {
+        mode: 'readonly',
+        variant: 'bare',
+        className: 'bg-transparent border border-transparent',
+      },
+      {
+        mode: 'disabled',
+        variant: 'bare',
+        className: 'bg-transparent border border-transparent cursor-not-allowed opacity-disabled text-fg-disabled',
+      },
+    ],
     defaultVariants: {
       mode: 'edit',
+      variant: 'default',
       size: 'md',
     },
   }
@@ -66,9 +123,15 @@ const textareaVariants = cva(
 
 export interface TextareaProps
   extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>,
-    Omit<VariantProps<typeof textareaVariants>, 'mode'> {
+    Omit<VariantProps<typeof textareaVariants>, 'mode' | 'variant'> {
   /** Field display mode */
   mode?: FieldMode
+  /**
+   * Visual chrome(正交於 mode);Phase B1(2026-05-05)新增。透傳自 FieldContext.chrome,per-prop override。
+   * - `'default'` — 完整 chrome(form 場景)
+   * - `'bare'` — 透明 chrome,hover/focus reveal(toolbar / cell-as-input)
+   */
+  chrome?: FieldChrome
   /** Error 狀態（正交於 mode）。border-error + aria-invalid。 */
   error?: boolean
 }
@@ -76,13 +139,15 @@ export interface TextareaProps
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
     {
-      mode: modeProp = 'edit',
+      mode: modeProp,
+      chrome: chromeProp,
       error: errorProp = false,
       size: sizeProp,
       className,
       disabled,
       readOnly,
       rows = 3,
+      value,
       id: idProp,
       'aria-describedby': ariaDescribedByProp,
       'aria-errormessage': ariaErrorMessageProp,
@@ -90,30 +155,51 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     },
     ref
   ) => {
-    // Field context 整合：disabled / mode / invalid / size / id 都能從 context 繼承
+    // Field context 整合：disabled / mode / chrome / invalid / size / id 都能從 context 繼承
     const fieldCtx = useFieldContext()
-    const mode = (fieldCtx?.mode ?? modeProp) as FieldMode
+    // chrome 透傳:per-prop override context
+    const chrome: FieldChrome = chromeProp ?? fieldCtx?.chrome ?? 'default'
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const size = sizeProp ?? fieldCtx?.size ?? 'md'
-    const effectiveDisabled = disabled ?? (fieldCtx?.disabled || mode === 'disabled')
-    const effectiveReadOnly = readOnly || mode === 'readonly'
-    const resolvedMode: FieldMode = effectiveDisabled
-      ? 'disabled'
-      : effectiveReadOnly
-        ? 'readonly'
-        : mode
+    // mode resolve order(Phase B1 2026-05-05):prop > fieldCtx > readOnly/disabled fallback > 'edit'
+    const resolvedMode: FieldMode = modeProp
+      ?? fieldCtx?.mode
+      ?? (readOnly ? 'readonly' : (disabled ?? fieldCtx?.disabled) ? 'disabled' : 'edit')
     const isEditable = resolvedMode === 'edit'
+    const isDisplay = resolvedMode === 'display'
     const inputId = idProp ?? fieldCtx?.id
     const ariaDescribedBy = ariaDescribedByProp ?? fieldCtx?.descriptionId
     const ariaErrorMessage = ariaErrorMessageProp ?? (error ? fieldCtx?.errorId : undefined)
+
+    // ── display mode:純展示,渲染 <div> 取代 <textarea>(white-space:pre-wrap 保留多行) ──
+    // 對齊 Carbon read-only / Cloudscape display-mode
+    if (isDisplay) {
+      const displayValue = value != null && value !== '' ? String(value) : null
+      return (
+        <div
+          id={inputId}
+          data-field-mode="display"
+          aria-describedby={ariaDescribedBy}
+          className={cn(
+            textareaVariants({ mode: 'display', variant: chrome, size }),
+            'whitespace-pre-wrap break-words',
+            displayValue == null && 'text-fg-muted',
+            className,
+          )}
+        >
+          {displayValue ?? EMPTY_DISPLAY}
+        </div>
+      )
+    }
 
     return (
       <textarea
         ref={ref}
         id={inputId}
         rows={rows}
-        disabled={effectiveDisabled}
-        readOnly={effectiveReadOnly}
+        value={value as string | number | readonly string[] | undefined}
+        disabled={resolvedMode === 'disabled'}
+        readOnly={resolvedMode === 'readonly'}
         aria-invalid={error || undefined}
         aria-required={fieldCtx?.required || undefined}
         aria-describedby={ariaDescribedBy}
@@ -121,7 +207,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         data-field-mode={resolvedMode}
         data-error={isEditable && error ? '' : undefined}
         className={cn(
-          textareaVariants({ mode: resolvedMode, size }),
+          textareaVariants({ mode: resolvedMode, variant: chrome, size }),
           isEditable && error && [
             'border-error hover:border-error-hover',
             'focus-visible:border-error focus-visible:hover:border-error',
