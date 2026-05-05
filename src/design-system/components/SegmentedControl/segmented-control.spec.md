@@ -6,6 +6,11 @@ sizes: {}
 traits:
   - hasSizes
   - hasInteractiveStates
+benchmark:
+  - Radix ToggleGroup primitive: github.com/radix-ui/primitives/tree/main/packages/react/toggle-group
+  - Ant Design Segmented: github.com/ant-design/ant-design/tree/master/components/segmented
+  - MUI ToggleButtonGroup: github.com/mui/material-ui/tree/master/packages/mui-material/src/ToggleButtonGroup
+  - Carbon ContentSwitcher: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/ContentSwitcher
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

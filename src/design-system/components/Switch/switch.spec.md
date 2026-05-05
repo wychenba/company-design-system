@@ -13,6 +13,11 @@ traits:
   - hasSizes
   - hasInteractiveStates
   - isSelectionSingle
+benchmark:
+  - Radix Switch primitive: github.com/radix-ui/primitives/tree/main/packages/react/switch
+  - MUI Switch: github.com/mui/material-ui/tree/master/packages/mui-material/src/Switch
+  - Carbon Toggle: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Toggle
+  - Ant Design Switch: github.com/ant-design/ant-design/tree/master/components/switch
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

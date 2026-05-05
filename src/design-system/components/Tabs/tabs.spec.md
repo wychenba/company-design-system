@@ -13,6 +13,11 @@ traits:
   - hasSizes
   - hasInteractiveStates
   - isStructural
+benchmark:
+  - Radix Tabs primitive: github.com/radix-ui/primitives/tree/main/packages/react/tabs
+  - Ant Design Tabs: github.com/ant-design/ant-design/tree/master/components/tabs
+  - Carbon Tabs: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Tabs
+  - Polaris Tabs: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Tabs
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

@@ -5,6 +5,12 @@ traits:
   - hasVariants
 variants: {}
 sizes: {}
+benchmark:
+  - Radix Toast primitive: github.com/radix-ui/primitives/tree/main/packages/react/toast
+  - Polaris Toast: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Toast
+  - MUI Snackbar: github.com/mui/material-ui/tree/master/packages/mui-material/src/Snackbar
+  - Carbon Notification: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Notification
+  - Ant Design notification: github.com/ant-design/ant-design/tree/master/components/notification
 ---
 
 # Toast 設計原則

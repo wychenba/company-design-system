@@ -5,6 +5,11 @@ variants: {}
 sizes: {}
 traits:
   - isOverlay
+benchmark:
+  - Radix Popover primitive: github.com/radix-ui/primitives/tree/main/packages/react/popover
+  - MUI Popover: github.com/mui/material-ui/tree/master/packages/mui-material/src/Popover
+  - Polaris Popover: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Popover
+  - Ant Design Popover: github.com/ant-design/ant-design/tree/master/components/popover
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

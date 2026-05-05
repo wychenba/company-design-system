@@ -6,6 +6,9 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isStructural
+benchmark:
+  - Embla Carousel (shadcn underlying lib): github.com/davidjerleke/embla-carousel
+  - Ant Design Carousel: github.com/ant-design/ant-design/tree/master/components/carousel
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

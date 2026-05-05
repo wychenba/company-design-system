@@ -6,6 +6,10 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isStructural
+benchmark:
+  - Carbon TreeView: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/TreeView
+  - MUI X TreeView: github.com/mui/mui-x/tree/master/packages/x-tree-view
+  - Ant Design Tree: github.com/ant-design/ant-design/tree/master/components/tree
 ---
 
 # TreeView 設計原則
