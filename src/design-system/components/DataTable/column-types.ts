@@ -12,6 +12,7 @@ export const columnTypes = [
   'number',
   'currency',
   'date',
+  'time',        // Phase C(2026-05-05):time-only column,渲 `<TimePicker>`
   'select',
   'multiSelect',
   'person',
@@ -38,6 +39,7 @@ export const columnTypeDefaults: Record<ColumnType, ColumnTypeConfig> = {
   number:      { align: 'right' },
   currency:    { align: 'right' },
   date:        { align: 'left' },
+  time:        { align: 'left' },
   select:      { align: 'left' },
   multiSelect: { align: 'left' },
   person:      { align: 'left' },

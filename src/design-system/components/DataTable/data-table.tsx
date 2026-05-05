@@ -15,7 +15,7 @@ import {
 } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { ChevronDown, Calendar, ArrowUp, ArrowDown, Filter as FilterIcon, EyeOff, X as XIcon, Pencil, GripVertical } from 'lucide-react'
+import { ChevronDown, Calendar, Clock, ArrowUp, ArrowDown, Filter as FilterIcon, EyeOff, X as XIcon, GripVertical } from 'lucide-react'
 import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, KeyboardSensor, type DragEndEvent, type CollisionDetection } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import { CSS as DndCSS } from '@dnd-kit/utilities'
@@ -24,15 +24,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/compone
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/design-system/components/DropdownMenu/dropdown-menu'
 import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { columnTypeDefaults, type ColumnType } from './column-types'
-import { Input } from '@/design-system/components/Input/input'
-import { NumberInput } from '@/design-system/components/NumberInput/number-input'
-import { Select } from '@/design-system/components/Select/select'
-import { Combobox } from '@/design-system/components/Combobox/combobox'
-import { DatePicker } from '@/design-system/components/DatePicker/date-picker'
-import { PersonDisplay, MultiPersonDisplay, type PersonValue } from '@/design-system/components/PeoplePicker/person-display'
-import { LinkInput } from '@/design-system/components/LinkInput/link-input'
+import { resolveCellComponent } from './cell-registry'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
-import { Button } from '@/design-system/components/Button/button'
 import { RadioGroupItem } from '@/design-system/components/RadioGroup/radio-group'
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
 import { useControllable } from '@/design-system/hooks/use-controllable'
@@ -142,182 +135,36 @@ export interface DataTableProps<TData>
   onRowReorder?: (sourceId: string, targetId: string, position: 'before' | 'after') => void
 }
 
-// ── Type → Display ──────────────────────────────────────────────────────────
-
-// column meta is user-supplied free-form bag(type / prefix / options / formatOptions / locale 等);
-// 窄型化到 discriminated union 會把 renderTypedValue() 吹成 ~100 行 switch,實際 runtime 靠 `type` field 區分
-// any-allow: free-form consumer meta
-function renderTypedValue(value: unknown, meta?: Record<string, any>, autoRowHeight?: boolean, tableSize?: TableSize): React.ReactNode {
-  const type = meta?.type as ColumnType | undefined
-  const wrap = autoRowHeight && meta?.wrap === true
-  switch (type) {
-    case 'number': case 'currency':
-      return <NumberInput mode="display" value={value as number | null} prefix={type === "currency" ? (meta?.prefix ?? "$") : meta?.prefix} suffix={meta?.suffix} precision={meta?.precision} locale={meta?.locale} />
-    case 'date': return <DatePicker mode="display" value={value as string | null} formatOptions={meta?.formatOptions} locale={meta?.locale} />
-    case 'boolean': return <Checkbox mode="display" checked={value === true} />
-    case 'select': return <Select mode="display" value={value as string | null} options={meta?.options ?? []} size={tableSize} display="tag" />
-    case 'multiSelect': return <Combobox mode="display" value={(value as string[] | null) ?? []} options={meta?.options ?? []} wrap={wrap} size={tableSize} />
-    case 'person': return <PersonDisplay value={value as PersonValue | null} size={tableSize} />
-    case 'multiPerson': return <MultiPersonDisplay value={value as PersonValue[] | null} size={tableSize} />
-    case 'url': return <LinkInput mode="display" value={value as string | null} label={meta?.linkLabel} />
-    default: return <Input mode="display" value={value != null ? String(value) : ""} />
-  }
-}
-
-// ── Inline Edit ──────────────────────────────────────────────────────────────
+// ── Cell Rendering(Phase C 2026-05-05 — type-keyed registry SSOT)─────────────
+//
+// 原 `renderTypedValue` switch + `EditableCellContent` switch 兩條平行 type-switch
+// 已 collapse 為單一 `cellRegistry`(./cell-registry.ts)— 每個 type → 一個 cell component,
+// 同時處理 display + edit mode(底層 Field control 的 mode prop)。對齊 M17 SSOT consolidation。
 //
 // 對齊 Notion / Airtable type-aware inline edit canonical(詳 spec §十二):
-//   - string / number / currency:cell click → inline `<Input>` autoFocus + selected
-//   - date / select / multiSelect / person / multiPerson:cell click → 進 edit mode 的 Field control
+//   - string / number / currency:cell click → inline edit
+//   - date / time / select / multiSelect / person / multiPerson:cell click → 進 edit mode
 //   - boolean:不分 read/edit mode,直接 `<Checkbox>` 點即 toggle + commit
-//   - url:read = 連結 + hover Pencil 按鈕,click 才進 `<Input>` edit mode
+//   - url:read = LinkInput display + hover Pencil button,click Pencil 才進 edit mode
 //
 // Cell id format: `${rowId}__${columnId}`(編輯狀態 keying)
 // Commit: blur OR Enter OR overlay close → 呼叫 onCellCommit
 // Cancel: Esc → 退出 edit mode 不 commit
 //
-// World-class source(@benchmark-unverified):Notion / Airtable / Material X-Grid / AG Grid
-// 主流 type-aware cell editor framework。
+// World-class source(@benchmark-unverified):AG Grid cellRendererSelector / Material X-Grid
+// `valueGetter + renderCell` / Notion property type registry。
 
 const cellEditId = (rowId: string, colId: string) => `${rowId}__${colId}`
 
-interface EditableCellProps {
-  type?: ColumnType
-  value: unknown
-  meta?: Record<string, any>  // any-allow: free-form consumer meta
-  isEditing: boolean
-  onCommit: (next: unknown) => void
-  onCancel: () => void
-  tableSize?: TableSize
-  autoRowHeight?: boolean
-}
-
-/**
- * EditableCellContent — 渲染 cell 內容(read OR edit mode)。
- * boolean 不分 mode(直接 Checkbox)。url 不分 mode(讀模式是 link,edit 鍵是外部 Pencil button)。
- * 其他 types 依 isEditing flag 切換 read/edit 元件。
- */
-function EditableCellContent({
-  type, value, meta, isEditing, onCommit, onCancel, tableSize, autoRowHeight,
-}: EditableCellProps): React.ReactNode {
-
-  // Boolean 特例:editable 時直接 Checkbox 可 toggle(無 read/edit mode 切換)
-  // 此函式進來時,boolean editable 已由 caller 判斷,直接 render Checkbox
-  if (type === 'boolean' && meta?._editable === true) {
-    return (
-      <Checkbox
-        size={tableSize === 'lg' ? 'lg' : 'md'}
-        checked={value === true}
-        onCheckedChange={(checked) => onCommit(checked === true)}
-        aria-label={meta?.ariaLabel ?? '切換'}
-      />
-    )
-  }
-
-  // URL 特例:讀模式永遠 link(edit 觸發走外部 Pencil button)
-  if (type === 'url' && !isEditing) {
-    return <LinkInput mode="display" value={value as string | null} label={meta?.linkLabel} />
-  }
-
-  // Edit mode renderers(per type)
-  if (isEditing) {
-    const handleEnterEsc = (e: React.KeyboardEvent<HTMLInputElement>, getValue?: () => unknown) => {
-      if (e.key === 'Escape') { e.preventDefault(); onCancel() }
-      if (e.key === 'Enter') { e.preventDefault(); onCommit(getValue ? getValue() : (e.target as HTMLInputElement).value) }
-    }
-    switch (type) {
-      case 'string':
-      case 'url':
-        return (
-          <Input
-            autoFocus
-            size={tableSize === 'lg' ? 'lg' : tableSize === 'sm' ? 'sm' : 'md'}
-            defaultValue={value != null ? String(value) : ''}
-            onBlur={(e) => onCommit(e.target.value)}
-            onKeyDown={handleEnterEsc}
-          />
-        )
-      case 'number':
-      case 'currency':
-        return (
-          <NumberInput
-            autoFocus
-            size={tableSize === 'lg' ? 'lg' : tableSize === 'sm' ? 'sm' : 'md'}
-            defaultValue={typeof value === 'number' ? value : undefined}
-            prefix={type === 'currency' ? (meta?.prefix ?? '$') : meta?.prefix}
-            suffix={meta?.suffix}
-            precision={meta?.precision}
-            onBlur={(e) => {
-              const num = parseFloat(e.target.value)
-              onCommit(Number.isFinite(num) ? num : null)
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') { e.preventDefault(); onCancel() }
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                const num = parseFloat((e.target as HTMLInputElement).value)
-                onCommit(Number.isFinite(num) ? num : null)
-              }
-            }}
-          />
-        )
-      case 'date':
-        return (
-          <DatePicker
-            autoFocus
-            size={tableSize === 'lg' ? 'lg' : 'md'}
-            value={typeof value === 'string' ? value : null}
-            showTime={meta?.includeTime === true}
-            onChange={(v) => { onCommit(v); }}
-          />
-        )
-      case 'select':
-        return (
-          <Select
-            autoFocus
-            size={tableSize === 'lg' ? 'lg' : 'md'}
-            options={meta?.options ?? []}
-            value={value as string | null | undefined}
-            onChange={(v) => onCommit(v)}
-          />
-        )
-      case 'multiSelect':
-        return (
-          <Combobox
-            size={tableSize === 'lg' ? 'lg' : 'md'}
-            options={meta?.options ?? []}
-            value={Array.isArray(value) ? (value as string[]) : []}
-            onChange={(v) => onCommit(v)}
-          />
-        )
-      // person / multiPerson v1:當作 string fallback;後續接 PeoplePicker primitive
-      case 'person':
-      case 'multiPerson':
-        return (
-          <Input
-            autoFocus
-            size={tableSize === 'lg' ? 'lg' : tableSize === 'sm' ? 'sm' : 'md'}
-            defaultValue={value != null ? String(value) : ''}
-            placeholder="Person picker(v1 fallback)"
-            onBlur={(e) => onCommit(e.target.value)}
-            onKeyDown={handleEnterEsc}
-          />
-        )
-    }
-  }
-
-  // Read mode(default fallback to renderTypedValue)
-  return renderTypedValue(value, meta, autoRowHeight, tableSize)
-}
-
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const CELL_PX = '0.75rem'
+// Phase C(2026-05-05):cell 水平 padding 從 magic `0.75rem` 提升為 `--table-cell-px` token
+//   (詳 ./data-table.css)— consumer 可走 CSS override 改值,不再 hard-code in TS。
 // L2 selection 內部 column id(避免 magic string 重複)
 const SELECT_COL_ID = '__select__'
 // L4 row drag 內部 column id(GripVertical handle 容器,永遠最左,在 __select__ 之前)
 const DRAG_COL_ID = '__drag__'
-const cellPadding: React.CSSProperties = { paddingBlock: 'var(--table-cell-py)', paddingInline: CELL_PX }
+const cellPadding: React.CSSProperties = { paddingBlock: 'var(--table-cell-py)', paddingInline: 'var(--table-cell-px)' }
 const HEADER_BG = 'bg-muted'
 
 // ── TruncateCell ─────────────────────────────────────────────────────────────
@@ -751,37 +598,42 @@ function DataTableInner<TData>(
   // 維持 API:hoverProps(idx) 仍存在但 no-op,實際邏輯搬到 table 層 delegation
   const hoverProps = (_idx: number): Record<string, never> => ({})
 
-  // ── Cell render ──
+  // ── Cell render(Phase C 2026-05-05 — type-keyed registry SSOT)──
+  // 命中 columnType → 走 cellRegistry(display / edit mode 同元件 with `mode` prop);
+  // 無 columnType → consumer 自訂 cell.columnDef.cell。
   const renderCellContent = (cell: ReturnType<typeof rows[number]['getVisibleCells']>[number]) => {
     const meta = cell.column.columnDef.meta
     const colType = meta?.type as ColumnType | undefined
     const wrap = autoRowHeight && meta?.wrap === true
-    // 已知 compound 欄位(Tag / PersonDisplay 等自帶 layout)直接 bypass TruncateCell,
+    // 已知 compound 欄位(Tag / PersonDisplay / LinkInput 等自帶 layout)直接 bypass TruncateCell,
     // 因為 `truncate` 的 inline baseline context 會破壞自訂 layout 的垂直對齊。
     const isKnownCompound = colType === 'select' || colType === 'multiSelect' || colType === 'person' || colType === 'multiPerson' || colType === 'url'
-    // L4 inline edit:本 cell 是否進 edit mode(依 editingCellId)
     const rowId = cell.row.id
     const colId = cell.column.id
     const editable = isCellEditable(meta, cell.row.original)
     const isEditingThisCell = editingCellId === cellEditId(rowId, colId)
-    // boolean 不分 mode(直接 Checkbox 可 toggle);editable 透過 _editable 私有 prop 傳給 EditableCellContent
-    const editableMeta = editable ? { ...meta, _editable: true } : meta
-    const content = colType
-      ? (
-        editable || isEditingThisCell || colType === 'boolean'
-          ? <EditableCellContent
-              type={colType}
-              value={cell.getValue()}
-              meta={editableMeta}
-              isEditing={isEditingThisCell}
-              onCommit={(next) => commitCell(rowId, colId, next)}
-              onCancel={exitEdit}
-              tableSize={size}
-              autoRowHeight={autoRowHeight}
-            />
-          : renderTypedValue(cell.getValue(), meta, autoRowHeight, size)
+
+    let content: React.ReactNode
+    if (colType) {
+      const Cell = resolveCellComponent(colType)
+      // boolean 不分 mode(editable 時 Checkbox 直接可 toggle);其他 type 由 isEditingThisCell 切 mode
+      const cellMode: 'edit' | 'display' = isEditingThisCell ? 'edit' : 'display'
+      content = (
+        <Cell
+          value={cell.getValue()}
+          meta={meta ?? {}}
+          mode={cellMode}
+          size={size}
+          autoRowHeight={autoRowHeight}
+          isEditable={editable}
+          onCommit={(next) => commitCell(rowId, colId, next)}
+          onCancel={exitEdit}
+          onRequestEdit={() => setEditingCellId(cellEditId(rowId, colId))}
+        />
       )
-      : flexRender(cell.column.columnDef.cell, cell.getContext())
+    } else {
+      content = flexRender(cell.column.columnDef.cell, cell.getContext())
+    }
     // Consumer 自訂 cell(無 colType)若回傳 React element,視為 compound — consumer 自己處理
     // 對齊與截斷。回傳 primitive(string / number)才走 TruncateCell。
     // 理由:TruncateCell 的 `span.truncate` 強制 white-space:nowrap + inline baseline,
@@ -794,13 +646,15 @@ function DataTableInner<TData>(
 
   const iconSize = size === 'lg' ? 20 : 16
 
-  // inline edit 指示器：select 類顯示 ChevronDown，date 顯示 Calendar
+  // inline edit 指示器:select 類顯示 ChevronDown,date 顯示 Calendar,time 顯示 Clock(Phase C)
   const getEditIndicator = (colType?: ColumnType) => {
     if (!inlineEdit) return null
     if (colType === 'select' || colType === 'multiSelect' || colType === 'person' || colType === 'multiPerson')
       return <ChevronDown size={iconSize} className="shrink-0 text-fg-muted" aria-hidden />
     if (colType === 'date')
       return <Calendar size={iconSize} className="shrink-0 text-fg-muted" aria-hidden />
+    if (colType === 'time')
+      return <Clock size={iconSize} className="shrink-0 text-fg-muted" aria-hidden />
     return null
   }
 
@@ -910,12 +764,10 @@ function DataTableInner<TData>(
     const cellColId = cell.column.id
     const cellEditable = isCellEditable(meta, cell.row.original)
     const isEditingThisCell = editingCellId === cellEditId(cellRowId, cellColId)
-    // Cell click → 進 edit mode(boolean 不需 — 自己 toggle;url 不需 — 走 Pencil button)
+    // Cell click → 進 edit mode(boolean 不需 — 自己 toggle;url 不需 — 走內部 Pencil button,Phase C 由 UrlCell 內處理)
     const onEditableCellClick = cellEditable && colType !== 'boolean' && colType !== 'url' && !isEditingThisCell
       ? () => setEditingCellId(cellEditId(cellRowId, cellColId))
       : undefined
-    // URL editable cell:hover 出 Pencil 按鈕 → 進 edit mode
-    const showUrlPencil = cellEditable && colType === 'url' && !isEditingThisCell
 
     // L4 nested rows:該 cell 是否是 row 第 1 個非 select content cell(注入 chevron + indent)
     // 對齊 TreeView design language(token `--tree-indent-{sm,md,lg}` 為 SSOT,跨元件視覺一致)
@@ -939,7 +791,6 @@ function DataTableInner<TData>(
           inlineEdit && !isLastInRow && 'border-r border-divider',
           indicator && 'gap-2',
           onEditableCellClick && 'cursor-pointer',
-          showUrlPencil && 'group/cell relative',
         )}
         style={{ width: cell.column.getSize(), minWidth: cell.column.columnDef.minSize, maxWidth: cell.column.columnDef.maxSize, ...cellPadding }}
         onClick={onEditableCellClick}
@@ -972,20 +823,6 @@ function DataTableInner<TData>(
           {renderCellContent(cell)}
         </span>
         {indicator}
-        {showUrlPencil && (
-          <Button
-            variant="tertiary"
-            size="xs"
-            iconOnly
-            startIcon={Pencil}
-            aria-label="編輯連結"
-            className="ml-1 opacity-0 group-hover/cell:opacity-100 transition-opacity"
-            onClick={(e) => {
-              e.stopPropagation()  // 防止觸發 cell click(雖然 url cell 沒 onCellClick)
-              setEditingCellId(cellEditId(cellRowId, cellColId))
-            }}
-          />
-        )}
       </div>
     )
   }

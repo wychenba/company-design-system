@@ -170,6 +170,9 @@ export const OPERATOR_REGISTRY: Record<ColumnType, OperatorSpec[]> = {
   number:      NUMBER_OPS,
   currency:    NUMBER_OPS,
   date:        DATE_OPS,
+  // Phase C(2026-05-05):time column 暫先 reuse DATE_OPS shape — advanced filter `time_*`
+  // ValueShape 整合留 Phase D+。consumer 走基本 cell render(無 advanced filter)不影響。
+  time:        DATE_OPS,
   select:      SELECT_OPS,
   multiSelect: MULTI_SELECT_OPS,
   person:      PERSON_OPS,
@@ -184,6 +187,7 @@ export const DEFAULT_OPERATOR: Record<ColumnType, string> = {
   number:      'equals',
   currency:    'equals',
   date:        'is',
+  time:        'is',
   select:      'is',
   multiSelect: 'has_any_of',
   person:      'is',
