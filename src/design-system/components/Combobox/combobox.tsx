@@ -2,10 +2,10 @@ import * as React from 'react'
 import { X, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign, nakedCellSuffixSlot } from '@/design-system/components/Field/field-wrapper'
+import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { Tag } from '@/design-system/components/Tag/tag'
-import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
 import { useIsTouchDevice } from '@/design-system/hooks/use-is-touch-device'
@@ -264,7 +264,7 @@ function NativeCombobox({
           )} onRemove={handleRemove} trailing={value.length === 0 ? selectDropdown : undefined} />
       </div>
       {value.length > 0 && selectDropdown}
-      <div className={cn(nakedCellSuffixSlot, 'gap-2 relative z-10 pointer-events-none', wrap && 'self-start')}
+      <ItemSuffix className={cn('relative z-10 pointer-events-none', wrap && 'self-start')}
         style={wrap ? { height: tagHeight } : undefined}>
         {showClear && (
           <span className="pointer-events-auto">
@@ -275,7 +275,7 @@ function NativeCombobox({
           </span>
         )}
         <ChevronDown size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
-      </div>
+      </ItemSuffix>
     </div>
   )
 }
@@ -369,7 +369,7 @@ function CustomCombobox({
           <span className="text-fg-muted">{placeholder ?? emptyPlaceholder}</span>
         )}
       </div>
-      <div className={cn(nakedCellSuffixSlot, 'gap-2 relative z-10 pointer-events-none', wrap && 'self-start')}
+      <ItemSuffix className={cn('relative z-10 pointer-events-none', wrap && 'self-start')}
         style={wrap ? { height: tagHeight } : undefined}>
         {showClear && (
           <span className="pointer-events-auto">
@@ -384,7 +384,7 @@ function CustomCombobox({
           </span>
         )}
         {chevronEl}
-      </div>
+      </ItemSuffix>
     </div>
   )
 

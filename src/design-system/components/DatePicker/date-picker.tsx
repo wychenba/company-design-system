@@ -4,8 +4,8 @@ import * as React from 'react'
 import { X, Calendar as CalendarIcon, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, nakedCellRowModeAlign, nakedCellSuffixSlot } from '@/design-system/components/Field/field-wrapper'
-import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
+import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverAnchor, PopoverContent } from '@/design-system/components/Popover/popover'
 import { DateGrid } from '@/design-system/components/DateGrid/date-grid'
 import { Button } from '@/design-system/components/Button/button'
@@ -345,9 +345,9 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
               : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
             }
           </span>
-          <span className={cn(nakedCellSuffixSlot, 'pointer-events-none')}>
+          <ItemSuffix className="pointer-events-none">
             <CalendarIcon size={iconSize} className="text-fg-muted" aria-hidden />
-          </span>
+          </ItemSuffix>
         </div>
       )
     }
@@ -418,9 +418,9 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                 }}
               />
             )}
-            <span className={cn(nakedCellSuffixSlot, 'pointer-events-none')}>
+            <ItemSuffix className="pointer-events-none">
               <CalendarIcon size={iconSize} className="text-fg-muted" aria-hidden />
-            </span>
+            </ItemSuffix>
           </div>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
@@ -711,9 +711,9 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
           <span className={cn('flex-1 min-w-0 truncate', !endIso && 'text-fg-muted', resolvedMode === 'disabled' && 'text-fg-disabled')}>
             {endIso ? formatDateOrDateTime(endIso, showTime, showSeconds, { formatOptions, locale }) : resolvedPlaceholder[1]}
           </span>
-          <span className={cn(nakedCellSuffixSlot, 'pointer-events-none')}>
+          <ItemSuffix className="pointer-events-none">
             <CalendarIcon size={iconSize} className="text-fg-muted" aria-hidden />
-          </span>
+          </ItemSuffix>
         </div>
       )
     }
@@ -785,9 +785,9 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
                 }}
               />
             )}
-            <span className={cn(nakedCellSuffixSlot, 'pointer-events-none')}>
+            <ItemSuffix className="pointer-events-none">
               <CalendarIcon size={iconSize} className="text-fg-muted" aria-hidden />
-            </span>
+            </ItemSuffix>
           </div>
         </PopoverAnchor>
         <PopoverContent className="w-auto p-0" align="start">

@@ -221,28 +221,23 @@ export const nakedCellHoverRing = 'hover:outline hover:outline-2 hover:outline-o
 export const nakedCellFocusRing = 'focus-within:outline focus-within:outline-2 focus-within:outline-offset-[-1px] focus-within:outline-primary'
 export const nakedCellOpenRing = 'data-[state=open]:outline data-[state=open]:outline-2 data-[state=open]:outline-offset-[-1px] data-[state=open]:outline-primary'
 
-// ── Cell-as-input Edge Slot SSOT(M19 / 2026-05-05 v4)──────────────────────
-// prefix(startIcon / Avatar / category icon)+ suffix(chevron / clear / endIcon / calendar)
-// 對齊 canonical 是**對稱的**:autoRow 場景 edge slot 中心 = value **第 1 行**垂直中心
-// (不是 cell 頂、也不是全高中心)。對齊 Combobox wrap mode line 372-373(`self-start +
-// height:tagHeight + flex items-center`)world-class pattern(Notion / Airtable / Linear
-// select / Slack message composer 共識:icon align with first text line, not block center)。
+// ── Cell-as-input Edge Slot SSOT(2026-05-05 v8 — retire 平行 SSOT,改 L1 消費)───
 //
-// **Group-data conditional**:只在 host cell `data-row-mode=auto` 時切換 alignment;
-// fixed row(default `items-center`)走 Field 自然 flex(edge slot 跟 value 一同垂直置中)。
-// autoRow 才 `self-start + h-[1lh] + flex items-center` 把 edge slot 鎖在第 1 行高度範圍
-// 內,中心對齊第 1 行。
+// 前身 `nakedCellPrefixSlot` / `nakedCellSuffixSlot` 是 M1+M17 違反:平行 SSOT 跟
+// `patterns/element-anatomy` 的 `<ItemPrefix>` / `<ItemSuffix>` primitive 撞 home。
+// 已 retire — Field naked variant 內 prefix / suffix slot 直接消費 L1 primitive:
 //
-// 命名:`Prefix` / `Suffix` 兩個 alias 共用同一 class — 幾何對稱(symmetric edge),但
-// 消費端意圖不同(prefix = startIcon / category-icon;suffix = chevron / clear / calendar)。
-// 兩個名比 `nakedCellEdgeSlot` 一個名 self-document 度高(consumer site 一眼讀出方向)。
+//   import { ItemPrefix, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
+//   <ItemPrefix><StartIcon /></ItemPrefix>     // 對 Input.startIcon / Select.startIcon
+//   <ItemSuffix>{chevron}</ItemSuffix>          // 對 Combobox / DatePicker / PeoplePicker chevron
 //
-// 用法:wrapper className 套對應 alias(無 inline style 需要)。
-//   `<span className={nakedCellPrefixSlot}><StartIcon /></span>`
-//   `<span className={nakedCellSuffixSlot}>{chevron}</span>`
-const nakedCellEdgeSlotBase = 'shrink-0 flex items-center group-data-[row-mode=auto]/cell:self-start group-data-[row-mode=auto]/cell:h-[1lh]'
-export const nakedCellPrefixSlot = nakedCellEdgeSlotBase
-export const nakedCellSuffixSlot = nakedCellEdgeSlotBase
+// **`h-[1lh]` 普世正確**(item-anatomy.spec.md:190-191 verbatim):
+//   - 單行 wrapper items-center → slot 1lh 在 cell 高度中心 = 第一行中線(視覺 = items-center)
+//   - 多行 wrapper items-start  → slot 1lh 鎖頂 = 第一行中線
+//   不需 conditional `group-data-[row-mode=auto]/cell:` — 我前 v4 自加的 conditional 是過度設計。
+//
+// State ring 3 const 仍留(下方)— 是 Field naked 專屬,MenuItem / TreeView 用 bg hover 不用 outline。
+// `nakedCellRowModeAlign`(wrapper 級)仍留 — 是 cell-context row-mode → wrapper alignment 適配,正交 slot 級。
 
 // ── Empty Value Display ─────────────────────────────────────────────────────
 
