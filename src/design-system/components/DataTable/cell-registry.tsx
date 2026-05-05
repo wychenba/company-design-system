@@ -176,6 +176,10 @@ function TimeCell({ value, meta, mode, size, onCommit }: CellComponentProps) {
 }
 
 function SelectCell({ value, meta, mode, size, onCommit }: CellComponentProps) {
+  // Display canonical(2026-05-05):cell IS chrome,default plain text(no Tag pill 疊在 cell border 內)。
+  // Consumer 可在 column meta.display='tag' opt-in 內容導向的 Tag 視覺(category 含色彩標籤等)。
+  // 對齊 JTable / AG Grid「renderer/editor 視覺一致」canonical。
+  const displayMode = (meta?.display as 'plain' | 'tag' | undefined) ?? 'plain'
   if (mode === 'display') {
     return (
       <Select
@@ -184,7 +188,7 @@ function SelectCell({ value, meta, mode, size, onCommit }: CellComponentProps) {
         value={value as string | null}
         options={meta?.options ?? []}
         size={size}
-        display="tag"
+        display={displayMode}
       />
     )
   }
@@ -196,6 +200,10 @@ function SelectCell({ value, meta, mode, size, onCommit }: CellComponentProps) {
       options={meta?.options ?? []}
       value={value as string | null | undefined}
       onChange={(v) => onCommit?.(v)}
+      // B7(2026-05-05):cell 編輯時支援 inline search,沿用 Select.searchable 機制(對齊 cell-as-input
+      // 「沿用既有輸入框互動」原則)。Default false,consumer 在 meta.searchable 開啟。
+      searchable={meta?.searchable === true}
+      display={displayMode}
     />
   )
 }

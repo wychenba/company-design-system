@@ -730,15 +730,19 @@ function DataTableInner<TData>(
 
   const iconSize = size === 'lg' ? 20 : 16
 
-  // inline edit 指示器:select 類顯示 ChevronDown,date 顯示 Calendar,time 顯示 Clock(Phase C)
+  // Inline edit 指示器 — hover-reveal canonical(2026-05-05,對齊 Airtable / Notion):
+  //   editable cell default 不顯示 indicator,cursor hover row → indicator 浮現提示「可編輯」。
+  //   減視覺噪音(reduce 表格 default 視覺密度),user explicit feedback「chevron 應 hover 才出現」。
+  //   實作:opacity-0 → group-hover/row:opacity-100;positioning 還是固定佔位避免 hover 時 layout shift。
   const getEditIndicator = (colType?: ColumnType) => {
     if (!inlineEdit) return null
+    const cls = 'shrink-0 text-fg-muted opacity-0 group-hover/row:opacity-100 transition-opacity'
     if (colType === 'select' || colType === 'multiSelect' || colType === 'person' || colType === 'multiPerson')
-      return <ChevronDown size={iconSize} className="shrink-0 text-fg-muted" aria-hidden />
+      return <ChevronDown size={iconSize} className={cls} aria-hidden />
     if (colType === 'date')
-      return <Calendar size={iconSize} className="shrink-0 text-fg-muted" aria-hidden />
+      return <Calendar size={iconSize} className={cls} aria-hidden />
     if (colType === 'time')
-      return <Clock size={iconSize} className="shrink-0 text-fg-muted" aria-hidden />
+      return <Clock size={iconSize} className={cls} aria-hidden />
     return null
   }
 
