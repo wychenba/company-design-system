@@ -406,13 +406,50 @@ function SortableRowProvider({
     setNodeRef,
     role: 'primary',
     style,
-    attributes,
+    attributes: attributes as unknown as Record<string, unknown>,
     listeners: undefined,
     isDragging,
-    handleListeners: listeners as Record<string, unknown> | undefined,
-    handleAttributes: attributes as Record<string, unknown>,
+    handleListeners: listeners as unknown as Record<string, unknown> | undefined,
+    handleAttributes: attributes as unknown as Record<string, unknown>,
   }
   return <SortableRowCtx.Provider value={ctxValue}>{children(ctxValue)}</SortableRowCtx.Provider>
+}
+
+/** GripVertical handle 顯示在 __drag__ cell。
+ *  - 透過 SortableRowCtx 拿 listeners(可能是 undefined,e.g. nested rows 子層 row 不 sortable)
+ *  - sort active 時 disabled(visual + listeners 移除 + Tooltip 解釋)
+ *  - hover-revealed:opacity-0 → group-hover/row:opacity-100(group/row 在 row 層級設定) */
+function DragHandleCell({ disabled }: { disabled: boolean }) {
+  const ctx = React.useContext(SortableRowCtx)
+  // nested rows 子層 / 排序中 → 不可拖
+  const canDrag = !!ctx && !disabled
+  const handle = (
+    <span
+      role={canDrag ? 'button' : undefined}
+      aria-label={canDrag ? '拖曳重排此列' : disabled ? '排序中無法拖曳' : '此列不可拖曳'}
+      aria-disabled={!canDrag || undefined}
+      tabIndex={canDrag ? 0 : -1}
+      className={cn(
+        'inline-flex items-center justify-center w-4 h-4 rounded-sm text-fg-muted',
+        'opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100 transition-opacity',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
+        canDrag ? 'cursor-grab active:cursor-grabbing hover:text-foreground' : 'cursor-not-allowed text-fg-disabled',
+      )}
+      {...(canDrag ? ctx?.handleListeners ?? {} : {})}
+      {...(canDrag ? ctx?.handleAttributes ?? {} : {})}
+    >
+      <GripVertical size={14} aria-hidden />
+    </span>
+  )
+  if (disabled) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild><span>{handle}</span></TooltipTrigger>
+        <TooltipContent>排序中無法拖曳,清除排序後可重排</TooltipContent>
+      </Tooltip>
+    )
+  }
+  return handle
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -493,36 +530,55 @@ function DataTableInner<TData>(
   // Shift-click anchor:存最後一次「單擊」的 row id,shift-click 時做區間選
   const anchorRowIdRef = React.useRef<string | null>(null)
 
-  // 注入 checkbox column(enabled 時)
+  // 注入 checkbox + drag column(分別由 enabled / enableRowDrag 控制)
+  // 順序:[__drag__?, __select__?, ...consumer columns]
   const columnsWithSelection = React.useMemo(() => {
-    if (!enabled) return columns
-    const selectColumn: ColumnDef<TData, any> = {
-      id: SELECT_COL_ID,
-      size: 40,
-      enableSorting: false,
-      enableResizing: false,
-      enableHiding: false,  // selection col 不能藏(L3 column visibility)
-      header: 'Select',  // header cell 由下方自訂 render 取代
-      cell: () => null,  // body cell 由下方自訂 render 取代
+    const synthetic: ColumnDef<TData, any>[] = []
+    if (enableRowDrag) {
+      synthetic.push({
+        id: DRAG_COL_ID,
+        size: 32,
+        enableSorting: false,
+        enableResizing: false,
+        enableHiding: false,
+        header: '',
+        cell: () => null, // body 由 cellEl 自訂 render(GripVertical handle)
+      })
     }
-    return [selectColumn, ...columns]
-  }, [columns, enabled])
+    if (enabled) {
+      synthetic.push({
+        id: SELECT_COL_ID,
+        size: 40,
+        enableSorting: false,
+        enableResizing: false,
+        enableHiding: false,  // selection col 不能藏(L3 column visibility)
+        header: 'Select',  // header cell 由下方自訂 render 取代
+        cell: () => null,  // body cell 由下方自訂 render 取代
+      })
+    }
+    return synthetic.length > 0 ? [...synthetic, ...columns] : columns
+  }, [columns, enabled, enableRowDrag])
 
-  // pinned-left 自動加 __select__
+  // pinned-left 自動加 __drag__ + __select__(__drag__ 永遠最左,在 __select__ 之前)
   const effectivePinnedLeft = React.useMemo(() => {
-    if (!enabled) return pinnedLeftColumns ?? []
     const list = pinnedLeftColumns ?? []
-    return list.includes(SELECT_COL_ID) ? list : [SELECT_COL_ID, ...list]
-  }, [pinnedLeftColumns, enabled])
+    const out = [...list]
+    if (enabled && !out.includes(SELECT_COL_ID)) out.unshift(SELECT_COL_ID)
+    if (enableRowDrag && !out.includes(DRAG_COL_ID)) out.unshift(DRAG_COL_ID)
+    return out
+  }, [pinnedLeftColumns, enabled, enableRowDrag])
 
-  // columnOrder 自動加 __select__ 第一位:consumer 傳的 columnOrder 通常只列 data
-  // columns(忘 __select__),TanStack 會把不在 order 的 column 推到末位 → checkbox
-  // 變右邊。世界級 convention(Notion / Linear / Airtable / Material X-Grid)選取在左。
+  // columnOrder 自動加 __drag__ / __select__ 在最前:consumer 傳的 columnOrder 通常只列 data
+  // columns,TanStack 會把不在 order 的 column 推到末位 → 同步幫他補上
   const userColumnOrder = tableOptions?.state?.columnOrder
   const effectiveColumnOrder = React.useMemo(() => {
-    if (!enabled || !userColumnOrder) return userColumnOrder
-    return userColumnOrder.includes(SELECT_COL_ID) ? userColumnOrder : [SELECT_COL_ID, ...userColumnOrder]
-  }, [userColumnOrder, enabled])
+    if (!userColumnOrder) return userColumnOrder
+    if (!enabled && !enableRowDrag) return userColumnOrder
+    const out = [...userColumnOrder]
+    if (enabled && !out.includes(SELECT_COL_ID)) out.unshift(SELECT_COL_ID)
+    if (enableRowDrag && !out.includes(DRAG_COL_ID)) out.unshift(DRAG_COL_ID)
+    return out
+  }, [userColumnOrder, enabled, enableRowDrag])
 
   // 注意:`...tableOptions` 必 spread 在 `state` 前,否則 user 傳的 tableOptions 會
   // 整個 override 掉我們組的 state(含 __select__ 自動 pinning + columnOrder 注入)。
@@ -736,8 +792,24 @@ function DataTableInner<TData>(
     return null
   }
 
+  // L4 row drag:sort active 時 drag handle disabled(對齊 Notion / Airtable 共識)
+  const dragDisabled = sorting.length > 0
+
   // code-quality-allow: long-function — cell render 含 selection / pinned / type-aware formatter 三邏輯,拆會增 prop drilling
   const cellEl = (cell: ReturnType<typeof rows[number]['getVisibleCells']>[number], isLastInRow = false) => {
+    // L4 row drag:__drag__ 欄自訂 render(GripVertical handle,hover-revealed)
+    if (cell.column.id === DRAG_COL_ID) {
+      return (
+        <div
+          key={cell.id}
+          role="cell"
+          className="flex items-center justify-center shrink-0"
+          style={{ width: cell.column.getSize(), ...cellPadding }}
+        >
+          <DragHandleCell disabled={dragDisabled} />
+        </div>
+      )
+    }
     // L2 selection:__select__ 欄自訂 render
     // multi 模式 → Checkbox(可多選)
     // single 模式 → Radio(單選 visual,對齊 Material DataGrid / Polaris IndexTable canonical)
@@ -995,6 +1067,18 @@ function DataTableInner<TData>(
   // ── Header cell ──
   // code-quality-allow: long-function — header render 含 selection tri-state / sort indicator / column dropdown / pinned / divider 五邏輯,拆 sub-fn 會切散 column type-aware rendering coherence
   const headerCellEl = (header: ReturnType<typeof table.getHeaderGroups>[number]['headers'][number], showDivider: boolean) => {
+    // L4 row drag:__drag__ 欄 header 為空 placeholder(寬度同 body cell 對齊)
+    if (header.column.id === DRAG_COL_ID) {
+      return (
+        <div
+          key={header.id}
+          role="columnheader"
+          aria-label="拖曳重排"
+          className="flex items-center justify-center shrink-0"
+          style={{ width: header.getSize(), ...cellPadding }}
+        />
+      )
+    }
     // L2 selection:__select__ 欄自訂 render(tri-state header checkbox)
     if (enabled && header.column.id === SELECT_COL_ID) {
       const isHeaderDisabled = selectableVisibleIds.length === 0 || mode !== 'multi'
@@ -1154,10 +1238,43 @@ function DataTableInner<TData>(
     }
     if (isEmpty) return null
 
+    // L4 row drag:primary region — left exists → left 為 primary;否則 center 為 primary
+    // primary region 掛 useSortable setNodeRef + transform style;mirror regions v1 不跟動。
+    const isPrimaryRegion = hasLeft ? cols === leftCols : isCenter
+
     const rowEl = (row: typeof rows[number], idx: number, opts?: { virtual?: boolean; start?: number; isLast?: boolean }) => {
       const showBorder = bordered !== false ? !opts?.isLast : true
-      return (
-        <div key={row.id} ref={isCenter && opts?.virtual ? virtualizer.measureElement : undefined} data-index={isCenter && opts?.virtual ? idx : undefined} data-row-index={idx} role="row" aria-rowindex={idx + 2} className={cn('flex', autoRowHeight ? 'items-start' : 'items-center', !autoRowHeight && rowHeight, !autoRowHeight && 'overflow-hidden', opts?.virtual && 'absolute w-full', showBorder && 'border-b border-divider', 'transition-colors data-[hovered]:bg-neutral-hover')} style={opts?.virtual ? { transform: `translateY(${opts.start}px)` } : undefined} {...hoverProps(idx)}>
+      // L4 row drag:nested sub-rows(depth>0)不 sortable(對齊 spec「同 parent level only」)
+      const isTopLevel = (row.depth ?? 0) === 0
+      const useSortableWrap = enableRowDrag && isTopLevel && isPrimaryRegion
+
+      const baseRowDiv = (extra?: { ref?: (el: HTMLElement | null) => void; style?: React.CSSProperties; isDragging?: boolean }) => (
+        <div
+          key={row.id}
+          ref={(el) => {
+            if (isCenter && opts?.virtual && el) virtualizer.measureElement(el)
+            extra?.ref?.(el)
+          }}
+          data-index={isCenter && opts?.virtual ? idx : undefined}
+          data-row-index={idx}
+          role="row"
+          aria-rowindex={idx + 2}
+          className={cn(
+            'group/row flex',
+            autoRowHeight ? 'items-start' : 'items-center',
+            !autoRowHeight && rowHeight,
+            !autoRowHeight && 'overflow-hidden',
+            opts?.virtual && 'absolute w-full',
+            showBorder && 'border-b border-divider',
+            'transition-colors data-[hovered]:bg-neutral-hover',
+            extra?.isDragging && 'bg-neutral-hover',
+          )}
+          style={{
+            ...(opts?.virtual ? { transform: `translateY(${opts.start}px)` } : {}),
+            ...(extra?.style ?? {}),
+          }}
+          {...hoverProps(idx)}
+        >
           {getRegionCells(row, cols).map((cell, ci, arr) => cellEl(cell, ci === arr.length - 1 && !(isRight && hasRowActions)))}
           {isRight && hasRowActions && (
             <div role="cell" className="flex items-center justify-end shrink-0 gap-2 flex-1" style={cellPadding}>
@@ -1166,6 +1283,15 @@ function DataTableInner<TData>(
           )}
         </div>
       )
+
+      if (useSortableWrap) {
+        return (
+          <SortableRowProvider key={row.id} id={row.id} disabled={dragDisabled}>
+            {(ctx) => baseRowDiv({ ref: ctx.setNodeRef, style: ctx.style, isDragging: ctx.isDragging })}
+          </SortableRowProvider>
+        )
+      }
+      return baseRowDiv()
     }
 
     // AR44 canonical(2026-04-21):virtual / non-virtual 都用 `minWidth: colsWidth` 的 wrapper,
@@ -1304,17 +1430,56 @@ function DataTableInner<TData>(
     </div>
   )
 
+  // ── L4 Row drag DnD wrapper ───────────────────────────────────────────────
+  // Sensors:Pointer(8px activation distance,避免 cell click 誤觸 drag)+ Keyboard(a11y)
+  // SortableContext items:**只 top-level row id**(nested sub-rows 不在 sortable 集合);
+  // 同 parent level 限制由「sub-rows 不在 items 內」自然成立。
+  // DragEnd:active.id / over.id → 算 position(active vs over 視覺位置),呼叫 onRowReorder。
+  // hooks 必呼叫(rules-of-hooks)— 即使 enableRowDrag=false 也走 useSensors;wrap 才條件化。
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+  const topLevelRowIds = React.useMemo(
+    () => rows.filter(r => (r.depth ?? 0) === 0).map(r => r.id),
+    [rows]
+  )
+  const handleDragEnd = React.useCallback((e: DragEndEvent) => {
+    const { active, over } = e
+    if (!over || active.id === over.id) return
+    const sourceId = String(active.id)
+    const targetId = String(over.id)
+    // position: active 原本 index < over index → drop after over;反之 → drop before
+    // (對齊 @dnd-kit/sortable arrayMove 慣例:active 從上往下拖到 over 下方 = after)
+    const oldIdx = topLevelRowIds.indexOf(sourceId)
+    const newIdx = topLevelRowIds.indexOf(targetId)
+    if (oldIdx === -1 || newIdx === -1) return
+    const position: 'before' | 'after' = oldIdx < newIdx ? 'after' : 'before'
+    onRowReorder?.(sourceId, targetId, position)
+  }, [topLevelRowIds, onRowReorder])
+
+  const wrapWithDnd = (node: React.ReactNode): React.ReactNode => {
+    if (!enableRowDrag) return node
+    return (
+      <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={topLevelRowIds} strategy={verticalListSortingStrategy}>
+          {node}
+        </SortableContext>
+      </DndContext>
+    )
+  }
+
   if (enabled && mode === 'single') {
     return (
       <RadioGroupPrimitive.Root
         value={selection[0] ?? ''}
         onValueChange={(v) => v && setSelection([v])}
       >
-        {tableContent}
+        {wrapWithDnd(tableContent)}
       </RadioGroupPrimitive.Root>
     )
   }
-  return tableContent
+  return wrapWithDnd(tableContent)
 }
 
 export const DataTable = React.forwardRef(DataTableInner) as <TData>(

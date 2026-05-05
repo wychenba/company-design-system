@@ -139,14 +139,14 @@ function CustomSelectTriggerContent({
   search: string
   setSearch: (v: string) => void
   inputRef: React.RefObject<HTMLInputElement | null>
-}) {
+}): React.ReactNode {
   // Searchable + open: 顯示搜尋 input
   if (searchable && open) {
     return (
       <>
         {StartIcon && <StartIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />}
         <input
-          ref={inputRef}
+          ref={inputRef as React.RefObject<HTMLInputElement>}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={selectedLabel || placeholder || '搜尋…'}
