@@ -2,7 +2,7 @@
 // same-row-mixed-allow: file 含 toolbar Button iconOnly + row ItemInlineActionButton,但兩者在不同 row(toolbar 跟 panel row 分離)
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { createColumnHelper } from '@tanstack/react-table'
+import { createColumnHelper, type ColumnDef } from '@tanstack/react-table'
 import { Pencil, Trash2, MoreVertical, Search, Filter, Eye, EyeOff, Lock, GripVertical, RotateCcw, Download, Plus, ArrowUpDown, X as XIcon } from 'lucide-react'
 import { DataTable } from './data-table'
 import { DataTableSortManager } from './data-table-sort-manager'
@@ -209,6 +209,46 @@ export const NumberAlignment: Story = {
 }
 
 /* ── 行高模式 — autoRowHeight prop(每 row 內容驅動高度) ── */
+export const RowAutoHeightInlineEdit: Story = {
+  name: '自動行高 × 內聯編輯(verify display↔edit position)',
+  render: () => {
+    const [list, setList] = React.useState<Product[]>(generateLargeData(4))
+    const cols: ColumnDef<Product & { note: string }>[] = [
+      { accessorKey: 'sku', header: 'SKU', size: 100, meta: { type: 'string' } },
+      { accessorKey: 'name', header: 'Product', size: 240, meta: { type: 'string', editable: true } },
+      { accessorKey: 'category', header: 'Category', size: 160, meta: { type: 'select', editable: true, options: [
+        { value: 'Electronics', label: 'Electronics' },
+        { value: 'Furniture', label: 'Furniture' },
+        { value: 'Food', label: 'Food' },
+      ] } },
+      { accessorKey: 'note', header: 'Note (wrap text)', size: 360, meta: { type: 'string', editable: true } },
+      { accessorKey: 'price', header: 'Price', size: 100, meta: { type: 'currency', editable: true } },
+    ]
+    const dataWithNotes = list.map((r, i) => ({
+      ...r,
+      note: i % 2 === 0
+        ? 'This product requires special packaging for international shipping. Please verify customs documentation before dispatch.'
+        : 'Standard delivery.',
+    }))
+    return (
+      <div className="max-w-5xl">
+        <p className="text-caption text-fg-muted mb-2">
+          autoRowHeight=true。Note 欄位 wrap text 撐高 row。其他單行 cell 在高 row 中應**頂對齊**。
+          Click 任一 cell 進 edit:文字位置 display↔edit 不偏移(仍頂對齊),
+          frame 填 cell,Field 自帶 state ring(focus-within → primary)。
+        </p>
+        <DataTable
+          columns={cols} data={dataWithNotes} height="auto" autoRowHeight inlineEdit
+          onCellCommit={(rowId, col, val) => {
+            setList((prev) => prev.map((r) => r.sku === rowId ? { ...r, [col]: val as never } : r))
+          }}
+          getRowId={(r) => r.sku}
+        />
+      </div>
+    )
+  },
+}
+
 export const RowAutoHeight: Story = {
   name: '自動行高',
   render: () => (

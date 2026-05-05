@@ -113,14 +113,18 @@ const textareaVariants = cva(
         variant: 'bare',
         className: 'bg-transparent border border-transparent cursor-not-allowed opacity-disabled text-fg-disabled',
       },
-      // naked chrome × mode — 完全無 wrapper border / 無 focus ring(host 自管 visual,cell-as-input)。
-      // `!h-full !resize-none !px-0 !py-0`:Textarea 本質可多行,naked 變體讓它 fill parent 高
-      //   (= host cell 高,Notion / Airtable canonical wrap-text cell:editor 跟 display 視覺一致 +
-      //   邊框跟 cell border seamless 銜接)。autoRowHeight 場景下 textarea fill cell→content 自然
-      //   wrap;fixed 場景下 cell=h-field-md→textarea=40px 等同 single-line(text 仍 block-flow 起始
-      //   於頂,跟 Input centered 不同 — string cell 在 fixed mode 應改用 Input 不用 Textarea)。
-      //   `!resize-none`:host cell 控制高度,user 不該手動 resize textarea。
-      { mode: 'edit', variant: 'naked', className: 'bg-transparent border border-transparent !h-full !resize-none !px-0 !py-0' },
+      // naked chrome × mode — cell-as-input substrate(對齊 fieldWrapperStyles naked 規則)。
+      //   `!h-full !resize-none !px-0 !py-0`:fill cell box(host cell 控高,user 不該手動 resize)。
+      //   edit mode 自帶 state ring(focus-within → border-primary)— 對齊 user「狀態樣式取決於原輸入框」。
+      {
+        mode: 'edit',
+        variant: 'naked',
+        className: [
+          'bg-transparent border border-transparent !h-full !resize-none !px-0 !py-0',
+          'hover:border-border',
+          'focus-visible:border-primary focus-visible:hover:border-primary',
+        ],
+      },
       { mode: 'display', variant: 'naked', className: 'bg-transparent border border-transparent !h-full !resize-none !px-0 !py-0' },
       { mode: 'readonly', variant: 'naked', className: 'bg-transparent border border-transparent !h-full !resize-none !px-0 !py-0' },
       { mode: 'disabled', variant: 'naked', className: 'bg-transparent border border-transparent cursor-not-allowed opacity-disabled text-fg-disabled !h-full !resize-none !px-0 !py-0' },

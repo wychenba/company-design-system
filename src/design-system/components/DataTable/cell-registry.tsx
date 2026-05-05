@@ -93,12 +93,18 @@ function StringCell({ value, mode, size, autoRowHeight, onCommit, onCancel }: Ce
       : <Input variant="naked" mode="display" value={v} />
   }
   if (autoRowHeight) {
+    // rows 預設估算:從 value 長度推算 wrap 行數(每行約 60 字),min 3 max 10。
+    // 避免 `rows=1` 導致 cell 進 edit 後 textarea intrinsic 30px → row 縮 → 視覺跳。
+    // !h-full 會 fallback 到 intrinsic 因為 row autoRowHeight 跟 cell content 的循環依賴
+    // (row=max(cells), cell=max(content), content=textarea h-full=row → 循環)。rows pre-size
+    // 給 textarea definite intrinsic 高,row 計算穩定 + 跟 display 內容高接近不會跳。
+    const estimateRows = Math.min(10, Math.max(3, Math.ceil(v.length / 60)))
     return (
       <Textarea
         autoFocus
         variant="naked"
         size={sizeForInput(size)}
-        rows={1}
+        rows={estimateRows}
         defaultValue={v}
         onBlur={(e) => onCommit?.((e.target as HTMLTextAreaElement).value)}
         onKeyDown={(e) => {

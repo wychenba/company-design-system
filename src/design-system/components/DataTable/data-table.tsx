@@ -898,14 +898,18 @@ function DataTableInner<TData>(
       <div
         key={cell.id}
         role="cell"
+        // group/cell + data-row-mode:讓 Field naked 用 `group-data-[row-mode=...]/cell:items-X`
+        // 從 cell 取 alignment(autoRowHeight=auto 頂對齊 / fixed=fixed 置中)。CSS propagation,
+        // Field API 不變;每個 mode 內 display↔edit 同 alignment(同 Field, 同 group → 同 items)。
+        data-row-mode={autoRowHeight ? 'auto' : 'fixed'}
         className={cn(
-          // Cell box canonical(spec.md「固定行高內容置中 / 自動行高頂對齊」+ Notion frame-fill canonical):
-          //   - `self-stretch`: cell box 永遠填 row 高(border-r divider 跨 row border-b seamless)
-          //   - alignment 跟 autoRowHeight,**不**因 editing 改變 — 確保文字 display↔edit 位置一致
-          //   - editing 時的「frame 填 cell」視覺由 cell 本身的 `box-shadow inset primary 1px` 提供
-          //     (見 style 區塊),Field naked 維持 intrinsic 高保證文字位置 invariant
-          'flex text-foreground text-body font-normal shrink-0 overflow-hidden relative self-stretch',
-          autoRowHeight ? 'items-start' : 'items-center',
+          // Cell box(2026-05-05 v5 — 設計原則超簡單:cell IS input box):
+          //   - `self-stretch`: cell 永遠填 row 高(border-r divider 跨 row border-b seamless)
+          //   - `items-stretch`: 讓 Field naked(`!h-full`)真實填 cell — frame 視覺 = cell box
+          //     (對齊 user「框框填滿 cell + 整 cell 都是 input focus 狀態」+ Notion canonical)
+          //   - **沒有** cell 自己 box-shadow ring — focus / hover / open ring 由 Field naked 自帶
+          //     state machine 提供(對齊 user「狀態樣式取決於原輸入框」reminder)
+          'group/cell flex text-foreground text-body font-normal shrink-0 overflow-hidden relative self-stretch items-stretch',
           align === 'right' && 'justify-end text-right',
           align === 'center' && 'justify-center text-center',
           inlineEdit && !isLastInRow && 'border-r border-divider',
@@ -918,12 +922,6 @@ function DataTableInner<TData>(
           minWidth: cell.column.columnDef.minSize,
           maxWidth: cell.column.columnDef.maxSize,
           ...cellPadding,
-          // Cell-as-input(2026-05-05 v2):editing 時 cell 本體扮演 input frame。
-          // box-shadow inset 1px 取代 outline — outline 在 overflow-hidden cell 內 top/bottom
-          // 會被 clip(只留左右兩條);box-shadow 是 paint(非 layout),不受 overflow 裁切,且
-          // 1px 落點與 cell 既有 `border-r border-divider` 同位,seamless 無縫替換 cell 邊框。
-          // 對齊 Airtable / Notion / Excel cell editing canonical。
-          ...(isEditingThisCell ? { boxShadow: 'inset 0 0 0 1px var(--primary)' } : null),
         }}
         onClick={onEditableCellClick}
       >

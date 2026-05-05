@@ -112,31 +112,49 @@ export const fieldWrapperStyles = cva(
         variant: 'bare',
         className: 'bg-transparent border border-transparent cursor-not-allowed opacity-disabled',
       },
-      // naked variant chrome by mode — 完全無 wrapper border / 無 focus ring / 無 inner padding,
-      // host(cell)自管 visual + padding。`!px-0 !gap-0` override size variant 預設的 `px-3 gap-2`,
-      // 讓 cell-as-input(Airtable / Notion / Excel canonical)在 display ↔ edit 切換時
-      // 文字位置完全不偏移(host cell padding 是唯一 padding source)。
-      // 高度:**保持 intrinsic h-field-{size}**(不 override),讓文字在 display ↔ edit 位置 invariant。
-      // 「frame 填 cell」視覺由 host cell 的 `box-shadow inset` 提供(cell self-stretch 已等於 row 高)。
+      // naked variant — cell-as-input substrate(Notion / Airtable / Excel canonical)
+      //   - `!h-full`: Field 框框 = host cell box(frame 填 cell)
+      //   - `!px-0 !gap-0`: host cell padding 為唯一 padding source(切 mode 文字無偏移)
+      //   - **edit mode 自帶 state ring**(user reminder「狀態樣式取決於原輸入框」):
+      //     hover / focus-within / data-[state=open] 各自 fire border 變化
+      //   - **內 alignment 從 host cell 取**(group-data-[row-mode]/cell):
+      //     autoRowHeight (row-mode=auto) → !items-start(頂對齊 per spec)
+      //     fixed       (row-mode=fixed) → 預設 items-center(置中 per spec)
+      //     每個 mode 內 display↔edit 自然同位置(同 Field 同 group → 同 items)
       {
         mode: 'edit',
         variant: 'naked',
-        className: 'bg-transparent border border-transparent !px-0 !gap-0',
+        className: [
+          'bg-transparent border border-transparent !px-0 !gap-0 !h-full',
+          'group-data-[row-mode=auto]/cell:!items-start',
+          'hover:border-border',
+          'focus-within:border-primary focus-within:hover:border-primary',
+          'data-[state=open]:border-border-hover',
+        ],
       },
       {
         mode: 'display',
         variant: 'naked',
-        className: 'bg-transparent border border-transparent !px-0 !gap-0',
+        className: [
+          'bg-transparent border border-transparent !px-0 !gap-0 !h-full',
+          'group-data-[row-mode=auto]/cell:!items-start',
+        ],
       },
       {
         mode: 'readonly',
         variant: 'naked',
-        className: 'bg-transparent border border-transparent !px-0 !gap-0',
+        className: [
+          'bg-transparent border border-transparent !px-0 !gap-0 !h-full',
+          'group-data-[row-mode=auto]/cell:!items-start',
+        ],
       },
       {
         mode: 'disabled',
         variant: 'naked',
-        className: 'bg-transparent border border-transparent cursor-not-allowed opacity-disabled !px-0 !gap-0',
+        className: [
+          'bg-transparent border border-transparent cursor-not-allowed opacity-disabled !px-0 !gap-0 !h-full',
+          'group-data-[row-mode=auto]/cell:!items-start',
+        ],
       },
     ],
     defaultVariants: {
