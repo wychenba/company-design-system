@@ -82,7 +82,7 @@ TimePicker 是**單一時間**(時/分/秒)輸入與顯示元件,對齊 Ant Desi
     disabledMinutes: [...],
     disabledSeconds: [...],
   })}
-  startIcon={Clock}              // 預設 Clock,傳 null 關閉
+  endIcon={Clock}                // 預設 Clock,傳 null 關閉(2026-05-05 v9:點擊觸發浮層 indicator 一律 suffix,對齊 DatePicker / Material endAdornment)
   locale="en-US"
   formatOptions={{ hour: '2-digit', minute: '2-digit', hour12: false }}
 />

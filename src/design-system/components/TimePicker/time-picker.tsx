@@ -8,7 +8,7 @@ import {
   bareInputStyles,
   EMPTY_DISPLAY,
 } from '@/design-system/components/Field/field-wrapper'
-import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { Button } from '@/design-system/components/Button/button'
@@ -31,8 +31,9 @@ import {
  *
  * ── Layout Family ──
  * CLAUDE.md 4-Family Model Family 4(Field control layout)消費者。結構繼承
- * `fieldWrapperStyles + [startIcon?] [<editable>] [endAction?]`,視覺對齊
- * Family 1(Menu item layout)。
+ * `fieldWrapperStyles + [<editable>] [endIcon=Clock]`,視覺對齊 DatePicker(同
+ * 「點擊觸發浮層」role:indicator 在 suffix slot,對齊 Material `endAdornment` /
+ * Ant DatePicker / Polaris Picker 共識)。
  *
  * ── 實作基礎 ──
  * Trigger:`<button>` + `fieldWrapperStyles`(視覺仍是 Input wrapper,改為可點擊觸發浮層)
@@ -115,8 +116,11 @@ export interface TimePickerProps
   secondStep?: TimeStep
   /** 動態 disabled 某些時/分/秒(基於已選其他欄位)。 */
   disabledTime?: (parts: TimeParts) => DisabledTimeResult
-  /** 左側 startIcon,預設 Clock。傳 null 可關閉 */
-  startIcon?: LucideIcon | null
+  /**
+   * Suffix indicator(2026-05-05 v9 canonical fix):「點擊觸發浮層」indicator 一律 suffix
+   * (對齊 DatePicker calendar / Material endAdornment)。預設 Clock,傳 null 可關閉。
+   */
+  endIcon?: LucideIcon | null
   /** Initial open state(uncontrolled)— DataTable cell-as-input 1-step open canonical */
   defaultOpen?: boolean
   /** open state 變更 callback。DataTable cell-as-input 用:open=false → cell exit edit */
@@ -141,7 +145,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
       minuteStep = 1,
       secondStep = 1,
       disabledTime,
-      startIcon,
+      endIcon,
       formatOptions,
       locale,
       defaultOpen = false,
@@ -160,8 +164,8 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
     const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const isEditable = resolvedMode === 'edit'
     const iconSize = size === 'lg' ? 20 : 16
-    const StartIconCmp: LucideIcon | null =
-      startIcon === null ? null : (startIcon ?? Clock)
+    const EndIconCmp: LucideIcon | null =
+      endIcon === null ? null : (endIcon ?? Clock)
     const defaultPlaceholder = showSeconds ? 'HH:MM:SS' : 'HH:MM'
     const resolvedPlaceholder = placeholder ?? defaultPlaceholder
     const showClear = clearable && !!value && isEditable
@@ -227,16 +231,6 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
           data-field-mode={resolvedMode}
           {...(props as React.HTMLAttributes<HTMLDivElement>)}
         >
-          {StartIconCmp && (
-            <StartIconCmp
-              size={iconSize}
-              className={cn(
-                'shrink-0 pointer-events-none',
-                resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted',
-              )}
-              aria-hidden
-            />
-          )}
           <span
             className={cn(
               'flex-1 min-w-0',
@@ -248,6 +242,15 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
               : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
             }
           </span>
+          {EndIconCmp && (
+            <ItemSuffix className="pointer-events-none">
+              <EndIconCmp
+                size={iconSize}
+                className={resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted'}
+                aria-hidden
+              />
+            </ItemSuffix>
+          )}
         </div>
       )
     }
@@ -290,13 +293,6 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
             )}
             {...props}
           >
-            {StartIconCmp && (
-              <StartIconCmp
-                size={iconSize}
-                className="shrink-0 text-fg-muted pointer-events-none"
-                aria-hidden
-              />
-            )}
             <span className={cn(bareInputStyles, 'truncate', !value && 'text-fg-muted')}>
               {displayText}
             </span>
@@ -312,6 +308,11 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
                   },
                 }}
               />
+            )}
+            {EndIconCmp && (
+              <ItemSuffix className="pointer-events-none">
+                <EndIconCmp size={iconSize} className="text-fg-muted" aria-hidden />
+              </ItemSuffix>
             )}
           </div>
         </PopoverTrigger>
