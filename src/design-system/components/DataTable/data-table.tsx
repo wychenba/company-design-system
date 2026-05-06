@@ -625,22 +625,29 @@ function DataTableInner<TData>(
     // L4 nested rows:啟用 expanded row model(consumer 透過 tableOptions.getSubRows + state.expanded forward)
     getExpandedRowModel: getExpandedRowModel(),
     getRowId: getRowId,
-    // 2026-05-06 v11 column resize:啟用 tanstack column resizing API。`columnResizeMode='onEnd'`
-    // commit-on-pointerup(非 live)— 跟 onColumnResize callback 對齊「user 拖完一輪才 commit」。
+    // 2026-05-06 v13.2 column resize:tanstack 內部管 columnSizing state(uncontrolled),`onEnd` mode
+    // → user 拖完才 commit 一次。`columnSizingState` 變動透過 useEffect 觀測 + 呼 callback。
+    //
+    // 前 v11 用 `onColumnSizingChange` 接管 updater 但忘了 setColumnSizing,導致 state 永遠不變動 →
+    // column.getSize() 永遠回初始值 → drag visual 完全沒效果(user 報 "drag 沒反應")。本 v13.2 改回
+    // tanstack uncontrolled state(預設行為)+ useEffect 觀測 columnSizing 變動 fire callback。
     enableColumnResizing: enableColumnResize,
     columnResizeMode: 'onEnd',
-    // 2026-05-06 v11:onEnd commit 時 forward callback。tanstack `onColumnSizingChange` 在
-    // resize end 觸發,delta 是 { [columnId]: width } map。我們對最後一筆變更呼叫 consumer。
-    onColumnSizingChange: enableColumnResize && onColumnResize ? (updater) => {
-      const prev = table.getState().columnSizing
-      const next = typeof updater === 'function' ? updater(prev) : updater
-      // 找變更的 column(diff)— commit-on-pointerup 通常只有 1 column 變
-      const changedId = Object.keys(next).find(id => next[id] !== prev[id])
-      if (changedId !== undefined) {
-        onColumnResize(changedId, next[changedId])
-      }
-    } : undefined,
   })
+
+  // v13.2:onColumnResize callback 透過 useEffect 觀測 columnSizing state 變動 fire(uncontrolled state pattern)
+  const columnSizingState = table.getState().columnSizing
+  const prevColumnSizingRef = React.useRef(columnSizingState)
+  React.useEffect(() => {
+    if (!onColumnResize) return
+    const prev = prevColumnSizingRef.current
+    Object.keys(columnSizingState).forEach(id => {
+      if (columnSizingState[id] !== prev[id]) {
+        onColumnResize(id, columnSizingState[id])
+      }
+    })
+    prevColumnSizingRef.current = columnSizingState
+  }, [columnSizingState, onColumnResize])
 
   const { rows } = table.getRowModel()
   const isEmpty = rows.length === 0
@@ -1323,13 +1330,17 @@ function DataTableInner<TData>(
           const colId = header.column.id
           const isResizable = enableColumnResize && !isSystemColumn(colId)
           const isResizing = header.column.getIsResizing?.()
+          // v13.2 visual fix:hot zone 7px straddle cell.right(invisible 易 hit),內 1px 線
+          // **絕對定位 right-[3px]**(從 outer span 右側 3px,即 cell.right - 1)→ 視覺 1px 在 cell 內側右邊,
+          // 對齊既有 grid divider 位置。前 v11 用 `flex justify-end` 把 1px 線放在 outer span 右端 →
+          // cell.right + 2 px 處 → 被 cell.overflow-hidden 切掉 → user 看不到分隔線。
           return (
             <span
               role={isResizable ? 'separator' : undefined}
               aria-orientation={isResizable ? 'vertical' : undefined}
               aria-label={isResizable ? '拖曳調整欄寬' : undefined}
               className={cn(
-                'group/resize absolute top-0 bottom-0 right-0 -mr-[3px] w-[7px] flex justify-end',
+                'group/resize absolute top-0 bottom-0 right-0 -mr-[3px] w-[7px]',
                 isResizable && 'cursor-col-resize select-none',
               )}
               onMouseDown={isResizable ? header.getResizeHandler?.() : undefined}
@@ -1338,14 +1349,14 @@ function DataTableInner<TData>(
               <span
                 aria-hidden
                 className={cn(
-                  'w-px transition-colors',
+                  'absolute right-[3px] w-px transition-colors',
                   isResizing
                     ? 'bg-primary'
                     : isResizable
                       ? 'bg-divider group-hover/resize:bg-[var(--border-hover)]'
                       : 'bg-divider',
                 )}
-                style={{ marginTop: 'var(--table-cell-py)', marginBottom: 'var(--table-cell-py)' }}
+                style={{ top: 'var(--table-cell-py)', bottom: 'var(--table-cell-py)' }}
               />
             </span>
           )
