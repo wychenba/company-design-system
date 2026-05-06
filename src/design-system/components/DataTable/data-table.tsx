@@ -14,10 +14,10 @@ import {
   type TableOptions,
   type Column,
 } from '@tanstack/react-table'
-import { useVirtualizer, defaultRangeExtractor } from '@tanstack/react-virtual'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { ChevronDown, Calendar, Clock, ArrowUp, ArrowDown, Filter as FilterIcon, EyeOff, X as XIcon, GripVertical } from 'lucide-react'
-import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, KeyboardSensor, type DragEndEvent, type CollisionDetection } from '@dnd-kit/core'
+import { DndContext, DragOverlay, closestCenter, useSensor, useSensors, PointerSensor, KeyboardSensor, type DragEndEvent, type CollisionDetection } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import { CSS as DndCSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
@@ -266,10 +266,12 @@ function SortableRowProvider({
   children: (ctx: SortableRowCtxValue) => React.ReactNode
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled })
+  // 2026-05-06 v10 DragOverlay portal:source row drag 中 invisible(opacity:0)— 視覺 by DragOverlay
+  // (前 v9 用 0.5 半透明殘影,跟 overlay 重疊 = 雙重影)。對齊 dnd-kit canonical for virtualized lists。
   const style: React.CSSProperties = {
     transform: DndCSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : undefined,
+    opacity: isDragging ? 0 : undefined,
     zIndex: isDragging ? 1 : undefined,
     position: 'relative',
   }
@@ -592,52 +594,14 @@ function DataTableInner<TData>(
   // ResizeObserver+measureElement 的修正過程被 user 看見 = mount-time growth bug 的真因。
   const ESTIMATE_BY_SIZE: Record<string, number> = { sm: 32, md: 40, lg: 48 }
   const resolvedEstimate = estimateRowHeight ?? ESTIMATE_BY_SIZE[size] ?? 40
-  // L4 row drag × virtualization fix(2026-05-05):enableRowDrag 時 overscan 自動拉到 ≥ 10。
-  // Root cause:rows scroll out of viewport → 整 row component unmount → useSortable subscription
-  // 跟著 unmount → SortableContext.items 還含該 id 但無 sortable instance → dnd-kit transform / collision
-  // 在拖到該 id 附近時 stale lookup → 視覺位移 / drop position 錯算。Overscan 拉高讓拖動範圍內
-  // 的 rows 全保持 mounted。10 是經驗值(Notion / Airtable virtualized list 也用 10-20 級別)。
-  const effectiveOverscan = enableRowDrag ? Math.max(overscan, 10) : overscan
-
-  // L4 row drag × virtualization v4(2026-05-05):active row sticky range extractor。
-  // Root cause(over v3):overscan 拉到 10 仍會在 user 拖 PRD-0001 → 滾到 PRD-0045 時把 source row
-  // 滑出 mounted window → useSortable subscription unmount → dnd-kit activeDraggable lookup miss
-  // → transform fall-back 到 (0,0) → 下一 frame remount → transform 又算回 → 連續閃爍。
-  // Fix:tanstack-virtual `rangeExtractor` 把 active drag row idx 強制注入 mounted set,不論 scroll
-  // 位置在哪都保證該 row 持續 mounted。對齊 tanstack-virtual sticky-item canonical(官方 examples
-  // sticky.story 同手法,sticky idx 永遠在 ext set 內)。
-  // SSOT-vs-DragOverlay 判斷:DragOverlay 需 portal-render full row(3-region 跨 left/center/right
-  // 拼接複雜,且 sticky region pin column 也要跟動)— rangeExtractor 較 surgical、零 layout 影響、
-  // 對既有 useSortable + 3-region transform sync 架構零侵入。
-  // active state ref:activeDragId state 在下游 declared(line ~771)— ref forward 讓 rangeExtractor
-  // 在 hook order 限制下也能讀。setActiveDragId 處同步寫 ref 觸發 virtualizer.measure() 重排。
+  // 2026-05-06 v10 DragOverlay canonical:retire windowed sticky range extractor (v4-v9 workaround)。
+  // 改用 `<DragOverlay>` portal 把 source row 視覺解耦 — source 即使 unmount(virtual scroll out)
+  // overlay 仍 render 由 cloned outerHTML 提供視覺。dnd-kit transform / collision 走 active item id
+  // (id 永遠在 SortableContext.items 集合,跟 hook instance mount 狀態無關)。
+  // 對齊 dnd-kit GitHub #1674 + drag-overlay docs canonical「virtualized list MUST use DragOverlay」。
+  // overscan 仍輕微拉高(避免 source row 旁邊 rows 也 unmount 致使 hover signal 計算抖動)。
+  const effectiveOverscan = enableRowDrag ? Math.max(overscan, 5) : overscan
   const activeDragIdRef = React.useRef<string | null>(null)
-  const rowsRef = React.useRef(rows)
-  rowsRef.current = rows
-  const stickyRangeExtractor = React.useCallback(
-    (range: Parameters<typeof defaultRangeExtractor>[0]) => {
-      const ext = defaultRangeExtractor(range)
-      const id = activeDragIdRef.current
-      if (!id) return ext
-      // B3 fix v6(2026-05-05):windowed sticky — pin active drag idx ± WINDOW(=50)+ default ext。
-      // 撤回 v5 pin-all(`Array.from(length: total)`)— 200 row × 3 region useSortable subscription
-      // 同 commit 階段 jank → 視覺空白(user reports 圖二 empty body area)。
-      // 真正 canonical = `<DragOverlay>` portal(decouple drag visual from sortable list),但需要
-      // 改 3-region row render 為 portal-friendly clone shape。本 windowed 方案 0 invasive,perf
-      // ~100 row max mounted(viewport ~20 + window ±50),可接受。後續 row count > 10k 才走
-      // DragOverlay portal canonical。
-      const idx = rowsRef.current.findIndex(r => r.id === id)
-      if (idx < 0 || ext.includes(idx)) return ext
-      const WINDOW = 50
-      const total = rowsRef.current.length
-      const lo = Math.max(0, idx - WINDOW)
-      const hi = Math.min(total - 1, idx + WINDOW)
-      const pinned: number[] = []
-      for (let i = lo; i <= hi; i++) pinned.push(i)
-      return Array.from(new Set([...ext, ...pinned])).sort((a, b) => a - b)
-    },
-    []
-  )
 
   const virtualizer = useVirtualizer({
     count: useVirtual ? rows.length : 0,
@@ -645,7 +609,6 @@ function DataTableInner<TData>(
     getScrollElement: () => centerBodyRef.current,
     estimateSize: () => resolvedEstimate,
     overscan: effectiveOverscan, enabled: useVirtual,
-    rangeExtractor: enableRowDrag ? stickyRangeExtractor : undefined,
   })
 
   // ── isFillHeight body maxHeight JS 計算(2026-04-30)──
@@ -1202,13 +1165,16 @@ function DataTableInner<TData>(
             <SortIcon size={14} aria-hidden className="shrink-0 text-fg-secondary" />
           )}
         </div>
-        {/* 右區:⌄ menu(hover/focus-within 才顯,佔位)
-            **Layout canonical**(2026-05-05 v2 user E rule):inline `shrink-0` 跟 sort/label 並排,
-            `gap-2`(8px,inline-action.spec.md:80 SSOT)分隔。`opacity-0 group-hover:opacity-100`
-            讓 hover 才視覺出現但**永遠佔位**(layout space 保留 = label 自動 truncate 讓位給 sort + more,
-            不再重疊;對齊 Notion / Airtable header layout)。
+        {/* 右區:⌄ menu(hover/focus-within 才顯;**不顯示時不佔位**)
+            **Layout canonical**(2026-05-06 v3 user explicit rule):`hidden` default →
+            `group-hover:inline-flex` / `group-focus-within:inline-flex` / `has-[[data-state=open]]:inline-flex`
+            才出現 + 佔位。前 v2 用 `opacity-0 group-hover:opacity-100` 是「永遠佔位 hover 才顯影」—
+            user 報「不應永遠佔位,沒顯示時應讓 label 多空間」。新行為:
+            - 不顯示 → display:none → 不佔位 → label 取得整個 header width
+            - hover/focus/menu-open → display:inline-flex → 佔位(width 同前;label 自然 truncate 讓位)
+            對齊 Notion(hover-row reveal action,inline action 不佔靜態 layout)/ Linear / Airtable。
             ItemInlineActionButton asChild-compatible,size="md" 因 header 不在 RowSizeProvider。 */}
-        <div className="shrink-0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
+        <div className="shrink-0 hidden group-hover:inline-flex group-focus-within:inline-flex has-[[data-state=open]]:inline-flex">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <ItemInlineActionButton
@@ -1321,6 +1287,7 @@ function DataTableInner<TData>(
           }}
           data-index={isCenter && opts?.virtual ? idx : undefined}
           data-row-index={idx}
+          data-sortable-row-id={enableRowDrag ? row.id : undefined}
           role="row"
           aria-rowindex={idx + 2}
           className={cn(
@@ -1533,9 +1500,39 @@ function DataTableInner<TData>(
     return closestCenter({ ...args, droppableContainers: filtered })
   }, [parentMap])
 
+  // 2026-05-06 v10 DragOverlay canonical:drag start 時 snapshot source row outerHTML(strip
+  // absolute / transform / opacity / data-* + reset width to natural width)→ render in
+  // DragOverlay portal。Source row scroll out-of-viewport unmount 也不影響(canvas 視覺已 detach)。
+  // 移除 windowed sticky range extractor — 不再需要 mount-pin source row,DragOverlay decoupled。
+  // Atlassian / dnd-kit canonical:「If your useDraggable items are within a virtualized list,
+  // you will absolutely want to use a drag overlay, since the original drag source can unmount
+  // while dragging as the virtualized container is scrolled.」(GitHub #1674 / docs/api-documentation/draggable/drag-overlay)
+  const [dragOverlayHtml, setDragOverlayHtml] = React.useState<string | null>(null)
+  const [dragOverlayWidth, setDragOverlayWidth] = React.useState<number | null>(null)
   const handleDragStart = React.useCallback((e: { active: { id: string | number } }) => {
-    setActiveDragId(String(e.active.id))
+    const id = String(e.active.id)
+    setActiveDragId(id)
     setInvalidDropActive(false)
+    // Snapshot source row visual:用第一個 region(primary,通常 center)的 row DOM
+    // (對齊 SortableRowProvider role='primary')。clone outerHTML + strip 動態 attributes。
+    const rowEl = document.querySelector<HTMLElement>(`[role="row"][data-row-index] [data-sortable-row-id="${id}"]`)
+      ?? document.querySelector<HTMLElement>(`[role="row"][data-sortable-row-id="${id}"]`)
+    if (rowEl) {
+      const clone = rowEl.cloneNode(true) as HTMLElement
+      // Strip transform / position attributes inherited from virtualizer / sortable
+      clone.style.position = 'static'
+      clone.style.transform = 'none'
+      clone.style.transition = 'none'
+      clone.style.opacity = '1'
+      clone.style.zIndex = ''
+      clone.style.width = `${rowEl.offsetWidth}px`
+      clone.removeAttribute('data-row-index')
+      clone.removeAttribute('aria-rowindex')
+      // Strip 拖曳手把 portal target(避免 nested handle 重疊)
+      clone.querySelectorAll('[data-drag-handle-portal]').forEach(n => n.remove())
+      setDragOverlayHtml(clone.outerHTML)
+      setDragOverlayWidth(rowEl.offsetWidth)
+    }
   }, [])
 
   const handleDragOver = React.useCallback((e: { active: { id: string | number }; over: { id: string | number } | null }) => {
@@ -1552,12 +1549,16 @@ function DataTableInner<TData>(
   const handleDragCancel = React.useCallback(() => {
     setActiveDragId(null)
     setInvalidDropActive(false)
+    setDragOverlayHtml(null)
+    setDragOverlayWidth(null)
   }, [])
 
   const handleDragEnd = React.useCallback((e: DragEndEvent) => {
     const { active, over } = e
     setActiveDragId(null)
     setInvalidDropActive(false)
+    setDragOverlayHtml(null)
+    setDragOverlayWidth(null)
     if (!over || active.id === over.id) return
     const sourceId = String(active.id)
     const targetId = String(over.id)
@@ -1602,6 +1603,19 @@ function DataTableInner<TData>(
         <SortableContext items={allRowIds} strategy={verticalListSortingStrategy}>
           {node}
         </SortableContext>
+        {/* 2026-05-06 v10:DragOverlay portal — drag-active source row 視覺從原 DOM 解耦,
+            virtual scroll source row unmount 也不影響(dnd-kit canonical for virtualized lists)。
+            cloned outerHTML 走 dangerouslySetInnerHTML(static visual,no React handlers needed
+            in overlay layer)。pointer-events-none 防 drag 中誤觸 inner control。 */}
+        <DragOverlay dropAnimation={null}>
+          {dragOverlayHtml ? (
+            <div
+              style={{ width: dragOverlayWidth ?? undefined }}
+              className="bg-surface-raised shadow-[var(--elevation-200)] rounded-md border border-border pointer-events-none opacity-90"
+              dangerouslySetInnerHTML={{ __html: dragOverlayHtml }}
+            />
+          ) : null}
+        </DragOverlay>
       </DndContext>
     )
   }
