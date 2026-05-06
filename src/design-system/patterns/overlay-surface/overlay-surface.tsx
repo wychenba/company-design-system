@@ -26,7 +26,7 @@ import { cn } from '@/lib/utils'
  * target,視覺 render 仍 28/32),layout 佔位精確匹配 chrome-header-height 幾何。詳
  * `overlay-surface.spec.md`「Chrome dismiss size canonical」。
  *
- * **Notification banner family**(Notice / Alert / Toast,fixed `px-4 py-3` chrome,
+ * **Notification banner family**(Notice / Alert / Toast,fixed `px-4 py-3` variant,
  * 無 padding-based header)→ dismiss 用 `size="xs"` explicit(24 固定,無 trick)。
  *
  * ── Token 規則 ──
@@ -41,21 +41,31 @@ import { cn } from '@/lib/utils'
  * 自管 list outer wrapper(詳 overlay-surface.spec.md「List-as-region in overlay body」)。
  */
 
-// Chrome-slot layout trick(2026-04-22 v5,user intent 精確實作):
+// Chrome-slot layout trick(2026-04-22 v5,2026-05-04 重思 parameterize):
 // **所有 unbounded control**(Button with `data-unbounded="true"` — Button 自動在 variant="text" 或 dismiss
-// 時標記)的 **native size 不變**(sm: 28 md / 32 lg),但 **layout 佔位** via 負 `my` 縮回 24。效果:
-// - Button render + touch target = native sm(視覺 / a11y 不受影響)
-// - Layout 佔位 = 24(與 SurfaceHeader py-tight 組合 = 48/56 chrome-header-height ✓)
-// - Header 若塞 bounded button(primary/tertiary 有 bg/border,無 data-unbounded)→ 不套負 my,自然長高
-// 負 my 公式:(field-height-xs - field-height-sm) / 2,density-aware:
-//   md: (24 - 28) / 2 = -2px
-//   lg: (24 - 32) / 2 = -4px
-const CHROME_UNBOUNDED_SLOT = '[&_[data-unbounded]]:my-[calc((var(--field-height-xs)-var(--field-height-sm))/2)]'
+// 時標記)的 **native size 不變**(sm: 28 md / 32 lg),但 **layout 佔位** via 負 `my` 縮成 `--chrome-slot-h`。
+//
+// **Slot height = header title 的 line-height**(讓 button 不 dominate,title 自然撐 header)
+//   - Default `var(--field-height-xs)` = 24,匹配 Dialog/Sheet text-body-lg (16 × 1.5 = 24)
+//   - Popover/Coachmark override `--chrome-slot-h: 1.25rem` (20),匹配 text-body (14 × 1.5 ≈ 21,floor 20)
+//
+// Header 永遠 padding-based(無 min-h),但因 slot ≤ title line-height,header 高度由 title 主導:
+//   - Dialog: max(24 title, 24 slot) + py-tight(12*2)= 48 ✓ chrome-header-height
+//   - Popover: max(21 title, 20 slot) + py-tight(12*2)= 45 ✓ 自然輕量
+// Q10 穩定性:title-only / title+button / refresh in/out 全 case header 高度 = title + py(slot 不 dominate)
+//
+// 負 my 公式:(slot - native) / 2,density-aware:
+//   Dialog md: (24 - 28) / 2 = -2px;  lg: (24 - 32) / 2 = -4px
+//   Popover md: (20 - 28) / 2 = -4px
+const CHROME_UNBOUNDED_SLOT = '[&_[data-unbounded]]:my-[calc((var(--chrome-slot-h,var(--field-height-xs))-var(--field-height-sm))/2)]'
 
 export const SurfaceHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
+  // Padding-based(預設) — Dialog/Sheet 用 body-lg title (16/24)，自然撐 max(24 title, 24 button slot) = 24
+  // → header = 24 + py-tight 12×2 = 48 chrome-header-height ✓ 穩定無需 min-h
+  // Popover 等輕量 chrome 走 PopoverHeader override(min-h-10 + py-2 = 40,內 24 匹配 button slot)
   <div
     ref={ref}
     className={cn(
@@ -73,9 +83,14 @@ export const SurfaceBody = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
+  // 2026-05-04 viewport-aware scroll canonical:
+  //   parent(PopoverContent / HoverCardContent / Dialog / Sheet)是 flex flex-col + max-h + overflow-hidden
+  //   header / footer shrink-0;Body flex-1 min-h-0 overflow-y-auto → 視窗太小時 body 內 scroll
+  //   非 flex-col parent 內 flex-1/min-h-0 no-op,backward compat
   <div
     ref={ref}
     className={cn(
+      'flex-1 min-h-0 overflow-y-auto',
       'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
       className,
     )}

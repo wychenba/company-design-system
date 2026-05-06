@@ -15,6 +15,7 @@ const meta: Meta<typeof NumberInput> = {
 export default meta
 type Story = StoryObj<typeof NumberInput>
 
+// @story-trait-rationale: pre-existing trait gaps (Default/WithError) tracked separately; this PR scope = add display mode card to Modes story only.
 /* ── 三種模式 ── */
 export const Modes: Story = {
   name: '三種模式',
@@ -25,6 +26,10 @@ export const Modes: Story = {
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">edit</h3>
           <NumberInput value={value} onChange={setValue} prefix="$" aria-label="價格(edit mode demo)" />
+        </div>
+        <div>
+          <h3 className="text-body font-bold text-foreground mb-2">display</h3>
+          <NumberInput mode="display" value={value} prefix="$" aria-label="價格(display mode demo)" />
         </div>
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>

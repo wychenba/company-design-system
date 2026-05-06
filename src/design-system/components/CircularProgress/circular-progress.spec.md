@@ -5,6 +5,9 @@ variants: {}
 sizes: {}
 traits:
   - isMatrixHeavy
+benchmark:
+  - MUI CircularProgress: github.com/mui/material-ui/tree/master/packages/mui-material/src/CircularProgress
+  - Ant Design Progress: github.com/ant-design/ant-design/tree/master/components/progress
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

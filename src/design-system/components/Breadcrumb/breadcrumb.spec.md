@@ -6,6 +6,11 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isStructural
+benchmark:
+  - Ant Design Breadcrumb: github.com/ant-design/ant-design/tree/master/components/breadcrumb
+  - MUI Breadcrumbs: github.com/mui/material-ui/tree/master/packages/mui-material/src/Breadcrumbs
+  - Polaris Breadcrumbs: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Breadcrumbs
+  - Carbon Breadcrumb: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Breadcrumb
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

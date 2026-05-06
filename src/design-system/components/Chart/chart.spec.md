@@ -5,6 +5,10 @@ variants: {}
 sizes: {}
 traits:
   - isStructural
+benchmark:
+  - Recharts: github.com/recharts/recharts
+  - MUI X Charts: github.com/mui/mui-x/tree/master/packages/x-charts
+  - Ant Design Charts: github.com/ant-design/ant-design-charts
 ---
 
 # Chart 設計原則

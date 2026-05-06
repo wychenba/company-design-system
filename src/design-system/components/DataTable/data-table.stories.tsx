@@ -2,7 +2,7 @@
 // same-row-mixed-allow: file 含 toolbar Button iconOnly + row ItemInlineActionButton,但兩者在不同 row(toolbar 跟 panel row 分離)
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { createColumnHelper } from '@tanstack/react-table'
+import { createColumnHelper, type ColumnDef } from '@tanstack/react-table'
 import { Pencil, Trash2, MoreVertical, Search, Filter, Eye, EyeOff, Lock, GripVertical, RotateCcw, Download, Plus, ArrowUpDown, X as XIcon } from 'lucide-react'
 import { DataTable } from './data-table'
 import { DataTableSortManager } from './data-table-sort-manager'
@@ -134,7 +134,7 @@ type Story = StoryObj
 
 /* ── Column Types ── */
 export const ColumnTypes: Story = {
-  name: 'Column Types',
+  name: '欄位型別',
   render: () => {
     interface TypeDemo {
       name: string
@@ -208,9 +208,82 @@ export const NumberAlignment: Story = {
   ),
 }
 
+/* ── Column resize(2026-05-06 v11):table 層級開關 + handle hover 變色 ── */
+export const ColumnResize: Story = {
+  name: '欄寬調整',
+  render: () => {
+    const [widths, setWidths] = React.useState<Record<string, number>>({})
+    return (
+      <div className="flex flex-col gap-3 max-w-5xl">
+        <p className="text-caption text-fg-muted">
+          enableColumnResize=true:所有 data column 可拖 header 右邊分隔線調整寬度。
+          <br />
+          - Hover handle:分隔線從 divider(淡灰)變 border-hover(深灰),cursor: col-resize
+          <br />
+          - 拖動中:分隔線變 primary(藍)
+          <br />
+          - more 選單「自動調整寬度」:scan column 內容 max scrollWidth + buffer 自動 fit
+          <br />
+          - System columns(__select__ 等)永遠 fixed,不在 resize 集合
+          <br />
+          目前 widths:{JSON.stringify(widths)}
+        </p>
+        <DataTable
+          columns={columnsWithPrice}
+          data={sampleData}
+          height="auto"
+          enableColumnResize
+          onColumnResize={(id, w) => setWidths(prev => ({ ...prev, [id]: w }))}
+        />
+      </div>
+    )
+  },
+}
+
 /* ── 行高模式 — autoRowHeight prop(每 row 內容驅動高度) ── */
+export const RowAutoHeightInlineEdit: Story = {
+  name: '自動行高 × 內聯編輯(verify display↔edit position)',
+  render: () => {
+    const [list, setList] = React.useState<Product[]>(generateLargeData(4))
+    const cols: ColumnDef<Product & { note: string }>[] = [
+      { accessorKey: 'sku', header: 'SKU', size: 100, meta: { type: 'string' } },
+      { accessorKey: 'name', header: 'Product', size: 240, meta: { type: 'string', editable: true } },
+      { accessorKey: 'category', header: 'Category', size: 160, meta: { type: 'select', editable: true, options: [
+        { value: 'Electronics', label: 'Electronics' },
+        { value: 'Furniture', label: 'Furniture' },
+        { value: 'Food', label: 'Food' },
+        { value: 'Lifestyle', label: 'Lifestyle' },
+      ] } },
+      { accessorKey: 'note', header: 'Note (wrap text)', size: 360, meta: { type: 'string', editable: true } },
+      { accessorKey: 'price', header: 'Price', size: 100, meta: { type: 'currency', editable: true } },
+    ]
+    const dataWithNotes = list.map((r, i) => ({
+      ...r,
+      note: i % 2 === 0
+        ? 'This product requires special packaging for international shipping. Please verify customs documentation before dispatch.'
+        : 'Standard delivery.',
+    }))
+    return (
+      <div className="max-w-5xl">
+        <p className="text-caption text-fg-muted mb-2">
+          autoRowHeight=true。Note 欄位 wrap text 撐高 row。其他單行 cell 在高 row 中應**頂對齊**。
+          Click 任一 cell 進 edit:文字位置 display↔edit 不偏移(仍頂對齊),
+          frame 填 cell,Field 自帶 state ring(focus-within → primary)。
+        </p>
+        <DataTable
+          columns={cols} data={dataWithNotes} height="auto" autoRowHeight inlineEdit
+          onCellCommit={(rowId, col, val) => {
+            setList((prev) => prev.map((r) => r.sku === rowId ? { ...r, [col]: val as never } : r))
+          }}
+          getRowId={(r) => r.sku}
+        />
+      </div>
+    )
+  },
+}
+
 export const RowAutoHeight: Story = {
-  name: 'Row 行高 — autoRowHeight',
+  name: '自動行高',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -253,7 +326,7 @@ export const EmptyState: Story = {
 /* ── Container 高度模式 — height prop(table 容器約束) ── */
 // Bordered showcase retired — anatomy.BorderedProp 已 canonical 涵蓋(prop table + 何時用 false 的 rationale + 對照),showcase 純重複
 export const ContainerHeight: Story = {
-  name: 'Container 高度 — height prop',
+  name: '容器高度',
   render: () => {
     const manyRows = React.useMemo(() => generateLargeData(50), [])
     return (
@@ -285,7 +358,7 @@ export const ContainerHeight: Story = {
 
 /* ── Row Actions ── */
 export const RowActions: Story = {
-  name: 'Row Actions',
+  name: '列操作',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -324,7 +397,7 @@ export const RowActions: Story = {
 
 /* ── Pinned Columns ── */
 export const PinnedColumns: Story = {
-  name: 'Pinned Columns',
+  name: '欄位釘選',
   render: () => {
     const manyRows = React.useMemo(() => generateLargeData(50), [])
     return (
@@ -371,32 +444,213 @@ export const PinnedColumns: Story = {
 }
 
 /* ── Inline Edit（視覺模式）── */
+/* ── Inline Edit canonical(2026-05-05 v3 user 統一):單一 story 覆蓋全 11 cell type ── */
+const CATEGORY_OPTIONS = [
+  { value: 'Electronics', label: 'Electronics' },
+  { value: 'Furniture', label: 'Furniture' },
+  { value: 'Food', label: 'Food' },
+  { value: 'Lifestyle', label: 'Lifestyle' },
+]
+const STOCK_OPTIONS = [
+  { value: 'In stock', label: 'In stock' },
+  { value: 'Low stock', label: 'Low stock' },
+  { value: 'Out of stock', label: 'Out of stock' },
+]
+// 11 cell type 全覆蓋 sample(對齊 cell-registry types):string / number / currency /
+// date / time / select / multiSelect / person / multiPerson / boolean / url。
+const TAG_OPTIONS = [
+  { value: 'urgent', label: '緊急' },
+  { value: 'review', label: '待審' },
+  { value: 'archived', label: '已封存' },
+]
+// SAMPLE_PEOPLE 完整 PersonData(2026-05-06 v11):每筆都有 default field values(email/phone/
+// department/location)+ status + statusMessage,讓 NameCard hoverCard 永遠完整顯示一致。
+// 對齊 NameCard always-render canonical(NAMECARD_DEFAULT_FIELD_KEYS SSOT)。
+const SAMPLE_PEOPLE: PersonData[] = [
+  {
+    name: 'Alice Chen', avatarUrl: 'https://i.pravatar.cc/48?u=alice', description: 'Design',
+    email: 'alice.chen@example.com', phone: '+886-2-2700-0001', department: 'Design / APAC', location: 'Taipei',
+    status: 'online', statusMessage: '本週設計評審,週四前 standup 移到 4pm',
+  },
+  {
+    name: 'Bob Lin', avatarUrl: 'https://i.pravatar.cc/48?u=bob', description: 'Engineering',
+    email: 'bob.lin@example.com', phone: '+886-2-2700-0002', department: 'Engineering / Platform', location: 'Taipei',
+    status: 'busy', statusMessage: 'Code review 中,訊息我會晚點回',
+  },
+  {
+    name: 'Charlie Wu', avatarUrl: 'https://i.pravatar.cc/48?u=charlie', description: 'Product',
+    email: 'charlie.wu@example.com', phone: '+852-2700-0003', department: 'Product / Growth', location: 'Hong Kong',
+    status: 'online', statusMessage: '今日 OKR 規劃日,可線上協助',
+  },
+  {
+    name: 'Diana Huang', avatarUrl: 'https://i.pravatar.cc/48?u=diana', description: 'Marketing',
+    email: 'diana.huang@example.com', phone: '+65-6700-0004', department: 'Marketing / Brand', location: 'Singapore',
+    status: 'away', statusMessage: '客戶會議中,週四上午回辦公室',
+  },
+]
+interface EditableProduct {
+  sku: string
+  name: string
+  qty: number
+  category: string
+  stock: string
+  tags: string[]
+  owner: PersonData | null
+  reviewers: PersonData[]
+  inStock: boolean
+  url: string
+  price: number
+  releaseDate: string
+  reminderTime: string
+}
+const editableSampleData: EditableProduct[] = sampleData.slice(0, 4).map((p, i) => ({
+  sku: p.sku,
+  name: p.name,
+  qty: 100 + i * 12,
+  category: p.category,
+  stock: p.stock,
+  tags: i === 0 ? ['urgent'] : i === 1 ? ['review', 'urgent'] : i === 2 ? [] : ['archived'],
+  owner: SAMPLE_PEOPLE[i],
+  reviewers: i % 2 === 0 ? [SAMPLE_PEOPLE[(i + 1) % 4], SAMPLE_PEOPLE[(i + 2) % 4]] : [SAMPLE_PEOPLE[(i + 3) % 4]],
+  inStock: p.stock === 'In stock',
+  url: 'https://shop.example.com/' + p.sku.toLowerCase(),
+  price: p.price ?? 0,
+  releaseDate: `2025-0${(i % 9) + 1}-15`,
+  reminderTime: `0${9 + i}:30`,
+}))
+
 export const InlineEdit: Story = {
-  name: 'Inline Edit',
-  render: () => (
-    <div className="flex flex-col gap-8">
+  name: '就地編輯',
+  render: () => {
+    const [data, setData] = React.useState(editableSampleData)
+    const editCol = createColumnHelper<EditableProduct>()
+    const editableColumns = React.useMemo(
+      () => [
+        editCol.accessor('sku', { header: 'SKU', size: 100, meta: { type: 'string' } }),  // 唯讀
+        editCol.accessor('name', { header: 'Product (string)', size: 200, meta: { type: 'string', editable: true } }),
+        editCol.accessor('qty', { header: 'Qty (number)', size: 110, meta: { type: 'number', editable: true } }),
+        editCol.accessor('category', { header: 'Category (select)', size: 150, meta: { type: 'select', options: CATEGORY_OPTIONS, editable: true } }),
+        editCol.accessor('stock', { header: 'Stock (select)', size: 140, meta: { type: 'select', options: STOCK_OPTIONS, editable: true } }),
+        editCol.accessor('tags', { header: 'Tags (multiSelect)', size: 180, meta: { type: 'multiSelect', options: TAG_OPTIONS, editable: true } }),
+        editCol.accessor('owner', { header: 'Owner (person)', size: 160, meta: { type: 'person', people: SAMPLE_PEOPLE, editable: true } }),
+        editCol.accessor('reviewers', { header: 'Reviewers (multiPerson)', size: 180, meta: { type: 'multiPerson', people: SAMPLE_PEOPLE, editable: true } }),
+        editCol.accessor('inStock', { header: 'In (boolean)', size: 90, meta: { type: 'boolean', editable: true } }),
+        editCol.accessor('url', { header: 'URL', size: 180, meta: { type: 'url', editable: true } }),
+        editCol.accessor('price', { header: 'Price (currency)', size: 130, meta: { type: 'currency', prefix: '$', editable: true } }),
+        editCol.accessor('releaseDate', { header: 'Release (date)', size: 140, meta: { type: 'date', editable: true } }),
+        editCol.accessor('reminderTime', { header: 'Reminder (time)', size: 130, meta: { type: 'time', editable: true } }),
+      ],
+      []
+    )
+    const handleCommit = (rowId: string, colId: string, value: unknown) => {
+      setData((prev) => prev.map((row) => row.sku === rowId ? { ...row, [colId]: value } : row))
+    }
+    return (
       <div>
-        <h3 className="text-body font-bold text-foreground mb-2">Inline Edit 模式</h3>
-        <p className="text-caption text-fg-muted mb-3">Cell 間有垂直分隔線，select 類欄位顯示 ChevronDown / Calendar 指示器。</p>
+        <p className="text-caption text-fg-muted mb-3">
+          11 cell type 全覆蓋:string / number / currency / date / time / select / multiSelect / person / multiPerson / boolean / url。
+          SKU 唯讀;boolean=點 Checkbox 即時 toggle;url=hover cell 顯示 Pencil → click;其他 click cell 進 edit → Enter/blur commit / Esc cancel。
+        </p>
         <DataTable
-          columns={columnsWithPrice}
-          data={sampleData}
+          columns={editableColumns}
+          data={data}
           height="auto"
           inlineEdit
-          rowActions={() => (
-            <>
-              <Button variant="text" size="xs" iconOnly startIcon={MoreVertical} aria-label="更多操作" />
-            </>
-          )}
+          tableOptions={{ getRowId: (row) => row.sku }}
+          getRowId={(row) => row.sku}
+          onCellCommit={handleCommit}
         />
       </div>
-    </div>
-  ),
+    )
+  },
+}
+
+/* ── Nested rows (tree-table) ── */
+interface TaskRow {
+  id: string
+  task: string
+  owner: string
+  status: string
+  children?: TaskRow[]
+}
+const NESTED_DATA: TaskRow[] = [
+  {
+    id: 'task-1',
+    task: 'Q1 行銷活動',
+    owner: 'Alice Wang',
+    status: 'In progress',
+    children: [
+      {
+        id: 'task-1-1',
+        task: '社群素材設計',
+        owner: 'Bob Chen',
+        status: 'Done',
+        children: [
+          { id: 'task-1-1-1', task: 'Instagram post 設計', owner: 'Bob Chen', status: 'Done' },
+          { id: 'task-1-1-2', task: 'Facebook cover 設計', owner: 'Bob Chen', status: 'Done' },
+        ],
+      },
+      { id: 'task-1-2', task: 'KOL 合作協調', owner: 'Carol Liu', status: 'In progress' },
+      { id: 'task-1-3', task: '預算審核', owner: 'Alice Wang', status: 'Blocked' },
+    ],
+  },
+  {
+    id: 'task-2',
+    task: 'Q2 產品上架',
+    owner: 'David Wu',
+    status: 'Not started',
+    children: [
+      { id: 'task-2-1', task: '產品文案撰寫', owner: 'Carol Liu', status: 'Not started' },
+      { id: 'task-2-2', task: 'SKU 設定', owner: 'David Wu', status: 'Not started' },
+    ],
+  },
+]
+
+export const NestedRows: Story = {
+  name: '巢狀 row(tree-table)',
+  render: () => {
+    const [expanded, setExpanded] = React.useState<Record<string, boolean>>({ 'task-1': true, 'task-1-1': true })
+    const STATUS_OPTIONS = [
+      { value: 'Not started', label: 'Not started' },
+      { value: 'In progress', label: 'In progress' },
+      { value: 'Blocked', label: 'Blocked' },
+      { value: 'Done', label: 'Done' },
+    ]
+    const taskCol = createColumnHelper<TaskRow>()
+    const taskColumns = React.useMemo(
+      () => [
+        taskCol.accessor('task', { header: '任務', size: 360, meta: { type: 'string' } }),
+        taskCol.accessor('owner', { header: '負責人', size: 160, meta: { type: 'string' } }),
+        taskCol.accessor('status', { header: '狀態', size: 140, meta: { type: 'select', options: STATUS_OPTIONS } }),
+      ],
+      []
+    )
+    return (
+      <div>
+        <p className="text-caption text-fg-muted mb-3">
+          forward TanStack <code>getSubRows</code> + 共用 token <code>--tree-indent-{'{sm,md,lg}'}</code>(跨 TreeView 設計語言)。Click chevron 展/收;chevron click stopPropagation 不 fire row select。
+        </p>
+        <DataTable
+          columns={taskColumns}
+          data={NESTED_DATA}
+          height="auto"
+          getRowId={(row) => row.id}
+          selectable
+          tableOptions={{
+            getSubRows: (row: TaskRow) => row.children,
+            getRowCanExpand: (row) => Boolean(row.original.children?.length),
+            state: { expanded },
+            onExpandedChange: setExpanded as any,
+          }}
+        />
+      </div>
+    )
+  },
 }
 
 /* ── 虛擬捲動（大量資料）── */
 export const VirtualScroll: Story = {
-  name: '虛擬捲動',
+  name: '大量資料',
   render: () => {
     const largeData = React.useMemo(() => generateLargeData(10000), [])
     return (
@@ -494,9 +748,13 @@ export const WithBulkActions: Story = {
       [search]
     )
     const VISIBLE = filteredData.length
-    const showHint = !allSelected
-      ? selection.length === VISIBLE && VISIBLE > 0 && TOTAL > VISIBLE
-      : true
+    // **NEW fix(2026-05-04)**:showHint 必含 selection.length > 0 前提,否則「清除選取」後 allSelected
+    // 還是 true 邏輯走「: true」branch → Alert 仍 render「已選取全部 N 個」 → 怪 state
+    const showHint = selection.length > 0 && (
+      !allSelected
+        ? selection.length === VISIBLE && VISIBLE > 0 && TOTAL > VISIBLE
+        : true
+    )
 
     return (
       // 撐滿 parent(layout=fullscreen);
@@ -706,7 +964,8 @@ export const WithBulkActions: Story = {
           />
         </div>
 
-        {/* 底部 chrome group:Alert hint(全選提示)+ BulkActionBar — wrapper mb-loose 已提供間距 */}
+        {/* 底部 chrome group(撤回前一版 absolute overlay,2026-05-04 user 抓 BulkActionBar 沒底色 + 蓋表底列 regression):
+            回 flex flow 自然推 table。Q7 mount-time growth 真因 = virtualizer estimateRowHeight ≠ token,已在 DataTable 內修(estimate size-aware) */}
         {(showHint || selection.length > 0) && (
           <div className="flex flex-col">
             {showHint && (
@@ -747,8 +1006,8 @@ export const WithBulkActions: Story = {
                 onClear={() => { setSelection([]); setAllSelected(false) }}
                 actions={
                   <>
-                    <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
-                    <Button variant="tertiary" size="sm" startIcon={Trash2} danger>移除</Button>
+                    <Button variant="tertiary" size="md" startIcon={Download}>下載</Button>
+                    <Button variant="tertiary" size="md" startIcon={Trash2} danger>移除</Button>
                   </>
                 }
               />
@@ -762,7 +1021,7 @@ export const WithBulkActions: Story = {
 
 /* ── L2 Selection — Shift-click + 鍵盤(Cmd+A / Esc)── */
 export const SelectionKeyboardAndShift: Story = {
-  name: '區間選取與鍵盤操作',
+  name: '範圍選取與鍵盤',
   render: () => {
     const [selection, setSelection] = React.useState<string[]>([])
     const data = generateLargeData(15)
@@ -834,6 +1093,305 @@ export const SelectionDisabledRows: Story = {
           onSelectionChange={setSelection}
           getRowId={(row) => row.sku}
           isRowSelectable={(row) => row.stock !== 'Out of stock'}
+        />
+      </div>
+    )
+  },
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   進階篩選(Filter Panel)— 2026-05-04 從 data-table-filter-panel.stories.tsx
+   inline 過來,sidebar 收斂於 DataTable/展示 同一層(Q1 canonical)
+   ──────────────────────────────────────────────────────────────────────────── */
+
+const FILTER_COLUMNS = [
+  col.accessor('sku',      { header: 'SKU',      meta: { type: 'string', filterable: true } }),
+  col.accessor('name',     { header: '名稱',     meta: { type: 'string', filterable: true } }),
+  col.accessor('category', { header: '類別',     meta: {
+    type: 'select', filterable: true,
+    options: [
+      { value: 'Electronics', label: 'Electronics' },
+      { value: 'Furniture', label: 'Furniture' },
+      { value: 'Food', label: 'Food' },
+      { value: 'Lifestyle', label: 'Lifestyle' },
+    ],
+  }}),
+  col.accessor('stock',     { header: '庫存',     meta: { type: 'select', filterable: true,
+    options: [
+      { value: 'In stock', label: 'In stock' },
+      { value: 'Low stock', label: 'Low stock' },
+      { value: 'Out of stock', label: 'Out of stock' },
+    ],
+  }}),
+  col.accessor('updatedAt', { header: '更新時間', meta: { type: 'date', filterable: true, includeTime: true } }),
+] as const
+
+/* ── 進階篩選 — 空狀態 ── */
+export const FilterPanelEmpty: Story = {
+  name: '進階篩選 — 空狀態',
+  render: () => {
+    const [value, setValue] = React.useState<FilterTree>(() => createEmptyFilterTree('flat'))
+    return (
+      <div className="w-full max-w-[680px]">
+        <DataTableFilterPanel
+          mode="flat"
+          columns={[...FILTER_COLUMNS]}
+          value={value}
+          onChange={setValue}
+
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 進階篩選 — 已填條件 ── */
+export const FilterPanelWithConditions: Story = {
+  name: '進階篩選 — 已填條件',
+  render: () => {
+    const [value, setValue] = React.useState<FilterTree>(() => ({
+      mode: 'flat', conjunction: 'and',
+      children: [
+        { kind: 'cond', id: 'c1', field: 'name',     op: 'contains', value: 'phone' },
+        { kind: 'cond', id: 'c2', field: 'category', op: 'is',       value: ['Electronics'] },
+        { kind: 'cond', id: 'c3', field: 'stock',    op: 'is',       value: ['In stock'] },
+      ],
+    }))
+    return (
+      <div className="w-full max-w-[680px]">
+        <DataTableFilterPanel
+          mode="flat"
+          columns={[...FILTER_COLUMNS]}
+          value={value}
+          onChange={setValue}
+
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 進階篩選 — 巢狀群組 ── */
+export const FilterPanelNested: Story = {
+  name: '進階篩選 — 巢狀群組',
+  render: () => {
+    const [value, setValue] = React.useState<FilterTree>(() => ({
+      mode: 'nested', conjunction: 'or',
+      children: [
+        {
+          kind: 'group', id: 'g1', conjunction: 'and',
+          children: [
+            { kind: 'cond', id: 'c1', field: 'category', op: 'is', value: ['Electronics'] },
+            { kind: 'cond', id: 'c2', field: 'stock',    op: 'is', value: ['In stock'] },
+          ],
+        },
+        {
+          kind: 'group', id: 'g2', conjunction: 'and',
+          children: [
+            { kind: 'cond', id: 'c3', field: 'category', op: 'is', value: ['Furniture'] },
+            { kind: 'cond', id: 'c4', field: 'stock',    op: 'is', value: ['Low stock'] },
+          ],
+        },
+      ],
+    }))
+    return (
+      <div className="w-full max-w-[680px]">
+        <DataTableFilterPanel
+          mode="nested"
+          columns={[...FILTER_COLUMNS]}
+          value={value}
+          onChange={setValue}
+
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 進階篩選 — 相對時間群組 ── */
+export const FilterPanelRelativeDate: Story = {
+  name: '進階篩選 — 相對時間群組',
+  render: () => {
+    const [value, setValue] = React.useState<FilterTree>(() => ({
+      mode: 'flat', conjunction: 'and',
+      children: [
+        { kind: 'cond', id: 'c1', field: 'updatedAt', op: 'is_relative', value: 'past_7_days' },
+      ],
+    }))
+    return (
+      <div className="w-full max-w-[680px]">
+        <p className="text-caption text-fg-muted mb-3">時間下拉分 過去 / 目前 / 未來 三組（Linear/Notion 共識）。</p>
+        <DataTableFilterPanel
+          mode="flat"
+          columns={[...FILTER_COLUMNS]}
+          value={value}
+          onChange={setValue}
+
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 進階篩選 — 已改動(refresh icon)── */
+export const FilterPanelModified: Story = {
+  name: '進階篩選 — 已改動',
+  render: () => {
+    const initial: FilterTree = {
+      mode: 'flat', conjunction: 'and',
+      children: [{ kind: 'cond', id: 'c1', field: 'category', op: 'is', value: ['Electronics'] }],
+    }
+    const modified: FilterTree = {
+      mode: 'flat', conjunction: 'and',
+      children: [{ kind: 'cond', id: 'c1', field: 'category', op: 'is', value: ['Furniture'] }],
+    }
+    const [value, setValue] = React.useState<FilterTree>(modified)
+    return (
+      <div className="w-full max-w-[680px]">
+        <p className="text-caption text-fg-muted mb-3">值偏離 default 時 header 出現 ↻ — 點擊 reset 回 default。</p>
+        <DataTableFilterPanel
+          mode="flat"
+          columns={[...FILTER_COLUMNS]}
+          value={value}
+          defaultValue={initial}
+          onChange={setValue}
+
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 進階篩選 — 長 tag 溢出測試(A5 reproduce)── */
+export const FilterPanelLongTagOverflow: Story = {
+  name: '進階篩選 — 長 tag 溢出',
+  render: () => {
+    // 故意用 select_multi op + 多個長 label values,測試 Combobox tag overflow + +N indicator
+    const longLabelColumns = [
+      col.accessor('category', {
+        header: '類別',
+        meta: { type: 'select', filterable: true, options: [
+          { value: 'Heavy Industrial Manufacturing Equipment', label: 'Heavy Industrial Manufacturing Equipment' },
+          { value: 'Premium Consumer Electronics & Accessories', label: 'Premium Consumer Electronics & Accessories' },
+          { value: 'Sustainable Organic Food & Beverage Products', label: 'Sustainable Organic Food & Beverage Products' },
+          { value: 'Lifestyle Home & Garden Decoration', label: 'Lifestyle Home & Garden Decoration' },
+        ] },
+      }),
+    ]
+    const [value, setValue] = React.useState<FilterTree>(() => ({
+      mode: 'flat', conjunction: 'and',
+      children: [
+        { kind: 'cond', id: 'c1', field: 'category', op: 'is', value: [
+          'Heavy Industrial Manufacturing Equipment',
+          'Premium Consumer Electronics & Accessories',
+          'Sustainable Organic Food & Beverage Products',
+        ]},
+      ],
+    }))
+    return (
+      <div className="w-full max-w-[680px]">
+        <p className="text-caption text-fg-muted mb-3">A5 reproduce — 多個超長 label values 是否觸發 Combobox `+N` overflow indicator?</p>
+        <DataTableFilterPanel
+          mode="flat"
+          columns={[...longLabelColumns]}
+          value={value}
+          onChange={setValue}
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 列拖曳重排(Jira-style + 3-panel pinned columns)──────────────────────
+   enableRowDrag + onRowReorder 整合範例(v3 Jira canonical):
+   - handle absolute 浮在 row 左 border(Button tertiary iconOnly xs = elevated chip)
+   - 不佔 column 空間 — table 看起來乾淨,沒有預留拖曳欄位
+   - hover row → handle 浮現(opacity 0 → 100)
+   - 拖曳 row → @dnd-kit/sortable 重排;放下 → onRowReorder(sourceId, targetId, 'before' | 'after')
+   - consumer 自管 data array mutation(同 Notion / Airtable / Linear pattern)
+   - sort 啟用時 drag handle 自動 disabled + Tooltip 解釋
+   - pinned-left + pinned-right 同時存在 → mirror regions 跟動 transform(per-region useSortable
+     共享同 SortableContext state) */
+export const RowDragInteractive: Story = {
+  name: '列拖曳重排（含釘選欄）',
+  render: () => {
+    const [list, setList] = React.useState<Product[]>(sampleData)
+    const handleReorder = (sourceId: string, targetId: string, position: 'before' | 'after') => {
+      setList((prev) => {
+        const sourceIdx = prev.findIndex((r) => r.sku === sourceId)
+        const targetIdx = prev.findIndex((r) => r.sku === targetId)
+        if (sourceIdx === -1 || targetIdx === -1) return prev
+        const next = [...prev]
+        const [moved] = next.splice(sourceIdx, 1)
+        // splice 後 target 可能位移,重算
+        const adjustedTarget = next.findIndex((r) => r.sku === targetId)
+        const insertAt = position === 'before' ? adjustedTarget : adjustedTarget + 1
+        next.splice(insertAt, 0, moved)
+        return next
+      })
+    }
+    return (
+      <div className="flex flex-col gap-3 max-w-3xl">
+        <p className="text-caption text-fg-muted">
+          handle 浮在 row 左緣（不佔 column 空間，Jira canonical）。pinned-left（SKU）+ pinned-right（Updated）+
+          center 中段欄。拖曳任一列時，三個 region 的 row 會同步跟動 transform（per-region
+          <code>useSortable</code> 共享同 SortableContext state）。
+        </p>
+        <DataTable
+          columns={columnsWithPrice}
+          data={list}
+          height="auto"
+          getRowId={(row) => row.sku}
+          pinnedLeftColumns={['sku']}
+          pinnedRightColumns={['updatedAt']}
+          enableRowDrag
+          onRowReorder={handleReorder}
+        />
+      </div>
+    )
+  },
+}
+
+/* ── 列拖曳 × 虛擬捲動（200 列）────────────────────────────────────────────
+   v3 fix(2026-05-05)— scroll bug 修法:
+   1. enableRowDrag 時 overscan 自動拉到 ≥ 10(避免 row unmount 時 useSortable subscription 跟著
+      消失導致 dnd-kit stale lookup → 拖到該 id 視覺錯位)
+   2. drag 進行中(activeDragId != null)整個略過 measureElement(任一 row 重新量測會跟 dnd-kit
+      transform 競爭,長 list 累積錯位)
+   3. DndContext modifier 鎖 Y 軸(restrictToVerticalAxis inline 實作)— row drag 是垂直語義,
+      X 抖動會觸發水平 transform → 進而 measureElement loop
+   - 200 列 + 固定高度 → virtualizer 啟用
+   - 拖曳長距離 + 持續往下捲 → 視覺位置仍對齊,放下後 onRowReorder 收到正確 sourceId / targetId */
+export const RowDragWithVirtualization: Story = {
+  name: '列拖曳 × 虛擬捲動',
+  render: () => {
+    const [list, setList] = React.useState<Product[]>(() => generateLargeData(200))
+    const handleReorder = (sourceId: string, targetId: string, position: 'before' | 'after') => {
+      setList((prev) => {
+        const sourceIdx = prev.findIndex((r) => r.sku === sourceId)
+        const targetIdx = prev.findIndex((r) => r.sku === targetId)
+        if (sourceIdx === -1 || targetIdx === -1) return prev
+        const next = [...prev]
+        const [moved] = next.splice(sourceIdx, 1)
+        const adjustedTarget = next.findIndex((r) => r.sku === targetId)
+        const insertAt = position === 'before' ? adjustedTarget : adjustedTarget + 1
+        next.splice(insertAt, 0, moved)
+        return next
+      })
+    }
+    return (
+      <div className="flex flex-col gap-3 max-w-3xl">
+        <p className="text-caption text-fg-muted">
+          200 列 + 虛擬捲動。v3 修正:enableRowDrag 自動拉高 overscan ≥ 10、drag 期間 freeze
+          measureElement、modifier 鎖 Y 軸 — 拖曳 + 持續往下捲不再錯位。
+        </p>
+        <DataTable
+          columns={baseColumns}
+          data={list}
+          height="500px"
+          getRowId={(row) => row.sku}
+          enableRowDrag
+          onRowReorder={handleReorder}
         />
       </div>
     )

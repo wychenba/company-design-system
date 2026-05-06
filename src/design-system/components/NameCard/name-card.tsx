@@ -69,6 +69,39 @@ const STATUS_LABEL: Record<StatusType, string> = {
   offline: 'Offline',
 }
 
+/**
+ * NameCard SSOT — 預設 field keys(v11 always-render canonical,2026-05-06)
+ *
+ * ── 為什麼 SSOT ──
+ * User explicit rule:「所有 namecard 預設顯示的資訊都是要一樣完整的」。前 v10 props
+ * 全 optional + body conditional render → consumer 漏傳 fields 視覺缺 section,每個範例
+ * 各自不一致(同 person 在 DataTable / PeoplePicker / avatar.principles 看起來不同)。
+ *
+ * v11 canonical:NameCard **always** renders 4 default sections regardless of consumer 是否
+ * 傳資料 — 缺 data → 對應 DescriptionItem 顯 `EMPTY_PLACEHOLDER`("—"),section 結構不收合。
+ * 視覺結構 SSOT 在此元件,不依賴 consumer。
+ *
+ * ── 對齊 world-class ──
+ * Slack profile card / Linear member card / Notion person card / GitHub user card / Figma user card
+ * 都是 fixed schema(role / email / location / department / department / pronouns 等),
+ * 不會因為某 user 沒填 phone 整個 phone field 不見 — 缺 = 顯 `Not set` 或留白。
+ *
+ * ── 為什麼 placeholder 不 hide ──
+ * Hide → consumer 不知道少傳 → 視覺漂移;Placeholder → 永遠看到「該欄該有」+ dev-warn 提示
+ * consumer 補資料,自動防漂移(M19 ensure-canonical 對齊)。
+ */
+export const NAMECARD_DEFAULT_FIELD_KEYS = ['email', 'phone', 'department', 'location'] as const
+export type NameCardDefaultFieldKey = typeof NAMECARD_DEFAULT_FIELD_KEYS[number]
+
+const DEFAULT_FIELD_LABEL: Record<NameCardDefaultFieldKey, string> = {
+  email: 'Email',
+  phone: 'Phone',
+  department: 'Department',
+  location: 'Location',
+}
+
+const FIELD_PLACEHOLDER = '—'
+
 export interface NameCardProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string
   avatar?: AvatarData
@@ -76,7 +109,17 @@ export interface NameCardProps extends React.HTMLAttributes<HTMLDivElement> {
   status?: StatusType
   statusMessage?: React.ReactNode
   actions?: React.ReactNode
-  fields?: { label: string; value: string }[]
+  /**
+   * Consumer 傳的 field 資料(partial)。預設 keys 走 `NAMECARD_DEFAULT_FIELD_KEYS` —
+   * email / phone / department / location 永遠 render(缺資料顯 `—`)。Consumer 想新增
+   * 自訂 field 直接傳入(在 default 之後 append),想 override default key value 也直接傳。
+   */
+  fields?: { label: string; value: React.ReactNode }[]
+  /**
+   * Default field 的真實值。Object key = NAMECARD_DEFAULT_FIELD_KEYS 之一。
+   * 缺 key → render placeholder。Dev mode 會 console.warn 提醒消費者補資料。
+   */
+  defaultFieldValues?: Partial<Record<NameCardDefaultFieldKey, React.ReactNode>>
   onViewMore?: () => void
   viewMoreLabel?: string
 }
@@ -92,6 +135,7 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
       statusMessage,
       actions,
       fields,
+      defaultFieldValues,
       onViewMore,
       viewMoreLabel = 'View more',
       className,
@@ -99,9 +143,25 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
     },
     ref,
   ) => {
-    const hasStatus = !!status
-    const hasFields = fields && fields.length > 0
-    const hasScrollableBody = hasStatus || hasFields
+    // v11 always-render canonical:default fields 永遠 render(缺資料顯 placeholder),
+    // consumer 自訂 fields 在 default 之後 append。Status section 也永遠 render(無 status
+    // 顯「Status not set」placeholder),統一視覺結構。
+    const allFields = React.useMemo(() => {
+      const defaults = NAMECARD_DEFAULT_FIELD_KEYS.map((key) => ({
+        label: DEFAULT_FIELD_LABEL[key],
+        value: defaultFieldValues?.[key] ?? FIELD_PLACEHOLDER,
+      }))
+      return fields && fields.length > 0 ? [...defaults, ...fields] : defaults
+    }, [defaultFieldValues, fields])
+
+    // Dev mode warn:consumer 沒傳 default field 任何 key → 提示補完(避免漂移成 placeholder-only)
+    if (process.env.NODE_ENV !== 'production' && !defaultFieldValues) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[NameCard] "${name}":no defaultFieldValues passed — sections will render placeholders. ` +
+        `Pass at least { email, phone, department, location } via PersonData or defaultFieldValues prop.`,
+      )
+    }
 
     // Layout canonical(2026-04-23):Header + Actions 固定上,Body(status + fields)可捲動,
     // View more 固定下。**NameCard 自己約束高度**,不依賴 consumer HoverCardContent 設 flex:
@@ -155,39 +215,42 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
           )}
         </div>
 
-        {/* ── BODY(可捲動): status + fields ── */}
-        {hasScrollableBody && (
-          <ScrollArea className="flex-1 min-h-0 border-t border-divider">
-            {hasStatus && (
-              <div className="px-4 py-3 flex flex-col gap-3">
-                {/* Status badge — dot 色走 --status-* presence token */}
-                <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-md">
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: STATUS_DOT_COLOR[status!] }}
-                  />
-                  <span className="text-body">{STATUS_LABEL[status!]}</span>
-                </div>
-                {/* Status message — 包 DescriptionList 維持 dl/dt/dd 語意 */}
-                {statusMessage && (
-                  <DescriptionList>
-                    <DescriptionItem label="Status message">{statusMessage}</DescriptionItem>
-                  </DescriptionList>
-                )}
-              </div>
-            )}
+        {/* ── BODY(可捲動,v11 always-render canonical): status + fields ──
+            前 v10 用 `hasStatus || hasFields` conditional render → consumer 漏傳 → section
+            消失 + 視覺結構在不同 consumer 不一致。v11:**永遠 render 兩個 section**(缺資料顯
+            placeholder),user explicit「視覺結構統一」rule。 */}
+        <ScrollArea className="flex-1 min-h-0 border-t border-divider">
+          <div className="px-4 py-3 flex flex-col gap-3">
+            {/* Status badge — dot 色走 --status-* presence token;無 status → muted 樣式 */}
+            <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-md">
+              <span
+                className="w-2.5 h-2.5 rounded-full shrink-0"
+                style={{ backgroundColor: status ? STATUS_DOT_COLOR[status] : 'var(--color-neutral-5)' }}
+              />
+              <span className={cn('text-body', !status && 'text-fg-muted')}>
+                {status ? STATUS_LABEL[status] : 'Status not set'}
+              </span>
+            </div>
+            {/* Status message — 包 DescriptionList 維持 dl/dt/dd 語意。缺則顯 placeholder */}
+            <DescriptionList>
+              <DescriptionItem label="Status message">
+                {statusMessage ?? <span className="text-fg-muted">{FIELD_PLACEHOLDER}</span>}
+              </DescriptionItem>
+            </DescriptionList>
+          </div>
 
-            {hasFields && (
-              <div className={cn(hasStatus && 'border-t border-divider', 'px-4 py-3')}>
-                <DescriptionList cols={2}>
-                  {fields!.map((f) => (
-                    <DescriptionItem key={f.label} label={f.label}>{f.value}</DescriptionItem>
-                  ))}
-                </DescriptionList>
-              </div>
-            )}
-          </ScrollArea>
-        )}
+          <div className="border-t border-divider px-4 py-3">
+            <DescriptionList cols={2}>
+              {allFields.map((f) => (
+                <DescriptionItem key={f.label} label={f.label}>
+                  {f.value === FIELD_PLACEHOLDER
+                    ? <span className="text-fg-muted">{FIELD_PLACEHOLDER}</span>
+                    : f.value}
+                </DescriptionItem>
+              ))}
+            </DescriptionList>
+          </div>
+        </ScrollArea>
 
         {/* ── FOOTER(固定): View more,py-3 canonical(12px,比一般 link 按鈕多呼吸) ── */}
         {onViewMore && (

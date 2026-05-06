@@ -286,6 +286,7 @@
   /* Border / Divider */
   --border:               var(--color-neutral-5);  /* 元件標準邊框 */
   --border-hover:         var(--color-neutral-6);  /* input、checkbox、radio hover 邊框 */
+  --border-opaque:        var(--color-neutral-5-opaque);  /* 視覺等同 --border (#D9D9D9 on white)但 alpha-immune。何時用:cell bg 非白 (e.g. disabled 灰底 / nested surface) 時,alpha 邊框會跟 bg compositing 致視覺位移。用此 token 維持邊框視覺一致。對齊 Ant colorBorderSecondary solid idiom。一般白底場景仍用 --border (alpha) */
   --divider:              var(--color-neutral-4);  /* 分隔線，比 border 更淡 */
   --ring:                 var(--primary);           /* focus ring */
 

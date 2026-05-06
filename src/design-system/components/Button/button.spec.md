@@ -41,6 +41,10 @@ sizes:
 related:
   近親: [SegmentedControl, IconButton, Link]
   SSOT-anchor: "button.spec.md → Pill Layout(Family 3 SSOT)"
+benchmark:
+  - Ant Design Button: github.com/ant-design/ant-design/tree/master/components/button
+  - MUI Button: github.com/mui/material-ui/tree/master/packages/mui-material/src/Button
+  - Carbon Button: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Button
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

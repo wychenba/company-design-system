@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { DatePicker, DatePickerDisplay } from './date-picker'
+import { DatePicker } from './date-picker'
 import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta<typeof DatePicker> = {
@@ -41,6 +41,11 @@ export const Modes: Story = {
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">edit</h3>
         <DatePicker value="2026-04-02" onChange={() => {}} />
+      </div>
+      {/* @story-trait-rationale: pre-existing trait gaps tracked separately */}
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">display</h3>
+        <DatePicker mode="display" value="2026-04-02" />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
@@ -292,19 +297,19 @@ export const Display: Story = {
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3">
         <span className="text-caption text-fg-muted w-20">預設</span>
-        <DatePickerDisplay value="2026-04-02" />
+        <DatePicker mode="display" value="2026-04-02" />
       </div>
       <div className="flex items-center gap-3">
         <span className="text-caption text-fg-muted w-20">完整月份</span>
-        <DatePickerDisplay value="2026-04-02" formatOptions={{ year: 'numeric', month: 'long', day: 'numeric' }} />
+        <DatePicker mode="display" value="2026-04-02" formatOptions={{ year: 'numeric', month: 'long', day: 'numeric' }} />
       </div>
       <div className="flex items-center gap-3">
         <span className="text-caption text-fg-muted w-20">zh-TW</span>
-        <DatePickerDisplay value="2026-04-02" locale="zh-TW" formatOptions={{ year: 'numeric', month: 'long', day: 'numeric' }} />
+        <DatePicker mode="display" value="2026-04-02" locale="zh-TW" formatOptions={{ year: 'numeric', month: 'long', day: 'numeric' }} />
       </div>
       <div className="flex items-center gap-3">
         <span className="text-caption text-fg-muted w-20">null</span>
-        <DatePickerDisplay value={null} />
+        <DatePicker mode="display" value={null} />
       </div>
     </div>
   ),

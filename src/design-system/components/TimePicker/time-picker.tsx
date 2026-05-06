@@ -2,13 +2,13 @@ import * as React from 'react'
 import { X, Clock } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { FieldMode } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import {
   fieldWrapperStyles,
   bareInputStyles,
   EMPTY_DISPLAY,
 } from '@/design-system/components/Field/field-wrapper'
-import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { Button } from '@/design-system/components/Button/button'
@@ -31,8 +31,9 @@ import {
  *
  * ── Layout Family ──
  * CLAUDE.md 4-Family Model Family 4(Field control layout)消費者。結構繼承
- * `fieldWrapperStyles + [startIcon?] [<editable>] [endAction?]`,視覺對齊
- * Family 1(Menu item layout)。
+ * `fieldWrapperStyles + [<editable>] [endIcon=Clock]`,視覺對齊 DatePicker(同
+ * 「點擊觸發浮層」role:indicator 在 suffix slot,對齊 Material `endAdornment` /
+ * Ant DatePicker / Polaris Picker 共識)。
  *
  * ── 實作基礎 ──
  * Trigger:`<button>` + `fieldWrapperStyles`(視覺仍是 Input wrapper,改為可點擊觸發浮層)
@@ -73,19 +74,6 @@ function formatTime(
   return new Intl.DateTimeFormat(locale, formatOptions).format(d)
 }
 
-// ── Display sub-component(DataTable cell 用)────────────────────────────────
-
-export interface TimePickerDisplayProps extends TimeFormatOptions {
-  value?: string | null
-}
-
-function TimePickerDisplay({ value, ...formatOptions }: TimePickerDisplayProps) {
-  if (value == null || value === '')
-    return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
-  return <>{formatTime(value, formatOptions)}</>
-}
-TimePickerDisplay.displayName = 'TimePickerDisplay'
-
 // ── Disabled time callback ──────────────────────────────────────────────────
 // `Step` / `buildRange` / `TimeColumn`(內部欄位實作)拔掉,改 import `TimeColumns` primitive。
 
@@ -105,6 +93,8 @@ export interface TimePickerProps
       'onChange' | 'placeholder'
     > {
   mode?: FieldMode
+  /** Field chrome variant. Default = context.variant ?? 'default'. Per-prop override. */
+  variant?: FieldVariant
   error?: boolean
   size?: 'sm' | 'md' | 'lg'
   /** ISO time string("HH:mm" 或 "HH:mm:ss") */
@@ -126,8 +116,15 @@ export interface TimePickerProps
   secondStep?: TimeStep
   /** 動態 disabled 某些時/分/秒(基於已選其他欄位)。 */
   disabledTime?: (parts: TimeParts) => DisabledTimeResult
-  /** 左側 startIcon,預設 Clock。傳 null 可關閉 */
-  startIcon?: LucideIcon | null
+  /**
+   * Suffix indicator(2026-05-05 v9 canonical fix):「點擊觸發浮層」indicator 一律 suffix
+   * (對齊 DatePicker calendar / Material endAdornment)。預設 Clock,傳 null 可關閉。
+   */
+  endIcon?: LucideIcon | null
+  /** Initial open state(uncontrolled)— DataTable cell-as-input 1-step open canonical */
+  defaultOpen?: boolean
+  /** open state 變更 callback。DataTable cell-as-input 用:open=false → cell exit edit */
+  onOpenChange?: (open: boolean) => void
 }
 
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
@@ -135,6 +132,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
   (
     {
       mode = 'edit',
+      variant: variantProp,
       error: errorProp = false,
       size = 'md',
       value,
@@ -147,9 +145,11 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
       minuteStep = 1,
       secondStep = 1,
       disabledTime,
-      startIcon,
+      endIcon,
       formatOptions,
       locale,
+      defaultOpen = false,
+      onOpenChange,
       id: idProp,
       'aria-describedby': ariaDescribedByProp,
       'aria-errormessage': ariaErrorMessageProp,
@@ -161,14 +161,16 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
     const resolvedMode = disabled ? 'disabled' : mode
+    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const isEditable = resolvedMode === 'edit'
     const iconSize = size === 'lg' ? 20 : 16
-    const StartIconCmp: LucideIcon | null =
-      startIcon === null ? null : (startIcon ?? Clock)
+    const EndIconCmp: LucideIcon | null =
+      endIcon === null ? null : (endIcon ?? Clock)
     const defaultPlaceholder = showSeconds ? 'HH:MM:SS' : 'HH:MM'
     const resolvedPlaceholder = placeholder ?? defaultPlaceholder
     const showClear = clearable && !!value && isEditable
-    const [open, setOpen] = React.useState(false)
+    const [open, setOpenState] = React.useState(defaultOpen)
+    const setOpen = React.useCallback((next: boolean) => { setOpenState(next); onOpenChange?.(next) }, [onOpenChange])
 
     const currentParts = React.useMemo(() => isoToTimeParts(value), [value])
     // draft 僅在 panel 開啟時用來處理 commit(OK button)的暫存
@@ -214,24 +216,21 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
       setOpen(false)
     }
 
+    // mode='display'(Phase B2 2026-05-05):純內容輸出 — 對齊原 TimePickerDisplay sub-component(retired)。
+    //   無 Field wrapper / 無 Clock icon / 無 input affordance。
+    if (resolvedMode === 'display') {
+      if (!value) return <span className={cn('text-fg-muted', className)}>{EMPTY_DISPLAY}</span>
+      return <span className={cn('truncate', className)}>{formatTime(value, { formatOptions, locale })}</span>
+    }
+
     // readonly / disabled
     if (!isEditable) {
       return (
         <div
-          className={cn(fieldWrapperStyles({ mode: resolvedMode, size }), className)}
+          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
           {...(props as React.HTMLAttributes<HTMLDivElement>)}
         >
-          {StartIconCmp && (
-            <StartIconCmp
-              size={iconSize}
-              className={cn(
-                'shrink-0 pointer-events-none',
-                resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted',
-              )}
-              aria-hidden
-            />
-          )}
           <span
             className={cn(
               'flex-1 min-w-0',
@@ -243,6 +242,15 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
               : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
             }
           </span>
+          {EndIconCmp && (
+            <ItemSuffix className="pointer-events-none">
+              <EndIconCmp
+                size={iconSize}
+                className={resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted'}
+                aria-hidden
+              />
+            </ItemSuffix>
+          )}
         </div>
       )
     }
@@ -274,7 +282,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
             data-field-mode="edit"
             data-error={error ? '' : undefined}
             className={cn(
-              fieldWrapperStyles({ mode: 'edit', size }),
+              fieldWrapperStyles({ mode: 'edit', variant: variant, size }),
               'text-left cursor-pointer',
               'focus-visible:outline-none',
               error && [
@@ -285,13 +293,6 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
             )}
             {...props}
           >
-            {StartIconCmp && (
-              <StartIconCmp
-                size={iconSize}
-                className="shrink-0 text-fg-muted pointer-events-none"
-                aria-hidden
-              />
-            )}
             <span className={cn(bareInputStyles, 'truncate', !value && 'text-fg-muted')}>
               {displayText}
             </span>
@@ -307,6 +308,11 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
                   },
                 }}
               />
+            )}
+            {EndIconCmp && (
+              <ItemSuffix className="pointer-events-none">
+                <EndIconCmp size={iconSize} className="text-fg-muted" aria-hidden />
+              </ItemSuffix>
             )}
           </div>
         </PopoverTrigger>
@@ -324,6 +330,12 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
               minuteStep={minuteStep}
               secondStep={secondStep}
               disabled={disabledForColumns}
+              // 2026-05-06 v9.1 M25 chain fix:TimeColumns 自然高 = 24 buttons × ~28.7px = 688px
+              // 會撐破 parent h-[216px]。flex-1 + min-h-0 讓 TimeColumns 取 parent 剩餘空間
+              // (216 - footer 40 = 176px)→ ScrollArea h-full 才能正確收斂 →
+              // listbox scrollIntoView 找對 nearest scrollable ancestor(內部 viewport),
+              // 不會走到 document body 把 popover 內容推出畫面(user 報「hours 欄空白」根因)。
+              className="flex-1 min-h-0"
             />
             {/* Footer:Now + OK */}
             <div
@@ -352,7 +364,6 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
 )
 TimePicker.displayName = 'TimePicker'
 
-// code-quality-allow: dead-export — sub-component (display variant) — consumer 可 compose 自行渲染
 // Story auto-compile metadata — Phase 1 mechanical migration(2026-04-24)
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const timePickerMeta = {
@@ -372,5 +383,4 @@ export const timePickerMeta = {
   },
 } as const
 
-// code-quality-allow: dead-export — sub-component (display variant) — consumer 可 compose 自行渲染
-export { TimePicker, TimePickerDisplay, formatTime }
+export { TimePicker, formatTime }

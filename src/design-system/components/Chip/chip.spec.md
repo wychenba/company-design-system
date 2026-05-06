@@ -5,6 +5,10 @@ variants: {}
 sizes: {}
 traits:
   - hasInteractiveStates
+benchmark:
+  - MUI Chip: github.com/mui/material-ui/tree/master/packages/mui-material/src/Chip
+  - Ant Design Tag: github.com/ant-design/ant-design/tree/master/components/tag
+  - Carbon Tag: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Tag
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

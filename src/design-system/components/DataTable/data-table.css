@@ -1,9 +1,14 @@
 /* DataTable Cell Padding
    ─────────────────────────────────────────────────────────
    py = (table-row-height - 1lh) / 2 — 單行時行高 = table-row token
-   px = 12px（固定，不隨 density 變）
+   px = 12px（固定，不隨 density 變;Phase C 2026-05-05 從 magic 0.75rem
+        提升為 token --table-cell-px,SSOT 給 cellPadding consumer)
    1lh 在使用時解析，跟隨元素的 computed line-height
    ───────────────────────────────────────────────────────── */
+
+:root {
+  --table-cell-px: 0.75rem;
+}
 
 [data-table-size="sm"] {
   --table-cell-py: calc((var(--table-row-sm) - 1lh) / 2);

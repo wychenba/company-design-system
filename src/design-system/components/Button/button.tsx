@@ -193,7 +193,14 @@ type InternalVariant = VariantProps<typeof buttonVariants>['variant']
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     Omit<VariantProps<typeof buttonVariants>, 'variant' | 'danger'> {
-  /** 將樣式套用至子元件（e.g. React Router Link） */
+  /**
+   * 將樣式套用至子元件（e.g. React Router Link）。
+   *
+   * ⚠️ **icon-only + asChild 警告**:當 `iconOnly={true}` 且 `asChild={true}` 時,內建
+   * Tooltip wrapper 不啟動(Radix Slot 不接受多 child)。consumer 必須**自管 child 的 `aria-label`**
+   * 給 screen reader,並視需要自行包 `<Tooltip>`(對齊 Polaris / Radix asChild idiom)。
+   * Button 不會主動補 tooltip — 否則會破壞 Slot 單 child 規則。
+   */
   asChild?: boolean
   /**
    * 按鈕視覺強調等級。

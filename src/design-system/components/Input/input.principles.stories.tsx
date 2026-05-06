@@ -139,10 +139,10 @@ export const ModeRule: Story = {
 
       <Rule
         title="❌ 不用 readonly 作為 DataTable cell"
-        note="readonly 仍然有 wrapper 高度和 padding,密集列表會顯得鬆散。Table cell 用 InputDisplay(純文字,無 wrapper)"
+        note="readonly 仍然有 wrapper 高度和 padding,密集列表會顯得鬆散。Table cell 用 `<Input mode='display'>`(純文字,無 wrapper)"
       >
         <Input mode="readonly" defaultValue="alice@example.com" />
-        <Label warn>↑ 在 table cell 中會過高且有多餘 padding → 用 &lt;InputDisplay /&gt;</Label>
+        <Label warn>↑ 在 table cell 中會過高且有多餘 padding → 用 &lt;Input mode=&quot;display&quot; /&gt;</Label>
       </Rule>
     </div>
   ),

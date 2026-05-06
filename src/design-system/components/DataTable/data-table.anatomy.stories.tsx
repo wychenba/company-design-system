@@ -180,7 +180,7 @@ export const ColumnTypes: Story = {
       <div className="flex flex-col gap-8">
         <div>
           <H3>meta.type 系統</H3>
-          <Desc>每個 column 透過 `meta.type` 宣告資料類型,DataTable 自動選擇對應 Field Control 的 Display 子元件渲染——消費者不需要手寫 cell。</Desc>
+          <Desc>每個 column 透過 `meta.type` 宣告資料類型,DataTable 自動選擇對應 Field Control 的 `mode="display"` 渲染——消費者不需要手寫 cell。</Desc>
           <DataTable columns={columns} data={SAMPLE_DATA} height="auto" />
         </div>
 
@@ -188,17 +188,17 @@ export const ColumnTypes: Story = {
           <H3>支援的 Column Types</H3>
           <div className="overflow-x-auto">
             <table className="text-caption border-collapse">
-              <thead><tr><Th>meta.type</Th><Th>Display 元件</Th><Th>對齊</Th><Th>典型場景</Th></tr></thead>
+              <thead><tr><Th>meta.type</Th><Th>Display 渲染</Th><Th>對齊</Th><Th>典型場景</Th></tr></thead>
               <tbody>
-                <tr><Td mono>text</Td><Td mono>InputDisplay</Td><Td>left</Td><Td>姓名、title、slug</Td></tr>
-                <tr><Td mono>number</Td><Td mono>NumberInputDisplay</Td><Td>right</Td><Td>數量、年齡</Td></tr>
-                <tr><Td mono>currency</Td><Td mono>NumberInputDisplay(+ prefix)</Td><Td>right</Td><Td>金額、價格</Td></tr>
-                <tr><Td mono>date</Td><Td mono>DatePickerDisplay</Td><Td>left</Td><Td>日期、時間戳</Td></tr>
-                <tr><Td mono>boolean</Td><Td mono>BooleanDisplay(✓ / —)</Td><Td>center</Td><Td>啟用 / 可見</Td></tr>
-                <tr><Td mono>select</Td><Td mono>SelectDisplay(Tag)</Td><Td>left</Td><Td>狀態、類別</Td></tr>
-                <tr><Td mono>combobox</Td><Td mono>ComboboxDisplay(Tag 陣列)</Td><Td>left</Td><Td>多選 tags</Td></tr>
+                <tr><Td mono>text</Td><Td mono>{`<Input mode="display">`}</Td><Td>left</Td><Td>姓名、title、slug</Td></tr>
+                <tr><Td mono>number</Td><Td mono>{`<NumberInput mode="display">`}</Td><Td>right</Td><Td>數量、年齡</Td></tr>
+                <tr><Td mono>currency</Td><Td mono>{`<NumberInput mode="display">`}(+ prefix)</Td><Td>right</Td><Td>金額、價格</Td></tr>
+                <tr><Td mono>date</Td><Td mono>{`<DatePicker mode="display">`}</Td><Td>left</Td><Td>日期、時間戳</Td></tr>
+                <tr><Td mono>boolean</Td><Td mono>{`<Checkbox mode="display">`}(✓ / —)</Td><Td>center</Td><Td>啟用 / 可見</Td></tr>
+                <tr><Td mono>select</Td><Td mono>{`<Select mode="display">`}</Td><Td>left</Td><Td>狀態、類別</Td></tr>
+                <tr><Td mono>combobox</Td><Td mono>{`<Combobox mode="display">`}</Td><Td>left</Td><Td>多選 tags</Td></tr>
                 <tr><Td mono>person</Td><Td mono>PersonDisplay / MultiPersonDisplay</Td><Td>left</Td><Td>指派者、reviewer</Td></tr>
-                <tr><Td mono>link</Td><Td mono>LinkInputDisplay</Td><Td>left</Td><Td>URL</Td></tr>
+                <tr><Td mono>link</Td><Td mono>{`<LinkInput mode="display">`}</Td><Td>left</Td><Td>URL</Td></tr>
               </tbody>
             </table>
           </div>

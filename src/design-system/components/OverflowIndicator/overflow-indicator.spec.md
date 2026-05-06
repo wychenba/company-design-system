@@ -5,6 +5,8 @@ variants: {}
 sizes: {}
 traits:
   - isInternal
+benchmark:
+  - Radix ScrollArea primitive: github.com/radix-ui/primitives/tree/main/packages/react/scroll-area
 ---
 
 # OverflowIndicator 設計原則

@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { X, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { FieldMode } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
+import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { Tag } from '@/design-system/components/Tag/tag'
-import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
 import { useIsTouchDevice } from '@/design-system/hooks/use-is-touch-device'
@@ -45,6 +45,9 @@ function useOverflowCount(
       const ofEl = overflowEl.current
       if (ofEl) ofEl.hidden = false
       const overflowW = ofEl?.offsetWidth || 60
+      // **#3 fix(2026-05-04)**:width-check 先於 count++,並處理 i=0 邊界(1 tag 自身就太寬 → 全 hidden 顯 +N)
+      // 之前 bug:greedy `count++` 永遠至少 = 1,1-tag-too-wide case 視覺呈半個 tag clipped + +N(錯)
+      // 修後:1 tag 太寬時 count = 0,全 N tags 走 +N 顯 indicator
       let used = 0, count = 0
       for (let i = 0; i < totalCount; i++) {
         const el = tagEls.current[i]
@@ -52,8 +55,9 @@ function useOverflowCount(
         const w = el.offsetWidth
         const next = used + (count > 0 ? GAP : 0) + w
         const remaining = totalCount - count - 1
-        if (remaining > 0 && next + GAP + overflowW > available && count > 0) break
-        if (remaining === 0 && next > available && count > 0) break
+        // width check FIRST(無 `count > 0` 短路):任何超寬都 break,包含 i=0 case
+        if (remaining > 0 && next + GAP + overflowW > available) break
+        if (remaining === 0 && next > available) break
         used = next; count++
       }
       for (let i = 0; i < tagEls.current.length; i++) { const el = tagEls.current[i]; if (el) el.hidden = i >= count }
@@ -112,9 +116,11 @@ function OverflowTagList({ containerRef, items, size, wrap, renderTag, onRemove,
   )
 }
 
-// ── Display (unchanged) ─────────────────────────────────────────────────────
-
-function ComboboxDisplay({
+// ── Internal tag-stack renderer (consumed by ReadonlyMultiSelect / mode='display') ───
+//
+// Phase B2(2026-05-05):原 ComboboxDisplay sub-component 已 retire,改 inline `<Combobox mode="display">`。
+// 本 helper 只負責 tag-stack 內容渲染(OverflowTagList 消費),不包 Field wrapper。
+function ComboboxTagStack({
   value, options, tagSize = 'md', wrap = false, containerRef: externalRef, disabled = false,
 }: {
   value?: string[] | null; options?: SelectOption[]; tagSize?: 'sm' | 'md' | 'lg'
@@ -131,18 +137,23 @@ function ComboboxDisplay({
   )
 
   if (externalRef) return content
+  // 2026-05-05 v9 fix(Bug 4):display path 內 wrapper 必須 `flex-1 min-w-0`,否則在 cell flex
+  // parent 下不認領完整可用寬度 → OverflowTagList 量得寬度小於 edit path → 顯 `+N` 多於 edit。
+  // edit path tagAreaRef wrapper 已是 `flex-1 min-w-0`(NativeCombobox/CustomCombobox line 258 / 354),
+  // display 必對稱才 SSOT。
   return (
-    <div ref={ownRef} className={cn('flex items-center min-w-0', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
+    <div ref={ownRef} className={cn('flex-1 min-w-0 flex items-center', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
       {content}
     </div>
   )
 }
-ComboboxDisplay.displayName = 'ComboboxDisplay'
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
 export interface ComboboxProps {
   mode?: FieldMode
+  /** Field chrome variant. Default = context.variant ?? 'default'. Per-prop override. */
+  variant?: FieldVariant
   error?: boolean
   size?: 'sm' | 'md' | 'lg'
   options: SelectOption[]
@@ -165,27 +176,42 @@ export interface ComboboxProps {
   emptyPlaceholder?: string
   /** a11y:無 Field wrapper 時提供 role='combobox' 的 accessible name(axe aria-input-field-name) */
   'aria-label'?: string
+  /** Initial open state(uncontrolled)— 對齊 Select.defaultOpen / Radix Popover canonical。
+   *  DataTable cell-as-input 1-step open 用 */
+  defaultOpen?: boolean
+  /** open state 變更 callback。DataTable cell-as-input 用:open=false → cell exit edit */
+  onOpenChange?: (open: boolean) => void
 }
 
 const getIconSize = (size: string) => size === 'lg' ? 20 : 16
 
-// ── Shared readonly/disabled render ─────────────────────────────────────────
+// ── Shared readonly/disabled/display render ─────────────────────────────────
 
 function ReadonlyMultiSelect({
-  mode, size, options, value, wrap, className,
-}: Pick<ComboboxProps, 'mode' | 'size' | 'options' | 'value' | 'wrap' | 'className'>) {
+  mode, variant: variantProp, size, options, value, wrap, className,
+}: Pick<ComboboxProps, 'mode' | 'variant' | 'size' | 'options' | 'value' | 'wrap' | 'className'>) {
   const resolvedMode = mode ?? 'readonly'
+  const variant = variantProp ?? 'default'
   const sz = size ?? 'md'
   const containerRef = React.useRef<HTMLDivElement>(null)
   const hasTags = (value?.length ?? 0) > 0
 
+  // mode='display'(Phase B2 2026-05-05):純內容輸出 — tag stack 不包 Field wrapper / 不 reserve 高度。
+  //   對齊原 ComboboxDisplay sub-component(retired)。
+  if (resolvedMode === 'display') {
+    if (!hasTags) return <span className={cn('text-fg-muted', className)}>{EMPTY_DISPLAY}</span>
+    return (
+      <ComboboxTagStack value={value} options={options} tagSize={sz} wrap={wrap} />
+    )
+  }
+
   return (
     <div ref={containerRef}
-      className={cn(fieldWrapperStyles({ mode: resolvedMode, size: sz }), hasTags && tagPadding[sz],
+      className={cn(fieldWrapperStyles({ mode: resolvedMode, variant, size: sz }), hasTags && tagPadding[sz],
         wrap ? 'flex-wrap py-1' : 'overflow-hidden', className)}
       style={{ gap: GAP, ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode={resolvedMode}>
       {hasTags ? (
-        <ComboboxDisplay value={value} options={options} tagSize={sz} wrap={wrap}
+        <ComboboxTagStack value={value} options={options} tagSize={sz} wrap={wrap}
           containerRef={containerRef} disabled={resolvedMode === 'disabled'} />
       ) : (
         <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
@@ -197,9 +223,11 @@ function ReadonlyMultiSelect({
 // ── Native Combobox (mobile) ────────────────────────────────────────
 
 function NativeCombobox({
-  mode = 'edit', error = false, size = 'md', options, value = [], onChange, placeholder,
+  mode = 'edit', variant: variantProp, error = false, size = 'md', options, value = [], onChange, placeholder,
   className, disabled, wrap = false, clearable = false,
 }: ComboboxProps) {
+  const fieldCtx = useFieldContext()
+  const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
   const resolvedMode = disabled ? 'disabled' : mode
   const iconSize = getIconSize(size)
   const showClear = clearable && value.length > 0 && resolvedMode === 'edit'
@@ -208,7 +236,7 @@ function NativeCombobox({
   const handleAdd = (v: string) => { if (!value.includes(v)) onChange?.([...value, v]) }
 
   if (resolvedMode !== 'edit') {
-    return <ReadonlyMultiSelect mode={resolvedMode} size={size} options={options} value={value} wrap={wrap} className={className} />
+    return <ReadonlyMultiSelect mode={resolvedMode} variant={variant} size={size} options={options} value={value} wrap={wrap} className={className} />
   }
 
   const items = value.map(v => ({ value: v, label: options.find(o => o.value === v)?.label ?? v }))
@@ -227,11 +255,11 @@ function NativeCombobox({
   ) : null
 
   return (
-    <div className={cn(fieldWrapperStyles({ mode: 'edit', size }), value.length > 0 && tagPadding[size], 'relative',
+    <div className={cn(fieldWrapperStyles({ mode: 'edit', variant: variant, size }), value.length > 0 && tagPadding[size], 'relative',
       wrap && 'items-start py-1', error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
       style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode="edit" data-error={error ? '' : undefined}
       onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}>
-      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}
+      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}
         onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}>
         <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
           renderTag={(item) => (
@@ -240,7 +268,7 @@ function NativeCombobox({
           )} onRemove={handleRemove} trailing={value.length === 0 ? selectDropdown : undefined} />
       </div>
       {value.length > 0 && selectDropdown}
-      <div className={cn('flex items-center gap-2 shrink-0 relative z-10 pointer-events-none', wrap && 'self-start')}
+      <ItemSuffix className={cn('relative z-10 pointer-events-none', wrap && 'self-start')}
         style={wrap ? { height: tagHeight } : undefined}>
         {showClear && (
           <span className="pointer-events-auto">
@@ -251,7 +279,7 @@ function NativeCombobox({
           </span>
         )}
         <ChevronDown size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
-      </div>
+      </ItemSuffix>
     </div>
   )
 }
@@ -259,20 +287,23 @@ function NativeCombobox({
 // ── Custom Combobox (desktop — consumes SelectMenu) ───────────────────
 
 function CustomCombobox({
-  mode = 'edit', error: errorProp = false, size = 'md', options, value = [], onChange, placeholder,
+  mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, value = [], onChange, placeholder,
   className, disabled: disabledProp, wrap = false, clearable = false, searchable = false, searchIn = 'menu',
   searchPlaceholder = '搜尋…', // i18n-allow: DS default
   searchAriaLabel = '搜尋選項', // i18n-allow: DS default
   emptyPlaceholder = '選擇…', // i18n-allow: DS default
+  defaultOpen = false,
+  onOpenChange,
   'aria-label': ariaLabel,
 }: ComboboxProps) {
   const fieldCtx = useFieldContext()
   const error = errorProp || (fieldCtx?.invalid ?? false)
   const disabled = disabledProp ?? fieldCtx?.disabled
   const resolvedMode = disabled ? 'disabled' : mode
+  const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
   const iconSize = getIconSize(size)
   const showClear = clearable && value.length > 0 && resolvedMode === 'edit'
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(defaultOpen)
   const [search, setSearch] = React.useState('')
   // a11y: 為 listbox 容器(SelectMenu 內 PopoverContent)建立穩定 id,讓 trigger 的
   // aria-controls 能指向它(WAI-ARIA combobox pattern 要求)。React.useId 在 SSR/CSR 都穩定。
@@ -281,7 +312,7 @@ function CustomCombobox({
   React.useEffect(() => { if (!open) setSearch('') }, [open])
 
   if (resolvedMode !== 'edit') {
-    return <ReadonlyMultiSelect mode={resolvedMode} size={size} options={options} value={value} wrap={wrap} className={className} />
+    return <ReadonlyMultiSelect mode={resolvedMode} variant={variant} size={size} options={options} value={value} wrap={wrap} className={className} />
   }
 
   const items = React.useMemo(
@@ -318,13 +349,14 @@ function CustomCombobox({
       aria-required={fieldCtx?.required || undefined}
       aria-describedby={fieldCtx?.descriptionId}
       aria-errormessage={error ? fieldCtx?.errorId : undefined}
-      className={cn(fieldWrapperStyles({ mode: 'edit', size }), value.length > 0 && tagPadding[size], 'relative cursor-pointer',
+      className={cn(fieldWrapperStyles({ mode: 'edit', variant: variant, size }), value.length > 0 && tagPadding[size], 'relative cursor-pointer',
         wrap && 'items-start py-1',
-        open && !error && 'border-primary',
+        // 2026-05-06 v13.3 SSOT retire:per-control `open && 'border-primary'` 移除。Field default
+        // 統一處理 — open=灰深(data-state)/ focus=藍(focus-within !important)。改一處全 control 跟動。
         error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
       style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }}
       data-field-mode="edit" data-error={error ? '' : undefined}>
-      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
+      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
         {value.length > 0 ? (
           <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
             renderTag={(item) => (
@@ -342,7 +374,7 @@ function CustomCombobox({
           <span className="text-fg-muted">{placeholder ?? emptyPlaceholder}</span>
         )}
       </div>
-      <div className={cn('flex items-center gap-2 shrink-0 relative z-10 pointer-events-none', wrap && 'self-start')}
+      <ItemSuffix className={cn('relative z-10 pointer-events-none', wrap && 'self-start')}
         style={wrap ? { height: tagHeight } : undefined}>
         {showClear && (
           <span className="pointer-events-auto">
@@ -357,7 +389,7 @@ function CustomCombobox({
           </span>
         )}
         {chevronEl}
-      </div>
+      </ItemSuffix>
     </div>
   )
 
@@ -370,7 +402,7 @@ function CustomCombobox({
       searchable={searchable && searchIn === 'menu'}
       size={size}
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={(o) => { setOpen(o); onOpenChange?.(o) }}
       onOpenAutoFocus={searchIn === 'trigger' ? (e) => e.preventDefault() : undefined}
       contentId={listboxId}
     >
@@ -409,4 +441,4 @@ export const comboboxMeta = {
   },
 } as const
 
-export { Combobox, ComboboxDisplay }
+export { Combobox }

@@ -5,6 +5,9 @@ variants: {}
 sizes: {}
 traits:
   - hasInteractiveStates
+benchmark:
+  - Ant Design Calendar: github.com/ant-design/ant-design/tree/master/components/calendar
+  - MUI X Date Pickers: github.com/mui/mui-x/tree/master/packages/x-date-pickers
 ---
 
 # Calendar 設計原則

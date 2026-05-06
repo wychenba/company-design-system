@@ -11,6 +11,32 @@ const meta: Meta<typeof Checkbox> = {
 export default meta
 type Story = StoryObj<typeof Checkbox>
 
+// @story-trait-rationale: pre-existing trait gaps tracked separately; this PR scope = add Modes story with display card.
+/* ── 三種模式 ── */
+export const Modes: Story = {
+  name: '三種模式',
+  render: () => (
+    <div className="flex flex-col gap-6 max-w-sm">
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">edit</h3>
+        <Checkbox defaultChecked aria-label="同意條款(edit mode demo)" />
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">display</h3>
+        <Checkbox mode="display" checked aria-label="同意條款(display mode demo)" />
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
+        <Checkbox mode="readonly" checked aria-label="同意條款(readonly mode demo)" />
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">disabled</h3>
+        <Checkbox mode="disabled" checked aria-label="同意條款(disabled mode demo)" />
+      </div>
+    </div>
+  ),
+}
+
 /* ── 狀態 ── */
 export const States: Story = {
   name: '狀態',

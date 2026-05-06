@@ -7,6 +7,10 @@ traits:
   - hasSizes
   - hasInteractiveStates
   - isMatrixHeavy
+benchmark:
+  - Radix Slider primitive: github.com/radix-ui/primitives/tree/main/packages/react/slider
+  - Ant Design Slider: github.com/ant-design/ant-design/tree/master/components/slider
+  - MUI Slider: github.com/mui/material-ui/tree/master/packages/mui-material/src/Slider
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

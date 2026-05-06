@@ -25,7 +25,17 @@
 | focus-visible | `outline: 2px solid var(--ring)` | — |
 | 宿主 disabled | 不渲染 inline action | — |
 
-**Overlay trigger canonical**(2026-04-29 訂 / 2026-05-02 改):trigger 透過 `asChild` 作 DropdownMenu / Popover / Tooltip trigger 時,Radix 自動 set `data-state="open"`,**trigger 維持 host hover 樣式**直到浮層關閉。對齊**狀態極簡派**(shadcn / Radix Themes / Material — 不另開 4th token);避免 state 增生 + 跨 host(neutral / colored)規則同步。落實:`ItemInlineActionButton` / Button text/secondary/tertiary / `fieldWrapperStyles` `data-[state=open]` 全走「等同 hover」。
+**Overlay trigger canonical**(2026-04-29 訂 / 2026-05-02 改 / 2026-05-05 prop 化):trigger 透過 `asChild` 作 DropdownMenu / Popover / Tooltip / HoverCard trigger 時,Radix 自動 set `data-state="open"`,**trigger 維持 host hover 樣式**直到浮層關閉。對齊**狀態極簡派**(shadcn / Radix Themes / Material — 不另開 4th token);避免 state 增生 + 跨 host(neutral / colored)規則同步。
+
+**2026-05-05 修正:overlay vs in-place 語意分離**。`Radix Collapsible.Trigger` 也 emit 同 `data-state="open"`,但語意完全不同(展開內容**接在下方非 floating**,user 不需追溯)。原 `ItemInlineActionButton` 將規則**無條件**套用於所有 `data-state=open`,造成 Sidebar collapsible group label 的 chevron 展開時殘留 hover bg(2026-05-05 user reported)。修正:`ItemInlineActionButton` 加 `overlayTrigger?: boolean` prop,**default `false`**。consumer 顯式宣告:
+
+| Consumer 場景 | `overlayTrigger` |
+|---|---|
+| `<DropdownMenuTrigger asChild>` / `<PopoverTrigger asChild>` / `<TooltipTrigger asChild>` / `<HoverCardTrigger asChild>` | `true`(opt-in) |
+| `<CollapsiblePrimitive.Trigger asChild>` | `false`(default) |
+| 純 onClick handler / drag handle / dismiss X | `false`(default) |
+
+落實同源:`fieldWrapperStyles data-[state=open]:border-border-hover` 對 Combobox/DatePicker overlay trigger 仍正確(這些只用於 overlay 包覆)。Button 變體的 `data-[state=open]` 規則目前**未 prop 化**(latent — Button 從未被當 `Collapsible.Trigger` asChild 包覆,故無 active bug);若未來出現 Button 包覆 Collapsible 場景,同 prop 化處理。
 
 ### Icon 色彩（按 host 分兩類,2026-04-21 D6 矛盾解）
 
@@ -153,7 +163,7 @@ Q3. Row 多大?
 #### Content-role vs action-role 分層(附補充原理)
 
 Row 內元件分兩類,**size 規則不同**:
-- **Content-role**(display 資料):InputDisplay / Badge / Avatar / Tag → size 對應 row tier(sm row → sm)
+- **Content-role**(display 資料):`<Input mode="display">` / Badge / Avatar / Tag → size 對應 row tier(sm row → sm)
 - **Action-role**(互動觸發):row action icon → **固定 ≤ 24**,不參與 content size-pair
 
 Row action 的 affordance 是「次要功能」,不是 primary CTA。Button chrome 過度強調;用 **Button xs 24 固定** 提供 command affordance 但不侵蝕 content hierarchy。

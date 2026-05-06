@@ -5,6 +5,10 @@ variants: {}
 sizes: {}
 traits:
   - hasActions
+benchmark:
+  - Polaris BulkActions: github.com/Shopify/polaris/tree/main/polaris-react/src/components/BulkActions
+  - Polaris IndexTable (bulk selection): github.com/Shopify/polaris/tree/main/polaris-react/src/components/IndexTable
+  - Carbon DataTable (batch actions): github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/DataTable
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
@@ -68,9 +72,24 @@ traits:
 
 ### Slot
 
-- **`actions`**:consumer 提供 sm Buttons;`variant=tertiary`(主)/ `tertiary danger`(destructive)— **不用 primary**(留 dialog 確認最終 action)
+- **`actions`**:consumer 提供 **md** Buttons(2026-05-04 spec update,前版 sm 為錯);`variant=tertiary`(主)/ `tertiary danger`(destructive)— **不用 primary**(留 dialog 確認最終 action)
 - **count 區**:`{N} 已選`(內建)+ inline filter hidden status `· {M} 個被 filter 隱藏`(`hiddenByFilter` prop 傳入時)
-- **clear**:`<Button iconOnly size=sm variant=text dismiss />`(內建,觸發 `onClear`)
+- **clear**:`<Button iconOnly size=md variant=text dismiss />`(內建,觸發 `onClear`)
+
+#### Size canonical(2026-05-04 升 SSOT)
+
+| Placement variant | Buttons size | 理由 |
+|--|--|--|
+| **default**(footer 浮層 / page-bottom 區段)| **md** | 視覺 weight 對齊 Dialog footer commit 系 / page primary-button bar(md)/ Linear/Notion/Asana world-class 共識 |
+| **top-toolbar 變體**(未來)| sm | 覆蓋 sm-density toolbar / GitHub-style;variant prop 驅動 override |
+
+#### Count text color canonical(2026-05-04 升 SSOT)
+
+| 元素 | Token / weight | 理由 |
+|--|--|--|
+| **count(`已選 N 項`)** | `text-foreground` + `font-medium` | state-bearing 主資訊(user 在 selection mode + N items),非裝飾 → primary foreground。對齊 Linear / Notion / Carbon / Polaris 共識;muted 化會弱化 state signal |
+| **`hiddenByFilter` suffix(`· M 個被 filter 隱藏`)** | `text-fg-muted` + `font-normal` | 次資訊,視覺層次低於 count |
+| **clear X icon** | dismiss md(自動 fg-muted)| chrome dismiss canonical |
 
 ### 不含 page-level primary / 不含 hint banner
 

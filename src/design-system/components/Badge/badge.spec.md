@@ -18,6 +18,10 @@ sizes: {}
 traits:
   - hasVariants
   - isMatrixHeavy
+benchmark:
+  - Ant Design Badge: github.com/ant-design/ant-design/tree/master/components/badge
+  - MUI Badge: github.com/mui/material-ui/tree/master/packages/mui-material/src/Badge
+  - Polaris Badge: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Badge
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

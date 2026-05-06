@@ -5,6 +5,10 @@ traits:
   - isInternal
 variants: {}
 sizes: {}
+benchmark:
+  - Radix Separator primitive: github.com/radix-ui/primitives/tree/main/packages/react/separator
+  - Ant Design Divider: github.com/ant-design/ant-design/tree/master/components/divider
+  - MUI Divider: github.com/mui/material-ui/tree/master/packages/mui-material/src/Divider
 ---
 
 # Separator 設計原則

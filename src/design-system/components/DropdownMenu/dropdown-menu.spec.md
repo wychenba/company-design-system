@@ -6,6 +6,10 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isOverlay
+benchmark:
+  - Radix DropdownMenu primitive: github.com/radix-ui/primitives/tree/main/packages/react/dropdown-menu
+  - Ant Design Dropdown: github.com/ant-design/ant-design/tree/master/components/dropdown
+  - Polaris ActionList: github.com/Shopify/polaris/tree/main/polaris-react/src/components/ActionList
 ---
 
 # DropdownMenu 設計原則

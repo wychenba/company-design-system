@@ -6,6 +6,11 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInputLike
+benchmark:
+  - Radix Select primitive: github.com/radix-ui/primitives/tree/main/packages/react/select
+  - Ant Design Select: github.com/ant-design/ant-design/tree/master/components/select
+  - MUI Select: github.com/mui/material-ui/tree/master/packages/mui-material/src/Select
+  - Polaris Select: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Select
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

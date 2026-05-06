@@ -8,6 +8,10 @@ traits:
   - hasSizes
   - hasInteractiveStates
   - isStructural
+benchmark:
+  - Ant Design Layout (Sider): github.com/ant-design/ant-design/tree/master/components/layout
+  - MUI Drawer: github.com/mui/material-ui/tree/master/packages/mui-material/src/Drawer
+  - Polaris Navigation: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Navigation
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

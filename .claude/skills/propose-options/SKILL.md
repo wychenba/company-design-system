@@ -68,18 +68,32 @@ description: Auto-invoke when about to list options / 建議 / 候選方案 to u
 - ✅ "M18 加,M12 部分 overlap 但 scope 不同共存(說明)"
 - ❌ "新加 M18,既有 M-row 全保留(沒檢查)"
 
+### Q5 — Issue list 100% mapped(2026-05-05 anti-drift,user trigger 第 5 次後新增)
+**問**:plan iteration / option list 改版時,user 提的**所有** raised issue 是否 100% mapped 到本版的 step / option / 評估?**未 mapped 的逐條 explicit 標**:`done` / `folded into Step X` / `informational(無實作)` / `dropped(原因)` / `pending`。
+**Fail**:silent drop / 沒 mapping table / fold 進 step 沒 trace
+**例**:
+- ✅ "Issue 1-14 列 mapping table,Issue 3+13 標 informational,其他 11 條 mapped"
+- ❌ "改版只列新 Step,沒 walk-through user 之前提的 issue list"
+
 ---
 
 ## Workflow Output Format
 
-對 user 回覆中的 option list 必含 **inline 4-Q 表**:
+對 user 回覆中的 option list 必含 **inline 5-Q 表 + Issue mapping**(plan iteration 場景):
 
 ```markdown
-| 選項 | M23 DS grep | M8 benchmark | M17 SSOT | Rule-of-3 | M10 下游 | 結論 |
-|---|---|---|---|---|---|---|
-| A | DS 已有 X token,對齊 | Polaris/Atlassian/Material 輔證 | 抽 utility 共用 | 0 處 SSOT 新增 OK | 可刪 X 條冗餘 | **PASS,推薦** |
-| B | 沒 grep | 只查 1 家 | 純 markdown rule | 已 3 處,無新 SSOT 動 | 純 append 沒 retire | **REJECT(M23+M8 雙 fail)** |
-| C | DS 已有 Y 但 option 違 | 4 家 2:2 split 無共識 | n/a | n/a | n/a | **REJECT(M23 違反 → 自開新 tier)** |
+| 選項 | M23 DS grep | M8 benchmark | M17 SSOT | Rule-of-3 | M10 下游 | Issue cover | 結論 |
+|---|---|---|---|---|---|---|---|
+| A | DS 已有 X token,對齊 | Polaris/Atlassian/Material 輔證 | 抽 utility 共用 | 0 處 SSOT 新增 OK | 可刪 X 條冗餘 | covers 8/14 | **PASS,推薦** |
+| B | 沒 grep | 只查 1 家 | 純 markdown rule | 已 3 處,無新 SSOT 動 | 純 append 沒 retire | covers 4/14 | **REJECT(M23+M8 雙 fail + Q5 不全)** |
+```
+
+**Plan iteration 必含 Issue ↔ Step 完整 mapping table**(不可只列新 step 表,user 看不到原 issue trace):
+```markdown
+| # | Issue (按 user 提出順序) | 處理 |
+|---|---|---|
+| 1 | <user 原文 issue> | Step X / informational / dropped(reason) |
+| ... | ... | ... |
 ```
 
 **所有 fail 過 4-Q 的 option 必明示 reject + 原因**,不只 list 不過的。User 看見 reject 過程才能信 propose 過原則。

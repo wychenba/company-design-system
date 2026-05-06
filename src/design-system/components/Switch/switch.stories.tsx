@@ -10,6 +10,32 @@ const meta: Meta<typeof Switch> = {
 export default meta
 type Story = StoryObj<typeof Switch>
 
+// @story-trait-rationale: pre-existing trait gaps tracked separately; this PR scope = add Modes story with display card.
+/* ── 三種模式 ── */
+export const Modes: Story = {
+  name: '三種模式',
+  render: () => (
+    <div className="flex flex-col gap-6 max-w-sm">
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">edit</h3>
+        <Switch defaultChecked aria-label="啟用通知(edit mode demo)" />
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">display</h3>
+        <Switch mode="display" checked aria-label="啟用通知(display mode demo)" />
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
+        <Switch mode="readonly" checked aria-label="啟用通知(readonly mode demo)" />
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">disabled</h3>
+        <Switch mode="disabled" checked aria-label="啟用通知(disabled mode demo)" />
+      </div>
+    </div>
+  ),
+}
+
 /* ── 狀態 ── */
 export const States: Story = {
   name: '狀態',

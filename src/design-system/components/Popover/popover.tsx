@@ -60,6 +60,9 @@ const PopoverContent = React.forwardRef<
       onOpenAutoFocus={onOpenAutoFocus ?? handlePopoverOpenAutoFocus}
       className={cn(
         "z-50 w-72 rounded-lg border border-border bg-surface-raised text-foreground shadow-[var(--elevation-200)] outline-none",
+        // 2026-05-04 viewport-aware max-h SSOT(從 NameCard 升 DS-wide):header/footer 永遠 in-viewport,body 壓縮 scroll
+        // 2026-05-05 audit dim 35 補:加 `min-h-0` 完成 M25 chain invariant(flex item default min-h: auto 阻 shrink)
+        "max-h-[var(--radix-popover-content-available-height,100vh)] flex flex-col overflow-hidden min-h-0",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 motion-reduce:animate-none",
         "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         "origin-[var(--radix-popover-content-transform-origin)]",
@@ -83,15 +86,21 @@ interface PopoverHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const PopoverHeader = React.forwardRef<HTMLDivElement, PopoverHeaderProps>(
   ({ className, children, hideClose = false, ...props }, ref) => (
+    // Popover lightweight chrome canonical(2026-05-04 重思 v2):
+    //   覆寫 `--chrome-slot-h: 1.25rem` (20px) → unbounded button 佔位縮成 20,**匹配 PopoverTitle
+    //   text-body line-height (14×1.5≈21,floor 20)**。Header 維持 padding-based 自然撐開:
+    //   max(21 title, 20 slot) + py-tight(12*2) = 45 → 自然比 Dialog/Sheet 48 輕一級。
+    //   Q10 穩定:title-only / title+close 都 = title + py 主導,slot 不 dominate。
+    //   無 min-h / 無 py override — 修正前一版過度設計。
     <SurfaceHeader
       ref={ref}
-      className={cn("justify-between", className)}
+      className={cn("justify-between [--chrome-slot-h:1.25rem]", className)}
       {...props}
     >
       <div className="flex-1 min-w-0">{children}</div>
       {!hideClose && (
         <PopoverPrimitive.Close asChild>
-          {/* Dismiss X = native sm,SurfaceHeader 負 my trick 讓 layout 佔位 24 → chrome-header-height */}
+          {/* Dismiss X = native sm,SurfaceHeader 負 my trick 讓 layout 佔位 24 → 匹配 inner 24 */}
           <Button data-dismiss iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" />
         </PopoverPrimitive.Close>
       )}

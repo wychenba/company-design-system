@@ -3,15 +3,25 @@ import { cva } from 'class-variance-authority'
 // ── Field Wrapper Styles ────────────────────────────────────────────────────
 // 所有 Field 元件共用的 input wrapper 樣式。
 //
-// 三種模式：
-//   edit     — bg-surface, border, hover/focus 回饋
-//   readonly — bg-disabled(neutral-2), 無邊框, 文字正常色
+// 4 種模式(2026-05-05 expand):
+//   edit     — bg-surface, border, hover/focus 回饋(可編輯 input)
+//   display  — 純展示(無 input chrome、無 affordance);語意「read-only 內容,展示給人看」。
+//              對齊 Carbon read-only / PatternFly inline-edit hidden-input。
+//   readonly — bg-disabled(neutral-2), 無邊框, 文字正常色(input chrome 但鎖定)
 //   disabled — bg-disabled(neutral-2), 無邊框, 文字灰化
 //
-// 高度：固定 h = field-height token（rem），與 Button 共用同一組 token。
+// 2 種視覺外殼(variant):
+//   default — 完整 chrome(form input 場景)
+//   bare    — 透明 chrome(cell-as-input substrate / Toolbar inline editing)
+//
+// 高度:固定 h = field-height token(rem),與 Button 共用同一組 token。
 
 export const fieldWrapperStyles = cva(
   [
+    // K10 fix(2026-05-04):`group/field` 讓 inner placeholder/text 可透過 `group-data-[field-mode=...]/field:` 變體
+    //   各 Field 元件 wrapper 同時加 `data-field-mode={resolvedMode}` 屬性,bareInputStyles 即可
+    //   依 mode 切 placeholder color。User canonical:disabled 顯著性優於 muted。
+    'group/field',
     'inline-flex items-center w-full rounded-md',
     'text-foreground font-normal',
     'transition-colors duration-150',
@@ -20,16 +30,21 @@ export const fieldWrapperStyles = cva(
     variants: {
       mode: {
         edit: '',
+        display: '',
         readonly: '',
         disabled: '',
       },
       variant: {
         // default — 完整 Field wrapper chrome(bg-surface、明顯 border、hover/focus 回饋)
         default: '',
-        // bare — 透明 chrome,hover / focus 才出現 border。適用 Toolbar inline editing
+        // bare — 透明 variant,hover / focus 才出現 border。適用 Toolbar inline editing
         // (FileViewer zoom input / chart config / rich text toolbar number input 等)。
         // 世界級對照:VS Code settings / Figma toolbar number / Notion prop input。
         bare: '',
+        // naked — 完全無 variant,hover/focus 也不出 border。適用 cell-as-input
+        // (host cell 自管 border + focus visual,內部 input 純文字承載)。
+        // 世界級對照:Airtable / Notion / Excel / Google Sheets cell editing。
+        naked: '',
       },
       size: {
         sm: 'text-body h-field-sm px-3 gap-2',
@@ -50,9 +65,30 @@ export const fieldWrapperStyles = cva(
         className: [
           'bg-surface border border-border',
           'hover:border-border-hover',
-          'focus-within:border-primary focus-within:hover:border-primary',
+          // 2026-05-06 v13.3 SSOT canonical:focus-within `!important` 強制勝過 data-state attribute
+          // selector(specificity tie at 0,2,0;source order 後者勝)。
+          //
+          // 設計原則:**focus dominates everything**(M11 fix「focus-dominates-hover」延伸成
+          // 「focus-dominates-{hover,open,error-rest}」)。Cursor 在輸入框 = user 編輯中 = 必藍。
+          //
+          // 對齊世界級三家共識:
+          //   - Material Design 3:focus → primary line color
+          //   - Polaris(Shopify):focus state border-focus(藍)overrides hover/open
+          //   - Ant Design 5:`.ant-select-focused` blue,popover open + select option close 後
+          //     trigger 仍 focused → blue stays(focus return canonical via Radix `onCloseAutoFocus`)
+          //
+          // 副作用 — Ant 風「選後藍 / 取消灰」自動達成:
+          //   - 選 option close popover → Radix focus return to trigger → focus-within fires → 藍
+          //   - 點外取消 close popover → focus 移外 → focus-within 不 fire → 灰
+          'focus-within:!border-primary focus-within:hover:!border-primary',
           'data-[state=open]:border-border-hover',
         ],
+      },
+      {
+        mode: 'display',
+        variant: 'default',
+        // 純展示:無 input variant,無 hover/focus affordance(語意 = 純內容展示)
+        className: 'bg-transparent border border-transparent',
       },
       {
         mode: 'readonly',
@@ -71,9 +107,16 @@ export const fieldWrapperStyles = cva(
         className: [
           'bg-transparent border border-transparent',
           'hover:border-border',
-          'focus-within:border-primary focus-within:hover:border-primary',
+          // 同 default chrome v13.3 SSOT:focus-within !important 強制勝過 data-state
+          'focus-within:!border-primary focus-within:hover:!border-primary',
           'data-[state=open]:border-border',
         ],
+      },
+      {
+        mode: 'display',
+        variant: 'bare',
+        // bare + display:cell-as-input default state(無 variant,完全融入 cell;hover/focus 才有 affordance 等 user 點下去切 edit mode)
+        className: 'bg-transparent border border-transparent',
       },
       {
         mode: 'readonly',
@@ -84,6 +127,81 @@ export const fieldWrapperStyles = cva(
         mode: 'disabled',
         variant: 'bare',
         className: 'bg-transparent border border-transparent cursor-not-allowed opacity-disabled',
+      },
+      // naked variant — cell-as-input substrate(Notion / Airtable / Excel canonical)
+      //
+      // ── 2026-05-06 v12 — 4 邊位置 overlap 修(seam fix,state machine 100% v9 不動)──
+      // user 報「上下左都 2px,只右邊 1px」+「我希望各 control state 各自繼承不被 wrapper 寫死」。
+      // DOM 量測證實:Field.border-l 跟 prev cell.border-r 兩 1px stripe **adjacent 不 overlap**
+      // (gap=0)→ 視覺 2px;顏色也不同(`--divider` 0.09 alpha grid vs `--border` 0.25 alpha Field)。
+      //
+      // v12 fix(只動位置不動 state machine):
+      //   - `absolute -top-px -left-px right-0 bottom-0`:Field box 整體 shift 1px 到上 + 左
+      //     → border-t/-l 位置精確 overlap prev row.border-b / prev cell.border-r
+      //     → border-r/-b 位置 overlap editing row.border-b / cell.border-r(child paint 後贏)
+      //   - `!h-auto`:absolute + inset 4 sides 已決定 dimensions,override 既有 !h-full
+      //   - host cell **editing 時必 `overflow-visible`** 才允許 Field 1px 外溢繪(data-table.tsx 配合)
+      //
+      // SSOT 保留證明:
+      //   - state machine token(`border-border` / `border-border-hover` / `border-primary` /
+      //     `border-border-hover` 等)100% 沿用 v9
+      //   - 各 control 在 cn() 自己 append `open && 'border-primary'` etc 的 SSOT 100% work
+      //     (Select cell open=primary 藍 / Input cell focus=primary 藍 / 各 control 各自 inherit)
+      //   - 改的只是 Field box 的物理位置(absolute + inset),**state semantic 完全不動**
+      //
+      // 對齊 v9 user 認可的「99% complete,差 4 邊 seam」反饋,minimal-change 補完。
+      {
+        mode: 'edit',
+        variant: 'naked',
+        className: [
+          'bg-transparent !rounded-none !gap-0',
+          // !important 強制 override:Select / Combobox per-control trigger 後續 cn() append `relative`
+          // (for Tag z-layering 等),tailwind-merge 預設後 wins 會蓋掉 `absolute`。`!absolute`
+          // 強制 position 為 absolute(Tag z-layering 仍 work,因 Field 本身 positioned ancestor)。
+          //
+          // 4 邊 inset:-1px(`-top-px -left-px -right-px -bottom-px`)→ Field box = cell + 2px。
+          //   - Field.border-t at [cell.top-1, cell.top] = OVERLAP prev row.border-b
+          //   - Field.border-l at [cell.left-1, cell.left] = OVERLAP prev cell.border-r
+          //   - Field.border-r at [cell.right-1, cell.right] = OVERLAP cell.border-r
+          //     (right: -1px 因 cell 有 border-r:1 padding-right edge = cell.right - 1)
+          //   - Field.border-b at [row.bottom-1, row.bottom] = OVERLAP editing row.border-b
+          //     (bottom: -1px 因 cell 無 border-b 但 row 有,padding-bottom edge = cell.bottom = row.bottom - 1)
+          '!absolute -top-px -left-px -right-px -bottom-px !h-auto !w-auto',
+          '!px-[var(--table-cell-px)] !py-[var(--table-cell-py)]',
+          'border border-border',
+          'hover:border-border-hover',
+          // v13.3 SSOT canonical:focus-within !important(同 default + bare)
+          'focus-within:!border-primary focus-within:hover:!border-primary',
+          'data-[state=open]:border-border-hover',
+          'group-data-[row-mode=auto]/cell:!items-start',
+        ],
+      },
+      {
+        mode: 'display',
+        variant: 'naked',
+        className: [
+          'bg-transparent !rounded-none !px-0 !py-0 !gap-0 !h-full',
+          'border border-transparent',
+          'group-data-[row-mode=auto]/cell:!items-start',
+        ],
+      },
+      {
+        mode: 'readonly',
+        variant: 'naked',
+        className: [
+          'bg-transparent !rounded-none !px-0 !py-0 !gap-0 !h-full',
+          'border border-transparent',
+          'group-data-[row-mode=auto]/cell:!items-start',
+        ],
+      },
+      {
+        mode: 'disabled',
+        variant: 'naked',
+        className: [
+          'bg-transparent !rounded-none cursor-not-allowed opacity-disabled !px-0 !py-0 !gap-0 !h-full',
+          'border border-transparent',
+          'group-data-[row-mode=auto]/cell:!items-start',
+        ],
       },
     ],
     defaultVariants: {
@@ -100,8 +218,67 @@ export const bareInputStyles = [
   'flex-1 min-w-0 bg-transparent',
   'outline-none border-none p-0',
   'text-[inherit] font-[inherit] leading-[inherit]',
+  // A3 fix(2026-05-05):`<input>` UA stylesheet 強制 `text-align: start`,阻斷 parent 的
+  //   `text-right`/`text-center` 繼承。顯式 `text-align: inherit` 復原(對齊 NumberCell /
+  //   CurrencyCell right-align canonical:column meta.align='right' → cell text-right →
+  //   input 跟著 right-align)。
+  '[text-align:inherit]',
   'placeholder:text-fg-muted',
+  // K10 fix(2026-05-04):wrapper data-field-mode=disabled 時,placeholder/text 都切 fg-disabled
+  //   依賴 fieldWrapperStyles 的 `group/field` + 各 Field 元件 wrapper 加 `data-field-mode={resolvedMode}`
+  //   User canonical:disabled state 顯著性優於 muted(neutral-6 > neutral-7)
+  'group-data-[field-mode=disabled]/field:placeholder:text-fg-disabled',
+  'group-data-[field-mode=disabled]/field:text-fg-disabled',
 ].join(' ')
+
+// ── Naked Variant Cell Row-Mode Alignment Propagation ──────────────────────
+// SSOT canonical(M19 / 2026-05-05):cell-as-input naked variant 元件**所有內部
+// wrapper**(`<span>` 包 Avatar+name 等)必 import + apply 此 SSOT,host cell
+// `data-row-mode` 屬性自動 propagate alignment(autoRow → items-start / fixed → items-center)。
+//
+// 不 propagate 的後果:autoRow 場景下 People / Select / Combobox 內部用
+// `inline-flex items-center` hardcode → 視覺垂直置中於 wrapper 自身高度,**沒**頂對齊
+// → 跟其他純文字 cell baseline 視覺漂移。
+//
+// 世界級對照:
+//   - HTML <td> default `vertical-align: baseline`(瀏覽器自動 first-baseline align)
+//   - AG Grid `cellStyle` + `cellRendererSelector`,row context 共享(closed source 部分)
+//   - Material X-Grid `gridClasses.cell` wrapper 不允許 cell content override alignment
+//   - Notion / Airtable cell content 從 host 繼承,不 hardcode self alignment
+//
+// Hook:`check_naked_row_mode_propagation.sh`(write-time BLOCKER)
+// Audit:design-system-audit Group N M27(periodic batch verify)
+export const nakedCellRowModeAlign = 'group-data-[row-mode=auto]/cell:items-start'
+
+// ── Cell-as-input Display Hover Ring(2026-05-05 v9 — sole remaining ring const)─
+// 唯一保留的 ring const:editable cell **display mode hover 提示**(「這 cell 可編,點 → 進
+// edit」affordance 信號)。對齊 Notion / Airtable hover-cell-shows-border canonical。
+//
+// 為何只剩這一個:Field naked **edit/focus/open state ring 已下沉到 Field default state
+// machine**(border-based,2026-05-05 v9 architectural rewrite),不需 outline 平行系統;
+// 但 display mode 沒 Field state(display = 純展示無互動),hover 提示需 cell wrapper 自加。
+//
+// 1px outline straddle cell edge:offset:[-1px] 起點,outline-1 1px 厚 → 完全 inside element
+// edge,不破 row layout。Color `--border-hover` 對齊 Field default hover state token。
+export const nakedCellEditableDisplayHover = 'hover:outline hover:outline-1 hover:outline-offset-[-1px] hover:outline-[var(--border-hover)]'
+
+// ── Cell-as-input Edge Slot SSOT(2026-05-05 v8 — retire 平行 SSOT,改 L1 消費)───
+//
+// 前身 `nakedCellPrefixSlot` / `nakedCellSuffixSlot` 是 M1+M17 違反:平行 SSOT 跟
+// `patterns/element-anatomy` 的 `<ItemPrefix>` / `<ItemSuffix>` primitive 撞 home。
+// 已 retire — Field naked variant 內 prefix / suffix slot 直接消費 L1 primitive:
+//
+//   import { ItemPrefix, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
+//   <ItemPrefix><StartIcon /></ItemPrefix>     // 對 Input.startIcon / Select.startIcon
+//   <ItemSuffix>{chevron}</ItemSuffix>          // 對 Combobox / DatePicker / PeoplePicker chevron
+//
+// **`h-[1lh]` 普世正確**(item-anatomy.spec.md:190-191 verbatim):
+//   - 單行 wrapper items-center → slot 1lh 在 cell 高度中心 = 第一行中線(視覺 = items-center)
+//   - 多行 wrapper items-start  → slot 1lh 鎖頂 = 第一行中線
+//   不需 conditional `group-data-[row-mode=auto]/cell:` — 我前 v4 自加的 conditional 是過度設計。
+//
+// State ring 3 const 仍留(下方)— 是 Field naked 專屬,MenuItem / TreeView 用 bg hover 不用 outline。
+// `nakedCellRowModeAlign`(wrapper 級)仍留 — 是 cell-context row-mode → wrapper alignment 適配,正交 slot 級。
 
 // ── Empty Value Display ─────────────────────────────────────────────────────
 

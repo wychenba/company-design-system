@@ -24,10 +24,10 @@ export const Default: Story = {
         onClear={() => setSelection([])}
         actions={
           <>
-            <Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>
-            <Button variant="tertiary" size="sm" startIcon={TagIcon}>加標籤</Button>
-            <Button variant="tertiary" size="sm" startIcon={MoveRight}>移動</Button>
-            <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+            <Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>
+            <Button variant="tertiary" size="md" startIcon={TagIcon}>加標籤</Button>
+            <Button variant="tertiary" size="md" startIcon={MoveRight}>移動</Button>
+            <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
           </>
         }
       />
@@ -47,8 +47,8 @@ export const WithFilterHidden: Story = {
         hiddenByFilter={2}
         actions={
           <>
-            <Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>
-            <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+            <Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>
+            <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
           </>
         }
       />
@@ -67,8 +67,11 @@ export const WithExtendDatasetHint: Story = {
       Array.from({ length: VISIBLE }, (_, i) => `file-${i}`)
     )
     const [allSelected, setAllSelected] = useState(false)
+    // **NEW fix(2026-05-04)**:Alert 必跟著 selection.length 一起 hide,否則「清除選取項目」
+    // 後 selection=0 但 Alert 仍 render → 怪 state「已選取本頁全部 0 個」
     return (
       <div className="flex flex-col">
+        {selection.length > 0 && (
         <Alert
           variant="info"
           placement="fixed"
@@ -99,13 +102,14 @@ export const WithExtendDatasetHint: Story = {
             )
           }
         />
+        )}
         <BulkActionBar
           selection={selection}
           onClear={() => { setSelection([]); setAllSelected(false) }}
           actions={
             <>
-              <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
-              <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+              <Button variant="tertiary" size="md" startIcon={Download}>下載</Button>
+              <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
             </>
           }
         />
@@ -121,7 +125,7 @@ export const EmptySelectionHidden: Story = {
     <div className="text-caption text-fg-muted">
       selection=[] → BulkActionBar 回傳 null,<strong>不佔 layout</strong>(對齊禁止事項 #3)
       <div className="mt-3 border border-dashed border-border-muted p-3">
-        <BulkActionBar selection={[]} actions={<Button variant="tertiary" size="sm">Action</Button>} />
+        <BulkActionBar selection={[]} actions={<Button variant="tertiary" size="md">Action</Button>} />
         ↑ 這裡 BulkActionBar 完全不渲染
       </div>
     </div>

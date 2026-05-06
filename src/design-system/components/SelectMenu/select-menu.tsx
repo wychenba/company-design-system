@@ -226,13 +226,16 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
       <RowSizeProvider value={size}>
       <PopoverContent
         id={contentId}
+        // w-auto override PopoverContent default w-72(rich-popover canonical)— SelectMenu 走「跟 trigger 同寬」
+        // canonical(spec L72)。minWidth = max(trigger-width, 240px sensible-min)— 對齊 shadcn / Material / Ant
+        // select dropdown 共識(2026-05-04 D1 verify SelectMenu spec implementation)。
         className={cn(
-          'p-0 rounded-lg border border-border bg-surface-raised overflow-hidden',
+          'p-0 w-auto rounded-lg border border-border bg-surface-raised overflow-hidden',
           className
         )}
         style={{
           boxShadow: 'var(--elevation-200)',
-          minWidth: minWidth ?? 'var(--radix-popover-trigger-width)',
+          minWidth: minWidth ?? 'max(var(--radix-popover-trigger-width), 15rem)',
         }}
         align={align}
         sideOffset={OVERLAY_SIDE_OFFSET}
@@ -253,6 +256,8 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
                 onValueChange={setSearch}
                 className={cn(
                   'flex w-full bg-transparent outline-none placeholder:text-fg-muted',
+                  // M24 disabled state precedence:disabled 時 placeholder 切 fg-disabled(audit dim 34)
+                  'disabled:placeholder:text-fg-disabled disabled:text-fg-disabled disabled:cursor-not-allowed',
                   size === 'lg' ? 'text-body-lg leading-compact' : 'text-body leading-compact',
                 )}
               />

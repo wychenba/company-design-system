@@ -88,10 +88,12 @@ interface TimeColumnProps {
 function TimeColumn({ values, selected, disabledSet, label, onSelect, withDivider }: TimeColumnProps) {
   const listRef = React.useRef<HTMLDivElement>(null)
 
-  // 開啟時滾到 selected 位置(在 ScrollArea viewport 中置中)。
+  // 開啟時跳到 selected 位置(置中);後續變更走 smooth(對齊 iOS / Material / Ant timepicker idiom)。
   // 用 scrollIntoView({ block: 'center' }) 自動找最近的 scrollable ancestor —
   // 比 manual scrollTop + parentElement 強健(Radix ScrollArea 結構為 Viewport > inner-div > content,
   // listRef.parentElement 不是真正 scrollable 元素)。
+  // mount 用 'auto' 避免開啟瞬間出現飄移,後續 user 操作走 'smooth'(同 Tabs/Chip/FileViewer canonical)。
+  const isFirstRunRef = React.useRef(true)
   React.useEffect(() => {
     const list = listRef.current
     if (!list) return
@@ -99,7 +101,8 @@ function TimeColumn({ values, selected, disabledSet, label, onSelect, withDivide
     if (idx < 0) return
     const item = list.children[idx] as HTMLElement | undefined
     if (!item) return
-    item.scrollIntoView({ block: 'center', behavior: 'auto' })
+    item.scrollIntoView({ block: 'center', behavior: isFirstRunRef.current ? 'auto' : 'smooth' })
+    isFirstRunRef.current = false
   }, [values, selected])
 
   // WAI-ARIA listbox keyboard pattern:ArrowUp/Down 切 option / Home / End 跳邊界。

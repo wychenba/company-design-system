@@ -5,6 +5,11 @@ variants: {}
 sizes: {}
 traits:
   - isOverlay
+benchmark:
+  - Radix Dialog primitive (shadcn Sheet base): github.com/radix-ui/primitives/tree/main/packages/react/dialog
+  - MUI Drawer: github.com/mui/material-ui/tree/master/packages/mui-material/src/Drawer
+  - Ant Design Drawer: github.com/ant-design/ant-design/tree/master/components/drawer
+  - Polaris Sheet: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Sheet
 ---
 
 # Sheet 設計原則

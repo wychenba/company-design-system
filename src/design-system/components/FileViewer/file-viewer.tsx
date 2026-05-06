@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/design-system/components/Button/button'
+import { Separator } from '@/design-system/components/Separator/separator'
 import { Input } from '@/design-system/components/Input/input'
 import { Empty } from '@/design-system/components/Empty/empty'
 import { AspectRatio } from '@/design-system/components/AspectRatio/aspect-ratio'
@@ -230,6 +231,7 @@ const ZoomInput: React.FC<ZoomInputProps> = ({ value, onChange, onFit, labels })
                 icon={ChevronDown}
                 aria-label={labels.zoomMenu}
                 size="sm"
+                overlayTrigger
               />
             </DropdownMenuTrigger>
           }
@@ -357,8 +359,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
           <>
             {/* Zoom group:-/%/+/▼ 屬同類「縮放」操作,群組並在右側加分隔線跟其他動作分群 */}
             <ZoomInput value={zoom} onChange={onZoomChange} onFit={onFit} labels={labels} />
-            {/* zoom group → next action group divider(action-bar canonical) */}
-            <div className="h-6 w-px bg-divider mx-1" aria-hidden />
+            {/* zoom group → next action group divider(action-bar canonical;v11 升級成 Separator
+                元件,對齊 separator.spec.md「consumer 手動放置 toolbar 群組分隔線 = 用 Separator」)*/}
+            <Separator orientation="vertical" className="h-6 mx-1" />
           </>
         )}
         <Button
@@ -380,8 +383,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
             onClick={onDownload}
           />
         )}
-        {/* action-bar canonical:dismiss 前加分隔線跟其他動作分群(info/download = action group,close = dismiss group) */}
-        <div className="h-6 w-px bg-divider mx-1" aria-hidden />
+        {/* action-bar canonical:dismiss 前加分隔線跟其他動作分群(info/download = action group,
+            close = dismiss group;v11 升級成 Separator,對齊 separator.spec.md canonical)*/}
+        <Separator orientation="vertical" className="h-6 mx-1" />
         {/* Close X 走 dismiss canonical(`<Button iconOnly dismiss />`)——對齊 CLAUDE.md
             `button.spec.md`「Dismiss 視覺類」+ `patterns/element-anatomy/item-anatomy.spec.md`
             「Dismiss canonical」:chrome corner close X = Button dismiss,不是 Inline Action。 */}

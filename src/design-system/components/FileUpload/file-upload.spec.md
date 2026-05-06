@@ -5,6 +5,9 @@ variants: {}
 sizes: {}
 traits:
   - hasInteractiveStates
+benchmark:
+  - Ant Design Upload: github.com/ant-design/ant-design/tree/master/components/upload
+  - Polaris DropZone: github.com/Shopify/polaris/tree/main/polaris-react/src/components/DropZone
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

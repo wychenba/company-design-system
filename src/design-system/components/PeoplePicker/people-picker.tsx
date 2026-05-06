@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { FieldMode } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
+import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
+import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { PersonDisplay, MultiPersonDisplay, buildPersonNameCard, resolvePerson, type PersonValue } from './person-display'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
 
@@ -31,7 +33,24 @@ function personToMenuOption(person: PersonValue): SelectMenuOption {
 
 export interface PeoplePickerProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  /**
+   * Field mode(2026-05-05 Phase B3 align):
+   *   edit     — Popover + Command 搜尋(預設)
+   *   display  — **純展示**:單選 → PersonDisplay(Avatar + NameCard hoverCard);
+   *              多選 → MultiPersonDisplay(Avatar stack + OverflowIndicator)。無 input chrome、無互動 Popover。
+   *              對齊 Carbon read-only / DataTable person cell read mode。
+   *   readonly — input chrome + 鎖互動,Avatar 視覺保留(留 a11y signal「這是 input 但鎖了」)
+   *   disabled — input chrome + disabled 降色
+   */
   mode?: FieldMode
+  /**
+   * Visual chrome(2026-05-05 Phase B3)。對齊 FieldContext.variant 透傳。
+   * - `'default'` — 完整 Field wrapper chrome(form / Field 內嵌)
+   * - `'bare'` — 透明 variant,hover/focus 才現 border(DataTable cell-as-input)
+   *
+   * mode='display' 時 chrome 無視覺意義(display 完全無 wrapper);chrome 僅作用於 edit / readonly / disabled。
+   */
+  variant?: FieldVariant
   size?: 'sm' | 'md' | 'lg'
   /** 當前已選的人（單選 PersonValue，多選 PersonValue[]） */
   value?: PersonValue | PersonValue[] | null
@@ -45,10 +64,15 @@ export interface PeoplePickerProps
   emptyText?: string
   className?: string
   disabled?: boolean
+  /** Initial open state(uncontrolled)— DataTable cell-as-input 1-step open canonical */
+  defaultOpen?: boolean
+  /** open state 變更 callback。DataTable cell-as-input 用:open=false → cell exit edit */
+  onOpenChange?: (open: boolean) => void
 }
 
 const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(function PeoplePicker({
-  mode = 'edit',
+  mode: modeProp,
+  variant: variantProp,
   size = 'md',
   value,
   onChange,
@@ -57,24 +81,41 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
   emptyText = '沒有符合的人員', // i18n-allow: DS default; consumer override via emptyText prop
   className,
   disabled,
+  defaultOpen = false,
+  onOpenChange,
   ...props
 }, ref) {
-  const resolvedMode = disabled ? 'disabled' : mode
+  const fieldCtx = useFieldContext()
+  const mode: FieldMode = modeProp ?? fieldCtx?.mode ?? 'edit'
+  const resolvedMode: FieldMode = disabled ? 'disabled' : mode
+  // chrome resolution:per-prop > context > 'default'
+  const resolvedVariant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
   const isEditable = resolvedMode === 'edit'
   const iconSize = size === 'lg' ? 20 : 16
   const isMulti = Array.isArray(value)
   const isEmpty = !value || (isMulti && value.length === 0)
+
+  // ── mode='display' ──────────────────────────────────────────────────────
+  // 純展示:無 fieldWrapperStyles 容器、無 chevron affordance。
+  // 直接 reuse 既有 PersonDisplay / MultiPersonDisplay primitive(該 primitive 同時供 NameCard /
+  // DataTable / 其他 cross-component 場景使用,不在本 phase retire — 保留 standalone export)。
+  if (resolvedMode === 'display') {
+    if (isEmpty) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+    return isMulti
+      ? <MultiPersonDisplay value={value as PersonValue[]} size={size} />
+      : <PersonDisplay value={value as PersonValue} size={size} />
+  }
 
   // ── Readonly / disabled ──
   if (!isEditable) {
     return (
       <div
         ref={ref}
-        className={cn(fieldWrapperStyles({ mode: resolvedMode, size }), className)}
+        className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: resolvedVariant, size }), className)}
         data-field-mode={resolvedMode}
         {...props}
       >
-        <span className={cn('flex-1 min-w-0 inline-flex items-center', resolvedMode === 'disabled' && 'text-fg-disabled')}>
+        <span className={cn('flex-1 min-w-0 inline-flex items-center', nakedCellRowModeAlign, resolvedMode === 'disabled' && 'text-fg-disabled')}>
           {isEmpty
             ? <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
             : isMulti
@@ -114,8 +155,9 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
   )
 
   // ── Edit mode trigger ──
-  // 不自己管 open state——讓 SelectMenu 內部的 Popover 管理
-  // (controlled open 容易跟 Radix Popover 衝突)
+  // open state:default uncontrolled,但 defaultOpen=true 時取 controlled path 注入 initial true
+  // (對齊 Radix Popover defaultOpen canonical;DataTable cell-as-input 1-step open 用)。
+  const [open, setOpen] = React.useState(defaultOpen)
   const trigger = (
     <div
       ref={ref}
@@ -123,15 +165,17 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
       aria-haspopup="listbox"
       tabIndex={0}
       className={cn(
-        fieldWrapperStyles({ mode: 'edit', size }),
-        // Radix Popover 在 trigger 上寫 data-state="open",用它顯示 focus border
-        'cursor-pointer data-[state=open]:border-primary',
+        fieldWrapperStyles({ mode: 'edit', variant: resolvedVariant, size }),
+        // 2026-05-06 v13.3 SSOT retire:per-control `data-[state=open]:border-primary` 移除。
+        // Field default state machine 統一處理 — open=灰深 / focus=藍 (focus-within !important)。
+        // 對齊全 DS focus dominates everything 共識。
+        'cursor-pointer',
         className,
       )}
       data-field-mode="edit"
       {...props}
     >
-      <span className="flex-1 min-w-0 inline-flex items-center">
+      <span className={cn('flex-1 min-w-0 inline-flex items-center', nakedCellRowModeAlign)}>
         {isEmpty
           ? <span className="text-fg-muted">選擇...</span>
           : isMulti
@@ -146,11 +190,9 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
             : <PersonDisplay value={value as PersonValue} size={size} />
         }
       </span>
-      <ChevronDown
-        size={iconSize}
-        className="shrink-0 text-fg-muted"
-        aria-hidden
-      />
+      <ItemSuffix>
+        <ChevronDown size={iconSize} className="text-fg-muted" aria-hidden />
+      </ItemSuffix>
     </div>
   )
 
@@ -164,6 +206,8 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
       searchPlaceholder={searchPlaceholder}
       emptyText={emptyText}
       size={size}
+      open={open}
+      onOpenChange={(o) => { setOpen(o); onOpenChange?.(o) }}
     >
       {trigger}
     </SelectMenu>

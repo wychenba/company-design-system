@@ -5,6 +5,11 @@ variants: {}
 sizes: {}
 traits:
   - isOverlay
+benchmark:
+  - Radix Tooltip primitive: github.com/radix-ui/primitives/tree/main/packages/react/tooltip
+  - Ant Design Tooltip: github.com/ant-design/ant-design/tree/master/components/tooltip
+  - MUI Tooltip: github.com/mui/material-ui/tree/master/packages/mui-material/src/Tooltip
+  - Polaris Tooltip: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Tooltip
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

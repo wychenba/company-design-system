@@ -5,6 +5,9 @@ traits:
   - isInternal
 variants: {}
 sizes: {}
+benchmark:
+  - Polaris MediaCard: github.com/Shopify/polaris/tree/main/polaris-react/src/components/MediaCard
+  - MUI Card: github.com/mui/material-ui/tree/master/packages/mui-material/src/Card
 ---
 
 # NameCard 設計原則

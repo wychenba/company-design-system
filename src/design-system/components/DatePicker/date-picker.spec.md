@@ -6,6 +6,10 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInputLike
+benchmark:
+  - Ant Design DatePicker: github.com/ant-design/ant-design/tree/master/components/date-picker
+  - MUI X Date Pickers: github.com/mui/mui-x/tree/master/packages/x-date-pickers
+  - react-day-picker: github.com/gpbl/react-day-picker
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
@@ -285,7 +289,7 @@ DatePicker 套 `React.forwardRef` + `displayName`,但**不 `...props` spread DOM
 
 顯式列 API surface 符合世界級 composite 元件慣例(Material DatePicker / Atlassian DateTimePicker 皆如此),consumer 知道能傳什麼,避免靜默失效。
 
-**`asChild` 不支援**:同理,compound trigger 無單一 Slot 目標。consumer 若要自訂 trigger 視覺,改用 DatePickerDisplay + 自家 Button composition。
+**`asChild` 不支援**:同理,compound trigger 無單一 Slot 目標。consumer 若要自訂 trigger 視覺,改用 `<DatePicker mode="display">` + 自家 Button composition。
 
 ---
 

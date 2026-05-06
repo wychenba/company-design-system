@@ -41,19 +41,19 @@ Field/
 ├── field-controls.spec.md  ← 本文件
 ├── field-types.ts          ← FieldMode、InlineActionConfig 共用型別
 ├── field-wrapper.tsx       ← 共用 wrapper 樣式、bareInputStyles、EMPTY_DISPLAY
-├── Input/                  ← Input + InputDisplay
-├── NumberInput/            ← NumberInput + NumberInputDisplay + formatNumber
-├── DatePicker/             ← DatePicker + DatePickerDisplay + formatDate
-├── Select/                 ← Select + SelectDisplay
-├── Combobox/               ← Combobox + ComboboxDisplay
-├── LinkInput/              ← LinkInput + LinkInputDisplay
-├── PeoplePicker/           ← PeoplePicker + PersonDisplay
+├── Input/                  ← Input（含 mode="display"）
+├── NumberInput/            ← NumberInput（含 mode="display" + formatNumber）
+├── DatePicker/             ← DatePicker（含 mode="display" + formatDate）
+├── Select/                 ← Select（含 mode="display"）
+├── Combobox/               ← Combobox（含 mode="display"）
+├── LinkInput/              ← LinkInput（含 mode="display"）
+├── PeoplePicker/           ← PeoplePicker + PersonDisplay（cross-component primitive）
 └── Textarea/               ← Textarea（多行）
 ```
 
-每個元件 export 兩樣東西：
-1. **主元件**（如 `Input`）— Form 用，有 edit / readonly / disabled 三種模式
-2. **Display 子元件**（如 `InputDisplay`）— DataTable cell 用，純格式化顯示
+每個元件統一以 `mode` prop 切換樣態：
+1. **edit / readonly / disabled** — Form 用，可編輯 / 鎖定 / 不可用
+2. **`mode="display"`** — DataTable cell 用，純格式化顯示（取代過往的 `XxxDisplay` 子元件）
 
 ---
 

@@ -1,5 +1,38 @@
 // ── Field Mode ───────────────────────────────────────────────────────────────
-export type FieldMode = 'edit' | 'readonly' | 'disabled'
+//
+// 4 模式 canonical(2026-05-05 expand to 4):
+//   edit     — 一般可編輯 input(預設 variant:border + bg)
+//   display  — **純展示**(無 input chrome / 無互動 affordance);語意「這是 read-only 內容,展示給人看」
+//              對齊 Carbon read-only / PatternFly inline-edit hidden-input / Cloudscape display-mode
+//   readonly — input chrome + non-editable(保留 underline / border subtle 給 a11y signal「這是 input 但鎖了」)
+//              對齊 Carbon read-only-with-underline。差異:`display` 完全無 chrome;`readonly` 保留 input affordance signal
+//   disabled — input chrome + disabled state(灰底,不可互動,語意「不適用」)
+//
+// `display` vs `readonly` 判別:
+//   - 該位置語意上是「純展示資料」(如 DataTable cell read mode / NameCard meta) → `display`
+//   - 該位置是「表單欄位但目前不可改」(如 form 鎖部分欄位) → `readonly`
+//
+// World-class refs(M22 verified):
+//   Carbon: https://carbondesignsystem.com/patterns/read-only-states-pattern/
+//   PatternFly: https://www.patternfly.org/components/inline-edit/design-guidelines/
+//   Cloudscape: https://cloudscape.design/patterns/general/disabled-and-read-only-states/
+export type FieldMode = 'edit' | 'display' | 'readonly' | 'disabled'
+
+// ── Field Variant ────────────────────────────────────────────────────────────
+//
+// 視覺外殼(對齊主流 DS canonical M22 verified 2026-05-05):
+//   - Ant Design `Input variant`: 'outlined' | 'borderless' | 'filled' | 'underlined'
+//   - MUI `TextField variant`: 'outlined' | 'standard' | 'filled'
+//
+//   default — 含 border + bg(一般 form input,= Ant outlined / MUI outlined)
+//   bare    — 透明 variant,hover/focus 才 reveal inner border(VS Code/Figma toolbar inline editing idiom,
+//             ≈ Ant borderless,但保留 hover/focus reveal)
+//   naked   — 完全無 chrome / 無 focus ring on wrapper(cell-as-input — host cell 提供 border + focus visual)
+//             對齊 Airtable / Notion / Excel cell editing — cell 本身扮演 input frame,內無 wrapper
+//
+// 透傳機制:Field 透過 FieldContext.variant 一次宣告,所有 child Field control 自動繼承。
+// per-control prop override 可覆寫 context。
+export type FieldVariant = 'default' | 'bare' | 'naked'
 
 // ── Menu List Min Height ─────────────────────────────────────────────────────
 // SelectMenu / Select / Combobox 共用的 CommandList minHeight 計算。

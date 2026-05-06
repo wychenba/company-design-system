@@ -6,6 +6,9 @@ sizes: {}
 traits:
   - isOverlay
   - isInternal
+benchmark:
+  - Radix HoverCard primitive: github.com/radix-ui/primitives/tree/main/packages/react/hover-card
+  - Ant Design Popover: github.com/ant-design/ant-design/tree/master/components/popover
 ---
 
 # HoverCard 設計原則

@@ -5,6 +5,8 @@ variants: {}
 sizes: {}
 traits:
   - hasInteractiveStates
+benchmark:
+  - Radix ScrollArea primitive: github.com/radix-ui/primitives/tree/main/packages/react/scroll-area
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

@@ -6,6 +6,11 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isStructural
+benchmark:
+  - Radix Accordion primitive: github.com/radix-ui/primitives/tree/main/packages/react/accordion
+  - MUI Accordion: github.com/mui/material-ui/tree/master/packages/mui-material/src/Accordion
+  - Ant Design Collapse: github.com/ant-design/ant-design/tree/master/components/collapse
+  - Carbon Accordion: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Accordion
 ---
 
 # Accordion 設計原則

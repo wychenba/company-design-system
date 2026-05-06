@@ -6,6 +6,11 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInputLike
+benchmark:
+  - Ant Design Input: github.com/ant-design/ant-design/tree/master/components/input
+  - MUI TextField: github.com/mui/material-ui/tree/master/packages/mui-material/src/TextField
+  - Polaris TextField: github.com/Shopify/polaris/tree/main/polaris-react/src/components/TextField
+  - Carbon TextInput: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/TextInput
 ---
 
 # Input 設計原則
@@ -81,7 +86,7 @@ startIcon 不隨 value 變化——它描述的是 input 的用途，不是 valu
 
 ## Display
 
-`InputDisplay` 是 identity 顯示：
+`<Input mode="display">` 是 identity 顯示：
 - 有值：原樣輸出
 - null / undefined / 空字串：`—`（em dash），`text-fg-muted`
 

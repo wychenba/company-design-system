@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import type { FieldMode } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import type { InlineActionConfig } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
@@ -32,27 +32,25 @@ function formatNumber(
   return `${prefix}${formatted}${suffix}`
 }
 
-// ── Display ─────────────────────────────────────────────────────────────────
-// Table cell 和 Form readonly 共用。DataTable 透過 column type 查到這個元件。
-
-export interface NumberInputDisplayProps extends NumberFormatOptions {
-  value?: number | null
-}
-
-function NumberInputDisplay({ value, ...formatOptions }: NumberInputDisplayProps) {
-  if (value == null) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
-  return <>{formatNumber(value, formatOptions)}</>
-}
-NumberInputDisplay.displayName = 'NumberInputDisplay'
+// Phase B1(2026-05-05):NumberInputDisplay 退場。
+// 改用 `<NumberInput mode="display" value={...} prefix={...} ... />`,format 邏輯在 mode='display' 分支重用。
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
 export interface NumberInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'value' | 'onChange' | 'type'>,
-    Omit<VariantProps<typeof fieldWrapperStyles>, 'mode'>,
+    Omit<VariantProps<typeof fieldWrapperStyles>, 'mode' | 'variant'>,
     NumberFormatOptions {
   /** Field display mode */
   mode?: FieldMode
+  /**
+   * Visual chrome(正交於 mode);Phase B1(2026-05-05)新增。
+   * - `'default'`(預設)— 完整 Field wrapper chrome。
+   * - `'bare'` — 透明 variant,hover/focus 才 reveal(Toolbar inline / DataTable cell)。
+   *
+   * 透傳:在 `<Field variant="bare">` 內自動繼承 context.variant;per-prop override context。
+   */
+  variant?: FieldVariant
   /** Error 狀態（正交於 mode）。 */
   error?: boolean
   /** 數值 */
@@ -75,7 +73,8 @@ export interface NumberInputProps
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
   (
     {
-      mode = 'edit',
+      mode: modeProp,
+      variant: variantProp,
       error: errorProp = false,
       size: sizeProp,
       value,
@@ -100,13 +99,18 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const size = sizeProp ?? fieldCtx?.size ?? 'md'
     const disabled = disabledProp ?? fieldCtx?.disabled
-    const resolvedMode = disabled ? 'disabled' : readOnly ? 'readonly' : mode
+    // chrome 透傳:per-prop override context;context 沒值則 'default'
+    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+    // mode resolve order(Phase B1 2026-05-05):prop > fieldCtx > readOnly/disabled fallback
+    const resolvedMode: FieldMode = modeProp
+      ?? fieldCtx?.mode
+      ?? (readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')
 
-    // readonly / disabled 顯示格式化值
+    // display / readonly / disabled 都顯示格式化值(span 取代 input)
     if (resolvedMode !== 'edit') {
       return (
         <div
-          className={cn(fieldWrapperStyles({ mode: resolvedMode, size }), className)}
+          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
         >
           <span
@@ -139,7 +143,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     return (
       <div
         className={cn(
-          fieldWrapperStyles({ mode: 'edit', size }),
+          fieldWrapperStyles({ mode: 'edit', variant: variant, size }),
           error && [
             'border-error hover:border-error-hover',
             'focus-within:border-error focus-within:hover:border-error',
@@ -196,4 +200,4 @@ export const numberInputMeta = {
 } as const
 
 // code-quality-allow: dead-export — public API surface — consumer-exposed for future use
-export { NumberInput, NumberInputDisplay, formatNumber }
+export { NumberInput, formatNumber }

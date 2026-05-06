@@ -11,6 +11,48 @@ const meta: Meta<typeof RadioGroupItem> = {
 export default meta
 type Story = StoryObj<typeof RadioGroupItem>
 
+// @story-trait-rationale: pre-existing trait gaps tracked separately; this PR scope = add Modes story with display card.
+/* ── 三種模式 ── */
+export const Modes: Story = {
+  name: '三種模式',
+  render: () => (
+    <div className="flex flex-col gap-6 max-w-md">
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">edit</h3>
+        <RadioGroup defaultValue="yearly" aria-label="付款方案(edit mode demo)">
+          <SelectionItem control={<RadioGroupItem value="monthly" id="m-edit" />} label="月付方案" htmlFor="m-edit" />
+          <SelectionItem control={<RadioGroupItem value="yearly" id="y-edit" />} label="年付方案" description="每年 $2,990，省下兩個月" htmlFor="y-edit" />
+          <SelectionItem control={<RadioGroupItem value="lifetime" id="l-edit" />} label="終身方案" htmlFor="l-edit" />
+        </RadioGroup>
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">display</h3>
+        <RadioGroup mode="display" value="yearly" aria-label="付款方案(display mode demo)">
+          <SelectionItem control={<RadioGroupItem value="monthly" id="m-disp" />} label="月付方案" htmlFor="m-disp" />
+          <SelectionItem control={<RadioGroupItem value="yearly" id="y-disp" />} label="年付方案" description="每年 $2,990，省下兩個月" htmlFor="y-disp" />
+          <SelectionItem control={<RadioGroupItem value="lifetime" id="l-disp" />} label="終身方案" htmlFor="l-disp" />
+        </RadioGroup>
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
+        <RadioGroup mode="readonly" value="yearly" aria-label="付款方案(readonly mode demo)">
+          <SelectionItem control={<RadioGroupItem value="monthly" id="m-ro" />} label="月付方案" htmlFor="m-ro" />
+          <SelectionItem control={<RadioGroupItem value="yearly" id="y-ro" />} label="年付方案" htmlFor="y-ro" />
+          <SelectionItem control={<RadioGroupItem value="lifetime" id="l-ro" />} label="終身方案" htmlFor="l-ro" />
+        </RadioGroup>
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">disabled</h3>
+        <RadioGroup mode="disabled" value="yearly" aria-label="付款方案(disabled mode demo)">
+          <SelectionItem control={<RadioGroupItem value="monthly" id="m-dis" />} label="月付方案" htmlFor="m-dis" disabled />
+          <SelectionItem control={<RadioGroupItem value="yearly" id="y-dis" />} label="年付方案" htmlFor="y-dis" disabled />
+          <SelectionItem control={<RadioGroupItem value="lifetime" id="l-dis" />} label="終身方案" htmlFor="l-dis" disabled />
+        </RadioGroup>
+      </div>
+    </div>
+  ),
+}
+
 /* ── 狀態 ── */
 export const States: Story = {
   name: '狀態',

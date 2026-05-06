@@ -13,6 +13,10 @@ traits:
   - hasSizes
   - hasInteractiveStates
   - isInputLike
+benchmark:
+  - Carbon TextArea: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/TextArea
+  - MUI TextField (multiline): github.com/mui/material-ui/tree/master/packages/mui-material/src/TextField
+  - Ant Design Input.TextArea: github.com/ant-design/ant-design/tree/master/components/input
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
@@ -92,6 +96,10 @@ sm 與 md 視覺相同（純命名 mapping，對齊 Field family）。
 ## Mode / Validation / a11y
 
 詳見 `../Field/field-controls.spec.md`(Mode / Validation)+ `../Field/form-validation.spec.md`(驗證時機)。三 mode 的色彩 / 互動 / aria 規則 Textarea 全部對齊。
+
+### Controlled / Uncontrolled(M26)
+
+native `<textarea>` 自帶 `value` / `defaultValue` / `onChange` triplet — Textarea 是 thin wrapper 直接 forward。3 模式:uncontrolled(只 `defaultValue`)/ controlled(`value` + `onChange`)/ read-only(走 `readOnly` prop,Radix-style)。autoResize 與兩模式都相容(內部 layoutEffect 量 scrollHeight,不影響 value source)。
 
 ### Readonly 特例
 

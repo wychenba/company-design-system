@@ -4,6 +4,7 @@ import * as SwitchPrimitives from '@radix-ui/react-switch'
 import { Check } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 
 /**
@@ -100,6 +101,21 @@ export interface SwitchProps
    * 用於表單 readonly 呈現、DataTable cell 非編輯態。
    */
   readOnly?: boolean
+  /**
+   * Field mode(2026-05-05 Phase B3 align):
+   *   edit     — 一般可互動 Switch(預設)
+   *   display  — **純展示**:渲染 ✓ / —(無互動 primitive、無 input chrome);
+   *              對齊 Carbon read-only / DataTable boolean cell。
+   *              `readonly` 保留 toggle 視覺 + 鎖互動;`display` 完全無 toggle 形體 — 兩者語意分離(field-types.ts)。
+   *   readonly — 同 readOnly prop
+   *   disabled — 同 disabled prop
+   */
+  mode?: FieldMode
+  /**
+   * Visual chrome — Switch 本體無 input wrapper variant,本 prop 對 Switch 主體無視覺影響;
+   * 為對齊 Field 4-mode + chrome 透傳契約而保留(M19 一致性)。
+   */
+  variant?: FieldVariant
 }
 
 const Switch = React.forwardRef<
@@ -114,6 +130,9 @@ const Switch = React.forwardRef<
       description,
       readOnly = false,
       disabled,
+      mode,
+      // chrome 對 Switch 主體無視覺影響(無 input wrapper)— 接收純為 prop 一致性;destructure 防 leak 到 DOM。
+      variant: _chrome,
       id: idProp,
       ...props
     },
@@ -121,6 +140,17 @@ const Switch = React.forwardRef<
   ) => {
     const sizeKey = size ?? 'md'
     const spec = SPECS[sizeKey]
+
+    // ── mode='display' ─────────────────────────────────────────────────────
+    // 純展示模式:無互動 toggle、無 input variant,渲染 ✓ / —。
+    // 與 Checkbox display 對齊(同為 boolean primitive)— DataTable boolean cell 場景共用。
+    // 與 readonly 差異:readonly 保留 toggle 視覺 + 鎖互動;display 完全無 toggle 形體。
+    if (mode === 'display') {
+      const isChecked = props.checked === true
+      return isChecked
+        ? <span className="text-foreground">✓</span>
+        : <span className="text-fg-muted">—</span>
+    }
 
     // Field context 偵測：在 Field 內時忽略自己的 label/description，避免雙層
     const fieldCtx = useFieldContext()

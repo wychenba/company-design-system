@@ -89,8 +89,8 @@ Tailwind utility 透過 `@theme inline` 橋接 semantic token，元件寫 `bg-pr
 |--------------------|------|
 | `text-foreground`  | 主要文字（一般資訊）|
 | `text-fg-secondary`| 次要資訊、helper text |
-| `text-fg-muted`    | placeholder、caption、弱化 icon |
-| `text-fg-disabled` | disabled 文字 |
+| `text-fg-muted`    | placeholder、caption、弱化 icon(**non-disabled only**)|
+| `text-fg-disabled` | disabled 文字 + **disabled 元件內所有文字 / placeholder / icon**(state 勝 emphasis,M24)|
 
 文字色一律使用 neutral alpha token，疊加在任何背景都能維持對比。
 弱化 icon hover 後變 `text-fg-secondary`。
@@ -100,17 +100,18 @@ Tailwind utility 透過 `@theme inline` 橋接 semantic token，元件寫 `bg-pr
 ## Disabled 狀態
 
 
-disabled 元件內的所有子元素必須呈現 disabled 狀態：
+disabled 元件內的所有子元素必須呈現 disabled 狀態:
 
 | 元素類型 | Disabled 處理 |
 |---|---|
-| 文字 | `text-fg-disabled` |
-| Icon（stroke） | `text-fg-disabled` |
-| 圖片 / Avatar | `opacity-disabled`——圖片無法套用語義色，用透明度弱化 |
+| 文字 / placeholder / Icon stroke | `text-fg-disabled`(state 勝 emphasis,M24)|
+| 圖片 / Avatar | `opacity-disabled`——圖片無法套用語義色,用透明度弱化 |
 | Checkbox / Radio | 元件自身的 disabled 樣式 |
-| 背景色 | `bg-disabled`（如適用） |
+| 背景色 | `bg-disabled`(如適用) |
 
-**判斷標準：disabled 元件內不應有任何元素呈現可互動 affordance。**
+**判斷標準**:disabled 元件內不應有任何元素呈現可互動 affordance。
+
+**State precedence(M24,2026-05-04 升 SSOT)**:disabled 是 state,muted 是 emphasis decoration。disabled element 內 placeholder 用 muted = state 弱於 decoration → 違反語意層級。實作:`field-wrapper.tsx bareInputStyles` 加 `group-data-[field-mode=disabled]/field:placeholder:text-fg-disabled`,Select 等 ReadonlyDisplay 看 `resolvedMode === 'disabled'` 決定。詳 M24 + `.claude/memory/feedback_disabled_state_overlay_scroll_chain.md`。
 
 ### 兩種 disabled 策略:何時用哪個
 
@@ -681,15 +682,31 @@ Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → ste
 
 | Utility | Token | 用途 |
 |---------|-------|------|
-| `border-border` | neutral-5 | 元件標準邊框 |
-| `border-border-hover` | neutral-6 | input、checkbox、radio 的 hover 邊框 |
-| `border-divider` | neutral-4 | 分隔線（比 border 更淡）|
+| `border-border` | neutral-5 alpha 15% | 元件標準邊框（input / Field family / standalone control)|
+| `border-border-hover` | neutral-6 alpha 25% | input、checkbox、radio 的 hover 邊框 |
+| `border-divider` | neutral-4 alpha 9% | 分隔線（比 border 更淡)/ **table 外框 + row divider 同色**(T-junction connectivity)|
+| `border-[var(--border-opaque)]` | neutral-5 opaque | alpha-immune 變體;cell bg 非白(disabled 灰底 / nested surface)時用 |
 
 選中狀態的邊框或文字使用 hover token：
 
 ```tsx
 <div className="border-primary-hover text-primary-hover" />
 ```
+
+### T-junction connectivity 原則(2026-05-04 升 SSOT)
+
+**問題**:Table row divider(horizontal)在 row 兩端 meet table outer border(vertical)。若 outer border 跟 divider **不同色** → 交匯處視覺斷層,user 感「不連續」。
+
+**為什麼不能加重 divider**:divider 是密集分隔 N rows,加重 → 過搶眼,reading flow 被打斷。
+
+**解法**:**淡化 outer border 至 divider 同色**(從 `border-border` 降到 `border-divider`)。交匯處 seamless,divider 視覺重量不變。
+
+**實作**:DataTable outer 用 `border-divider`(對齊 row 內 dividers)。對齊 Ant Design `colorBorderSecondary` idiom — Ant table 外框 + row divider 同 token。
+
+**何時 outer = `--border` vs `--divider`**:
+- 元件**無 inner divider**(input / Field / Card / Dialog)→ 用 `--border`(獨立邊框,標準視覺重量)
+- 元件**有 inner divider**(Table / List with dividers)→ outer 用 `--divider`(同色,T-junction seamless)
+- 元件 cell bg **非白底**(FCG disabled cell)→ 用 `--border-opaque`(alpha-immune 變體)
 
 
 ## Utility Tokens
@@ -712,22 +729,9 @@ Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → ste
 自己寫的元件優先用具體的 disabled 色彩（如 `text-fg-disabled`、`bg-[var(--bg-disabled)]`）。`opacity-disabled` 僅作為逃生艙，適用於無法逐一替換內部顏色的場景（第三方元件、複雜多層結構如 Switch）。
 
 
-## shadcn Compat Aliases（歷史記錄）
+## shadcn Compat Aliases(已清除,2026-04-18)
 
-**已清除**：Popover / Card / Accent / muted-foreground / secondary-foreground / primary-foreground / destructive / background / input 等 shadcn compat aliases 2026-04-18 全數移除——我們元件 code 從未使用它們，保留只會讓人誤以為可用。
-
-歷史遷移對照（僅供 migration reference，這些 alias 已不存在）：
-
-| 舊 alias        | 目前 token（已取代） |
-|-----------------|--------------------|
-| `bg-background` | `bg-canvas`        |
-| `bg-card`       | `bg-surface`       |
-| `bg-popover`    | `bg-surface-raised` |
-| `bg-destructive`| `bg-error`         |
-| `bg-accent`     | `bg-neutral-hover` |
-| `border-input`  | `border-border`    |
-
-> **`bg-secondary`** 和 `bg-muted` 已升級為正式語義 token（見 Static Subtle 段落），不屬於此次移除範圍。
+shadcn compat aliases(`bg-background` / `bg-card` / `bg-popover` / `bg-destructive` / `bg-accent` / `border-input` / `*-foreground` 等)2026-04-18 全數移除。新 code 一律用 direct token(`bg-canvas` / `bg-surface` / `bg-surface-raised` / `bg-error` / `bg-neutral-hover` / `border-border`)。`bg-secondary` + `bg-muted` 已升正式語義 token(見 Static Subtle)。
 
 
 ## Nested Theme

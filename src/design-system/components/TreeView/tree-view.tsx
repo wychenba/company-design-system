@@ -22,6 +22,8 @@ import {
   ICON_SIZE,
   RowSizeProvider,
   ItemIcon,
+  ItemPrefix,
+  ItemSuffix,
   ItemInlineAction,
   ROW_PADDING_BY_SIZE,
   type InlineActionConfig,
@@ -86,8 +88,10 @@ export interface TreeDragEndEvent {
 // Icon / chevron 尺寸——從 item-layout pattern module 引入(在檔頂 import),
 // 這裡本地不再宣告。所有 row primitives 共用同一個常數。
 
-// indentStep = chevronSize + gap-2(8px)
-// 結構對齊:子 chevron 對齊父 icon,子 icon 對齊父 label
+// indentStep = chevronSize + gap-2(8px)— 2026-05-04 升 SSOT 為 token `--tree-indent-{sm,md,lg}`
+// 在 `tokens/uiSize/uiSize.css`。DataTable nested rows 共用此 SSOT,跨元件視覺一致。
+// 結構對齊:子 chevron 對齊父 icon,子 icon 對齊父 label。
+// Numeric value 此處保留(drop indicator JS px 計算需 number),Tailwind class 走 token。
 const INDENT_STEP: Record<SizeKey, number> = { sm: 24, md: 24, lg: 28 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -833,9 +837,10 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
     )
 
     // ── Chevron(永遠存在:expandable = 旋轉箭頭;leaf = placeholder 佔位) ──
-    // 包在 h-[1lh] 裡,items-start 時對齊 label 第一行中線
+    // 消費 `<ItemPrefix>` SSOT — 永遠 h-[1lh] 對齊 label 第一行中線(item-anatomy 對應)。
+    // forced width 透過 style 鎖 chevron 槽寬,讓 sibling label 起點水平對齊(無 chevron leaf 佔位同寬)。
     const chevronSlot = (
-      <span className="h-[1lh] shrink-0 flex items-center" style={{ width: iconPx }}>
+      <ItemPrefix style={{ width: iconPx }}>
         {hasChildren ? (
           <button
             type="button"
@@ -857,7 +862,7 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
           // Leaf placeholder
           <span style={{ width: iconPx }} aria-hidden />
         )}
-      </span>
+      </ItemPrefix>
     )
 
     return (
@@ -922,21 +927,21 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
           >
             {chevronSlot}
 
-            {/* Checkbox 在 icon 前——h-[1lh] 對齊第一行 */}
+            {/* Checkbox 在 icon 前——消費 `<ItemPrefix>` 對齊第一行 */}
             {checkbox && (
-              <span className="h-[1lh] shrink-0 flex items-center pointer-events-none">
+              <ItemPrefix className="pointer-events-none">
                 {checkbox}
-              </span>
+              </ItemPrefix>
             )}
 
             {/* indicator 取代 icon 的位置;h-[1lh] 對齊第一行
-                indicator 是 escape hatch(stepper status dot 等客製內容),用裸 ItemPrefix 模式;
+                indicator 是 escape hatch(stepper status dot 等客製內容),消費 `<ItemPrefix>` 鎖 chevron 槽寬;
                 Icon 走 canonical `<ItemIcon>` helper——自動標 data-prefix-type="icon",
                 讓 SidebarProvider 的全域 :has() prefix-mix 偵測能命中。 */}
             {indicator ? (
-              <span className="h-[1lh] shrink-0 flex items-center justify-center" style={{ width: iconPx }}>
+              <ItemPrefix style={{ width: iconPx }}>
                 {indicator}
-              </span>
+              </ItemPrefix>
             ) : Icon ? (
               <ItemIcon icon={Icon} className={disabled ? 'text-fg-disabled' : undefined} />
             ) : null}
@@ -946,28 +951,20 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             </span>
 
             {/* Suffix inline actions——宣告式 API,用 `<ItemInlineAction>` 渲染。
-                actionsReveal="hover"(預設):row hover 或 keyboard focus-visible 才顯示。
-                actionsReveal=false:常駐顯示。
-                跟 SidebarMenuButton 共用同一條規則,行為一致。
+                消費 `<ItemSuffix hoverReveal hoverGroup="tree-item">` SSOT(2026-05-05 v8 group selector 參數化後)。
+                actionsReveal="hover"(預設):row hover 或 keyboard focus-visible 才顯示;
+                actionsReveal=false:常駐顯示。跟 SidebarMenuButton 共用同一條規則,行為一致。
                 inlineActionsSlot escape hatch 優先(consumer 自控 JSX,reveal 一樣套外層 group)。 */}
             {inlineActionsSlot ? (
-              <span className={cn(
-                "h-[1lh] shrink-0 ml-auto flex items-center gap-2",
-                actionsReveal === 'hover' &&
-                  "opacity-0 group-hover/tree-item:opacity-100 group-has-[:focus-visible]/tree-item:opacity-100 transition-opacity duration-150"
-              )}>
+              <ItemSuffix hoverReveal={actionsReveal === 'hover'} hoverGroup="tree-item">
                 {inlineActionsSlot}
-              </span>
+              </ItemSuffix>
             ) : inlineActions && inlineActions.length > 0 ? (
-              <span className={cn(
-                "h-[1lh] shrink-0 ml-auto flex items-center gap-2",
-                actionsReveal === 'hover' &&
-                  "opacity-0 group-hover/tree-item:opacity-100 group-has-[:focus-visible]/tree-item:opacity-100 transition-opacity duration-150"
-              )}>
+              <ItemSuffix hoverReveal={actionsReveal === 'hover'} hoverGroup="tree-item">
                 {inlineActions.map((action, i) => (
                   <ItemInlineAction key={action.label + i} action={action} />
                 ))}
-              </span>
+              </ItemSuffix>
             ) : null}
           </div>
 

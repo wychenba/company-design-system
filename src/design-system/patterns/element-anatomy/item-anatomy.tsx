@@ -583,12 +583,26 @@ export interface ItemInlineActionButtonProps
    * Use case:Tag solid(blue/green/red 等)需 hover bg 跟 host 色相一致(非 neutral)。
    */
   hoverBgClassName?: string
+  /**
+   * 標記本 button 是 **overlay trigger**(DropdownMenu / Popover / Tooltip 透過 `asChild` 包覆)。
+   *
+   * `true` 時:Radix overlay open 期間(`data-state="open"`)button 維持 host hover 樣式
+   * — 視覺鎖,讓 user 追溯 floating panel 來源(對齊 shadcn / Radix Themes / Material)。
+   *
+   * `false` 時(default):無 data-state=open 樣式 — 適用 in-place 互動如 `Collapsible.Trigger`
+   * (展開內容接在 trigger 下方,不需追溯)、drag handle、dismiss X 等。
+   *
+   * Canonical 詳 `inline-action.spec.md`「Overlay trigger canonical」段。
+   *
+   * @default false
+   */
+  overlayTrigger?: boolean
 }
 
 export const ItemInlineActionButton = React.forwardRef<
   HTMLButtonElement,
   ItemInlineActionButtonProps
->(({ icon: Icon, className, iconClassName, style, type = "button", size: sizeProp, hoverBgClassName, ...rest }, ref) => {
+>(({ icon: Icon, className, iconClassName, style, type = "button", size: sizeProp, hoverBgClassName, overlayTrigger = false, ...rest }, ref) => {
   const contextSize = useRowSize()
   const size = sizeProp ?? contextSize
   const iconPx = ICON_SIZE[size]
@@ -600,10 +614,10 @@ export const ItemInlineActionButton = React.forwardRef<
       className={cn(
         "group/action relative grid place-content-center shrink-0 cursor-pointer",
         "text-fg-muted hover:text-foreground active:text-foreground transition-colors",
-        // Overlay trigger active state(Radix 自動 set data-state=open on asChild trigger)
-        // — 維持 host hover 樣式(canonical 2026-05-02 改:對齊 shadcn/Radix/Material 狀態
-        // 極簡派,不另開 selected 4%,跨 host 一致性高)
-        "data-[state=open]:text-foreground",
+        // Overlay trigger active state — 只在 consumer 顯式宣告 overlayTrigger=true 時生效
+        // (canonical 2026-05-05:Collapsible / drag / dismiss 等 in-place 互動 ≠ overlay,
+        // 不應 leak 視覺 lock。詳 inline-action.spec.md「Overlay trigger canonical」)
+        overlayTrigger && "data-[state=open]:text-foreground",
         "focus-visible:outline-2 focus-visible:outline-ring",
         className
       )}
@@ -617,8 +631,8 @@ export const ItemInlineActionButton = React.forwardRef<
           "rounded-md",
           "bg-transparent",
           hoverBgClassName ?? "group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active",
-          // Overlay 開啟 = 維持 host hover bg(對齊上方 text 顏色策略)
-          "group-data-[state=open]/action:bg-neutral-hover",
+          // Overlay 開啟 = 維持 host hover bg(只在 overlayTrigger=true 時生效)
+          overlayTrigger && "group-data-[state=open]/action:bg-neutral-hover",
           "transition-colors"
         )}
         style={{
@@ -675,28 +689,51 @@ ItemInlineAction.displayName = "ItemInlineAction"
 // - `h-[1lh]`:suffix 永遠對齊第一行 label(跟 prefix 解耦)
 // - `ml-auto`:靠右
 // - `gap-2`:多個 inline action 之間的標準間距(item-anatomy.spec.md「Inline Action 設計規格」節)
-// - `hoverReveal` opt-in:opacity 0→1 on 父層 `group/menu-item` hover(TreeView 模式)
+// - `hoverReveal` opt-in:opacity 0→1 on 父層 row hover/focus-visible
+//
+// `hoverGroup`(2026-05-05 v8 SSOT 升級):row primitive group selector 參數化。
+//   先前 `/menu-item` hardcode → TreeView(`/tree-item`)/ FileItem(`/row`)/
+//   DataTable(`/row`)無法消費,被迫自刻 suffix slot(M1 違反)。
+//   參數化後 4 個 row primitive 都走同一條 SSOT。Tailwind JIT 需 static class,
+//   故用 lookup table 而非動態字串(避免 JIT scan 失敗)。
+
+const SUFFIX_HOVER_REVEAL_BY_GROUP = {
+  "menu-item":
+    "opacity-0 group-hover/menu-item:opacity-100 group-has-[:focus-visible]/menu-item:opacity-100 transition-opacity duration-150",
+  "tree-item":
+    "opacity-0 group-hover/tree-item:opacity-100 group-has-[:focus-visible]/tree-item:opacity-100 transition-opacity duration-150",
+  row: "opacity-0 group-hover/row:opacity-100 group-has-[:focus-visible]/row:opacity-100 transition-opacity duration-150",
+} as const
+
+export type ItemSuffixHoverGroup = keyof typeof SUFFIX_HOVER_REVEAL_BY_GROUP
 
 export interface ItemSuffixProps extends React.HTMLAttributes<HTMLSpanElement> {
   /**
-   * Hover-reveal 模式:預設隱藏,父層 row(必須是 `group/menu-item`)hover 時才淡入。
-   * 對齊 TreeView 的 inline action 行為。預設 false(永遠顯示,如 Badge)。
+   * Hover-reveal:預設隱藏,父層 row hover / keyboard focus-visible 時才淡入。
+   * 對齊 TreeView / SidebarMenuButton inline action 行為。預設 false(永遠顯示,如 Badge)。
+   *
+   * 用 `group-has-[:focus-visible]` 而非 `group-focus-within`——後者會被 mouse click 觸發,
+   * 導致 click 後 suffix 永久顯示直到焦點移走。focus-visible 只在鍵盤 tab 時啟動。
    */
   hoverReveal?: boolean
+  /**
+   * 父層 row 的 group selector(consumer 必加 `group/<name>` 到 row wrapper)。
+   * 預設 `'menu-item'`(對齊 MenuItem / Sidebar)。其他 row primitive:
+   * `'tree-item'`(TreeView)/ `'row'`(DataTable / FileItem)。
+   *
+   * 加新 row primitive(且需 hover-reveal)時:在 `SUFFIX_HOVER_REVEAL_BY_GROUP`
+   * 加 entry,Tailwind JIT 才能 scan 到 static class。
+   */
+  hoverGroup?: ItemSuffixHoverGroup
 }
 
 export const ItemSuffix = React.forwardRef<HTMLSpanElement, ItemSuffixProps>(
-  ({ className, hoverReveal = false, ...props }, ref) => (
+  ({ className, hoverReveal = false, hoverGroup = "menu-item", ...props }, ref) => (
     <span
       ref={ref}
       className={cn(
         "h-[1lh] shrink-0 ml-auto flex items-center gap-2",
-        // hover-reveal:滑鼠 hover 或鍵盤 focus 時顯示。
-        // 用 `group-has-[:focus-visible]` 而非 `group-focus-within`——後者會被
-        // mouse click 觸發,導致 click 後 suffix 永久顯示直到焦點移走。
-        // focus-visible 只在鍵盤 tab 時啟動,mouse click 不會觸發。
-        hoverReveal &&
-          "opacity-0 group-hover/menu-item:opacity-100 group-has-[:focus-visible]/menu-item:opacity-100 transition-opacity duration-150",
+        hoverReveal && SUFFIX_HOVER_REVEAL_BY_GROUP[hoverGroup],
         className
       )}
       {...props}

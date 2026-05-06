@@ -6,6 +6,10 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInternal
+benchmark:
+  - react-day-picker (shadcn Calendar base): github.com/gpbl/react-day-picker
+  - Ant Design DatePicker: github.com/ant-design/ant-design/tree/master/components/date-picker
+  - MUI X Date Pickers: github.com/mui/mui-x/tree/master/packages/x-date-pickers
 ---
 
 <!-- M22 retrofit DONE 2026-05-03 v11(real source URLs added inline below)-->
@@ -50,7 +54,7 @@ DateGrid 是 **DatePicker 內部的 date-grid primitive**(月份格網 + 前後�
 | 場景 | 改用 | 原因 |
 |------|------|------|
 | 日期輸入欄位 | `DatePicker` | Calendar 是 inline,欄位需要 trigger + popup 結構 |
-| 純顯示單日期 | `DatePickerDisplay` / `Intl.DateTimeFormat` | 不需 interactive 月曆 |
+| 純顯示單日期 | `<DatePicker mode="display">` / `Intl.DateTimeFormat` | 不需 interactive 月曆 |
 | 時間選擇(時分) | ⚠️ 未來 TimePicker | Calendar 只處理日期層級 |
 | 事件行事曆(日程本) | 專用行事曆元件 | Calendar 是日期選擇;事件日誌需要 event overlay / drag / week/month view 切換 |
 

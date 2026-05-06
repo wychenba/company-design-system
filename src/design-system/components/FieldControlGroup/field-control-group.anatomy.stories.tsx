@@ -1,0 +1,112 @@
+import type { Meta, StoryObj } from '@storybook/react'
+import { FieldControlGroup } from './field-control-group'
+import { Select } from '@/design-system/components/Select/select'
+import { Input } from '@/design-system/components/Input/input'
+
+const meta: Meta<typeof FieldControlGroup> = {
+  title: 'Design System/Components/FieldControlGroup/設計規格',
+  component: FieldControlGroup,
+  parameters: { layout: 'padded' },
+}
+export default meta
+type Story = StoryObj<typeof FieldControlGroup>
+
+const FIELDS = [
+  { value: 'sku', label: 'SKU' },
+  { value: 'name', label: '名稱' },
+]
+const OPS = [
+  { value: 'is', label: '等於' },
+  { value: 'contains', label: '包含' },
+]
+
+/* Overview */
+export const Overview: Story = {
+  name: 'Overview',
+  render: () => (
+    <div className="flex flex-col gap-6 w-[520px]">
+      <section>
+        <h3 className="text-body font-bold mb-2">機制(Ant compact-item.ts source verified)</h3>
+        <ul className="text-body text-fg-secondary list-disc pl-5 space-y-1">
+          <li>子 controls 保留自身 border + radius(不 strip)</li>
+          <li>鄰接子用 <code>margin-left: -1px</code> 重疊 border → 視覺 1 條線</li>
+          <li>z-index:default 2 / hover/focus 3 / disabled 0</li>
+          <li>first child 右 radii=0;middle 全 radii=0;last child 左 radii=0</li>
+        </ul>
+      </section>
+      <section>
+        <h3 className="text-body font-bold mb-2">範例</h3>
+        <FieldControlGroup block>
+          <Select className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} />
+          <Select className="w-[100px]" options={OPS} value="contains" onChange={() => {}} />
+          <Input className="flex-1" defaultValue="phone" />
+        </FieldControlGroup>
+      </section>
+    </div>
+  ),
+}
+
+/* SizeMatrix */
+export const SizeMatrix: Story = {
+  name: 'SizeMatrix',
+  render: () => (
+    <div className="flex flex-col gap-6 w-[420px]">
+      {(['sm', 'md', 'lg'] as const).map(size => (
+        <div key={size}>
+          <p className="text-caption text-fg-muted mb-2">size="{size}"</p>
+          <FieldControlGroup block>
+            <Select size={size} className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} />
+            <Input size={size} className="flex-1" defaultValue="value" />
+          </FieldControlGroup>
+        </div>
+      ))}
+    </div>
+  ),
+}
+
+/* StateBehavior */
+export const StateBehavior: Story = {
+  name: 'StateBehavior',
+  render: () => (
+    <div className="flex flex-col gap-6 w-[420px]">
+      <div>
+        <p className="text-caption text-fg-muted mb-2">default</p>
+        <FieldControlGroup block>
+          <Select className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} />
+          <Input className="flex-1" defaultValue="abc" />
+        </FieldControlGroup>
+      </div>
+      <div>
+        <p className="text-caption text-fg-muted mb-2">disabled(整 group children 各自 disabled)</p>
+        <FieldControlGroup block>
+          <Select className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} disabled />
+          <Input className="flex-1" defaultValue="abc" disabled />
+        </FieldControlGroup>
+      </div>
+      <div>
+        <p className="text-caption text-fg-muted mb-2">cell error(其中一 child invalid → border-error + z-3)</p>
+        <FieldControlGroup block>
+          <Select className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} />
+          <Input className="flex-1" defaultValue="abc" error />
+        </FieldControlGroup>
+      </div>
+    </div>
+  ),
+}
+
+/* Accessibility */
+export const Accessibility: Story = {
+  name: 'Accessibility',
+  render: () => (
+    <div className="flex flex-col gap-3 w-[420px]">
+      <p className="text-body">
+        Container 不加 ARIA role(透明 wrapper);children 各自 aria-label。Tab 鍵在 children 之間正常移動,no focus trap。
+      </p>
+      <FieldControlGroup block>
+        <Select className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} aria-label="篩選欄位" />
+        <Select className="w-[100px]" options={OPS} value="contains" onChange={() => {}} aria-label="篩選運算子" />
+        <Input className="flex-1" defaultValue="phone" aria-label="篩選值" />
+      </FieldControlGroup>
+    </div>
+  ),
+}

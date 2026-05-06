@@ -5,6 +5,9 @@ variants: {}
 sizes: {}
 traits:
   - isStructural
+benchmark:
+  - Ant Design Descriptions: github.com/ant-design/ant-design/tree/master/components/descriptions
+  - Polaris DescriptionList: github.com/Shopify/polaris/tree/main/polaris-react/src/components/DescriptionList
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

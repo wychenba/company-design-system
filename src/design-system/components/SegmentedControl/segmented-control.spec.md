@@ -6,6 +6,11 @@ sizes: {}
 traits:
   - hasSizes
   - hasInteractiveStates
+benchmark:
+  - Radix ToggleGroup primitive: github.com/radix-ui/primitives/tree/main/packages/react/toggle-group
+  - Ant Design Segmented: github.com/ant-design/ant-design/tree/master/components/segmented
+  - MUI ToggleButtonGroup: github.com/mui/material-ui/tree/master/packages/mui-material/src/ToggleButtonGroup
+  - Carbon ContentSwitcher: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/ContentSwitcher
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
@@ -82,9 +87,9 @@ SegmentedControl (root, role="radiogroup")
   │─── gap-1 ─│─── gap-1 ─────────────────│
 ```
 
-- Slot 間 **gap-1**（4px），與 Button size sm/md/lg 的 `gap-1` 一致
-- Label 用 `<span className="px-1">` 包覆，與 Button label 一致
-- Suffix 是 `<span className="inline-flex items-center gap-1">` 容器，**即使目前只有 badge，wrapper 也要從第一天存在**——未來若開放 endIcon，gap-1 已烤在 wrapper 上，零漂移風險
+- Slot 間留 Button 同等 gap（與 Button size sm/md/lg 一致）
+- Label 帶水平 breathing（與 Button label 一致 — 多語言 / 大寫字距更穩）
+- Suffix 是 inline 視覺群容器，**即使目前只有 badge，wrapper 也要從第一天存在**——未來若開放 endIcon，群距已烤在 wrapper 上，零漂移風險
 
 ### Slot 支援與不支援
 

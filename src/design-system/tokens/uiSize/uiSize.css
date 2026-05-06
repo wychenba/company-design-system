@@ -36,6 +36,13 @@
   --tab-height-sm: 2rem;        /* 32px — Dialog / Sidebar / dense */
   --tab-height-md: 2.5rem;      /* 40px — ★ 預設，頁面主要 tabs */
   --tab-height-lg: 3rem;        /* 48px — page-level hero tabs */
+
+  /* Tree Indent — TreeView + DataTable nested rows(SSOT,2026-05-04)
+     公式:chevronSize + gap-2 = 16+8(sm/md)/ 20+8(lg)
+     Consumer:TreeView depth indent / DataTable nested row depth indent */
+  --tree-indent-sm: 1.5rem;     /* 24px */
+  --tree-indent-md: 1.5rem;     /* 24px */
+  --tree-indent-lg: 1.75rem;    /* 28px */
 }
 
 [data-ui-size="lg"],
@@ -70,6 +77,10 @@
   --tab-height-sm: 2rem;        /* 32px */
   --tab-height-md: 2.5rem;      /* 40px */
   --tab-height-lg: 3rem;        /* 48px */
+
+  --tree-indent-sm: 1.5rem;     /* 24px — md default */
+  --tree-indent-md: 1.5rem;     /* 24px — md default */
+  --tree-indent-lg: 1.75rem;    /* 28px — md default */
 }
 
 
@@ -86,4 +97,7 @@
   --spacing-tab-sm: var(--tab-height-sm);
   --spacing-tab-md: var(--tab-height-md);
   --spacing-tab-lg: var(--tab-height-lg);
+  --spacing-tree-indent-sm: var(--tree-indent-sm);
+  --spacing-tree-indent-md: var(--tree-indent-md);
+  --spacing-tree-indent-lg: var(--tree-indent-lg);
 }

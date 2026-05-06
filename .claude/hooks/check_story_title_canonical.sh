@@ -27,6 +27,7 @@ case "$TOOL" in
 esac
 
 case "$FILE_PATH" in
+  *.anatomy.stories.tsx|*.principles.stories.tsx) exit 0 ;;  # anatomy/principles 容許實作 prop 註記
   *.stories.tsx) ;;
   *) exit 0 ;;
 esac
@@ -54,9 +55,14 @@ fi
 # Common English whitelist(stories framework canonical or pre-existing names)
 WHITELIST_REGEX='^(Default|Display|Anatomy|Overview|Inspector|ColorMatrix|SizeMatrix|StateBehavior|Accessibility|All[A-Z][a-z]+|Loading|Empty|Disabled|Error|Hover|Focus|Active|Pressed|FocusVisible)$'
 
-# Extract added/changed `name:` values, check for English-only subtitle
+# Extract added/changed `name:` values, check for English-only OR prop-syntax leak (Q2 2026-05-04)
 VIOLATIONS=$(printf '%s' "$NEW_CONTENT" | grep -oE "name:[[:space:]]*['\"][^'\"]*['\"]" | sed -E "s/name:[[:space:]]*['\"]([^'\"]*)['\"]/\1/" | while IFS= read -r name; do
   [ -z "$name" ] && continue
+  # Q2 leak class: parameter syntax(`(prop)`) / prop assignment(`=`) — implementation 細節漏入展示名
+  if echo "$name" | grep -qE '\([a-zA-Z]+\)|=[a-zA-Z]'; then
+    echo "  - \"$name\"  [leak: 含 prop/parameter syntax]"
+    continue
+  fi
   # If contains Chinese char anywhere → OK
   if echo "$name" | LC_ALL=C grep -qE '[^\x00-\x7F]'; then
     continue
@@ -66,7 +72,7 @@ VIOLATIONS=$(printf '%s' "$NEW_CONTENT" | grep -oE "name:[[:space:]]*['\"][^'\"]
     continue
   fi
   # Non-whitelist English-only → flag
-  echo "  - \"$name\""
+  echo "  - \"$name\"  [pure English]"
 done)
 
 if [ -n "$VIOLATIONS" ]; then

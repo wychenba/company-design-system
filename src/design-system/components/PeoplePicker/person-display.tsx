@@ -7,20 +7,26 @@ import { NameCard, NameCardDefaultActions } from '@/design-system/components/Nam
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
-// PersonValue 承載 NameCard 所需的完整資訊(optional)。DS 全域 person avatar 的
-// hoverCard NameCard 呈現一致(name / subtitle / status / statusMessage / fields / actions / View more)—
-// 消費者的 person 資料若有 rich info 可直接傳入,缺項則自然不 render 該 section。
-// 對齊 avatar.spec.md「person avatar hover → NameCard」DS-wide canonical。
+// PersonData 承載 NameCard 所需的完整資訊。DS 全域 person avatar 的 hoverCard NameCard 永遠
+// 顯示同一組 sections(name + subtitle + status + 4 default fields + 自訂 fields + actions + View more)
+// — 缺資料顯 placeholder,不會 collapse。對齊 avatar.spec.md「person avatar hover → NameCard」
+// DS-wide canonical(2026-05-06 v11 always-render schema 升級)。
 export interface PersonData {
   name: string
   avatarUrl?: string
   /** 角色 / 部門 / ID 等 meta 單行(NameCard subtitle) */
   description?: string
-  /** Presence 狀態(對齊 Avatar presence canonical) */
+  /** Presence 狀態(對齊 Avatar presence canonical)。NameCard 永遠 render status section,
+   *  缺則顯「Status not set」placeholder */
   status?: 'online' | 'away' | 'busy' | 'offline'
-  /** Status 訊息(NameCard status section) */
+  /** Status 訊息(NameCard status section)。缺則顯 `—` */
   statusMessage?: React.ReactNode
-  /** 結構化 info fields(NameCard info section) */
+  /** Default field values — NameCard always render(缺顯 `—`)。對齊 NAMECARD_DEFAULT_FIELD_KEYS */
+  email?: string
+  phone?: string
+  department?: string
+  location?: string
+  /** 自訂額外 fields(在 default fields 之後 append) */
   fields?: { label: string; value: string }[]
   /** 跳至完整 profile 頁的 handler(hover NameCard 必含,不傳時 fallback noop placeholder) */
   onViewProfile?: () => void
@@ -33,8 +39,9 @@ function resolvePerson(value: PersonValue): PersonData {
 }
 
 // buildPersonNameCard — DS 全域 person avatar hoverCard 的 canonical NameCard JSX 建構器。
-// 用一個 helper 避免每個 consumer 各自構造 NameCard 導致顯示的資訊不一致。
-// 缺項 prop 自然不 render(NameCard 內部 conditional)。
+// SSOT for「avatar hover NameCard 一致視覺」— 任何 person avatar consumer 都走這個 helper,
+// 不可繞道直接 build NameCard。v11(2026-05-06):default field values(email/phone/department/
+// location)透過 `defaultFieldValues` 統一傳入,NameCard always render 這些 sections。
 function buildPersonNameCard(person: PersonData): React.ReactNode {
   return (
     <NameCard
@@ -43,6 +50,12 @@ function buildPersonNameCard(person: PersonData): React.ReactNode {
       avatar={{ src: person.avatarUrl, alt: person.name }}
       status={person.status}
       statusMessage={person.statusMessage}
+      defaultFieldValues={{
+        email: person.email,
+        phone: person.phone,
+        department: person.department,
+        location: person.location,
+      }}
       fields={person.fields}
       actions={<NameCardDefaultActions />}
       // onViewMore hover context 必含(avatar.spec.md canonical)。consumer 傳

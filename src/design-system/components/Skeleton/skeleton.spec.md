@@ -5,6 +5,10 @@ variants: {}
 sizes: {}
 traits:
   - isMatrixHeavy
+benchmark:
+  - Ant Design Skeleton: github.com/ant-design/ant-design/tree/master/components/skeleton
+  - MUI Skeleton: github.com/mui/material-ui/tree/master/packages/mui-material/src/Skeleton
+  - Polaris SkeletonBodyText: github.com/Shopify/polaris/tree/main/polaris-react/src/components/SkeletonBodyText
 ---
 
 # Skeleton 設計原則

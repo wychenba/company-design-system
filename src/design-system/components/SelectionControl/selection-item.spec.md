@@ -10,6 +10,10 @@ traits:
   - hasSizes
   - isStructural
   - isInternal
+benchmark:
+  - Radix Checkbox primitive: github.com/radix-ui/primitives/tree/main/packages/react/checkbox
+  - Radix RadioGroup primitive: github.com/radix-ui/primitives/tree/main/packages/react/radio-group
+  - Polaris Checkbox: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Checkbox
 ---
 
 # SelectionItem 設計原則

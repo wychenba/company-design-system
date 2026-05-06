@@ -33,6 +33,8 @@ function relativeKeyToRange(key: string, now: Date = new Date()): [number, numbe
     case 'next_month':   return [startOfMonth(addMonths(now, 1)).getTime(), endOfMonth(addMonths(now, 1)).getTime()]
     case 'past_7_days':  return [startOfDay(subDays(now, 7)).getTime(), endOfDay(now).getTime()]
     case 'past_30_days': return [startOfDay(subDays(now, 30)).getTime(), endOfDay(now).getTime()]
+    case 'next_7_days':  return [startOfDay(now).getTime(), endOfDay(addDays(now, 7)).getTime()]
+    case 'next_30_days': return [startOfDay(now).getTime(), endOfDay(addDays(now, 30)).getTime()]
     default: return null
   }
 }

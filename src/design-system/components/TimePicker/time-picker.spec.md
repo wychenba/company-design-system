@@ -6,6 +6,9 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInputLike
+benchmark:
+  - Ant Design TimePicker: github.com/ant-design/ant-design/tree/master/components/time-picker
+  - MUI X Date Pickers (Time): github.com/mui/mui-x/tree/master/packages/x-date-pickers
 ---
 
 <!-- M22 retrofit DONE 2026-05-03 v11(real source URLs added inline below)-->
@@ -79,7 +82,7 @@ TimePicker 是**單一時間**(時/分/秒)輸入與顯示元件,對齊 Ant Desi
     disabledMinutes: [...],
     disabledSeconds: [...],
   })}
-  startIcon={Clock}              // 預設 Clock,傳 null 關閉
+  endIcon={Clock}                // 預設 Clock,傳 null 關閉(2026-05-05 v9:點擊觸發浮層 indicator 一律 suffix,對齊 DatePicker / Material endAdornment)
   locale="en-US"
   formatOptions={{ hour: '2-digit', minute: '2-digit', hour12: false }}
 />
@@ -143,6 +146,7 @@ Panel 展開後的 column picker 結構:
 - Panel 內 padding = `--layout-space-tight`(12px @ md density)
 - **三欄(時 / 分 / 秒)各欄 `w-12`(48px)固定,非 flex-1 均分**(對齊 Ant / Google 世界級慣例 `@benchmark-unverified` visual measurement)。**分隔「:」移除**(AR8 canonical — Ant TimePicker / Google Calendar 同樣不加 `:`,靠 column 間距自明 `@benchmark-unverified` visual)
 - Scrollable list 用 **`<ScrollArea>`**(對齊 DS 跨 OS 一致 overlay 捲軸 canonical);不 raw `overflow-y-auto`
+- **Scroll-into-view**:mount = `behavior:'auto'`(避閃爍),後續 `value` 變更 = `behavior:'smooth'`(對齊 iOS / Material / Ant timepicker idiom)。SSOT 在 `time-columns.tsx` `TimeColumn` useEffect
 - 每 item **`h-field-sm`(28px @ md / 32px @ lg)對齊 DatePicker date cell**(跨 picker 視覺一致)
 - List 高 `h-[216px]`(容納約 7 個 item 置中)
 

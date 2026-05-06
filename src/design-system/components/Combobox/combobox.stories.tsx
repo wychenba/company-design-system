@@ -23,6 +23,7 @@ const meta: Meta<typeof Combobox> = {
 export default meta
 type Story = StoryObj<typeof Combobox>
 
+// @story-trait-rationale: pre-existing trait gaps (Default/WithError) tracked separately; this PR scope = add display mode card to Modes story only.
 /* ── 三種模式 ── */
 export const Modes: Story = {
   name: '三種模式',
@@ -33,6 +34,10 @@ export const Modes: Story = {
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">edit</h3>
           <Combobox options={categoryOptions} value={value} onChange={setValue} aria-label="類別(edit mode demo)" />
+        </div>
+        <div>
+          <h3 className="text-body font-bold text-foreground mb-2">display</h3>
+          <Combobox mode="display" options={categoryOptions} value={value} aria-label="類別(display mode demo)" />
         </div>
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>

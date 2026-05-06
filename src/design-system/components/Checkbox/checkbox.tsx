@@ -5,6 +5,7 @@ import { Check, Minus } from "lucide-react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import type { FieldMode, FieldVariant } from "@/design-system/components/Field/field-types"
 import { useFieldContext } from "@/design-system/components/Field/field-context"
 import { SelectionItem } from "@/design-system/components/SelectionControl/selection-item"
 import { CheckboxGroupContext } from "./checkbox-group"
@@ -87,6 +88,20 @@ export interface CheckboxProps
    * 用於表單 readonly 呈現、DataTable cell 非編輯態。
    */
   readOnly?: boolean
+  /**
+   * Field mode(2026-05-05 Phase B3 align):
+   *   edit     — 一般可互動 checkbox(預設)
+   *   display  — **純展示**:渲染 ✓ / —(無互動 primitive、無 input chrome);
+   *              對齊 Carbon read-only / DataTable boolean cell 場景。取代既有 BooleanDisplay。
+   *   readonly — 同 readOnly prop:checkbox 視覺保留 + 鎖互動 + a11y readonly signal
+   *   disabled — 同 disabled prop:降色 + 鎖互動
+   */
+  mode?: FieldMode
+  /**
+   * Visual chrome — checkbox 本體無 input wrapper variant,本 prop 對 checkbox 主體無視覺影響;
+   * 為對齊 Field 4-mode + chrome 透傳契約而保留(M19 一致性)。
+   */
+  variant?: FieldVariant
 }
 
 // ── Component ───────────────────────────────────────────────────────────────
@@ -103,6 +118,9 @@ const Checkbox = React.forwardRef<
       description,
       readOnly = false,
       disabled,
+      mode,
+      // chrome 對 Checkbox 主體無視覺影響(無 input wrapper)— 接收純為 prop 一致性;destructure 防 leak 到 DOM。
+      variant: _chrome,
       id: idProp,
       ...props
     },
@@ -111,6 +129,17 @@ const Checkbox = React.forwardRef<
     const sizeKey = size ?? 'md'
     const iconPx = checkIconSize[sizeKey]
     const iconStrokeWidth = checkStrokeWidth[sizeKey]
+
+    // ── mode='display' ─────────────────────────────────────────────────────
+    // 純展示模式:無互動 primitive、無 input variant,渲染 ✓ / —。
+    // 取代既有 BooleanDisplay(2026-05-05 Phase B3 retire)— 該 helper 已併入 Checkbox。
+    // 顯示規則:checked=true → ✓(foreground);其他(false / null / undefined / indeterminate)→ —(fg-muted)
+    if (mode === 'display') {
+      const isChecked = props.checked === true
+      return isChecked
+        ? <span className="text-foreground">✓</span>
+        : <span className="text-fg-muted">—</span>
+    }
 
     // Field context:Checkbox 單獨塞進 Field(binary toggle)時,忽略自己的 label 讓 FieldLabel 接管
     //

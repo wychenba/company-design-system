@@ -12,6 +12,7 @@ export const columnTypes = [
   'number',
   'currency',
   'date',
+  'time',        // Phase C(2026-05-05):time-only column,渲 `<TimePicker>`
   'select',
   'multiSelect',
   'person',
@@ -38,6 +39,7 @@ export const columnTypeDefaults: Record<ColumnType, ColumnTypeConfig> = {
   number:      { align: 'right' },
   currency:    { align: 'right' },
   date:        { align: 'left' },
+  time:        { align: 'left' },
   select:      { align: 'left' },
   multiSelect: { align: 'left' },
   person:      { align: 'left' },
@@ -90,5 +92,22 @@ declare module '@tanstack/react-table' {
     includeTime?: boolean
     /** Link: 自訂顯示文字（不設則自動從 URL 提取 hostname） */
     linkLabel?: string
+    /**
+     * Inline edit:column 是否可編輯。
+     * - `true`:可編
+     * - `false`(default):唯讀
+     * - `(row) => boolean`:per-row 動態決定(e.g. row.status !== 'archived' 才能編)
+     *
+     * 互動 per type(對齊 Notion / Airtable):
+     * - string / number / currency:click cell → inline `<Input>` autoFocus + selected
+     * - date / select / multiSelect / person / multiPerson:click cell → 進 edit mode 的 Field control(用戶按 trigger 開 picker)
+     * - boolean:不分 read/edit mode,直接 `<Checkbox>` 點即 toggle + commit
+     * - url:read = 連結;**hover cell** 右側出 Pencil 按鈕,click 才進 `<Input>` edit mode(保留 click 連結語意)
+     *
+     * Esc cancel / blur or Enter commit。Commit 觸發 `onCellCommit`。
+     */
+    editable?: boolean | ((row: TData) => boolean)
+    /** Person/multiPerson edit mode: people pool for picker(2026-05-05 v4 type-augmentation)。 */
+    people?: Array<{ name: string; avatarUrl?: string; description?: string }>
   }
 }

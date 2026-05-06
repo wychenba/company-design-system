@@ -3,9 +3,9 @@
 import * as React from 'react'
 import { X, Calendar as CalendarIcon, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { FieldMode } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
-import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
+import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
+import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverAnchor, PopoverContent } from '@/design-system/components/Popover/popover'
 import { DateGrid } from '@/design-system/components/DateGrid/date-grid'
 import { Button } from '@/design-system/components/Button/button'
@@ -214,25 +214,6 @@ function CalendarTimeContainer({ showTime, showSeconds, calendar, timePanel }: C
   )
 }
 
-// ── Display ─────────────────────────────────────────────────────────────────
-// Table cell 和 Form readonly 共用。DataTable 透過 column type 查到這個元件。
-
-export interface DatePickerDisplayProps extends DateFormatOptions {
-  value?: string | number | Date | null
-  /** 顯示時間部分(配合 showTime DatePicker 的 readonly view) */
-  showTime?: boolean
-  showSeconds?: boolean
-}
-
-function DatePickerDisplay({ value, showTime = false, showSeconds = false, ...formatOptions }: DatePickerDisplayProps) {
-  if (value == null) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
-  if (showTime && typeof value === 'string') {
-    return <>{formatDateOrDateTime(value, true, showSeconds, formatOptions)}</>
-  }
-  return <>{formatDate(value, formatOptions)}</>
-}
-DatePickerDisplay.displayName = 'DatePickerDisplay'
-
 // ── DatePicker(single)──────────────────────────────────────────────────
 
 export interface DatePickerProps
@@ -242,6 +223,8 @@ export interface DatePickerProps
       'value' | 'onChange' | 'placeholder' | 'defaultValue'
     > {
   mode?: FieldMode
+  /** Field chrome variant. Default = context.variant ?? 'default'. Per-prop override. */
+  variant?: FieldVariant
   error?: boolean
   size?: 'sm' | 'md' | 'lg'
   /** ISO date(YYYY-MM-DD)或 ISO datetime(YYYY-MM-DDTHH:MM:SS,當 showTime=true) */
@@ -265,6 +248,10 @@ export interface DatePickerProps
    * — datetime picker user 習慣編完才 commit,避免 calendar 點到就關。
    */
   needConfirm?: boolean
+  /** Initial open state(uncontrolled)— DataTable cell-as-input 1-step open canonical */
+  defaultOpen?: boolean
+  /** open state 變更 callback。DataTable cell-as-input 用:open=false → cell exit edit */
+  onOpenChange?: (open: boolean) => void
 }
 
 // Trigger uses `<div role="combobox" tabIndex={...}>` instead of `<button>` —
@@ -275,6 +262,7 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
   (
     {
       mode = 'edit',
+      variant: variantProp,
       error: errorProp = false,
       size = 'md',
       value,
@@ -290,6 +278,8 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       minuteStep = 1,
       secondStep = 1,
       needConfirm: needConfirmProp,
+      defaultOpen = false,
+      onOpenChange,
       id: idProp,
       'aria-label': ariaLabelProp,
       'aria-labelledby': ariaLabelledByProp,
@@ -303,10 +293,12 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
     const resolvedMode = disabled ? 'disabled' : mode
+    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const isEditable = resolvedMode === 'edit'
     const iconSize = size === 'lg' ? 20 : 16
     const needConfirm = needConfirmProp ?? showTime  // datetime 預設需確認
-    const [open, setOpen] = React.useState(false)
+    const [open, setOpenState] = React.useState(defaultOpen)
+    const setOpen = React.useCallback((next: boolean) => { setOpenState(next); onOpenChange?.(next) }, [onOpenChange])
     const [draft, setDraft] = React.useState<string | null>(value ?? null)
     const resolvedPlaceholder = placeholder ?? (showTime ? 'YYYY/MM/DD HH:MM' : 'YYYY/MM/DD')
     // a11y:role="combobox" 必須有 accessible name(aria-label / labelledby / fieldCtx label)
@@ -332,11 +324,18 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     const displayCommitted = formatDateOrDateTime(value, showTime, showSeconds, { formatOptions, locale })
     const displayLive = formatDateOrDateTime(displayValue, showTime, showSeconds, { formatOptions, locale })
 
+    // mode='display'(Phase B2 2026-05-05):純內容輸出 — 對齊原 DatePickerDisplay sub-component(retired)。
+    //   無 Field wrapper chrome / 無 Calendar icon / 無 input affordance。
+    if (resolvedMode === 'display') {
+      if (!value) return <span className={cn('text-fg-muted', className)}>{EMPTY_DISPLAY}</span>
+      return <span className={cn('truncate', className)}>{displayCommitted}</span>
+    }
+
     // readonly / disabled
     if (!isEditable) {
       return (
         <div
-          className={cn(fieldWrapperStyles({ mode: resolvedMode, size }), className)}
+          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
           {...(props as React.HTMLAttributes<HTMLDivElement>)}
         >
@@ -346,7 +345,9 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
               : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
             }
           </span>
-          <CalendarIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
+          <ItemSuffix className="pointer-events-none">
+            <CalendarIcon size={iconSize} className="text-fg-muted" aria-hidden />
+          </ItemSuffix>
         </div>
       )
     }
@@ -385,7 +386,7 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
             data-field-mode="edit"
             data-error={error ? '' : undefined}
             className={cn(
-              fieldWrapperStyles({ mode: 'edit', size }),
+              fieldWrapperStyles({ mode: 'edit', variant: variant, size }),
               'text-left cursor-pointer',
               'focus-visible:outline-none',
               error && [
@@ -417,44 +418,54 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                 }}
               />
             )}
-            <CalendarIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
+            <ItemSuffix className="pointer-events-none">
+              <CalendarIcon size={iconSize} className="text-fg-muted" aria-hidden />
+            </ItemSuffix>
           </div>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <div role="dialog">
-            <CalendarTimeContainer
-              showTime={showTime}
-              showSeconds={showSeconds}
-              calendar={
-                <DateGrid
-                  mode="single"
-                  selected={displayDate}
-                  onSelect={(date) => {
-                    if (!date) return
-                    if (showTime) {
-                      commitDraft(combineDateAndTime(date, draftTime))
-                    } else {
-                      commitDraft(dateToIso(date))
-                      if (!needConfirm) setOpen(false)
-                    }
-                  }}
-                  defaultMonth={displayDate ?? undefined}
-                  autoFocus
-                />
-              }
-              timePanel={
-                <TimePickerSidePanel
-                  value={draftTime}
-                  onChange={(time) => {
-                    const target = draftDate ?? new Date()
-                    commitDraft(combineDateAndTime(target, time))
-                  }}
-                  showSeconds={showSeconds}
-                  minuteStep={minuteStep}
-                  secondStep={secondStep}
-                />
-              }
-            />
+          {/* role="dialog" 為 flex item of PopoverContent(flex flex-col overflow-hidden)。
+              2026-05-06 v9.1:加 `flex flex-col flex-1 min-h-0` 完成 M25 chain — viewport
+              壓縮時 dialog 縮 + 內 calendar/footer 排序;原無 chain 致 calendar 末行被
+              overflow-hidden 切掉、footer 推出 popover(user 報「位置改變就壞掉」根因)。 */}
+          <div role="dialog" className="flex flex-col flex-1 min-h-0">
+            {/* Calendar 區包 overflow-y-auto:viewport 壓縮時 calendar 內滾(Material / Carbon
+                date picker idiom)。footer 永遠 in-view(SurfaceFooter shrink-0)。 */}
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <CalendarTimeContainer
+                showTime={showTime}
+                showSeconds={showSeconds}
+                calendar={
+                  <DateGrid
+                    mode="single"
+                    selected={displayDate}
+                    onSelect={(date) => {
+                      if (!date) return
+                      if (showTime) {
+                        commitDraft(combineDateAndTime(date, draftTime))
+                      } else {
+                        commitDraft(dateToIso(date))
+                        if (!needConfirm) setOpen(false)
+                      }
+                    }}
+                    defaultMonth={displayDate ?? undefined}
+                    autoFocus
+                  />
+                }
+                timePanel={
+                  <TimePickerSidePanel
+                    value={draftTime}
+                    onChange={(time) => {
+                      const target = draftDate ?? new Date()
+                      commitDraft(combineDateAndTime(target, time))
+                    }}
+                    showSeconds={showSeconds}
+                    minuteStep={minuteStep}
+                    secondStep={secondStep}
+                  />
+                }
+              />
+            </div>
             {showTime && (
               // Footer:消費 SurfaceFooter SSOT(border-t + canonical px-loose py-tight padding,
               // 不再 hand-coded p-2 / Separator / ml-auto wrapper 三層垃圾)。
@@ -504,6 +515,8 @@ export interface DatePickerRangeProps
       'value' | 'onChange' | 'placeholder' | 'defaultValue'
     > {
   mode?: FieldMode
+  /** Field chrome variant. Default = context.variant ?? 'default'. Per-prop override. */
+  variant?: FieldVariant
   error?: boolean
   size?: 'sm' | 'md' | 'lg'
   /** 區間值:[start ISO, end ISO]。任一 null 代表尚未選。 */
@@ -527,6 +540,7 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
   (
     {
       mode = 'edit',
+      variant: variantProp,
       error: errorProp = false,
       size = 'md',
       value,
@@ -553,6 +567,7 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
     const resolvedMode = disabled ? 'disabled' : mode
+    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const isEditable = resolvedMode === 'edit'
     const iconSize = size === 'lg' ? 20 : 16
     const needConfirm = needConfirmProp ?? showTime
@@ -671,12 +686,29 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
       return false
     }, [activeEnd, startDate, endDate])
 
+    // mode='display'(Phase B2 2026-05-05):純內容輸出 — 無 Field wrapper / 無 Calendar icon。
+    if (resolvedMode === 'display') {
+      const hasAny = !!(startIso || endIso)
+      if (!hasAny) return <span className={cn('text-fg-muted', className)}>{EMPTY_DISPLAY}</span>
+      return (
+        <span className={cn('inline-flex items-center min-w-0', nakedCellRowModeAlign, className)}>
+          <span className={cn('truncate', !startIso && 'text-fg-muted')}>
+            {startIso ? formatDateOrDateTime(startIso, showTime, showSeconds, { formatOptions, locale }) : resolvedPlaceholder[0]}
+          </span>
+          <ArrowRight size={iconSize} className="shrink-0 text-fg-muted mx-2" aria-hidden />
+          <span className={cn('truncate', !endIso && 'text-fg-muted')}>
+            {endIso ? formatDateOrDateTime(endIso, showTime, showSeconds, { formatOptions, locale }) : resolvedPlaceholder[1]}
+          </span>
+        </span>
+      )
+    }
+
     // readonly / disabled view — plain wrapper,no popover
     if (!isEditable) {
       return (
         <div
           ref={ref}
-          className={cn(fieldWrapperStyles({ mode: resolvedMode, size }), className)}
+          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
           {...props}
         >
@@ -687,7 +719,9 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
           <span className={cn('flex-1 min-w-0 truncate', !endIso && 'text-fg-muted', resolvedMode === 'disabled' && 'text-fg-disabled')}>
             {endIso ? formatDateOrDateTime(endIso, showTime, showSeconds, { formatOptions, locale }) : resolvedPlaceholder[1]}
           </span>
-          <CalendarIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
+          <ItemSuffix className="pointer-events-none">
+            <CalendarIcon size={iconSize} className="text-fg-muted" aria-hidden />
+          </ItemSuffix>
         </div>
       )
     }
@@ -759,11 +793,15 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
                 }}
               />
             )}
-            <CalendarIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
+            <ItemSuffix className="pointer-events-none">
+              <CalendarIcon size={iconSize} className="text-fg-muted" aria-hidden />
+            </ItemSuffix>
           </div>
         </PopoverAnchor>
         <PopoverContent className="w-auto p-0" align="start">
-          <div role="dialog" aria-label="日期區間選擇">
+          {/* 2026-05-06 v9.1 M25 chain — 同 single DatePicker 修法,viewport 壓縮 calendar 內滾 + footer 永遠 in-view */}
+          <div role="dialog" aria-label="日期區間選擇" className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-y-auto">
             <CalendarTimeContainer
               showTime={showTime}
               showSeconds={showSeconds}
@@ -853,8 +891,8 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
                 />
               }
             />
-          </div>
-          {(showTime || needConfirm) && (
+            </div>
+            {(showTime || needConfirm) && (
             // Footer 消費 SurfaceFooter SSOT(border-t + canonical px-loose py-tight)。
             // showTime Range 無「此刻」(對齊 Ant `showNow={multiple ? false : showNow}`)→ 只有 確定 走 justify-end。
             // date-only Range needConfirm:左 此刻(mr-auto)+ 右 確定。
@@ -881,6 +919,7 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
               )}
             </SurfaceFooter>
           )}
+          </div>
         </PopoverContent>
       </Popover>
     )
@@ -913,7 +952,6 @@ export const datePickerMeta = {
 
 export {
   DatePickerWithRange as DatePicker,
-  DatePickerDisplay,
   DatePickerRange,
   formatDate,
 }

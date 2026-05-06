@@ -5,6 +5,10 @@ variants: {}
 sizes: {}
 traits:
   - isInternal
+benchmark:
+  - Ant Design Alert: github.com/ant-design/ant-design/tree/master/components/alert
+  - Polaris Banner: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Banner
+  - Carbon Notification: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Notification
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

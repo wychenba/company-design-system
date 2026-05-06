@@ -13,6 +13,11 @@ traits:
   - hasSizes
   - hasInteractiveStates
   - isStructural
+benchmark:
+  - Radix Tabs primitive: github.com/radix-ui/primitives/tree/main/packages/react/tabs
+  - Ant Design Tabs: github.com/ant-design/ant-design/tree/master/components/tabs
+  - Carbon Tabs: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Tabs
+  - Polaris Tabs: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Tabs
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
@@ -47,28 +52,13 @@ Tabs 用於在**同一個上下文底下切換平行的視圖**——每個 tab 
 
 ## Tabs 與 SegmentedControl 的分界
 
-兩者都能「切換下方顯示的內容」，**「切 view vs 切 value」是過度簡化的二分法**——SegmentedControl 切換下方表單欄位、chart 維度、list 排序都是正當用法。真正的分界用以下三個角度，**任何一個明確傾向哪邊就選哪邊**：
+兩者都能「切換下方顯示的內容」，**「切 view vs 切 value」是過度簡化**——SegmentedControl 切表單欄位 / chart 維度 / list 排序都正當。三角度判斷（任何一個明確傾向就選）：
 
-### 1. 切換對象的規模
+1. **規模**：Tabs 切一整塊 container（含自己的 header / toolbar / 多 section,子頁規模);SegmentedControl 切局部變體(單一 chart 維度 / list 排序 / form 條件欄位,單 control 承載量)
+2. **角色**：Tabs 是 **container 結構元件**(跨父容器寬度、頂部 underline、與 header border 對齊,section 導覽 anchor);SegmentedControl 是 **control 元件**(pill 尺寸、可塞 toolbar / Field / form row、與 Button / Input 並排)
+3. **生命週期**：Tabs 切換不進表單狀態(頂多 URL hash);SegmentedControl 值常綁 form state / URL param / 持久化
 
-- **Tabs**：切換的是一整塊 container——可能包含它自己的 header、toolbar、多個 section。每個 view 是獨立的子頁規模
-- **SegmentedControl**：切換的是局部內容的變體——單一 chart 的資料維度、單一 list 的排序方式、單一 form 的條件欄位。規模 = 一個 control 能承載的量
-
-### 2. 視覺與結構角色
-
-- **Tabs**：是 **container 的結構元件**。跨越整個父容器寬度、頂部 underline、與 header border 對齊——它是 section 的導覽 anchor，頁面裡不能有兩組 Tabs 互相搶戲
-- **SegmentedControl**：是 **control 元件**。pill 尺寸、可塞進 toolbar / Field / form row、能跟 Button / Input 並排而不違和
-
-### 3. 值的生命週期
-
-- **Tabs**：切換通常**不進表單狀態、不會被送出**——純粹是 view 的路徑（頂多存在 URL hash 裡）
-- **SegmentedControl**：選值常常**綁在 form state / URL param / 會被持久化**——它是一個 control 的當前值
-
-### Fallback 判斷
-
-邊界模糊時：
-- 把它跟 Input / Button / Checkbox 並排不違和 → **SegmentedControl**
-- 必須佔據自己的一整行作為 section header → **Tabs**
+**Fallback**:跟 Input / Button / Checkbox 並排不違和 → SegmentedControl;必須佔一整行作 section header → Tabs。
 
 ### 常見灰色地帶
 
@@ -110,25 +100,14 @@ TabsContent ← 對應被選中的 trigger
 
 ### 對標對象與故意的偏離
 
-Tabs trigger 對標 **item-layout pattern 的橫向變體**，但有三處刻意偏離：
+Tabs trigger = **item-layout 橫向變體 + Button 高度系統**。對標 item-layout 的:slot gap-2 / startIcon-label-suffix 三格固定 / suffix 可組合容器。對標 Button 的:固定高度 token(`--tab-height-*`)/ icon size 查表 / suffix wrapper gap-1。
 
-| 偏離 | 做法 | 理由 |
-|------|------|------|
-| 不用 `h-[1lh]` 對齊 prefix | 固定高度 `h-[var(--tab-height-*)]` + `items-center` | Tabs 是固定高度容器（像 Button），不是內容撐高的 row；prefix 靠 flex 置中即可 |
-| 不提供 `<ItemIcon>` / `<ItemLabel>` helper | 直接接受 `LucideIcon` prop、label 用裸 `<span>` | Tabs trigger 單行文字、slot 固定三格，沒有複雜 prefix mixing 場景，不需要 typed helper |
-| label 不包 `<span className="px-1">`（與 Button 不同） | 裸 `<span>` | trigger 的 selected underline 必須 fit content——若 label 有 px-1，underline 會比視覺文字多 8px 顯得鬆散 |
+三處刻意偏離 item-layout:
+- **固定高度** `h-[var(--tab-height-*)]` + `items-center`(非 `h-[1lh]`)— Tabs 是 Button 樣的固定容器,非內容撐高 row
+- **無 `<ItemIcon>` / `<ItemLabel>` helper**,直接吃 `LucideIcon` prop + 裸 `<span>` label — slot 固定三格,無複雜 prefix mixing
+- **label 不包 `<span>` padding wrapper**(對比 Button 設計) — selected underline 必須 fit content,label 有橫向 padding 會讓 underline 多 8px 鬆散
 
-**共同點（才是真正對標 item-layout 的部分）**：
-- slot 間 gap-2 的橫向節奏
-- startIcon / label / suffix 三格固定順序
-- suffix 作為可組合容器（目前 badge + endIcon，未來可擴充）
-
-**與 Button 共享的部分**：
-- 固定高度 token 系統（`--tab-height-*` 對應 `--field-height-*` 的語義結構）
-- Icon size 查表（sm/md=16, lg=20）
-- suffix wrapper `gap-1`
-
-> **結論**：Tabs 不完全屬於 item-layout，也不完全屬於 Button，而是「item-layout 的橫向 inline 變體 + Button 的高度系統」。未來若有人在 row primitive 和 Tabs 之間發現設計漂移，以 **item-anatomy.spec.md 為主**；若在 inline 高度 / icon size / suffix 結構發現漂移，以 **button.tsx 為主**。
+**漂移歸屬**:row primitive 漂移以 `item-anatomy.spec.md` 為主;inline 高度 / icon size / suffix 結構漂移以 `button.tsx` 為主。
 
 ---
 
@@ -172,39 +151,19 @@ Tabs 支援三種 overflow 策略，透過 `TabsList` 的 `overflow` prop 選擇
 
 ### scroll 模式
 
-- 外層 `overflow-x-auto scrollbar-none`
-- 邊緣用 `mask-image: linear-gradient(...)` 漸變透明，指示還有內容在視窗外
-- Mask 依滾動位置動態調整（不可滾→無 mask、可往右→右邊 fade、可往左→左邊 fade、雙向→兩側 fade）
-- **左右 scroll arrow buttons**：`atStart === false` 時左側顯示 `<ChevronLeft>`、`atEnd === false` 時右側顯示 `<ChevronRight>`，點擊捲動 80% 容器寬度（smooth scroll）
-- 使用 `useScrollEdges()` hook 追蹤 scroll state
+外層 overflow-x scroll(scrollbar 隱藏)+ 邊緣 mask-image gradient 依滾動位置動態 fade(不可滾無 mask / 可右→右 fade / 可左→左 fade / 雙向→兩側)。`useScrollEdges()` hook 追蹤狀態。**Mask 不用 gradient overlay**:mask 淡化內容本身 alpha,自動融合任何背景(dark / card / surface);overlay 需寫死背景色會漂移。
 
-**為什麼用 mask 不用 gradient overlay**：mask 淡化的是內容本身的 alpha，自動融合任何背景色（dark mode / card / surface 都自動正確）。Gradient overlay 需要寫死具體背景色，遇到不同背景就漂移。
-
-**為什麼要 scroll arrow buttons**：三種輸入方式都要顧到
-- **鍵盤使用者**：Radix Tabs 原生左右方向鍵 + 瀏覽器 `scroll-into-view` 自動捲到 focused trigger ✓
-- **Trackpad 使用者**：兩指橫向滑動 ✓
-- **滑鼠滾輪使用者**：水平滾動需要 `Shift+wheel`，一般使用者不知道——**必須補 arrow buttons**
-
-Arrow buttons 用 `pointer-events-none` 外層 + `pointer-events-auto` 內層包 Button 的技巧，讓 arrow 按鈕以外的絕對定位區域不阻擋下方 triggers 的 hit test。
-
-**對齊**：Material 3 / Ant Design / Carbon / Mantine 都有 scroll arrows（Polaris / Primer 是少數例外，假設使用者用 trackpad）。
+**Scroll arrow buttons**(`atStart/atEnd === false` 時顯示 `<ChevronLeft/Right>`,點擊捲 80% 容器寬,smooth scroll):三輸入方式都要顧——鍵盤(Radix 原生方向鍵 + scroll-into-view) / trackpad(兩指橫滑) / 滑鼠滾輪(需 `Shift+wheel`,一般使用者不知道,**必須補 arrow buttons**)。Arrow 容器 `pointer-events-none` + 內層 Button `pointer-events-auto`,不阻擋下方 trigger hit test。對齊 Material 3 / Ant / Carbon / Mantine。
 
 ### menu 模式
 
-- 所有 `TabsTrigger` 渲染在 DOM 中（保留 Radix Tabs 的 roving tabindex）
-- 用 `useOverflowIndices()` 偵測哪些 trigger 溢出
-- 溢出的 trigger 套 `invisible`（`visibility: hidden`，不接受 hit test 但保持 layout）
-- 右側渲染 `<Button variant="text" iconOnly startIcon={MoreVertical} />`(overflow menu canonical icon,見 CLAUDE.md「常用 icon canonical」)
-- 點擊開 DropdownMenu，內容是對應的 tab labels
-- 點 menu item 透過 Tabs context 的 `onValueChange` 觸發選擇變化，Radix 自然更新 `data-state` 並讓對應 trigger 浮現
+所有 TabsTrigger 仍在 DOM(保 Radix roving tabindex),溢出者套 `invisible`(visibility hidden,不接 hit test 但保 layout)。`useOverflowIndices()` 偵測溢出。右側 `<Button variant="text" iconOnly startIcon={MoreVertical} />`(overflow canonical icon)開 DropdownMenu 顯示對應 labels;點 menu item 經 Tabs context `onValueChange` 觸發,Radix 自然更新 `data-state`。
 
-**a11y 保留機制**：溢出的 triggers 只是視覺隱藏、仍在 DOM，Radix 的 roving tabindex 依然可以 focus 它們。鍵盤使用者可以進入 TabsList 用方向鍵在所有 triggers 之間導覽，或用 Tab 到 `⋯` 按鈕用 dropdown 介面，兩條互動路徑同時可用。
-
-**對齊**：Ant Design Tabs `moreIcon` / Atlassian Navigation Tabs 的作法。
+**a11y**:溢出 trigger 只視覺隱藏仍可 focus;鍵盤使用者方向鍵導覽 / Tab 到 ⋯ 用 dropdown,兩路徑並存。對齊 Ant `moreIcon` / Atlassian Navigation Tabs。
 
 ### 跨元件共用
 
-`useOverflowIndices` 和 `useScrollEdges` 是 `src/design-system/hooks/use-overflow-items.ts` 裡的共用 hook，`ChipGroup` 的 `layout="scroll" | "menu"` 消費同一組 hook，確保 Tabs 和 Chip 的 overflow 行為視覺 / 機制一致。
+`useOverflowIndices` / `useScrollEdges` 在 `src/design-system/hooks/use-overflow-items.ts`,`ChipGroup` 的 `layout="scroll" | "menu"` 消費同一組 hook,確保 Tabs / Chip overflow 行為一致。
 
 ---
 

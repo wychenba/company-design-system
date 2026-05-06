@@ -6,6 +6,10 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isOverlay
+benchmark:
+  - react-zoom-pan-pinch: github.com/BetterTyped/react-zoom-pan-pinch
+  - Ant Design Image (preview): github.com/ant-design/ant-design/tree/master/components/image
+  - Polaris Image: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Image
 ---
 
 # FileViewer 設計原則

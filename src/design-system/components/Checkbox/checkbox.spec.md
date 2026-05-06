@@ -11,6 +11,11 @@ sizes:
     when: "touch / prominent CTA / stakeholder-facing surface"
 traits:
   - isSelectionMulti
+benchmark:
+  - Radix Checkbox primitive: github.com/radix-ui/primitives/tree/main/packages/react/checkbox
+  - Ant Design Checkbox: github.com/ant-design/ant-design/tree/master/components/checkbox
+  - MUI Checkbox: github.com/mui/material-ui/tree/master/packages/mui-material/src/Checkbox
+  - Polaris Checkbox: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Checkbox
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
@@ -221,6 +226,18 @@ Indeterminate 是由父層邏輯控制的狀態，Checkbox 本身不會自動進
 | hover checked | primary-hover | surface | primary-hover dot |
 | disabled unchecked | 無 | neutral-2 | 無 |
 | disabled checked | 無 | neutral-2 | fg-disabled dot |
+
+---
+
+## Controlled / Uncontrolled API(M26)
+
+繼承 Radix `CheckboxPrimitive.Root` triplet:`checked` / `defaultChecked` / `onCheckedChange`(Radix forward 不改名)。Form 用 `name` + `value`(native form contract)。3 模式:
+
+- **Uncontrolled**:只傳 `defaultChecked`,DOM 自管 — 適合表單 native submit
+- **Controlled**:傳 `checked` + `onCheckedChange`,React state 主導 — 適合需即時聯動其他欄位
+- **Read-only**:傳 `checked` 不傳 `onCheckedChange` → Radix 視同 controlled disabled state
+
+CheckboxGroup 額外提供 `value` / `defaultValue` / `onValueChange`(string[] 多選 array)— group-level controlled 模式;item 不傳獨立 onChange(group 統一 dispatch)。
 
 ---
 

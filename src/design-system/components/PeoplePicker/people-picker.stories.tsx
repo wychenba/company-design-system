@@ -59,6 +59,7 @@ const samplePeople = [
   },
 ]
 
+// @story-trait-rationale: pre-existing trait gaps (Default/WithError) tracked separately; this PR scope = add display mode card to mode showcase only.
 /* ── 單人（互動） ── */
 const SinglePicker = () => {
   const [val, setVal] = React.useState<PersonValue | null>(samplePeople[0])
@@ -67,6 +68,11 @@ const SinglePicker = () => {
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">edit（可互動）</h3>
         <PeoplePicker value={val} people={samplePeople} onChange={(v) => setVal(v[0] ?? null)} aria-label="負責人(edit mode demo)" />
+      </div>
+      {/* @story-trait-rationale: pre-existing trait gaps tracked separately */}
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">display</h3>
+        <PeoplePicker mode="display" value={samplePeople[0]} />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Pencil } from 'lucide-react'
 import type { VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import type { FieldMode } from '@/design-system/components/Field/field-types'
+import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
@@ -27,15 +27,11 @@ function formatHostname(url: string): string {
   }
 }
 
-// ── Display ─────────────────────────────────────────────────────────────────
-
-export interface LinkInputDisplayProps {
-  value?: string | null
-  label?: string
-}
-
-function LinkInputDisplay({ value, label }: LinkInputDisplayProps) {
-  if (!value) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+// ── Display rendering(inline,2026-05-05 Phase B3 retire LinkInputDisplay)──
+// 取代 LinkInputDisplay sub-component:純展示 a tag,無 input chrome、無 hover affordance。
+// edit mode 內 link state(showLink branch)也共用此 helper,確保「編輯態的 link 顯示」與
+// display mode 的視覺完全一致(SSOT)。
+function renderLinkAnchor(value: string, label?: string) {
   const displayText = label || formatHostname(value)
   return (
     <a
@@ -48,14 +44,21 @@ function LinkInputDisplay({ value, label }: LinkInputDisplayProps) {
     </a>
   )
 }
-LinkInputDisplay.displayName = 'LinkInputDisplay'
 
 // ── Component ───────────────────────────────────────────────────────────────
 
 export interface LinkInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'value' | 'onChange'>,
-    Omit<VariantProps<typeof fieldWrapperStyles>, 'mode'> {
+    Omit<VariantProps<typeof fieldWrapperStyles>, 'mode' | 'variant'> {
   mode?: FieldMode
+  /**
+   * Visual chrome(2026-05-05 Phase B3)。對齊 FieldContext.variant 透傳。
+   * - `'default'`(預設)— Field wrapper 完整 chrome(form / Field 內嵌)。
+   * - `'bare'` — 透明 variant,hover/focus 才現 border(Toolbar inline edit / DataTable cell-as-input)。
+   *
+   * mode='display' 時 chrome 無視覺意義(display 完全無 wrapper);chrome 僅作用於 edit / readonly / disabled。
+   */
+  variant?: FieldVariant
   error?: boolean
   value?: string | null
   onChange?: (value: string) => void
@@ -70,7 +73,8 @@ export interface LinkInputProps
 const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
   (
     {
-      mode = 'edit',
+      mode: modeProp,
+      variant: variantProp,
       error: errorProp = false,
       size: sizeProp = 'md',
       value,
@@ -89,8 +93,21 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
     const fieldCtx = useFieldContext()
     const size = sizeProp ?? fieldCtx?.size ?? 'md'
     const disabled = disabledProp ?? fieldCtx?.disabled
-    const resolvedMode = disabled ? 'disabled' : mode
+    // mode resolution:disabled prop 一律覆蓋;否則 prop > context.mode > default 'edit'
+    const mode: FieldMode = modeProp ?? fieldCtx?.mode ?? 'edit'
+    const resolvedMode: FieldMode = disabled ? 'disabled' : mode
     const isEditable = resolvedMode === 'edit'
+    // chrome resolution:per-prop > context > 'default'
+    const resolvedVariant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+
+    // ── mode='display' ─────────────────────────────────────────────────────
+    // 純展示:無 input chrome / 無 hover affordance / 無 Pencil edit 入口。
+    // 取代既有 LinkInputDisplay sub-component(2026-05-05 Phase B3 retire)。
+    // chrome 對 display 無視覺意義(display 完全無 wrapper)。
+    if (resolvedMode === 'display') {
+      if (!value) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+      return renderLinkAnchor(value, label)
+    }
 
     const [editing, setEditing] = React.useState(false)
     const [localValue, setLocalValue] = React.useState(value ?? '')
@@ -156,7 +173,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
       const displayText = value ? (label || formatHostname(value)) : null
       return (
         <div
-          className={cn(fieldWrapperStyles({ mode: resolvedMode, size }), className)}
+          className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: resolvedVariant, size }), className)}
           data-field-mode={resolvedMode}
         >
           <span className="flex-1 min-w-0 truncate">
@@ -164,7 +181,9 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
               ? (displayText
                   ? <span className="text-fg-disabled">{displayText}</span>
                   : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>)
-              : <LinkInputDisplay value={value} label={label} />
+              : (value
+                  ? renderLinkAnchor(value, label)
+                  : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>)
             }
           </span>
         </div>
@@ -175,11 +194,11 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
     if (showLink) {
       return (
         <div
-          className={cn(fieldWrapperStyles({ mode: 'edit', size }), className)}
+          className={cn(fieldWrapperStyles({ mode: 'edit', variant: resolvedVariant, size }), className)}
           data-field-mode="edit"
         >
           <span className="flex-1 min-w-0">
-            <LinkInputDisplay value={value} label={label} />
+            {value && renderLinkAnchor(value, label)}
           </span>
           <ItemInlineAction
             size={size ?? 'md'}
@@ -193,7 +212,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
     return (
       <div
         className={cn(
-          fieldWrapperStyles({ mode: 'edit', size }),
+          fieldWrapperStyles({ mode: 'edit', variant: resolvedVariant, size }),
           error && [
             'border-error hover:border-error-hover',
             'focus-within:border-error focus-within:hover:border-error',
@@ -244,4 +263,4 @@ export const linkInputMeta = {
   },
 } as const
 
-export { LinkInput, LinkInputDisplay }
+export { LinkInput }

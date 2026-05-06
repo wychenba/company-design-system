@@ -13,6 +13,11 @@ traits:
   - hasSizes
   - hasInteractiveStates
   - isSelectionMulti
+benchmark:
+  - Radix RadioGroup primitive: github.com/radix-ui/primitives/tree/main/packages/react/radio-group
+  - Ant Design Radio: github.com/ant-design/ant-design/tree/master/components/radio
+  - MUI Radio: github.com/mui/material-ui/tree/master/packages/mui-material/src/Radio
+  - Polaris RadioButton: github.com/Shopify/polaris/tree/main/polaris-react/src/components/RadioButton
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

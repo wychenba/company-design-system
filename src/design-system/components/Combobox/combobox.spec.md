@@ -6,6 +6,10 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInputLike
+benchmark:
+  - Ant Design AutoComplete: github.com/ant-design/ant-design/tree/master/components/auto-complete
+  - MUI Autocomplete: github.com/mui/material-ui/tree/master/packages/mui-material/src/Autocomplete
+  - Polaris Combobox: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Combobox
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

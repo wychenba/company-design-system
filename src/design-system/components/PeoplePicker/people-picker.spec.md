@@ -5,6 +5,10 @@ variants: {}
 sizes: {}
 traits:
   - isInputLike
+benchmark:
+  - Ant Design Mentions: github.com/ant-design/ant-design/tree/master/components/mentions
+  - MUI Autocomplete: github.com/mui/material-ui/tree/master/packages/mui-material/src/Autocomplete
+  - Polaris Combobox: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Combobox
 ---
 
 # PeoplePicker 設計原則

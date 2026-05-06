@@ -26,6 +26,32 @@ export default meta
 
 type Story = StoryObj<typeof TimePicker>
 
+// @story-trait-rationale: pre-existing trait gaps tracked separately; this PR scope = add Modes story with display card.
+/* ── 三種模式 ── */
+export const Modes: Story = {
+  name: '三種模式',
+  render: () => (
+    <div className="flex flex-col gap-6 w-80">
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">edit</h3>
+        <TimePicker value="14:30" onChange={() => {}} aria-label="會議時段(edit mode demo)" />
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">display</h3>
+        <TimePicker mode="display" value="14:30" aria-label="會議時段(display mode demo)" />
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
+        <TimePicker mode="readonly" value="14:30" aria-label="會議時段(readonly mode demo)" />
+      </div>
+      <div>
+        <h3 className="text-body font-bold text-foreground mb-2">disabled</h3>
+        <TimePicker mode="disabled" value="14:30" aria-label="會議時段(disabled mode demo)" />
+      </div>
+    </div>
+  ),
+}
+
 // ── 真實業務情境(禁用 Option A/B/C 或抽象場景)─────────────────────────────
 
 /**

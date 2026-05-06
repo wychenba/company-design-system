@@ -6,6 +6,9 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInputLike
+benchmark:
+  - Ant Design Input: github.com/ant-design/ant-design/tree/master/components/input
+  - MUI TextField: github.com/mui/material-ui/tree/master/packages/mui-material/src/TextField
 ---
 
 # LinkInput 設計原則

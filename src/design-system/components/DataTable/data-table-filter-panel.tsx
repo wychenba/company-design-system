@@ -10,15 +10,17 @@ import { Combobox } from '@/design-system/components/Combobox/combobox'
 import { Input } from '@/design-system/components/Input/input'
 import { NumberInput } from '@/design-system/components/NumberInput/number-input'
 import { DatePicker, DatePickerRange } from '@/design-system/components/DatePicker/date-picker'
-import { SurfaceHeader, SurfaceBody, SurfaceFooter } from '@/design-system/patterns/overlay-surface/overlay-surface'
+import { SurfaceHeader, SurfaceBody } from '@/design-system/patterns/overlay-surface/overlay-surface'
 import { PopoverTitle, PopoverClose } from '@/design-system/components/Popover/popover'
-import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ButtonDivider } from '@/design-system/components/Button/button-group'
+import { FieldControlGroup } from '@/design-system/components/FieldControlGroup/field-control-group'
 import type { ColumnType } from './column-types'
 import { getColumnId, getColumnLabel, getColumnMeta } from './lib/column-meta'
 import {
   OPERATOR_REGISTRY,
   DEFAULT_OPERATOR,
   DATE_RELATIVE_OPTIONS,
+  DATE_RELATIVE_GROUPS,
   getOperatorSpec,
   getValueShape,
   type ValueShape,
@@ -115,11 +117,28 @@ const newCondition = (firstCol: FilterColumn | undefined): FilterCondition => ({
   value: '',
 })
 
+// **G fix(2026-05-04)**:initial-mount 用 — field 不預選,user 自選後 op/value 才 enable
+//   Disabled state(field='')→ op + value 在 FilterRow 內走 `disabled={!hasField}` 自動連動
+const newEmptyCondition = (): FilterCondition => ({
+  kind: 'cond',
+  id: newId(),
+  field: '',
+  op: '',
+  value: '',
+})
+
 const newGroup = (firstCol: FilterColumn | undefined): FilterGroup => ({
   kind: 'group',
   id: newId(),
   conjunction: 'or',                                // group 內 default OR(對齊 ref 圖)
   children: [newCondition(firstCol)],
+})
+
+const newEmptyGroup = (): FilterGroup => ({
+  kind: 'group',
+  id: newId(),
+  conjunction: 'or',
+  children: [newEmptyCondition()],
 })
 
 // ── Internal — FilterValuePicker(value-picker switcher per ValueShape)──
@@ -142,6 +161,9 @@ interface FilterValuePickerProps {
   disabled?: boolean
   /** 用 column.label 組「{label} 篩選值」(panel 每 row 不顯式 label,a11y 必填) */
   ariaLabel?: string
+  /** Forward 給內部 Field control 的 className(2026-05-04 #2 fix)
+   *  避免外層包 wrapper div 破壞 FieldControlGroup CSS variants(rounded radii / margin overlap) */
+  className?: string
 }
 
 function FilterValuePicker({
@@ -151,9 +173,10 @@ function FilterValuePicker({
   colInfo,
   disabled,
   ariaLabel,
+  className,
 }: FilterValuePickerProps) {
   if (!shape || disabled) {
-    return <Input size="md" value="" onChange={() => {}} placeholder="輸入值…" disabled aria-label={ariaLabel} />
+    return <Input size="sm" value="" onChange={() => {}} placeholder="輸入值…" disabled aria-label={ariaLabel} className={className} />
   }
 
   switch (shape) {
@@ -163,60 +186,68 @@ function FilterValuePicker({
     case 'text':
       return (
         <Input
-          size="md"
+          size="sm"
           value={String(value ?? '')}
           onChange={(e) => onChange(e.target.value)}
           placeholder="輸入值…"
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
     case 'number':
       return (
         <NumberInput
-          size="md"
+          size="sm"
           value={typeof value === 'number' ? value : null}
           onChange={(v) => onChange(v ?? '')}
           placeholder="輸入數字…"
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
     case 'date_single':
       return (
         <DatePicker
-          size="md"
+          size="sm"
           value={typeof value === 'string' ? value : null}
           onChange={(v) => onChange(v ?? '')}
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
     case 'date_range':
       return (
         <DatePickerRange
-          size="md"
+          size="sm"
           value={Array.isArray(value) && value.length === 2
             ? (value as [string | null, string | null])
             : null}
           onChange={(v) => onChange(v)}
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
     case 'date_relative': {
+      // 群組分類:Past / Current / Future(對齊 Linear / Notion idiom),走 Select.groups → SelectMenu
       const opts: SelectOption[] = DATE_RELATIVE_OPTIONS.map((o) => ({
         value: o.value,
         label: o.label,
+        group: o.group,
       }))
       return (
         <Select
-          size="md"
+          size="sm"
           options={opts}
+          groups={DATE_RELATIVE_GROUPS as unknown as Array<{ key: string; label: string }>}
           value={String(value ?? '')}
           onChange={(v) => onChange(v)}
           placeholder="選擇相對日期"
           aria-label={ariaLabel}
+          className={className}
         />
       )
     }
@@ -228,12 +259,13 @@ function FilterValuePicker({
       }))
       return (
         <Select
-          size="md"
+          size="sm"
           options={opts}
           value={String(value ?? '')}
           onChange={(v) => onChange(v)}
           placeholder="選擇值"
           aria-label={ariaLabel}
+          className={className}
         />
       )
     }
@@ -246,12 +278,13 @@ function FilterValuePicker({
       const arr = Array.isArray(value) ? (value as string[]) : []
       return (
         <Combobox
-          size="md"
+          size="sm"
           options={opts}
           value={arr}
           onChange={(v) => onChange(v)}
           placeholder="選擇值…"
           aria-label={ariaLabel}
+          className={className}
         />
       )
     }
@@ -259,24 +292,26 @@ function FilterValuePicker({
     case 'datetime_single':
       return (
         <DatePicker
-          size="md"
+          size="sm"
           showTime
           value={typeof value === 'string' ? value : null}
           onChange={(v) => onChange(v ?? '')}
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
     case 'datetime_range':
       return (
         <DatePickerRange
-          size="md"
+          size="sm"
           showTime
           value={Array.isArray(value) && value.length === 2
             ? (value as [string | null, string | null])
             : null}
           onChange={(v) => onChange(v)}
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
@@ -286,11 +321,12 @@ function FilterValuePicker({
     case 'person_multi':
       return (
         <Input
-          size="md"
+          size="sm"
           value={typeof value === 'string' ? value : ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder="(person picker 預留)"
           aria-label={ariaLabel}
+          className={className}
         />
       )
 
@@ -342,20 +378,26 @@ function DataTableFilterPanelInner<TData>({
     () => filterableColumns.map((c) => ({ value: c.id, label: c.label })),
     [filterableColumns],
   )
-  const firstCol = filterableColumns[0]
+  // K13 後 firstCol 不再被 add* 消費(改用 newEmpty*),這裡只留 prefill effect 用(已直接讀 prefilledColumnId)。
 
-  // 對齊 ref 圖 — 開啟時若空,自動加 1 條空 row(flat)or 1 個 group 含 1 條空 row(nested)
+  // **G fix(2026-05-04 v2)**:initial-mount 預設 1 empty row(field 未選 → op+value 自動 disabled)
+  //   useRef gate → 只 mount 一次;user 後續手動刪光 → 不 re-add → 維持「全清 = empty CTA only」UX
+  //   Two states clearly separated:
+  //     (a) Initial mount with empty value → auto-add 1 empty row(讓 user 看到 row shape,不必先點 CTA)
+  //     (b) User explicitly deletes all → empty CTA only(無 row,respect user intent)
+  const initialMountDoneRef = React.useRef(false)
   React.useEffect(() => {
+    if (initialMountDoneRef.current) return
+    initialMountDoneRef.current = true
     if (filterableColumns.length === 0) return
-    if (value.mode !== mode) return                  // mode 不一致時 consumer 須先修
     if (value.children.length > 0) return
     if (value.mode === 'flat') {
-      onChange({ ...value, children: [newCondition(firstCol)] })
+      onChange({ ...value, children: [newEmptyCondition()] } as FilterTreeFlat)
     } else {
-      onChange({ ...value, children: [newGroup(firstCol)] })
+      onChange({ ...value, children: [newEmptyGroup()] } as FilterTreeNested)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [filterableColumns.length])
 
   // Prefill from cell ⌄ menu「Filter by this」
   React.useEffect(() => {
@@ -402,7 +444,9 @@ function DataTableFilterPanelInner<TData>({
   }
   const addFlatCondition = () => {
     if (!flatTree) return
-    onChange({ ...flatTree, children: [...flatTree.children, newCondition(firstCol)] })
+    // K13 fix(2026-05-04):加篩選 → empty row(field 未選 → op+value disabled)
+    //   World-class:Notion / Coda / ClickUp 不 auto-select;對齊 initial mount canonical
+    onChange({ ...flatTree, children: [...flatTree.children, newEmptyCondition()] })
   }
   const setFlatConjunction = (conj: Conjunction) => {
     if (!flatTree) return
@@ -438,12 +482,13 @@ function DataTableFilterPanelInner<TData>({
       ),
     })
   }
+  // K13 fix(2026-05-04):同 addFlatCondition,巢狀內加條件也 empty row
   const addConditionToGroup = (groupId: string) => {
     if (!nestedTree) return
     onChange({
       ...nestedTree,
       children: nestedTree.children.map((g) =>
-        g.id === groupId ? { ...g, children: [...g.children, newCondition(firstCol)] } : g
+        g.id === groupId ? { ...g, children: [...g.children, newEmptyCondition()] } : g
       ),
     })
   }
@@ -453,7 +498,8 @@ function DataTableFilterPanelInner<TData>({
   }
   const addGroup = () => {
     if (!nestedTree) return
-    onChange({ ...nestedTree, children: [...nestedTree.children, newGroup(firstCol)] })
+    // K13:加群組也用 empty group
+    onChange({ ...nestedTree, children: [...nestedTree.children, newEmptyGroup()] })
   }
   const setRootConjunction = (conj: Conjunction) => {
     if (!nestedTree) return
@@ -463,27 +509,51 @@ function DataTableFilterPanelInner<TData>({
   return (
     // 寬度策略:desktop 680px;mobile 縮到 viewport 內留 32px 邊(避溢出 popover 切右半)。
     // 對齊 Notion / Airtable 的 advanced filter 在 mobile 走 full-width 邊處理。
-    <div ref={ref} className={cn('w-[min(680px,calc(100vw-2rem))]', className)}>
-      <SurfaceHeader>
-        <div className="flex items-center gap-1 w-full min-w-0">
-          <PopoverTitle className="flex-1">篩選</PopoverTitle>
-          {/* Refresh icon — 只在 value ≠ defaultValue 時顯示(對齊 sort modified-from-default UX) */}
-          {defaultValue && !isFilterTreeEqual(value, defaultValue) && (
+    // **#8 fix(2026-05-04)**:popover width by mode(由 cell min-w 與 group nested chrome 反推)
+    //   flat:cell ConjunctionLabel(80) + gap-2(8) + FCG(field-min 160 + op-min 120 + value 200) +
+    //         gap-2(8) + trash(28) + 2×loose padding(32) = ~636 → 640px
+    //   nested:再加 group p-2 (16) + outer ConjunctionLabel (80) + outer gap (8) → ~740 → 760px
+    //   對齊 Airtable / Notion / Linear filter row 視覺密度 @benchmark-unverified(non-OSS)
+    // **K11 fix(2026-05-04)**:viewport-aware scroll chain invariant
+    //   parent PopoverContent 是 flex flex-col + max-h + overflow-hidden,
+    //   panel root 必 forward `flex flex-col h-full` 才能讓 SurfaceBody flex-1 min-h-0 overflow-y-auto 生效
+    //   無此 forward → 中間 wrapper 斷鏈 → body 不 scroll(NameCard 因為自身設 max-h flex-col 才繞過)
+    //   詳 overlay-surface.spec.md「viewport-aware scroll chain invariant」段
+    // K11 v2 fix(2026-05-04):flex item 預設 min-h:auto 讓 content 撐 height,h-full 失效。
+    // 必加 `min-h-0` 才能讓 panel 在 PopoverContent max-h cap 下正確 shrink + body scroll。
+    <div ref={ref} className={cn(
+      'flex flex-col h-full min-h-0',
+      mode === 'nested'
+        ? 'w-[min(760px,calc(100vw-2rem))]'
+        : 'w-[min(640px,calc(100vw-2rem))]',
+      className,
+    )}>
+      {/* Popover 派輕量 chrome — slot 縮 20 匹配 PopoverTitle text-body line-height,header 自然 ~45px */}
+      <SurfaceHeader className="[--chrome-slot-h:1.25rem]">
+        <PopoverTitle className="flex-1">篩選</PopoverTitle>
+        {/* Refresh icon — 只在 value ≠ defaultValue 時顯示(對齊 sort modified-from-default UX)
+            含 ButtonDivider 對齊「欄位顯示」+「排序」chrome corner action canonical(2026-05-04) */}
+        {defaultValue && !isFilterTreeEqual(value, defaultValue) && (
+          <>
             <Button
               variant="text" size="sm" iconOnly startIcon={RotateCcw}
               aria-label="恢復預設"
               onClick={() => onChange(defaultValue)}
             />
-          )}
-          {onClose && (
-            <PopoverClose asChild>
-              <Button data-dismiss iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" onClick={onClose} />
-            </PopoverClose>
-          )}
-        </div>
+            {onClose && <ButtonDivider />}
+          </>
+        )}
+        {onClose && (
+          <PopoverClose asChild>
+            <Button data-dismiss iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉" onClick={onClose} />
+          </PopoverClose>
+        )}
       </SurfaceHeader>
 
-      <SurfaceBody className="flex flex-col gap-2">
+      {/* Body — flat / nested 條件;空條件 → 直接顯 + 加篩選 CTA(對齊 Notion / Airtable / Linear inline 派,
+          無條件時不需要 Empty 元件大區塊,單顆 CTA 引導即可。SurfaceFooter 整層拔除,
+          + Add filter / + 加篩選器 inline 緊貼最後一條 row,讓 user 感受到「條件」與「加入」屬同一語境)*/}
+      <SurfaceBody className="flex flex-col gap-[var(--layout-space-tight)]">
         {flatTree && flatTree.children.map((cond, idx) => (
           <FilterRow
             key={cond.id}
@@ -519,16 +589,19 @@ function DataTableFilterPanelInner<TData>({
             onRemoveGroup={() => removeGroup(group.id)}
           />
         ))}
-      </SurfaceBody>
 
-      <SurfaceFooter className="justify-start">
-        <Button
-          variant="tertiary" size="sm" startIcon={Plus}
-          onClick={mode === 'flat' ? addFlatCondition : addGroup}
-        >
-          {mode === 'nested' ? '加入篩選器' : '加條件'}
-        </Button>
-      </SurfaceFooter>
+        {/* Inline CTA(2026-05-04 A1)— root-level「加篩選」用 tertiary(視覺輕量但有邊界,
+            符合 root-CTA 視覺重量);nested 內「加入巢狀篩選」走 text variant(更輕,在 group 內 inline)
+            不放 SurfaceFooter:條件與「加入」屬同一語義群,中間插 footer 切斷敘事 */}
+        <div>
+          <Button
+            variant="tertiary" size="sm" startIcon={Plus}
+            onClick={mode === 'flat' ? addFlatCondition : addGroup}
+          >
+            {mode === 'nested' ? '加入篩選器' : '加篩選'}
+          </Button>
+        </div>
+      </SurfaceBody>
     </div>
   )
 }
@@ -550,18 +623,28 @@ const CONJ_OPTIONS: SelectOption[] = [
 function ConjunctionLabel({
   index, conjunction, onChange,
 }: { index: number; conjunction: Conjunction; onChange: (c: Conjunction) => void }) {
+  // index === 0:首 row 顯示靜態「Where」label
+  // index === 1:**唯一可改**的 AND/OR Select(連動整 group conjunction)
+  // index ≥ 2:被連動的 row,read-only 顯示當前 conjunction 文字(同 Where 視覺,A6 canonical)
+  //   對齊 Airtable / Notion / Linear 共識 @benchmark-unverified(non-OSS)
+  //   px-3 對齊 Field 內部 padding 12px(Q13)
   if (index === 0) {
-    // 「Where」靜態 label;w-20 對齊 row 2+ 的 Select 寬度
-    return <div className="w-20 shrink-0 text-body text-fg-muted px-2">Where</div>
+    return <div className="w-20 shrink-0 text-body text-fg-muted px-3 self-center">Where</div>
   }
+  if (index >= 2) {
+    const label = conjunction === 'and' ? 'And' : 'Or'
+    return <div className="w-20 shrink-0 text-body text-fg-muted px-3 self-center">{label}</div>
+  }
+  // index === 1:可切換的 AND/OR Select
+  // minRows={2} — And/Or 2 選項,顯式縮 menu 高度避免 reserve 3 row 空白(Q5)
   return (
-    // w-20(80px)— 容納「And ⌄」/「Or ⌄」label + chevron 不被截斷
     <div className="w-20 shrink-0">
       <Select
-        size="md"
+        size="sm"
         options={CONJ_OPTIONS}
         value={conjunction}
         onChange={(v) => onChange(v as Conjunction)}
+        minRows={2}
         aria-label="連接詞 — 同 group 共用"
       />
     </div>
@@ -592,41 +675,57 @@ function FilterRow({
   const valueShape: ValueShape | null = colInfo && opSpec
     ? getValueShape(opSpec, colInfo.type, colInfo.includeTime)
     : null
+  // op 'is_set' / 'is_not_set' 等 shape='none' → 無 value cell,op 自動 expand 填剩餘寬
+  // 對齊 Notion / Airtable / Linear filter row 行為
+  // 注意:valueShape=null(初始無 field 選)時仍 render value cell(disabled placeholder)— 只 'none' 才 fold
+  const hasValueCell = valueShape !== 'none'
 
+  // FieldControlGroup 接合 field + op + value 視覺(2026-05-04 E refactor + 多輪 fix):
+  //   - border collapse 取代 3 顆獨立 Select 並排,對齊 Airtable / Linear / Notion filter row idiom
+  //   - ConjunctionLabel + Trash 在 group 外層(meta actions,不屬 control 一體)
+  //   - **#5 fix**:row 內水平 gap = `gap-2` (8px),layoutSpace 規則 5 緊密相關
+  //   - **#9 fix**:cell 用 `min-w-[]`(field 160 / op 120),value flex-1 min-w-0,讓 long label 可撐寬
+  //   - **#2 fix**:FilterValuePicker 直接是 FieldControlGroup direct child(無 wrapper div),CSS variants 命中正確
   return (
     <div className="flex items-center gap-2">
       <ConjunctionLabel index={index} conjunction={conjunction} onChange={onChangeConjunction} />
-      <div className="w-40 shrink-0">
+      {/* **#9 fix(2026-05-04 v4)**:Field controls trigger `w-full` override 外 className,改用 Tailwind `!`
+          important 強制 override(`!w-[160px]` / `!w-[120px]`),value 用 `!flex-1 !min-w-0`。
+          Select 元件本身沒 destructure `style` prop 所以 inline style flex-basis 行不通,只能用 className。 */}
+      <FieldControlGroup block className="flex-1 min-w-0">
         <Select
-          size="md"
+          className="!w-[160px] flex-shrink-0"
+          size="sm"
           options={fieldOptions}
           value={condition.field}
           onChange={onChangeField}
           placeholder="選擇欄位"
           aria-label="篩選欄位"
         />
-      </div>
-      <div className="w-32 shrink-0">
         <Select
-          size="md"
+          className={hasValueCell ? '!w-[120px] flex-shrink-0' : '!flex-1 !min-w-0'}
+          size="sm"
           options={operatorOptions}
           value={condition.op}
           onChange={onChangeOp}
           disabled={!hasField}
+          placeholder="運算子"
           aria-label="篩選運算子"
         />
-      </div>
-      <div className="flex-1 min-w-0">
-        <FilterValuePicker
-          shape={valueShape}
-          value={condition.value}
-          onChange={onChangeValue}
-          colInfo={colInfo}
-          disabled={!hasField}
-          ariaLabel={colInfo ? `${colInfo.label} 篩選值` : '篩選值'}
-        />
-      </div>
-      <ItemInlineActionButton icon={Trash2} size="md" aria-label="刪除" onClick={onRemove} />
+        {hasValueCell && (
+          <FilterValuePicker
+            shape={valueShape}
+            value={condition.value}
+            onChange={onChangeValue}
+            colInfo={colInfo}
+            disabled={!hasField}
+            ariaLabel={colInfo ? `${colInfo.label} 篩選值` : '篩選值'}
+            className="!flex-1 !min-w-0"
+          />
+        )}
+      </FieldControlGroup>
+      {/* Trash 用 text Button — filter row 是 form-control row,Field 同高對齊(28 md) */}
+      <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={onRemove} />
     </div>
   )
 }
@@ -675,10 +774,11 @@ function GroupBlock({
             onRemove={() => onRemoveCondition(cond.id)}
           />
         ))}
+        {/* Q9 — text variant 對齊 inline 派 + 視覺輕量 */}
         <div className="flex items-center justify-between">
-          <Button variant="tertiary" size="sm" startIcon={Plus} onClick={onAddCondition}>加入巢狀篩選</Button>
+          <Button variant="text" size="sm" startIcon={Plus} onClick={onAddCondition}>加入巢狀篩選</Button>
           {group.children.length === 0 && (
-            <Button variant="tertiary" size="sm" startIcon={Trash2} onClick={onRemoveGroup}>移除空群組</Button>
+            <Button variant="text" size="sm" startIcon={Trash2} danger onClick={onRemoveGroup}>移除空群組</Button>
           )}
         </div>
       </div>

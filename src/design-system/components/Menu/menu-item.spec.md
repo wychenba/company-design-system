@@ -9,6 +9,10 @@ sizes:
 traits:
   - hasInteractiveStates
   - isInternal
+benchmark:
+  - Radix Menu primitive: github.com/radix-ui/primitives/tree/main/packages/react/menu
+  - Ant Design Menu: github.com/ant-design/ant-design/tree/master/components/menu
+  - Polaris ActionList: github.com/Shopify/polaris/tree/main/polaris-react/src/components/ActionList
 ---
 
 # MenuItem 設計原則
@@ -45,13 +49,7 @@ prefix icon 跟 label 同色（foreground），不是 fg-muted。詳見 item-ana
 | ≤ 24px | `h-[1lh]` | 第一行 label 的垂直中心 |
 | > 24px | `h-[calc(1lh+var(--item-gap-label-desc)+desc_1lh)]` | label + gap + description 文字塊的垂直中心 |
 
-**SSOT**:公式實作在 `patterns/element-anatomy/item-anatomy.tsx` 的 `itemPrefixAlignVariants`
-cva(2026-04-23 重構)。MenuItem 直接 import 消費,不自建 cva:
-```tsx
-import { itemPrefixAlignVariants } from '@/design-system/patterns/element-anatomy/item-anatomy'
-<div className={cn(itemPrefixAlignVariants({ align: 'block-md' }))}>
-```
-改 gap token(`--item-gap-label-desc`)或 font-size token 一處 → MenuItem 自動同步。
+**SSOT**:對齊公式封裝於 `patterns/element-anatomy/item-anatomy.tsx` 的 `itemPrefixAlignVariants`(2026-04-23 重構)。MenuItem 消費此 primitive,不自建對齊邏輯;改 gap token(`--item-gap-label-desc`)或 font-size token 一處 → MenuItem 自動同步。
 
 **24px 是物理限制**——16px icon 在 24px 圓內仍可辨識(內部 icon 下限 12px),但在更小的容器中 icon 會低於可讀閾值。
 
