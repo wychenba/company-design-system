@@ -220,6 +220,7 @@ export const RowAutoHeightInlineEdit: Story = {
         { value: 'Electronics', label: 'Electronics' },
         { value: 'Furniture', label: 'Furniture' },
         { value: 'Food', label: 'Food' },
+        { value: 'Lifestyle', label: 'Lifestyle' },
       ] } },
       { accessorKey: 'note', header: 'Note (wrap text)', size: 360, meta: { type: 'string', editable: true } },
       { accessorKey: 'price', header: 'Price', size: 100, meta: { type: 'currency', editable: true } },

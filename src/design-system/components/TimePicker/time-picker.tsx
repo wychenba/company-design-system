@@ -330,6 +330,12 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
               minuteStep={minuteStep}
               secondStep={secondStep}
               disabled={disabledForColumns}
+              // 2026-05-06 v9.1 M25 chain fix:TimeColumns 自然高 = 24 buttons × ~28.7px = 688px
+              // 會撐破 parent h-[216px]。flex-1 + min-h-0 讓 TimeColumns 取 parent 剩餘空間
+              // (216 - footer 40 = 176px)→ ScrollArea h-full 才能正確收斂 →
+              // listbox scrollIntoView 找對 nearest scrollable ancestor(內部 viewport),
+              // 不會走到 document body 把 popover 內容推出畫面(user 報「hours 欄空白」根因)。
+              className="flex-1 min-h-0"
             />
             {/* Footer:Now + OK */}
             <div

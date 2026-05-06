@@ -424,40 +424,48 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
           </div>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <div role="dialog">
-            <CalendarTimeContainer
-              showTime={showTime}
-              showSeconds={showSeconds}
-              calendar={
-                <DateGrid
-                  mode="single"
-                  selected={displayDate}
-                  onSelect={(date) => {
-                    if (!date) return
-                    if (showTime) {
-                      commitDraft(combineDateAndTime(date, draftTime))
-                    } else {
-                      commitDraft(dateToIso(date))
-                      if (!needConfirm) setOpen(false)
-                    }
-                  }}
-                  defaultMonth={displayDate ?? undefined}
-                  autoFocus
-                />
-              }
-              timePanel={
-                <TimePickerSidePanel
-                  value={draftTime}
-                  onChange={(time) => {
-                    const target = draftDate ?? new Date()
-                    commitDraft(combineDateAndTime(target, time))
-                  }}
-                  showSeconds={showSeconds}
-                  minuteStep={minuteStep}
-                  secondStep={secondStep}
-                />
-              }
-            />
+          {/* role="dialog" 為 flex item of PopoverContent(flex flex-col overflow-hidden)。
+              2026-05-06 v9.1:加 `flex flex-col flex-1 min-h-0` 完成 M25 chain — viewport
+              壓縮時 dialog 縮 + 內 calendar/footer 排序;原無 chain 致 calendar 末行被
+              overflow-hidden 切掉、footer 推出 popover(user 報「位置改變就壞掉」根因)。 */}
+          <div role="dialog" className="flex flex-col flex-1 min-h-0">
+            {/* Calendar 區包 overflow-y-auto:viewport 壓縮時 calendar 內滾(Material / Carbon
+                date picker idiom)。footer 永遠 in-view(SurfaceFooter shrink-0)。 */}
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <CalendarTimeContainer
+                showTime={showTime}
+                showSeconds={showSeconds}
+                calendar={
+                  <DateGrid
+                    mode="single"
+                    selected={displayDate}
+                    onSelect={(date) => {
+                      if (!date) return
+                      if (showTime) {
+                        commitDraft(combineDateAndTime(date, draftTime))
+                      } else {
+                        commitDraft(dateToIso(date))
+                        if (!needConfirm) setOpen(false)
+                      }
+                    }}
+                    defaultMonth={displayDate ?? undefined}
+                    autoFocus
+                  />
+                }
+                timePanel={
+                  <TimePickerSidePanel
+                    value={draftTime}
+                    onChange={(time) => {
+                      const target = draftDate ?? new Date()
+                      commitDraft(combineDateAndTime(target, time))
+                    }}
+                    showSeconds={showSeconds}
+                    minuteStep={minuteStep}
+                    secondStep={secondStep}
+                  />
+                }
+              />
+            </div>
             {showTime && (
               // Footer:消費 SurfaceFooter SSOT(border-t + canonical px-loose py-tight padding,
               // 不再 hand-coded p-2 / Separator / ml-auto wrapper 三層垃圾)。
@@ -791,7 +799,9 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
           </div>
         </PopoverAnchor>
         <PopoverContent className="w-auto p-0" align="start">
-          <div role="dialog" aria-label="日期區間選擇">
+          {/* 2026-05-06 v9.1 M25 chain — 同 single DatePicker 修法,viewport 壓縮 calendar 內滾 + footer 永遠 in-view */}
+          <div role="dialog" aria-label="日期區間選擇" className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-y-auto">
             <CalendarTimeContainer
               showTime={showTime}
               showSeconds={showSeconds}
@@ -881,8 +891,8 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
                 />
               }
             />
-          </div>
-          {(showTime || needConfirm) && (
+            </div>
+            {(showTime || needConfirm) && (
             // Footer 消費 SurfaceFooter SSOT(border-t + canonical px-loose py-tight)。
             // showTime Range 無「此刻」(對齊 Ant `showNow={multiple ? false : showNow}`)→ 只有 確定 走 justify-end。
             // date-only Range needConfirm:左 此刻(mr-auto)+ 右 確定。
@@ -909,6 +919,7 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
               )}
             </SurfaceFooter>
           )}
+          </div>
         </PopoverContent>
       </Popover>
     )

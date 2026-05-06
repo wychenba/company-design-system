@@ -343,7 +343,11 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
     //   原本 useMemo(L280, L291) 在 early return 之後 = latent bug,K13 觸發(filter Op 從 disabled
     //   變 edit 當 user 選欄位)。修法:把所有 useMemo 提到 early return 之前。
     const selectedOpt = options?.find(o => o.value === value)
-    const selectedLabel = selectedOpt?.label ?? ''
+    // 2026-05-06 v9.1:value 不在 options 也要顯示原值(不沉默丟失)。原 fallback `''` 致
+    // SelectCell 開 edit 時若 cell value 不在當前 options(e.g. 上游資料漂移 / options async
+    // 後到 / 跨 dataset),trigger 顯示空白 — user 報「value 不見」。對齊 ReadonlyDisplay 同
+    // 級 fallback `?? value`。
+    const selectedLabel = selectedOpt?.label ?? value ?? ''
     const SelectedIcon = selectedOpt?.icon
     // ── 過濾選項 ──
     const filteredOptions = searchable && search
