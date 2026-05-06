@@ -64,6 +64,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.2",
+    "@openai/codex": "^0.128.0",
     "@storybook/addon-a11y": "8.6.0",
     "@storybook/addon-docs": "8.6.0",
     "@storybook/addon-essentials": "8.6.0",

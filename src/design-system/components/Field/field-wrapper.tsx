@@ -114,37 +114,42 @@ export const fieldWrapperStyles = cva(
       },
       // naked variant — cell-as-input substrate(Notion / Airtable / Excel canonical)
       //
-      // ── 2026-05-05 v9 architectural rewrite ──
-      // 前 v4-v8 用 `outline-2 outline-offset-[-1px]` 平行 state machine 跟 Field default
-      // border state 對抗 → user 報 6 bug(thickness 加粗 / hover 蓋 focus / open 藍框 vs
-      // Field default open hover-color 不同)。本 v9 砍掉 outline ring,**naked 完全繼承
-      // Field default state machine**(同 border-based 同 token 同 hover/focus/open precedence),
-      // 只改物理尺寸(rounded-none / h-full / cell padding tokens)。
+      // ── 2026-05-06 v10 outline state machine(seam fix) ──
+      // 前 v9 用 `border` state machine,但 token `--border`(neutral-5)≠ 跟 grid 用的
+      // `--divider`(neutral-4),且 border-l/t/b 跟 adjacent cell border-r / row border-b
+      // 雖位置同但 paint precedence 含糊 → user 報「只有右邊框跟 grid 無縫接軌,其他 3 邊有 seam」。
       //
-      // user 原話:「原本 field 的互動樣式都能保留,唯一差別就是 field 會填滿 cell,然後沒有圓角而已」
+      // v10 改 **outline-1 outline-offset-[-1px]** state machine:
+      // - outline 不佔 layout space → cell padding 計算不變
+      // - `outline-offset:[-1px]` → outline 完全畫在 cell box 內側 1px → 跟 adjacent grid line
+      //   完美 overlap(同 1px 同位置)
+      // - rest token = `outline-divider` 跟 grid 同色 → 視覺零落差
+      // - hover/focus/open 顏色加深(對齊 DS 一致語言:hover 永遠是顏色變化,不加粗)
       //
+      // 跟 v8 outline-2 失敗點區別:
+      // - v8 用 `outline-2`(2px)且兩 ring(border + outline)stacking → 厚度加倍
+      // - v10 **唯一 outline + 純 color change**(永遠 1px,只切顏色),無 stacking
+      // - 保留 v9 修好的 `focus-within:hover:outline-primary` 顯式 AND case(M11 fix)
+      //
+      // 物理尺寸(同 v9):
       //   - `!h-full`:Field 框框 = host cell box(frame 填 cell)
-      //   - `!rounded-none`:cell 無 corner gap
-      //   - `!px-[var(--table-cell-px)] !py-[var(--table-cell-py)]`(edit 用)
-      //     / `!px-0 !py-0`(display/readonly/disabled 用):host cell padding ↔ Field padding
-      //     反向接管,切 mode 文字 0px shift
-      //   - state machine **完全繼承 Field default**(`border-border` 1px gray rest;hover
-      //     `border-border-hover`;focus-within `border-primary` + `focus-within:hover:border-primary`
-      //     處理 AND case;open `border-border-hover` 對齊 Field default 不是藍框)
-      //   - display/readonly/disabled **`border-transparent`** 預留 1px 空間防 hover 切 layout
-      //     shift,視覺無 border(host cell 仍有 cellPadding + border-r divider 構成 grid 線)
-      //   - `group-data-[row-mode=auto]/cell:!items-start`:host cell `data-row-mode=auto` 自動
-      //     propagate alignment
+      //   - `!rounded-none`:cell 無 corner gap(outline 無 round 也對齊)
+      //   - `!px-[var(--table-cell-px)] !py-[var(--table-cell-py)]`(edit)
+      //     / `!px-0 !py-0`(display/readonly/disabled):host cell padding ↔ Field padding 反向接管
+      //   - `group-data-[row-mode=auto]/cell:!items-start`:host cell row-mode propagate
+      //
+      // Border 繼續存在但永遠 transparent,純為 layout placeholder(防 outline 切換時 layout shift,
+      // 雖 outline 不佔空間但保留 border placeholder 是 defensive coding)。
       {
         mode: 'edit',
         variant: 'naked',
         className: [
-          'bg-transparent !rounded-none !gap-0 !h-full',
+          'bg-transparent !rounded-none !gap-0 !h-full border border-transparent',
           '!px-[var(--table-cell-px)] !py-[var(--table-cell-py)]',
-          'border border-border',
-          'hover:border-border-hover',
-          'focus-within:border-primary focus-within:hover:border-primary',
-          'data-[state=open]:border-border-hover',
+          'outline outline-1 outline-offset-[-1px] outline-divider',
+          'hover:outline-[var(--border-hover)]',
+          'focus-within:outline-primary focus-within:hover:outline-primary',
+          'data-[state=open]:outline-[var(--border-hover)]',
           'group-data-[row-mode=auto]/cell:!items-start',
         ],
       },
@@ -152,8 +157,7 @@ export const fieldWrapperStyles = cva(
         mode: 'display',
         variant: 'naked',
         className: [
-          'bg-transparent !rounded-none !px-0 !py-0 !gap-0 !h-full',
-          'border border-transparent',
+          'bg-transparent !rounded-none !px-0 !py-0 !gap-0 !h-full border border-transparent',
           'group-data-[row-mode=auto]/cell:!items-start',
         ],
       },
@@ -161,8 +165,7 @@ export const fieldWrapperStyles = cva(
         mode: 'readonly',
         variant: 'naked',
         className: [
-          'bg-transparent !rounded-none !px-0 !py-0 !gap-0 !h-full',
-          'border border-transparent',
+          'bg-transparent !rounded-none !px-0 !py-0 !gap-0 !h-full border border-transparent',
           'group-data-[row-mode=auto]/cell:!items-start',
         ],
       },
@@ -170,8 +173,7 @@ export const fieldWrapperStyles = cva(
         mode: 'disabled',
         variant: 'naked',
         className: [
-          'bg-transparent !rounded-none cursor-not-allowed opacity-disabled !px-0 !py-0 !gap-0 !h-full',
-          'border border-transparent',
+          'bg-transparent !rounded-none cursor-not-allowed opacity-disabled !px-0 !py-0 !gap-0 !h-full border border-transparent',
           'group-data-[row-mode=auto]/cell:!items-start',
         ],
       },

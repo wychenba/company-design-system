@@ -16,9 +16,9 @@ import {
 } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { ChevronDown, Calendar, Clock, ArrowUp, ArrowDown, Filter as FilterIcon, EyeOff, X as XIcon, GripVertical } from 'lucide-react'
+import { ChevronDown, Calendar, Clock, ArrowUp, ArrowDown, ArrowUpDown, Filter as FilterIcon, EyeOff, X as XIcon, GripVertical } from 'lucide-react'
 import { DndContext, DragOverlay, closestCenter, useSensor, useSensors, PointerSensor, KeyboardSensor, type DragEndEvent, type CollisionDetection } from '@dnd-kit/core'
-import { SortableContext, useSortable, verticalListSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
+import { SortableContext, useSortable, verticalListSortingStrategy, horizontalListSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import { CSS as DndCSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
@@ -136,6 +136,40 @@ export interface DataTableProps<TData>
    * @param position 'before' | 'after' — 放在 target 前 OR 後
    */
   onRowReorder?: (sourceId: string, targetId: string, position: 'before' | 'after') => void
+  /**
+   * 啟用全表 column resize(2026-05-06 v11):
+   * - `true`: 所有 data columns 全 fixed width,header 右邊出現 resize handle(hover 顯色 +
+   *   cursor:col-resize),user 拖拉調整 column width。System columns(checkbox / drag handle /
+   *   row actions)永遠 fixed,不在 resize 集合。
+   * - `false`(default): 所有 data columns 全 flex-grow:1 均分剩餘寬度。
+   *
+   * **二選一 canonical**(對齊 Notion / Airtable / Linear product UI 共識)— 不支援 per-column
+   * mixed,簡單明確。Min width 預設 80px,consumer 透過 `columnDef.minSize` override。
+   */
+  enableColumnResize?: boolean
+  /**
+   * Column resize callback。User 拖完一輪觸發(commit-on-pointerup,非 live)。Consumer 收到
+   * 自管 width persistence(localStorage / URL / API)— DS 不持久化(對齊「DS 不包全域 provider」原則)。
+   * @param columnId 被 resize 的 column id
+   * @param width 最終 width(px)
+   */
+  onColumnResize?: (columnId: string, width: number) => void
+  /**
+   * 啟用全表 column reorder(2026-05-06 v11):
+   * - `true`: 所有 data column header 可拖曳重排,DragOverlay portal 顯示 ghost
+   * - `false`(default): 不啟用
+   *
+   * 使用 `columnDef.meta.locked = true` 標示鎖定欄(無 grab cursor、不啟動 drag、被拖過不顯
+   * drop indicator)。對齊 Notion / Linear locked column canonical。
+   */
+  enableColumnReorder?: boolean
+  /**
+   * Column reorder callback。
+   * @param sourceId source column id
+   * @param targetId target column id
+   * @param position 'before' | 'after'
+   */
+  onColumnReorder?: (sourceId: string, targetId: string, position: 'before' | 'after') => void
 }
 
 // ── Cell Rendering(Phase C 2026-05-05 — type-keyed registry SSOT)─────────────
@@ -168,20 +202,39 @@ const SELECT_COL_ID = '__select__'
 const cellPadding: React.CSSProperties = { paddingBlock: 'var(--table-cell-py)', paddingInline: 'var(--table-cell-px)' }
 const HEADER_BG = 'bg-muted'
 
-// Column sizing canonical(2026-05-05 user E rule + Notion / Airtable / AG Grid 共識):
-//   - column.getCanResize() === true  → fixed width = column.getSize()(尊重 user 拖拉設定)
-//   - column.getCanResize() === false → flex-grow:1 + minWidth = configured size(吃剩餘寬,
-//     對齊 Notion / Airtable「最後 column flex fill」canonical;預設最後 column auto !resizable)
-//   - maxSize 一律 forward 為 maxWidth(防止 flex 列無限擴張)
-function columnSizeStyle(col: { getCanResize: () => boolean; getSize: () => number; columnDef: { minSize?: number; maxSize?: number } }): React.CSSProperties {
+// Column sizing canonical(2026-05-06 v11 — table-level all-or-nothing,Notion / Airtable / Linear 共識):
+//   - **Table-level prop `enableColumnResize`** 控制全表 mode(per-column mixed 已 retire,跟 product
+//     UI 世界級對齊 — Notion / Airtable / Linear 都是全表二選一,簡單明確)
+//   - `enableColumnResize=true`  → 所有 data columns 全 fixed width(尊重 user 拖拉)
+//   - `enableColumnResize=false` → 所有 data columns 全 flex-grow:1 均分剩餘寬度(預設,minWidth 保護)
+//   - **System columns**(`__select__` / drag handle / row actions)永遠 fixed,跟 enableColumnResize 無關
+//   - maxSize 一律 forward 為 maxWidth(防 flex 無限擴張)
+//
+// 預設 min width = `MIN_COLUMN_WIDTH`(80px;對齊 Polaris IndexTable / AG Grid 範圍下限),consumer
+// 可透過 `columnDef.minSize` override。
+export const MIN_COLUMN_WIDTH = 80
+
+function columnSizeStyle(
+  col: { id: string; getSize: () => number; columnDef: { minSize?: number; maxSize?: number } },
+  opts: { resize: boolean; isSystemCol: boolean },
+): React.CSSProperties {
   const baseSize = col.getSize()
-  const minSize = col.columnDef.minSize ?? baseSize
+  const minSize = col.columnDef.minSize ?? MIN_COLUMN_WIDTH
   const maxSize = col.columnDef.maxSize
-  if (col.getCanResize()) {
-    return { width: baseSize, minWidth: col.columnDef.minSize, maxWidth: maxSize }
+  // System columns 永遠 fixed(checkbox / drag handle 等內建欄位,不在 resize 集合)
+  if (opts.isSystemCol) {
+    return { width: baseSize, minWidth: baseSize, maxWidth: maxSize }
   }
+  // Data columns:enableColumnResize=true → fixed 尊重 user 拖拉
+  if (opts.resize) {
+    return { width: baseSize, minWidth: minSize, maxWidth: maxSize }
+  }
+  // Data columns:enableColumnResize=false → flex 均分(default)
   return { flex: '1 1 0%', minWidth: minSize, maxWidth: maxSize }
 }
+
+const SYSTEM_COL_IDS = new Set([SELECT_COL_ID, '__drag__', '__actions__'])
+const isSystemColumn = (colId: string) => SYSTEM_COL_IDS.has(colId)
 
 // ── TruncateCell ─────────────────────────────────────────────────────────────
 // Shared ResizeObserver(2026-04-22 D3 perf audit):從 per-cell RO 改為全 DS 共用一個 RO
@@ -454,6 +507,10 @@ function DataTableInner<TData>(
     onCellCommit,
     enableRowDrag = false,
     onRowReorder,
+    enableColumnResize = false,
+    onColumnResize,
+    enableColumnReorder = false,
+    onColumnReorder,
     className, ...props
   }: DataTableProps<TData>,
   ref: React.ForwardedRef<HTMLDivElement>
@@ -568,6 +625,21 @@ function DataTableInner<TData>(
     // L4 nested rows:啟用 expanded row model(consumer 透過 tableOptions.getSubRows + state.expanded forward)
     getExpandedRowModel: getExpandedRowModel(),
     getRowId: getRowId,
+    // 2026-05-06 v11 column resize:啟用 tanstack column resizing API。`columnResizeMode='onEnd'`
+    // commit-on-pointerup(非 live)— 跟 onColumnResize callback 對齊「user 拖完一輪才 commit」。
+    enableColumnResizing: enableColumnResize,
+    columnResizeMode: 'onEnd',
+    // 2026-05-06 v11:onEnd commit 時 forward callback。tanstack `onColumnSizingChange` 在
+    // resize end 觸發,delta 是 { [columnId]: width } map。我們對最後一筆變更呼叫 consumer。
+    onColumnSizingChange: enableColumnResize && onColumnResize ? (updater) => {
+      const prev = table.getState().columnSizing
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      // 找變更的 column(diff)— commit-on-pointerup 通常只有 1 column 變
+      const changedId = Object.keys(next).find(id => next[id] !== prev[id])
+      if (changedId !== undefined) {
+        onColumnResize(changedId, next[changedId])
+      }
+    } : undefined,
   })
 
   const { rows } = table.getRowModel()
@@ -837,7 +909,7 @@ function DataTableInner<TData>(
           key={cell.id}
           role="cell"
           className={cn('flex items-center justify-center shrink-0', !isDisabled && 'cursor-pointer')}
-          style={{ ...columnSizeStyle(cell.column), ...cellPadding }}
+          style={{ ...columnSizeStyle(cell.column, { resize: enableColumnResize, isSystemCol: isSystemColumn(cell.column.id) }), ...cellPadding }}
           onClick={onCellClick}
         >
           {mode === 'single' ? (
@@ -909,6 +981,7 @@ function DataTableInner<TData>(
         // 從 cell 取 alignment(autoRowHeight=auto 頂對齊 / fixed=fixed 置中)。CSS propagation,
         // Field API 不變;每個 mode 內 display↔edit 同 alignment(同 Field, 同 group → 同 items)。
         data-row-mode={autoRowHeight ? 'auto' : 'fixed'}
+        data-column-id={cell.column.id}
         className={cn(
           // Cell box(2026-05-05 v6 — A4 canonical: Field frame seamlessly replaces cell border):
           //   - `self-stretch`: cell 永遠填 row 高
@@ -930,7 +1003,7 @@ function DataTableInner<TData>(
           isEditingThisCell && 'z-10',
         )}
         style={{
-          ...columnSizeStyle(cell.column),
+          ...columnSizeStyle(cell.column, { resize: enableColumnResize, isSystemCol: isSystemColumn(cell.column.id) }),
           ...(isEditingThisCell ? {} : cellPadding),
         }}
         onClick={onEditableCellClick}
@@ -1096,7 +1169,7 @@ function DataTableInner<TData>(
           key={header.id}
           role="columnheader"
           className={cn('flex items-center justify-center shrink-0 select-none', !isHeaderDisabled && 'cursor-pointer')}
-          style={{ ...columnSizeStyle(header.column), ...cellPadding }}
+          style={{ ...columnSizeStyle(header.column, { resize: enableColumnResize, isSystemCol: isSystemColumn(header.column.id) }), ...cellPadding }}
           onClick={isHeaderDisabled ? undefined : (e) => { e.stopPropagation(); toggleHeaderCheckbox() }}
         >
           {mode === 'multi' && (
@@ -1143,7 +1216,7 @@ function DataTableInner<TData>(
           align === 'right' && 'justify-end',
           align === 'center' && 'justify-center',
         )}
-        style={{ ...columnSizeStyle(header.column), ...cellPadding }}
+        style={{ ...columnSizeStyle(header.column, { resize: enableColumnResize, isSystemCol: isSystemColumn(header.column.id) }), ...cellPadding }}
       >
         {/* 左區:label + sort indicator(整區 click → toggle sort;Shift+click 加 secondary,enableMultiSort 啟用時) */}
         <div
@@ -1199,10 +1272,72 @@ function DataTableInner<TData>(
               {header.column.getCanHide() && (
                 <DropdownMenuItem startIcon={EyeOff} onClick={() => header.column.toggleVisibility(false)}>隱藏欄位</DropdownMenuItem>
               )}
+              {/* 2026-05-06 v11:Auto-fit 放 more menu(不綁 double-click,避免跟 click-to-sort 衝突)。
+                  scan column body cells max scrollWidth + cellPadding → reset column.size。
+                  System columns 永遠 fixed 不顯此 item。 */}
+              {enableColumnResize && !isSystemColumn(header.column.id) && (
+                <DropdownMenuItem
+                  startIcon={ArrowUpDown}
+                  onClick={() => {
+                    const cells = document.querySelectorAll<HTMLElement>(
+                      `[role="cell"][data-column-id="${header.column.id}"]`,
+                    )
+                    let max = MIN_COLUMN_WIDTH
+                    cells.forEach(c => {
+                      const inner = c.firstElementChild as HTMLElement | null
+                      const w = (inner?.scrollWidth ?? c.scrollWidth) + 32 // + cellPadding 兩側 + buffer
+                      if (w > max) max = w
+                    })
+                    header.column.resetSize?.()
+                    table.setColumnSizing(prev => ({ ...prev, [header.column.id]: max }))
+                    onColumnResize?.(header.column.id, max)
+                  }}
+                >
+                  自動調整寬度
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        {showDivider && <span className="absolute right-0 w-px bg-divider" style={{ top: 'var(--table-cell-py)', bottom: 'var(--table-cell-py)' }} aria-hidden />}
+        {/* Header divider — 同時擔任 column resize handle(2026-05-06 v11):
+            - 視覺:1px line `bg-divider` 永遠 visible(顯示 grid line)
+            - Hot zone:absolute padding 4px 兩側,讓 mouse 容易 hit(invisible)
+            - Hover:`bg-border-hover` 顏色加深(對齊 DS 一致語言「hover 永遠是顏色變化不加粗」)
+            - Active(drag 中):`bg-primary` 信號 user 正在 resize
+            - cursor: col-resize(可 resize 時)/ default(system column 或 enableColumnResize=false)
+            - System columns 不啟動 resize listener(永遠 fixed)
+            - role="separator" + aria-orientation="vertical" 對齊 WAI-ARIA */}
+        {showDivider && (() => {
+          const colId = header.column.id
+          const isResizable = enableColumnResize && !isSystemColumn(colId)
+          const isResizing = header.column.getIsResizing?.()
+          return (
+            <span
+              role={isResizable ? 'separator' : undefined}
+              aria-orientation={isResizable ? 'vertical' : undefined}
+              aria-label={isResizable ? '拖曳調整欄寬' : undefined}
+              className={cn(
+                'group/resize absolute top-0 bottom-0 right-0 -mr-[3px] w-[7px] flex justify-end',
+                isResizable && 'cursor-col-resize select-none',
+              )}
+              onMouseDown={isResizable ? header.getResizeHandler?.() : undefined}
+              onTouchStart={isResizable ? header.getResizeHandler?.() : undefined}
+            >
+              <span
+                aria-hidden
+                className={cn(
+                  'w-px transition-colors',
+                  isResizing
+                    ? 'bg-primary'
+                    : isResizable
+                      ? 'bg-divider group-hover/resize:bg-[var(--border-hover)]'
+                      : 'bg-divider',
+                )}
+                style={{ marginTop: 'var(--table-cell-py)', marginBottom: 'var(--table-cell-py)' }}
+              />
+            </span>
+          )
+        })()}
       </div>
     )
   }
@@ -1509,29 +1644,50 @@ function DataTableInner<TData>(
   // while dragging as the virtualized container is scrolled.」(GitHub #1674 / docs/api-documentation/draggable/drag-overlay)
   const [dragOverlayHtml, setDragOverlayHtml] = React.useState<string | null>(null)
   const [dragOverlayWidth, setDragOverlayWidth] = React.useState<number | null>(null)
-  const handleDragStart = React.useCallback((e: { active: { id: string | number } }) => {
+  // 2026-05-06 v11:column reorder 共用 drag overlay state — `dragType` 區分 row vs column
+  const [dragType, setDragType] = React.useState<'row' | 'column' | null>(null)
+  const [, setActiveDragColId] = React.useState<string | null>(null)
+  const handleDragStart = React.useCallback((e: { active: { id: string | number; data: { current?: { type?: 'row' | 'column'; columnId?: string } } } }) => {
     const id = String(e.active.id)
-    setActiveDragId(id)
+    const type = e.active.data?.current?.type ?? 'row'
+    setDragType(type)
     setInvalidDropActive(false)
-    // Snapshot source row visual:用第一個 region(primary,通常 center)的 row DOM
-    // (對齊 SortableRowProvider role='primary')。clone outerHTML + strip 動態 attributes。
-    const rowEl = document.querySelector<HTMLElement>(`[role="row"][data-row-index] [data-sortable-row-id="${id}"]`)
-      ?? document.querySelector<HTMLElement>(`[role="row"][data-sortable-row-id="${id}"]`)
-    if (rowEl) {
-      const clone = rowEl.cloneNode(true) as HTMLElement
-      // Strip transform / position attributes inherited from virtualizer / sortable
-      clone.style.position = 'static'
-      clone.style.transform = 'none'
-      clone.style.transition = 'none'
-      clone.style.opacity = '1'
-      clone.style.zIndex = ''
-      clone.style.width = `${rowEl.offsetWidth}px`
-      clone.removeAttribute('data-row-index')
-      clone.removeAttribute('aria-rowindex')
-      // Strip 拖曳手把 portal target(避免 nested handle 重疊)
-      clone.querySelectorAll('[data-drag-handle-portal]').forEach(n => n.remove())
-      setDragOverlayHtml(clone.outerHTML)
-      setDragOverlayWidth(rowEl.offsetWidth)
+    if (type === 'column') {
+      // Column drag:snapshot header cell visual,strip transform/inline-styles
+      const colId = e.active.data?.current?.columnId ?? id
+      setActiveDragColId(colId)
+      const headerEl = document.querySelector<HTMLElement>(`[role="columnheader"][data-column-id="${colId}"]`)
+      if (headerEl) {
+        const clone = headerEl.cloneNode(true) as HTMLElement
+        clone.style.position = 'static'
+        clone.style.transform = 'none'
+        clone.style.transition = 'none'
+        clone.style.opacity = '1'
+        clone.style.zIndex = ''
+        clone.style.width = `${headerEl.offsetWidth}px`
+        // Strip resize handle clone(避免重複疊在 overlay 上)
+        clone.querySelectorAll('[role="separator"][aria-orientation="vertical"]').forEach(n => n.remove())
+        setDragOverlayHtml(clone.outerHTML)
+        setDragOverlayWidth(headerEl.offsetWidth)
+      }
+    } else {
+      setActiveDragId(id)
+      const rowEl = document.querySelector<HTMLElement>(`[role="row"][data-row-index] [data-sortable-row-id="${id}"]`)
+        ?? document.querySelector<HTMLElement>(`[role="row"][data-sortable-row-id="${id}"]`)
+      if (rowEl) {
+        const clone = rowEl.cloneNode(true) as HTMLElement
+        clone.style.position = 'static'
+        clone.style.transform = 'none'
+        clone.style.transition = 'none'
+        clone.style.opacity = '1'
+        clone.style.zIndex = ''
+        clone.style.width = `${rowEl.offsetWidth}px`
+        clone.removeAttribute('data-row-index')
+        clone.removeAttribute('aria-rowindex')
+        clone.querySelectorAll('[data-drag-handle-portal]').forEach(n => n.remove())
+        setDragOverlayHtml(clone.outerHTML)
+        setDragOverlayWidth(rowEl.offsetWidth)
+      }
     }
   }, [])
 
@@ -1548,33 +1704,57 @@ function DataTableInner<TData>(
 
   const handleDragCancel = React.useCallback(() => {
     setActiveDragId(null)
+    setActiveDragColId(null)
+    setDragType(null)
     setInvalidDropActive(false)
     setDragOverlayHtml(null)
     setDragOverlayWidth(null)
   }, [])
 
+  // Reorderable column ids(non-locked,non-system) — 計算一次 cached
+  const reorderableColumnIds = React.useMemo(() => {
+    return columnsWithSelection
+      .map(c => (c.id as string | undefined) ?? '')
+      .filter(id => id && !isSystemColumn(id))
+      .filter(id => {
+        const def = columnsWithSelection.find(c => c.id === id)
+        return !((def?.meta as { locked?: boolean } | undefined)?.locked)
+      })
+  }, [columnsWithSelection])
+
   const handleDragEnd = React.useCallback((e: DragEndEvent) => {
     const { active, over } = e
+    const type = (active.data?.current as { type?: 'row' | 'column' } | undefined)?.type ?? 'row'
     setActiveDragId(null)
+    setActiveDragColId(null)
+    setDragType(null)
     setInvalidDropActive(false)
     setDragOverlayHtml(null)
     setDragOverlayWidth(null)
     if (!over || active.id === over.id) return
     const sourceId = String(active.id)
     const targetId = String(over.id)
-    // v2:cross-parent 已被 collisionDetection 過濾,但 defensive check
-    if (parentMap.get(sourceId) !== parentMap.get(targetId)) return
 
-    // position 計算需用「same parent siblings」list(對 sub-rows 也適用)
+    if (type === 'column') {
+      // Column reorder:用 reorderableColumnIds 算 before/after
+      const oldIdx = reorderableColumnIds.indexOf(sourceId)
+      const newIdx = reorderableColumnIds.indexOf(targetId)
+      if (oldIdx === -1 || newIdx === -1) return
+      const position: 'before' | 'after' = oldIdx < newIdx ? 'after' : 'before'
+      onColumnReorder?.(sourceId, targetId, position)
+      return
+    }
+
+    // Row reorder(原邏輯)
+    if (parentMap.get(sourceId) !== parentMap.get(targetId)) return
     const parentId = parentMap.get(sourceId)
     const siblings = allRowIds.filter(id => parentMap.get(id) === parentId)
     const oldIdx = siblings.indexOf(sourceId)
     const newIdx = siblings.indexOf(targetId)
     if (oldIdx === -1 || newIdx === -1) return
-    // 對齊 @dnd-kit/sortable arrayMove 慣例:active 從上往下拖到 over 下方 = after
     const position: 'before' | 'after' = oldIdx < newIdx ? 'after' : 'before'
     onRowReorder?.(sourceId, targetId, position)
-  }, [allRowIds, parentMap, onRowReorder])
+  }, [allRowIds, parentMap, onRowReorder, onColumnReorder, reorderableColumnIds])
 
   // v2 fix #5(2026-05-05):custom modifier — 鎖 Y 軸,排除 X 抖動。
   // Row drag 是垂直 reorder 語義(同 parent siblings 上下移),X 軸抖動會觸發水平 transform
@@ -1588,25 +1768,43 @@ function DataTableInner<TData>(
     []
   )
 
+  // 2026-05-06 v11:column reorder collision detection — drag column 時 droppable filter
+  // 只保留 column id(避免 over 觸發 row);drag row 走 sameParent canonical。
+  const dndCollisionDetection: CollisionDetection = React.useCallback((args) => {
+    const activeData = args.active?.data?.current as { type?: 'row' | 'column' } | undefined
+    if (activeData?.type === 'column') {
+      const filtered = args.droppableContainers.filter(c => {
+        const cData = c.data?.current as { type?: 'row' | 'column' } | undefined
+        return cData?.type === 'column' && c.id !== args.active?.id
+      })
+      return closestCenter({ ...args, droppableContainers: filtered })
+    }
+    return sameParentCollisionDetection(args)
+  }, [sameParentCollisionDetection])
+
   const wrapWithDnd = (node: React.ReactNode): React.ReactNode => {
-    if (!enableRowDrag) return node
+    if (!enableRowDrag && !enableColumnReorder) return node
     return (
       <DndContext
         sensors={dndSensors}
-        collisionDetection={sameParentCollisionDetection}
-        modifiers={[restrictToVerticalAxis]}
+        collisionDetection={dndCollisionDetection}
+        // Column reorder 走水平,不適用 verticalAxis modifier;只 row drag 用
+        modifiers={dragType === 'column' ? [] : [restrictToVerticalAxis]}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragCancel={handleDragCancel}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={allRowIds} strategy={verticalListSortingStrategy}>
-          {node}
+        {/* 兩個 SortableContext 並列(非 nested):dnd-kit 允許單 DnDContext 內多 SortableContext,
+            useSortable 透過 enclosing context 找 items。Row drag = vertical strategy / column reorder
+            = horizontal strategy。Active item 透過 data.type 區分。 */}
+        <SortableContext items={enableColumnReorder ? reorderableColumnIds : []} strategy={horizontalListSortingStrategy}>
+          <SortableContext items={enableRowDrag ? allRowIds : []} strategy={verticalListSortingStrategy}>
+            {node}
+          </SortableContext>
         </SortableContext>
-        {/* 2026-05-06 v10:DragOverlay portal — drag-active source row 視覺從原 DOM 解耦,
-            virtual scroll source row unmount 也不影響(dnd-kit canonical for virtualized lists)。
-            cloned outerHTML 走 dangerouslySetInnerHTML(static visual,no React handlers needed
-            in overlay layer)。pointer-events-none 防 drag 中誤觸 inner control。 */}
+        {/* DragOverlay portal — row 跟 column 都用同一個 overlay state(dragOverlayHtml /
+            dragOverlayWidth),onDragStart 依 type 截不同 source DOM 寫入 state。 */}
         <DragOverlay dropAnimation={null}>
           {dragOverlayHtml ? (
             <div

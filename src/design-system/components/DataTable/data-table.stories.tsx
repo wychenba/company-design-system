@@ -208,6 +208,38 @@ export const NumberAlignment: Story = {
   ),
 }
 
+/* ── Column resize(2026-05-06 v11):table 層級開關 + handle hover 變色 ── */
+export const ColumnResize: Story = {
+  name: '欄寬調整',
+  render: () => {
+    const [widths, setWidths] = React.useState<Record<string, number>>({})
+    return (
+      <div className="flex flex-col gap-3 max-w-5xl">
+        <p className="text-caption text-fg-muted">
+          enableColumnResize=true:所有 data column 可拖 header 右邊分隔線調整寬度。
+          <br />
+          - Hover handle:分隔線從 divider(淡灰)變 border-hover(深灰),cursor: col-resize
+          <br />
+          - 拖動中:分隔線變 primary(藍)
+          <br />
+          - more 選單「自動調整寬度」:scan column 內容 max scrollWidth + buffer 自動 fit
+          <br />
+          - System columns(__select__ 等)永遠 fixed,不在 resize 集合
+          <br />
+          目前 widths:{JSON.stringify(widths)}
+        </p>
+        <DataTable
+          columns={columnsWithPrice}
+          data={sampleData}
+          height="auto"
+          enableColumnResize
+          onColumnResize={(id, w) => setWidths(prev => ({ ...prev, [id]: w }))}
+        />
+      </div>
+    )
+  },
+}
+
 /* ── 行高模式 — autoRowHeight prop(每 row 內容驅動高度) ── */
 export const RowAutoHeightInlineEdit: Story = {
   name: '自動行高 × 內聯編輯(verify display↔edit position)',
@@ -431,11 +463,30 @@ const TAG_OPTIONS = [
   { value: 'review', label: '待審' },
   { value: 'archived', label: '已封存' },
 ]
-const SAMPLE_PEOPLE: Array<{ name: string; avatarUrl: string; description?: string }> = [
-  { name: 'Alice Chen', avatarUrl: 'https://i.pravatar.cc/48?u=alice', description: 'Design' },
-  { name: 'Bob Lin', avatarUrl: 'https://i.pravatar.cc/48?u=bob', description: 'Engineering' },
-  { name: 'Charlie Wu', avatarUrl: 'https://i.pravatar.cc/48?u=charlie', description: 'Product' },
-  { name: 'Diana Huang', avatarUrl: 'https://i.pravatar.cc/48?u=diana', description: 'Marketing' },
+// SAMPLE_PEOPLE 完整 PersonData(2026-05-06 v11):每筆都有 default field values(email/phone/
+// department/location)+ status + statusMessage,讓 NameCard hoverCard 永遠完整顯示一致。
+// 對齊 NameCard always-render canonical(NAMECARD_DEFAULT_FIELD_KEYS SSOT)。
+const SAMPLE_PEOPLE: PersonData[] = [
+  {
+    name: 'Alice Chen', avatarUrl: 'https://i.pravatar.cc/48?u=alice', description: 'Design',
+    email: 'alice.chen@example.com', phone: '+886-2-2700-0001', department: 'Design / APAC', location: 'Taipei',
+    status: 'online', statusMessage: '本週設計評審,週四前 standup 移到 4pm',
+  },
+  {
+    name: 'Bob Lin', avatarUrl: 'https://i.pravatar.cc/48?u=bob', description: 'Engineering',
+    email: 'bob.lin@example.com', phone: '+886-2-2700-0002', department: 'Engineering / Platform', location: 'Taipei',
+    status: 'busy', statusMessage: 'Code review 中,訊息我會晚點回',
+  },
+  {
+    name: 'Charlie Wu', avatarUrl: 'https://i.pravatar.cc/48?u=charlie', description: 'Product',
+    email: 'charlie.wu@example.com', phone: '+852-2700-0003', department: 'Product / Growth', location: 'Hong Kong',
+    status: 'online', statusMessage: '今日 OKR 規劃日,可線上協助',
+  },
+  {
+    name: 'Diana Huang', avatarUrl: 'https://i.pravatar.cc/48?u=diana', description: 'Marketing',
+    email: 'diana.huang@example.com', phone: '+65-6700-0004', department: 'Marketing / Brand', location: 'Singapore',
+    status: 'away', statusMessage: '客戶會議中,週四上午回辦公室',
+  },
 ]
 interface EditableProduct {
   sku: string
@@ -444,8 +495,8 @@ interface EditableProduct {
   category: string
   stock: string
   tags: string[]
-  owner: { name: string; avatarUrl: string; description?: string } | null
-  reviewers: Array<{ name: string; avatarUrl: string; description?: string }>
+  owner: PersonData | null
+  reviewers: PersonData[]
   inStock: boolean
   url: string
   price: number

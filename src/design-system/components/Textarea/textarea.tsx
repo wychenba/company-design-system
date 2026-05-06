@@ -113,27 +113,25 @@ const textareaVariants = cva(
         variant: 'bare',
         className: 'bg-transparent border border-transparent cursor-not-allowed opacity-disabled text-fg-disabled',
       },
-      // naked chrome × mode — cell-as-input substrate(2026-05-05 v9 architectural rewrite)。
-      //   v8 用 outline-2 平行 state ring 跟 Field default border state 對抗 → user 報 Bug
-      //   (focus 樣式丟失 / hover 蓋 focus 變灰 / 線框加粗)。v9 **完全繼承 Field default
-      //   state machine**(border-based 同 token 同 hover/focus/open precedence),只改物理尺寸。
-      //   `!h-full !resize-none`:fill cell box(host cell 控高,user 不該手動 resize)。
-      //   `!rounded-none` 對齊 cell square edge。`!resize-none` 防 user drag handle。
-      //   edit 反向接管 cell padding,display/readonly/disabled 不重複 padding。
-      //   **focus-visible 用 textarea 自身 selector**(其為 focusable element,語意同 Field
-      //   default `focus-within`,DOM 層級不同寫法不同)。
+      // naked chrome × mode — cell-as-input substrate(2026-05-06 v10 outline state machine)。
+      //   v9 用 border state machine,但 token `--border` ≠ grid `--divider` → user 報「邊框跟 grid
+      //   不無縫接軌(只右邊 OK,其他 3 邊 seam)」。v10 統一改 outline state machine,跟 Field
+      //   naked compoundVariant v10 同步(同 token 同 precedence)— rest=outline-divider 跟 grid
+      //   同色 + offset:[-1px] 完美 overlap adjacent grid line。
+      //   focus-visible 用 textarea 自身 selector(其為 focusable element,語意同 Field default
+      //   `focus-within`,DOM 層級不同寫法不同)。
       {
         mode: 'edit',
         variant: 'naked',
         className: [
-          'bg-transparent !rounded-none !h-full !resize-none',
+          'bg-transparent !rounded-none !h-full !resize-none border border-transparent',
           '!px-[var(--table-cell-px)] !py-[var(--table-cell-py)]',
-          'border border-border',
-          'hover:border-border-hover',
-          'focus-visible:border-primary focus-visible:hover:border-primary',
+          'outline outline-1 outline-offset-[-1px] outline-divider',
+          'hover:outline-[var(--border-hover)]',
+          'focus-visible:outline-primary focus-visible:hover:outline-primary',
           // textarea UA stylesheet 預設 line-height: normal(1.2-1.5 不定),會跟 display
           // `<div>` text-body line-height: 1.5(21px @ 14px)不一致 → cell 進 edit 後 height
-          // shift。顯式 leading-normal-content + box-sizing border-box 對齊 div 行為。
+          // shift。顯式 leading 對齊 div 行為。
           '!leading-[1.5]',
         ],
       },
