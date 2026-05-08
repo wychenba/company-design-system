@@ -107,18 +107,21 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 
 **找不到** → 進 `# 遇不確定時的協議`,不自決定。
 
-# Git solo-work canonical(2026-05-08 codified — solo work 不該累積 branch)
+# Git solo-work canonical(SSOT → `.claude/memory/feedback_solo_dev_workflow.md`)
 
-**單 active feature branch + main**;PR merge 完**立刻**清,不留 stale。
+**1 chat = 1 working branch**;**Netlify preview 是 user gate**;**「push」/「OK」trigger 才 merge main**。
 
 | 步驟 | 動作 |
 |------|------|
-| 1 Local main 對齊 | `git fetch origin && git checkout main && git reset --hard origin/main`(sandbox 累積的 unpushed 都是 stop-hook / sync-memory 殘留可棄)|
-| 2 砍 local feature branch | `git branch -d <feature>`(已 merge 的 lowercase `-d` 安全) |
-| 3 砍 remote feature branch | `git push origin --delete <feature>` ;sandbox proxy HTTP 403 攔 → 提醒 user **GitHub UI 手動刪** |
-| 4 Session start 健檢 | `git branch -a` 應只有 `main` + 0-1 active feature(本 session 的);> 1 active feature → 立刻清 |
+| 1 Edit | AI 改 code |
+| 2 Commit + push working branch | 自動觸發 Netlify per-branch preview |
+| 3 告訴 user 主要 change(or preview URL)| 讓 user 知道看什麼 |
+| 4 等 user trigger | **「push / OK / 好 / 合 main」** → step 5;**「改 X / 不對 / 等等」** → 繼續 step 1 |
+| 5 Squash merge to main | 不開 PR(可 GitHub API squash-merge OR fast-forward)|
+| 6 砍 remote branch | `git push origin --delete <branch>` ;sandbox HTTP 403 → 提醒 user GitHub UI 手動 |
+| 7 Local 對齊 | `git checkout main && git fetch && git reset --hard origin/main && git branch -d <branch>` |
 
-**禁止**:留 merged 但 remote 未刪的 branch / local main 跟 origin/main divergent / 並行多 active feature 不收斂。Solo work = 1-active 法則,違反 = governance bug。
+**禁止**:開 PR / AI 自決 push main / 同 chat 開多 branch / 留 stale 不刪 / 「下個 session 處理」deferred 措辭。完整禁忌 / Trigger phrase / 反 pattern 詳 SSOT memory file。
 
 # 命名與語言一致性
 
