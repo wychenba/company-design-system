@@ -469,3 +469,15 @@ export const ColorMatrix: Story = {
     </div>
   ),
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `dialog.spec.md` 「A11y 預設」段。摘要:\n\nRadix Dialog 自動處理：\n\n-   Modal 語意  ： role=\"dialog\"  +  aria-modal=\"true\" \n-   標題綁定  ： <DialogTitle>  自動成為  aria-labelledby  指向對象，screen reader 開啟時讀出標題\n-   Focus trap  ：焦點鎖在 Dialog 內，Tab 循環不逃出\n-   Esc 關閉  ：按 Esc 自動關閉\n-   Focus return  ：關閉時焦點返回 trigger 元素\n-   Overlay click  ：點擊 overlay 關閉（可透過  onPointerDownOutside  阻止）\n\nConsumer 必須保留  <DialogTitle> ——即使視覺不顯示，也要用  VisuallyHidden  包裹提供給 screen reader。"}</p>
+    </div>
+  ),
+}

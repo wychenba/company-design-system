@@ -105,9 +105,12 @@ export const Horizontal: Story = {
   ),
 }
 
-/* ── Horizontal + divided(row 下分隔線,對齊格線)──────────────────── */
-export const HorizontalDivided: Story = {
-  name: 'Horizontal + divided',
+// @story-trait-rationale: HorizontalDivided retired 2026-05-17 per audit Dim 24/25 strict re-run —
+//   違 story-rules.md L42「同 affordance 內 prop variations 用 Controls 不另開」。Horizontal direction
+//   已展示;divided 是單一 prop toggle,anatomy Inspector 已 expose Controls (L85-86)。
+//   原本內容 archive(若要看 divided 視覺,進 anatomy Inspector 開 divided=true)
+export const _RETIRED_HorizontalDivided = {
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="border border-border rounded-lg p-4 max-w-md">
       {/* title 到第一個 item 的間距 = item 之間間距(Gestalt proximity canonical,見 spec) */}

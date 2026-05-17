@@ -16,6 +16,23 @@
 
 `color/` / `typography/` / `uiSize/` / `layoutSpace/` / `density/` / `elevation/` / `radius/` / `opacity/`
 
+## Consumer scope:public vs internal token(2026-05-17 codified)
+
+| Token folder | Scope | Consumer 範例 |
+|---|---|---|
+| `color/` / `typography/` / `radius/` / `elevation/` / `opacity/` / `layoutSpace/` / `density/` | **Public** — consumer-layer(`src/app` / `src/explorations`)直接消費 | UI 開發者寫 `text-body` / `bg-primary` / `--layout-space-loose` 等 |
+| `uiSize/`(`--field-height-*` / `--tab-height-*` / `--table-row-*` / `--tree-indent-*`)| **Internal primitive** — DS 內部 component 消費,consumer 不直接用 | Button / Input / Tabs / DataTable / TreeView 等 primitive 內部消費;consumer 用 `<Button size="sm">` 不用 `h-[var(--field-height-sm)]` |
+
+**Internal token 規則**(`uiSize/` 適用):
+- **不必補 Storybook stories**(consumer 不直接看;審查 grep 結果:`src/app` + `src/explorations` 0 個檔案直接消費 uiSize token,2026-05-17 verified)
+- 但仍有 `.spec.md` codify family / 命名 / 派生公式
+- 出現在 consumer-layer code = anti-pattern(該用 component prop 不該 raw token)
+
+**Public token 規則**:
+- 必補 Storybook stories(色票 / 字級 / 間距對照展示)
+- consumer 可直接消費 utility(`text-body` / `gap-[var(--layout-space-loose)]` 等)
+- 2026-05-17 ship:opacity / layoutSpace 補齊 stories(原本只 spec.md + css 沒展示頁)
+
 ## 這裡**不收**(反例)
 
 | 疑似要放這但其實不是 | 實際應去 | 為什麼 |

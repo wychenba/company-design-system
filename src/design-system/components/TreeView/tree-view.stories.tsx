@@ -217,7 +217,7 @@ const INITIAL_TREE: DemoNode[] = [
 ]
 
 export const DragAndDrop: Story = {
-  name: 'Drag & Drop',
+  name: '拖曳重排',
   render: () => {
     const [tree, setTree] = React.useState(INITIAL_TREE)
     const [log, setLog] = React.useState<string[]>([])

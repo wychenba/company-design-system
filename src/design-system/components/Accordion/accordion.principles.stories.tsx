@@ -65,7 +65,7 @@ export const UsageGuidance: Story = {
     <div>
       <Rule
         title="何時用 — 真實業務場景"
-        note="適合 Accordion 的場景(點擊跳轉「展示」頁範例);判斷不確定時對照 spec.md「何時用 / 何時不用」段。"
+        note="Accordion 適合「多個獨立主題、使用者依興趣或當下需要展開單一段」的內容(非互斥可同時展開,Radix Accordion type='multiple');每段內容 self-contained,不展開不影響上下脈絡。對齊 Material 3 Expansion panel / Polaris Disclosure 共識。"
       >
         <ul className="space-y-1">
           <li>

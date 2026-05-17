@@ -1,0 +1,44 @@
+
+══ Bug A: Multi-select stack visible-count drift ══
+  [A1 180px] {"triggerWidth":178,"tagAreaWidth":130,"totalAvatarWrappers":4,"visibleAvatarCount":4,"overflowChipText":null,"overflowChipHidden":true}
+  ✓ A1 length=4 at 130px → visible=4 — formula expected=4, +N=hidden
+  [A2 100px] {"triggerWidth":98,"tagAreaWidth":50,"totalAvatarWrappers":4,"visibleAvatarCount":1,"overflowChipText":"+3","overflowChipHidden":false}
+  ✓ A2 length=4 at narrow 50px → visible=1 — formula expected=1, +N=+3
+  [A3 60px] {"triggerWidth":58,"tagAreaWidth":10,"totalAvatarWrappers":4,"visibleAvatarCount":0,"overflowChipText":"+4","overflowChipHidden":false}
+  ✓ A3 length=4 at very narrow 10px → visible=0 — formula expected=0, +N=+4
+
+══ Bug B: Single picker placeholder ellipsis ══
+  {
+  "overlays": [
+    {
+      "outer": {
+        "text": "Alice Chen",
+        "scrollWidth": 50,
+        "clientWidth": 50,
+        "display": "flex",
+        "overflow": "visible",
+        "textOverflow": "clip",
+        "whiteSpace": "normal",
+        "position": "absolute"
+      },
+      "inner": {
+        "text": "Alice Chen",
+        "scrollWidth": 69,
+        "clientWidth": 50,
+        "display": "block",
+        "overflow": "hidden",
+        "textOverflow": "ellipsis",
+        "whiteSpace": "nowrap"
+      }
+    }
+  ]
+}
+  ✓ B1 inner truncate span fires ellipsis with correct styles
+
+════════════════════════════════════════════════════════════
+Results: 4 PASS / 0 FAIL
+════════════════════════════════════════════════════════════
+  ✓ A1 length=4 at 130px → visible=4 — formula expected=4, +N=hidden
+  ✓ A2 length=4 at narrow 50px → visible=1 — formula expected=1, +N=+3
+  ✓ A3 length=4 at very narrow 10px → visible=0 — formula expected=0, +N=+4
+  ✓ B1 inner truncate span fires ellipsis with correct styles

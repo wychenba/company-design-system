@@ -683,3 +683,15 @@ export const StateBehavior = {
     </div>
   ),
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `avatar.spec.md` 「A11y 預設」段。摘要:\n\n-    alt  必傳  :即使有  src , alt  是 image fallback / SR 訊號雙重來源。Person avatar  alt  應含 name + presence(例  \"Alan Chen (online)\" ),entity avatar 用品牌 / 專案名,純裝飾(極罕見)用空字串  alt=\"\" ( aria-hidden )。\n-   無  alt  時 fallback  :image 模式自動降級 initials / icon;一律不靜默渲染無 SR 標的元素。\n-   Status dot SR 處理  :status dot 內部 span  aria-hidden (presence 訊號整合進 parent  alt ),避免  role=\"status\"  live region 在 member list 造成 SR 洪水(詳「"}</p>
+    </div>
+  ),
+}

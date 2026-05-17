@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/react'
-import { User, Building2 } from 'lucide-react'
+import { Building2 } from 'lucide-react'
 import { Avatar } from './avatar'
 import { MenuItem } from '@/design-system/components/Menu/menu-item'
 
@@ -40,94 +40,10 @@ export const Modes = {
   ),
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   2. 形狀
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-export const Shapes = {
-  name: '形狀',
-  render: () => {
-    const sizes = [24, 32, 40]
-    return (
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-1">
-          <h3 className="text-h6 font-semibold text-foreground">形狀</h3>
-          <p className="text-caption text-fg-muted max-w-[720px]">
-            circle 用於人物，square 用於實體（專案、組織、App）。判斷標準：「代表一個人，還是一個東西？」
-          </p>
-        </div>
-        <div className="flex gap-10">
-          <div className="flex flex-col gap-3">
-            <span className="text-caption font-medium text-fg-secondary">circle（預設）— 人物</span>
-            <div className="flex items-end gap-4">
-              {sizes.map((s) => (
-                <div key={s} className="flex flex-col items-center gap-2">
-                  <Avatar size={s} alt="Alice" color="blue" />
-                  <span className="text-[10px] text-fg-muted font-mono">{s}px</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col gap-3">
-            <span className="text-caption font-medium text-fg-secondary">square — 實體</span>
-            <div className="flex items-end gap-4">
-              {sizes.map((s) => (
-                <div key={s} className="flex flex-col items-center gap-2">
-                  <Avatar size={s} icon={Building2} shape="square" color="purple" />
-                  <span className="text-[10px] text-fg-muted font-mono">{s}px</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  },
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   3. 色彩
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-const ALL_COLORS = ['neutral', 'blue', 'red', 'green', 'yellow', 'purple', 'magenta', 'turquoise', 'indigo'] as const
-
-export const Colors = {
-  name: '色彩',
-  render: () => (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-h6 font-semibold text-foreground">色彩</h3>
-        <p className="text-caption text-fg-muted max-w-[720px]">
-          兩種變體：subtle（淡底深字）和 solid（深底白字）。Image 模式不顯示背景色。
-        </p>
-      </div>
-      {([false, true] as const).map((isSolid) => (
-        <div key={String(isSolid)} className="flex flex-col gap-4">
-          <span className="text-caption font-semibold text-fg-secondary">{isSolid ? 'solid' : 'subtle（預設）'}</span>
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-4">
-              {ALL_COLORS.map((c) => (
-                <div key={c} className="flex flex-col items-center gap-2">
-                  <Avatar size={32} icon={User} color={c} solid={isSolid} />
-                  <span className="text-[10px] text-fg-muted font-mono">{c}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-4">
-              {ALL_COLORS.map((c, i) => (
-                <div key={c} className="flex flex-col items-center gap-2">
-                  <Avatar size={32} alt={String.fromCharCode(65 + i)} color={c} solid={isSolid} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  ),
-}
-
-/* @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。 */
+/* @story-trait-rationale: Shapes / Colors / AllSizes retired 2026-05-17 per audit Dim 24 —
+ *   anatomy.stories.tsx SizeMatrix(含 circle/square shape axis)+ ColorMatrix(9 hue × subtle/solid)
+ *   已 cover trait grids。展示層保留 typical real-product 情境(Modes / Fallback / Status / Count badge 等),
+ *   避免跟 anatomy trait grid 重複。 */
 
 /* ═══════════════════════════════════════════════════════════════════════════
    5. Fallback 行為

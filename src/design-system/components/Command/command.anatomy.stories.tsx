@@ -91,3 +91,15 @@ export const Overview: Story = {
     </div>
   ),
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `command.spec.md` 「A11y 預設」段。摘要:\n\ncmdk 自動處理：\n\n-   List 語意  ： role=\"listbox\"  +  aria-activedescendant  指向目前 highlight 項\n-   搜尋框  ： role=\"combobox\"  +  aria-expanded  /  aria-controls  指向 list\n-   鍵盤導覽  ：↑ / ↓ 移動 highlight、Enter 選取、Esc 關閉（或清空搜尋）\n-   空狀態  ： <CommandEmpty>  自動帶  role=\"presentation\" ,不干擾 screen reader 的 list 朗讀\n\nConsumer 無需額外處理 a11y,保留 cmdk 原結構 + 使用  <CommandInput>  /  <CommandList>  /  <CommandItem>  即可。"}</p>
+    </div>
+  ),
+}

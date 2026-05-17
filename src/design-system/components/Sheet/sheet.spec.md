@@ -76,6 +76,8 @@ Sheet 的 `SheetHeader` / `SheetBody` / `SheetFooter` 對應 `SurfaceHeader` / `
 
 ## 關閉按鈕
 
+> **跨家族 SSOT pointer**:SheetHeader 屬 **Padding-based overlay header 家族**;border / padding / dismiss size / withTabs 的跨家族視覺契約 SSOT 詳 `patterns/header-canonical/header-canonical.spec.md`。本節僅 codify Sheet 特有 close X canonical。
+
 永遠存在於 SheetHeader 右側(對齊 DialogHeader canonical)。使用 `<Button iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />`,不可移除——使用者永遠需要明確的關閉手段。
 
 **Canonical 來源**:Sheet 是 overlay chrome,corner close X 屬 action group region,必用 Button(非 Inline Action / 非自刻 button)。詳見 `patterns/element-anatomy/inline-action.spec.md`「Dismiss canonical — X close only」+ `patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical」。

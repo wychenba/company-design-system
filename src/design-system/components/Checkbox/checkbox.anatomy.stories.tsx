@@ -612,3 +612,15 @@ export const StateBehavior = {
     </div>
   ),
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 Checkbox 對應 Radix / Material / Polaris a11y 規範。"}</p>
+    </div>
+  ),
+}

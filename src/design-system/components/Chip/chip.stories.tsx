@@ -13,12 +13,6 @@ export default meta
 
 type Story = StoryObj<typeof ChipGroup>
 
-const LANGUAGES = [
-  'JavaScript', 'TypeScript', 'Python', 'Rust', 'Go',
-  'Ruby', 'Java', 'C++', 'Swift', 'Kotlin',
-  'PHP', 'Elixir', 'Haskell', 'Scala', 'Clojure',
-]
-
 // ── Default ──────────────────────────────────────────────────────────────────
 
 export const Default: Story = {
@@ -88,76 +82,6 @@ export const SingleSelection: Story = {
   },
 }
 
-// ── Layout: wrap (default) ──────────────────────────────────────────────────
-
-export const LayoutWrap: Story = {
-  name: '版面換行',
-  render: () => {
-    const [value, setValue] = useState<string[]>(['TypeScript', 'Rust'])
-    return (
-      <div className="max-w-[480px]">
-        <div className="text-caption text-fg-muted mb-2">layout="wrap"（預設）— 塞不下自動換行</div>
-        <ChipGroup type="multiple" layout="wrap" value={value} onValueChange={setValue}>
-          {LANGUAGES.map((lang) => (
-            <Chip key={lang} value={lang}>{lang}</Chip>
-          ))}
-        </ChipGroup>
-      </div>
-    )
-  },
-}
-
-// ── Layout: scroll ──────────────────────────────────────────────────────────
-
-export const LayoutScroll: Story = {
-  name: '版面捲動',
-  render: () => {
-    const [value, setValue] = useState<string[]>(['TypeScript'])
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="text-caption text-fg-muted max-w-xl">
-          <strong>layout="scroll"</strong> — 單行橫向滾動 + 邊緣 fade mask + 左右 scroll arrow buttons。
-          拖拉容器右下角調整寬度，觀察 arrows 依滾動位置出現 / 消失。
-        </div>
-        <div
-          className="resize-x overflow-hidden border border-dashed border-border p-4 min-w-[240px] max-w-full"
-          style={{ width: '480px' }}
-        >
-          <ChipGroup type="multiple" layout="scroll" value={value} onValueChange={setValue}>
-            {LANGUAGES.map((lang) => (
-              <Chip key={lang} value={lang}>{lang}</Chip>
-            ))}
-          </ChipGroup>
-        </div>
-      </div>
-    )
-  },
-}
-
-// ── Layout: menu ────────────────────────────────────────────────────────────
-
-export const LayoutMenu: Story = {
-  name: '版面選單',
-  render: () => {
-    const [value, setValue] = useState<string[]>(['TypeScript', 'Rust'])
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="text-caption text-fg-muted max-w-xl">
-          <strong>layout="menu"</strong> — 塞不下收進 "⋯" dropdown，menu items 透過 ChipGroup 的
-          onValueChange proxy checkbox 狀態（因此 menu 模式必須 controlled）。
-          拖拉容器右下角調整寬度，觀察 chips 即時進 / 出 dropdown。
-        </div>
-        <div
-          className="resize-x overflow-hidden border border-dashed border-border p-4 min-w-[240px] max-w-full"
-          style={{ width: '480px' }}
-        >
-          <ChipGroup type="multiple" layout="menu" value={value} onValueChange={setValue}>
-            {LANGUAGES.map((lang) => (
-              <Chip key={lang} value={lang}>{lang}</Chip>
-            ))}
-          </ChipGroup>
-        </div>
-      </div>
-    )
-  },
-}
+// @story-trait-rationale: LayoutWrap / LayoutScroll / LayoutMenu retired 2026-05-17 per audit Dim 24 —
+//   anatomy.stories.tsx LayoutMatrix(3 layout values side-by-side)+ principles.stories.tsx LayoutRule
+//   已 cover layout 機制比較與業務情境。展示層保留 typical 情境(Default / WithLeftIcon / Removable 等)。

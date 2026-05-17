@@ -1,0 +1,2183 @@
+OpenAI Codex v0.128.0 (research preview)
+--------
+workdir: /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+model: gpt-5.5
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: none
+reasoning summaries: none
+session id: 019e2f05-90b6-79e1-967c-f27e550c83f7
+--------
+user
+# Codex Round 5 — race fix root cause confirmation + DS-wide similar pattern audit(M31 真辯論)
+
+## User verbatim 2026-05-16(round 5)
+
+> 「你跟 codex 確認你目前的解法是否真的解決 root cause 且其他相關的問題都有被解決?
+>  然後你一定有辦法自己驗證,請你自己想辦法」
+
+## Layer A 本 round 已修(commit `dd0f96ba`)
+
+`combobox.tsx:60-130` `useOverflowCount`:
+1. `useEffect` → `useLayoutEffect`(tighter sync timing after commit before paint)
+2. Capture rAF IDs(`rafId1` / `rafId2`)
+3. `scheduleCalc` 排新 rAF 前 cancel in-flight
+4. Cleanup function cancel pending rAFs(原 L123 漏 cancel 為 race 根因)
+
+Layer A hypothesis:
+- Path A(逐個 click 滿 6):每 step length 變 → useLayoutEffect re-fire → override 寫 `el.hidden`
+- Path B(length 6→0→6):length=0 走 internal calc 排 rAF;length=6 後 stale rAF fire 覆寫 override
+- **Race close**:cleanup 取消 rAF + useLayoutEffect 更早跑 → 不留 race window
+
+## Codex Round 5 任務
+
+### Q1 — Verify race hypothesis 跟 fix completeness
+
+請 codex 獨立 grep `combobox.tsx:60-130` 新 useLayoutEffect 實作,verify:
+1. **Race hypothesis 正確嗎?** 拆解 step-by-step React render lifecycle + rAF microtask ordering,
+   驗證 path B 是否真會發生 stale rAF overwrite。如不同意,counter-propose root cause。
+2. **fix completeness**:
+   - useEffect → useLayoutEffect 是否引入新問題?(e.g. 沒 paint flicker / sync 過多 layout reads)
+   - rAF cancel 兩 IDs 夠不夠?scheduleCalc 內 cancel in-flight 是否 sound?
+   - 還有沒有別的時序漏洞(deps mismatch / 多 component instance 共用 ref)?
+3. **edge case**:
+   - length=1 fast-path early-return 跳過 measurement,override=undefined 時是否一致行為?
+   - totalCount=0 early-return 同樣問題?
+
+### Q2 — DS-wide similar pattern audit(user verbatim「其他相關的問題都有被解決」)
+
+請 codex grep DS-wide 找 `useEffect` + `requestAnimationFrame` without capture/cancel pattern:
+```bash
+rg -n "useEffect.*requestAnimationFrame|requestAnimationFrame.*useEffect" src/design-system
+rg -n "requestAnimationFrame\(" src/design-system --multiline
+```
+
+對每個 hit 判:
+- 有沒有 rAF ID capture?
+- cleanup 有沒有 cancel?
+- 跟 React state update 有沒有 race?
+
+特別 check:
+- `MultiPersonDisplay` person-display.tsx `useLayoutEffect` 內 measurement(已用 useLayoutEffect 但有沒有 rAF/observer leak)
+- `useOverflowCount` 周邊 helper / cleanup
+- `DataTable` virtualized scroll observers
+- 任何 measurement-driven primitive
+
+### Q3 — Self-verify mechanism
+
+Layer A 跑 Playwright force-click 模擬 path A(逐個 click)被 Radix popover 攔。
+Codex propose:
+- 用什麼方式可精確重現 user path A(逐個 click)vs path B(全選→取消→全選)?
+- 是否可直接 DOM dispatchEvent / React state injection?
+- 還是該寫 controlled test story 暴露 setter on window?
+
+## 限制
+
+- **不 ship code**;Codex Round 5 純 verify + propose
+- Cite source(file:line + 引文)
+- 如 fix 不完整 → 明示 missing piece
+- 如 race hypothesis 錯 → 明示 alternative root cause
+
+## Output 3 sections
+
+1. **Q1 race hypothesis + fix completeness verdict**
+2. **Q2 DS-wide similar pattern grep + audit table**
+3. **Q3 self-verify mechanism propose**
+
+codex
+I’ll verify this from the checked-out code rather than the summary: first I’m reading the current combobox implementation and then I’ll run the DS-wide rAF grep patterns the prompt specified.
+exec
+/bin/zsh -lc "nl -ba src/design-system/combobox.tsx | sed -n '50,145p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+nl: src/design-system/combobox.tsx: No such file or directory
+
+exec
+/bin/zsh -lc "rg -n \"requestAnimationFrame\\(\" src/design-system --multiline" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+exec
+/bin/zsh -lc 'rg -n "MultiPersonDisplay|useLayoutEffect|ResizeObserver|IntersectionObserver|MutationObserver|virtual|requestAnimationFrame|cancelAnimationFrame" src/design-system' in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+exec
+/bin/zsh -lc 'rg -n "useEffect.*requestAnimationFrame|requestAnimationFrame.*useEffect" src/design-system' in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+src/design-system/hooks/use-overflow-items.ts:157: *   requestAnimationFrame(() => {
+src/design-system/components/DataTable/data-table-interaction-layer.tsx:165:      rafId = requestAnimationFrame(() => {
+src/design-system/components/FileViewer/image-renderer.tsx:107:    requestAnimationFrame(() => {
+src/design-system/components/FileViewer/image-renderer.tsx:122:      rafId = requestAnimationFrame(() => {
+src/design-system/components/LinkInput/link-input.tsx:165:      requestAnimationFrame(() => inputRef.current?.focus())
+src/design-system/components/Breadcrumb/breadcrumb.tsx:51:    const raf = requestAnimationFrame(check)
+src/design-system/components/DataTable/data-table.tsx:619:    const onScroll = () => requestAnimationFrame(update)
+src/design-system/components/DataTable/data-table.tsx:1087:      rafId = requestAnimationFrame(() => {
+src/design-system/components/OverflowIndicator/overflow-indicator.tsx:42:    requestAnimationFrame(() => {
+src/design-system/components/Tabs/tabs.tsx:272:      requestAnimationFrame(() => {
+src/design-system/components/Combobox/combobox.tsx:133:      rafId1 = requestAnimationFrame(() => {
+src/design-system/components/Combobox/combobox.tsx:135:        rafId2 = requestAnimationFrame(() => {
+src/design-system/components/Chip/chip.tsx:275:      requestAnimationFrame(() => {
+
+ exited 1 in 0ms:
+ succeeded in 0ms:
+src/design-system/hooks/use-overflow-items.ts:82:    const ro = new ResizeObserver(update)
+src/design-system/hooks/use-overflow-items.ts:85:    const mo = new MutationObserver(update)
+src/design-system/hooks/use-overflow-items.ts:143: *   - ResizeObserver: 容器寬度變化 / item 尺寸變化
+src/design-system/hooks/use-overflow-items.ts:157: *   requestAnimationFrame(() => {
+src/design-system/hooks/use-overflow-items.ts:231:    const ro = new ResizeObserver(compute)
+src/design-system/lib/drag-visual.ts:189: * 到 ghost「跟 source 不一樣」(Bug B)。virtualized + 無 pinning 下亦可能因 region 多
+src/design-system/components/DataTable/data-table-interaction-layer.tsx:115: * Notion sticky-cell virtualizer mask。
+src/design-system/components/DataTable/data-table-interaction-layer.tsx:150: *   3. ResizeObserver on container(column resize / table dimension 變)
+src/design-system/components/DataTable/data-table-interaction-layer.tsx:165:      rafId = requestAnimationFrame(() => {
+src/design-system/components/DataTable/data-table-interaction-layer.tsx:173:    let ro: ResizeObserver | null = null
+src/design-system/components/DataTable/data-table-interaction-layer.tsx:174:    if (container && typeof ResizeObserver !== 'undefined') {
+src/design-system/components/DataTable/data-table-interaction-layer.tsx:175:      ro = new ResizeObserver(force)
+src/design-system/components/DataTable/data-table-interaction-layer.tsx:182:      if (rafId !== null) cancelAnimationFrame(rafId)
+src/design-system/components/DataTable/data-table-interaction-layer.tsx:242:  // window scroll(capture)+ resize + ResizeObserver(container)→ rAF coalesced re-render → rect 重算
+src/design-system/components/DataTable/data-table-interaction-layer.tsx:421: * Notion sticky-cell virtualizer mask。
+src/design-system/components/DataTable/data-table.principles.stories.tsx:222:          note="資料量小,全渲染比 virtualizer 簡單。沒有固定高度,table 自然撐開,頁面捲動即可"
+src/design-system/components/DataTable/data-table.principles.stories.tsx:229:          title="固定 height 數字 — 大量資料(> 100 筆),啟用 virtualization"
+src/design-system/components/DataTable/data-table.principles.stories.tsx:233:          <Label>↑ 500 筆資料,固定 400px 高度 → virtualizer 只渲染畫面中的 ~20 rows</Label>
+src/design-system/components/DataTable/data-table.principles.stories.tsx:238:          note="全部 DOM 渲染 → 初始 render 慢、滾動 janky、記憶體吃緊。當資料規模會大時用固定 height 啟用 virtualization"
+src/design-system/components/FileViewer/image-renderer.tsx:107:    requestAnimationFrame(() => {
+src/design-system/components/FileViewer/image-renderer.tsx:113:  // rAF debounce:drag window edge 期間 ResizeObserver 連續 fire 數十次,
+src/design-system/components/FileViewer/image-renderer.tsx:120:    const obs = new ResizeObserver(() => {
+src/design-system/components/FileViewer/image-renderer.tsx:121:      if (rafId) cancelAnimationFrame(rafId)
+src/design-system/components/FileViewer/image-renderer.tsx:122:      rafId = requestAnimationFrame(() => {
+src/design-system/components/FileViewer/image-renderer.tsx:134:      if (rafId) cancelAnimationFrame(rafId)
+src/design-system/components/FileViewer/image-renderer.tsx:172:    lastFitModeRef.current = fitRequest.fit  // 記 fit mode 給 ResizeObserver 用
+src/design-system/components/DataTable/cell-registry.tsx:67:  /** Per-keystroke draft propagation(2026-05-10 Phase 7 D.3 portal Field virtualizer unmount preserve draft):
+src/design-system/components/DataTable/cell-registry.tsx:69:   *  data-table.tsx)持有 user 編輯中字。Cell DOM unmount(virtualizer scroll out)時 draft 在
+src/design-system/components/DataTable/cell-registry.tsx:495: *  subcomponents」/ Glide Data Grid「DOM virtualization 加解掛 = bottleneck」。 */
+src/design-system/components/DataTable/data-table.stories.tsx:1142:            回 flex flow 自然推 table。Q7 mount-time growth 真因 = virtualizer estimateRowHeight ≠ token,已在 DataTable 內修(estimate size-aware) */}
+src/design-system/components/DataTable/data-table.stories.tsx:1540:   - 200 列 + 固定高度 → virtualizer 啟用
+src/design-system/components/DataTable/data-table.stories.tsx:1689: *   - 500 rows + virtualization(per fold-in BigData)
+src/design-system/components/DataTable/data-table.stories.tsx:1692: * Play function assertion(virtualization invariant per codex Q-3):500 rows + 固定高 →
+src/design-system/components/DataTable/data-table.stories.tsx:1704:    // 確保 virtualization invariant 仍在 500-row scale 驗證。
+src/design-system/components/DataTable/data-table.stories.tsx:1928:    // 500 rows + height 100% → rendered rows 應 << 500(virtualizer 應只 render visible viewport
+src/design-system/components/DataTable/data-table.stories.tsx:1930:    // rows + overscan padding → 50-70 typical;遠 < 200 → virtualization work。
+src/design-system/components/LinkInput/link-input.tsx:165:      requestAnimationFrame(() => inputRef.current?.focus())
+src/design-system/components/DataTable/data-table.tsx:17:import { useVirtualizer } from '@tanstack/react-virtual'
+src/design-system/components/DataTable/data-table.tsx:311:// Shared ResizeObserver(2026-04-22 D3 perf audit):從 per-cell RO 改為全 DS 共用一個 RO
+src/design-system/components/DataTable/data-table.tsx:315:type RoCallback = (entry: ResizeObserverEntry) => void
+src/design-system/components/DataTable/data-table.tsx:316:let sharedResizeObserver: ResizeObserver | null = null
+src/design-system/components/DataTable/data-table.tsx:319:function getSharedRO(): ResizeObserver {
+src/design-system/components/DataTable/data-table.tsx:320:  if (sharedResizeObserver) return sharedResizeObserver
+src/design-system/components/DataTable/data-table.tsx:321:  sharedResizeObserver = new ResizeObserver((entries) => {
+src/design-system/components/DataTable/data-table.tsx:327:  return sharedResizeObserver
+src/design-system/components/DataTable/data-table.tsx:571: *  - 不佔 column 空間;hover-revealed 透過 row.dataset.hovered MutationObserver 觸發
+src/design-system/components/DataTable/data-table.tsx:590:  React.useLayoutEffect(() => {
+src/design-system/components/DataTable/data-table.tsx:615:    const observer = new MutationObserver(update)
+src/design-system/components/DataTable/data-table.tsx:619:    const onScroll = () => requestAnimationFrame(update)
+src/design-system/components/DataTable/data-table.tsx:773:  // Phase 7 D.3 portal Field virtualizer unmount preserve draft(2026-05-10 per codex Q-B4 verdict):
+src/design-system/components/DataTable/data-table.tsx:774:  // Lifted draft state in DataTable — Cell DOM unmount(virtualizer scroll out)時 draft 不丟,
+src/design-system/components/DataTable/data-table.tsx:997:  // 對齊 AG Grid `suppressVirtualization` / TanStack Table virtualization-when-needed idiom。
+src/design-system/components/DataTable/data-table.tsx:1014:  // ResizeObserver+measureElement 的修正過程被 user 看見 = mount-time growth bug 的真因。
+src/design-system/components/DataTable/data-table.tsx:1018:  // 改用 `<DragOverlay>` portal 把 source row 視覺解耦 — source 即使 unmount(virtual scroll out)
+src/design-system/components/DataTable/data-table.tsx:1021:  // 對齊 dnd-kit GitHub #1674 + drag-overlay docs canonical「virtualized list MUST use DragOverlay」。
+src/design-system/components/DataTable/data-table.tsx:1026:  const virtualizer = useVirtualizer({
+src/design-system/components/DataTable/data-table.tsx:1043:  // 改用 ResizeObserver 算 body avail = outer rect - header rect → set centerBody
+src/design-system/components/DataTable/data-table.tsx:1047:  // 預設 36 ≠ 真實 row height(token md=40 / sm=32 / lg=48),virtualizer initial total = 6×36 = 216,
+src/design-system/components/DataTable/data-table.tsx:1051:  React.useLayoutEffect(() => {
+src/design-system/components/DataTable/data-table.tsx:1087:      rafId = requestAnimationFrame(() => {
+src/design-system/components/DataTable/data-table.tsx:1094:    const obs = new ResizeObserver(scheduleCompute)
+src/design-system/components/DataTable/data-table.tsx:1098:      if (rafId != null) cancelAnimationFrame(rafId)
+src/design-system/components/DataTable/data-table.tsx:1166:  // Header 寬度 → body region 同步（virtual mode 需要明確寬度）
+src/design-system/components/DataTable/data-table.tsx:1173:    const obs = new ResizeObserver(measure)
+src/design-system/components/DataTable/data-table.tsx:1312:  // sync ref + force virtualizer recompute so rangeExtractor 看得到新 active id(M25 chain invariant)
+src/design-system/components/DataTable/data-table.tsx:1315:    if (enableRowDrag && useVirtual) virtualizer.measure()
+src/design-system/components/DataTable/data-table.tsx:1316:  }, [activeDragId, enableRowDrag, useVirtual, virtualizer])
+src/design-system/components/DataTable/data-table.tsx:1998:  // hoist region id Sets 一次,避免 n_rows × n_regions 重建(virtual mode 1000+ rows 場景效益顯著)
+src/design-system/components/DataTable/data-table.tsx:2086:    const rowEl = (row: typeof rows[number], idx: number, opts?: { virtual?: boolean; start?: number; isLast?: boolean }) => {
+src/design-system/components/DataTable/data-table.tsx:2117:            // v2 fix #4(virtual freeze):drag 進行中(activeDragId != null)整個略過 measureElement
+src/design-system/components/DataTable/data-table.tsx:2132:            if (isCenter && opts?.virtual && el && !isThisRowDragging && activeDragId == null) {
+src/design-system/components/DataTable/data-table.tsx:2133:              virtualizer.measureElement(el)
+src/design-system/components/DataTable/data-table.tsx:2137:          data-index={isCenter && opts?.virtual ? idx : undefined}
+src/design-system/components/DataTable/data-table.tsx:2152:            opts?.virtual && 'absolute w-full',
+src/design-system/components/DataTable/data-table.tsx:2164:            ...(opts?.virtual ? { transform: `translateY(${opts.start}px)` } : {}),
+src/design-system/components/DataTable/data-table.tsx:2210:    // AR44 canonical(2026-04-21):virtual / non-virtual 都用 `minWidth: colsWidth` 的 wrapper,
+src/design-system/components/DataTable/data-table.tsx:2213:    // 先前 non-virtual 走 `<>...</>`(無 wrapper),依靠 row 內 cells 自然寬推擠容器,
+src/design-system/components/DataTable/data-table.tsx:2214:    // 跟 virtual 的 `minWidth: containerWidth` 行為不同,造成 story 1 / story 2 看起來水平
+src/design-system/components/DataTable/data-table.tsx:2221:      // wrap virtual body with `<TableScrollProvider isScrolling={virtualizer.isScrolling}>` →
+src/design-system/components/DataTable/data-table.tsx:2226:        <TableScrollProvider isScrolling={virtualizer.isScrolling}>
+src/design-system/components/DataTable/data-table.tsx:2227:          <div style={{ height: virtualizer.getTotalSize(), position: 'relative', minWidth: containerWidth }}>
+src/design-system/components/DataTable/data-table.tsx:2228:            {virtualizer.getVirtualItems().map(vr => rowEl(rows[vr.index], vr.index, { virtual: true, start: vr.start, isLast: vr.index === rows.length - 1 }))}
+src/design-system/components/DataTable/data-table.tsx:2408:          // Phase 7 virtualizer unmount preserve draft:portal Field value 從 lifted editingDraft 取
+src/design-system/components/DataTable/data-table.tsx:2478:                onDraft={setEditingDraft}  // Phase 7:每 keystroke 寫 draft → preserve across virtualizer unmount
+src/design-system/components/DataTable/data-table.tsx:2571:    // **v15.8 fix**(virtualized list dnd-kit droppableRects stale issue):
+src/design-system/components/DataTable/data-table.tsx:2572:    // virtualized rows position 由 virtualizer transform:translateY 動態套,但 dnd-kit
+src/design-system/components/DataTable/data-table.tsx:2609:  // Atlassian / dnd-kit canonical:「If your useDraggable items are within a virtualized list,
+src/design-system/components/DataTable/data-table.tsx:2611:  // while dragging as the virtualized container is scrolled.」(GitHub #1674 / docs/api-documentation/draggable/drag-overlay)
+src/design-system/components/DataTable/data-table.tsx:2802:        // **v15.8 fix**:virtualized rows mount/unmount 期間 droppable rect cache stale →
+src/design-system/components/DataTable/data-table.tsx:2804:        // detection 都 re-measure droppables(SSOT 對齊 dnd-kit virtualized list canonical)。
+src/design-system/components/DataTable/data-table.anatomy.stories.tsx:200:                <tr><Td mono>person</Td><Td mono>PersonDisplay / MultiPersonDisplay</Td><Td>left</Td><Td>指派者、reviewer</Td></tr>
+src/design-system/components/DataTable/data-table.anatomy.stories.tsx:297:    const virtualData = Array.from({ length: 500 }, (_, i) => ({
+src/design-system/components/DataTable/data-table.anatomy.stories.tsx:317:            <DataTable columns={columns} data={virtualData} height="400px" />
+src/design-system/components/DataTable/data-table.spec.md:67:| **L4 資料操作 + Cell 能力** | 進階篩選(本文件 L4 Filter)、inline edit、nested rows、row drag(本文件 L4 段)| ✅ Filter / Inline edit / Nested rows / Row drag v3 完成(Jira canonical + virtualization fix) |
+src/design-system/components/DataTable/data-table.spec.md:115:**Header/body region 寬度同步。** Header region 寬度由內容決定（columns + actions），body region 用 ResizeObserver 量測 header 寬度並同步。
+src/design-system/components/OverflowIndicator/overflow-indicator.tsx:42:    requestAnimationFrame(() => {
+src/design-system/components/Tag/tag.tsx:148:  React.useLayoutEffect(() => {
+src/design-system/components/Tag/tag.tsx:165:    const obs = new ResizeObserver(check)
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:8: *   2. `overflowEl` 不被 ResizeObserver observe,first calc 用 fallback 後不會 recalc
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:10: *   4. **架構違反**:`MultiPersonDisplay` display path 用 canvas-based 算 / Combobox edit path 用 DOM offsetWidth
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:23: * **Why centralize**:M14 mechanical guard against future drift。`MultiPersonDisplay` +
+src/design-system/components/PeoplePicker/person-display.tsx:100:// (c) push-up scroll-defer:當 DataTable virtualizer.isScrolling=true,**完全不 build NameCard**
+src/design-system/components/PeoplePicker/person-display.tsx:161:function MultiPersonDisplay({
+src/design-system/components/PeoplePicker/person-display.tsx:191:  React.useLayoutEffect(() => {
+src/design-system/components/PeoplePicker/person-display.tsx:205:    const ro = new ResizeObserver(calc)
+src/design-system/components/PeoplePicker/person-display.tsx:277:MultiPersonDisplay.displayName = 'MultiPersonDisplay'
+src/design-system/components/PeoplePicker/person-display.tsx:296:// **Why centralize**:Combobox tagRenderer (PeoplePicker stack mode) + MultiPersonDisplay
+src/design-system/components/PeoplePicker/person-display.tsx:358:export { PersonDisplay, MultiPersonDisplay, PersonAvatarTag, buildPersonNameCard, resolvePerson }
+src/design-system/components/PeoplePicker/people-picker.tsx:15:import { PersonDisplay, MultiPersonDisplay, PersonAvatarTag, buildPersonNameCard, resolvePerson, type PersonValue } from './person-display'
+src/design-system/components/PeoplePicker/people-picker.tsx:86://         trigger 內 render `<MultiPersonDisplay>` reuse baseline primitive(SSOT)。
+src/design-system/components/PeoplePicker/people-picker.tsx:186:  // Default(showDisplayEndIcon=false):裸 PersonDisplay / MultiPersonDisplay — backward compat。
+src/design-system/components/PeoplePicker/people-picker.tsx:193:        ? <MultiPersonDisplay value={value as PersonValue[]} size={size} measured />
+src/design-system/components/PeoplePicker/people-picker.tsx:206:              ? <MultiPersonDisplay value={value as PersonValue[]} size={size} measured />
+src/design-system/components/PeoplePicker/people-picker.tsx:230:              ? <MultiPersonDisplay value={value as PersonValue[]} size={size} measured />
+src/design-system/components/PeoplePicker/people-picker.tsx:330:  // measurement。`MultiPersonDisplay`(display path)同 primitive,display + edit 結果一致。
+src/design-system/components/PeoplePicker/people-picker.tsx:335:  // SSOT visible count compute via formula primitive + ResizeObserver
+src/design-system/components/PeoplePicker/people-picker.tsx:338:  React.useLayoutEffect(() => {
+src/design-system/components/PeoplePicker/people-picker.tsx:364:    const ro = new ResizeObserver(calc)
+src/design-system/components/PeoplePicker/people-picker.tsx:368:  // Merge ref:forward to parent + capture for ResizeObserver
+src/design-system/components/PeoplePicker/people-picker.tsx:421:      // mode pass `'circle'`(圓形 avatar-shape,跟 avatar 一樣大)。對齊 MultiPersonDisplay readonly path
+src/design-system/components/PeoplePicker/people-picker.tsx:428:      // Tag with avatar(對齊 display MultiPersonDisplay popover SSOT,user 抓 display vs edit
+src/design-system/components/Command/command.tsx:67: * 捲入 selected ✓。不需 MutationObserver sync。
+src/design-system/components/Command/command.tsx:69: * `cmdk-list-sizer` ResizeObserver 只量 offsetHeight 設 CSS var `--cmdk-list-height`
+src/design-system/components/Chip/chip.tsx:275:      requestAnimationFrame(() => {
+src/design-system/components/Avatar/avatar.tsx:98:    const obs = new MutationObserver(update)
+src/design-system/components/Notice/notice.tsx:144:// Singleton MutationObserver + subscription fan-out(2026-04-22 D3 perf audit):
+src/design-system/components/Notice/notice.tsx:160:  const observer = new MutationObserver(() => {
+src/design-system/components/Tabs/tabs.stories.tsx:91:        觀察 tabs 即時進 / 出 dropdown（ResizeObserver 追蹤容器尺寸）。
+src/design-system/components/Breadcrumb/breadcrumb.tsx:17:// (shared ResizeObserver + scrollWidth > clientWidth → wrap Tooltip)。
+src/design-system/components/Breadcrumb/breadcrumb.tsx:21:type RoCallback = (entry: ResizeObserverEntry) => void
+src/design-system/components/Breadcrumb/breadcrumb.tsx:22:let sharedRO: ResizeObserver | null = null
+src/design-system/components/Breadcrumb/breadcrumb.tsx:24:function getSharedRO(): ResizeObserver {
+src/design-system/components/Breadcrumb/breadcrumb.tsx:26:  sharedRO = new ResizeObserver((entries) => {
+src/design-system/components/Breadcrumb/breadcrumb.tsx:51:    const raf = requestAnimationFrame(check)
+src/design-system/components/Breadcrumb/breadcrumb.tsx:55:      cancelAnimationFrame(raf)
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:785:            <span>2. ResizeObserver 持續監聽容器變化</span>
+src/design-system/components/Tabs/tabs.tsx:272:      requestAnimationFrame(() => {
+src/design-system/components/Breadcrumb/breadcrumb.spec.md:167:- Shared ResizeObserver 偵測 `scrollWidth > clientWidth` → `<Tooltip>` wrap
+src/design-system/components/Combobox/combobox.tsx:64:  // 然後 length=6 + override=N → deps change → cleanup 跑(disconnect ResizeObserver 但
+src/design-system/components/Combobox/combobox.tsx:69:  // 1. useEffect → useLayoutEffect:tighter timing,measurement 在 paint 前 sync
+src/design-system/components/Combobox/combobox.tsx:71:  // 3. scheduleCalc 函式包裝,cancel in-flight rAF 才排新一輪(避免 ResizeObserver
+src/design-system/components/Combobox/combobox.tsx:76:  React.useLayoutEffect(() => {
+src/design-system/components/Combobox/combobox.tsx:124:    // 場景 tag 還 0-width)。Plus observe per-item ResizeObserver — 任何 tag width 變動
+src/design-system/components/Combobox/combobox.tsx:131:      if (rafId1) { cancelAnimationFrame(rafId1); rafId1 = 0 }
+src/design-system/components/Combobox/combobox.tsx:132:      if (rafId2) { cancelAnimationFrame(rafId2); rafId2 = 0 }
+src/design-system/components/Combobox/combobox.tsx:133:      rafId1 = requestAnimationFrame(() => {
+src/design-system/components/Combobox/combobox.tsx:135:        rafId2 = requestAnimationFrame(() => {
+src/design-system/components/Combobox/combobox.tsx:142:    const containerObs = new ResizeObserver(scheduleCalc)
+src/design-system/components/Combobox/combobox.tsx:144:    const itemObs = new ResizeObserver(scheduleCalc)
+src/design-system/components/Combobox/combobox.tsx:149:      if (rafId1) cancelAnimationFrame(rafId1)
+src/design-system/components/Combobox/combobox.tsx:150:      if (rafId2) cancelAnimationFrame(rafId2)
+src/design-system/components/Combobox/combobox.tsx:178:   * (對齊 display MultiPersonDisplay overflow popover Tag avatar SSOT)。
+src/design-system/components/Combobox/combobox.tsx:230:        // 加 z-index per-index — 前 item z 高(對齊 MultiPersonDisplay zIndex: visible.length - i
+src/design-system/components/Combobox/combobox.tsx:336:   * (對齊 display MultiPersonDisplay overflow popover 含 avatar SSOT)。PeoplePicker stack
+src/design-system/components/Combobox/combobox.tsx:460:// `useLayoutEffect` early return → `visibleCountOverride` 永遠 undefined →
+src/design-system/components/Breadcrumb/breadcrumb.stories.tsx:183:          shrink:1。各 item 內 `truncate` + ResizeObserver 偵測 → hover tooltip 顯完整文字
+src/design-system/components/Field/field-controls.spec.md:288:**(a) Selected value renderer**:rich display(avatar+name/icon+label)元件**必**提供 consumer renderer slot,**display/readonly/disabled/edit** 4 mode 共享同一 renderer(禁 edit-only)。`Select.selectedItemRenderer` / `Combobox.tagRenderer`(edit 已接;display path unify deferred 下 cycle)/ PeoplePicker 走 `PersonDisplay`+`MultiPersonDisplay`+`Combobox.tagRenderer`。對齊 MUI Autocomplete `renderValue` / Ant Select `tagRender`+`labelRender`+`optionRender` / MUI DataGrid `renderCell`+`renderEditCell` 共享 params。
+src/design-system/components/Field/field-context.ts:111: * Host(DataTable)在 virtualizer.isScrolling=true 期間 wrap children with `TableScrollProvider`,
+src/design-system/components/Carousel/carousel.spec.md:33:- **Swiper**:獨立 library,功能遠超 DS 需求(3D effects / virtualization / zoom 等);本 DS 刻意**不選 Swiper**,因為 Embla 更輕量、tree-shakable,且本 DS 的 carousel 用途單純(hero banner / product image / testimonial),Swiper 的 feature 90% 不會用到,屬過度工程
+
+codex
+The component lives under `src/design-system/components/Combobox/combobox.tsx`, not the shorter path in the prompt. The initial grep already found several rAF users; I’m narrowing each hit to its local effect/cleanup shape now so the audit can be specific instead of pattern-based guesswork.
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/Combobox/combobox.tsx | sed -n '55,155p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+    55	  gap: number = GAP,  // (2026-05-07 v15.13)stack avatar 模式傳 0
+    56	  visibleCountOverride?: number,  // 2026-05-15 Bug 3 fix:override DOM measurement(PeoplePicker stack 走 formula primitive)
+    57	): { visibleCount: number; ready: boolean } {
+    58	  const [state, setState] = React.useState({ visibleCount: totalCount, ready: !enabled })
+    59	
+    60	  // 2026-05-16 RACE FIX(user 抓「逐個 click 滿 6」vs「取消全選→再全選」same length 不同 visible):
+    61	  //
+    62	  // 原 useEffect + 雙 rAF 沒 capture rAF IDs → cleanup 不 cancel pending rAFs。
+    63	  // Path B(length=6→0→6):length=0 時 override=undefined 走 internal calc 排 rAF,
+    64	  // 然後 length=6 + override=N → deps change → cleanup 跑(disconnect ResizeObserver 但
+    65	  // 不 cancel rAF)→ 新 useEffect 跑 override 寫 el.hidden → 舊 rAF 仍 fire → 跑舊
+    66	  // internal calc → 覆寫 el.hidden 用 internal measurement(不一致於 override formula)。
+    67	  //
+    68	  // Fix:
+    69	  // 1. useEffect → useLayoutEffect:tighter timing,measurement 在 paint 前 sync
+    70	  // 2. Capture rAF IDs,cancel on cleanup
+    71	  // 3. scheduleCalc 函式包裝,cancel in-flight rAF 才排新一輪(避免 ResizeObserver
+    72	  //    re-fire 堆 rAF)
+    73	  //
+    74	  // 對齊 2026-05-14 I3 fix comment「user 抓『全選 vs 逐個勾 result 不同』」 — 當時 fix
+    75	  // 只加 double-rAF 但漏 cancel,本次補完 race close。
+    76	  React.useLayoutEffect(() => {
+    77	    if (!enabled || totalCount === 0) { setState({ visibleCount: totalCount, ready: true }); return }
+    78	    if (visibleCountOverride !== undefined) {
+    79	      for (let i = 0; i < tagEls.current.length; i++) {
+    80	        const el = tagEls.current[i]
+    81	        if (el) el.hidden = i >= visibleCountOverride
+    82	      }
+    83	      const ofEl = overflowEl.current
+    84	      if (ofEl) ofEl.hidden = visibleCountOverride >= totalCount
+    85	      setState({ visibleCount: visibleCountOverride, ready: true }); return
+    86	    }
+    87	    // totalCount=1 fast path:single-tag case 直接 visible 不跑 measurement loop。
+    88	    // (歷史:c90d029 曾移除此 bypass,後復原 — 移除會造成 narrow cell 1-selected 跑 unbounded Tag
+    89	    // measurement 後 visibleCount=0 → 顯 +1 indicator 而非 single tag,違反 PeoplePicker length===1
+    90	    // 走 PersonDisplay SSOT。)
+    91	    if (totalCount === 1) { setState({ visibleCount: 1, ready: true }); return }
+    92	    const container = containerRef.current
+    93	    if (!container) return
+    94	
+    95	    const calc = () => {
+    96	      const cs = getComputedStyle(container)
+    97	      const available = container.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0)
+    98	      for (const el of tagEls.current) if (el) el.hidden = false
+    99	      const ofEl = overflowEl.current
+   100	      if (ofEl) ofEl.hidden = false
+   101	      const overflowW = ofEl?.offsetWidth || 60
+   102	      // **#3 fix(2026-05-04)**:width-check 先於 count++,並處理 i=0 邊界(1 tag 自身就太寬 → 全 hidden 顯 +N)
+   103	      // 之前 bug:greedy `count++` 永遠至少 = 1,1-tag-too-wide case 視覺呈半個 tag clipped + +N(錯)
+   104	      // 修後:1 tag 太寬時 count = 0,全 N tags 走 +N 顯 indicator
+   105	      let used = 0, count = 0
+   106	      for (let i = 0; i < totalCount; i++) {
+   107	        const el = tagEls.current[i]
+   108	        if (!el) continue
+   109	        const w = el.offsetWidth
+   110	        const next = used + (count > 0 ? gap : 0) + w
+   111	        const remaining = totalCount - count - 1
+   112	        // width check FIRST(無 `count > 0` 短路):任何超寬都 break,包含 i=0 case
+   113	        if (remaining > 0 && next + gap + overflowW > available) break
+   114	        if (remaining === 0 && next > available) break
+   115	        used = next; count++
+   116	      }
+   117	      for (let i = 0; i < tagEls.current.length; i++) { const el = tagEls.current[i]; if (el) el.hidden = i >= count }
+   118	      if (ofEl) ofEl.hidden = count >= totalCount
+   119	      setState({ visibleCount: count, ready: true })
+   120	    }
+   121	
+   122	    // 2026-05-14 I3 fix(per codex M31 verdict + user 抓「全選 vs 逐個勾 result 不同」):
+   123	    // double-rAF ensures layout 完成 before measurement(原 single rAF 在 batched render
+   124	    // 場景 tag 還 0-width)。Plus observe per-item ResizeObserver — 任何 tag width 變動
+   125	    // 都 trigger recalc(deterministic regardless of commit order)。
+   126	    //
+   127	    // 2026-05-16 Race close:capture rAF IDs + cancel on cleanup(原版 race I3 沒 close
+   128	    // 完;user 抓 path A 逐個 click vs path B 取消全選再全選 same length 不同 visible)。
+   129	    let rafId1 = 0, rafId2 = 0
+   130	    const scheduleCalc = () => {
+   131	      if (rafId1) { cancelAnimationFrame(rafId1); rafId1 = 0 }
+   132	      if (rafId2) { cancelAnimationFrame(rafId2); rafId2 = 0 }
+   133	      rafId1 = requestAnimationFrame(() => {
+   134	        rafId1 = 0
+   135	        rafId2 = requestAnimationFrame(() => {
+   136	          rafId2 = 0
+   137	          calc()
+   138	        })
+   139	      })
+   140	    }
+   141	    scheduleCalc()
+   142	    const containerObs = new ResizeObserver(scheduleCalc)
+   143	    containerObs.observe(container)
+   144	    const itemObs = new ResizeObserver(scheduleCalc)
+   145	    for (const el of tagEls.current) {
+   146	      if (el) itemObs.observe(el)
+   147	    }
+   148	    return () => {
+   149	      if (rafId1) cancelAnimationFrame(rafId1)
+   150	      if (rafId2) cancelAnimationFrame(rafId2)
+   151	      containerObs.disconnect()
+   152	      itemObs.disconnect()
+   153	    }
+   154	  }, [containerRef, totalCount, enabled, gap, visibleCountOverride])  // 2026-05-15 Bug 3 fix:visibleCountOverride 入 deps,override 改 trigger recalc
+   155	
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/DataTable/data-table-interaction-layer.tsx | sed -n '145,190p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   145	 * user 拍板「所有 overlay 在各種 RWD 和捲動時都能處在正確位置上」)。
+   146	 *
+   147	 * 監聽 3 source(rAF coalesce 避 frame storm):
+   148	 *   1. window scroll(capture mode 抓 nested table body scroll + page scroll)
+   149	 *   2. window resize(viewport size change → cell width 變)
+   150	 *   3. ResizeObserver on container(column resize / table dimension 變)
+   151	 *
+   152	 * 每次事件 fire → setVersion(v+1) → 觸發 layer re-render → rect 用最新 getBoundingClientRect
+   153	 * 重算。getBoundingClientRect 本身永遠 return 當下 viewport-relative coords,沒 stale cache。
+   154	 *
+   155	 * Per codex(brief: codex-brief-rwd-future-2026-05-10):rAF coalesce 不需要 debounce,scroll
+   156	 * 跟到不延遲才對(Glide / AG Grid 同 idiom)。
+   157	 */
+   158	function useReactiveRect(containerRef: React.RefObject<HTMLElement | null>, enabled: boolean) {
+   159	  const [, setVersion] = React.useState(0)
+   160	  React.useEffect(() => {
+   161	    if (!enabled) return
+   162	    let rafId: number | null = null
+   163	    const force = () => {
+   164	      if (rafId !== null) return
+   165	      rafId = requestAnimationFrame(() => {
+   166	        rafId = null
+   167	        setVersion((v) => v + 1)
+   168	      })
+   169	    }
+   170	    window.addEventListener('scroll', force, { capture: true, passive: true })
+   171	    window.addEventListener('resize', force, { passive: true })
+   172	    const container = containerRef.current
+   173	    let ro: ResizeObserver | null = null
+   174	    if (container && typeof ResizeObserver !== 'undefined') {
+   175	      ro = new ResizeObserver(force)
+   176	      ro.observe(container)
+   177	    }
+   178	    return () => {
+   179	      window.removeEventListener('scroll', force, { capture: true } as EventListenerOptions)
+   180	      window.removeEventListener('resize', force)
+   181	      if (ro) ro.disconnect()
+   182	      if (rafId !== null) cancelAnimationFrame(rafId)
+   183	    }
+   184	  }, [enabled, containerRef])
+   185	}
+   186	
+   187	/**
+   188	 * Hover state hook — 監聽 container hover events,track hovered cell id。
+   189	 *
+   190	 * Implementation:event delegation on container(不 per-cell mount listeners),
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/FileViewer/image-renderer.tsx | sed -n '95,140p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+    95	    // 完整可見 + 視覺 symmetric padding。代價是最多 ~1% 的空間餘量,視覺幾乎看不出。
+    96	    return Math.floor(clamped * 100)
+    97	  }, [])
+    98	
+    99	  // Image onLoad → 自動 fit-to-page(世界級開圖預設)
+   100	  const handleImageLoad = React.useCallback(() => {
+   101	    setLoaded(true)
+   102	    const scale = computeFitScale('fit-page')
+   103	    if (scale == null) return
+   104	    const pct = clampToPct(scale)
+   105	    lastFitModeRef.current = 'fit-page'
+   106	    // 等 transform 就緒再更新(避免 initialScale=1 → fit 過程跳兩段)
+   107	    requestAnimationFrame(() => {
+   108	      onZoomChange(pct)
+   109	    })
+   110	  }, [computeFitScale, clampToPct, onZoomChange])
+   111	
+   112	  // Q2 RWD:container resize 時若在 fit mode 重算 — 對齊 Apple Photos / Drive canonical
+   113	  // rAF debounce:drag window edge 期間 ResizeObserver 連續 fire 數十次,
+   114	  // 合併到下一 frame 只觸發一次 → 避免 race / 過多 centerView animation 互相打斷。
+   115	  React.useEffect(() => {
+   116	    if (!loaded) return
+   117	    const container = containerRef.current
+   118	    if (!container) return
+   119	    let rafId = 0
+   120	    const obs = new ResizeObserver(() => {
+   121	      if (rafId) cancelAnimationFrame(rafId)
+   122	      rafId = requestAnimationFrame(() => {
+   123	        rafId = 0
+   124	        const mode = lastFitModeRef.current
+   125	        if (mode === 'manual') return
+   126	        const scale = computeFitScale(mode)
+   127	        if (scale == null) return
+   128	        onZoomChange(clampToPct(scale))
+   129	      })
+   130	    })
+   131	    obs.observe(container)
+   132	    return () => {
+   133	      obs.disconnect()
+   134	      if (rafId) cancelAnimationFrame(rafId)
+   135	    }
+   136	  }, [loaded, computeFitScale, clampToPct, onZoomChange])
+   137	
+   138	  // Q3 雙擊 toggle fit ↔ 100%(對齊 Apple Photos / Preview.app / Imgur / PhotoSwipe canonical)
+   139	  const handleDoubleClick = React.useCallback(() => {
+   140	    if (!loaded) return
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/DataTable/data-table.tsx | sed -n '585,625p' && nl -ba src/design-system/components/DataTable/data-table.tsx | sed -n '1050,1105p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   585	  // 用 useState 觸發 effect re-run(child ref callback 會 fire 在 commit phase,early enough for layout effect)
+   586	  const anchorRef = React.useCallback((node: HTMLSpanElement | null) => {
+   587	    setRowEl((node?.parentElement as HTMLDivElement) ?? null)
+   588	  }, [])
+   589	
+   590	  React.useLayoutEffect(() => {
+   591	    if (!rowEl || !ctx || ctx.role !== 'primary') return
+   592	
+   593	    // Portal target = table outer 的 parent(保持 CSS variable / theme scope 繼承,
+   594	    // 不 portal 到 document.body — body 沒 theme tokens 會使 Button tertiary 變透明)
+   595	    const tableEl = rowEl.closest<HTMLElement>('[data-data-table-outer]')
+   596	    setPortalTarget(tableEl?.parentElement ?? null)
+   597	
+   598	    const update = () => {
+   599	      if (!tableEl) return
+   600	      const rRect = rowEl.getBoundingClientRect()
+   601	      const tRect = tableEl.getBoundingClientRect()
+   602	      // v15.1:drag 期間 source button hide(visible 邏輯已 guard isDragging),
+   603	      // 此處只報「真實 hover」狀態,不疊 isDragging mask。
+   604	      const rowHovered = rowEl.hasAttribute('data-hovered')
+   605	      setPos({
+   606	        top: rRect.top + rRect.height / 2,
+   607	        left: tRect.left, // table outer 左 border line position(viewport coords)
+   608	        rowHovered,
+   609	      })
+   610	    }
+   611	
+   612	    update()
+   613	
+   614	    // Observe row data-hovered changes(cross-region hover delegation 設置 dataset.hovered)
+   615	    const observer = new MutationObserver(update)
+   616	    observer.observe(rowEl, { attributes: true, attributeFilter: ['data-hovered'] })
+   617	
+   618	    // Update on scroll(capture phase 抓所有 scroll container)+ resize
+   619	    const onScroll = () => requestAnimationFrame(update)
+   620	    window.addEventListener('scroll', onScroll, true)
+   621	    window.addEventListener('resize', onScroll)
+   622	
+   623	    return () => {
+   624	      observer.disconnect()
+   625	      window.removeEventListener('scroll', onScroll, true)
+  1050	  const [bodyMaxHeight, setBodyMaxHeight] = React.useState<number | null>(null)
+  1051	  React.useLayoutEffect(() => {
+  1052	    if (!isFillHeight) { setBodyMaxHeight(null); return }
+  1053	    // **R4 真根因 fix(2026-05-09 v2 — codex Q3.6 root cause + Q3.9 reproduce verified)**:
+  1054	    //
+  1055	    // Bug:isFillHeight 時 outer 用 `style={{ maxHeight: height }}`(L1819-1824)沒 explicit height
+  1056	    // → outer.getBoundingClientRect().height 受 children 反向影響(因 outer = children intrinsic,
+  1057	    // children 又被 bodyMaxHeight 限制)→ **circular dependency**。
+  1058	    //
+  1059	    // 表現:viewport / layout 變化時 parent 變(392→672)但 outer 永遠卡(282)→ body 永遠 240,
+  1060	    // 不跟 parent 變大時填滿。Initial mount 過程則看起來像 stepping(parent 從 0 慢慢長,outer 跟著
+  1061	    // 一階一階長)。
+  1062	    //
+  1063	    // 真 fix:**改量 parent slot,不量 outer**。Parent 是 definite height 限制因子,不被 child 反向影響。
+  1064	    //   - rAF coalesce:RO callback 多次觸發 → 1 frame 內只 compute 1 次(降頻,防 RO 連續 fire redundant)
+  1065	    //   - diff guard:< 1px 不 setState(防 micro-step)
+  1066	    //   - **observe parent 而非 self**(打破 circular)
+  1067	    //
+  1068	    // Codex root cause cite:circular feedback `tableRef.height ↔ bodyMaxHeight ↔ body layout ↔ tableRef.height`
+  1069	    // Reproduce verified:viewport 1280→1920→900,parentH 392/672/292 變化,但 a524e03 fix 下 bodyRectH 永遠 240。
+  1070	    let rafId: number | null = null
+  1071	    let lastValue: number | null = null
+  1072	    const compute = () => {
+  1073	      if (!tableRef.current) return
+  1074	      // ⭐ 量 parent slot(definite height,不受 child 反向影響),fallback 用 outer
+  1075	      const parentEl = tableRef.current.parentElement
+  1076	      const slotH = parentEl?.getBoundingClientRect().height
+  1077	                ?? tableRef.current.getBoundingClientRect().height
+  1078	      const headerEl = tableRef.current.firstElementChild as HTMLElement | null
+  1079	      const headerH = headerEl?.getBoundingClientRect().height ?? 0
+  1080	      const next = Math.max(0, slotH - headerH)
+  1081	      if (lastValue != null && Math.abs(next - lastValue) < 1) return
+  1082	      lastValue = next
+  1083	      setBodyMaxHeight(next)
+  1084	    }
+  1085	    const scheduleCompute = () => {
+  1086	      if (rafId != null) return
+  1087	      rafId = requestAnimationFrame(() => {
+  1088	        rafId = null
+  1089	        compute()
+  1090	      })
+  1091	    }
+  1092	    compute() // initial sync(cap 帶值,避 first paint blank)
+  1093	    // ⭐ 只 observe parent,不 observe tableRef(打破 circular)
+  1094	    const obs = new ResizeObserver(scheduleCompute)
+  1095	    if (tableRef.current?.parentElement) obs.observe(tableRef.current.parentElement)
+  1096	    return () => {
+  1097	      obs.disconnect()
+  1098	      if (rafId != null) cancelAnimationFrame(rafId)
+  1099	    }
+  1100	  }, [isFillHeight])
+  1101	
+  1102	  // JS scroll sync(AR44 user-reported UX fix):
+  1103	  // 原本 V scroll 在 body-viewport(外層),center-body H scroll 於其內部底部 = 所有 row 都 render 下方。
+  1104	  // Virtualized 1800px 內容 → H scrollbar 在 1800px 下方,user 必須 V-scroll 到底才看見 → UX bug。
+  1105	  // **現在 V scroll 移到各 region 自己(left / center / right 分別)**,三者 scrollTop JS 同步;
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/DataTable/data-table.tsx | sed -n '623,635p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   623	    return () => {
+   624	      observer.disconnect()
+   625	      window.removeEventListener('scroll', onScroll, true)
+   626	      window.removeEventListener('resize', onScroll)
+   627	    }
+   628	  }, [rowEl, ctx])
+   629	
+   630	  // 永遠 render anchor span(讓 anchorRef 可拿到 row element)。
+   631	  // A3 fix(2026-05-05):顯式 `top:0 left:0 pointer-events:none` — 雖 width/height=0 不該佔
+   632	  // flex space,但部分瀏覽器對 abs span 在 flex container 行為微妙 → 顯式座標固定原點,
+   633	  // 確保第一個 cell 文字位置不被推開。
+   634	  // ctx 為 null 或 mirror role 時 anchor 仍渲染但不渲 handle Portal
+   635	  const anchor = (
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/Breadcrumb/breadcrumb.tsx | sed -n '35,62p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+    35	  const obs = getSharedRO()
+    36	  sharedROCallbacks.set(el, cb)
+    37	  obs.observe(el)
+    38	  return () => { sharedROCallbacks.delete(el); obs.unobserve(el) }
+    39	}
+    40	
+    41	function TruncatedLabel({ children, fullText }: { children: React.ReactNode; fullText?: string }) {
+    42	  const ref = React.useRef<HTMLSpanElement>(null)
+    43	  const [isTruncated, setIsTruncated] = React.useState(false)
+    44	  React.useEffect(() => {
+    45	    const el = ref.current
+    46	    if (!el) return
+    47	    const check = () => setIsTruncated(el.scrollWidth > el.clientWidth)
+    48	    check()
+    49	    // 2026-05-11 fix:首幀 layout 未完成 / 字型 async load → scrollWidth=clientWidth 假陰性。
+    50	    // RAF + 短延遲再驗一次,捕獲字型 / 容器尺寸後變(對齊 TruncateCell / Tag SSOT pattern)。
+    51	    const raf = requestAnimationFrame(check)
+    52	    const t = setTimeout(check, 100)
+    53	    const cleanup = observeShared(el, check)
+    54	    return () => {
+    55	      cancelAnimationFrame(raf)
+    56	      clearTimeout(t)
+    57	      cleanup()
+    58	    }
+    59	  }, [])
+    60	  // Tooltip canonical:per `tooltip.principles.stories.tsx:190`「Tooltip 是資訊補救 — 文字被
+    61	  // truncate 時才顯示完整內容。沒被截斷就不該顯示 tooltip」
+    62	  //
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/OverflowIndicator/overflow-indicator.tsx | sed -n '30,58p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+    30	  extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
+    31	  count: number
+    32	  shape?: 'circle' | 'tag'
+    33	  size?: 'sm' | 'md' | 'lg'
+    34	  children: React.ReactNode
+    35	  className?: string
+    36	}
+    37	
+    38	function ShrinkWrapList({ children }: { children: React.ReactNode }) {
+    39	  const ref = React.useCallback((container: HTMLDivElement | null) => {
+    40	    if (!container) return
+    41	
+    42	    requestAnimationFrame(() => {
+    43	      const cs = getComputedStyle(container)
+    44	      const padL = parseFloat(cs.paddingLeft) || 0
+    45	      const padR = parseFloat(cs.paddingRight) || 0
+    46	      const gap = parseFloat(cs.gap) || parseFloat(cs.columnGap) || 0
+    47	      const available = container.offsetWidth - padL - padR
+    48	
+    49	      const items = Array.from(container.children) as HTMLElement[]
+    50	      if (items.length === 0) return
+    51	
+    52	      let currentRow = 0
+    53	      let maxRow = 0
+    54	
+    55	      items.forEach(item => {
+    56	        const w = item.offsetWidth
+    57	        const needed = currentRow > 0 ? currentRow + gap + w : w
+    58	
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/Tabs/tabs.tsx | sed -n '245,285p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   245	    (index: number) => (el: HTMLElement | null) => {
+   246	      if (el) itemRefs.current.set(index, el)
+   247	      else itemRefs.current.delete(index)
+   248	    },
+   249	    []
+   250	  )
+   251	
+   252	  const items = React.useMemo(
+   253	    () => React.Children.toArray(children).filter(React.isValidElement) as React.ReactElement[],
+   254	    [children]
+   255	  )
+   256	
+   257	  const enhancedChildren = items.map((child, i) =>
+   258	    React.cloneElement(
+   259	      child as React.ReactElement<{ ref?: React.Ref<HTMLElement> }>,
+   260	      { ref: registerItem(i) }
+   261	    )
+   262	  )
+   263	
+   264	  // Menu 模式沒有 arrows,但仍套 fade mask (reserveArrowWidth: 0) 軟化內容硬邊
+   265	  // code-quality-allow: long-function — helper fn 結構緊密,拆 sub-fn 會跨 fn 傳 state 反而複雜
+   266	  const maskImage = buildFadeMask({ canScroll, atStart, atEnd, reserveArrowWidth: 0 })
+   267	
+   268	  const handleMenuSelect = React.useCallback(
+   269	    (triggerValue: string, index: number) => {
+   270	      onValueChange?.(triggerValue)
+   271	      // 下一個 tick 再 scroll, 讓 Radix 先完成 data-state 更新
+   272	      requestAnimationFrame(() => {
+   273	        const el = itemRefs.current.get(index)
+   274	        el?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+   275	      })
+   276	    },
+   277	    [onValueChange]
+   278	  )
+   279	
+   280	  return (
+   281	    <div className="flex items-center border-b border-border">
+   282	      <div
+   283	        ref={scrollRef}
+   284	        className="flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+   285	        style={{ maskImage, WebkitMaskImage: maskImage }}
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/Chip/chip.tsx | sed -n '255,285p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   255	  const toggleFromMenu = React.useCallback(
+   256	    (chipValue: string, index: number) => {
+   257	      if (!groupOnValueChange) {
+   258	        if (import.meta.env?.DEV) {
+   259	          console.warn(
+   260	            '[ChipGroup] layout="menu" 需要 controlled 使用（請傳 value + onValueChange），否則 menu items 無法同步主 chip 選擇狀態。'
+   261	          )
+   262	        }
+   263	        return
+   264	      }
+   265	      if (groupType === 'multiple') {
+   266	        const current = (Array.isArray(groupValue) ? groupValue : []) as string[]
+   267	        const next = current.includes(chipValue)
+   268	          ? current.filter((v) => v !== chipValue)
+   269	          : [...current, chipValue]
+   270	        ;(groupOnValueChange as (v: string[]) => void)(next)
+   271	      } else {
+   272	        ;(groupOnValueChange as (v: string) => void)(chipValue)
+   273	      }
+   274	      // scrollIntoView: 讓剛選中的 chip 出現在視圖中央
+   275	      requestAnimationFrame(() => {
+   276	        const el = itemRefs.current.get(index)
+   277	        el?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+   278	      })
+   279	    },
+   280	    [groupType, groupValue, groupOnValueChange]
+   281	  )
+   282	
+   283	  const enhancedItems = items.map((child, i) =>
+   284	    React.cloneElement(
+   285	      child as React.ReactElement<{ ref?: React.Ref<HTMLElement> }>,
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/LinkInput/link-input.tsx | sed -n '150,172p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   150	    }, [value, editing])
+   151	
+   152	    // Merge refs
+   153	    const setRef = React.useCallback((el: HTMLInputElement | null) => {
+   154	      inputRef.current = el
+   155	      if (typeof ref === 'function') ref(el)
+   156	      else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = el
+   157	    }, [ref])
+   158	
+   159	    const hasValidValue = !!value && isValidUrl(value)
+   160	    const showLink = isEditable && hasValidValue && !editing && !localError
+   161	    const error = errorProp || localError
+   162	
+   163	    const handleEdit = () => {
+   164	      setEditing(true)
+   165	      requestAnimationFrame(() => inputRef.current?.focus())
+   166	    }
+   167	
+   168	    const handleBlur = () => {
+   169	      setEditing(false)
+   170	      const trimmed = localValue.trim()
+   171	      if (!trimmed) {
+   172	        // Empty is OK — clear value
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/hooks/use-overflow-items.ts | sed -n '65,95p' && nl -ba src/design-system/hooks/use-overflow-items.ts | sed -n '220,240p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+    65	  React.useEffect(() => {
+    66	    const el = scrollRef.current
+    67	    if (!el) return
+    68	
+    69	    const update = () => {
+    70	      const canScroll = el.scrollWidth > el.clientWidth + 1
+    71	      const atStart = el.scrollLeft <= 0
+    72	      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1
+    73	      setState((prev) =>
+    74	        prev.atStart === atStart && prev.atEnd === atEnd && prev.canScroll === canScroll
+    75	          ? prev
+    76	          : { atStart, atEnd, canScroll }
+    77	      )
+    78	    }
+    79	
+    80	    update()
+    81	    el.addEventListener('scroll', update, { passive: true })
+    82	    const ro = new ResizeObserver(update)
+    83	    ro.observe(el)
+    84	    // 監聽 children 變化（items 增減、字體載入）
+    85	    const mo = new MutationObserver(update)
+    86	    mo.observe(el, { childList: true, subtree: true, characterData: true })
+    87	
+    88	    return () => {
+    89	      el.removeEventListener('scroll', update)
+    90	      ro.disconnect()
+    91	      mo.disconnect()
+    92	    }
+    93	  }, [])
+    94	
+    95	  return { scrollRef, ...state }
+   220	      }
+   221	
+   222	      setOverflowIndices((prev) => {
+   223	        if (prev.length === overflow.length && prev.every((v, i) => v === overflow[i])) {
+   224	          return prev
+   225	        }
+   226	        return overflow
+   227	      })
+   228	    }
+   229	
+   230	    compute()
+   231	    const ro = new ResizeObserver(compute)
+   232	    ro.observe(container)
+   233	    // 也觀察每個 item 的尺寸變化（字體載入、label 更新等）
+   234	    itemRefsMap.current.forEach((el) => ro.observe(el))
+   235	    // Scroll event: overflow 集合隨 scroll 位置變化
+   236	    container.addEventListener('scroll', compute, { passive: true })
+   237	
+   238	    return () => {
+   239	      ro.disconnect()
+   240	      container.removeEventListener('scroll', compute)
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/PeoplePicker/person-display.tsx | sed -n '180,214p' && nl -ba src/design-system/components/PeoplePicker/people-picker.tsx | sed -n '335,370p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   180	  onRemove?: (person: PersonValue) => void
+   181	}) {
+   182	  if (!value || value.length === 0) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+   183	
+   184	  // 2026-05-15 Bug 3 fix(Claude+Codex Step 5 比稿 consensus):消費 shared `avatar-stack-overflow`
+   185	  // primitive。原 inline canvas-based formula 是 dual-implementation 違反 user SSOT「同 cell width 同
+   186	  // overflow 判斷」(edit path 用 Combobox useOverflowCount DOM offsetWidth / display path 用 inline
+   187	  // canvas)。**抽 primitive 統一**:display + edit 共用 `getAvatarStackVisibleCount` formula。
+   188	  // SSOT in `./avatar-stack-overflow.ts`,M14 mechanical guard 防 future drift。
+   189	  const containerRef = React.useRef<HTMLSpanElement>(null)
+   190	  const [measuredCount, setMeasuredCount] = React.useState<number | null>(null)
+   191	  React.useLayoutEffect(() => {
+   192	    if (!measured) return
+   193	    const el = containerRef.current
+   194	    if (!el) return
+   195	    const calc = () => {
+   196	      const visible = getAvatarStackVisibleCount({
+   197	        availablePx: el.clientWidth,
+   198	        total: value.length,
+   199	        avatarPx: AVATAR_STACK_AVATAR_PX[size],
+   200	        overflowChipPx: AVATAR_STACK_OVERFLOW_CHIP_PX[size],
+   201	      })
+   202	      setMeasuredCount(visible)
+   203	    }
+   204	    calc()
+   205	    const ro = new ResizeObserver(calc)
+   206	    ro.observe(el)
+   207	    return () => ro.disconnect()
+   208	  }, [measured, size, value])
+   209	
+   210	  const resolvedMax = measured && measuredCount !== null ? measuredCount : (max ?? 3)
+   211	  const people = value.map(resolvePerson)
+   212	  const visible = people.slice(0, resolvedMax)
+   213	  const hidden = people.slice(resolvedMax)
+   214	  const overflow = hidden.length
+   335	  // SSOT visible count compute via formula primitive + ResizeObserver
+   336	  const stackContainerRef = React.useRef<HTMLDivElement | null>(null)
+   337	  const [stackVisibleCount, setStackVisibleCount] = React.useState<number | undefined>(undefined)
+   338	  React.useLayoutEffect(() => {
+   339	    // 注:此 effect 只在 multi stack mode 跑(early return if not stack);length<=1 不需 override
+   340	    if (!isMulti || selectedNames.length <= 1) {
+   341	      setStackVisibleCount(undefined); return
+   342	    }
+   343	    const root = stackContainerRef.current
+   344	    if (!root) return
+   345	    // 2026-05-15 ROOT CAUSE FIX(user 抓「之前說的問題都還是存在」):
+   346	    // stackContainerRef 透過 mergedStackRef 接 Combobox forwarded ref → root **就是** [role=combobox]
+   347	    // div 自己。原 `root.querySelector('[role=combobox]')` 不找 self 永遠 null → trigger=null →
+   348	    // tagArea=null → available=0 → setStackVisibleCount(0) → 整 stack 全 overflow → fallback 到
+   349	    // Combobox DOM-based useOverflowCount(非 deterministic 那個算法)。修:用 root 自己當 trigger,
+   350	    // 從 root 內找 tagArea(flex-1 min-w-0 div)。
+   351	    const calc = () => {
+   352	      const trigger = root.matches('[role="combobox"]') ? root : root.querySelector<HTMLElement>('[role="combobox"]')
+   353	      const tagArea = trigger?.querySelector<HTMLElement>('div[class*="flex-1"][class*="min-w-0"]')
+   354	      const available = tagArea?.clientWidth ?? trigger?.clientWidth ?? 0
+   355	      const visible = getAvatarStackVisibleCount({
+   356	        availablePx: available,
+   357	        total: selectedNames.length,
+   358	        avatarPx: AVATAR_STACK_AVATAR_PX[size],
+   359	        overflowChipPx: AVATAR_STACK_OVERFLOW_CHIP_PX[size],
+   360	      })
+   361	      setStackVisibleCount(visible)
+   362	    }
+   363	    calc()
+   364	    const ro = new ResizeObserver(calc)
+   365	    ro.observe(root)
+   366	    return () => ro.disconnect()
+   367	  }, [isMulti, multiDisplay, selectedNames.length, size])
+   368	  // Merge ref:forward to parent + capture for ResizeObserver
+   369	  const mergedStackRef = React.useCallback((el: HTMLDivElement | null) => {
+   370	    stackContainerRef.current = el
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/OverflowIndicator/overflow-indicator.tsx | sed -n '58,95p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+    58	
+    59	        if (needed > available && currentRow > 0) {
+    60	          maxRow = Math.max(maxRow, currentRow)
+    61	          currentRow = w
+    62	        } else {
+    63	          currentRow = needed
+    64	        }
+    65	      })
+    66	      maxRow = Math.max(maxRow, currentRow)
+    67	
+    68	      container.style.maxWidth = `${Math.ceil(maxRow) + padL + padR + 1}px`
+    69	    })
+    70	  }, [children])
+    71	
+    72	  return (
+    73	    <div ref={ref} className="flex flex-wrap gap-1 p-2 max-w-[280px]">
+    74	      {children}
+    75	    </div>
+    76	  )
+    77	}
+    78	
+    79	const OverflowIndicator = React.forwardRef<HTMLSpanElement, OverflowIndicatorProps>(
+    80	  function OverflowIndicator(
+    81	    { count, shape = 'circle', size = 'md', children, className, ...props },
+    82	    ref,
+    83	  ) {
+    84	    if (count <= 0) return null
+    85	
+    86	    const trigger = shape === 'tag' ? (
+    87	      <span
+    88	        ref={ref}
+    89	        className={cn(tagVariants({ color: 'neutral', size }), 'cursor-default', className)}
+    90	        {...props}
+    91	      >
+    92	        <span className="px-1">+{count}</span>
+    93	      </span>
+    94	    ) : (
+    95	      <span
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/Combobox/combobox.tsx | sed -n '155,245p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   155	
+   156	  return state
+   157	}
+   158	
+   159	// ── OverflowTagList (unchanged) ──────────────────────────────────────────────
+   160	
+   161	type ComboboxOverflowShape = 'circle' | 'tag'
+   162	
+   163	// 2026-05-16 fix:overflow chip wrapper 必能跟 tag wrapper 套同 overlap class
+   164	// (per user 物理模型「avatar 和 +N 都是同尺寸圓形 + 同 step」)。原 chip wrapper
+   165	// 只有 `shrink-0`,在 stack 模式 -ml-0.5 不 apply → chip 不 overlap → 視覺多 22px
+   166	// 額外空間 → length=4→4 / length=5→2+3 saw bug 物理根因。
+   167	// PeoplePicker stack mode pass `'-ml-0.5 first:ml-0 relative inline-flex'` 對齊。
+   168	interface OverflowTagListProps {
+   169	  containerRef: React.RefObject<HTMLDivElement | null>
+   170	  items: { value: string; label: string }[]
+   171	  size: 'sm' | 'md' | 'lg'
+   172	  wrap: boolean
+   173	  renderTag: (item: { value: string; label: string }, index: number) => React.ReactNode
+   174	  /**
+   175	   * 2026-05-14 I4 fix(per codex M31 verdict + user 抓「display overflow 有 avatar / edit 無」):
+   176	   * Optional renderer for hidden items in `+N` overflow popover。Default fallback = `<Tag>{label}</Tag>`
+   177	   * (純文字 chip,backward-compat)。Consumer pass 此 prop 讓 hidden items 顯示同 avatar 視覺
+   178	   * (對齊 display MultiPersonDisplay overflow popover Tag avatar SSOT)。
+   179	   */
+   180	  renderHiddenTag?: (item: { value: string; label: string }) => React.ReactNode
+   181	  onRemove?: (value: string) => void
+   182	  trailing?: React.ReactNode
+   183	  /** Tag area gap in px(default 4)。Stack mode 傳 0 讓 negative margin 生效 */
+   184	  gap?: number
+   185	  /**
+   186	   * Optional class merged into each tag's outer measurement wrapper `<div className="shrink-0">`.
+   187	   * (2026-05-07 v15.13)為 PeoplePicker stack mode 提供 hook point — 讓 stack avatar 走
+   188	   * `-ml-0.5 first:ml-0 relative inline-flex group/avatar` 達成 overlap + dismiss group selector,
+   189	   * 同時保留 `useOverflowCount` 量測 wrapper(必要,不可移除)。
+   190	   *
+   191	   * **Caveat(Q2 known tradeoff)**:`-ml-0.5` 負 margin 不改 each wrapper 的 `offsetWidth` →
+   192	   * `useOverflowCount` 累加按完整寬計算 → 視覺實際塞得進的 tag 數 > 量測判定能塞的數 →
+   193	   * **+N indicator 偏保守**(視覺還有空間但已顯 `+N`)。當前 v1 接受此 tradeoff;若窄 trigger
+   194	   * + 多人場景明顯不對,future 可加 `overlapPx` prop 讓量測補償。
+   195	   */
+   196	  tagWrapperClassName?: string
+   197	  /** 2026-05-16 fix:overflow chip 圓形 wrapper 套此 class(stack 模式套 `-ml-0.5` overlap),
+   198	   *  讓 chip 跟 avatar 同 step 物理 — 避免「chip 多 24px 額外空間」造成 saw transition。*/
+   199	  overflowWrapperClassName?: string
+   200	  /**
+   201	   * Overflow indicator(+N)形狀(2026-05-12 Round 7 fix,user 抓 PeoplePicker stack +N 該圓形):
+   202	   * - `'tag'`(default,backward-compat)— 矩形 chip(對齊 Combobox 文字 tag)
+   203	   * - `'circle'`(opt-in for avatar stack consumers)— 圓形 avatar-shape +N(對齊 GitHub picker idiom)
+   204	   * PeoplePicker stack mode pass `'circle'`,Combobox 文字 tag 自走 `'tag'`。
+   205	   */
+   206	  overflowShape?: ComboboxOverflowShape
+   207	  /**
+   208	   * 2026-05-15 Bug 3 fix:override visible count via formula-based primitive(PeoplePicker stack
+   209	   * 用 `avatar-stack-overflow` primitive deterministic formula 計算 visible,bypass DOM offsetWidth
+   210	   * measurement)。對齊 user SSOT「同 cell width 同 overflow 判斷」。
+   211	   */
+   212	  visibleCountOverride?: number
+   213	}
+   214	
+   215	function OverflowTagList({ containerRef, items, size, wrap, renderTag, renderHiddenTag, onRemove, trailing, tagWrapperClassName, overflowWrapperClassName, gap = GAP, overflowShape = 'tag', visibleCountOverride }: OverflowTagListProps) {
+   216	  const tagEls = React.useRef<(HTMLDivElement | null)[]>([])
+   217	  const overflowEl = React.useRef<HTMLDivElement>(null)
+   218	  const { visibleCount, ready } = useOverflowCount(containerRef, tagEls, overflowEl, items.length, !wrap, gap, visibleCountOverride)
+   219	  tagEls.current.length = items.length
+   220	
+   221	  if (wrap) return <>{items.map((item, i) => renderTag(item, i))}{trailing}</>
+   222	
+   223	  const overflow = items.length - visibleCount
+   224	  const hiddenItems = items.slice(visibleCount)
+   225	
+   226	  return (
+   227	    <span className="contents" style={{ opacity: ready ? 1 : 0 }}>
+   228	      {items.map((item, i) => (
+   229	        // 2026-05-14 I5 fix(per codex M31 verdict + user 抓「avatar stack 堆疊方向不一致」):
+   230	        // 加 z-index per-index — 前 item z 高(對齊 MultiPersonDisplay zIndex: visible.length - i
+   231	        // canonical + MUI AvatarGroup surplus pattern)。display + edit stack 堆疊方向統一。
+   232	        <div key={item.value} ref={el => { tagEls.current[i] = el }} className={cn('shrink-0', tagWrapperClassName)} style={{ zIndex: items.length - i }}>{renderTag(item, i)}</div>
+   233	      ))}
+   234	      <div ref={overflowEl} className={cn('shrink-0', overflowWrapperClassName)}>
+   235	        <OverflowIndicator count={overflow} shape={overflowShape} size={size}>
+   236	          {hiddenItems.map(item => (
+   237	            renderHiddenTag
+   238	              ? <React.Fragment key={item.value}>{renderHiddenTag(item)}</React.Fragment>
+   239	              : <Tag key={item.value} size="sm" onDismiss={onRemove ? () => onRemove(item.value) : undefined}>
+   240	                  {item.label}
+   241	                </Tag>
+   242	          ))}
+   243	        </OverflowIndicator>
+   244	      </div>
+   245	      {trailing}
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/Combobox/combobox.tsx | sed -n '440,470p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   440	    <div ref={containerRef}
+   441	      className={cn(fieldWrapperStyles({ mode: resolvedMode, variant, size: sz }), hasTags && tagPadding[sz],
+   442	        wrap ? 'flex-wrap py-1' : 'overflow-visible', className)}
+   443	      style={{ gap: GAP, ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode={resolvedMode}>
+   444	      {hasTags ? (
+   445	        <ComboboxTagStack value={value} options={options} tagSize={sz} wrap={wrap}
+   446	          containerRef={containerRef} disabled={resolvedMode === 'disabled'} />
+   447	      ) : (
+   448	        <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+   449	      )}
+   450	    </div>
+   451	  )
+   452	}
+   453	
+   454	// ── Native Combobox (mobile) ────────────────────────────────────────
+   455	
+   456	// 2026-05-16 Bug A root cause fix(Claude+Codex M31 Step 5 比稿 consensus,user verbatim
+   457	// 「圖二/圖三 同 180px 不同 length 不同 visible — 跟 user 一開始抓的問題一模一樣」):
+   458	// 公開 `Combobox.forwardRef` 之前用 `(props, _ref)` 把 ref drop,內部 `NativeCombobox` /
+   459	// `CustomCombobox` 從未拿 ref → PeoplePicker `stackContainerRef.current` 永遠 null →
+   460	// `useLayoutEffect` early return → `visibleCountOverride` 永遠 undefined →
+   461	// Combobox 走原 internal `useOverflowCount` 60px chip fallback bug → drift。
+   462	// Fix:internal `__triggerRef` prop(underscore = internal-only)attach root div;
+   463	// 公開 `Combobox.forwardRef` 把 `ref` forward 為 `__triggerRef`。對齊 codex DS-wide iceberg
+   464	// audit:`SelectMenu` / `DateGrid` / `Toast` 的 `_ref` 是 intentional documented(no DOM
+   465	// target);唯本處 actionable drop。
+   466	type ComboboxInternalProps = ComboboxProps & { __triggerRef?: React.Ref<HTMLDivElement> }
+   467	
+   468	function NativeCombobox({
+   469	  mode = 'edit', variant: variantProp, error = false, size = 'md', options, value = [], onChange, placeholder,
+   470	  className, disabled, wrap = false, clearable = false, showDisplayEndIcon = false,
+
+exec
+/bin/zsh -lc "rg -n \"visibleCountOverride|useOverflowCount\\(\" src/design-system/components/Combobox src/design-system/components/PeoplePicker" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+src/design-system/components/PeoplePicker/people-picker.tsx:349:    // Combobox DOM-based useOverflowCount(非 deterministic 那個算法)。修:用 root 自己當 trigger,
+src/design-system/components/PeoplePicker/people-picker.tsx:426:      visibleCountOverride={stackVisibleCount}
+src/design-system/components/Combobox/combobox.tsx:49:function useOverflowCount(
+src/design-system/components/Combobox/combobox.tsx:56:  visibleCountOverride?: number,  // 2026-05-15 Bug 3 fix:override DOM measurement(PeoplePicker stack 走 formula primitive)
+src/design-system/components/Combobox/combobox.tsx:78:    if (visibleCountOverride !== undefined) {
+src/design-system/components/Combobox/combobox.tsx:81:        if (el) el.hidden = i >= visibleCountOverride
+src/design-system/components/Combobox/combobox.tsx:84:      if (ofEl) ofEl.hidden = visibleCountOverride >= totalCount
+src/design-system/components/Combobox/combobox.tsx:85:      setState({ visibleCount: visibleCountOverride, ready: true }); return
+src/design-system/components/Combobox/combobox.tsx:154:  }, [containerRef, totalCount, enabled, gap, visibleCountOverride])  // 2026-05-15 Bug 3 fix:visibleCountOverride 入 deps,override 改 trigger recalc
+src/design-system/components/Combobox/combobox.tsx:212:  visibleCountOverride?: number
+src/design-system/components/Combobox/combobox.tsx:215:function OverflowTagList({ containerRef, items, size, wrap, renderTag, renderHiddenTag, onRemove, trailing, tagWrapperClassName, overflowWrapperClassName, gap = GAP, overflowShape = 'tag', visibleCountOverride }: OverflowTagListProps) {
+src/design-system/components/Combobox/combobox.tsx:218:  const { visibleCount, ready } = useOverflowCount(containerRef, tagEls, overflowEl, items.length, !wrap, gap, visibleCountOverride)
+src/design-system/components/Combobox/combobox.tsx:385:  visibleCountOverride?: number
+src/design-system/components/Combobox/combobox.tsx:460:// `useLayoutEffect` early return → `visibleCountOverride` 永遠 undefined →
+src/design-system/components/Combobox/combobox.tsx:547:  visibleCountOverride,
+src/design-system/components/Combobox/combobox.tsx:635:            visibleCountOverride={visibleCountOverride}
+src/design-system/components/Combobox/combobox.tsx:710:    // `__triggerRef`,讓 PeoplePicker stack 透過 ref 量 trigger DOM(visibleCountOverride
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/PeoplePicker/people-picker.tsx | sed -n '410,432p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   410	      // SSOT helper `getPeoplePickerTagWrapperClass(count)` 集中,future 改 wrapper 行為改一處。
+   411	      tagWrapperClassName={getPeoplePickerTagWrapperClass(selectedNames.length)}
+   412	      // 2026-05-16 真 root cause fix:overflow chip wrapper 套同 `-ml-0.5` 讓 chip 物理上
+   413	      // 跟 avatar 同 slot(等寬同 step,non-overlapping 多 24px 區塊不再 saw)。對齊 user
+   414	      // 「avatars 和 +N 都是同尺寸圓形,空間最多容固定數量圓形」物理模型 directive +
+   415	      // MUI AvatarGroup / Primer AvatarStack 共識(`AvatarGroup.js` L54-59 same negative margin)。
+   416	      overflowWrapperClassName="-ml-0.5 first:ml-0 relative inline-flex"
+   417	      tagAreaGapPx={0}
+   418	      tagAreaPaddingLeftPx={undefined}
+   419	      // 2026-05-12 Round 7 fix(user 抓 image 2「+N tag 應該圓形不是矩形」+ 對齊 GitHub picker idiom):
+   420	      // Combobox default `overflowShape='tag'`(矩形 chip,文字 Combobox 慣例);PeoplePicker stack
+   421	      // mode pass `'circle'`(圓形 avatar-shape,跟 avatar 一樣大)。對齊 MultiPersonDisplay readonly path
+   422	      // 既有 OverflowIndicator default 'circle' SSOT。
+   423	      overflowShape="circle"
+   424	      // 2026-05-15 Bug 3 fix:formula-based visible count override(避免 Combobox DOM measurement +
+   425	      // 60px fallback 不 deterministic)。SSOT in `./avatar-stack-overflow.ts`,display + edit 共用。
+   426	      visibleCountOverride={stackVisibleCount}
+   427	      // 2026-05-14 I4 fix(per codex+Layer A 共識):hidden items 在 `+N` overflow popover 顯
+   428	      // Tag with avatar(對齊 display MultiPersonDisplay popover SSOT,user 抓 display vs edit
+   429	      // overflow 視覺不一致)。
+   430	      renderHiddenTag={(item) => {
+   431	        const p = resolvePerson(findPerson(people, item.value))
+   432	        return (
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/Combobox/combobox.tsx | sed -n '620,640p' && nl -ba src/design-system/components/Combobox/combobox.tsx | sed -n '700,715p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   620	      aria-errormessage={error ? fieldCtx?.errorId : undefined}
+   621	      className={cn(fieldWrapperStyles({ mode: 'edit', variant: variant, size }), value.length > 0 && tagPadding[size], 'relative cursor-pointer',
+   622	        wrap && 'items-start py-1',
+   623	        // 2026-05-06 v13.3 SSOT retire:per-control `open && 'border-primary'` 移除。Field default
+   624	        // 統一處理 — open=灰深(data-state)/ focus=藍(focus-within !important)。改一處全 control 跟動。
+   625	        error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
+   626	      style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }}
+   627	      data-field-mode="edit" data-error={error ? '' : undefined}>
+   628	      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-visible')} style={{ gap: tagAreaGap, paddingLeft: tagAreaPaddingLeftPx }}>
+   629	        {value.length > 0 ? (
+   630	          <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
+   631	            tagWrapperClassName={tagWrapperClassName}
+   632	            overflowWrapperClassName={overflowWrapperClassName}
+   633	            gap={tagAreaGap}
+   634	            overflowShape={overflowShape}
+   635	            visibleCountOverride={visibleCountOverride}
+   636	            renderTag={(item) => (
+   637	              tagRenderer
+   638	                ? tagRenderer(item, () => handleRemove(item.value))
+   639	                : <Tag size={size} className="shrink-0 relative z-10"
+   640	                    onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>
+   700	      {trigger}
+   701	    </SelectMenu>
+   702	  )
+   703	}
+   704	
+   705	// ── Public component ────────────────────────────────────────────────────────
+   706	
+   707	const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
+   708	  (props, ref) => {
+   709	    // 2026-05-16 真 root cause fix:之前用 `_ref` drop ref。修為 forward 給 internal
+   710	    // `__triggerRef`,讓 PeoplePicker stack 透過 ref 量 trigger DOM(visibleCountOverride
+   711	    // 才生效)。對齊 React forwardRef public-API canonical(MUI Autocomplete / Radix
+   712	    // Popover.Trigger 共識)+ codex M31 Step 5 比稿 verdict + DS-wide ref-drop iceberg audit。
+   713	    const isMobile = useIsTouchDevice()
+   714	    if (isMobile) return <NativeCombobox {...props} __triggerRef={ref} />
+   715	    return <CustomCombobox {...props} __triggerRef={ref} />
+
+exec
+/bin/zsh -lc 'rg -n "Combobox|PeoplePicker|stack|all select|全選|select all|visibleCountOverride|overflow" src/design-system/components/**/*.stories.tsx src/design-system/components/**/*.test.* src/design-system/components/**/*.spec.*' in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ exited 1 in 0ms:
+zsh:1: no matches found: src/design-system/components/**/*.test.*
+
+exec
+/bin/zsh -lc 'git status --short && git rev-parse --short HEAD && git show --stat --oneline -1' in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-OMZZx0y5' (errno=Operation not permitted)
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-LscEvy4c' (errno=Operation not permitted)
+?? .claude/logs/audit-preflight-2026-05-16.json
+?? .claude/scratch/
+?? scripts/peoplepicker-length5-probe.mjs
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-ALU9XhB9' (errno=Operation not permitted)
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-WzjzDwEf' (errno=Operation not permitted)
+dd0f96ba
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-pg18Mq7F' (errno=Operation not permitted)
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-dNIxKZAH' (errno=Operation not permitted)
+dd0f96ba fix(真 root cause): useOverflowCount rAF cancel gap — close I3 race
+ scripts/peoplepicker-twopath-race-probe.mjs        | 126 +++++++++++++++++++++
+ scripts/roadmap-cell-width-compare.mjs             |  86 ++++++++++++++
+ src/design-system/components/Combobox/combobox.tsx |  47 ++++++--
+ 3 files changed, 249 insertions(+), 10 deletions(-)
+
+codex
+The current commit is `dd0f96ba`; the working tree has unrelated/untracked probe files and Claude scratch output, so I’m treating the source files as the evidence base and not modifying anything. One shell glob failed under zsh because there were no matching test files for that pattern; I’ll use `rg --files` style if I need story/test inventory.
+exec
+/bin/zsh -lc "nl -ba scripts/peoplepicker-twopath-race-probe.mjs | sed -n '1,180p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+     1	#!/usr/bin/env node
+     2	/**
+     3	 * 重現 user 抓 2026-05-16 真 bug:
+     4	 *   路徑 A(逐個 click 滿 6)→ trigger visible=X chip=+Y
+     5	 *   路徑 B(取消全選 → 再全選)→ trigger visible=X' chip=+Y'
+     6	 *   X ≠ X' 即為 race 真 bug
+     7	 *
+     8	 * Hypothesis:Combobox `useOverflowCount` internal rAF/ResizeObserver 跟 PeoplePicker
+     9	 * `useLayoutEffect` override race。length=0 中間態 disable override,internal calc 排隊,
+    10	 * length 跳 6 後 stale rAF 跑 internal measurement 覆寫 `el.hidden`。
+    11	 */
+    12	import { chromium } from 'playwright'
+    13	import { mkdirSync, existsSync } from 'node:fs'
+    14	import { fileURLToPath } from 'node:url'
+    15	import { dirname, join } from 'node:path'
+    16	
+    17	const __filename = fileURLToPath(import.meta.url)
+    18	const __dirname = dirname(__filename)
+    19	const OUT_DIR = join(__dirname, '..', 'snapshots', 'peoplepicker-twopath')
+    20	if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true })
+    21	
+    22	const browser = await chromium.launch()
+    23	const page = await browser.newContext({ viewport: { width: 1280, height: 800 } }).then(c => c.newPage())
+    24	
+    25	// Use Multi story (init length=4) — narrow to 100px cell to force overflow boundary
+    26	await page.goto('http://localhost:6006/iframe.html?id=design-system-components-peoplepicker-展示--multi&viewMode=story')
+    27	await page.waitForLoadState('networkidle')
+    28	await page.waitForTimeout(1000)
+    29	await page.addStyleTag({ content: '.max-w-xs { max-width: 140px !important; width: 140px !important; }' })
+    30	await page.waitForTimeout(500)
+    31	
+    32	async function probe(label) {
+    33	  const data = await page.evaluate(() => {
+    34	    const trig = document.querySelector('[role="combobox"]')
+    35	    if (!trig) return { err: 'no trigger' }
+    36	    const tagArea = trig.querySelector('div[class*="flex-1"][class*="min-w-0"]')
+    37	    const overflowSpan = tagArea?.querySelector('span.contents')
+    38	    const directChildren = overflowSpan ? Array.from(overflowSpan.children) : []
+    39	    const overflowWrapper = directChildren[directChildren.length - 1]
+    40	    const avatarWrappers = directChildren.slice(0, -1)
+    41	    const visibleAvatars = avatarWrappers.filter(w => !w.hidden && w.offsetParent !== null)
+    42	    let chipText = null
+    43	    if (overflowWrapper && !overflowWrapper.hidden && overflowWrapper.offsetParent !== null) {
+    44	      const text = overflowWrapper.textContent?.trim()
+    45	      if (text?.match(/^\+\d+$/)) chipText = text
+    46	    }
+    47	    return {
+    48	      triggerWidth: trig.clientWidth,
+    49	      tagAreaWidth: tagArea?.clientWidth,
+    50	      visibleAvatarCount: visibleAvatars.length,
+    51	      chipText,
+    52	      totalCircles: visibleAvatars.length + (chipText ? 1 : 0),
+    53	    }
+    54	  })
+    55	  console.log(`  [${label}]`, JSON.stringify(data))
+    56	  return data
+    57	}
+    58	
+    59	// ─────────── 路徑 A: 逐個 click 滿 6 ───────────
+    60	console.log('\n══ 路徑 A:逐個 click 把全部 6 人選齊 ══')
+    61	// Init = 4 selected (Alice-Diana). Need to add Eric + Fiona one by one.
+    62	await page.locator('[role="combobox"]').first().click()
+    63	await page.waitForTimeout(500)
+    64	
+    65	for (const name of ['Eric', 'Fiona']) {
+    66	  const idx = await page.evaluate((n) => {
+    67	    const opts = Array.from(document.querySelectorAll('[role="option"]'))
+    68	    for (let i = 0; i < opts.length; i++) {
+    69	      if (opts[i].textContent?.includes(n) && opts[i].getAttribute('aria-selected') === 'false') return i
+    70	    }
+    71	    return -1
+    72	  }, name)
+    73	  if (idx >= 0) {
+    74	    await page.locator('[role="option"]').nth(idx).click({ force: true })
+    75	    await page.waitForTimeout(400)
+    76	  }
+    77	}
+    78	await page.keyboard.press('Escape')
+    79	await page.waitForTimeout(500)
+    80	
+    81	const pathA = await probe('A:逐個 click 滿 6')
+    82	await page.screenshot({ path: join(OUT_DIR, 'pathA-onebyone-len6.png'), fullPage: false, clip: { x: 0, y: 0, width: 800, height: 200 } })
+    83	
+    84	// ─────────── 路徑 B: 全選 → 取消全選 → 再全選 ───────────
+    85	console.log('\n══ 路徑 B:取消全選 → 再點全選 ══')
+    86	await page.locator('[role="combobox"]').first().click()
+    87	await page.waitForTimeout(500)
+    88	
+    89	// Click 「全部」 — toggle off (length 6 → 0)
+    90	const allBtn = page.locator('[role="option"]').filter({ hasText: '全部' }).first()
+    91	await allBtn.click({ force: true })
+    92	await page.waitForTimeout(600)
+    93	const intermediate = await probe('intermediate length=0')
+    94	
+    95	// Click 「全部」 again — toggle on (length 0 → 6 via applySelectAll)
+    96	await allBtn.click({ force: true })
+    97	await page.waitForTimeout(600)
+    98	await page.keyboard.press('Escape')
+    99	await page.waitForTimeout(500)
+   100	
+   101	const pathB = await probe('B:取消→再全選 → len 6')
+   102	await page.screenshot({ path: join(OUT_DIR, 'pathB-clearselectall-len6.png'), fullPage: false, clip: { x: 0, y: 0, width: 800, height: 200 } })
+   103	
+   104	// ─────────── Compare ───────────
+   105	console.log('\n══ Compare ══')
+   106	console.log(`  Path A: tagArea=${pathA.tagAreaWidth} visible=${pathA.visibleAvatarCount} chip=${pathA.chipText} totalCircles=${pathA.totalCircles}`)
+   107	console.log(`  Path B: tagArea=${pathB.tagAreaWidth} visible=${pathB.visibleAvatarCount} chip=${pathB.chipText} totalCircles=${pathB.totalCircles}`)
+   108	
+   109	let bugConfirmed = false
+   110	if (pathA.tagAreaWidth === pathB.tagAreaWidth) {
+   111	  if (pathA.visibleAvatarCount !== pathB.visibleAvatarCount || pathA.chipText !== pathB.chipText) {
+   112	    console.log('\n🚨 BUG CONFIRMED: same tagArea width different visible/chip — formula non-deterministic / race condition')
+   113	    bugConfirmed = true
+   114	  } else {
+   115	    console.log('\n✓ same width same output — deterministic, no bug')
+   116	  }
+   117	} else {
+   118	  console.log(`\n  ℹ tagArea width 不同(A=${pathA.tagAreaWidth} vs B=${pathB.tagAreaWidth})— `)
+   119	  if (pathA.visibleAvatarCount !== pathB.visibleAvatarCount) {
+   120	    console.log('  → formula at different widths returns different visible. Could be (a) responsive correct OR (b) intermediate state leak.')
+   121	    bugConfirmed = true
+   122	  }
+   123	}
+   124	
+   125	await browser.close()
+   126	process.exit(bugConfirmed ? 1 : 0)
+
+exec
+/bin/zsh -lc "nl -ba scripts/peoplepicker-length5-probe.mjs | sed -n '1,180p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+     1	#!/usr/bin/env node
+     2	/**
+     3	 * Probe length=5 visual at cell=140px(user 截圖的真實場景)。
+     4	 * Multi story init = 4 selected。Click first option in dropdown to add 5th。
+     5	 * Then measure trigger visible avatar + chip + screenshot。
+     6	 */
+     7	import { chromium } from 'playwright'
+     8	import { mkdirSync, existsSync } from 'node:fs'
+     9	import { fileURLToPath } from 'node:url'
+    10	import { dirname, join } from 'node:path'
+    11	
+    12	const __filename = fileURLToPath(import.meta.url)
+    13	const __dirname = dirname(__filename)
+    14	const OUT_DIR = join(__dirname, '..', 'snapshots', 'peoplepicker-length5')
+    15	if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true })
+    16	
+    17	const browser = await chromium.launch()
+    18	const page = await browser.newContext({ viewport: { width: 1280, height: 800 } }).then(c => c.newPage())
+    19	
+    20	await page.goto('http://localhost:6006/iframe.html?id=design-system-components-peoplepicker-展示--multi&viewMode=story')
+    21	await page.waitForLoadState('networkidle')
+    22	await page.waitForTimeout(1000)
+    23	
+    24	await page.addStyleTag({ content: `.max-w-xs { max-width: 140px !important; width: 140px !important; }` })
+    25	await page.waitForTimeout(500)
+    26	
+    27	async function probe(label) {
+    28	  const data = await page.evaluate(() => {
+    29	    const trig = document.querySelector('[role="combobox"]')
+    30	    if (!trig) return { err: 'no trigger' }
+    31	    const tagArea = trig.querySelector('div[class*="flex-1"][class*="min-w-0"]')
+    32	    const overflowSpan = tagArea?.querySelector('span.contents')
+    33	    const directChildren = overflowSpan ? Array.from(overflowSpan.children) : []
+    34	    const overflowWrapper = directChildren[directChildren.length - 1]
+    35	    const avatarWrappers = directChildren.slice(0, -1)
+    36	    const visibleAvatars = avatarWrappers.filter(w => !w.hidden && w.offsetParent !== null)
+    37	    let chipText = null
+    38	    if (overflowWrapper && !overflowWrapper.hidden && overflowWrapper.offsetParent !== null) {
+    39	      const text = overflowWrapper.textContent?.trim()
+    40	      if (text?.match(/^\+\d+$/)) chipText = text
+    41	    }
+    42	    // Measure overflowWrapper margin to verify -ml-0.5 applied
+    43	    let overflowMl = 'n/a'
+    44	    if (overflowWrapper) {
+    45	      overflowMl = getComputedStyle(overflowWrapper).marginLeft
+    46	    }
+    47	    return {
+    48	      triggerWidth: trig.clientWidth,
+    49	      tagAreaWidth: tagArea?.clientWidth,
+    50	      visibleAvatarCount: visibleAvatars.length,
+    51	      chipText,
+    52	      totalCircles: visibleAvatars.length + (chipText ? 1 : 0),
+    53	      overflowChipMarginLeft: overflowMl,
+    54	    }
+    55	  })
+    56	  console.log(`  [${label}]`, JSON.stringify(data))
+    57	  return data
+    58	}
+    59	
+    60	const initState = await probe('init length=4')
+    61	await page.screenshot({ path: join(OUT_DIR, '01-length-4.png'), fullPage: false, clip: { x: 0, y: 0, width: 800, height: 200 } })
+    62	
+    63	// Open dropdown + click 5th option (David Wu) to make length=5
+    64	await page.locator('[role="combobox"]').first().click()
+    65	await page.waitForTimeout(500)
+    66	await page.screenshot({ path: join(OUT_DIR, '02-dropdown-open.png'), fullPage: false })
+    67	
+    68	// Click 「全部」footer to selectAll → 6 people。Then test deselect later to vary length。
+    69	// 「全部」 footer is last role=option in visible popover.
+    70	const allBtn = page.locator('[role="option"]').filter({ hasText: '全部' }).first()
+    71	await allBtn.click({ force: true }).catch(() => {})
+    72	await page.waitForTimeout(500)
+    73	await page.keyboard.press('Escape')
+    74	await page.waitForTimeout(500)
+    75	
+    76	const state6 = await probe('after-selectAll length=6')
+    77	await page.screenshot({ path: join(OUT_DIR, '03-length-6.png'), fullPage: false, clip: { x: 0, y: 0, width: 800, height: 200 } })
+    78	
+    79	// Now deselect 1 (Fiona) to get length=5
+    80	await page.locator('[role="combobox"]').first().click()
+    81	await page.waitForTimeout(500)
+    82	const fionaIdx = await page.evaluate(() => {
+    83	  const opts = Array.from(document.querySelectorAll('[role="option"]'))
+    84	  for (let i = 0; i < opts.length; i++) {
+    85	    if (opts[i].textContent?.includes('Fiona') && opts[i].getAttribute('aria-selected') === 'true') return i
+    86	  }
+    87	  return -1
+    88	})
+    89	console.log(`  Fiona selected idx=${fionaIdx}`)
+    90	if (fionaIdx >= 0) {
+    91	  await page.locator('[role="option"]').nth(fionaIdx).click({ force: true })
+    92	  await page.waitForTimeout(500)
+    93	}
+    94	await page.keyboard.press('Escape')
+    95	await page.waitForTimeout(500)
+    96	
+    97	const state5 = await probe('after-deselect-Fiona length=5')
+    98	await page.screenshot({ path: join(OUT_DIR, '02-length-5.png'), fullPage: false, clip: { x: 0, y: 0, width: 800, height: 200 } })
+    99	
+   100	await browser.close()
+   101	
+   102	console.log('\n══ Verdict ══')
+   103	const seq = [initState, state6, state5]
+   104	const labels = ['length=4 (init)', 'length=6 (selectAll)', 'length=5 (deselect Fiona)']
+   105	for (let i = 0; i < seq.length; i++) {
+   106	  if (seq[i].err) continue
+   107	  const total = i + 4
+   108	  console.log(`  ${labels[i]}: visible=${seq[i].visibleAvatarCount} chip=${seq[i].chipText ?? 'none'} totalCircles=${seq[i].totalCircles} overflowML=${seq[i].overflowChipMarginLeft}`)
+   109	}
+   110	// Smooth transition assertion
+   111	let smooth = true
+   112	for (let i = 1; i < seq.length; i++) {
+   113	  if (seq[i].err || seq[i-1].err) continue
+   114	  const delta = Math.abs(seq[i].visibleAvatarCount - seq[i-1].visibleAvatarCount)
+   115	  if (delta > 1) { console.log(`  ✗ FAIL: ${labels[i-1]}→${labels[i]} delta=${delta}`); smooth = false }
+   116	  else console.log(`  ✓ ${labels[i-1]}→${labels[i]} delta=${delta} (smooth)`)
+   117	}
+   118	process.exit(smooth ? 0 : 1)
+
+exec
+/bin/zsh -lc "rg --files src/design-system | rg '(stories|test|spec)\\.(tsx|ts|md)"'$'"' | rg '(Combobox|PeoplePicker|combobox|people-picker)'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx
+src/design-system/components/PeoplePicker/people-picker.stories.tsx
+src/design-system/components/PeoplePicker/people-picker.spec.md
+src/design-system/components/Combobox/combobox.stories.tsx
+src/design-system/components/Combobox/combobox.principles.stories.tsx
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx
+src/design-system/components/Combobox/combobox.spec.md
+
+exec
+/bin/zsh -lc 'rg -n "PeoplePicker|Combobox|stack|全選|select all|visibleCountOverride|overflow" src/design-system/components/PeoplePicker src/design-system/components/Combobox' in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+src/design-system/components/Combobox/combobox.stories.tsx:3:import { createColumnHelper } from '@tanstack/react-table'
+src/design-system/components/Combobox/combobox.stories.tsx:4:import { Combobox } from './combobox'
+src/design-system/components/Combobox/combobox.stories.tsx:17:const meta: Meta<typeof Combobox> = {
+src/design-system/components/Combobox/combobox.stories.tsx:18:  title: 'Design System/Components/Combobox/展示',
+src/design-system/components/Combobox/combobox.stories.tsx:19:  component: Combobox,
+src/design-system/components/Combobox/combobox.stories.tsx:24:type Story = StoryObj<typeof Combobox>
+src/design-system/components/Combobox/combobox.stories.tsx:36:          <Combobox options={categoryOptions} value={value} onChange={setValue} aria-label="類別(edit mode demo)" />
+src/design-system/components/Combobox/combobox.stories.tsx:40:          <Combobox mode="display" options={categoryOptions} value={value} aria-label="類別(display mode demo)" />
+src/design-system/components/Combobox/combobox.stories.tsx:44:          <Combobox mode="readonly" options={categoryOptions} value={value} aria-label="類別(readonly mode demo)" />
+src/design-system/components/Combobox/combobox.stories.tsx:48:          <Combobox mode="disabled" options={categoryOptions} value={value} aria-label="類別(disabled mode demo)" />
+src/design-system/components/Combobox/combobox.stories.tsx:52:          <Combobox mode="readonly" options={categoryOptions} value={[]} aria-label="類別(readonly empty demo)" />
+src/design-system/components/Combobox/combobox.stories.tsx:71:            <Combobox size={size} options={categoryOptions} value={states[size][0]} onChange={states[size][1]} className="max-w-xs" />
+src/design-system/components/Combobox/combobox.stories.tsx:93:          <Combobox options={categoryOptions} value={v1} onChange={setV1} />
+src/design-system/components/Combobox/combobox.stories.tsx:97:          <Combobox mode="readonly" options={categoryOptions} value={init} />
+src/design-system/components/Combobox/combobox.stories.tsx:102:          <Combobox options={categoryOptions} value={v2} onChange={setV2} wrap />
+src/design-system/components/Combobox/combobox.stories.tsx:106:          <Combobox mode="readonly" options={categoryOptions} value={init} wrap />
+src/design-system/components/Combobox/combobox.stories.tsx:123:          <Combobox
+src/design-system/components/Combobox/combobox.stories.tsx:133:          <Combobox
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:2: * avatar-stack-overflow — Deterministic SSOT primitive for avatar stack overflow math
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:6: * Real root cause of Bug 3「same cell width but different overflow timing per total count」:
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:7: *   1. `useOverflowCount` 在 Combobox 用 DOM `offsetWidth` 量測 + `overflowW = 60` fallback(實際 24px)
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:8: *   2. `overflowEl` 不被 ResizeObserver observe,first calc 用 fallback 後不會 recalc
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:10: *   4. **架構違反**:`MultiPersonDisplay` display path 用 canvas-based 算 / Combobox edit path 用 DOM offsetWidth
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:11: *      → 同 cell width 兩 path 不同結果 → user verbatim「同寬 cell overflow 時間不一樣」SSOT 根本被違反
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:17: * firstAvatar + (visible - 1) * (avatar - overlap) + overflowChip <= available
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:20: * - subsequent items:`avatar - overlap`(stack `-ml-0.5` 視覺等同 measurement subtract)
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:21: * - `overflowChip`:若有 hidden,留 +N chip 空間;最後一個 visible item 不需留(`remaining === 0`)
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:24: * PeoplePicker stack edit + future avatar consumers 都 import 此 helper,不可 copy formula。
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:25: * 對齊 codex「one avatar-stack primitive owns avatarPx, overlapPx, overflowChipPx」directive。
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:28: * limitTags / Ant Select maxTagCount="responsive"(explicit overflow contract,非 incidental clip)/
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:33: * Pure deterministic visible-count formula for avatar stack with overlap + overflow chip.
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:35: * @param availablePx — Container width available for the entire stack(含 +N chip 預留空間)
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:39: * @param overflowChipPx — Width reserved for +N indicator when overflow needed(default 24px = circle h-6 min-w-6)
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:47:  // NOTE: overflowChipPx is kept for backward-compat API but the slot-based
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:49:  // + same -ml-0.5 overlap when stacked)。Consumer 必 ensure 視覺 chip wrapper
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:50:  // 也套同 `-ml-0.5` overlap class(Combobox `overflowWrapperClassName`)。
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:51:  overflowChipPx: _overflowChipPx = 24,
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:57:  overflowChipPx?: number
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:64:  //   2. overflow 路徑重算 remainder(chip 當 24px 額外空間)
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:65:  //   兩 path 切換時 visible 跳 2(saw)— 因 chip 不被當「stack 內 1 個圓」,
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:66:  //   被當「stack 外額外 chunk」。User 抓 length=4→4、length=5→2+3 = 物理錯。
+src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:93: * Default overflow chip width per size(對齊 overflow-indicator.tsx:17 triggerSize SSOT)。
+src/design-system/components/Combobox/combobox.principles.stories.tsx:5:import { Combobox } from './combobox'
+src/design-system/components/Combobox/combobox.principles.stories.tsx:8:  title: 'Design System/Components/Combobox/設計原則',
+src/design-system/components/Combobox/combobox.principles.stories.tsx:57:      <p>適合 Combobox 的真實業務場景(點擊跳轉「展示」頁範例):</p>
+src/design-system/components/Combobox/combobox.principles.stories.tsx:60:          <LinkTo kind="Design System/Components/Combobox/展示" name="三種模式"><span className="text-primary hover:underline font-medium cursor-pointer">三種模式</span></LinkTo>
+src/design-system/components/Combobox/combobox.principles.stories.tsx:63:          <LinkTo kind="Design System/Components/Combobox/展示" name="尺寸與 Button 對齊"><span className="text-primary hover:underline font-medium cursor-pointer">尺寸與 Button 對齊</span></LinkTo>
+src/design-system/components/Combobox/combobox.principles.stories.tsx:66:          <LinkTo kind="Design System/Components/Combobox/展示" name="單行 vs 換行"><span className="text-primary hover:underline font-medium cursor-pointer">單行 vs 換行</span></LinkTo>
+src/design-system/components/Combobox/combobox.principles.stories.tsx:69:          <LinkTo kind="Design System/Components/Combobox/展示" name="搜尋"><span className="text-primary hover:underline font-medium cursor-pointer">搜尋</span></LinkTo>
+src/design-system/components/Combobox/combobox.principles.stories.tsx:72:          <LinkTo kind="Design System/Components/Combobox/展示" name="DataTable 整合"><span className="text-primary hover:underline font-medium cursor-pointer">DataTable 整合</span></LinkTo>
+src/design-system/components/Combobox/combobox.principles.stories.tsx:81:          title="Combobox 的 sweet spot — 多選 + 空間受限 + 選項數 6+"
+src/design-system/components/Combobox/combobox.principles.stories.tsx:84:          <Combobox options={categoryOptions} value={tags} onChange={setTags} />
+src/design-system/components/Combobox/combobox.principles.stories.tsx:89:          note="Combobox 永遠多選——單選塞進來使用者每次要手動先移除舊 Tag 再選新的，多餘的互動"
+src/design-system/components/Combobox/combobox.principles.stories.tsx:91:          <Combobox options={categoryOptions} value={['electronics']} onChange={() => {}} />
+src/design-system/components/Combobox/combobox.principles.stories.tsx:96:          title="❌ 2-5 個選項且需要全可見 + description:用 Checkbox stack"
+src/design-system/components/Combobox/combobox.principles.stories.tsx:97:          note="權限授予、條款勾選、通知類型選擇——選項需要完整閱讀（含描述），決策後同意。Combobox 藏選項強迫多次點擊對比。完整對照見 select.spec.md「與 RadioGroup 的分界」(Combobox vs Checkbox stack 同構)"
+src/design-system/components/Combobox/combobox.principles.stories.tsx:99:          <Combobox
+src/design-system/components/Combobox/combobox.principles.stories.tsx:108:          <Label warn>↑ 條款勾選是「完整閱讀後同意」→ 用 Checkbox stack 全露內容</Label>
+src/design-system/components/Combobox/combobox.principles.stories.tsx:113:          note="Combobox 是平面選項。部門 / 權限 / 資料夾等樹狀結構需要 TreeView 的展開收合互動"
+src/design-system/components/Combobox/combobox.principles.stories.tsx:115:          <Combobox
+src/design-system/components/Combobox/combobox.principles.stories.tsx:125:          <Label warn>↑ 用縮排偽造階層 → 沒有展開收合、不能按父節點全選、破壞資料結構</Label>
+src/design-system/components/Combobox/combobox.principles.stories.tsx:144:          <Combobox options={categoryOptions} value={single} onChange={setSingle} />
+src/design-system/components/Combobox/combobox.principles.stories.tsx:152:          <Combobox wrap options={categoryOptions} value={wrapped} onChange={setWrapped} />
+src/design-system/components/Combobox/combobox.principles.stories.tsx:160:          <div className="border border-border rounded-lg overflow-hidden w-full max-w-md">
+src/design-system/components/Combobox/combobox.principles.stories.tsx:167:              <Combobox wrap options={categoryOptions} value={['electronics', 'lifestyle', 'sports']} mode="readonly" className="flex-1" />
+src/design-system/components/Combobox/combobox.principles.stories.tsx:171:              <Combobox wrap options={categoryOptions} value={['electronics']} mode="readonly" className="flex-1" />
+src/design-system/components/Combobox/combobox.principles.stories.tsx:192:          <Combobox options={categoryOptions} value={value} onChange={setValue} />
+src/design-system/components/Combobox/combobox.principles.stories.tsx:200:          <Combobox mode="readonly" options={categoryOptions} value={ro} />
+src/design-system/components/Combobox/combobox.principles.stories.tsx:208:          <Combobox options={categoryOptions} value={['electronics']} onChange={() => {}} />
+src/design-system/components/Combobox/combobox.principles.stories.tsx:226:          <Combobox options={categoryOptions} value={value} onChange={setValue} />
+src/design-system/components/Combobox/combobox.principles.stories.tsx:232:          note="與 Select 同理——原生 select 提供 mobile picker、鍵盤導覽、screen reader，自建會失去這些。Combobox 底層也走原生 select，Tag 浮在上層但點擊穿透"
+src/design-system/components/Combobox/combobox.principles.stories.tsx:234:          <Label>實作細節見 Design System / Components / Combobox / 設計規格</Label>
+src/design-system/components/PeoplePicker/person-display.tsx:6:import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
+src/design-system/components/PeoplePicker/person-display.tsx:15:} from './avatar-stack-overflow'
+src/design-system/components/PeoplePicker/person-display.tsx:144:  // → cell overflow-hidden 硬裁 → ellipsis dots 不可見。改 flex(block-level full width)
+src/design-system/components/PeoplePicker/person-display.tsx:174:   * → display + edit stack 同 algorithm(同 cell width → 同 overflow 判斷),不再 display 用固定 3 vs edit
+src/design-system/components/PeoplePicker/person-display.tsx:184:  // 2026-05-15 Bug 3 fix(Claude+Codex Step 5 比稿 consensus):消費 shared `avatar-stack-overflow`
+src/design-system/components/PeoplePicker/person-display.tsx:186:  // overflow 判斷」(edit path 用 Combobox useOverflowCount DOM offsetWidth / display path 用 inline
+src/design-system/components/PeoplePicker/person-display.tsx:188:  // SSOT in `./avatar-stack-overflow.ts`,M14 mechanical guard 防 future drift。
+src/design-system/components/PeoplePicker/person-display.tsx:200:        overflowChipPx: AVATAR_STACK_OVERFLOW_CHIP_PX[size],
+src/design-system/components/PeoplePicker/person-display.tsx:214:  const overflow = hidden.length
+src/design-system/components/PeoplePicker/person-display.tsx:221:  // 2026-05-14 item-anatomy SSOT fix(per codex+Layer A 共識):outer items-start + avatar stack
+src/design-system/components/PeoplePicker/person-display.tsx:222:  // 鎖 first-line baseline(整 stack 是 prefix slot,h-[1lh] 對齊 first line)。
+src/design-system/components/PeoplePicker/person-display.tsx:229:        // 共用 SSOT(下方 export),Combobox tagRenderer / 此處 / 任何 future avatar consumer
+src/design-system/components/PeoplePicker/person-display.tsx:243:      {overflow > 0 && (
+src/design-system/components/PeoplePicker/person-display.tsx:245:          count={overflow}
+src/design-system/components/PeoplePicker/person-display.tsx:296:// **Why centralize**:Combobox tagRenderer (PeoplePicker stack mode) + MultiPersonDisplay
+src/design-system/components/PeoplePicker/person-display.tsx:311:        // **12×12 + 2px white ring**(SSOT match stacked avatar,Slack/Material/iOS
+src/design-system/components/PeoplePicker/person-display.tsx:332:// ── PersonAvatarTag(Combobox tagRenderer SSOT for stack mode)─────────────
+src/design-system/components/PeoplePicker/person-display.tsx:333:// PeoplePicker `multiDisplay='stack'` 模式 wraps Combobox,tagRenderer 不能用 Tag pill
+src/design-system/components/PeoplePicker/person-display.tsx:338:// 因 Combobox `tagRenderer` 結果會被內部 `<div shrink-0>` 包成 measurement wrapper
+src/design-system/components/PeoplePicker/person-display.tsx:339:// (useOverflowCount 必要)。把 overlap + group 拉到 Combobox 的 `tagWrapperClassName`
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:3:import { Combobox } from './combobox'
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:7:  title: 'Design System/Components/Combobox/設計規格',
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:304:        <div className="overflow-x-auto">
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:403:            <Combobox
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:433:              <div className="flex items-center rounded-md overflow-hidden" style={{ height: 52, outline: `2px solid ${Z.dim.text}22` }}>
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:439:                <BpZone w={36} color={Z.tag} label="+N" sub="overflow" />
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:458:        <div className="w-[300px] shrink-0 border border-divider rounded-lg bg-surface overflow-hidden">
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:540:          <div className="overflow-x-auto">
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:548:                      <Combobox
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:563:                      <Combobox
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:583:          <div className="overflow-x-auto">
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:591:                      <Combobox mode={m} options={categoryOptions} value={['electronics', 'food']} size="sm" />
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:594:                      <Combobox mode={m} options={categoryOptions} value={[]} size="sm" />
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:641:      <div className="overflow-x-auto">
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:729:              <Combobox size={sz} options={categoryOptions} value={['electronics', 'food']} onChange={() => {}} className="w-64" />
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:742:              <Combobox mode="readonly" size={sz} options={categoryOptions} value={['electronics', 'food']} className="w-64" />
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:760:    const [overflowV, setOverflowV] = useState(allValues)
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:769:          <Desc>Combobox 特有的溢出、換行、清除、個別移除行為。</Desc>
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:777:            <Combobox
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:779:              value={overflowV}
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:795:            <Combobox
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:812:                <Combobox
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:823:                <Combobox
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:843:            <Combobox
+src/design-system/components/Combobox/combobox.anatomy.stories.tsx:870:            <Combobox
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:2:import { PeoplePicker } from './people-picker'
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:7:  title: 'Design System/Components/PeoplePicker/設計規格',
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:28:        <Desc>PeoplePicker 是組合元件——Popover(浮層)+ Command(cmdk 搜尋)+ SelectMenu(選單)+ PersonDisplay(Avatar + Name)。外觀對齊 Select / Combobox,差異在選項前綴有 Avatar 視覺。</Desc>
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:30:          <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:40:        <Desc>透過 `value` prop 的類型決定:`PersonValue | null`(單選)或 `PersonValue[]`(多選)。多選 field 顯示 Avatar 陣列(同 Combobox)。</Desc>
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:44:            <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:52:            <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:63:        <div className="overflow-x-auto">
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:110:      <PeoplePicker {...args} onChange={() => {}} />
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:122:        <PeoplePicker people={SAMPLE_PEOPLE} value={SAMPLE_PEOPLE[0]} onChange={() => {}} />
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:127:        <PeoplePicker mode="readonly" people={SAMPLE_PEOPLE} value={SAMPLE_PEOPLE[0]} />
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:131:        <PeoplePicker mode="disabled" people={SAMPLE_PEOPLE} value={SAMPLE_PEOPLE[0]} />
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:135:        <PeoplePicker mode="readonly" people={SAMPLE_PEOPLE} value={null} />
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:148:          PeoplePicker 作為 Field Control,高度對齊 `--field-height-*` tier(sm=28/32、md=32/36、lg=36/40
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:151:        <div className="overflow-x-auto mb-4">
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:174:              <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:195:          PeoplePicker 的 field 外觀跟 Select / Combobox 完全一致——共用 `fieldWrapperStyles`。差別只在
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:198:        <div className="overflow-x-auto mb-4">
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:253:          Dropdown 的 row 色彩走 item-layout canonical——跟 Select / Combobox / DropdownMenu 同一套
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:256:        <div className="overflow-x-auto mb-4">
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:294:        <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:305:          GitHub PR reviewers 場景——多選、field 顯示 Avatar 陣列(限定顯示前幾個 + overflow count),
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:308:        <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:321:        <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:335:        <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:349:        <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:365:        <div className="overflow-x-auto">
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:377:            <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:385:            <PeoplePicker
+src/design-system/components/Combobox/combobox.spec.md:2:component: Combobox
+src/design-system/components/Combobox/combobox.spec.md:12:  - Polaris Combobox: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Combobox
+src/design-system/components/Combobox/combobox.spec.md:17:# Combobox 設計原則
+src/design-system/components/Combobox/combobox.spec.md:21:Combobox 是**多選下拉**的輸入與顯示元件。選中值以 Tag 陣列呈現，支援單行溢出與多行換行兩種版面。底層走原生 `<select>`（配合 Tag 疊層 overlay）。
+src/design-system/components/Combobox/combobox.spec.md:23:共用規則見 `../Field/field-controls.spec.md`。本文件只記錄 Combobox 特有的原則。
+src/design-system/components/Combobox/combobox.spec.md:45:- **選項數 6+**（少於 6 且 2-5 可見的多選，用 Checkbox stack 更有效）
+src/design-system/components/Combobox/combobox.spec.md:53:| 單選 | `Select` | Combobox 永遠多選；單選場景強迫使用者每次手動清除再選新的 |
+src/design-system/components/Combobox/combobox.spec.md:54:| 2-5 個選項且全部可見 | Checkbox stack（`SelectionItem` 垂直排列）| 全可見 + 掃視快 + 支援描述文字 |
+src/design-system/components/Combobox/combobox.spec.md:55:| 階層結構（父/子節點）| `TreeView` | Combobox 是平面選項，沒有層級概念 |
+src/design-system/components/Combobox/combobox.spec.md:58:### 與 Checkbox stack 的分界
+src/design-system/components/Combobox/combobox.spec.md:62:- **Progressive disclosure 成本**：Combobox 藏（多一次點擊），Checkbox stack 全露
+src/design-system/components/Combobox/combobox.spec.md:63:- **視覺重量**：Combobox O(1)，Checkbox stack O(n) 每個選項各一行
+src/design-system/components/Combobox/combobox.spec.md:64:- **評估深度**：Checkbox stack 適合「需要仔細讀選項 / 連帶 description」（權限授予、條款勾選），Combobox 適合「label 自帶語意、快速添加」（tag、分類）
+src/design-system/components/Combobox/combobox.spec.md:66:**Fallback**：表單中法律 / 權限類多選一律 Checkbox stack（完整閱讀優先，見 `../Checkbox/checkbox.spec.md`「Clamp 政策」）；Tag / 分類 / 協作成員用 Combobox。
+src/design-system/components/Combobox/combobox.spec.md:101:多選時 tag 跟 search input 共擠在 `fieldWrapperStyles` 內；input 以 `flex-1 min-w-[60px]` 確保**最少 60px 可打字空間**。低於 60px 會讓 search 輸入變得無法用（使用者看不到自己打什麼）。這是 Combobox 專用 layout 常數，非跨元件 token。
+src/design-system/components/Combobox/combobox.spec.md:125:- ❌ 單選場景用 Combobox——使用者每次需手動清除再選新的，改用 `Select`
+src/design-system/components/Combobox/combobox.spec.md:126:- ❌ 法律 / 權限類多選用 Combobox——完整閱讀優先，改用 Checkbox stack（見 Checkbox spec「Clamp 政策」）
+src/design-system/components/Combobox/combobox.spec.md:134:Combobox 內部結構有多個 `<div>` / `<Tag>` 帶 `onClick`（tag 容器、ChevronDown 區域、搜尋輸入 wrapper 等）——**這些是 mouse 優化的 click-path delegation，不是鍵盤介面**。鍵盤路徑由**隱藏的 native `<select>`** 處理（tab-focusable，Enter/Space 開啟，arrow 導覽，Esc 關閉）。
+src/design-system/components/Combobox/combobox.spec.md:142:**結論**: Combobox 多處 `onClick` 在非 button 元素上**是經過評估的 acceptable a11y 模式**,不是需要修復的 bug。
+src/design-system/components/Combobox/combobox.spec.md:148:- `../Select/select.spec.md` — 單選對應元件；「與 RadioGroup 的分界」是 Combobox vs Checkbox stack 的 framework 來源
+src/design-system/components/Combobox/combobox.spec.md:149:- `../Checkbox/checkbox.spec.md` — Checkbox stack（多選全可見場景）
+src/design-system/components/Combobox/combobox.spec.md:158:- `overflow-indicator.spec.md`
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:5:import { PeoplePicker } from './people-picker'
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:8:import { Combobox } from '@/design-system/components/Combobox/combobox'
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:11:  title: 'Design System/Components/PeoplePicker/設計原則',
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:45:// ── UsageGuidance — 何時用 / 何時不用 / vs 近親元件(合併 WhenToUse + VsSelectRule + VsComboboxRule) ──
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:57:          note="適合 PeoplePicker 的場景(點擊跳轉「展示」頁範例);判斷不確定時對照 spec.md「何時用 / 何時不用」段。"
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:61:              <LinkTo kind="Design System/Components/PeoplePicker/展示" name="單人"><span className="text-primary hover:underline font-medium cursor-pointer">單人</span></LinkTo>
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:64:              <LinkTo kind="Design System/Components/PeoplePicker/展示" name="多人"><span className="text-primary hover:underline font-medium cursor-pointer">多人</span></LinkTo>
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:67:              <LinkTo kind="Design System/Components/PeoplePicker/展示" name="尺寸"><span className="text-primary hover:underline font-medium cursor-pointer">尺寸</span></LinkTo>
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:73:          title="vs Select — PeoplePicker 是選人員(選項有 avatar 視覺)"
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:78:            <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:87:          title="❌ 選非人員(分類 / 狀態)用 PeoplePicker"
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:88:          note="Avatar 視覺是「選人」的獨有語意——選「優先級」、「產品類別」、「訂單狀態」這些非人員的分類用 Select / Combobox,否則 avatar 會變成無意義裝飾"
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:102:          <Label warn>↑ 非人員不要用 PeoplePicker</Label>
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:106:          title="vs Combobox — 多選非人員 → Combobox(不是 PeoplePicker)"
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:107:          note="Combobox 是通用多選,沒 avatar 假設。「產品標籤」、「技術 stack」這類非人員多選用 Combobox;人員多選才用 PeoplePicker"
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:109:          <Combobox
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:119:          <Label>↑ 技術 stack 是分類多選,不是人員,用 Combobox</Label>
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:139:          <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:151:          <PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:178:        note="跟 Select / Combobox 的 placeholder 行為一致。不用 em-dash,因為 edit mode 是可操作的"
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:180:        <PeoplePicker value={null} onChange={() => {}} people={team} />
+src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:187:        <PeoplePicker mode="readonly" value={null} />
+src/design-system/components/Combobox/combobox.tsx:2:// @renderer-symmetry-allow: ComboboxTagStack(display path)接 consumer tagRenderer 是 Stream C 下 cycle 工作 — 2026-05-12 先 ship Issues 2/3/4 surgical fixes(placeholder vocabulary + cell surface metrics + placeholder truncate),tagRenderer display-path unify deferred per field-controls.spec.md 共享 contract a。當前 multi=1 顯示已透過 PeoplePicker tagRenderer 線 314 PersonDisplay SSOT 對齊;其他 Combobox consumer 走 default `<Tag>` 純文字 backward-compat。
+src/design-system/components/Combobox/combobox.tsx:11:import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
+src/design-system/components/Combobox/combobox.tsx:26: * Combobox option schema(2026-05-10 post-Issue-4 audit unify):**explicit extends
+src/design-system/components/Combobox/combobox.tsx:27: * SelectMenuOption(primitive SSOT)** — 避免重蹈先前 PeoplePicker 改壞的 wrapper schema drift。
+src/design-system/components/Combobox/combobox.tsx:33: *   PeoplePicker multi-mode 走 Combobox 路徑,dropdown menu rows lose avatar / description —
+src/design-system/components/Combobox/combobox.tsx:52:  overflowEl: React.RefObject<HTMLDivElement | null>,
+src/design-system/components/Combobox/combobox.tsx:55:  gap: number = GAP,  // (2026-05-07 v15.13)stack avatar 模式傳 0
+src/design-system/components/Combobox/combobox.tsx:56:  visibleCountOverride?: number,  // 2026-05-15 Bug 3 fix:override DOM measurement(PeoplePicker stack 走 formula primitive)
+src/design-system/components/Combobox/combobox.tsx:60:  // 2026-05-16 RACE FIX(user 抓「逐個 click 滿 6」vs「取消全選→再全選」same length 不同 visible):
+src/design-system/components/Combobox/combobox.tsx:74:  // 對齊 2026-05-14 I3 fix comment「user 抓『全選 vs 逐個勾 result 不同』」 — 當時 fix
+src/design-system/components/Combobox/combobox.tsx:78:    if (visibleCountOverride !== undefined) {
+src/design-system/components/Combobox/combobox.tsx:81:        if (el) el.hidden = i >= visibleCountOverride
+src/design-system/components/Combobox/combobox.tsx:83:      const ofEl = overflowEl.current
+src/design-system/components/Combobox/combobox.tsx:84:      if (ofEl) ofEl.hidden = visibleCountOverride >= totalCount
+src/design-system/components/Combobox/combobox.tsx:85:      setState({ visibleCount: visibleCountOverride, ready: true }); return
+src/design-system/components/Combobox/combobox.tsx:89:    // measurement 後 visibleCount=0 → 顯 +1 indicator 而非 single tag,違反 PeoplePicker length===1
+src/design-system/components/Combobox/combobox.tsx:99:      const ofEl = overflowEl.current
+src/design-system/components/Combobox/combobox.tsx:101:      const overflowW = ofEl?.offsetWidth || 60
+src/design-system/components/Combobox/combobox.tsx:113:        if (remaining > 0 && next + gap + overflowW > available) break
+src/design-system/components/Combobox/combobox.tsx:122:    // 2026-05-14 I3 fix(per codex M31 verdict + user 抓「全選 vs 逐個勾 result 不同」):
+src/design-system/components/Combobox/combobox.tsx:128:    // 完;user 抓 path A 逐個 click vs path B 取消全選再全選 same length 不同 visible)。
+src/design-system/components/Combobox/combobox.tsx:154:  }, [containerRef, totalCount, enabled, gap, visibleCountOverride])  // 2026-05-15 Bug 3 fix:visibleCountOverride 入 deps,override 改 trigger recalc
+src/design-system/components/Combobox/combobox.tsx:161:type ComboboxOverflowShape = 'circle' | 'tag'
+src/design-system/components/Combobox/combobox.tsx:163:// 2026-05-16 fix:overflow chip wrapper 必能跟 tag wrapper 套同 overlap class
+src/design-system/components/Combobox/combobox.tsx:165:// 只有 `shrink-0`,在 stack 模式 -ml-0.5 不 apply → chip 不 overlap → 視覺多 22px
+src/design-system/components/Combobox/combobox.tsx:167:// PeoplePicker stack mode pass `'-ml-0.5 first:ml-0 relative inline-flex'` 對齊。
+src/design-system/components/Combobox/combobox.tsx:175:   * 2026-05-14 I4 fix(per codex M31 verdict + user 抓「display overflow 有 avatar / edit 無」):
+src/design-system/components/Combobox/combobox.tsx:176:   * Optional renderer for hidden items in `+N` overflow popover。Default fallback = `<Tag>{label}</Tag>`
+src/design-system/components/Combobox/combobox.tsx:178:   * (對齊 display MultiPersonDisplay overflow popover Tag avatar SSOT)。
+src/design-system/components/Combobox/combobox.tsx:187:   * (2026-05-07 v15.13)為 PeoplePicker stack mode 提供 hook point — 讓 stack avatar 走
+src/design-system/components/Combobox/combobox.tsx:197:  /** 2026-05-16 fix:overflow chip 圓形 wrapper 套此 class(stack 模式套 `-ml-0.5` overlap),
+src/design-system/components/Combobox/combobox.tsx:199:  overflowWrapperClassName?: string
+src/design-system/components/Combobox/combobox.tsx:201:   * Overflow indicator(+N)形狀(2026-05-12 Round 7 fix,user 抓 PeoplePicker stack +N 該圓形):
+src/design-system/components/Combobox/combobox.tsx:202:   * - `'tag'`(default,backward-compat)— 矩形 chip(對齊 Combobox 文字 tag)
+src/design-system/components/Combobox/combobox.tsx:203:   * - `'circle'`(opt-in for avatar stack consumers)— 圓形 avatar-shape +N(對齊 GitHub picker idiom)
+src/design-system/components/Combobox/combobox.tsx:204:   * PeoplePicker stack mode pass `'circle'`,Combobox 文字 tag 自走 `'tag'`。
+src/design-system/components/Combobox/combobox.tsx:206:  overflowShape?: ComboboxOverflowShape
+src/design-system/components/Combobox/combobox.tsx:208:   * 2026-05-15 Bug 3 fix:override visible count via formula-based primitive(PeoplePicker stack
+src/design-system/components/Combobox/combobox.tsx:209:   * 用 `avatar-stack-overflow` primitive deterministic formula 計算 visible,bypass DOM offsetWidth
+src/design-system/components/Combobox/combobox.tsx:210:   * measurement)。對齊 user SSOT「同 cell width 同 overflow 判斷」。
+src/design-system/components/Combobox/combobox.tsx:212:  visibleCountOverride?: number
+src/design-system/components/Combobox/combobox.tsx:215:function OverflowTagList({ containerRef, items, size, wrap, renderTag, renderHiddenTag, onRemove, trailing, tagWrapperClassName, overflowWrapperClassName, gap = GAP, overflowShape = 'tag', visibleCountOverride }: OverflowTagListProps) {
+src/design-system/components/Combobox/combobox.tsx:217:  const overflowEl = React.useRef<HTMLDivElement>(null)
+src/design-system/components/Combobox/combobox.tsx:218:  const { visibleCount, ready } = useOverflowCount(containerRef, tagEls, overflowEl, items.length, !wrap, gap, visibleCountOverride)
+src/design-system/components/Combobox/combobox.tsx:223:  const overflow = items.length - visibleCount
+src/design-system/components/Combobox/combobox.tsx:229:        // 2026-05-14 I5 fix(per codex M31 verdict + user 抓「avatar stack 堆疊方向不一致」):
+src/design-system/components/Combobox/combobox.tsx:231:        // canonical + MUI AvatarGroup surplus pattern)。display + edit stack 堆疊方向統一。
+src/design-system/components/Combobox/combobox.tsx:234:      <div ref={overflowEl} className={cn('shrink-0', overflowWrapperClassName)}>
+src/design-system/components/Combobox/combobox.tsx:235:        <OverflowIndicator count={overflow} shape={overflowShape} size={size}>
+src/design-system/components/Combobox/combobox.tsx:250:// ── Internal tag-stack renderer (consumed by ReadonlyMultiSelect / mode='display') ───
+src/design-system/components/Combobox/combobox.tsx:252:// Phase B2(2026-05-05):原 ComboboxDisplay sub-component 已 retire,改 inline `<Combobox mode="display">`。
+src/design-system/components/Combobox/combobox.tsx:253:// 本 helper 只負責 tag-stack 內容渲染(OverflowTagList 消費),不包 Field wrapper。
+src/design-system/components/Combobox/combobox.tsx:254:function ComboboxTagStack({
+src/design-system/components/Combobox/combobox.tsx:273:  // edit path tagAreaRef wrapper 已是 `flex-1 min-w-0`(NativeCombobox/CustomCombobox line 258 / 354),
+src/design-system/components/Combobox/combobox.tsx:276:  // `overflow-visible` → `overflow-hidden` 讓 narrow cell width 強制 clip(Tag 內建 truncate
+src/design-system/components/Combobox/combobox.tsx:277:  // 處理 text ellipsis,stack `-ml-0.5` 負 margin 在 wrapper 內不受影響)。對齊
+src/design-system/components/Combobox/combobox.tsx:281:    <div ref={ownRef} className={cn('flex-1 min-w-0 flex items-center', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}>
+src/design-system/components/Combobox/combobox.tsx:289:export interface ComboboxProps {
+src/design-system/components/Combobox/combobox.tsx:330:   * 用例:PeoplePicker(multi)用此 slot 把 selected tag 換成 avatar + name pill,而非
+src/design-system/components/Combobox/combobox.tsx:331:   * 純文字 Tag。對齊 PeoplePicker = Combobox wrapper SSOT。
+src/design-system/components/Combobox/combobox.tsx:335:   * 2026-05-14 I4 fix:Optional renderer for hidden items in `+N` overflow popover
+src/design-system/components/Combobox/combobox.tsx:336:   * (對齊 display MultiPersonDisplay overflow popover 含 avatar SSOT)。PeoplePicker stack
+src/design-system/components/Combobox/combobox.tsx:344:   * (`group/avatar`)— 既保留 Combobox 必要 measurement wrapper,又讓 dismiss/overlap 視覺生效。
+src/design-system/components/Combobox/combobox.tsx:347:  /** 2026-05-16:overflow chip wrapper 套此 class(對齊 tagWrapperClassName)。Stack 模式
+src/design-system/components/Combobox/combobox.tsx:350:  overflowWrapperClassName?: string
+src/design-system/components/Combobox/combobox.tsx:360:   * tagAreaRef container 左 paddingLeft(px,2026-05-12 加,for PeoplePicker Avatar inset)。
+src/design-system/components/Combobox/combobox.tsx:366:   * **2026-05-13 v2 deprecate path**:原 PeoplePicker pass `{8}` 假設「Combobox tagPadding=4px,4+8=12」
+src/design-system/components/Combobox/combobox.tsx:368:   * default density 才 = 4px;其他 size/density 漂 6/8px → 4+8=12 公式破。改 PeoplePicker 直接 inject
+src/design-system/components/Combobox/combobox.tsx:369:   * `!px-3` className 到 Combobox Field wrapper(per people-picker.spec.md:94 v2),`tagAreaPaddingLeftPx`
+src/design-system/components/Combobox/combobox.tsx:370:   * 走 undefined。Future 仍保留此 prop 給其他 consumer 精準調整 padding,但 PeoplePicker 已不再用。
+src/design-system/components/Combobox/combobox.tsx:374:   * Overflow indicator (+N) 形狀(2026-05-12 Round 7,opt-in 給 avatar stack consumer):
+src/design-system/components/Combobox/combobox.tsx:375:   * - `'tag'`(default)— 矩形 chip(Combobox 文字 tag default)
+src/design-system/components/Combobox/combobox.tsx:376:   * - `'circle'`(opt-in)— 圓形 avatar-shape(PeoplePicker stack 用)
+src/design-system/components/Combobox/combobox.tsx:378:  overflowShape?: ComboboxOverflowShape
+src/design-system/components/Combobox/combobox.tsx:381:   * DOM-based `useOverflowCount`)。PeoplePicker stack mode 用 `avatar-stack-overflow` primitive
+src/design-system/components/Combobox/combobox.tsx:382:   * deterministic formula 計算 visible count,forward 給 Combobox bypass DOM offsetWidth
+src/design-system/components/Combobox/combobox.tsx:383:   * measurement,避免 dual-algorithm drift。對齊 user SSOT「同 cell width 同 overflow 判斷」。
+src/design-system/components/Combobox/combobox.tsx:385:  visibleCountOverride?: number
+src/design-system/components/Combobox/combobox.tsx:388:   * — DataTable cell display↔edit 像素級對齊用。預設 false(裸 tag stack,backward compat)。
+src/design-system/components/Combobox/combobox.tsx:401:}: Pick<ComboboxProps, 'mode' | 'variant' | 'size' | 'options' | 'value' | 'wrap' | 'className' | 'showDisplayEndIcon'>) {
+src/design-system/components/Combobox/combobox.tsx:409:  // mode='display'(Phase B2 2026-05-05):純內容輸出 — tag stack 不包 Field wrapper / 不 reserve 高度。
+src/design-system/components/Combobox/combobox.tsx:410:  //   對齊原 ComboboxDisplay sub-component(retired)。
+src/design-system/components/Combobox/combobox.tsx:419:        <ComboboxTagStack value={value} options={options} tagSize={sz} wrap={wrap} />
+src/design-system/components/Combobox/combobox.tsx:428:          <ComboboxTagStack value={value} options={options} tagSize={sz} wrap={wrap} />
+src/design-system/components/Combobox/combobox.tsx:442:        wrap ? 'flex-wrap py-1' : 'overflow-visible', className)}
+src/design-system/components/Combobox/combobox.tsx:445:        <ComboboxTagStack value={value} options={options} tagSize={sz} wrap={wrap}
+src/design-system/components/Combobox/combobox.tsx:454:// ── Native Combobox (mobile) ────────────────────────────────────────
+src/design-system/components/Combobox/combobox.tsx:458:// 公開 `Combobox.forwardRef` 之前用 `(props, _ref)` 把 ref drop,內部 `NativeCombobox` /
+src/design-system/components/Combobox/combobox.tsx:459:// `CustomCombobox` 從未拿 ref → PeoplePicker `stackContainerRef.current` 永遠 null →
+src/design-system/components/Combobox/combobox.tsx:460:// `useLayoutEffect` early return → `visibleCountOverride` 永遠 undefined →
+src/design-system/components/Combobox/combobox.tsx:461:// Combobox 走原 internal `useOverflowCount` 60px chip fallback bug → drift。
+src/design-system/components/Combobox/combobox.tsx:463:// 公開 `Combobox.forwardRef` 把 `ref` forward 為 `__triggerRef`。對齊 codex DS-wide iceberg
+src/design-system/components/Combobox/combobox.tsx:466:type ComboboxInternalProps = ComboboxProps & { __triggerRef?: React.Ref<HTMLDivElement> }
+src/design-system/components/Combobox/combobox.tsx:468:function NativeCombobox({
+src/design-system/components/Combobox/combobox.tsx:472:}: ComboboxInternalProps) {
+src/design-system/components/Combobox/combobox.tsx:506:      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-visible')} style={{ gap: GAP }}
+src/design-system/components/Combobox/combobox.tsx:531:// ── Custom Combobox (desktop — consumes SelectMenu) ───────────────────
+src/design-system/components/Combobox/combobox.tsx:533:function CustomCombobox({
+src/design-system/components/Combobox/combobox.tsx:545:  overflowWrapperClassName,
+src/design-system/components/Combobox/combobox.tsx:547:  visibleCountOverride,
+src/design-system/components/Combobox/combobox.tsx:549:  overflowShape,
+src/design-system/components/Combobox/combobox.tsx:552:}: ComboboxInternalProps) {
+src/design-system/components/Combobox/combobox.tsx:595:  // disabled / icon / group)— 修先前 PeoplePicker multi-mode dropdown 漏 avatar drift bug。
+src/design-system/components/Combobox/combobox.tsx:628:      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-visible')} style={{ gap: tagAreaGap, paddingLeft: tagAreaPaddingLeftPx }}>
+src/design-system/components/Combobox/combobox.tsx:632:            overflowWrapperClassName={overflowWrapperClassName}
+src/design-system/components/Combobox/combobox.tsx:634:            overflowShape={overflowShape}
+src/design-system/components/Combobox/combobox.tsx:635:            visibleCountOverride={visibleCountOverride}
+src/design-system/components/Combobox/combobox.tsx:649:                // items.length > 0(已選)→ no placeholder,純 cursor(對齊 Combobox empty cursor SSOT)。
+src/design-system/components/Combobox/combobox.tsx:658:             truncate,narrow container 時單行省略(對齊 Combobox text-tag truncate canonical)。
+src/design-system/components/Combobox/combobox.tsx:707:const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
+src/design-system/components/Combobox/combobox.tsx:710:    // `__triggerRef`,讓 PeoplePicker stack 透過 ref 量 trigger DOM(visibleCountOverride
+src/design-system/components/Combobox/combobox.tsx:714:    if (isMobile) return <NativeCombobox {...props} __triggerRef={ref} />
+src/design-system/components/Combobox/combobox.tsx:715:    return <CustomCombobox {...props} __triggerRef={ref} />
+src/design-system/components/Combobox/combobox.tsx:718:Combobox.displayName = 'Combobox'
+src/design-system/components/Combobox/combobox.tsx:723:  component: 'Combobox',
+src/design-system/components/Combobox/combobox.tsx:739:export { Combobox }
+src/design-system/components/PeoplePicker/people-picker.tsx:2:// @placeholder-vocabulary-allow: 1-cycle backward-compat — `placeholder` 已加(trigger empty SSOT),`emptyPlaceholder={emptyText}` forward 仍保留讓既有 consumer 不被 silent break;Combobox line 509 `placeholder ?? emptyPlaceholder` fallback → placeholder 永遠 takes precedence。Future cycle 移除 emptyPlaceholder forward(per field-controls.spec.md 共享 contract b)。
+src/design-system/components/PeoplePicker/people-picker.tsx:14:import { Combobox } from '@/design-system/components/Combobox/combobox'
+src/design-system/components/PeoplePicker/people-picker.tsx:20:} from './avatar-stack-overflow'
+src/design-system/components/PeoplePicker/people-picker.tsx:25: * SSOT helper for PeoplePicker stack mode tag wrapper className(per-length canonical)。
+src/design-system/components/PeoplePicker/people-picker.tsx:29: * PersonAvatarTag stack overlap(per spec.md §D row 1)需要 negative margin overlap visual。
+src/design-system/components/PeoplePicker/people-picker.tsx:30: * 一個 static wrapper class 涵蓋兩 contract 不可能 — Combobox `OverflowTagList` 把 result 包
+src/design-system/components/PeoplePicker/people-picker.tsx:34: * **Why centralize**:M14 mechanical guard against future drift。任何人未來改 stack mode 邏輯,
+src/design-system/components/PeoplePicker/people-picker.tsx:49: * **禁加 overflow-hidden**:inner `<span truncate>` 自帶 overflow-hidden + text-overflow:ellipsis,
+src/design-system/components/PeoplePicker/people-picker.tsx:50: *   wrapper overflow-hidden 反而 clip 24px avatar(ItemPrefix h-[1lh]~20px slot 容不下)+ break inner ellipsis
+src/design-system/components/PeoplePicker/people-picker.tsx:55:export function getPeoplePickerTagWrapperClass(selectedCount: number): string {
+src/design-system/components/PeoplePicker/people-picker.tsx:58:    // length>=2 stack 視覺(spec.md §D row 1):圓形 avatar overlap + group/avatar selector for dismiss overlay
+src/design-system/components/PeoplePicker/people-picker.tsx:63:// 已 unified with SelectMenuOption per Issue 4)。先前 PeoplePicker single mode 透過 Select 開
+src/design-system/components/PeoplePicker/people-picker.tsx:79:// ── PeoplePicker ────────────────────────────────────────────────────────────
+src/design-system/components/PeoplePicker/people-picker.tsx:84://       - **'stack'**(default,baseline 既有視覺)— Avatar 疊合 + `+N` overflow indicator,
+src/design-system/components/PeoplePicker/people-picker.tsx:88://       - **'pill'**(opt-in)— 每人 Tag pill,可 wrap。Wrap `<Combobox tagRenderer>`,
+src/design-system/components/PeoplePicker/people-picker.tsx:91://         對齊 GitHub Reviewers / Combobox tag-input idiom。
+src/design-system/components/PeoplePicker/people-picker.tsx:95:// component 內部 `...rest` forward 到 trigger 容器(對齊 DS 既有 Combobox / Select 慣例)。
+src/design-system/components/PeoplePicker/people-picker.tsx:97:export interface PeoplePickerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+src/design-system/components/PeoplePicker/people-picker.tsx:100:  /** Field chrome variant(對齊 Select / Combobox)*/
+src/design-system/components/PeoplePicker/people-picker.tsx:124:   * Multi mode 顯示樣式(default 'stack')。Single mode 此 prop 忽略。
+src/design-system/components/PeoplePicker/people-picker.tsx:125:   * - 'stack' — Avatar 疊合 + `+N`(空間省、不可 wrap;default)
+src/design-system/components/PeoplePicker/people-picker.tsx:128:  multiDisplay?: 'stack' | 'pill'
+src/design-system/components/PeoplePicker/people-picker.tsx:134:  /** Pill 模式下是否允許 wrap(default true)— 對齊 Combobox `wrap` prop */
+src/design-system/components/PeoplePicker/people-picker.tsx:140:   *   類 Combobox inline-trigger idiom)
+src/design-system/components/PeoplePicker/people-picker.tsx:148:   * 與 edit (Select / Combobox wrapped) 同 DOM 結構,消除 Layer-B padding mismatch。
+src/design-system/components/PeoplePicker/people-picker.tsx:155:const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(function PeoplePicker({
+src/design-system/components/PeoplePicker/people-picker.tsx:169:  multiDisplay = 'stack',
+src/design-system/components/PeoplePicker/people-picker.tsx:188:  // 與 edit (Select / Combobox wrapped) 同 DOM 結構消除 cell display↔edit 像素偏移。
+src/design-system/components/PeoplePicker/people-picker.tsx:265:        // event handler element 型別跟 PeoplePicker `HTMLAttributes<HTMLDivElement>` 不一致
+src/design-system/components/PeoplePicker/people-picker.tsx:273:  // ── multi 'pill' → wraps Combobox(對齊 GitHub Reviewers / Combobox idiom)────
+src/design-system/components/PeoplePicker/people-picker.tsx:279:      <Combobox
+src/design-system/components/PeoplePicker/people-picker.tsx:290:        // emptyPlaceholder backward-compat forward(Combobox line 509 `placeholder ?? emptyPlaceholder` fallback)
+src/design-system/components/PeoplePicker/people-picker.tsx:325:  // ── multi 'stack' (default) → wraps Combobox 跟 pill mode 同 SSOT,差別在 tagRenderer 視覺。
+src/design-system/components/PeoplePicker/people-picker.tsx:328:  // `avatar-stack-overflow` primitive deterministic formula(取代 Combobox DOM offsetWidth-based
+src/design-system/components/PeoplePicker/people-picker.tsx:329:  // useOverflowCount + 60px fallback 不 deterministic),pass override 給 Combobox bypass internal
+src/design-system/components/PeoplePicker/people-picker.tsx:331:  // 對齊 user verbatim SSOT「同 cell width 同 overflow 判斷」+ codex Q3 consensus shared primitive。
+src/design-system/components/PeoplePicker/people-picker.tsx:336:  const stackContainerRef = React.useRef<HTMLDivElement | null>(null)
+src/design-system/components/PeoplePicker/people-picker.tsx:337:  const [stackVisibleCount, setStackVisibleCount] = React.useState<number | undefined>(undefined)
+src/design-system/components/PeoplePicker/people-picker.tsx:339:    // 注:此 effect 只在 multi stack mode 跑(early return if not stack);length<=1 不需 override
+src/design-system/components/PeoplePicker/people-picker.tsx:343:    const root = stackContainerRef.current
+src/design-system/components/PeoplePicker/people-picker.tsx:346:    // stackContainerRef 透過 mergedStackRef 接 Combobox forwarded ref → root **就是** [role=combobox]
+src/design-system/components/PeoplePicker/people-picker.tsx:348:    // tagArea=null → available=0 → setStackVisibleCount(0) → 整 stack 全 overflow → fallback 到
+src/design-system/components/PeoplePicker/people-picker.tsx:349:    // Combobox DOM-based useOverflowCount(非 deterministic 那個算法)。修:用 root 自己當 trigger,
+src/design-system/components/PeoplePicker/people-picker.tsx:359:        overflowChipPx: AVATAR_STACK_OVERFLOW_CHIP_PX[size],
+src/design-system/components/PeoplePicker/people-picker.tsx:370:    stackContainerRef.current = el
+src/design-system/components/PeoplePicker/people-picker.tsx:376:    <Combobox
+src/design-system/components/PeoplePicker/people-picker.tsx:393:      // 撤掉 `tagAreaPaddingLeftPx={8}` magic — Combobox `tagPadding[size]` 是 density-dependent
+src/design-system/components/PeoplePicker/people-picker.tsx:397:      // 達成 GitHub PeoplePicker fixed 12px inset(對齊 cell context 同 13px from cell.left 含 1px border)。
+src/design-system/components/PeoplePicker/people-picker.tsx:400:      // - isEmpty → 不 inject,走 Combobox 預設文字 inset(`tagPadding[size]` 公式自然 vertical center)
+src/design-system/components/PeoplePicker/people-picker.tsx:404:      // wrapper class — length=1 降階單人視覺需要 width constraint chain(`flex-1 min-w-0 overflow-hidden`),
+src/design-system/components/PeoplePicker/people-picker.tsx:405:      // length>=2 stack 視覺保留 overlap(`-ml-0.5 first:ml-0 relative inline-flex group/avatar`)。對齊
+src/design-system/components/PeoplePicker/people-picker.tsx:406:      // spec.md §C row 1(length=1 = avatar+人名+ellipsis)+ §D row 1(length>=2 = stack overlap)。
+src/design-system/components/PeoplePicker/people-picker.tsx:407:      // 真根因:Combobox `OverflowTagList` 把所有 tagRenderer 結果包 `shrink-0`,加 `inline-flex` 後
+src/design-system/components/PeoplePicker/people-picker.tsx:409:      // 修法:length=1 wrapper 改 `flex-1 min-w-0 overflow-hidden` 提供 width constraint 給 PersonDisplay。
+src/design-system/components/PeoplePicker/people-picker.tsx:410:      // SSOT helper `getPeoplePickerTagWrapperClass(count)` 集中,future 改 wrapper 行為改一處。
+src/design-system/components/PeoplePicker/people-picker.tsx:411:      tagWrapperClassName={getPeoplePickerTagWrapperClass(selectedNames.length)}
+src/design-system/components/PeoplePicker/people-picker.tsx:412:      // 2026-05-16 真 root cause fix:overflow chip wrapper 套同 `-ml-0.5` 讓 chip 物理上
+src/design-system/components/PeoplePicker/people-picker.tsx:416:      overflowWrapperClassName="-ml-0.5 first:ml-0 relative inline-flex"
+src/design-system/components/PeoplePicker/people-picker.tsx:420:      // Combobox default `overflowShape='tag'`(矩形 chip,文字 Combobox 慣例);PeoplePicker stack
+src/design-system/components/PeoplePicker/people-picker.tsx:423:      overflowShape="circle"
+src/design-system/components/PeoplePicker/people-picker.tsx:424:      // 2026-05-15 Bug 3 fix:formula-based visible count override(避免 Combobox DOM measurement +
+src/design-system/components/PeoplePicker/people-picker.tsx:425:      // 60px fallback 不 deterministic)。SSOT in `./avatar-stack-overflow.ts`,display + edit 共用。
+src/design-system/components/PeoplePicker/people-picker.tsx:426:      visibleCountOverride={stackVisibleCount}
+src/design-system/components/PeoplePicker/people-picker.tsx:427:      // 2026-05-14 I4 fix(per codex+Layer A 共識):hidden items 在 `+N` overflow popover 顯
+src/design-system/components/PeoplePicker/people-picker.tsx:429:      // overflow 視覺不一致)。
+src/design-system/components/PeoplePicker/people-picker.tsx:459:        // SSOT 對齊 PeoplePicker single mode line 201 selectedItemRenderer。多選 1 人時視覺等同單選,
+src/design-system/components/PeoplePicker/people-picker.tsx:460:        // 只在 length > 1 才走 stack(各 avatar 純 chip)。多選 + inline 搜尋場景拿掉 name 改 cursor
+src/design-system/components/PeoplePicker/people-picker.tsx:461:        // 是 future 工作(需 PeoplePicker 加 searchIn='trigger' opt-in,當前 wrapped Combobox 走 menu search)。
+src/design-system/components/PeoplePicker/people-picker.tsx:477:PeoplePicker.displayName = 'PeoplePicker'
+src/design-system/components/PeoplePicker/people-picker.tsx:481:  component: 'PeoplePicker',
+src/design-system/components/PeoplePicker/people-picker.tsx:493:export { PeoplePicker }
+src/design-system/components/PeoplePicker/people-picker.stories.tsx:3:import { PeoplePicker } from '@/design-system/components/PeoplePicker/people-picker'
+src/design-system/components/PeoplePicker/people-picker.stories.tsx:8:  title: 'Design System/Components/PeoplePicker/展示',
+src/design-system/components/PeoplePicker/people-picker.stories.tsx:70:        <PeoplePicker value={val} people={samplePeople} onChange={(v) => setVal(v[0] ?? null)} aria-label="負責人(edit mode demo)" />
+src/design-system/components/PeoplePicker/people-picker.stories.tsx:75:        <PeoplePicker mode="display" value={samplePeople[0]} />
+src/design-system/components/PeoplePicker/people-picker.stories.tsx:79:        <PeoplePicker mode="readonly" value={samplePeople[0]} />
+src/design-system/components/PeoplePicker/people-picker.stories.tsx:83:        <PeoplePicker mode="disabled" value={samplePeople[0]} />
+src/design-system/components/PeoplePicker/people-picker.stories.tsx:102:        <PeoplePicker value={val} people={samplePeople} onChange={setVal} />
+src/design-system/components/PeoplePicker/people-picker.stories.tsx:106:        <PeoplePicker mode="readonly" value={readonlyVal} />
+src/design-system/components/PeoplePicker/people-picker.stories.tsx:122:      <PeoplePicker size={size} value={val} people={samplePeople} onChange={(v) => setVal(v[0] ?? null)} className="max-w-xs" />
+src/design-system/components/PeoplePicker/people-picker.spec.md:2:component: PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.spec.md:11:  - Polaris Combobox: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Combobox
+src/design-system/components/PeoplePicker/people-picker.spec.md:16:# PeoplePicker 設計原則
+src/design-system/components/PeoplePicker/people-picker.spec.md:20:PeoplePicker 是**人員選擇器**——專為「從人員清單中選一個或多個」設計的複合元件。外觀對齊 Select / Combobox，差異在選項前綴有 Avatar 視覺。
+src/design-system/components/PeoplePicker/people-picker.spec.md:24:共用規則見 `../Field/field-controls.spec.md`。本文件只記錄 PeoplePicker 特有的原則。
+src/design-system/components/PeoplePicker/people-picker.spec.md:42:| 一般分類選擇（非人員）| `Select` / `Combobox` | PeoplePicker 專為人員設計，有 Avatar prefix |
+src/design-system/components/PeoplePicker/people-picker.spec.md:43:| 單選純文字選項（狀態 / 類別）| `Select` | PeoplePicker 開銷較大，靠 Avatar 識別；非人員用 Select |
+src/design-system/components/PeoplePicker/people-picker.spec.md:44:| 多選非人員 tag | `Combobox` | Combobox 是通用多選，無 Avatar 假設 |
+src/design-system/components/PeoplePicker/people-picker.spec.md:45:| 只顯示單一人員（不需選擇）| `NameCard` + `Avatar` | PeoplePicker 是選擇器，純展示用 NameCard |
+src/design-system/components/PeoplePicker/people-picker.spec.md:46:| 顯示整個 team 成員列表 | `Avatar.Group` / 自訂 list | PeoplePicker 是「選人」介面，不是「展示 team」 |
+src/design-system/components/PeoplePicker/people-picker.spec.md:57:| 多選 | `PersonValue[]` | Field 顯示 Avatar 陣列（與 Combobox 多選同模式）|
+src/design-system/components/PeoplePicker/people-picker.spec.md:69:PeoplePicker 永遠支援搜尋（內部使用 `Command` / cmdk）——因為人員清單通常規模較大且使用者記得人名關鍵字（符合 Select spec「Searchable 開啟判斷」的「label 性質」主判準：人名是獨特關鍵字）。
+src/design-system/components/PeoplePicker/people-picker.spec.md:76:## 與 Select / Combobox 的分界
+src/design-system/components/PeoplePicker/people-picker.spec.md:78:| | PeoplePicker | Select | Combobox |
+src/design-system/components/PeoplePicker/people-picker.spec.md:86:**搜尋型態 SSOT canonical**（A1-A5 spec,2026-05-11;2026-05-12 補 PeoplePicker multi `searchIn` opt-in）：
+src/design-system/components/PeoplePicker/people-picker.spec.md:91:| **inline-trigger** | 單選 + 需快速 type-and-pick;trigger 變 input | `<Select searchable />` / `<Combobox searchable searchIn='trigger' />` / `<PeoplePicker />` single / `<PeoplePicker multi searchIn='trigger' />` |
+src/design-system/components/PeoplePicker/people-picker.spec.md:92:| **panel-top** | 多選 + 連續 type-and-select(關鍵字保留在 menu 不被 chip 切走) | `<Combobox searchable searchIn='menu' />` / `<PeoplePicker multi />`(default menu) |
+src/design-system/components/PeoplePicker/people-picker.spec.md:96:**PeoplePicker 是獨立元件,有自己的另一層 SSOT,並非完全繼承 Select / Combobox**。下表標出哪些繼承、哪些 PeoplePicker 自己定義 — **改一處先看本表,違反該層 SSOT = 漂移**。
+src/design-system/components/PeoplePicker/people-picker.spec.md:103:| 多人互動邏輯(N tag / overflow / inline-search)| **繼承 Combobox**(但 tag 和溢出**換成圓形 avatar 視覺**)|
+src/design-system/components/PeoplePicker/people-picker.spec.md:104:| Avatar 在 field 內 padding(12px 固定)| **PeoplePicker 自己**(不繼承 Combobox density-dependent 公式)|
+src/design-system/components/PeoplePicker/people-picker.spec.md:105:| +N 溢出 chip 形狀(**圓形**)| **PeoplePicker 自己**(不繼承 Combobox 矩形 tag) |
+src/design-system/components/PeoplePicker/people-picker.spec.md:106:| 多人 tag 視覺(**圓形 avatar overlap `-ml-0.5`**) | **PeoplePicker 自己**(不繼承 Combobox 矩形 Tag chip)|
+src/design-system/components/PeoplePicker/people-picker.spec.md:107:| 多人 length=1 視覺(降階為 avatar+人名,跟單人視覺一致)| **PeoplePicker 自己**(Combobox 無此特殊)|
+src/design-system/components/PeoplePicker/people-picker.spec.md:127:#### D. 多人 length≥2 trigger SSOT(avatar stack 視覺)
+src/design-system/components/PeoplePicker/people-picker.spec.md:131:| closed | **圓形 avatar stack overlap `-ml-0.5` + 圓形 +N 溢出 chip**(本來放人名的地方不放人名)|
+src/design-system/components/PeoplePicker/people-picker.spec.md:133:| open + inline-search、**已選**(length≥2)| **avatar stack + 圓形 +N + input cursor 在 +N 的右側**(stack 跟 +N 不動;cursor 接在 +N 後;empty search 不顯 placeholder,純 cursor。對齊 Combobox `trailing` slot placement)|
+src/design-system/components/PeoplePicker/people-picker.spec.md:134:| open + panel-search、已選 | avatar stack + 圓形 +N(searchbox 在 panel 內,trigger 視覺不變)|
+src/design-system/components/PeoplePicker/people-picker.spec.md:144:| Empty-state inline-search placeholder(未選時 → trigger empty placeholder) | `select.tsx:185` `selectedLabel \|\| placeholder` / `combobox.tsx:554` `items.length === 0 ? placeholder : ''`(2026-05-15 Drift A fix 對齊 PeoplePicker SSOT)|
+src/design-system/components/PeoplePicker/people-picker.spec.md:152:| 多人 inline-search、length≥1、open | ✅(avatar/stack 仍在,input 在 trailing)| **placeholder = '' 純 cursor**(避免跟 avatar 重複)|
+src/design-system/components/PeoplePicker/people-picker.spec.md:161:`MultiPersonCell` / `PersonCell`(`cell-registry.tsx:381-391` cell-as-input)+ form context PeoplePicker **包同一個元件**,所以 §B/§C/§D 規則對兩 surface 都成立。差別只在 padding 機制(共 §E)— 兩 surface 都產出 12px inset,**禁分歧**。
+src/design-system/components/PeoplePicker/people-picker.spec.md:163:**改 PeoplePicker 視覺前必查本表,動 trigger render / placeholder / overflowShape / tagWrapperClassName 前先 cite 對應 row。** Hook `check_peoplepicker_ssot_drift.sh` 機械強制。
+src/design-system/components/PeoplePicker/people-picker.spec.md:165:**Avatar 左 inset SSOT(2026-05-13 v2 — user 拍 Path a + density-drift root-cause,GitHub people picker idiom)**:single trigger / multi stack 第一個 avatar 距 trigger.left = **12px 固定**(不隨 size / density 漂移)。實作:PeoplePicker form context + 有 tag → `cn(className, '!px-3')` inject 12px override 到 Combobox Field wrapper,**覆蓋** Combobox `tagPadding[size]` density-dependent calc 公式;`tagAreaPaddingLeftPx={undefined}` 不再 +8 magic。Cell context naked variant `!px-[var(--table-cell-px)]` 已是 12px 不 inject。**為何 v1「4+8=12」公式報廢**(per 2026-05-13 codex V2 verdict correction):`tagPadding[size]` 是 `(field-height - icon-size) / 2`,真值表:default sm/md=4px → 4+8=12 ✓;default lg=6px → 14px ✗;comfortable sm/md=6px → 14px ✗;comfortable lg=8px → 16px ✗。**default sm + default md 兩個 size 也 = 12px**(我前 too narrow claim「只 md」 codex 修正);**真正漂的 = default lg + 全 comfortable 共 4 個組合**。整體 stale 結論不變(4 個漂 / 2 個對),故 `!px-3` 固定 12px 是正解。對齊 GitHub picker / Material Autocomplete renderTags / Ant Select tagRender 共享 fixed-inset canonical(不 scale with size)。
+src/design-system/components/PeoplePicker/people-picker.spec.md:168:- **選人 → PeoplePicker**（不用 Select / Combobox 代替，失去 Avatar 視覺）
+src/design-system/components/PeoplePicker/people-picker.spec.md:170:- **非人員多選 → Combobox**
+src/design-system/components/PeoplePicker/people-picker.spec.md:195:- ❌ 用 PeoplePicker 選非人員（部門 / 專案 / 類別）——那些用 Select / Combobox
+src/design-system/components/PeoplePicker/people-picker.spec.md:198:- ❌ 把 PeoplePicker 當 Team Member 展示元件用（不選人、只看名單）——用 Avatar.Group 或自訂 list
+src/design-system/components/PeoplePicker/people-picker.spec.md:199:- ❌ 不搭配 Avatar 視覺（純文字名字）——失去 PeoplePicker 存在的理由，直接用 Select / Combobox
+src/design-system/components/PeoplePicker/people-picker.spec.md:205:PeoplePicker 是 **composite Field Control**(Field shell + Avatar + SelectMenu),關鍵決策維度是 `mode`(single / multi)× `size` × search behavior × value type——已由 `ModeMatrix` / `SizeMatrix` / `ColorMatrix` / `StateBehavior` / `PersonValueType` 五張矩陣完整覆蓋。互動 Inspector 對 composite 元件較弱:「傳 PersonValue 陣列」需要真實資料 fixture 展示,單組合試玩無法呈現——改以 `StateBehavior` 的真實 Assignee picker 場景取代。
+src/design-system/components/PeoplePicker/people-picker.spec.md:213:PeoplePicker 是 **composite 元件**(Popover + Command + SelectMenu + Avatar 內部組裝),其 API 為完全 declarative(value / onChange / size / mode / options...)。**不套 `forwardRef` / `...props` spread**:
+src/design-system/components/PeoplePicker/people-picker.spec.md:217:- **API 邊界明確才是 composite 價值**:PeoplePicker 暴露的是「選人」語意,不是「彈出選單 + 搜尋 + 渲染頭像」的 DOM 細節。若 consumer 需要 DOM-level 控制,該用底層 Popover + Combobox 自組,不該透過 PeoplePicker
+src/design-system/components/PeoplePicker/people-picker.spec.md:219:`displayName = 'PeoplePicker'` 保留,無 `asChild`(composite 不是 Slot-compat)。
+src/design-system/components/PeoplePicker/people-picker.spec.md:227:- `../Combobox/combobox.spec.md` — 非人員多選的對應元件
+src/design-system/components/PeoplePicker/people-picker.spec.md:228:- `../SelectMenu/select-menu.tsx` — PeoplePicker edit mode 的浮層選單（內部消費）
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/PeoplePicker/avatar-stack-overflow.ts | sed -n '1,85p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+     1	/**
+     2	 * avatar-stack-overflow — Deterministic SSOT primitive for avatar stack overflow math
+     3	 *
+     4	 * **2026-05-15 Bug 3 fix(Claude+Codex Step 5 比稿 consensus,user verbatim「就 A」)**:
+     5	 *
+     6	 * Real root cause of Bug 3「same cell width but different overflow timing per total count」:
+     7	 *   1. `useOverflowCount` 在 Combobox 用 DOM `offsetWidth` 量測 + `overflowW = 60` fallback(實際 24px)
+     8	 *   2. `overflowEl` 不被 ResizeObserver observe,first calc 用 fallback 後不會 recalc
+     9	 *   3. `offsetWidth` 不減 `-ml-0.5` overlap → measurement 偏保守
+    10	 *   4. **架構違反**:`MultiPersonDisplay` display path 用 canvas-based 算 / Combobox edit path 用 DOM offsetWidth
+    11	 *      → 同 cell width 兩 path 不同結果 → user verbatim「同寬 cell overflow 時間不一樣」SSOT 根本被違反
+    12	 *
+    13	 * **Fix**(per codex Q3 consensus):抽 pure formula + React hook,display + edit 兩 path **共用**。
+    14	 *
+    15	 * **Deterministic formula**:
+    16	 * ```
+    17	 * firstAvatar + (visible - 1) * (avatar - overlap) + overflowChip <= available
+    18	 * ```
+    19	 * - `firstAvatar`:第一個 avatar 全寬 = `avatarPx`
+    20	 * - subsequent items:`avatar - overlap`(stack `-ml-0.5` 視覺等同 measurement subtract)
+    21	 * - `overflowChip`:若有 hidden,留 +N chip 空間;最後一個 visible item 不需留(`remaining === 0`)
+    22	 *
+    23	 * **Why centralize**:M14 mechanical guard against future drift。`MultiPersonDisplay` +
+    24	 * PeoplePicker stack edit + future avatar consumers 都 import 此 helper,不可 copy formula。
+    25	 * 對齊 codex「one avatar-stack primitive owns avatarPx, overlapPx, overflowChipPx」directive。
+    26	 *
+    27	 * **Benchmark cite**(per codex external baseline):MDN flex truncation / MUI Autocomplete
+    28	 * limitTags / Ant Select maxTagCount="responsive"(explicit overflow contract,非 incidental clip)/
+    29	 * Primer Truncate(parent-constrained max width)。
+    30	 */
+    31	
+    32	/**
+    33	 * Pure deterministic visible-count formula for avatar stack with overlap + overflow chip.
+    34	 *
+    35	 * @param availablePx — Container width available for the entire stack(含 +N chip 預留空間)
+    36	 * @param total — Total avatars in selection
+    37	 * @param avatarPx — Per-avatar pixel width(包含 ring border)
+    38	 * @param overlapPx — Negative margin overlap between siblings(default 2px = `-ml-0.5`)
+    39	 * @param overflowChipPx — Width reserved for +N indicator when overflow needed(default 24px = circle h-6 min-w-6)
+    40	 * @returns visible count(0 ≤ visible ≤ total)。若全部 fit 則 visible = total(無 +N chip);否則 visible 為 max fit。
+    41	 */
+    42	export function getAvatarStackVisibleCount({
+    43	  availablePx,
+    44	  total,
+    45	  avatarPx,
+    46	  overlapPx = 2,
+    47	  // NOTE: overflowChipPx is kept for backward-compat API but the slot-based
+    48	  // formula below treats chip = avatar physical size(both circles same shape
+    49	  // + same -ml-0.5 overlap when stacked)。Consumer 必 ensure 視覺 chip wrapper
+    50	  // 也套同 `-ml-0.5` overlap class(Combobox `overflowWrapperClassName`)。
+    51	  overflowChipPx: _overflowChipPx = 24,
+    52	}: {
+    53	  availablePx: number
+    54	  total: number
+    55	  avatarPx: number
+    56	  overlapPx?: number
+    57	  overflowChipPx?: number
+    58	}): number {
+    59	  if (total <= 0 || availablePx <= 0) return 0
+    60	  // 2026-05-16 真 root cause fix(Claude+Codex Round 2 + user 物理模型 directive):
+    61	  //
+    62	  // 原 formula 雙態 bug:
+    63	  //   1. full-fit 路徑算 fullStack(無 chip space)
+    64	  //   2. overflow 路徑重算 remainder(chip 當 24px 額外空間)
+    65	  //   兩 path 切換時 visible 跳 2(saw)— 因 chip 不被當「stack 內 1 個圓」,
+    66	  //   被當「stack 外額外 chunk」。User 抓 length=4→4、length=5→2+3 = 物理錯。
+    67	  //
+    68	  // **User 物理模型(對齊 MUI AvatarGroup / Primer AvatarStack / Material idiom)**:
+    69	  //   avatar 跟 +N 都是同尺寸圓形 + 同 -ml-0.5 overlap → 同 step。空間 W 容
+    70	  //   `slots = 1 + floor((W - avatar) / step)` 個圓。total ≤ slots → 全 avatar 無 chip;
+    71	  //   total > slots → (slots-1) avatar + 1 chip(共 slots 個圓)。
+    72	  //
+    73	  // 物理 saw 性質:length 從 slots 跳到 slots+1 時 visible 從 slots 跳到 slots-1
+    74	  // = delta 1 avatar(同 slots 個圓,只 swap 最後一個 avatar 變 chip)。對齊 user 直覺。
+    75	  const step = avatarPx - overlapPx
+    76	  if (step <= 0) return Math.min(total, 1)
+    77	  const slots = 1 + Math.floor((availablePx - avatarPx) / step)
+    78	  if (slots <= 0) return 0
+    79	  if (total <= slots) return total  // 全 fit:每 slot 一個 avatar
+    80	  return Math.max(0, slots - 1)  // 超過 slots:slots-1 個 avatar + 1 個 chip(last slot)
+    81	}
+    82	
+    83	/**
+    84	 * Map size token to avatar pixel(對齊 person-display.tsx:80 AVATAR_PX SSOT)。
+    85	 */
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/PeoplePicker/avatar-stack-overflow.ts | sed -n '85,110p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+    85	 */
+    86	export const AVATAR_STACK_AVATAR_PX: Record<'sm' | 'md' | 'lg', number> = {
+    87	  sm: 20,
+    88	  md: 24,
+    89	  lg: 24,
+    90	}
+    91	
+    92	/**
+    93	 * Default overflow chip width per size(對齊 overflow-indicator.tsx:17 triggerSize SSOT)。
+    94	 * shape='circle' → h-{5|6} min-w-{5|6} ≈ 20-24px
+    95	 */
+    96	export const AVATAR_STACK_OVERFLOW_CHIP_PX: Record<'sm' | 'md' | 'lg', number> = {
+    97	  sm: 20,
+    98	  md: 24,
+    99	  lg: 24,
+   100	}
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/PeoplePicker/people-picker.stories.tsx | sed -n '90,112p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+    90	  name: '單人',
+    91	  render: () => <SinglePicker />,
+    92	}
+    93	
+    94	/* ── 多人（互動） ── */
+    95	const MultiPicker = () => {
+    96	  const [val, setVal] = React.useState<PersonValue[]>(samplePeople.slice(0, 4))
+    97	  const readonlyVal = samplePeople.slice(0, 4)
+    98	  return (
+    99	    <div className="flex flex-col gap-6 max-w-xs">
+   100	      <div>
+   101	        <h3 className="text-body font-bold text-foreground mb-2">edit（可互動,多選）</h3>
+   102	        <PeoplePicker value={val} people={samplePeople} onChange={setVal} />
+   103	      </div>
+   104	      <div>
+   105	        <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
+   106	        <PeoplePicker mode="readonly" value={readonlyVal} />
+   107	      </div>
+   108	    </div>
+   109	  )
+   110	}
+   111	
+   112	export const Multi: Story = {
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/Combobox/combobox.anatomy.stories.tsx | sed -n '760,790p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   760	    const [overflowV, setOverflowV] = useState(allValues)
+   761	    const [wrapV, setWrapV] = useState(allValues)
+   762	    const [clearV, setClearV] = useState(['electronics', 'food', 'lifestyle'])
+   763	    const [dismissV, setDismissV] = useState(['electronics', 'food', 'lifestyle'])
+   764	
+   765	    return (
+   766	      <div className="flex flex-col gap-8">
+   767	        <div className="flex flex-col gap-1">
+   768	          <H3>狀態行為</H3>
+   769	          <Desc>Combobox 特有的溢出、換行、清除、個別移除行為。</Desc>
+   770	        </div>
+   771	
+   772	        {/* Overflow +N */}
+   773	        <div className="flex flex-col gap-3">
+   774	          <span className="text-caption font-medium text-fg-secondary">單行溢出 — +N 指示器</span>
+   775	          <Desc>以量測為基礎：計算容器可用寬度，依序放入 Tag，放不下的隱藏。+N 使用 OverflowIndicator 元件（tag shape），hover 顯示隱藏的 Tag 清單。</Desc>
+   776	          <div className="w-64">
+   777	            <Combobox
+   778	              options={categoryOptions}
+   779	              value={overflowV}
+   780	              onChange={setOverflowV}
+   781	            />
+   782	          </div>
+   783	          <div className="flex flex-col gap-1 text-[11px] text-fg-muted">
+   784	            <span>1. useOverflowCount hook 量測 container 寬度與每個 tag 的自然寬度</span>
+   785	            <span>2. ResizeObserver 持續監聽容器變化</span>
+   786	            <span>3. 初次量測前 opacity:0，量測後 opacity:1，避免閃爍</span>
+   787	            <span>4. 超出的 tag 用 DOM hidden 隱藏（非 display:none）</span>
+   788	          </div>
+   789	        </div>
+   790	
+
+codex
+**Q1 race hypothesis + fix completeness verdict**
+
+Verdict: root-cause class is correct, but the exact “length=0 queues stale rAF” detail is not correct in the current code.
+
+Evidence: `useOverflowCount` now early-returns for `totalCount === 0`, so length 0 itself cannot schedule the internal double-rAF: [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:77) says `if (!enabled || totalCount === 0) { setState(...); return }`.
+
+The real stale-overwrite path is still valid when any prior render enters the internal measurement branch before `visibleCountOverride` is available. In PeoplePicker stack mode, `stackVisibleCount` resets to `undefined` for `length <= 1` at [people-picker.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/people-picker.tsx:338), then a later length 6 render can briefly pass `visibleCountOverride={undefined}` at [people-picker.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/people-picker.tsx:426). That lets Combobox enter the internal measurement path, schedule double-rAF at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:130), then a follow-up override render writes `el.hidden` at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:78). Before `dd0f96ba`, the older rAF could still fire and overwrite the override. So: stale rAF overwrite is a real root cause; the stale rAF source is “pre-override internal measurement render”, not necessarily the length 0 render.
+
+Fix completeness:
+- `useEffect -> useLayoutEffect`: sound here. It writes DOM hidden state and readiness before paint, matching the existing “opacity 0 until ready” contract at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:227). The layout reads only occur in the internal branch, not when `visibleCountOverride` is present.
+- Two rAF IDs are enough for the current nested rAF chain: `rafId1` owns the outer frame, `rafId2` owns the inner frame at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:129). Cleanup cancels both at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:148).
+- `scheduleCalc` cancel-before-schedule is sound for observer bursts: it cancels both pending IDs before queuing a new frame at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:130).
+- I do not see shared-ref cross-instance leakage: refs are per hook/component instance.
+- Remaining minor timing gap: `overflowEl` still is not observed directly, while `avatar-stack-overflow.ts` explicitly documents that as an older root-cause component at [avatar-stack-overflow.ts](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:6). For PeoplePicker stack this is bypassed by formula override, so it is not a blocker for this bug. For generic Combobox tags, it is residual design debt, not the same race.
+
+Edge cases:
+- `totalCount=1`: current fast path sets React state but does not explicitly unhide DOM nodes: [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:91). If the same mounted wrappers were previously hidden, this relies on render/remount/index changes to clear state. Safer behavior would explicitly set tag 0 visible and overflow hidden, same as override branch.
+- `totalCount=0`: same pattern. It returns ready but does not explicitly hide/clear stale wrapper hidden state. Usually no item wrappers render, so practical risk is low.
+
+**Q2 DS-wide similar pattern grep + audit table**
+
+The exact same-line grep returned no hits. The broader `requestAnimationFrame(` grep found these relevant hits:
+
+| File | rAF capture? | Cleanup cancel? | Race/state risk verdict |
+|---|---:|---:|---|
+| [Combobox/combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:129) | Yes, two IDs | Yes | Fixed for the reported stale overwrite race. |
+| [DataTable/data-table-interaction-layer.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/DataTable/data-table-interaction-layer.tsx:160) | Yes | Yes | Sound. Coalesces `setVersion`; cleanup cancels. |
+| [DataTable/data-table.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/DataTable/data-table.tsx:619) | No | No | Missing piece. Scroll/resize can schedule uncancelled rAF that calls `setPos` after unmount or after `rowEl/tableEl` changed. Not the same PeoplePicker root cause, but same uncancelled rAF pattern. |
+| [DataTable/data-table.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/DataTable/data-table.tsx:1070) | Yes | Yes | Sound. Initial compute sync, RO rAF canceled. |
+| [FileViewer/image-renderer.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/FileViewer/image-renderer.tsx:107) | No | No | Low/medium residual risk: image `onLoad` rAF can call `onZoomChange` after unmount or after props changed. |
+| [FileViewer/image-renderer.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/FileViewer/image-renderer.tsx:119) | Yes | Yes | Sound for ResizeObserver path. |
+| [Breadcrumb/breadcrumb.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Breadcrumb/breadcrumb.tsx:44) | Yes | Yes | Sound. Also clears timeout. |
+| [OverflowIndicator/overflow-indicator.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/OverflowIndicator/overflow-indicator.tsx:39) | No | No | DOM mutation after unmount possible, but no React state. Lower priority. |
+| [Tabs/tabs.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Tabs/tabs.tsx:268) | No | No | Event-handler scrollIntoView only. Low risk; stale index/ref possible but no state overwrite. |
+| [Chip/chip.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Chip/chip.tsx:255) | No | No | Same as Tabs. Low risk. |
+| [LinkInput/link-input.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/LinkInput/link-input.tsx:163) | No | No | Focus-only. Low risk because it derefs `inputRef.current` at callback time. |
+| [use-overflow-items.ts](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/hooks/use-overflow-items.ts:157) | N/A | N/A | Comment/example only. Runtime hooks use RO/MO without rAF. |
+
+Special checks:
+- `MultiPersonDisplay`: no rAF; `useLayoutEffect + ResizeObserver` disconnects at [person-display.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/person-display.tsx:191). No observer leak found.
+- PeoplePicker stack measurement: no rAF; RO disconnects at [people-picker.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/people-picker.tsx:364).
+- DataTable virtualized scroll observers: the body-height RO path is sound, but row action handle scroll rAF at [data-table.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/DataTable/data-table.tsx:619) is the main DS-wide similar missing cancellation.
+
+So “其他相關的問題都有被解決” is not fully true DS-wide. The reported Combobox/PeoplePicker race is addressed; similar uncancelled rAF patterns remain, especially DataTable row action positioning.
+
+**Q3 self-verify mechanism propose**
+
+Best verification: add a controlled Storybook probe story for PeoplePicker stack, not DOM-only clicks as the primary test.
+
+Use a test-only story that exposes a tiny harness on `window`, e.g. `window.__peoplePickerRaceProbe.setValue([...])`, `clear()`, `selectAll()`, and `measure()`. Then Playwright can run exact state transitions:
+- Path A: `setValue([p1]) -> ... -> setValue([p1..p6])`, awaiting two animation frames after each step.
+- Path B: `setValue([p1..p6]) -> setValue([]) -> setValue([p1..p6])`, then await two animation frames.
+- Assert same `tagArea.clientWidth`, same visible avatar count, same `+N`, and no hidden-state divergence.
+
+DOM `dispatchEvent` can help, but it is less precise because Radix/cmdk/Popover event ordering, focus guards, and portal hit testing become part of the test. It verifies the user path, but it is noisy for root-cause isolation.
+
+The existing probe script already aims at the right comparison: it measures visible avatar count and chip text for “逐個 click” vs “取消全選→再全選” in [peoplepicker-twopath-race-probe.mjs](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/scripts/peoplepicker-twopath-race-probe.mjs:32). I would keep that as an end-to-end regression, but add the controlled story/window setter as the deterministic root-cause test.
+tokens used
+59,320
+**Q1 race hypothesis + fix completeness verdict**
+
+Verdict: root-cause class is correct, but the exact “length=0 queues stale rAF” detail is not correct in the current code.
+
+Evidence: `useOverflowCount` now early-returns for `totalCount === 0`, so length 0 itself cannot schedule the internal double-rAF: [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:77) says `if (!enabled || totalCount === 0) { setState(...); return }`.
+
+The real stale-overwrite path is still valid when any prior render enters the internal measurement branch before `visibleCountOverride` is available. In PeoplePicker stack mode, `stackVisibleCount` resets to `undefined` for `length <= 1` at [people-picker.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/people-picker.tsx:338), then a later length 6 render can briefly pass `visibleCountOverride={undefined}` at [people-picker.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/people-picker.tsx:426). That lets Combobox enter the internal measurement path, schedule double-rAF at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:130), then a follow-up override render writes `el.hidden` at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:78). Before `dd0f96ba`, the older rAF could still fire and overwrite the override. So: stale rAF overwrite is a real root cause; the stale rAF source is “pre-override internal measurement render”, not necessarily the length 0 render.
+
+Fix completeness:
+- `useEffect -> useLayoutEffect`: sound here. It writes DOM hidden state and readiness before paint, matching the existing “opacity 0 until ready” contract at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:227). The layout reads only occur in the internal branch, not when `visibleCountOverride` is present.
+- Two rAF IDs are enough for the current nested rAF chain: `rafId1` owns the outer frame, `rafId2` owns the inner frame at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:129). Cleanup cancels both at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:148).
+- `scheduleCalc` cancel-before-schedule is sound for observer bursts: it cancels both pending IDs before queuing a new frame at [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:130).
+- I do not see shared-ref cross-instance leakage: refs are per hook/component instance.
+- Remaining minor timing gap: `overflowEl` still is not observed directly, while `avatar-stack-overflow.ts` explicitly documents that as an older root-cause component at [avatar-stack-overflow.ts](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:6). For PeoplePicker stack this is bypassed by formula override, so it is not a blocker for this bug. For generic Combobox tags, it is residual design debt, not the same race.
+
+Edge cases:
+- `totalCount=1`: current fast path sets React state but does not explicitly unhide DOM nodes: [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:91). If the same mounted wrappers were previously hidden, this relies on render/remount/index changes to clear state. Safer behavior would explicitly set tag 0 visible and overflow hidden, same as override branch.
+- `totalCount=0`: same pattern. It returns ready but does not explicitly hide/clear stale wrapper hidden state. Usually no item wrappers render, so practical risk is low.
+
+**Q2 DS-wide similar pattern grep + audit table**
+
+The exact same-line grep returned no hits. The broader `requestAnimationFrame(` grep found these relevant hits:
+
+| File | rAF capture? | Cleanup cancel? | Race/state risk verdict |
+|---|---:|---:|---|
+| [Combobox/combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:129) | Yes, two IDs | Yes | Fixed for the reported stale overwrite race. |
+| [DataTable/data-table-interaction-layer.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/DataTable/data-table-interaction-layer.tsx:160) | Yes | Yes | Sound. Coalesces `setVersion`; cleanup cancels. |
+| [DataTable/data-table.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/DataTable/data-table.tsx:619) | No | No | Missing piece. Scroll/resize can schedule uncancelled rAF that calls `setPos` after unmount or after `rowEl/tableEl` changed. Not the same PeoplePicker root cause, but same uncancelled rAF pattern. |
+| [DataTable/data-table.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/DataTable/data-table.tsx:1070) | Yes | Yes | Sound. Initial compute sync, RO rAF canceled. |
+| [FileViewer/image-renderer.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/FileViewer/image-renderer.tsx:107) | No | No | Low/medium residual risk: image `onLoad` rAF can call `onZoomChange` after unmount or after props changed. |
+| [FileViewer/image-renderer.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/FileViewer/image-renderer.tsx:119) | Yes | Yes | Sound for ResizeObserver path. |
+| [Breadcrumb/breadcrumb.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Breadcrumb/breadcrumb.tsx:44) | Yes | Yes | Sound. Also clears timeout. |
+| [OverflowIndicator/overflow-indicator.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/OverflowIndicator/overflow-indicator.tsx:39) | No | No | DOM mutation after unmount possible, but no React state. Lower priority. |
+| [Tabs/tabs.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Tabs/tabs.tsx:268) | No | No | Event-handler scrollIntoView only. Low risk; stale index/ref possible but no state overwrite. |
+| [Chip/chip.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Chip/chip.tsx:255) | No | No | Same as Tabs. Low risk. |
+| [LinkInput/link-input.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/LinkInput/link-input.tsx:163) | No | No | Focus-only. Low risk because it derefs `inputRef.current` at callback time. |
+| [use-overflow-items.ts](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/hooks/use-overflow-items.ts:157) | N/A | N/A | Comment/example only. Runtime hooks use RO/MO without rAF. |
+
+Special checks:
+- `MultiPersonDisplay`: no rAF; `useLayoutEffect + ResizeObserver` disconnects at [person-display.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/person-display.tsx:191). No observer leak found.
+- PeoplePicker stack measurement: no rAF; RO disconnects at [people-picker.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/people-picker.tsx:364).
+- DataTable virtualized scroll observers: the body-height RO path is sound, but row action handle scroll rAF at [data-table.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/DataTable/data-table.tsx:619) is the main DS-wide similar missing cancellation.
+
+So “其他相關的問題都有被解決” is not fully true DS-wide. The reported Combobox/PeoplePicker race is addressed; similar uncancelled rAF patterns remain, especially DataTable row action positioning.
+
+**Q3 self-verify mechanism propose**
+
+Best verification: add a controlled Storybook probe story for PeoplePicker stack, not DOM-only clicks as the primary test.
+
+Use a test-only story that exposes a tiny harness on `window`, e.g. `window.__peoplePickerRaceProbe.setValue([...])`, `clear()`, `selectAll()`, and `measure()`. Then Playwright can run exact state transitions:
+- Path A: `setValue([p1]) -> ... -> setValue([p1..p6])`, awaiting two animation frames after each step.
+- Path B: `setValue([p1..p6]) -> setValue([]) -> setValue([p1..p6])`, then await two animation frames.
+- Assert same `tagArea.clientWidth`, same visible avatar count, same `+N`, and no hidden-state divergence.
+
+DOM `dispatchEvent` can help, but it is less precise because Radix/cmdk/Popover event ordering, focus guards, and portal hit testing become part of the test. It verifies the user path, but it is noisy for root-cause isolation.
+
+The existing probe script already aims at the right comparison: it measures visible avatar count and chip text for “逐個 click” vs “取消全選→再全選” in [peoplepicker-twopath-race-probe.mjs](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/scripts/peoplepicker-twopath-race-probe.mjs:32). I would keep that as an end-to-end regression, but add the controlled story/window setter as the deterministic root-cause test.

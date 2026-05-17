@@ -121,13 +121,15 @@ Tabs trigger = **item-layout 橫向變體 + Button 高度系統**。對標 item-
 
 ## Size
 
-Tabs 有三種尺寸，**高度由 `--tab-height-*` token 控制**，隨 `data-density` 自動縮放。
+Tabs 有三種尺寸,**高度由 `--tab-height-*` token 控制**,隨 `data-density` 自動縮放。
 
-| Size | md density | lg density | 字體 | 何時用 |
-|------|-----------|-----------|------|--------|
-| `sm` | 32 | 40 | `text-body` (14) | Dialog、Sidebar 面板、dense toolbar |
-| `md` ★default | 40 | 48 | `text-body` (14) | 一般頁面主要 tabs |
-| `lg` | 48 | 56 | `text-body-lg` (16) | Page-level hero tabs（少見）|
+| Size | md density | lg density | 字體 | 何時用 | 世界級對照 |
+|------|-----------|-----------|------|--------|-----------|
+| `sm` ★ cva default(2026-05-17 從 md 改 sm)| 32 | 40 | `text-body` (14) | **預設 use case**:所有 header 內 tabs(overlay header / chrome header / Dialog / Sidebar / dense toolbar)| Ant Design verbatim:「**small size could be used in Modal**」(`ant.design/components/tabs`)|
+| `md` | 40 | 48 | `text-body` (14) | **Future tier — 目前無 recommended use case**;新 consumer 必先諮詢 DS owner | 多家世界級 DS(Material / MUI / Primer / Polaris)只有 1 個 default size,無中間階梯 |
+| `lg` | 48 | 56 | `text-body-lg` (16) | **獨立 tabs 直接取代 chrome header 用**(tab 高度 = `--chrome-header-height` 像素相等,48/56)— page-level workspace 主導覽 | Ant verbatim:「**Large size tabs are usually used in page header**」(`ant.design/components/tabs`)|
+
+**Token alignment + size 階梯 rationale SSOT**:`--tab-height-lg` (48/56) = `--chrome-header-height` (48/56) 像素相等 + md future tier + sm default 遷移 — **完整 cross-family canonical 詳** `patterns/header-canonical/header-canonical.spec.md` W3/W5/W6(per Rule-of-3 SSOT 集中此處,本元件 spec.md 不重複論述,只列上表 size table)。
 
 ### 為什麼 Tabs 不複用 `--field-height-*`
 
@@ -190,13 +192,21 @@ TabsList 底部有 1px gray border（`border-border`），selected trigger 有 2
 
 ---
 
-## 出現在 Dialog / Sidebar
+## 出現在 Dialog / Sidebar / 任何 header
 
-Tabs 常與容器 header 的底邊 border 合併——**視覺上只有一條線**，不是 header border + tabs border 疊兩條。
+Tabs 常與容器 header 的底邊 border 合併——**視覺上只有一條線**,不是 header border + tabs border 疊兩條。
 
-**做法**：Tabs 的 `TabsList` 底部 border 與 Dialog/Sidebar header 的 `border-b` 實際上是**同一條線**（設計上重疊、實作上不重複渲染）。Consumer 把 Tabs 放在 header 區域內、移除 header 自己的 `border-b`，讓 Tabs 的 border 接管。
+**做法**:Tabs 的 `TabsList` 底部 border 與 header 的 `border-b` 實際上是**同一條線**(設計上重疊、實作上不重複渲染)。**Header 退讓**(移除自己 `border-b`),**Tabs 接管**(自身 `border-b border-border` 延展全 header 寬,因 TabsList wrapper 是 block-level full-width)。
 
-Size 建議在這些容器內用 `sm`（32/40），避免 header 過高。
+**世界級對照(verbatim cite)**:
+- **GitHub Primer PageHeader**:「`hasBorder` defaults true,**but border NOT rendered if Navigation child contains UnderlineNav**;UnderlineNav itself provides bottom border」(`primer.style/components/page-header/react`)
+- **Ant Design Tabs**:line type 自帶 bottom border(`ant.design/components/tabs`)
+- **Mantine Tabs**:default variant 自包 bottom border(`mantine.dev/core/tabs/`)
+- **Counter-pattern(reject)**:Material UI 走「container 畫 border + tabs 不畫」(`<Box sx={{ borderBottom: 1 }}><Tabs>...</Tabs></Box>` 從 `mui.com/material-ui/react-tabs/`)— 本 DS reject,理由:tabs underline 需 1px gray base line(`tabs.spec.md:185-187`),tabs 不畫 border 會讓 2px primary indicator 浮空失去 base
+
+**Auto-suppress 機制(Phase 2 production code 提案)**:header primitive 加 `withTabs?: boolean` prop → true 時自動移除自身 `border-b`,免 consumer 手動忘記。對齊 GitHub Primer 的 auto-suppress 模式(免 consumer 手動 prop)。完整 cross-header canonical 詳 `patterns/header-canonical/header-canonical.spec.md` W1。
+
+Size 建議:overlay / chrome header 內用 `sm`(32/40)— 對應 close X 也是 sm,視覺一致;**獨立取代 chrome header** 的 page-level workspace tabs 用 `lg`(48/56,= chrome-header-height)。
 
 ---
 

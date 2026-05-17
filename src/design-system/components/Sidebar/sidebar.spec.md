@@ -206,6 +206,8 @@ Gmail / Linear 的標準版型：上方 SidebarGroup 放扁平主導覽（Sideba
 
 `SidebarHeader` 和 `SidebarFooter` 的高度 = `var(--chrome-header-height)`，**不是寫死**，也**不是完全 content-based**。這個 token：
 
+> **跨家族 SSOT pointer**:本元件 SidebarHeader 屬 **Chrome header(Fixed-h)家族**;border / padding / dismiss size / withTabs(tabs 進 header 時 border auto-suppress + tabs size 對應 + flush stack)的跨家族視覺契約 SSOT 詳 `patterns/header-canonical/header-canonical.spec.md`。本節僅 codify Sidebar 特有的高度 + token rationale。
+
 - md density: `3rem`（48px）
 - lg density: `3.5rem`（56px）
 - **跨元件共享**：sidebar header、sidebar footer、主內容 page header 都用同一個 token

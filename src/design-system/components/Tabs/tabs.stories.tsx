@@ -44,68 +44,9 @@ export const WithSuffix: Story = {
   ),
 }
 
-const MANY_TABS = [
-  { value: 'overview', label: '總覽' },
-  { value: 'members', label: '成員' },
-  { value: 'activity', label: '活動紀錄' },
-  { value: 'notifications', label: '通知' },
-  { value: 'billing', label: '計費與付款' },
-  { value: 'integrations', label: '整合' },
-  { value: 'security', label: '安全' },
-  { value: 'audit', label: '稽核日誌' },
-  { value: 'advanced', label: '進階設定' },
-]
-
-export const OverflowScroll: Story = {
-  name: '溢位捲動',
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <div className="text-caption text-fg-muted max-w-xl">
-        <strong>overflow="scroll"</strong> — 單行橫向滾動 + 邊緣 fade mask + 左右 scroll arrow buttons。
-        拖拉容器右下角調整寬度，觀察 arrow 如何依滾動位置出現 / 消失。
-        鍵盤使用者用方向鍵（Radix 原生 + 瀏覽器 scroll-into-view），trackpad 兩指滑動，滑鼠點 arrow。
-      </div>
-      <div
-        className="resize-x overflow-hidden border border-dashed border-border p-4 min-w-[240px] max-w-full"
-        style={{ width: '480px' }}
-      >
-        <Tabs defaultValue="overview">
-          <TabsList overflow="scroll">
-            {MANY_TABS.map((t) => (
-              <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      </div>
-    </div>
-  ),
-}
-
-export const OverflowMenu: Story = {
-  name: '溢位選單',
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <div className="text-caption text-fg-muted max-w-xl">
-        <strong>overflow="menu"</strong> — 塞不下收進 "⋯" dropdown。
-        所有 triggers 仍在 DOM（visibility: hidden 保留 Radix roving tabindex），
-        menu items 透過 Tabs context 的 onValueChange proxy click。拖拉容器右下角調整寬度，
-        觀察 tabs 即時進 / 出 dropdown（ResizeObserver 追蹤容器尺寸）。
-      </div>
-      <div
-        className="resize-x overflow-hidden border border-dashed border-border p-4 min-w-[240px] max-w-full"
-        style={{ width: '480px' }}
-      >
-        <Tabs defaultValue="overview">
-          <TabsList overflow="menu">
-            {MANY_TABS.map((t) => (
-              <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      </div>
-    </div>
-  ),
-}
+// @story-trait-rationale: OverflowScroll / OverflowMenu + MANY_TABS array retired 2026-05-17 per audit Dim 24 —
+//   anatomy.stories.tsx OverflowMatrix(3 overflow values side-by-side)已 cover overflow 機制比較。
+//   展示層保留 typical 情境(Default / WithSuffix / Disabled);overflow 真實情境靠 anatomy。
 
 export const Disabled: Story = {
   name: '停用',

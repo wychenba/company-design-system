@@ -535,6 +535,54 @@ const CollapsedFrame = ({
   )
 }
 
+// 2026-05-17 ship per audit Dim 45 strict re-run — cva variant matrix codify
+// SidebarMenuButton cva 有 variant: { default, meta } 兩個值,本 story 展示 default vs meta 區別
+export const VariantMatrix: Story = {
+  name: '變體對照(default vs meta)',
+  render: () => (
+    <div className="flex flex-col gap-6 max-w-md">
+      <div className="flex flex-col gap-2">
+        <H3>variant=&quot;default&quot;(導覽 item)</H3>
+        <Desc>正常導覽目的地。文字 `text-fg-secondary` + `font-medium`,參與 single-selection,可 active。</Desc>
+        <div className="border border-border rounded-md p-3 bg-surface flex flex-col gap-1">
+          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
+            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
+            <span className="text-caption font-medium">專案 A</span>
+          </div>
+          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
+            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
+            <span className="text-caption font-medium">專案 B</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <H3>variant=&quot;meta&quot;(命令 row,非導覽目的地)</H3>
+        <Desc>
+          section 底部的命令(「查看更多 / 載入更多 / + 新增專案」)。文字退到 `text-fg-muted` + `font-normal`,
+          視覺重量下沉。**不參與 single-selection**(誤傳 isActive 也不啟動)。對齊 Linear「Show N more」/ Notion「Show more」/ Slack「Show more」/ Gmail Labels「More」共識。
+        </Desc>
+        <div className="border border-border rounded-md p-3 bg-surface flex flex-col gap-1">
+          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
+            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
+            <span className="text-caption font-medium">專案 A</span>
+          </div>
+          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
+            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
+            <span className="text-caption font-medium">專案 B</span>
+          </div>
+          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-muted)' }}>
+            <span className="text-caption font-normal">+ 新增專案</span>
+          </div>
+          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-muted)' }}>
+            <span className="text-caption font-normal">查看更多</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export const StateBehavior: Story = {
   name: '狀態行為',
   render: () => (
@@ -697,6 +745,18 @@ export const ChromeTokens: Story = {
           </tbody>
         </table>
       </div>
+    </div>
+  ),
+}
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `sidebar.spec.md` 「A11y 預設」段。摘要:\n\n-   Landmark  : <Sidebar>  渲染  <nav aria-label=\"Main\"> (或 consumer 傳入更精確的 label,例「Workspace navigation」),作為 page-level navigation landmark,讓 SR user 直接跳轉。\n-   Active item  : SidebarMenuButton  帶  id  + 命中  activeId  時自動加  aria-current=\"page\" ,SR 朗讀「current page」。 variant=\"meta\"  不參與 selection 不加此 attribute。\n-   快捷鍵不衝突  : Cmd+B  /  Ctrl+B  是 industry-standard(VS Code / Linear / shadcn),DS 內建並  prev"}</p>
     </div>
   ),
 }

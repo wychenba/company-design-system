@@ -93,6 +93,8 @@ Modal 與 viewport 四邊保持 `--layout-space-bottom`（48px）最小間距。
 
 ## 關閉按鈕
 
+> **跨家族 SSOT pointer**:DialogHeader 屬 **Padding-based overlay header 家族**;border / padding / dismiss size / withTabs(tabs 進 header 時 border auto-suppress)的跨家族視覺契約 SSOT 詳 `patterns/header-canonical/header-canonical.spec.md`。本節僅 codify Dialog 特有 close X size + chrome-unbounded rationale。
+
 永遠存在於 DialogHeader 右側。使用 `<Button data-dismiss iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />`，不可移除——使用者永遠需要明確的關閉手段。
 
 **Size canonical(v5 chrome-unbounded)**:Button native size **sm**(28 md / 32 lg),touch target 亦同。SurfaceHeader 的 `[data-unbounded]` CSS rule 自動對 text variant / dismiss 套負 my `calc((xs-sm)/2)` → **layout 佔位 = 24**(xs 固定)。效果:

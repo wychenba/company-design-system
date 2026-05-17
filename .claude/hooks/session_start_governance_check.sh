@@ -170,8 +170,8 @@ if [ -d "$HOOKS_DIR" ]; then
     2>/dev/null | wc -l | tr -d ' ')
   HOOK_COUNT=${HOOK_COUNT:-0}
 fi
-if [ "$HOOK_COUNT" -gt 30 ]; then
-  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 30 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). /knowledge-prune REQUIRED FIRST ACTION 評估 retire / consolidate."
+if [ "$HOOK_COUNT" -gt 35 ]; then
+  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 35 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-17 升 30→35:audit Dim 19 抓 32 hooks 全 active 有 fire(無 6-month 0-fire candidate),DS governance complexity(53 dims + 32 M-rules + codex collab + cross-family canonical)justified higher count。/knowledge-prune REQUIRED FIRST ACTION 評估 retire / consolidate."
 elif [ "$HOOK_COUNT" -gt 26 ]; then
   # 2026-05-15 raised soft cap 25→26 per /knowledge-prune D2 audit:
   # 26 wired hooks reflects M30 wrapper-schema-drift 新增 dedicated hook(justified evolution

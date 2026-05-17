@@ -127,14 +127,7 @@ export const ErrorState: Story = {
   ),
 }
 
-/* ── 邊框互動狀態 ── */
-export const BorderStates: Story = {
-  name: '邊框互動狀態',
-  render: () => (
-    <div className="flex flex-col gap-4 max-w-sm">
-      <p className="text-caption text-fg-muted">Default → Hover（深一階）→ Focus（primary）</p>
-      <Input placeholder="hover、點擊觀察邊框" />
-      <Input placeholder="第二個，測試 Tab 切換" />
-    </div>
-  ),
-}
+// @story-trait-rationale: BorderStates retired 2026-05-17 per audit Dim 24/25 strict re-run —
+//   anatomy.stories.tsx StateBehavior「Focus — border-primary」section 已 cover hover/focus 邊框互動
+//   (同 2 inputs 同 placeholder「點擊或 Tab 觀察 focus 邊框」)。Showcase tier 展示 anatomy 已覆蓋
+//   不教新原則 = retire。ErrorState 已滿足 isInputLike + hasInteractiveStates trait mandate。

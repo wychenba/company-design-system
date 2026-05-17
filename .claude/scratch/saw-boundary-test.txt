@@ -1,0 +1,35 @@
+
+══ Unit: slot-based formula 鄰 length delta at boundary widths ══
+  X=80px slot=3: 2→2 3→3 4→2 5→2 6→2 7→2 8→2
+  ✓ X=80px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→2 5→2 6→2 7→2 8→2
+  X=88px slot=3: 2→2 3→3 4→2 5→2 6→2 7→2 8→2
+  ✓ X=88px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→2 5→2 6→2 7→2 8→2
+  X=89px slot=3: 2→2 3→3 4→2 5→2 6→2 7→2 8→2
+  ✓ X=89px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→2 5→2 6→2 7→2 8→2
+  X=90px slot=4: 2→2 3→3 4→4 5→3 6→3 7→3 8→3
+  ✓ X=90px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→4 5→3 6→3 7→3 8→3
+  X=91px slot=4: 2→2 3→3 4→4 5→3 6→3 7→3 8→3
+  ✓ X=91px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→4 5→3 6→3 7→3 8→3
+  X=100px slot=4: 2→2 3→3 4→4 5→3 6→3 7→3 8→3
+  ✓ X=100px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→4 5→3 6→3 7→3 8→3
+  X=112px slot=5: 2→2 3→3 4→4 5→5 6→4 7→4 8→4
+  ✓ X=112px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→4 5→5 6→4 7→4 8→4
+  X=130px slot=5: 2→2 3→3 4→4 5→5 6→4 7→4 8→4
+  ✓ X=130px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→4 5→5 6→4 7→4 8→4
+
+══ Visual: Storybook Multi story at narrow boundary ══
+  cell=140px: {"triggerWidth":138,"tagAreaWidth":90,"visibleAvatarCount":4,"chipText":null,"totalCircles":4}
+  ✓ cell=140px tagArea=90px length=4 visible=4 — formula expected=4, chip="hidden"
+
+════════════════════════════════════════════════════════════
+Results: 9 PASS / 0 FAIL
+════════════════════════════════════════════════════════════
+  ✓ X=80px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→2 5→2 6→2 7→2 8→2
+  ✓ X=88px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→2 5→2 6→2 7→2 8→2
+  ✓ X=89px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→2 5→2 6→2 7→2 8→2
+  ✓ X=90px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→4 5→3 6→3 7→3 8→3
+  ✓ X=91px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→4 5→3 6→3 7→3 8→3
+  ✓ X=100px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→4 5→3 6→3 7→3 8→3
+  ✓ X=112px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→4 5→5 6→4 7→4 8→4
+  ✓ X=130px smooth — adjacent delta ≤ 1 — 2→2 3→3 4→4 5→5 6→4 7→4 8→4
+  ✓ cell=140px tagArea=90px length=4 visible=4 — formula expected=4, chip="hidden"

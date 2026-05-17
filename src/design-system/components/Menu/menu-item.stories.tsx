@@ -53,18 +53,10 @@ export const Default: Story = {
   ),
 }
 
-// ── startIcon ──
-
-export const WithStartIcon: Story = {
-  name: '前綴圖示',
-  render: () => (
-    <MenuContainer><MenuGroup>
-      <MenuItem startIcon={Mail}>電子郵件</MenuItem>
-      <MenuItem startIcon={Bell}>通知</MenuItem>
-      <MenuItem startIcon={Settings}>設定</MenuItem>
-    </MenuGroup></MenuContainer>
-  ),
-}
+// @story-trait-rationale: WithStartIcon retired 2026-05-17 per audit Dim 24/25 strict re-run —
+//   違 story-rules.md L42 explicit ban「❌ WithStartIcon+WithEndIcon → ✓ WithIcon grid」。
+//   anatomy.stories.tsx Overview/Inspector/ColorMatrix/SizeMatrix(L218/276/395/572)已 cover startIcon。
+//   WithDescription(下)教 icon+description block layout 是 distinct teaching,保留。
 
 // ── startIcon + description ──
 

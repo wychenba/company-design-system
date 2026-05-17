@@ -482,3 +482,15 @@ export const StateBehavior: Story = {
     </div>
   ),
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `accordion.spec.md` 「A11y 預設」段。摘要:\n\nRadix Accordion 自動處理:\n-   鍵盤  ：Tab 到 trigger → Enter/Space 切換;ArrowUp/Down 在 trigger 間移動\n-   ARIA  ：trigger  aria-expanded  /  aria-controls  自動設置,content  role=\"region\"  +  aria-labelledby \n-   焦點  ：收合時焦點停在 trigger,不會跳到隱藏 content 內\n\nConsumer 無需額外處理,保留 Radix  data-state  屬性即可。"}</p>
+    </div>
+  ),
+}

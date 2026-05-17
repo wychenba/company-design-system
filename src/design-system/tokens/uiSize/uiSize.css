@@ -33,9 +33,9 @@
      獨立於 field-height 與 table-row：tabs 是 navigation container，
      需要比 form control 更大的呼吸感。數值目前與 table-row 對齊，
      但概念獨立，不用 var() alias — 未來任何一方調整都不牽動另一方。 */
-  --tab-height-sm: 2rem;        /* 32px — Dialog / Sidebar / dense */
-  --tab-height-md: 2.5rem;      /* 40px — ★ 預設，頁面主要 tabs */
-  --tab-height-lg: 3rem;        /* 48px — page-level hero tabs */
+  --tab-height-sm: 2rem;        /* 32px — ★ 預設(2026-05-17 從 md 改),overlay / chrome / dense */
+  --tab-height-md: 2.5rem;      /* 40px — future tier(無 recommended use case,2026-05-17 從 default 降級) */
+  --tab-height-lg: 3rem;        /* 48px — 獨立 tabs 取代 chrome header(= --chrome-header-height) */
 
   /* Tree Indent — TreeView + DataTable nested rows(SSOT,2026-05-04)
      公式:chevronSize + gap-2 = 16+8(sm/md)/ 20+8(lg)

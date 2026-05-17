@@ -24,6 +24,7 @@ import { Textarea } from '@/design-system/components/Textarea/textarea'
 import { Field, FieldLabel } from '@/design-system/components/Field/field'
 import { DescriptionList, DescriptionItem } from '@/design-system/components/DescriptionList/description-list'
 import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
 import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
 import {
   DropdownMenu,
@@ -324,14 +325,15 @@ const Toolbar: React.FC<ToolbarProps> = ({
   labels,
 }) => {
   return (
-    <div
+    <ChromeHeader
+      lockDensity="lg"
       className={cn(
         // Chrome layer — `bg-surface-raised` 對齊 token semantic「遮蓋型浮層必須不透明」。
         // FileViewer 整體是 overlay,chrome 屬其 raised surface(同 DropdownMenuContent line 244)。
         // 不用 bg-surface(dark = white α8 半透明,outer 透明時失去 backdrop 洗白)。
         // 不用 bg-canvas(那是「頁面最底層」semantic,chrome 不是 page)。
-        'flex items-center gap-2 shrink-0 h-[var(--chrome-header-height)] bg-surface-raised border-b border-divider',
-        'px-[var(--layout-space-loose)]',
+        // ChromeHeader 自帶 flex/items-center/gap-2/shrink-0/h-chrome-header-height/border-b/px-loose
+        'bg-surface-raised',
       )}
     >
       {/* 檔名(左,佔據可用寬度,ellipsis)—— file-type icon 代表檔名的意象(這是什麼檔),
@@ -400,7 +402,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           onClick={onClose}
         />
       </div>
-    </div>
+    </ChromeHeader>
   )
 }
 
@@ -453,13 +455,8 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       )}
       aria-label={labels.detailPanel}
     >
-      {/* Panel header — 與 Toolbar 等高(h-[var(--chrome-header-height)]),視覺一致 */}
-      <div
-        className={cn(
-          'flex items-center justify-between gap-2 shrink-0 h-[var(--chrome-header-height)] border-b border-divider',
-          'px-[var(--layout-space-loose)]',
-        )}
-      >
+      {/* Panel header — 與 Toolbar 等高(consume ChromeHeader lockDensity="lg"),視覺一致 */}
+      <ChromeHeader lockDensity="lg" className="justify-between">
         <h3 className="text-body-lg font-medium text-foreground">{labels.detailsHeading}</h3>
         {/* InfoPanel close 走 dismiss canonical `<Button iconOnly dismiss />`,對齊 button.spec.md
             「Dismiss 視覺類」+ inline-action.spec.md「Dismiss canonical — X close only」。 */}
@@ -472,7 +469,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
           aria-label={labels.detailPanelClose}
           onClick={onClose}
         />
-      </div>
+      </ChromeHeader>
 
       {/* Panel body — header(shrink-0)上常駐 + body 走 ScrollArea(高度小時內容可捲動)。
           padding 對齊 layoutSpace v6 規則 4「bounded region → 容器底(無 action buttons)= loose」。

@@ -18,6 +18,7 @@
 | `action-bar/` | `action-bar.tsx` + `action-bar.spec.md` — toolbar / action row 排列公式 | 任何有按鈕列的頁面 |
 | `horizontal-overflow/` | `useOverflowItems` hook + fade-mask 樣式 | Tabs / ChipGroup |
 | `overlay-surface/` | `SurfaceHeader/Body/Footer` sub-components + padding SSOT | Dialog / Popover / Sheet |
+| `header-canonical/` | `<ChromeHeader>` primitive(withTabs / lockDensity 窄 API)+ cross-family canonical SSOT(chrome + overlay 兩家族 W1-W6 lockstep:border auto-suppress / token equality / tabs size 對應 / flush stack / md future tier / sm default)| Sidebar / FileViewer Toolbar / FileViewer InfoPanel(ChromeHeader 直接消費);Dialog / Sheet / Popover(SurfaceHeader 走 cross-family canonical)|
 
 > **note**:i18n 已 relocate 到 `src/design-system/lib/i18n/`(2026-05-01)— patterns/ 純化只收 visual primitive,non-visual cross-cutting 改去 `lib/`(對齊 Material `@mui/material/locale` / Ant ConfigProvider 共識)。詳 `src/design-system/lib/README.md`。
 

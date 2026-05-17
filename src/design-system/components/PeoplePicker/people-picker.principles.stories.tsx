@@ -54,7 +54,7 @@ export const UsageGuidance: Story = {
       <div>
         <Rule
           title="何時用 — 真實業務場景"
-          note="適合 PeoplePicker 的場景(點擊跳轉「展示」頁範例);判斷不確定時對照 spec.md「何時用 / 何時不用」段。"
+          note="PeoplePicker 用於「選擇 user 為值」場景 — 資料本質是「人」,需要 avatar 視覺輔助辨識(對比一般 Combobox 純字串)。Avatar-first display 對齊 Linear assignee picker / Asana people field / Slack mention picker 共識,讓使用者「掃 avatar 而非讀名字」更快。"
         >
           <ul className="space-y-1">
             <li>

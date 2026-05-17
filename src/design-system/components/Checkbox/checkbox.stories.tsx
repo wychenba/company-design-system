@@ -107,13 +107,7 @@ export const Horizontal: Story = {
   ),
 }
 
-/* ── Disabled ── */
-export const Disabled: Story = {
-  name: '停用',
-  render: () => (
-    <div className="grid max-w-sm">
-      <SelectionItem control={<Checkbox id="dis-a" disabled defaultChecked />} label="已選取但不可更改" htmlFor="dis-a" disabled />
-      <SelectionItem control={<Checkbox id="dis-b" disabled />} label="此選項不可用" htmlFor="dis-b" disabled />
-    </div>
-  ),
-}
+// @story-trait-rationale: Disabled retired 2026-05-17 per audit Dim 24/25 strict re-run —
+//   anatomy.stories.tsx StateBehavior「Disabled — 品牌色移除,統一 neutral」段(L535-558)已 cover。
+//   非 trait-required(`isSelectionMulti` 不 mandate Disabled);RadioGroup 同 Family 已 retire 同類。
+//   States showcase (compact all-states overview)保留,跟 anatomy「focused subsection」不同教學。

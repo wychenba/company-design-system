@@ -182,8 +182,8 @@ export const SizeSelection: Story = {
   render: () => (
     <div>
       <Rule
-        title="sm — Dialog / Sidebar / dense toolbar"
-        note="h-tab-sm(32/40)。容器高度受限時使用,避免 header 過高"
+        title="sm — ★ 預設,overlay / chrome / dense toolbar"
+        note="h-tab-sm(32/40)。所有 header 內 tabs 預設用 sm(對齊 Ant Design verbatim「small size could be used in Modal」)"
       >
         <Tabs defaultValue="a">
           <TabsList size="sm">
@@ -194,8 +194,8 @@ export const SizeSelection: Story = {
       </Rule>
 
       <Rule
-        title="md — ★ 一般頁面主要 tabs(預設)"
-        note="h-tab-md(40/48)。絕大多數情境使用"
+        title="md — future tier(目前無 recommended use case)"
+        note="h-tab-md(40/48)。中間階梯保留 token,新 consumer 必先諮詢 DS owner(多家世界級 DS 只有 1 個 default size,無中間階梯)"
       >
         <Tabs defaultValue="a">
           <TabsList size="md">
@@ -207,8 +207,8 @@ export const SizeSelection: Story = {
       </Rule>
 
       <Rule
-        title="lg — Page-level hero tabs(少見)"
-        note="h-tab-lg(48/56)。整個頁面的主結構切換才用,一般不建議"
+        title="lg — 獨立 tabs 取代 chrome header(罕見 page-level hero)"
+        note="h-tab-lg(48/56)= --chrome-header-height 像素相等。整個頁面的主結構切換,tabs 本身取代 chrome header 位置(對齊 Ant verbatim「Large size tabs are usually used in page header」)"
       >
         <Tabs defaultValue="a">
           <TabsList size="lg">

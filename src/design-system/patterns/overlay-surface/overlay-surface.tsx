@@ -59,17 +59,32 @@ import { cn } from '@/lib/utils'
 //   Popover md: (20 - 28) / 2 = -4px
 const CHROME_UNBOUNDED_SLOT = '[&_[data-unbounded]]:my-[calc((var(--chrome-slot-h,var(--field-height-xs))-var(--field-height-sm))/2)]'
 
+export interface SurfaceHeaderProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * 是否內含 Tabs。
+   * true → 移除自身 border-b,讓 TabsList border 接管 paint。
+   * 對齊 patterns/header-canonical/header-canonical.spec.md W1
+   * 「Header semantic owner / TabsList paint owner in withTabs state」。
+   */
+  withTabs?: boolean
+}
+
 export const SurfaceHeader = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  SurfaceHeaderProps
+>(({ className, withTabs = false, ...props }, ref) => (
   // Padding-based(預設) — Dialog/Sheet 用 body-lg title (16/24)，自然撐 max(24 title, 24 button slot) = 24
   // → header = 24 + py-tight 12×2 = 48 chrome-header-height ✓ 穩定無需 min-h
   // Popover 等輕量 chrome 走 PopoverHeader override(min-h-10 + py-2 = 40,內 24 匹配 button slot)
+  //
+  // withTabs=true(per header-canonical.spec.md W1):
+  //   移除 border-b,讓 TabsList 自身的 border-b border-border 接管 paint
   <div
     ref={ref}
     className={cn(
-      'flex items-center gap-2 shrink-0 border-b border-divider',
+      'flex items-center gap-2 shrink-0',
+      !withTabs && 'border-b border-divider',
       'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
       CHROME_UNBOUNDED_SLOT,
       className,

@@ -1,0 +1,1485 @@
+OpenAI Codex v0.128.0 (research preview)
+--------
+workdir: /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+model: gpt-5.5
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: none
+reasoning summaries: none
+session id: 019e2e53-6a89-7f72-8ff3-6aacbcd5da13
+--------
+user
+# Codex Round 2 — PeoplePicker stack saw transition + Select All ordering(M31 fresh discussion)
+
+## User verbatim 2026-05-16 (third strike after my ship)
+
+> 「這個還是錯的啊,你們他媽根本沒有發現root cause 也根本沒有找對重現方式和判斷何謂正確何謂錯誤,你們再給我去討論辯論」
+
+> 「然後 select all 那個問題我不買單,你自己去研究看看 ant design 到底是不是你說的那樣,然後這題也跟 codex 討論辯論」
+
+## Round 1 我承認的錯誤
+
+1. **Ref drop fix shipped 但不是 user 抓的 root cause**:Combobox forwardRef `_ref` 漏接是 real bug,但 user 截圖顯示的「同寬不同 visible」**不**是 dual-algorithm drift(那個 deterministic 後 fixed),而是 **formula saw transition** — full-fit 跟 need-chip 狀態之間視覺跳變(length=4→4 → length=5→2+3 at same width X≈90px,delta=2)。
+2. **判斷標準錯**:Round 1 reproduce 在 X=130px 跑(length=4 和 length=5 都 full fit,saw 不觸發)。我 claim「formula deterministic ✓ PASS」但 user 截圖實機看到的是 saw 視覺問題,reproduce 沒涵蓋。
+3. **Select All 排序**:Round 1 我說 Ant Design 用 source order「實機觀察都是這 pattern,可惜 docs 沒明文」— 沒實機驗證、沒 source code 證據。
+
+## User 提的新 success criteria(我推斷)
+
+「同 cell width → 同 overflow 判斷」應該不只指 deterministic,而是:
+**Smooth transition** — length=N 跟 length=N+1 at same width 視覺差 ≤ 1 個 avatar(不該跳 2)。
+
+## Formula saw 物理分析
+
+`avatar-stack-overflow.ts` formula:
+```ts
+// 全 fit 路徑(無 chip):
+const fullStackWidth = avatar + (total-1) * (avatar - overlap)
+if (fullStackWidth <= availablePx) return total  // 早退,無 chip
+
+// 不全 fit → 需 chip:
+const remainder = availablePx - avatar - overflowChipPx
+const visible = 1 + Math.floor(remainder / step)
+return Math.min(visible, total - 1)  // 至少 1 個 overflow
+```
+
+At X=90px, avatar=24, overlap=2, chip=24:
+- length=4:fullStack=24+3*22=90 ≤ 90 → return 4(全 fit no chip)
+- length=5:fullStack=112 > 90 → 走 chip path。remainder=90-24-24=42。visible=1+floor(42/22)=2。min(2, 4)=2。 → 2 visible + +3
+- **saw delta = 2(4→2)**
+
+Saw 來自 3 個物理 cost 同時觸發:
+1. 多 1 個 avatar(-22px)
+2. 多 chip 預留(-24px)
+3. 強制 ≥ 1 overflow(`min(visible, total-1)` cap)
+
+## Codex Round 2 任務
+
+### Q1 真 root cause(refresh)
+
+User 抓的「同寬不同 visible」**真 root cause** 是 ref drop(我前 round claim)還是 formula saw?
+請獨立判斷 + 提出證據(grep formula + 比稿 user 截圖物理對應)。
+
+### Q2 判斷標準
+
+「正確」應該是哪種?
+- **(a) deterministic only**:同 width 同 length 同 visible。saw 接受。Round 1 我的 reproduce 標準。
+- **(b) smooth transition**:length+1 視覺差 ≤ 1 avatar。要求改 formula 或 visual idiom。
+- **(c) world-class match**:對齊 Material AvatarGroup / Atlassian AvatarStack / GitHub avatar-stack 真實 source code 行為。
+
+請 cite 三家 world-class avatar stack source code(non-docs,真 GitHub source):
+- `@mui/material/AvatarGroup/AvatarGroup.js`
+- `@atlaskit/avatar-group` source
+- GitHub Primer `AvatarStack` source
+- 或 Polaris / Carbon equivalent
+
+判斷他們的 saw 行為:有 saw 嗎?如何處理?
+
+### Q3 Reproduce 改造
+
+Round 1 reproduce 在 X=130px 沒抓到 saw。請建議:
+- 確切重現 user 截圖的 reproduce setup(column width 範圍 / state 序列 / Storybook story)
+- 加 saw delta assertion:對相鄰 length(N, N+1)at 同 width 量 visible 差,assert ≤ 1
+
+### Q4 Fix proposal
+
+如 saw 是真 bug,fix 方向?(reject / approve / counter-propose):
+- **(α) 撤掉 `min(visible, total-1)` 強制 overflow**:full fit threshold 之上才需 chip
+- **(β) chip 永遠 reserve**:length≥3 都假設需 chip space(犧牲 length=3 一個 visible)
+- **(γ) overflow 視覺改 last-avatar-overlay**(GitHub idiom):chip 疊在最後 avatar 上不佔額外空間
+- **(δ) 不修 formula,改 column width**:接受 saw 是物理事實,document 為 expected behavior
+
+### Q5 Select All 排序 — Ant Design 真實源碼
+
+我 Round 1 claim「Ant Design Select multiple = source order」但無 source code 證據。
+請用 codex `exec --sandbox read-only` grep `node_modules/antd/es/select`(已 installed)或 WebFetch:
+- `react-component/select/src/OptionList.tsx`
+- `react-component/select/src/hooks/useCache.ts`
+- `react-component/select/src/Select.tsx`
+
+實際看 multiple 模式 value 陣列 ordering 機制:click order append?source order filter?
++ multiple + checkAll(若有)的 value 重置順序。
+
+完整 cite line + 引文。
+
+## 限制
+
+- **不 ship code** Round 2(我前 round false claim 太多)
+- 提 verdict 3-column 表(hypothesis / cite / reasoning)
+- Layer A 整合後再 propose user 拍板,**不**自動 implement
+- 若 sandbox 跑不了 Playwright,明示「Layer C visual missing」
+
+## Output
+
+Markdown:
+1. **Q1 verdict**:saw 是 root cause 嗎?
+2. **Q2 判斷標準** + 三家 world-class cite
+3. **Q3 reproduce 改造** code snippet
+4. **Q4 fix proposal** 4 路徑投票
+5. **Q5 Ant Design source code 引文** + verdict
+
+codex
+我會先只讀 repo 和 installed packages，確認現有公式、測試位置、以及 antd/rc-select 的實際排序邏輯；這一輪不改檔。接著會用官方/源碼頁補齊 world-class avatar stack source citations，因為你要求最新實際 source code。
+exec
+/bin/zsh -lc "rg --files node_modules/antd node_modules/rc-select 2>/dev/null | rg \"(OptionList|useCache|Select)\\.(tsx|ts|js)"'$|antd/es/select"' in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ exited 1 in 0ms:
+exec
+/bin/zsh -lc 'rg -n "avatar-stack-overflow|calculate.*overflow|overflowChip|AvatarStack|PeoplePicker|Select All|select all|checkAll|rc-select|antd" .' in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+./src/design-system/patterns/element-anatomy/element-anatomy.spec.md:73:| 4 Field control | `Input`(field-controls SSOT) | `NumberInput`, `DatePicker`, `Select`, `Combobox`, `LinkInput`, `PeoplePicker`, `Textarea`(multi-line variant) |
+./src/design-system/patterns/element-anatomy/item-anatomy.spec.md:40:| `SelectMenu`（→ `Select` searchable / `Combobox` searchable / `PeoplePicker`） | `components/SelectMenu/select-menu.tsx` | internal primitive，內部 CommandGroup > MenuItem 走 Family 1 |
+./src/design-system/components/DataTable/filter-tree.ts:193:// 當 stable id(PeoplePicker SSOT 沒有 id field,name 是唯一身分標識)。對齊 Notion / Linear /
+./src/design-system/components/DataTable/filter-operators.ts:32:  | 'person_single'     // <PeoplePicker>(預留)
+./src/design-system/components/DataTable/filter-operators.ts:33:  | 'person_multi'      // <PeoplePicker multiple>(person.is 也走這)
+./scripts/runtime-verify-peoplepicker-3bugs.mjs:106:console.log('=== PeoplePicker 3 Bugs Runtime Verify ===')
+./scripts/runtime-verify-real.mjs:29:async function captureFullPeoplePickerMulti(testId, description, narrowPx, clickToOpen) {
+./scripts/runtime-verify-real.mjs:76:// samplePeople first 4 = ['Alice Wonderland Wang', 'Bob Christopher Chen', 'Charlie Wu', 'Alexander Hamilton Zhang'] (per PeoplePicker stories typical sample data)
+./scripts/runtime-verify-real.mjs:77:await captureFullPeoplePickerMulti('Bug3-multi-default-wide', 'Multi length=4 default wide trigger (~320px max-w-xs)', null, false)
+./scripts/runtime-verify-real.mjs:78:await captureFullPeoplePickerMulti('Bug3-multi-narrow-180', 'Multi length=4 with 180px narrow trigger (simulate cell)', 180, false)
+./scripts/runtime-verify-real.mjs:79:await captureFullPeoplePickerMulti('Bug3-multi-narrow-120', 'Multi length=4 with 120px very narrow trigger', 120, false)
+./scripts/runtime-verify-real.mjs:80:await captureFullPeoplePickerMulti('Bug3-multi-narrow-180-opened', 'Multi length=4 narrow 180px + open panel-search', 180, true)
+./src/design-system/components/DataTable/cell-registry.tsx:30:import { PeoplePicker } from '@/design-system/components/PeoplePicker/people-picker'
+./src/design-system/components/DataTable/cell-registry.tsx:34:import type { PersonValue } from '@/design-system/components/PeoplePicker/person-display'
+./src/design-system/components/DataTable/cell-registry.tsx:358:    return <PeoplePicker key="display" variant="naked" mode={displayOrDisabled(isDisabled)} value={value as PersonValue | null} size={size} showDisplayEndIcon={isEditable === true} />
+./src/design-system/components/DataTable/cell-registry.tsx:361:    <PeoplePicker
+./src/design-system/components/DataTable/cell-registry.tsx:367:      // PeoplePicker onChange 永遠 emit array(API contract);single mode commit 取首位
+./src/design-system/components/DataTable/cell-registry.tsx:378:    return <PeoplePicker key="display" variant="naked" mode={displayOrDisabled(isDisabled)} value={(value as PersonValue[]) ?? []} size={size} showDisplayEndIcon={isEditable === true} />
+./src/design-system/components/DataTable/cell-registry.tsx:383:    <PeoplePicker
+./scripts/visual-audit-peoplepicker-multi-avatar.mjs:1:// Verify PeoplePicker multi-mode dropdown rows have avatar (post Combobox schema unify)
+./scripts/visual-audit-peoplepicker-multi-avatar.mjs:37:  'PeoplePicker (single) dropdown rows have avatar',
+./scripts/visual-audit-peoplepicker-multi-avatar.mjs:43:  'PeoplePicker (multi) dropdown rows have avatar',
+./scripts/visual-audit-peoplepicker-multi-avatar.mjs:48:console.log('\n=== PeoplePicker multi avatar audit ===\n')
+./src/design-system/components/ScrollArea/scroll-area.stories.tsx:18:  { id: 'ENG-1199', title: 'PeoplePicker 選中多人後換行邏輯錯誤', status: 'In Progress', assignee: 'David Kuo' },
+./scripts/verify-phase-e2.mjs:4: *   1. 7 Field controls' mode='display' rendering (Input/NumberInput/Combobox/Checkbox/Switch/RadioGroup/PeoplePicker/TimePicker)
+./src/design-system/components/DataTable/data-table.stories.tsx:28:import type { PersonData } from '@/design-system/components/PeoplePicker/person-display'
+./src/design-system/components/DataTable/data-table.stories.tsx:1301:  // 看見 PeoplePicker filter UI 真實渲染(否則 picker render 但 people pool=undefined → 選項空)。
+./src/design-system/components/DataTable/advanced-filter-operators.draft.md:32:| `person_multi` | `<PeoplePicker multiple>` | 多人員(`person.is` 也走這 — OR 語意) |
+./src/design-system/components/DataTable/advanced-filter-operators.draft.md:34:| `person_single` | `<PeoplePicker>` 單選 | (預留)罕用 |
+./src/design-system/components/SelectMenu/select-menu.anatomy.stories.tsx:71:            PeoplePicker 消費,App 不直接使用。結構:Popover(浮動)→ Command(搜尋 + 鍵盤導覽)→ CommandList →
+./src/design-system/components/SelectMenu/select-menu.anatomy.stories.tsx:466:                  <Td>PeoplePicker(reviewer 多選)</Td>
+./src/design-system/components/SelectMenu/select-menu.tsx:181:  // ── Multi-select: select all ──
+./src/design-system/components/SelectMenu/select-menu.tsx:374:          {/* Multi-select footer: Select All
+./src/design-system/components/DataTable/data-table-filter-panel.tsx:14:import { PeoplePicker } from '@/design-system/components/PeoplePicker/people-picker'
+./src/design-system/components/DataTable/data-table-filter-panel.tsx:15:import type { PersonValue } from '@/design-system/components/PeoplePicker/person-display'
+./src/design-system/components/DataTable/data-table-filter-panel.tsx:326:    // person_single / person_multi — 走 PeoplePicker(2026-05-07 升級,對齊 cell-registry SSOT)。
+./src/design-system/components/DataTable/data-table-filter-panel.tsx:333:        <PeoplePicker
+./src/design-system/components/DataTable/data-table-filter-panel.tsx:346:        <PeoplePicker
+./src/design-system/components/SelectMenu/select-menu.principles.stories.tsx:43:          <p>SelectMenu 是 Internal primitive,被 Select / Combobox / PeoplePicker 消費。直接使用前先確認:</p>
+./src/design-system/components/SelectMenu/select-menu.principles.stories.tsx:91:      <Section title="Pattern 3 — PeoplePicker(人員選擇 + Avatar 渲染)">
+./src/design-system/components/SelectMenu/select-menu.principles.stories.tsx:93:          <p>選人員(單 / 多)+ 渲染 avatar + 名稱 + role → <LinkTo kind="Design System/Components/PeoplePicker/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">PeoplePicker</span></LinkTo>。對齊 Slack mention / Linear assignee / Asana people-search idiom。</p>
+./src/design-system/components/SelectMenu/select-menu.principles.stories.tsx:102:          <p>不可直接 <code>import &#123; SelectMenu &#125; from '@/design-system/...'</code> 在 app — 必透過 Select / Combobox / PeoplePicker 三個 user-facing wrapper 之一。如有特殊 dropdown 需求(這 3 個都不對),回 DS 開新 wrapper 而不是繞過抽象層。</p>
+./src/design-system/components/SelectMenu/select-menu.spec.md:47:| 人員選擇器（搜尋 + Avatar）| 用 `PeoplePicker`（內部消費 SelectMenu）|
+./src/design-system/components/SelectMenu/select-menu.spec.md:51:| 直接在 JSX 中用 `<SelectMenu>` | ❌ **禁止**——失去外層 Select / Combobox / PeoplePicker 的 Field 整合、trigger 行為、state 管理 |
+./src/design-system/components/SelectMenu/select-menu.spec.md:55:- `../PeoplePicker/people-picker.tsx` — 人員選擇（永遠 searchable）
+./src/design-system/components/SelectMenu/select-menu.spec.md:130:- ❌ 直接在 JSX 用 `<SelectMenu>`——透過外層元件（Select / Combobox / PeoplePicker）消費
+./src/design-system/components/SelectMenu/select-menu.spec.md:150:SelectMenu 是 **composite**(Popover trigger + Command search + 滾動 MenuItem list + 浮動 surface),純 declarative API。**不套 `forwardRef` / `...props` spread`**,同 PeoplePicker 理由:
+./src/design-system/components/SelectMenu/select-menu.spec.md:170:- `../PeoplePicker/people-picker.spec.md` — 永遠使用 SelectMenu 的消費者
+./src/design-system/components/DataTable/data-table.tsx:1284:  //   — Select / TimePicker / DatePicker / Combobox / PeoplePicker 5 picker 的 display mode 內建
+./src/design-system/components/Field/field-wrapper.tsx:33:    // Textarea/NumberInput/PeoplePicker)— 對齊 M17/M19/M23 一處 SSOT + data-table.spec.md:233
+./src/design-system/components/Field/field-wrapper.tsx:327://   <ItemSuffix>{chevron}</ItemSuffix>          // 對 Combobox / DatePicker / PeoplePicker chevron
+./src/design-system/components/Field/field-controls.spec.md:15:> Family 4 (Field Control Layout) SSOT owner。Input / NumberInput / DatePicker / Select / Combobox / LinkInput / TimePicker / Textarea / PeoplePicker 等皆消費 `fieldWrapperStyles` / edit-readonly-disabled 三態 mode architecture / endAction 處理 / Display 子元件 pattern / Inline Action canonical(後者也 cascade 到 Sidebar / TreeView / DropdownMenu)。scope 本質 > 單一元件。
+./src/design-system/components/Field/field-controls.spec.md:17:> **注意**：此文件是 Field Controls（Input / NumberInput / DatePicker / Select / Combobox / LinkInput / PeoplePicker 等)**共用**的設計原則，與 `Field/field.spec.md`（表單 Layout 容器）**不是同一個東西**。
+./src/design-system/components/Field/field-controls.spec.md:22:**Layout Family**：本 spec 是 CLAUDE.md 4-Family Model **Family 4（Field Control Layout）的 SSOT**。結構 `fieldWrapperStyles + [startIcon?] [<editable content>] [endAction?]`，**視覺對齊 Family 1（Menu item layout）**——Select trigger 的高度 / 字體 / icon size 必須跟其 SelectMenu options 連續一致。Consumers: Input（canonical）, NumberInput, DatePicker, Select, Combobox, LinkInput, PeoplePicker。
+./src/design-system/components/Field/field-controls.spec.md:50:├── PeoplePicker/           ← PeoplePicker + PersonDisplay（cross-component primitive）
+./src/design-system/components/Field/field-controls.spec.md:288:**(a) Selected value renderer**:rich display(avatar+name/icon+label)元件**必**提供 consumer renderer slot,**display/readonly/disabled/edit** 4 mode 共享同一 renderer(禁 edit-only)。`Select.selectedItemRenderer` / `Combobox.tagRenderer`(edit 已接;display path unify deferred 下 cycle)/ PeoplePicker 走 `PersonDisplay`+`MultiPersonDisplay`+`Combobox.tagRenderer`。對齊 MUI Autocomplete `renderValue` / Ant Select `tagRender`+`labelRender`+`optionRender` / MUI DataGrid `renderCell`+`renderEditCell` 共享 params。
+./src/design-system/components/DataTable/data-table.spec.md:372:| `person_multi` | `<PeoplePicker multi>` 預留 | v1 fallback Input |
+./src/design-system/components/Field/field.spec.md:32:Field 和 Field Controls（Input / NumberInput / DatePicker / Select / Combobox / LinkInput / PeoplePicker / Textarea）是兩件事：
+./src/design-system/components/Field/field.spec.md:338:Field 內的資料輸入控件（Input / NumberInput / DatePicker / Select / Combobox / LinkInput / PeoplePicker / Textarea）共用的三 mode、size、focus、endAction、Display 規則，詳見 `Field/field-controls.spec.md`。
+./src/design-system/components/Field/field.spec.md:386:**反模式 ❌**:per-control `open && 'border-primary'`(Combobox/Select/PeoplePicker)/ `data-[state=open]:border-primary` — 已 v13.3 全 retire。`hook check_field_state_token_consume` write-time 攔。
+./src/design-system/components/Field/field.spec.md:403:| **L6 Cell trigger indicator(v15,2026-05-09)** | naked-display branch + `showDisplayEndIcon?: boolean` opt-in | DataTable cell-registry 顯式傳 `showDisplayEndIcon` → Field component 內部 `<ItemSuffix>` 渲對應 trigger icon(Select/Combobox/PeoplePicker → ChevronDown / DatePicker → CalendarIcon / TimePicker → Clock / LinkInput 例外無 suffix)。table 外用法不傳此 prop = 純展示無 icon。詳 `.claude/planning/cell-indicator-ssot-rfc.md`。|
+./scripts/migrate-trait-frontmatter.mjs:10://   isInputLike    — name matches Input/Textarea/Combobox/Select/NumberInput/PeoplePicker/LinkInput/DatePicker/TimePicker
+./scripts/migrate-trait-frontmatter.mjs:22:const inputLike = new Set(['Input', 'Textarea', 'Combobox', 'Select', 'NumberInput', 'PeoplePicker', 'LinkInput', 'DatePicker', 'TimePicker', 'SelectMenu']);
+./src/design-system/components/Field/field-context.ts:112: * 重 cell 組件(Avatar HoverCard / PeoplePicker / etc.)讀此 signal 跳過昂貴 subtree(如 HoverCard
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:2: * avatar-stack-overflow — Deterministic SSOT primitive for avatar stack overflow math
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:17: * firstAvatar + (visible - 1) * (avatar - overlap) + overflowChip <= available
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:21: * - `overflowChip`:若有 hidden,留 +N chip 空間;最後一個 visible item 不需留(`remaining === 0`)
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:24: * PeoplePicker stack edit + future avatar consumers 都 import 此 helper,不可 copy formula。
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:25: * 對齊 codex「one avatar-stack primitive owns avatarPx, overlapPx, overflowChipPx」directive。
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:39: * @param overflowChipPx — Width reserved for +N indicator when overflow needed(default 24px = circle h-6 min-w-6)
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:42:export function getAvatarStackVisibleCount({
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:47:  overflowChipPx = 24,
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:53:  overflowChipPx?: number
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:62:  //   firstAvatar + (N - 1) * (avatar - overlap) + overflowChipPx <= availablePx
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:64:  //   (N - 1) * (avatar - overlap) <= availablePx - firstAvatar - overflowChipPx
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:65:  //   N - 1 <= (availablePx - firstAvatar - overflowChipPx) / (avatar - overlap)
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:69:  const remainder = availablePx - avatarPx - overflowChipPx
+./src/design-system/components/PeoplePicker/person-display.tsx:12:  getAvatarStackVisibleCount,
+./src/design-system/components/PeoplePicker/person-display.tsx:15:} from './avatar-stack-overflow'
+./src/design-system/components/PeoplePicker/person-display.tsx:184:  // 2026-05-15 Bug 3 fix(Claude+Codex Step 5 比稿 consensus):消費 shared `avatar-stack-overflow`
+./src/design-system/components/PeoplePicker/person-display.tsx:187:  // canvas)。**抽 primitive 統一**:display + edit 共用 `getAvatarStackVisibleCount` formula。
+./src/design-system/components/PeoplePicker/person-display.tsx:188:  // SSOT in `./avatar-stack-overflow.ts`,M14 mechanical guard 防 future drift。
+./src/design-system/components/PeoplePicker/person-display.tsx:196:      const visible = getAvatarStackVisibleCount({
+./src/design-system/components/PeoplePicker/person-display.tsx:200:        overflowChipPx: AVATAR_STACK_OVERFLOW_CHIP_PX[size],
+./src/design-system/components/PeoplePicker/person-display.tsx:296:// **Why centralize**:Combobox tagRenderer (PeoplePicker stack mode) + MultiPersonDisplay
+./src/design-system/components/PeoplePicker/person-display.tsx:333:// PeoplePicker `multiDisplay='stack'` 模式 wraps Combobox,tagRenderer 不能用 Tag pill
+./src/design-system/components/Chip/chip.spec.md:41:| 使用者已輸入的 token（收件人、filter summary）| Input chip 系列（`LinkInput` / `PeoplePicker`）| 那些是 input 內的 token，不是獨立選擇器 |
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:2:import { PeoplePicker } from './people-picker'
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:7:  title: 'Design System/Components/PeoplePicker/設計規格',
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:28:        <Desc>PeoplePicker 是組合元件——Popover(浮層)+ Command(cmdk 搜尋)+ SelectMenu(選單)+ PersonDisplay(Avatar + Name)。外觀對齊 Select / Combobox,差異在選項前綴有 Avatar 視覺。</Desc>
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:30:          <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:44:            <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:52:            <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:110:      <PeoplePicker {...args} onChange={() => {}} />
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:122:        <PeoplePicker people={SAMPLE_PEOPLE} value={SAMPLE_PEOPLE[0]} onChange={() => {}} />
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:127:        <PeoplePicker mode="readonly" people={SAMPLE_PEOPLE} value={SAMPLE_PEOPLE[0]} />
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:131:        <PeoplePicker mode="disabled" people={SAMPLE_PEOPLE} value={SAMPLE_PEOPLE[0]} />
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:135:        <PeoplePicker mode="readonly" people={SAMPLE_PEOPLE} value={null} />
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:148:          PeoplePicker 作為 Field Control,高度對齊 `--field-height-*` tier(sm=28/32、md=32/36、lg=36/40
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:174:              <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:195:          PeoplePicker 的 field 外觀跟 Select / Combobox 完全一致——共用 `fieldWrapperStyles`。差別只在
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:294:        <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:308:        <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:321:        <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:335:        <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:349:        <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:377:            <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx:385:            <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:5:import { PeoplePicker } from './people-picker'
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:11:  title: 'Design System/Components/PeoplePicker/設計原則',
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:57:          note="適合 PeoplePicker 的場景(點擊跳轉「展示」頁範例);判斷不確定時對照 spec.md「何時用 / 何時不用」段。"
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:61:              <LinkTo kind="Design System/Components/PeoplePicker/展示" name="單人"><span className="text-primary hover:underline font-medium cursor-pointer">單人</span></LinkTo>
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:64:              <LinkTo kind="Design System/Components/PeoplePicker/展示" name="多人"><span className="text-primary hover:underline font-medium cursor-pointer">多人</span></LinkTo>
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:67:              <LinkTo kind="Design System/Components/PeoplePicker/展示" name="尺寸"><span className="text-primary hover:underline font-medium cursor-pointer">尺寸</span></LinkTo>
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:73:          title="vs Select — PeoplePicker 是選人員(選項有 avatar 視覺)"
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:78:            <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:87:          title="❌ 選非人員(分類 / 狀態)用 PeoplePicker"
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:102:          <Label warn>↑ 非人員不要用 PeoplePicker</Label>
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:106:          title="vs Combobox — 多選非人員 → Combobox(不是 PeoplePicker)"
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:107:          note="Combobox 是通用多選,沒 avatar 假設。「產品標籤」、「技術 stack」這類非人員多選用 Combobox;人員多選才用 PeoplePicker"
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:139:          <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:151:          <PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:180:        <PeoplePicker value={null} onChange={() => {}} people={team} />
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx:187:        <PeoplePicker mode="readonly" value={null} />
+./src/design-system/components/PeoplePicker/people-picker.tsx:17:  getAvatarStackVisibleCount,
+./src/design-system/components/PeoplePicker/people-picker.tsx:20:} from './avatar-stack-overflow'
+./src/design-system/components/PeoplePicker/people-picker.tsx:25: * SSOT helper for PeoplePicker stack mode tag wrapper className(per-length canonical)。
+./src/design-system/components/PeoplePicker/people-picker.tsx:55:export function getPeoplePickerTagWrapperClass(selectedCount: number): string {
+./src/design-system/components/PeoplePicker/people-picker.tsx:63:// 已 unified with SelectMenuOption per Issue 4)。先前 PeoplePicker single mode 透過 Select 開
+./src/design-system/components/PeoplePicker/people-picker.tsx:79:// ── PeoplePicker ────────────────────────────────────────────────────────────
+./src/design-system/components/PeoplePicker/people-picker.tsx:97:export interface PeoplePickerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+./src/design-system/components/PeoplePicker/people-picker.tsx:155:const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(function PeoplePicker({
+./src/design-system/components/PeoplePicker/people-picker.tsx:265:        // event handler element 型別跟 PeoplePicker `HTMLAttributes<HTMLDivElement>` 不一致
+./src/design-system/components/PeoplePicker/people-picker.tsx:328:  // `avatar-stack-overflow` primitive deterministic formula(取代 Combobox DOM offsetWidth-based
+./src/design-system/components/PeoplePicker/people-picker.tsx:355:      const visible = getAvatarStackVisibleCount({
+./src/design-system/components/PeoplePicker/people-picker.tsx:359:        overflowChipPx: AVATAR_STACK_OVERFLOW_CHIP_PX[size],
+./src/design-system/components/PeoplePicker/people-picker.tsx:397:      // 達成 GitHub PeoplePicker fixed 12px inset(對齊 cell context 同 13px from cell.left 含 1px border)。
+./src/design-system/components/PeoplePicker/people-picker.tsx:410:      // SSOT helper `getPeoplePickerTagWrapperClass(count)` 集中,future 改 wrapper 行為改一處。
+./src/design-system/components/PeoplePicker/people-picker.tsx:411:      tagWrapperClassName={getPeoplePickerTagWrapperClass(selectedNames.length)}
+./src/design-system/components/PeoplePicker/people-picker.tsx:415:      // Combobox default `overflowShape='tag'`(矩形 chip,文字 Combobox 慣例);PeoplePicker stack
+./src/design-system/components/PeoplePicker/people-picker.tsx:420:      // 60px fallback 不 deterministic)。SSOT in `./avatar-stack-overflow.ts`,display + edit 共用。
+./src/design-system/components/PeoplePicker/people-picker.tsx:454:        // SSOT 對齊 PeoplePicker single mode line 201 selectedItemRenderer。多選 1 人時視覺等同單選,
+./src/design-system/components/PeoplePicker/people-picker.tsx:456:        // 是 future 工作(需 PeoplePicker 加 searchIn='trigger' opt-in,當前 wrapped Combobox 走 menu search)。
+./src/design-system/components/PeoplePicker/people-picker.tsx:472:PeoplePicker.displayName = 'PeoplePicker'
+./src/design-system/components/PeoplePicker/people-picker.tsx:476:  component: 'PeoplePicker',
+./src/design-system/components/PeoplePicker/people-picker.tsx:488:export { PeoplePicker }
+./src/design-system/components/PeoplePicker/people-picker.stories.tsx:3:import { PeoplePicker } from '@/design-system/components/PeoplePicker/people-picker'
+./src/design-system/components/PeoplePicker/people-picker.stories.tsx:8:  title: 'Design System/Components/PeoplePicker/展示',
+./src/design-system/components/PeoplePicker/people-picker.stories.tsx:70:        <PeoplePicker value={val} people={samplePeople} onChange={(v) => setVal(v[0] ?? null)} aria-label="負責人(edit mode demo)" />
+./src/design-system/components/PeoplePicker/people-picker.stories.tsx:75:        <PeoplePicker mode="display" value={samplePeople[0]} />
+./src/design-system/components/PeoplePicker/people-picker.stories.tsx:79:        <PeoplePicker mode="readonly" value={samplePeople[0]} />
+./src/design-system/components/PeoplePicker/people-picker.stories.tsx:83:        <PeoplePicker mode="disabled" value={samplePeople[0]} />
+./src/design-system/components/PeoplePicker/people-picker.stories.tsx:102:        <PeoplePicker value={val} people={samplePeople} onChange={setVal} />
+./src/design-system/components/PeoplePicker/people-picker.stories.tsx:106:        <PeoplePicker mode="readonly" value={readonlyVal} />
+./src/design-system/components/PeoplePicker/people-picker.stories.tsx:122:      <PeoplePicker size={size} value={val} people={samplePeople} onChange={(v) => setVal(v[0] ?? null)} className="max-w-xs" />
+./src/design-system/components/PeoplePicker/people-picker.spec.md:2:component: PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.spec.md:16:# PeoplePicker 設計原則
+./src/design-system/components/PeoplePicker/people-picker.spec.md:20:PeoplePicker 是**人員選擇器**——專為「從人員清單中選一個或多個」設計的複合元件。外觀對齊 Select / Combobox，差異在選項前綴有 Avatar 視覺。
+./src/design-system/components/PeoplePicker/people-picker.spec.md:24:共用規則見 `../Field/field-controls.spec.md`。本文件只記錄 PeoplePicker 特有的原則。
+./src/design-system/components/PeoplePicker/people-picker.spec.md:42:| 一般分類選擇（非人員）| `Select` / `Combobox` | PeoplePicker 專為人員設計，有 Avatar prefix |
+./src/design-system/components/PeoplePicker/people-picker.spec.md:43:| 單選純文字選項（狀態 / 類別）| `Select` | PeoplePicker 開銷較大，靠 Avatar 識別；非人員用 Select |
+./src/design-system/components/PeoplePicker/people-picker.spec.md:45:| 只顯示單一人員（不需選擇）| `NameCard` + `Avatar` | PeoplePicker 是選擇器，純展示用 NameCard |
+./src/design-system/components/PeoplePicker/people-picker.spec.md:46:| 顯示整個 team 成員列表 | `Avatar.Group` / 自訂 list | PeoplePicker 是「選人」介面，不是「展示 team」 |
+./src/design-system/components/PeoplePicker/people-picker.spec.md:69:PeoplePicker 永遠支援搜尋（內部使用 `Command` / cmdk）——因為人員清單通常規模較大且使用者記得人名關鍵字（符合 Select spec「Searchable 開啟判斷」的「label 性質」主判準：人名是獨特關鍵字）。
+./src/design-system/components/PeoplePicker/people-picker.spec.md:78:| | PeoplePicker | Select | Combobox |
+./src/design-system/components/PeoplePicker/people-picker.spec.md:86:**搜尋型態 SSOT canonical**（A1-A5 spec,2026-05-11;2026-05-12 補 PeoplePicker multi `searchIn` opt-in）：
+./src/design-system/components/PeoplePicker/people-picker.spec.md:91:| **inline-trigger** | 單選 + 需快速 type-and-pick;trigger 變 input | `<Select searchable />` / `<Combobox searchable searchIn='trigger' />` / `<PeoplePicker />` single / `<PeoplePicker multi searchIn='trigger' />` |
+./src/design-system/components/PeoplePicker/people-picker.spec.md:92:| **panel-top** | 多選 + 連續 type-and-select(關鍵字保留在 menu 不被 chip 切走) | `<Combobox searchable searchIn='menu' />` / `<PeoplePicker multi />`(default menu) |
+./src/design-system/components/PeoplePicker/people-picker.spec.md:96:**PeoplePicker 是獨立元件,有自己的另一層 SSOT,並非完全繼承 Select / Combobox**。下表標出哪些繼承、哪些 PeoplePicker 自己定義 — **改一處先看本表,違反該層 SSOT = 漂移**。
+./src/design-system/components/PeoplePicker/people-picker.spec.md:104:| Avatar 在 field 內 padding(12px 固定)| **PeoplePicker 自己**(不繼承 Combobox density-dependent 公式)|
+./src/design-system/components/PeoplePicker/people-picker.spec.md:105:| +N 溢出 chip 形狀(**圓形**)| **PeoplePicker 自己**(不繼承 Combobox 矩形 tag) |
+./src/design-system/components/PeoplePicker/people-picker.spec.md:106:| 多人 tag 視覺(**圓形 avatar overlap `-ml-0.5`**) | **PeoplePicker 自己**(不繼承 Combobox 矩形 Tag chip)|
+./src/design-system/components/PeoplePicker/people-picker.spec.md:107:| 多人 length=1 視覺(降階為 avatar+人名,跟單人視覺一致)| **PeoplePicker 自己**(Combobox 無此特殊)|
+./src/design-system/components/PeoplePicker/people-picker.spec.md:144:| Empty-state inline-search placeholder(未選時 → trigger empty placeholder) | `select.tsx:185` `selectedLabel \|\| placeholder` / `combobox.tsx:554` `items.length === 0 ? placeholder : ''`(2026-05-15 Drift A fix 對齊 PeoplePicker SSOT)|
+./src/design-system/components/PeoplePicker/people-picker.spec.md:161:`MultiPersonCell` / `PersonCell`(`cell-registry.tsx:381-391` cell-as-input)+ form context PeoplePicker **包同一個元件**,所以 §B/§C/§D 規則對兩 surface 都成立。差別只在 padding 機制(共 §E)— 兩 surface 都產出 12px inset,**禁分歧**。
+./src/design-system/components/PeoplePicker/people-picker.spec.md:163:**改 PeoplePicker 視覺前必查本表,動 trigger render / placeholder / overflowShape / tagWrapperClassName 前先 cite 對應 row。** Hook `check_peoplepicker_ssot_drift.sh` 機械強制。
+./src/design-system/components/PeoplePicker/people-picker.spec.md:165:**Avatar 左 inset SSOT(2026-05-13 v2 — user 拍 Path a + density-drift root-cause,GitHub people picker idiom)**:single trigger / multi stack 第一個 avatar 距 trigger.left = **12px 固定**(不隨 size / density 漂移)。實作:PeoplePicker form context + 有 tag → `cn(className, '!px-3')` inject 12px override 到 Combobox Field wrapper,**覆蓋** Combobox `tagPadding[size]` density-dependent calc 公式;`tagAreaPaddingLeftPx={undefined}` 不再 +8 magic。Cell context naked variant `!px-[var(--table-cell-px)]` 已是 12px 不 inject。**為何 v1「4+8=12」公式報廢**(per 2026-05-13 codex V2 verdict correction):`tagPadding[size]` 是 `(field-height - icon-size) / 2`,真值表:default sm/md=4px → 4+8=12 ✓;default lg=6px → 14px ✗;comfortable sm/md=6px → 14px ✗;comfortable lg=8px → 16px ✗。**default sm + default md 兩個 size 也 = 12px**(我前 too narrow claim「只 md」 codex 修正);**真正漂的 = default lg + 全 comfortable 共 4 個組合**。整體 stale 結論不變(4 個漂 / 2 個對),故 `!px-3` 固定 12px 是正解。對齊 GitHub picker / Material Autocomplete renderTags / Ant Select tagRender 共享 fixed-inset canonical(不 scale with size)。
+./src/design-system/components/PeoplePicker/people-picker.spec.md:168:- **選人 → PeoplePicker**（不用 Select / Combobox 代替，失去 Avatar 視覺）
+./src/design-system/components/PeoplePicker/people-picker.spec.md:195:- ❌ 用 PeoplePicker 選非人員（部門 / 專案 / 類別）——那些用 Select / Combobox
+./src/design-system/components/PeoplePicker/people-picker.spec.md:198:- ❌ 把 PeoplePicker 當 Team Member 展示元件用（不選人、只看名單）——用 Avatar.Group 或自訂 list
+./src/design-system/components/PeoplePicker/people-picker.spec.md:199:- ❌ 不搭配 Avatar 視覺（純文字名字）——失去 PeoplePicker 存在的理由，直接用 Select / Combobox
+./src/design-system/components/PeoplePicker/people-picker.spec.md:205:PeoplePicker 是 **composite Field Control**(Field shell + Avatar + SelectMenu),關鍵決策維度是 `mode`(single / multi)× `size` × search behavior × value type——已由 `ModeMatrix` / `SizeMatrix` / `ColorMatrix` / `StateBehavior` / `PersonValueType` 五張矩陣完整覆蓋。互動 Inspector 對 composite 元件較弱:「傳 PersonValue 陣列」需要真實資料 fixture 展示,單組合試玩無法呈現——改以 `StateBehavior` 的真實 Assignee picker 場景取代。
+./src/design-system/components/PeoplePicker/people-picker.spec.md:213:PeoplePicker 是 **composite 元件**(Popover + Command + SelectMenu + Avatar 內部組裝),其 API 為完全 declarative(value / onChange / size / mode / options...)。**不套 `forwardRef` / `...props` spread**:
+./src/design-system/components/PeoplePicker/people-picker.spec.md:217:- **API 邊界明確才是 composite 價值**:PeoplePicker 暴露的是「選人」語意,不是「彈出選單 + 搜尋 + 渲染頭像」的 DOM 細節。若 consumer 需要 DOM-level 控制,該用底層 Popover + Combobox 自組,不該透過 PeoplePicker
+./src/design-system/components/PeoplePicker/people-picker.spec.md:219:`displayName = 'PeoplePicker'` 保留,無 `asChild`(composite 不是 Slot-compat)。
+./src/design-system/components/PeoplePicker/people-picker.spec.md:228:- `../SelectMenu/select-menu.tsx` — PeoplePicker edit mode 的浮層選單（內部消費）
+./src/design-system/components/NameCard/name-card.tsx:79: * 各自不一致(同 person 在 DataTable / PeoplePicker / avatar.principles 看起來不同)。
+./scripts/diff-pre-stream-c.mjs:9: *   - PeoplePicker stories(placeholder 'request user' + Issue 2 cell offset + Issue 1 multi=1)
+./scripts/diff-pre-stream-c.mjs:11: *   - DataTable stories with PeoplePicker / disabled cells
+./src/design-system/components/OverflowIndicator/overflow-indicator.anatomy.stories.tsx:362:                <Td>PeoplePicker / Avatar Group +N</Td>
+./src/design-system/components/OverflowIndicator/overflow-indicator.stories.tsx:35:          'OverflowIndicator 是 `+N` 溢出指示器——當容器無法顯示全部項目時,以 `+N` 形式提示,hover 展開完整清單(HoverCard 承載,可互動)。由 Combobox / PeoplePicker / Avatar Group 等元件消費,App 不直接使用。',
+./src/design-system/components/OverflowIndicator/overflow-indicator.stories.tsx:93:export const AvatarStackOverflow: Story = {
+./scripts/assign-layout-family.mjs:41:  PeoplePicker: 4,
+./src/design-system/components/Combobox/combobox.tsx:2:// @renderer-symmetry-allow: ComboboxTagStack(display path)接 consumer tagRenderer 是 Stream C 下 cycle 工作 — 2026-05-12 先 ship Issues 2/3/4 surgical fixes(placeholder vocabulary + cell surface metrics + placeholder truncate),tagRenderer display-path unify deferred per field-controls.spec.md 共享 contract a。當前 multi=1 顯示已透過 PeoplePicker tagRenderer 線 314 PersonDisplay SSOT 對齊;其他 Combobox consumer 走 default `<Tag>` 純文字 backward-compat。
+./src/design-system/components/Combobox/combobox.tsx:27: * SelectMenuOption(primitive SSOT)** — 避免重蹈先前 PeoplePicker 改壞的 wrapper schema drift。
+./src/design-system/components/Combobox/combobox.tsx:33: *   PeoplePicker multi-mode 走 Combobox 路徑,dropdown menu rows lose avatar / description —
+./src/design-system/components/Combobox/combobox.tsx:56:  visibleCountOverride?: number,  // 2026-05-15 Bug 3 fix:override DOM measurement(PeoplePicker stack 走 formula primitive)
+./src/design-system/components/Combobox/combobox.tsx:63:    // 直接用 override(PeoplePicker stack mode 用 `avatar-stack-overflow` primitive deterministic
+./src/design-system/components/Combobox/combobox.tsx:79:    // measurement 後 visibleCount=0 → 顯 +1 indicator 而非 single tag,違反 PeoplePicker length===1
+./src/design-system/components/Combobox/combobox.tsx:155:   * (2026-05-07 v15.13)為 PeoplePicker stack mode 提供 hook point — 讓 stack avatar 走
+./src/design-system/components/Combobox/combobox.tsx:166:   * Overflow indicator(+N)形狀(2026-05-12 Round 7 fix,user 抓 PeoplePicker stack +N 該圓形):
+./src/design-system/components/Combobox/combobox.tsx:169:   * PeoplePicker stack mode pass `'circle'`,Combobox 文字 tag 自走 `'tag'`。
+./src/design-system/components/Combobox/combobox.tsx:173:   * 2026-05-15 Bug 3 fix:override visible count via formula-based primitive(PeoplePicker stack
+./src/design-system/components/Combobox/combobox.tsx:174:   * 用 `avatar-stack-overflow` primitive deterministic formula 計算 visible,bypass DOM offsetWidth
+./src/design-system/components/Combobox/combobox.tsx:295:   * 用例:PeoplePicker(multi)用此 slot 把 selected tag 換成 avatar + name pill,而非
+./src/design-system/components/Combobox/combobox.tsx:296:   * 純文字 Tag。對齊 PeoplePicker = Combobox wrapper SSOT。
+./src/design-system/components/Combobox/combobox.tsx:301:   * (對齊 display MultiPersonDisplay overflow popover 含 avatar SSOT)。PeoplePicker stack
+./src/design-system/components/Combobox/combobox.tsx:321:   * tagAreaRef container 左 paddingLeft(px,2026-05-12 加,for PeoplePicker Avatar inset)。
+./src/design-system/components/Combobox/combobox.tsx:327:   * **2026-05-13 v2 deprecate path**:原 PeoplePicker pass `{8}` 假設「Combobox tagPadding=4px,4+8=12」
+./src/design-system/components/Combobox/combobox.tsx:329:   * default density 才 = 4px;其他 size/density 漂 6/8px → 4+8=12 公式破。改 PeoplePicker 直接 inject
+./src/design-system/components/Combobox/combobox.tsx:331:   * 走 undefined。Future 仍保留此 prop 給其他 consumer 精準調整 padding,但 PeoplePicker 已不再用。
+./src/design-system/components/Combobox/combobox.tsx:337:   * - `'circle'`(opt-in)— 圓形 avatar-shape(PeoplePicker stack 用)
+./src/design-system/components/Combobox/combobox.tsx:342:   * DOM-based `useOverflowCount`)。PeoplePicker stack mode 用 `avatar-stack-overflow` primitive
+./src/design-system/components/Combobox/combobox.tsx:420:// `CustomCombobox` 從未拿 ref → PeoplePicker `stackContainerRef.current` 永遠 null →
+./src/design-system/components/Combobox/combobox.tsx:555:  // disabled / icon / group)— 修先前 PeoplePicker multi-mode dropdown 漏 avatar drift bug。
+./src/design-system/components/Combobox/combobox.tsx:669:    // `__triggerRef`,讓 PeoplePicker stack 透過 ref 量 trigger DOM(visibleCountOverride
+./src/design-system/components/Select/select.tsx:101:   * 用例:PeoplePicker 用此 slot 把 single 選中的 person render 成 PersonDisplay
+./src/design-system/components/Select/select.tsx:102:   * (avatar + name)而非純文字 label。對齊 PeoplePicker = Select wrapper SSOT。
+./src/design-system/components/Select/select.tsx:225:  // PeoplePicker 接 PersonDisplay)。優先於 isTextDisplay / Tag 預設 path,但 empty value
+./src/design-system/components/Select/select.tsx:226:  // 仍走 placeholder。對齊 PeoplePicker = Select wrapper SSOT。
+./src/design-system/components/Avatar/avatar.spec.md:75:- PeoplePicker tag / table cell 頭像 / sidebar user / comment author / avatar 堆疊
+./src/design-system/components/Avatar/avatar.spec.md:112:**不論頭像出現在 PeoplePicker tag、table cell、sidebar、comment、avatar 堆疊——只要是人員頭像,hover 一律觸發 HoverCard 顯示 name card**(完整姓名、部門、聯絡方式等)。
+./src/design-system/components/Avatar/avatar.tsx:148:// (filter Avatar/PeoplePicker/FieldSurfaceProvider remounts)。
+./src/design-system/components/Command/command.stories.tsx:38:          'Command 是 cmdk 的 shadcn passthrough 搜尋 + 鍵盤導覽清單 primitive。App 層級**不直接使用** Command——透過 Select / Combobox / PeoplePicker 的 searchable 模式消費,底層自動切換到 SelectMenu(SelectMenu 包 Command)。唯一可以直接組合 Command 的場景是 Command Palette(Cmd+K)——跨頁全域搜尋與快速動作入口。',
+./src/design-system/components/Command/command.anatomy.stories.tsx:5://   PeoplePicker)決定並在各自的 anatomy 詳述。本檔僅保留 Overview 教結構與
+./src/design-system/components/Command/command.anatomy.stories.tsx:87:          <br />• <code className="font-mono text-footnote">SelectMenu</code> — Select / Combobox / PeoplePicker 的 searchable 浮層
+./src/design-system/components/Command/command.spec.md:23:**分類**：Internal primitive——由 SelectMenu 消費（Select / Combobox / PeoplePicker 透過 SelectMenu 使用）。App 不直接使用 Command；若要 Command Palette 類 UX,組合 Popover + Command 即可。
+./src/design-system/components/Command/command.spec.md:31:- **SelectMenu 內部搜尋**：Select / Combobox / PeoplePicker 的 searchable 模式底層
+./src/design-system/components/Command/command.spec.md:42:| 人員選擇 | `PeoplePicker` | 專用人員選擇器（內部會消費 Command）|
+./src/design-system/components/Command/command.spec.md:66:- **SelectMenu**：Select / Combobox / PeoplePicker 的 searchable 浮層（**由 Field 觸發**,帶有 input field + 選中值回填）
+./src/design-system/components/Command/command.spec.md:159:- `../SelectMenu/select-menu.spec.md` — 主要消費者（Select / Combobox / PeoplePicker 的 searchable 浮層）
+./scripts/runtime-verify-peoplepicker-full.mjs:3: * Full visual verification for PeoplePicker 3 bugs — capture ALL original user scenarios
+./scripts/runtime-verify-peoplepicker-full.mjs:9: * Uses PeoplePicker stories directly(not DataTable)to control state precisely.
+./scripts/runtime-verify-peoplepicker-full.mjs:44:await probe('Bug1-multi-length1-default', 'Multi PeoplePicker length=1 default story', 'design-system-components-peoplepicker-展示--multi', { width: 1440, height: 900 })
+./scripts/runtime-verify-peoplepicker-full.mjs:47:await probe('Bug2-single-default', 'Single PeoplePicker default story', 'design-system-components-peoplepicker-展示--single', { width: 1440, height: 900 }, async (p) => {
+./scripts/runtime-verify-peoplepicker-full.mjs:105:await probe('Bug1-anatomy-multi', 'Multi PeoplePicker anatomy story (ModeMatrix)', 'design-system-components-peoplepicker-設計規格--mode-matrix', { width: 1920, height: 1080 }, async (p) => {
+./scripts/runtime-verify-peoplepicker-full.mjs:138:console.log('=== PeoplePicker Full Visual Verify ===')
+./src/design-system/components/Command/command.principles.stories.tsx:69:          <li><LinkTo kind="Design System/Components/PeoplePicker/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">PeoplePicker</span></LinkTo>——人員搜尋</li>
+./scripts/peoplepicker-bug-reproduce.mjs:9: *     - 真 root cause:Combobox forwardRef body `_ref` 把 ref drop → PeoplePicker
+./scripts/peoplepicker-bug-reproduce.mjs:64:    let overflowChipText = null
+./scripts/peoplepicker-bug-reproduce.mjs:67:      if (text?.match(/^\+\d+$/)) overflowChipText = text
+./scripts/peoplepicker-bug-reproduce.mjs:74:      overflowChipText,
+./scripts/peoplepicker-bug-reproduce.mjs:75:      overflowChipHidden: overflowWrapper?.hidden ?? null,
+./scripts/peoplepicker-bug-reproduce.mjs:117:      pass(`A1 length=4 at ${probe180.tagAreaWidth}px → visible=${probe180.visibleAvatarCount}`, `formula expected=${expected}, +N=${probe180.overflowChipText ?? 'hidden'}`)
+./scripts/peoplepicker-bug-reproduce.mjs:135:      pass(`A2 length=4 at narrow ${probe100.tagAreaWidth}px → visible=${probe100.visibleAvatarCount}`, `formula expected=${expected}, +N=${probe100.overflowChipText ?? 'hidden'}`)
+./scripts/peoplepicker-bug-reproduce.mjs:153:      pass(`A3 length=4 at very narrow ${probe60.tagAreaWidth}px → visible=${probe60.visibleAvatarCount}`, `formula expected=${expected}, +N=${probe60.overflowChipText ?? 'hidden'}`)
+./scripts/runtime-verify-issue2-avatar-offset.mjs:5: * 量 PeoplePicker multi 2-avatar stack 在 cell:
+./scripts/runtime-verify-tagpadding-density.mjs:5: * 對 PeoplePicker multi standalone(form context),3 size 量 avatar.left from trigger.left。
+./scripts/runtime-verify-tagpadding-density.mjs:18:  // Find the multi-mode PeoplePicker trigger (role=combobox or button with avatar)
+./scripts/runtime-verify-tagpadding-density.mjs:43:  console.log('=== Standalone PeoplePicker multi triggers ===\n')
+./scripts/peoplepicker-baseline.mjs:2:// PeoplePicker baseline screenshots — Task 2 SSOT refactor 前的視覺基準
+
+exec
+/bin/zsh -lc 'pwd && ls && rg --files . | rg "(storybook|stories|avatar|people|picker|select|overflow|package.json|pnpm-lock|yarn.lock|package-lock)"' in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+CLAUDE.md
+components.json
+index.html
+netlify.toml
+node_modules
+package-lock.json
+package.json
+scripts
+snapshots
+snapshots-baseline
+snapshots-devmode
+src
+storybook-static
+tmp
+tsconfig.app.json
+tsconfig.json
+tsconfig.node.json
+vite.config.ts
+./src/design-system/tokens/elevation/elevation.stories.tsx
+./src/design-system/tokens/typography/typography.stories.tsx
+./src/design-system/tokens/radius/radius.stories.tsx
+./src/design-system/tokens/density/density.stories.tsx
+./src/design-system/tokens/color/color.stories.tsx
+./src/design-system/hooks/use-overflow-items.ts
+./src/design-system/components/CircularProgress/circular-progress.stories.tsx
+./src/design-system/components/CircularProgress/circular-progress.principles.stories.tsx
+./src/design-system/components/CircularProgress/circular-progress.anatomy.stories.tsx
+./src/design-system/components/Badge/badge.stories.tsx
+./src/design-system/components/Badge/badge.principles.stories.tsx
+./src/design-system/components/Badge/badge.anatomy.stories.tsx
+./src/design-system/components/DataTable/data-table.principles.stories.tsx
+./src/design-system/components/DataTable/data-table.stories.tsx
+./src/design-system/components/DataTable/data-table.anatomy.stories.tsx
+./src/design-system/components/Input/input.principles.stories.tsx
+./src/design-system/components/Input/input.anatomy.stories.tsx
+./src/design-system/components/Input/input.stories.tsx
+./src/design-system/components/Tag/tag.anatomy.stories.tsx
+./src/design-system/components/Tag/tag.principles.stories.tsx
+./src/design-system/components/Tag/tag.stories.tsx
+./src/design-system/components/Button/button.anatomy.stories.tsx
+./src/design-system/components/Button/button.stories.tsx
+./src/design-system/components/Button/button.principles.stories.tsx
+./src/design-system/components/TreeView/tree-view.principles.stories.tsx
+./src/design-system/components/TreeView/tree-view.anatomy.stories.tsx
+./src/design-system/components/TreeView/tree-view.stories.tsx
+./src/design-system/components/Textarea/textarea.principles.stories.tsx
+./src/design-system/components/Textarea/textarea.stories.tsx
+./src/design-system/components/Textarea/textarea.anatomy.stories.tsx
+./src/design-system/components/Breadcrumb/breadcrumb.anatomy.stories.tsx
+./src/design-system/components/Breadcrumb/breadcrumb.stories.tsx
+./src/design-system/components/Breadcrumb/breadcrumb.principles.stories.tsx
+./src/design-system/components/Combobox/combobox.stories.tsx
+./src/design-system/components/Combobox/combobox.principles.stories.tsx
+./src/design-system/components/Combobox/combobox.anatomy.stories.tsx
+./src/design-system/components/DateGrid/date-grid.stories.tsx
+./src/design-system/components/DateGrid/date-grid.principles.stories.tsx
+./src/design-system/components/DateGrid/date-grid.anatomy.stories.tsx
+./src/design-system/components/Popover/popover.principles.stories.tsx
+./src/design-system/components/Popover/popover.anatomy.stories.tsx
+./src/design-system/components/Popover/popover.stories.tsx
+./src/design-system/components/Select/select.tsx
+./src/design-system/components/Select/select.anatomy.stories.tsx
+./src/design-system/components/Select/select.principles.stories.tsx
+./src/design-system/components/Select/select.stories.tsx
+./src/design-system/components/Select/select.spec.md
+./src/design-system/components/ScrollArea/scroll-area.stories.tsx
+./src/design-system/components/ScrollArea/scroll-area.principles.stories.tsx
+./src/design-system/components/ScrollArea/scroll-area.anatomy.stories.tsx
+./src/design-system/components/SelectMenu/select-menu.anatomy.stories.tsx
+./src/design-system/components/SelectMenu/select-menu.tsx
+./src/design-system/components/SelectMenu/select-menu.stories.tsx
+./src/design-system/components/SelectMenu/select-menu.principles.stories.tsx
+./src/design-system/components/SelectMenu/select-menu.spec.md
+./src/design-system/components/SelectionControl/selection-item.stories.tsx
+./src/design-system/components/SelectionControl/selection-item.principles.stories.tsx
+./src/design-system/components/SelectionControl/selection-item.anatomy.stories.tsx
+./src/design-system/components/SelectionControl/selection-item.tsx
+./src/design-system/components/SelectionControl/selection-item.spec.md
+./src/design-system/components/NumberInput/number-input.anatomy.stories.tsx
+./src/design-system/components/NumberInput/number-input.principles.stories.tsx
+./src/design-system/components/NumberInput/number-input.stories.tsx
+./src/design-system/components/Empty/empty.principles.stories.tsx
+./src/design-system/components/Empty/empty.stories.tsx
+./src/design-system/components/Dialog/dialog.stories.tsx
+./src/design-system/components/Empty/empty.anatomy.stories.tsx
+./src/design-system/components/Dialog/dialog.anatomy.stories.tsx
+./src/design-system/components/Dialog/dialog.principles.stories.tsx
+./src/design-system/components/Carousel/carousel.stories.tsx
+./src/design-system/components/Carousel/carousel.principles.stories.tsx
+./src/design-system/components/Carousel/carousel.anatomy.stories.tsx
+./src/design-system/components/Command/command.principles.stories.tsx
+./src/design-system/components/Command/command.anatomy.stories.tsx
+./src/design-system/components/Command/command.stories.tsx
+./src/design-system/components/Slider/slider.stories.tsx
+./src/design-system/components/Slider/slider.principles.stories.tsx
+./src/design-system/components/Slider/slider.anatomy.stories.tsx
+./src/design-system/components/BulkActionBar/bulk-action-bar.anatomy.stories.tsx
+./src/design-system/components/Calendar/calendar.anatomy.stories.tsx
+./src/design-system/components/BulkActionBar/bulk-action-bar.principles.stories.tsx
+./src/design-system/components/Calendar/calendar.principles.stories.tsx
+./src/design-system/components/BulkActionBar/bulk-action-bar.stories.tsx
+./src/design-system/components/Calendar/calendar.stories.tsx
+./src/design-system/components/Avatar/avatar.principles.stories.tsx
+./src/design-system/components/Avatar/avatar.spec.md
+./src/design-system/components/Avatar/avatar.tsx
+./src/design-system/components/Avatar/avatar.anatomy.stories.tsx
+./src/design-system/components/Avatar/avatar.stories.tsx
+./src/design-system/components/Toast/toast.anatomy.stories.tsx
+./src/design-system/components/Toast/toast.principles.stories.tsx
+./src/design-system/components/Toast/toast.stories.tsx
+./src/design-system/components/HoverCard/hover-card.principles.stories.tsx
+./src/design-system/components/HoverCard/hover-card.stories.tsx
+./src/design-system/components/HoverCard/hover-card.anatomy.stories.tsx
+./src/design-system/components/Field/field.anatomy.stories.tsx
+./src/design-system/components/Field/field.principles.stories.tsx
+./src/design-system/components/Field/field.stories.tsx
+./src/design-system/components/Rating/rating.stories.tsx
+./src/design-system/components/Rating/rating.principles.stories.tsx
+./src/design-system/components/Rating/rating.anatomy.stories.tsx
+./src/design-system/components/Notice/notice.principles.stories.tsx
+./src/design-system/components/Notice/notice.stories.tsx
+./src/design-system/components/Notice/notice.anatomy.stories.tsx
+./src/design-system/components/Switch/switch.principles.stories.tsx
+./src/design-system/components/Switch/switch.anatomy.stories.tsx
+./src/design-system/components/Switch/switch.stories.tsx
+./src/design-system/components/ProgressBar/progress-bar.anatomy.stories.tsx
+./src/design-system/components/ProgressBar/progress-bar.stories.tsx
+./src/design-system/components/ProgressBar/progress-bar.principles.stories.tsx
+./src/design-system/components/SegmentedControl/segmented-control.principles.stories.tsx
+./src/design-system/components/SegmentedControl/segmented-control.stories.tsx
+./src/design-system/components/SegmentedControl/segmented-control.anatomy.stories.tsx
+./src/design-system/components/Tooltip/tooltip.stories.tsx
+./src/design-system/components/Tooltip/tooltip.anatomy.stories.tsx
+./src/design-system/components/Tooltip/tooltip.principles.stories.tsx
+./src/design-system/components/FileItem/file-item.principles.stories.tsx
+./src/design-system/components/FileItem/file-item.anatomy.stories.tsx
+./src/design-system/components/FileItem/file-item.stories.tsx
+./src/design-system/components/FileViewer/file-viewer.stories.tsx
+./src/design-system/components/FileViewer/file-viewer.anatomy.stories.tsx
+./src/design-system/components/FileViewer/file-viewer.principles.stories.tsx
+./src/design-system/components/OverflowIndicator/overflow-indicator.anatomy.stories.tsx
+./src/design-system/components/OverflowIndicator/overflow-indicator.stories.tsx
+./src/design-system/components/OverflowIndicator/overflow-indicator.tsx
+./src/design-system/components/OverflowIndicator/overflow-indicator.principles.stories.tsx
+./src/design-system/components/OverflowIndicator/overflow-indicator.spec.md
+./src/design-system/components/TimePicker/time-picker.principles.stories.tsx
+./src/design-system/components/TimePicker/time-picker.spec.md
+./src/design-system/components/TimePicker/time-picker.anatomy.stories.tsx
+./src/design-system/components/TimePicker/time-picker.stories.tsx
+./src/design-system/components/TimePicker/time-picker.tsx
+./src/design-system/components/Sheet/sheet.stories.tsx
+./src/design-system/components/Sheet/sheet.anatomy.stories.tsx
+./src/design-system/components/Sheet/sheet.principles.stories.tsx
+./src/design-system/components/DatePicker/date-picker.anatomy.stories.tsx
+./src/design-system/components/DatePicker/date-picker.principles.stories.tsx
+./src/design-system/components/DatePicker/date-picker.stories.tsx
+./src/design-system/components/DatePicker/date-picker.tsx
+./src/design-system/components/DatePicker/date-picker.spec.md
+./src/design-system/components/Menu/menu-item.stories.tsx
+./src/design-system/components/Menu/menu-item.anatomy.stories.tsx
+./src/design-system/components/LinkInput/link-input.anatomy.stories.tsx
+./src/design-system/components/Steps/steps.stories.tsx
+./src/design-system/components/LinkInput/link-input.principles.stories.tsx
+./src/design-system/components/Menu/menu-item.principles.stories.tsx
+./src/design-system/components/Steps/steps.anatomy.stories.tsx
+./src/design-system/components/Steps/steps.principles.stories.tsx
+./src/design-system/components/LinkInput/link-input.stories.tsx
+./src/design-system/components/FileUpload/file-upload.stories.tsx
+./src/design-system/components/FileUpload/file-upload.principles.stories.tsx
+./src/design-system/components/FileUpload/file-upload.anatomy.stories.tsx
+./src/design-system/components/FieldControlGroup/field-control-group.stories.tsx
+./src/design-system/components/FieldControlGroup/field-control-group.principles.stories.tsx
+./src/design-system/components/FieldControlGroup/field-control-group.anatomy.stories.tsx
+./package-lock.json
+./package.json
+./src/design-system/components/Coachmark/coachmark.stories.tsx
+./src/design-system/components/Coachmark/coachmark.principles.stories.tsx
+./src/design-system/components/Coachmark/coachmark.anatomy.stories.tsx
+./src/design-system/components/NameCard/name-card.stories.tsx
+./src/design-system/components/NameCard/name-card.principles.stories.tsx
+./src/design-system/components/NameCard/name-card.anatomy.stories.tsx
+./src/design-system/components/Sidebar/sidebar.principles.stories.tsx
+./src/design-system/components/Sidebar/sidebar.stories.tsx
+./src/design-system/components/Sidebar/sidebar.anatomy.stories.tsx
+./src/design-system/stories-helpers/anatomy/anatomy-utils.tsx
+./src/design-system/components/Tabs/tabs.stories.tsx
+./src/design-system/components/Tabs/tabs.principles.stories.tsx
+./src/design-system/components/Tabs/tabs.anatomy.stories.tsx
+./src/design-system/components/Separator/separator.principles.stories.tsx
+./src/design-system/components/Separator/separator.anatomy.stories.tsx
+./src/design-system/components/Separator/separator.stories.tsx
+./src/design-system/components/AspectRatio/aspect-ratio.anatomy.stories.tsx
+./src/design-system/components/AspectRatio/aspect-ratio.stories.tsx
+./src/design-system/components/AspectRatio/aspect-ratio.principles.stories.tsx
+./src/design-system/components/RadioGroup/radio-group.anatomy.stories.tsx
+./src/design-system/components/RadioGroup/radio-group.stories.tsx
+./src/design-system/components/RadioGroup/radio-group.principles.stories.tsx
+./src/design-system/components/Accordion/accordion.anatomy.stories.tsx
+./src/design-system/components/Accordion/accordion.stories.tsx
+./src/design-system/components/Accordion/accordion.principles.stories.tsx
+./src/design-system/patterns/element-anatomy/item-anatomy.stories.tsx
+./src/design-system/components/DropdownMenu/dropdown-menu.stories.tsx
+./src/design-system/components/DropdownMenu/dropdown-menu.anatomy.stories.tsx
+./src/design-system/components/DropdownMenu/dropdown-menu.principles.stories.tsx
+./src/design-system/components/Alert/alert.principles.stories.tsx
+./src/design-system/components/Alert/alert.anatomy.stories.tsx
+./src/design-system/components/Alert/alert.stories.tsx
+./src/design-system/patterns/horizontal-overflow/horizontal-overflow.tsx
+./src/design-system/patterns/horizontal-overflow/horizontal-overflow.spec.md
+./src/design-system/components/Chip/chip.principles.stories.tsx
+./src/design-system/components/Chip/chip.anatomy.stories.tsx
+./src/design-system/components/Chip/chip.stories.tsx
+./src/design-system/components/DescriptionList/description-list.stories.tsx
+./src/design-system/components/DescriptionList/description-list.principles.stories.tsx
+./src/design-system/components/DescriptionList/description-list.anatomy.stories.tsx
+./snapshots-baseline/peoplepicker-single.png
+./snapshots-baseline/select-modes.png
+./snapshots-baseline/datepicker-range-middle-hover-state.png
+./snapshots-baseline/timepicker-modes.png
+./snapshots-baseline/datepicker-show-time-range.png
+./snapshots-baseline/datepicker-show-time.png
+./snapshots-baseline/datepicker-range.png
+./snapshots-baseline/datepicker-show-time-popover-open.png
+./snapshots-baseline/timepicker-flight.png
+./snapshots-baseline/datepicker-sizes.png
+./snapshots-baseline/overflowindicator-combobox-tag-overflow.png
+./snapshots-baseline/datepicker-basic.png
+./snapshots-baseline/timepicker-shop-hours.png
+./snapshots-baseline/avatar-modes.png
+./snapshots-baseline/selectioncontrol-notification-preferences.png
+./snapshots-baseline/datepicker-error.png
+./src/design-system/patterns/action-bar/action-bar.stories.tsx
+./snapshots-baseline/selectmenu-single-select.png
+./snapshots-baseline/timepicker-meeting.png
+./snapshots-baseline/datepicker-range-popover-open.png
+./snapshots-baseline/datepicker-show-time-range-popover-open.png
+./src/design-system/components/PeoplePicker/people-picker.spec.md
+./src/design-system/components/PeoplePicker/people-picker.stories.tsx
+./src/design-system/components/Chart/chart.principles.stories.tsx
+./src/design-system/components/Chart/chart.stories.tsx
+./src/design-system/components/Chart/chart.anatomy.stories.tsx
+./src/design-system/components/PeoplePicker/people-picker.tsx
+./src/design-system/components/PeoplePicker/people-picker.principles.stories.tsx
+./src/design-system/components/Skeleton/skeleton.anatomy.stories.tsx
+./src/design-system/components/Skeleton/skeleton.stories.tsx
+./src/design-system/components/Checkbox/checkbox.anatomy.stories.tsx
+./src/design-system/components/Skeleton/skeleton.principles.stories.tsx
+./src/design-system/components/PeoplePicker/avatar-stack-overflow.ts
+./src/design-system/components/PeoplePicker/people-picker.anatomy.stories.tsx
+./src/design-system/components/Checkbox/checkbox.principles.stories.tsx
+./src/design-system/components/Checkbox/checkbox.stories.tsx
+./scripts/peoplepicker-diff.mjs
+./scripts/probe-cell-picker-comprehensive.mjs
+./scripts/peoplepicker-baseline.mjs
+./scripts/runtime-verify-issue2-avatar-offset.mjs
+./scripts/runtime-verify-peoplepicker-3bugs.mjs
+./scripts/visual-audit-peoplepicker-multi-avatar.mjs
+./scripts/runtime-verify-peoplepicker-stress.mjs
+./scripts/peoplepicker-dom-probe.mjs
+./scripts/migrate-stories-meta-width.py
+./scripts/datepicker-interaction-walkthrough.mjs
+./scripts/probe-cell-picker-geometry.mjs
+./scripts/compile-stories.mjs
+./scripts/runtime-verify-peoplepicker-full.mjs
+./scripts/peoplepicker-bug-reproduce.mjs
+
+codex
+目前 repo 裡已看到 `avatar-stack-overflow.ts` 正是你描述的早退公式，且現有 reproduce 腳本註解還停在「ref drop 是 root cause」。我會把這兩件事分開判斷：ref bug 是否存在、以及它是否能解釋 user 截圖中的 length 轉換 saw。
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/PeoplePicker/avatar-stack-overflow.ts | sed -n '1,120p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+     1	/**
+     2	 * avatar-stack-overflow — Deterministic SSOT primitive for avatar stack overflow math
+     3	 *
+     4	 * **2026-05-15 Bug 3 fix(Claude+Codex Step 5 比稿 consensus,user verbatim「就 A」)**:
+     5	 *
+     6	 * Real root cause of Bug 3「same cell width but different overflow timing per total count」:
+     7	 *   1. `useOverflowCount` 在 Combobox 用 DOM `offsetWidth` 量測 + `overflowW = 60` fallback(實際 24px)
+     8	 *   2. `overflowEl` 不被 ResizeObserver observe,first calc 用 fallback 後不會 recalc
+     9	 *   3. `offsetWidth` 不減 `-ml-0.5` overlap → measurement 偏保守
+    10	 *   4. **架構違反**:`MultiPersonDisplay` display path 用 canvas-based 算 / Combobox edit path 用 DOM offsetWidth
+    11	 *      → 同 cell width 兩 path 不同結果 → user verbatim「同寬 cell overflow 時間不一樣」SSOT 根本被違反
+    12	 *
+    13	 * **Fix**(per codex Q3 consensus):抽 pure formula + React hook,display + edit 兩 path **共用**。
+    14	 *
+    15	 * **Deterministic formula**:
+    16	 * ```
+    17	 * firstAvatar + (visible - 1) * (avatar - overlap) + overflowChip <= available
+    18	 * ```
+    19	 * - `firstAvatar`:第一個 avatar 全寬 = `avatarPx`
+    20	 * - subsequent items:`avatar - overlap`(stack `-ml-0.5` 視覺等同 measurement subtract)
+    21	 * - `overflowChip`:若有 hidden,留 +N chip 空間;最後一個 visible item 不需留(`remaining === 0`)
+    22	 *
+    23	 * **Why centralize**:M14 mechanical guard against future drift。`MultiPersonDisplay` +
+    24	 * PeoplePicker stack edit + future avatar consumers 都 import 此 helper,不可 copy formula。
+    25	 * 對齊 codex「one avatar-stack primitive owns avatarPx, overlapPx, overflowChipPx」directive。
+    26	 *
+    27	 * **Benchmark cite**(per codex external baseline):MDN flex truncation / MUI Autocomplete
+    28	 * limitTags / Ant Select maxTagCount="responsive"(explicit overflow contract,非 incidental clip)/
+    29	 * Primer Truncate(parent-constrained max width)。
+    30	 */
+    31	
+    32	/**
+    33	 * Pure deterministic visible-count formula for avatar stack with overlap + overflow chip.
+    34	 *
+    35	 * @param availablePx — Container width available for the entire stack(含 +N chip 預留空間)
+    36	 * @param total — Total avatars in selection
+    37	 * @param avatarPx — Per-avatar pixel width(包含 ring border)
+    38	 * @param overlapPx — Negative margin overlap between siblings(default 2px = `-ml-0.5`)
+    39	 * @param overflowChipPx — Width reserved for +N indicator when overflow needed(default 24px = circle h-6 min-w-6)
+    40	 * @returns visible count(0 ≤ visible ≤ total)。若全部 fit 則 visible = total(無 +N chip);否則 visible 為 max fit。
+    41	 */
+    42	export function getAvatarStackVisibleCount({
+    43	  availablePx,
+    44	  total,
+    45	  avatarPx,
+    46	  overlapPx = 2,
+    47	  overflowChipPx = 24,
+    48	}: {
+    49	  availablePx: number
+    50	  total: number
+    51	  avatarPx: number
+    52	  overlapPx?: number
+    53	  overflowChipPx?: number
+    54	}): number {
+    55	  if (total <= 0 || availablePx <= 0) return 0
+    56	  // First, check if 全部 fit without overflow chip(`remaining === 0` last item rule)
+    57	  // 全部 fit: firstAvatar + (total-1) * (avatar - overlap) <= availablePx
+    58	  const fullStackWidth = avatarPx + Math.max(0, total - 1) * (avatarPx - overlapPx)
+    59	  if (fullStackWidth <= availablePx) return total
+    60	
+    61	  // 全部不 fit → 需 overflow chip。Find max visible N s.t.:
+    62	  //   firstAvatar + (N - 1) * (avatar - overlap) + overflowChipPx <= availablePx
+    63	  // Solve for N:
+    64	  //   (N - 1) * (avatar - overlap) <= availablePx - firstAvatar - overflowChipPx
+    65	  //   N - 1 <= (availablePx - firstAvatar - overflowChipPx) / (avatar - overlap)
+    66	  //   N <= 1 + floor(...)
+    67	  const step = avatarPx - overlapPx
+    68	  if (step <= 0) return Math.min(total, 1)  // pathological case: full overlap or wider overlap
+    69	  const remainder = availablePx - avatarPx - overflowChipPx
+    70	  if (remainder < 0) return 0  // even 1 avatar + chip doesn't fit → 0 visible + +N
+    71	  const visible = 1 + Math.floor(remainder / step)
+    72	  return Math.max(0, Math.min(visible, total - 1))  // -1 because at least 1 must overflow when full stack doesn't fit
+    73	}
+    74	
+    75	/**
+    76	 * Map size token to avatar pixel(對齊 person-display.tsx:80 AVATAR_PX SSOT)。
+    77	 */
+    78	export const AVATAR_STACK_AVATAR_PX: Record<'sm' | 'md' | 'lg', number> = {
+    79	  sm: 20,
+    80	  md: 24,
+    81	  lg: 24,
+    82	}
+    83	
+    84	/**
+    85	 * Default overflow chip width per size(對齊 overflow-indicator.tsx:17 triggerSize SSOT)。
+    86	 * shape='circle' → h-{5|6} min-w-{5|6} ≈ 20-24px
+    87	 */
+    88	export const AVATAR_STACK_OVERFLOW_CHIP_PX: Record<'sm' | 'md' | 'lg', number> = {
+    89	  sm: 20,
+    90	  md: 24,
+    91	  lg: 24,
+    92	}
+
+exec
+/bin/zsh -lc "nl -ba scripts/peoplepicker-bug-reproduce.mjs | sed -n '1,190p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+     1	#!/usr/bin/env node
+     2	/**
+     3	 * scripts/peoplepicker-bug-reproduce.mjs
+     4	 *
+     5	 * Self-reproduce + auto-verify for the two bugs user抓「修了一百次還沒好」:
+     6	 *
+     7	 *   Bug A: Multi-select stack visible-count drift at fixed trigger width
+     8	 *     - Same width × different selection length → DIFFERENT visible count(drift)
+     9	 *     - 真 root cause:Combobox forwardRef body `_ref` 把 ref drop → PeoplePicker
+    10	 *       stack `visibleCountOverride` 從未生效 → 走 Combobox internal `useOverflowCount`
+    11	 *       (60px chip fallback bug + items.length non-deterministic)
+    12	 *     - Fix:Combobox forward ref → 內部 `__triggerRef` attach trigger DOM,
+    13	 *       useOverflowCount override path 補 apply `el.hidden`
+    14	 *
+    15	 *   Bug B: Single picker open-state placeholder no ellipsis dots
+    16	 *     - 真 root cause:overlay span `inline-flex items-center truncate` 套同一 element →
+    17	 *       text 變 anonymous flex item → `text-overflow:ellipsis` 不 styleable to anonymous
+    18	 *       (W3C CSS Overflow / MDN / Mozilla Bug 972664#c1)
+    19	 *     - Fix:outer flex container + inner real `<span truncate>` 拆分(對齊
+    20	 *       `person-display.tsx:148` 既有 DS canonical)
+    21	 *
+    22	 * Tests:
+    23	 *   A1: length=4 at 180px width → measure visible avatar count(via `hidden` attr)
+    24	 *   A2: same trigger width × different selection length(simulated)→ same `available`
+    25	 *       measurement → formula must return monotone(length=3 visible <= length=4 visible)
+    26	 *   B1: single picker open at narrow 100px with selected Alice → INNER truncate span
+    27	 *       must show scrollWidth > clientWidth(ellipsis fires on real block-level box)
+    28	 *
+    29	 * Usage:
+    30	 *   1. npm run storybook(http://localhost:6006)
+    31	 *   2. node scripts/peoplepicker-bug-reproduce.mjs
+    32	 */
+    33	
+    34	import { chromium } from 'playwright'
+    35	import { mkdirSync, existsSync } from 'node:fs'
+    36	import { fileURLToPath } from 'node:url'
+    37	import { dirname, join } from 'node:path'
+    38	
+    39	const __filename = fileURLToPath(import.meta.url)
+    40	const __dirname = dirname(__filename)
+    41	const OUT_DIR = join(__dirname, '..', 'snapshots', 'peoplepicker-bug')
+    42	const STORYBOOK_URL = 'http://localhost:6006'
+    43	
+    44	if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true })
+    45	
+    46	const results = []
+    47	function pass(name, detail = '') { results.push({ name, status: 'PASS', detail }); console.log(`  ✓ ${name}${detail ? ` — ${detail}` : ''}`) }
+    48	function fail(name, msg) { results.push({ name, status: 'FAIL', msg }); console.log(`  ✗ ${name}: ${msg}`) }
+    49	async function snap(page, label) { const file = join(OUT_DIR, `${label}.png`); await page.screenshot({ path: file, fullPage: false }); return file }
+    50	
+    51	async function probeMulti(page) {
+    52	  return await page.evaluate(() => {
+    53	    const trig = document.querySelector('[role="combobox"]')
+    54	    if (!trig) return { err: 'no trigger' }
+    55	    const tagArea = trig.querySelector('div[class*="flex-1"][class*="min-w-0"]')
+    56	    if (!tagArea) return { err: 'no tagArea' }
+    57	    const overflowSpan = tagArea.querySelector('span.contents')
+    58	    if (!overflowSpan) return { err: 'no overflowSpan' }
+    59	    const directChildren = Array.from(overflowSpan.children)
+    60	    // Last child is the overflow indicator wrapper(`<div ref={overflowEl}>`)。
+    61	    const overflowWrapper = directChildren[directChildren.length - 1]
+    62	    const avatarWrappers = directChildren.slice(0, -1)
+    63	    const visibleAvatars = avatarWrappers.filter(w => !w.hidden && w.offsetParent !== null)
+    64	    let overflowChipText = null
+    65	    if (overflowWrapper && !overflowWrapper.hidden && overflowWrapper.offsetParent !== null) {
+    66	      const text = overflowWrapper.textContent?.trim()
+    67	      if (text?.match(/^\+\d+$/)) overflowChipText = text
+    68	    }
+    69	    return {
+    70	      triggerWidth: trig.clientWidth,
+    71	      tagAreaWidth: tagArea.clientWidth,
+    72	      totalAvatarWrappers: avatarWrappers.length,
+    73	      visibleAvatarCount: visibleAvatars.length,
+    74	      overflowChipText,
+    75	      overflowChipHidden: overflowWrapper?.hidden ?? null,
+    76	    }
+    77	  })
+    78	}
+    79	
+    80	function formulaExpect(available, total, avatar = 24, overlap = 2, chip = 24) {
+    81	  if (total <= 0 || available <= 0) return 0
+    82	  const step = avatar - overlap
+    83	  const fullStack = avatar + Math.max(0, total - 1) * step
+    84	  if (fullStack <= available) return total
+    85	  if (step <= 0) return Math.min(total, 1)
+    86	  const remainder = available - avatar - chip
+    87	  if (remainder < 0) return 0
+    88	  const visible = 1 + Math.floor(remainder / step)
+    89	  return Math.max(0, Math.min(visible, total - 1))
+    90	}
+    91	
+    92	async function main() {
+    93	  const browser = await chromium.launch()
+    94	  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } })
+    95	  const page = await ctx.newPage()
+    96	
+    97	  console.log('\n══ Bug A: Multi-select stack visible-count drift ══')
+    98	
+    99	  // ── Test A1: length=4 at default 180px → 4 visible(full fit)
+   100	  await page.goto(`${STORYBOOK_URL}/iframe.html?id=design-system-components-peoplepicker-展示--multi&viewMode=story`)
+   101	  await page.waitForLoadState('networkidle')
+   102	  await page.waitForTimeout(800)
+   103	
+   104	  await page.addStyleTag({ content: `
+   105	    .max-w-xs { max-width: 180px !important; width: 180px !important; }
+   106	  ` })
+   107	  await page.waitForTimeout(500)
+   108	
+   109	  const probe180 = await probeMulti(page)
+   110	  console.log(`  [A1 180px] ${JSON.stringify(probe180)}`)
+   111	  await snap(page, 'A1-length4-180px-AFTER-FIX')
+   112	
+   113	  if (probe180.err) { fail('A1 probe', probe180.err); }
+   114	  else {
+   115	    const expected = formulaExpect(probe180.tagAreaWidth, 4)
+   116	    if (probe180.visibleAvatarCount === expected) {
+   117	      pass(`A1 length=4 at ${probe180.tagAreaWidth}px → visible=${probe180.visibleAvatarCount}`, `formula expected=${expected}, +N=${probe180.overflowChipText ?? 'hidden'}`)
+   118	    } else {
+   119	      fail('A1 visible mismatch formula', `actual=${probe180.visibleAvatarCount} expected=${expected} at available=${probe180.tagAreaWidth}px`)
+   120	    }
+   121	  }
+   122	
+   123	  // ── Test A2: narrow width 100px → formula returns < 4 → verify drift gone
+   124	  await page.addStyleTag({ content: `
+   125	    .max-w-xs { max-width: 100px !important; width: 100px !important; }
+   126	  ` })
+   127	  await page.waitForTimeout(500)
+   128	  const probe100 = await probeMulti(page)
+   129	  console.log(`  [A2 100px] ${JSON.stringify(probe100)}`)
+   130	  await snap(page, 'A2-length4-100px-AFTER-FIX')
+   131	
+   132	  if (!probe100.err) {
+   133	    const expected = formulaExpect(probe100.tagAreaWidth, 4)
+   134	    if (probe100.visibleAvatarCount === expected) {
+   135	      pass(`A2 length=4 at narrow ${probe100.tagAreaWidth}px → visible=${probe100.visibleAvatarCount}`, `formula expected=${expected}, +N=${probe100.overflowChipText ?? 'hidden'}`)
+   136	    } else {
+   137	      fail('A2 narrow visible mismatch', `actual=${probe100.visibleAvatarCount} expected=${expected} at available=${probe100.tagAreaWidth}px`)
+   138	    }
+   139	  }
+   140	
+   141	  // ── Test A3: very narrow 60px → only 1 visible + +N(drift would show 0)
+   142	  await page.addStyleTag({ content: `
+   143	    .max-w-xs { max-width: 60px !important; width: 60px !important; }
+   144	  ` })
+   145	  await page.waitForTimeout(500)
+   146	  const probe60 = await probeMulti(page)
+   147	  console.log(`  [A3 60px] ${JSON.stringify(probe60)}`)
+   148	  await snap(page, 'A3-length4-60px-AFTER-FIX')
+   149	
+   150	  if (!probe60.err) {
+   151	    const expected = formulaExpect(probe60.tagAreaWidth, 4)
+   152	    if (probe60.visibleAvatarCount === expected) {
+   153	      pass(`A3 length=4 at very narrow ${probe60.tagAreaWidth}px → visible=${probe60.visibleAvatarCount}`, `formula expected=${expected}, +N=${probe60.overflowChipText ?? 'hidden'}`)
+   154	    } else {
+   155	      fail('A3 very narrow visible mismatch', `actual=${probe60.visibleAvatarCount} expected=${expected} at available=${probe60.tagAreaWidth}px`)
+   156	    }
+   157	  }
+   158	
+   159	  console.log('\n══ Bug B: Single picker placeholder ellipsis ══')
+   160	
+   161	  await page.goto(`${STORYBOOK_URL}/iframe.html?id=design-system-components-peoplepicker-展示--single&viewMode=story`)
+   162	  await page.waitForLoadState('networkidle')
+   163	  await page.waitForTimeout(800)
+   164	
+   165	  await page.addStyleTag({ content: `
+   166	    .max-w-xs { max-width: 100px !important; width: 100px !important; }
+   167	  ` })
+   168	  await page.waitForTimeout(500)
+   169	
+   170	  // Open dropdown (single picker searchable+open state)
+   171	  const singleTrigger = page.locator('[role="combobox"]').first()
+   172	  await singleTrigger.click()
+   173	  await page.waitForTimeout(400)
+   174	  await snap(page, 'B1-single-open-100px-AFTER-FIX')
+   175	
+   176	  const overlayMetrics = await page.evaluate(() => {
+   177	    const trig = document.querySelector('[role="combobox"]')
+   178	    if (!trig) return { err: 'no trigger' }
+   179	    const overlays = trig.querySelectorAll('span[aria-hidden="true"]')
+   180	    const found = []
+   181	    for (const ov of overlays) {
+   182	      const text = ov.textContent?.trim()
+   183	      if (!text) continue
+   184	      const cs = getComputedStyle(ov)
+   185	      const innerSpan = ov.querySelector('span')
+   186	      const innerCs = innerSpan ? getComputedStyle(innerSpan) : null
+   187	      found.push({
+   188	        outer: { text: text.slice(0, 50), scrollWidth: ov.scrollWidth, clientWidth: ov.clientWidth, display: cs.display, overflow: cs.overflow, textOverflow: cs.textOverflow, whiteSpace: cs.whiteSpace, position: cs.position },
+   189	        inner: innerSpan ? { text: innerSpan.textContent?.trim().slice(0, 50), scrollWidth: innerSpan.scrollWidth, clientWidth: innerSpan.clientWidth, display: innerCs.display, overflow: innerCs.overflow, textOverflow: innerCs.textOverflow, whiteSpace: innerCs.whiteSpace } : null,
+   190	      })
+
+exec
+/bin/zsh -lc "find node_modules -path '*rc-select*' -o -path '*antd/es/select*' | head -200" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 777ms:
+exec
+/bin/zsh -lc "rg -n '\"antd\"|\"rc-select\"|\"@rc-component\"' package.json package-lock.json" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ exited 1 in 0ms:
+exec
+/bin/zsh -lc "ls node_modules | sed -n '1,160p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+@adobe
+@axe-core
+@babel
+@babel (1)
+@blazediff
+@blazediff (1)
+@chromatic-com
+@date-fns
+@date-fns (1)
+@dnd-kit
+@emnapi
+@emotion
+@emotion (1)
+@esbuild
+@floating-ui
+@isaacs
+@joshwooding
+@joshwooding (1)
+@jridgewell
+@mdx-js
+@napi-rs
+@openai
+@oxc-project
+@pkgjs
+@polka
+@radix-ui
+@reduxjs
+@reduxjs (1)
+@rolldown
+@rollup
+@rollup (1)
+@standard-schema
+@storybook
+@tabby_ai
+@tabby_ai (1)
+@tailwindcss
+@tanstack
+@testing-library
+@testing-library (1)
+@tybys
+@types
+@types (1)
+@vitejs
+@vitest
+@whitespace
+acorn
+ansi-regex
+ansi-styles
+argparse
+aria-hidden
+aria-query
+assertion-error
+ast-types
+available-typed-arrays
+axe-core
+balanced-match
+baseline-browser-mapping
+better-opn
+brace-expansion
+browser-assert
+browserslist
+call-bind
+call-bind-apply-helpers
+call-bound
+caniuse-lite
+chai
+chalk
+check-error
+class-variance-authority
+clsx
+cmdk
+color-convert
+color-name
+convert-source-map
+cross-spawn
+css.escape
+csstype
+d3-array
+d3-color
+d3-ease
+d3-format
+d3-interpolate
+d3-path
+d3-scale
+d3-shape
+d3-time
+d3-time-format
+d3-timer
+date-fns
+date-fns-jalali
+debug
+decimal.js-light
+deep-eql
+define-data-property
+define-lazy-prop
+dequal
+detect-libc
+detect-node-es
+doctrine
+dom-accessibility-api
+dunder-proto
+eastasianwidth
+electron-to-chromium
+embla-carousel
+embla-carousel-react
+embla-carousel-reactive-utils
+emoji-regex
+enhanced-resolve
+es-define-property
+es-errors
+es-object-atoms
+es-toolkit
+esbuild
+esbuild-register
+escalade
+esprima
+estree-walker
+esutils
+eventemitter3
+find-up
+for-each
+foreground-child
+fsevents
+function-bind
+generator-function
+gensync
+get-intrinsic
+get-nonce
+get-proto
+glob
+gopd
+graceful-fs
+has-flag
+has-property-descriptors
+has-symbols
+has-tostringtag
+hasown
+husky
+immer
+indent-string
+inherits
+internmap
+is-arguments
+is-callable
+is-core-module
+is-docker
+is-fullwidth-code-point
+is-generator-function
+is-regex
+is-typed-array
+is-wsl
+isexe
+jackspeak
+jiti
+js-tokens
+js-yaml
+jsdoc-type-pratt-parser
+jsesc
+json5
+lightningcss
+
+exec
+/bin/zsh -lc "find node_modules -maxdepth 3 -type d -name '*select*' | sed -n '1,200p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+node_modules/reselect
+
+web search: 
+web search: MUI AvatarGroup source AvatarGroup.js GitHub max avatars surplus
+web search: 
+web search: 
+web search: 
+web search: 
+web search: 
+web search: site:github.com/mui/material-ui AvatarGroup.js max avatars surplus children.slice
+web search: 
+web search: 
+web search: 
+web search: unpkg @mui/material AvatarGroup AvatarGroup.js
+web search: 
+web search: 
+web search: 
+web search: github react-component select OptionList.tsx onSelect multiple selected keys
+web search: 
+web search: 
+codex
+本機 `node_modules` 沒有 `antd` 或 `rc-select`，`package.json/package-lock` 也沒有這兩個套件，所以 Q5 無法照「grep installed package」完成；我會改用 upstream `react-component/select` source 來判斷，並明確標註這個 fallback。
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (failed)
+web search: 
+web search: 
+web search: 
+web search: 
+web search: 
+web search: https://unpkg.com/@atlaskit/avatar-group@10.1.3/dist/esm/components/avatar-group.js
+web search: 
+web search: cdn.jsdelivr.net/npm/@atlaskit/avatar-group@12.1.4/dist/esm/components/avatar-group.js maxCount data slice
+exec
+/bin/zsh -lc "curl -L --max-time 10 'https://cdn.jsdelivr.net/npm/@atlaskit/avatar-group@12.1.4/dist/esm/components/avatar-group.js' | sed -n '1,220p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0curl: (6) Could not resolve host: cdn.jsdelivr.net
+
+web search: 
+web search: Carbon Design System avatar group source GitHub AvatarGroup max avatars overflow
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (failed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (failed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (failed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (failed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+mcp: codex_apps/github_fetch_file started
+mcp: codex_apps/github_fetch_file (completed)
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/PeoplePicker/person-display.tsx | sed -n '170,220p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   170	  /** 最多顯示幾個 avatar(不含 +N),預設 3。`measured=true` 時忽略此 prop(改 container width 算)*/
+   171	  max?: number
+   172	  /**
+   173	   * 2026-05-15 codex Round 5 C+ SSOT fix:`measured=true` 啟動 container-width 量測(取代 hardcode `max ?? 3`)
+   174	   * → display + edit stack 同 algorithm(同 cell width → 同 overflow 判斷),不再 display 用固定 3 vs edit
+   175	   * 用 useOverflowCount。對齊 field-controls.spec.md:286 「4-mode 共享 renderer」contract + user round 3
+   176	   * verbatim「同空間兩判斷點」SSOT directive。Default false 保 backward compat(non-cell context 仍 max ?? 3)。
+   177	   */
+   178	  measured?: boolean
+   179	  /** 傳入時啟用 dismiss(edit mode),callback 接收被移除的 person */
+   180	  onRemove?: (person: PersonValue) => void
+   181	}) {
+   182	  if (!value || value.length === 0) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+   183	
+   184	  // 2026-05-15 Bug 3 fix(Claude+Codex Step 5 比稿 consensus):消費 shared `avatar-stack-overflow`
+   185	  // primitive。原 inline canvas-based formula 是 dual-implementation 違反 user SSOT「同 cell width 同
+   186	  // overflow 判斷」(edit path 用 Combobox useOverflowCount DOM offsetWidth / display path 用 inline
+   187	  // canvas)。**抽 primitive 統一**:display + edit 共用 `getAvatarStackVisibleCount` formula。
+   188	  // SSOT in `./avatar-stack-overflow.ts`,M14 mechanical guard 防 future drift。
+   189	  const containerRef = React.useRef<HTMLSpanElement>(null)
+   190	  const [measuredCount, setMeasuredCount] = React.useState<number | null>(null)
+   191	  React.useLayoutEffect(() => {
+   192	    if (!measured) return
+   193	    const el = containerRef.current
+   194	    if (!el) return
+   195	    const calc = () => {
+   196	      const visible = getAvatarStackVisibleCount({
+   197	        availablePx: el.clientWidth,
+   198	        total: value.length,
+   199	        avatarPx: AVATAR_STACK_AVATAR_PX[size],
+   200	        overflowChipPx: AVATAR_STACK_OVERFLOW_CHIP_PX[size],
+   201	      })
+   202	      setMeasuredCount(visible)
+   203	    }
+   204	    calc()
+   205	    const ro = new ResizeObserver(calc)
+   206	    ro.observe(el)
+   207	    return () => ro.disconnect()
+   208	  }, [measured, size, value])
+   209	
+   210	  const resolvedMax = measured && measuredCount !== null ? measuredCount : (max ?? 3)
+   211	  const people = value.map(resolvePerson)
+   212	  const visible = people.slice(0, resolvedMax)
+   213	  const hidden = people.slice(resolvedMax)
+   214	  const overflow = hidden.length
+   215	
+   216	  // 單人回退到 PersonDisplay(顯示名字)
+   217	  if (people.length === 1) {
+   218	    return <PersonDisplay value={value[0]} size={size} />
+   219	  }
+   220	
+
+exec
+/bin/zsh -lc "nl -ba src/design-system/components/Combobox/combobox.tsx | sed -n '410,435p;660,675p'" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+   410	      )}
+   411	    </div>
+   412	  )
+   413	}
+   414	
+   415	// ── Native Combobox (mobile) ────────────────────────────────────────
+   416	
+   417	// 2026-05-16 Bug A root cause fix(Claude+Codex M31 Step 5 比稿 consensus,user verbatim
+   418	// 「圖二/圖三 同 180px 不同 length 不同 visible — 跟 user 一開始抓的問題一模一樣」):
+   419	// 公開 `Combobox.forwardRef` 之前用 `(props, _ref)` 把 ref drop,內部 `NativeCombobox` /
+   420	// `CustomCombobox` 從未拿 ref → PeoplePicker `stackContainerRef.current` 永遠 null →
+   421	// `useLayoutEffect` early return → `visibleCountOverride` 永遠 undefined →
+   422	// Combobox 走原 internal `useOverflowCount` 60px chip fallback bug → drift。
+   423	// Fix:internal `__triggerRef` prop(underscore = internal-only)attach root div;
+   424	// 公開 `Combobox.forwardRef` 把 `ref` forward 為 `__triggerRef`。對齊 codex DS-wide iceberg
+   425	// audit:`SelectMenu` / `DateGrid` / `Toast` 的 `_ref` 是 intentional documented(no DOM
+   426	// target);唯本處 actionable drop。
+   427	type ComboboxInternalProps = ComboboxProps & { __triggerRef?: React.Ref<HTMLDivElement> }
+   428	
+   429	function NativeCombobox({
+   430	  mode = 'edit', variant: variantProp, error = false, size = 'md', options, value = [], onChange, placeholder,
+   431	  className, disabled, wrap = false, clearable = false, showDisplayEndIcon = false,
+   432	  __triggerRef,
+   433	}: ComboboxInternalProps) {
+   434	  const fieldCtx = useFieldContext()
+   435	  const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+   660	    </SelectMenu>
+   661	  )
+   662	}
+   663	
+   664	// ── Public component ────────────────────────────────────────────────────────
+   665	
+   666	const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
+   667	  (props, ref) => {
+   668	    // 2026-05-16 真 root cause fix:之前用 `_ref` drop ref。修為 forward 給 internal
+   669	    // `__triggerRef`,讓 PeoplePicker stack 透過 ref 量 trigger DOM(visibleCountOverride
+   670	    // 才生效)。對齊 React forwardRef public-API canonical(MUI Autocomplete / Radix
+   671	    // Popover.Trigger 共識)+ codex M31 Step 5 比稿 verdict + DS-wide ref-drop iceberg audit。
+   672	    const isMobile = useIsTouchDevice()
+   673	    if (isMobile) return <NativeCombobox {...props} __triggerRef={ref} />
+   674	    return <CustomCombobox {...props} __triggerRef={ref} />
+   675	  }
+
+exec
+/bin/zsh -lc "node -e \"function v(a,total,av=24,over=2,chip=24){if(total<=0||a<=0)return 0;const step=av-over;const full=av+Math.max(0,total-1)*step;if(full<=a)return total;const rem=a-av-chip;if(rem<0)return 0;const visible=1+Math.floor(rem/step);return Math.max(0,Math.min(visible,total-1));} for (const x of [88,89,90,91,100,112,130]) console.log(x,'len4',v(x,4),'len5',v(x,5),'delta',v(x,4)-v(x,5));\"" in /Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project
+ succeeded in 0ms:
+88 len4 2 len5 2 delta 0
+89 len4 2 len5 2 delta 0
+90 len4 4 len5 2 delta 2
+91 len4 4 len5 2 delta 2
+100 len4 4 len5 3 delta 1
+112 len4 4 len5 5 delta -1
+130 len4 4 len5 5 delta -1
+
+codex
+**Q1 Verdict**
+
+Yes: for the screenshot class described as “same cell width, length=4 shows 4 but length=5 becomes 2 + +3”, the root cause is the **formula saw transition**, not the ref drop.
+
+| hypothesis | cite | reasoning |
+|---|---|---|
+| Ref drop was a real bug | [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:417), [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:666) | It explains “override never activates, falls back to old DOM overflow algorithm”. It does **not** explain deterministic `90px: len4=4, len5=2`. |
+| Formula saw is the screenshot root cause | [avatar-stack-overflow.ts](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:56) | Lines 56-72 do exactly this: full-fit early return, then chip-reserved path with `total - 1` cap. At `available=90`, `len4=4`, `len5=2`. |
+| Round 1 reproduce missed it | [peoplepicker-bug-reproduce.mjs](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/scripts/peoplepicker-bug-reproduce.mjs:99) | It asserts formula match at 180/100/60-ish paths, not the boundary where full-fit flips to chip mode. `X=130` also cannot catch this. |
+
+Computed from current formula:
+
+```txt
+88: len4=2 len5=2 delta=0
+90: len4=4 len5=2 delta=2  <-- saw
+100: len4=4 len5=3 delta=1
+130: len4=4 len5=5 delta=-1
+```
+
+**Q2 判斷標準**
+
+I would reject **(a) deterministic only**. It is internally consistent but user-visible wrong: adding one person can hide two visible avatars at the same width.
+
+I would choose **(b) smooth transition** as the product criterion: adjacent `N -> N+1` at same available width should change visible avatars by at most 1. **(c)** supports that direction, but “world-class match” means matching the idiom, not copying one formula.
+
+| system | source cite | saw behavior |
+|---|---|---|
+| MUI `AvatarGroup` | [`AvatarGroup.js`](https://github.com/mui/material-ui/blob/master/packages/mui-material/src/AvatarGroup/AvatarGroup.js), fetched lines around 88-124: computes `maxAvatars`, `extraAvatars`, renders surplus first, then `children.slice(0, maxAvatars).reverse()` | Count-based `max`, not measured-width based. With `max=4`, `len4 -> 4`, `len5 -> 3 + +2`: delta 1, no 4 -> 2 saw. |
+| GitHub Primer `AvatarStack` | [`AvatarStack.tsx`](https://github.com/primer/react/blob/main/packages/react/src/AvatarStack/AvatarStack.tsx), around 66-154: `count`, `data-avatar-count={count > 3 ? '3+' : count}`, renders `transformChildren(children, shape)`; CSS [`AvatarStack.module.css`](https://github.com/primer/react/blob/main/packages/react/src/AvatarStack/AvatarStack.module.css), around 64-122 sets fixed min-width for `2`, `3`, `3+` | No `+N` chip reservation path. For `3+`, CSS changes overlap/min-width class, but children are still rendered as a stack. Avoids chip-cost saw by visual idiom. |
+| Fluent UI `AvatarGroup` | [`useAvatarGroup.tsx`](https://github.com/microsoft/fluentui/blob/master/packages/react-components/react-avatar/library/src/components/AvatarGroup/useAvatarGroup.tsx), around 33-58: state only carries `layout`; [`useAvatarGroupPopover.tsx`](https://github.com/microsoft/fluentui/blob/master/packages/react-components/react-avatar/library/src/components/AvatarGroupPopover/useAvatarGroupPopover.tsx), around 67-99: overflow count is explicit popover state; [`useAvatarGroupItemStyles.styles.ts`](https://github.com/microsoft/fluentui/blob/master/packages/react-components/react-avatar/library/src/components/AvatarGroupItem/useAvatarGroupItemStyles.styles.ts), around 220-254: stack spacing by size | No auto measured width formula. Overflow is author-controlled via `AvatarGroupPopover`; stack spacing is CSS class based. No same-width formula saw. |
+
+Layer C visual missing: I did not run Playwright/Storybook visual verification in this read-only round.
+
+**Q3 Reproduce 改造**
+
+Add a narrow boundary story or script case that forces the actual tag area to `88-100px`, especially `90/91px`, and compares adjacent lengths.
+
+```ts
+function expectSmooth(values: Array<{ total: number; visible: number }>) {
+  for (let i = 1; i < values.length; i++) {
+    const prev = values[i - 1]
+    const next = values[i]
+    const delta = Math.abs(prev.visible - next.visible)
+
+    if (next.total === prev.total + 1 && delta > 1) {
+      throw new Error(
+        `avatar stack saw: width fixed, len ${prev.total}->${next.total}, visible ${prev.visible}->${next.visible}, delta=${delta}`,
+      )
+    }
+  }
+}
+
+// Boundary unit assertion for current md constants:
+expectSmooth([
+  { total: 4, visible: getAvatarStackVisibleCount({ availablePx: 90, total: 4, avatarPx: 24 }) },
+  { total: 5, visible: getAvatarStackVisibleCount({ availablePx: 90, total: 5, avatarPx: 24 }) },
+])
+```
+
+Storybook setup: one controlled PeoplePicker/stack matrix with fixed `tagAreaWidth` or trigger width calibrated until measured `tagArea.clientWidth` is `88, 90, 91, 100`. Render rows for `length=3,4,5,6` at the same width and assert `visibleDelta <= 1`.
+
+**Q4 Fix Proposal**
+
+| option | vote | reason |
+|---|---:|---|
+| α remove/relax forced `total - 1` cap | Counter-propose | Removing only the cap is not enough because chip reservation still causes a 4 -> 2 drop at 90. Need a transition rule, e.g. when `total-1` fully fits, show `total-1 + +1` instead of solving from chip-reserved first avatar. |
+| β always reserve chip | Reject | It makes small counts worse and sacrifices visible avatars even when no overflow exists. Predictable, but visibly pessimistic. |
+| γ last-avatar-overlay / Primer-like overlap idiom | Approve | Best visual answer. Overflow indicator should not introduce a full extra 24px layout cost at the transition. This matches Primer’s “stack/cascade” direction and avoids the saw by design. |
+| δ document as expected | Reject | The user’s complaint is valid: deterministic math can still be bad UX. Documenting a 2-avatar jump is not acceptable for this component. |
+
+My preferred fix: **γ**, or a smaller α-style variant that makes `len5 at 90px` become `3 + +2` or `4 + overlay +1`, never `2 + +3`.
+
+**Q5 Ant Design / rc-select Ordering**
+
+Local result: `antd` / `rc-select` are **not installed** in this repo, so I could not grep `node_modules/antd/es/select`. I used upstream `react-component/select` via GitHub.
+
+| hypothesis | source cite | reasoning |
+|---|---|---|
+| Clicking in multiple mode appends in click order | [`Select.tsx`](https://github.com/react-component/select/blob/master/src/Select.tsx), around 553-570 | `onInternalSelect` does `cloneValues = multiple ? [...mergedValues, val] : [val]`; deselect filters existing values. That is append order, not source-order re-sort. |
+| Display preserves incoming value order | [`Select.tsx`](https://github.com/react-component/select/blob/master/src/Select.tsx), around 327-371; [`useCache.ts`](https://github.com/react-component/select/blob/master/src/hooks/useCache.ts), around 14-33 | `convert2LabelValues` maps `valueList`; `useCache` maps `labeledValues`. No source-order sort in normal multiple mode. |
+| OptionList selected state does not reorder | [`OptionList.tsx`](https://github.com/react-component/select/blob/master/src/OptionList.tsx), around 151-164 and 184-190 | It checks `rawValues.has(value)` and calls `onSelect(value, { selected })`; it does not rebuild selection by option source order. |
+| Built-in Select All | No rc-select/antd source found | Ant Design `Select` does not have a built-in `checkAll` ordering algorithm. “Select all” examples are userland: if implemented as `setValue(options.map(o => o.value))`, result is source order; if implemented by sequential appends, result follows that append sequence. |
+
+Verdict: my Round 1 claim “Ant Design multiple is source order” was too broad. Upstream `rc-select` click behavior is **selection/click order append**. Source order only happens when the caller resets `value` from the option list, which is how most custom Select All implementations are written.
+tokens used
+189,158
+**Q1 Verdict**
+
+Yes: for the screenshot class described as “same cell width, length=4 shows 4 but length=5 becomes 2 + +3”, the root cause is the **formula saw transition**, not the ref drop.
+
+| hypothesis | cite | reasoning |
+|---|---|---|
+| Ref drop was a real bug | [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:417), [combobox.tsx](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/Combobox/combobox.tsx:666) | It explains “override never activates, falls back to old DOM overflow algorithm”. It does **not** explain deterministic `90px: len4=4, len5=2`. |
+| Formula saw is the screenshot root cause | [avatar-stack-overflow.ts](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/src/design-system/components/PeoplePicker/avatar-stack-overflow.ts:56) | Lines 56-72 do exactly this: full-fit early return, then chip-reserved path with `total - 1` cap. At `available=90`, `len4=4`, `len5=2`. |
+| Round 1 reproduce missed it | [peoplepicker-bug-reproduce.mjs](/Users/chenqiren/Library/CloudStorage/GoogleDrive-qijenchen@gmail.com/我的雲端硬碟/my-project/scripts/peoplepicker-bug-reproduce.mjs:99) | It asserts formula match at 180/100/60-ish paths, not the boundary where full-fit flips to chip mode. `X=130` also cannot catch this. |
+
+Computed from current formula:
+
+```txt
+88: len4=2 len5=2 delta=0
+90: len4=4 len5=2 delta=2  <-- saw
+100: len4=4 len5=3 delta=1
+130: len4=4 len5=5 delta=-1
+```
+
+**Q2 判斷標準**
+
+I would reject **(a) deterministic only**. It is internally consistent but user-visible wrong: adding one person can hide two visible avatars at the same width.
+
+I would choose **(b) smooth transition** as the product criterion: adjacent `N -> N+1` at same available width should change visible avatars by at most 1. **(c)** supports that direction, but “world-class match” means matching the idiom, not copying one formula.
+
+| system | source cite | saw behavior |
+|---|---|---|
+| MUI `AvatarGroup` | [`AvatarGroup.js`](https://github.com/mui/material-ui/blob/master/packages/mui-material/src/AvatarGroup/AvatarGroup.js), fetched lines around 88-124: computes `maxAvatars`, `extraAvatars`, renders surplus first, then `children.slice(0, maxAvatars).reverse()` | Count-based `max`, not measured-width based. With `max=4`, `len4 -> 4`, `len5 -> 3 + +2`: delta 1, no 4 -> 2 saw. |
+| GitHub Primer `AvatarStack` | [`AvatarStack.tsx`](https://github.com/primer/react/blob/main/packages/react/src/AvatarStack/AvatarStack.tsx), around 66-154: `count`, `data-avatar-count={count > 3 ? '3+' : count}`, renders `transformChildren(children, shape)`; CSS [`AvatarStack.module.css`](https://github.com/primer/react/blob/main/packages/react/src/AvatarStack/AvatarStack.module.css), around 64-122 sets fixed min-width for `2`, `3`, `3+` | No `+N` chip reservation path. For `3+`, CSS changes overlap/min-width class, but children are still rendered as a stack. Avoids chip-cost saw by visual idiom. |
+| Fluent UI `AvatarGroup` | [`useAvatarGroup.tsx`](https://github.com/microsoft/fluentui/blob/master/packages/react-components/react-avatar/library/src/components/AvatarGroup/useAvatarGroup.tsx), around 33-58: state only carries `layout`; [`useAvatarGroupPopover.tsx`](https://github.com/microsoft/fluentui/blob/master/packages/react-components/react-avatar/library/src/components/AvatarGroupPopover/useAvatarGroupPopover.tsx), around 67-99: overflow count is explicit popover state; [`useAvatarGroupItemStyles.styles.ts`](https://github.com/microsoft/fluentui/blob/master/packages/react-components/react-avatar/library/src/components/AvatarGroupItem/useAvatarGroupItemStyles.styles.ts), around 220-254: stack spacing by size | No auto measured width formula. Overflow is author-controlled via `AvatarGroupPopover`; stack spacing is CSS class based. No same-width formula saw. |
+
+Layer C visual missing: I did not run Playwright/Storybook visual verification in this read-only round.
+
+**Q3 Reproduce 改造**
+
+Add a narrow boundary story or script case that forces the actual tag area to `88-100px`, especially `90/91px`, and compares adjacent lengths.
+
+```ts
+function expectSmooth(values: Array<{ total: number; visible: number }>) {
+  for (let i = 1; i < values.length; i++) {
+    const prev = values[i - 1]
+    const next = values[i]
+    const delta = Math.abs(prev.visible - next.visible)
+
+    if (next.total === prev.total + 1 && delta > 1) {
+      throw new Error(
+        `avatar stack saw: width fixed, len ${prev.total}->${next.total}, visible ${prev.visible}->${next.visible}, delta=${delta}`,
+      )
+    }
+  }
+}
+
+// Boundary unit assertion for current md constants:
+expectSmooth([
+  { total: 4, visible: getAvatarStackVisibleCount({ availablePx: 90, total: 4, avatarPx: 24 }) },
+  { total: 5, visible: getAvatarStackVisibleCount({ availablePx: 90, total: 5, avatarPx: 24 }) },
+])
+```
+
+Storybook setup: one controlled PeoplePicker/stack matrix with fixed `tagAreaWidth` or trigger width calibrated until measured `tagArea.clientWidth` is `88, 90, 91, 100`. Render rows for `length=3,4,5,6` at the same width and assert `visibleDelta <= 1`.
+
+**Q4 Fix Proposal**
+
+| option | vote | reason |
+|---|---:|---|
+| α remove/relax forced `total - 1` cap | Counter-propose | Removing only the cap is not enough because chip reservation still causes a 4 -> 2 drop at 90. Need a transition rule, e.g. when `total-1` fully fits, show `total-1 + +1` instead of solving from chip-reserved first avatar. |
+| β always reserve chip | Reject | It makes small counts worse and sacrifices visible avatars even when no overflow exists. Predictable, but visibly pessimistic. |
+| γ last-avatar-overlay / Primer-like overlap idiom | Approve | Best visual answer. Overflow indicator should not introduce a full extra 24px layout cost at the transition. This matches Primer’s “stack/cascade” direction and avoids the saw by design. |
+| δ document as expected | Reject | The user’s complaint is valid: deterministic math can still be bad UX. Documenting a 2-avatar jump is not acceptable for this component. |
+
+My preferred fix: **γ**, or a smaller α-style variant that makes `len5 at 90px` become `3 + +2` or `4 + overlay +1`, never `2 + +3`.
+
+**Q5 Ant Design / rc-select Ordering**
+
+Local result: `antd` / `rc-select` are **not installed** in this repo, so I could not grep `node_modules/antd/es/select`. I used upstream `react-component/select` via GitHub.
+
+| hypothesis | source cite | reasoning |
+|---|---|---|
+| Clicking in multiple mode appends in click order | [`Select.tsx`](https://github.com/react-component/select/blob/master/src/Select.tsx), around 553-570 | `onInternalSelect` does `cloneValues = multiple ? [...mergedValues, val] : [val]`; deselect filters existing values. That is append order, not source-order re-sort. |
+| Display preserves incoming value order | [`Select.tsx`](https://github.com/react-component/select/blob/master/src/Select.tsx), around 327-371; [`useCache.ts`](https://github.com/react-component/select/blob/master/src/hooks/useCache.ts), around 14-33 | `convert2LabelValues` maps `valueList`; `useCache` maps `labeledValues`. No source-order sort in normal multiple mode. |
+| OptionList selected state does not reorder | [`OptionList.tsx`](https://github.com/react-component/select/blob/master/src/OptionList.tsx), around 151-164 and 184-190 | It checks `rawValues.has(value)` and calls `onSelect(value, { selected })`; it does not rebuild selection by option source order. |
+| Built-in Select All | No rc-select/antd source found | Ant Design `Select` does not have a built-in `checkAll` ordering algorithm. “Select all” examples are userland: if implemented as `setValue(options.map(o => o.value))`, result is source order; if implemented by sequential appends, result follows that append sequence. |
+
+Verdict: my Round 1 claim “Ant Design multiple is source order” was too broad. Upstream `rc-select` click behavior is **selection/click order append**. Source order only happens when the caller resets `value` from the option list, which is how most custom Select All implementations are written.

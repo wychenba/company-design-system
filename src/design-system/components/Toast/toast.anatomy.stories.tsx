@@ -300,3 +300,15 @@ export const StateBehavior: Story = {
     </div>
   ),
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `toast.spec.md` 「A11y 預設」段。摘要:\n\n-   預設  （success / info / neutral）： role=\"status\"  +  aria-live=\"polite\" ——screen reader 在空閒時讀出，不中斷使用者\n-   error / warning 升級  ： role=\"alert\"  +  aria-live=\"assertive\" ——立即中斷朗讀通知使用者\n-   由 sonner 自動管理  ：本 DS 不覆寫 sonner 的 a11y 行為，consumer 無需額外處理\n-   關閉按鈕  ：若 consumer 自訂 action,務必提供  aria-label （sonner 內建 dismiss 已處理）"}</p>
+    </div>
+  ),
+}

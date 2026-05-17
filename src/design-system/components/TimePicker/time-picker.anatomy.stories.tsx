@@ -248,7 +248,7 @@ export const Inspector: Story = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const Accessibility: Story = {
-  name: 'A11y',
+  name: '無障礙',
   render: () => (
     <div className="flex flex-col gap-6 max-w-3xl text-body">
       <section>

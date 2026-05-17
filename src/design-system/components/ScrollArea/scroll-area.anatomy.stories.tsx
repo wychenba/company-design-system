@@ -409,3 +409,15 @@ export const OrientationBehavior: Story = {
     </div>
   ),
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `scrollarea.spec.md` 「A11y 預設」段。摘要:\n\nRadix ScrollArea 自動處理:\n\n-   鍵盤捲動  :Viewport 原生可 focus,支援  ArrowUp/Down/Left/Right  /  PageUp/Down  /  Home/End \n-   Focus 可見  :focused viewport 保留原生 focus ring\n-   Scrollbar 非 tab stop  :scrollbar thumb 不搶焦點,使用鍵盤的使用者透過 viewport 捲動\n-   Pointer 支援  :thumb 可拖曳,track 可 click-to-jump(Radix 內建)\n\nConsumer 無需額外處理 a11y。"}</p>
+    </div>
+  ),
+}

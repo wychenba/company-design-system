@@ -356,3 +356,15 @@ export const StateBehavior: Story = {
     )
   },
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `coachmark.spec.md` 「A11y 預設」段。摘要:\n\n-   焦點管理  :由 Popover(Radix)處理——開啟移焦點進 content,關閉 return to trigger\n-   Esc 關閉  :預設啟用(= Skip 行為)——user 按 Esc 等同 skip,尊重退出意願\n-   ARIA  :trigger 自動  aria-expanded  /  aria-controls ,content  role=\"dialog\" (Radix 預設)\n-   Step 計數 tabular-nums  :螢幕閱讀器讀「2 of 3」語意清楚"}</p>
+    </div>
+  ),
+}

@@ -27,9 +27,9 @@ import {
  *   切 value 用 SegmentedControl；切路由用 navigation。
  *
  * ── Size ──
- *   sm   h-tab-sm（32/40），Dialog / Sidebar / dense
- *   md   h-tab-md（40/48），★ 預設，一般頁面
- *   lg   h-tab-lg（48/56），page-level hero
+ *   sm   h-tab-sm（32/40），★ 預設(2026-05-17 從 md 改),overlay / chrome / dense
+ *   md   h-tab-md（40/48），future tier 無 recommended use case
+ *   lg   h-tab-lg（48/56），page-level hero / 獨立 tabs 取代 chrome header
  *
  * ── 寬度行為 ──
  *   Trigger 寬度永遠由內容決定（hug content）。
@@ -124,7 +124,7 @@ interface TabsListProps
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   TabsListProps
->(({ className, size = 'md', overflow = 'none', children, ...props }, ref) => {
+>(({ className, size = 'sm', overflow = 'none', children, ...props }, ref) => {
   const tabsSizeContext = React.useMemo(() => ({ size }), [size])
   if (overflow === 'scroll') {
     return (
@@ -375,7 +375,11 @@ const tabsTriggerVariants = cva(
       },
     },
     defaultVariants: {
-      size: 'md',
+      // size = 'sm' per header-canonical.spec.md W6:overlay / chrome / dense toolbar
+      // 都用 sm;獨立 page hero 用 lg。md 為 future tier(無 recommended use case)。
+      // 2026-05-17 從 'md' 改 'sm'(M31 codex 比稿後)— production consumer = 0,
+      // 影響面限 stories baseline(已過 visual diff gate)。
+      size: 'sm',
     },
   }
 )
@@ -452,7 +456,7 @@ export const tabsMeta = {
     fg: ['text-fg-disabled', 'text-fg-secondary', 'text-foreground'],
     ring: ['ring-ring'],
   },
-  defaultSize: 'md',
+  defaultSize: 'sm',
 } as const
 
 export { Tabs, TabsList, TabsTrigger, TabsContent, tabsTriggerVariants }

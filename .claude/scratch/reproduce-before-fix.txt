@@ -1,0 +1,33 @@
+
+[Bug A] Multi stack visible-count drift at fixed 180px width
+    [length=4] trigger=178px tagArea=130px visible=12 +N="+2" text="+2"
+    found 0 potential dismiss buttons in trigger
+    formula deterministic check: {"available":130,"length4":{"fullStackFits":true,"expectedVisible":4},"length3":{"fullStackFits":true,"expectedVisible":3}}
+  ✓ formula deterministic check: available=130px length4-fits=true length3-fits=true
+  ✗ length=4 visible MISMATCH formula: actual=12 expected=4 — means visibleCountOverride not applied (ref drop bug)
+
+[Bug B] Single picker placeholder ellipsis at narrow width
+    overlay metrics: {
+  "overlays": [
+    {
+      "text": "Alice Chen",
+      "scrollWidth": 69,
+      "clientWidth": 50,
+      "offsetWidth": 50,
+      "display": "flex",
+      "overflow": "hidden",
+      "textOverflow": "ellipsis",
+      "whiteSpace": "nowrap",
+      "position": "absolute",
+      "innerSpan": null
+    }
+  ]
+}
+  ✓ overlay ellipsis fires — at least one overlay has overflow
+
+════════════════════════════════════════════════════════════
+Results: 2 PASS / 1 FAIL
+════════════════════════════════════════════════════════════
+  ✓ formula deterministic check: available=130px length4-fits=true length3-fits=true
+  ✗ length=4 visible MISMATCH formula — actual=12 expected=4 — means visibleCountOverride not applied (ref drop bug)
+  ✓ overlay ellipsis fires — at least one overlay has overflow

@@ -904,3 +904,15 @@ export const StateBehavior = {
     )
   },
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `combobox.spec.md` 「A11y 預設」段。摘要:\n\n### 鍵盤可達性的 delegation 設計\n\nCombobox 內部結構有多個  <div>  /  <Tag>  帶  onClick （tag 容器、ChevronDown 區域、搜尋輸入 wrapper 等）——  這些是 mouse 優化的 click-path delegation，不是鍵盤介面  。鍵盤路徑由  隱藏的 native  <select>    處理（tab-focusable，Enter/Space 開啟，arrow 導覽，Esc 關閉）。\n\n  設計取捨  :\n- ✅   好處  : 保留原生  <select>  的完整 a11y（包含 mobile screen reader + 語音輸入 + 所有 OS-level 整合）\n- ⚠️   後果  : 非 button 元素帶  onClick  是 mouse-only 互動,鍵盤使用者不經過它們—"}</p>
+    </div>
+  ),
+}

@@ -293,63 +293,9 @@ export const SegmentedControlInField: Story = {
   ),
 }
 
-// ── Required / Disabled / Invalid ───────────────────────────────────────
-
-export const States: Story = {
-  name: '狀態',
-  render: () => (
-    <div className="max-w-sm">
-      <FieldGroup>
-        <Field>
-          <FieldLabel>一般</FieldLabel>
-          <Input placeholder="預設狀態" />
-          <FieldDescription>輔助說明文字</FieldDescription>
-        </Field>
-
-        <Field required>
-          <FieldLabel>必填</FieldLabel>
-          <Input placeholder="label 前有 *" />
-          <FieldDescription>required prop 自動在 label 前加 *</FieldDescription>
-        </Field>
-
-        <Field disabled>
-          <FieldLabel>Disabled</FieldLabel>
-          <Input placeholder="disabled" disabled />
-          <FieldDescription>label 與 description 都變灰</FieldDescription>
-        </Field>
-
-        <Field required disabled>
-          <FieldLabel>Required + Disabled</FieldLabel>
-          <Input placeholder="disabled" disabled />
-          <FieldDescription>required 星號也會降成 disabled 色</FieldDescription>
-        </Field>
-
-        <Field invalid>
-          <FieldLabel>Invalid</FieldLabel>
-          <Input placeholder="with error" />
-          <FieldError>此欄位必填</FieldError>
-        </Field>
-
-        <Field required invalid>
-          <FieldLabel>必填 + Invalid</FieldLabel>
-          <Input placeholder="with error" />
-          <FieldError>格式不正確，請重新輸入</FieldError>
-        </Field>
-
-        <Field>
-          <FieldLabel info="使用者的全名，將顯示在個人資料頁面">姓名</FieldLabel>
-          <Input placeholder="請輸入姓名" />
-          <FieldDescription>將顯示在你的個人頁面上</FieldDescription>
-        </Field>
-
-        <Field required>
-          <FieldLabel info="用於登入和接收通知，格式為 name@example.com">Email</FieldLabel>
-          <Input placeholder="required + info" />
-        </Field>
-      </FieldGroup>
-    </div>
-  ),
-}
+// @story-trait-rationale: States retired 2026-05-17 per audit Dim 24 —
+//   anatomy.stories.tsx StateBehavior own required/disabled/invalid/readonly state matrix。
+//   展示層保留 typical real-product 情境(Block control / Mode 等),避免跟 anatomy trait grid 重複。
 
 // ── Block Control: RadioGroup ───────────────────────────────────────────
 

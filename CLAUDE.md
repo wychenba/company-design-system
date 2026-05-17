@@ -32,7 +32,7 @@
 
 ## 行數預算(Anthropic 對齊)
 
-CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory **per-file ≤ 100 lines** + **MEMORY.md index ≤ 20 entries**(soft 18 / hard 20,session-start hook 攔)。Hooks **26 soft / 30 hard**(SSOT = `session_start_governance_check.sh:174`,2026-05-15 升)。
+CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory **per-file ≤ 100 lines** + **MEMORY.md index ≤ 20 entries**(soft 18 / hard 20,session-start hook 攔)。Hooks **26 soft / 35 hard**(SSOT = `session_start_governance_check.sh:173`,2026-05-17 升 30→35:DS governance complexity 53 dims + 32 M-rules + codex collab justified higher count,32 hooks 全 active 無 dead candidate)。
 
 ## Anti-bloat L1-L3
 

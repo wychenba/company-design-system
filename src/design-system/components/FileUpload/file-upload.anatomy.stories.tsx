@@ -416,3 +416,15 @@ export const StateBehavior: Story = {
     </div>
   ),
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `fileupload.spec.md` 「A11y 預設」段。摘要:\n\n-  role=\"button\"  +  tabIndex=0 (disabled 時  -1 )\n- Enter / Space 鍵觸發檔案選取浮窗(模擬 click)\n-  aria-disabled={true}  當 disabled\n-  <input type=\"file\">  隱藏但仍可被 screen reader 偵測到;Label 透過 container 文字(title + description)提供情境"}</p>
+    </div>
+  ),
+}

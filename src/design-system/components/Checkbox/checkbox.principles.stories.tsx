@@ -47,7 +47,7 @@ export const UsageGuidance: Story = {
       <div>
         <Rule
           title="何時用 — 真實業務場景"
-          note="適合 Checkbox 的場景(點擊跳轉「展示」頁範例);判斷不確定時對照 spec.md「何時用 / 何時不用」段。"
+          note="Checkbox 用於「獨立布林開關(on/off)」或「同類選項可複選」場景 — 每個 Checkbox 的值跟其他互不影響(對比 RadioGroup 互斥)。提交前可反悔(state local),點擊即時 toggle 視覺,不需要額外確認。對齊 WAI-ARIA `role=checkbox` / Polaris Choice 共識。"
         >
           <ul className="space-y-1">
             <li>

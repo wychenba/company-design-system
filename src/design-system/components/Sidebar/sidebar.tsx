@@ -22,6 +22,7 @@ import {
   SheetTitle,
 } from "@/design-system/components/Sheet/sheet"
 import { Skeleton } from "@/design-system/components/Skeleton/skeleton"
+import { ChromeHeader } from "@/design-system/patterns/header-canonical/chrome-header"
 import {
   Tooltip,
   TooltipContent,
@@ -423,14 +424,14 @@ SidebarInput.displayName = "SidebarInput"
 // 會隨 density 變大。Chrome 如果不跟著放大,lg density 下 padding 會被擠壓。
 const SidebarHeader = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div">
->(({ className, ...props }, ref) => {
+  React.ComponentProps<"div"> & { withTabs?: boolean }
+>(({ className, withTabs, ...props }, ref) => {
   return (
-    <div
+    <ChromeHeader
       ref={ref}
+      withTabs={withTabs}
       data-sidebar="header"
       className={cn(
-        "flex h-[var(--chrome-header-height)] shrink-0 items-center gap-2 border-b border-divider px-[var(--layout-space-loose)]",
         // Icon 模式:拿掉水平 padding 讓內容(Avatar 24px)置中於 48px 正方形
         "group-data-[collapsible=icon]:!px-0 group-data-[collapsible=icon]:!justify-center",
         "transition-[padding] duration-200 ease-linear motion-reduce:duration-0",

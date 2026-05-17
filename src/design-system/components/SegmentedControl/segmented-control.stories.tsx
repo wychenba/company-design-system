@@ -1,9 +1,12 @@
-// @story-trait-rationale: hasSizes 由 anatomy.stories.tsx SizeMatrix auto-compile owns size showcase(2026-05-15 F-migration);showcase 展示 Default / WithStartIcon / WithBadge / IconOnly / FullWidth / Disabled 等真實使用情境。
+// @story-trait-rationale: 6 stories(Default/WithStartIcon/WithBadge/IconOnly/FullWidth/Disabled)
+// 2026-05-17 retire per audit Dim 24:跟 anatomy.stories.tsx 4 個 matrix
+// (Overview/IconOnlyMatrix/FullWidthMatrix/StateBehavior)完全 trait-grid 重複,無 unique teaching。
+// 真實業務情境靠 principles.stories.tsx 的 VsTabsRule / DecisionTreeExamples;
+// trait matrix 靠 anatomy.stories.tsx;本檔保留 1 典型「Jira-style view switcher」入口情境。
 import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { AlignLeft, AlignCenter, AlignRight, List, LayoutGrid, Calendar } from 'lucide-react'
+import { List, LayoutGrid, Calendar } from 'lucide-react'
 import { SegmentedControl, SegmentedControlItem } from './segmented-control'
-import { Badge } from '@/design-system/components/Badge/badge'
 
 const meta: Meta<typeof SegmentedControl> = {
   title: 'Design System/Components/SegmentedControl/展示',
@@ -14,100 +17,17 @@ export default meta
 
 type Story = StoryObj<typeof SegmentedControl>
 
-export const Default: Story = {
-  name: '預設',
+// 典型 Jira / Notion / Linear view switcher 入口情境(對齊 mindset #4「真實業務場景」)
+export const ViewSwitcher: Story = {
+  name: '視圖切換器',
   render: () => {
-    const [value, setValue] = useState('list')
+    const [view, setView] = useState('list')
     return (
-      <SegmentedControl value={value} onValueChange={setValue}>
-        <SegmentedControlItem value="list">清單</SegmentedControlItem>
-        <SegmentedControlItem value="board">看板</SegmentedControlItem>
-        <SegmentedControlItem value="calendar">行事曆</SegmentedControlItem>
-      </SegmentedControl>
-    )
-  },
-}
-
-export const WithStartIcon: Story = {
-  name: '前綴圖示',
-  render: () => {
-    const [value, setValue] = useState('list')
-    return (
-      <SegmentedControl value={value} onValueChange={setValue}>
+      <SegmentedControl value={view} onValueChange={setView}>
         <SegmentedControlItem value="list" startIcon={List}>清單</SegmentedControlItem>
         <SegmentedControlItem value="board" startIcon={LayoutGrid}>看板</SegmentedControlItem>
         <SegmentedControlItem value="calendar" startIcon={Calendar}>行事曆</SegmentedControlItem>
       </SegmentedControl>
     )
   },
-}
-
-export const WithBadge: Story = {
-  name: '帶 Badge',
-  render: () => {
-    const [value, setValue] = useState('all')
-    return (
-      <SegmentedControl value={value} onValueChange={setValue}>
-        <SegmentedControlItem value="all" badge={<Badge count={12} />}>全部</SegmentedControlItem>
-        <SegmentedControlItem value="active" badge={<Badge count={3} />}>進行中</SegmentedControlItem>
-        <SegmentedControlItem value="done" badge={<Badge count={9} />}>已完成</SegmentedControlItem>
-      </SegmentedControl>
-    )
-  },
-}
-
-export const IconOnly: Story = {
-  name: '純圖示',
-  render: () => {
-    const [value, setValue] = useState('left')
-    return (
-      <SegmentedControl value={value} onValueChange={setValue} iconOnly>
-        <SegmentedControlItem value="left" startIcon={AlignLeft} aria-label="靠左對齊" />
-        <SegmentedControlItem value="center" startIcon={AlignCenter} aria-label="置中對齊" />
-        <SegmentedControlItem value="right" startIcon={AlignRight} aria-label="靠右對齊" />
-      </SegmentedControl>
-    )
-  },
-}
-
-export const FullWidth: Story = {
-  name: '全寬',
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <div>
-        <div className="text-caption text-fg-muted mb-1">父容器 w-full（跟著 story panel）</div>
-        <SegmentedControl defaultValue="a" fullWidth>
-          <SegmentedControlItem value="day">日</SegmentedControlItem>
-          <SegmentedControlItem value="week">週</SegmentedControlItem>
-          <SegmentedControlItem value="month">月</SegmentedControlItem>
-        </SegmentedControl>
-      </div>
-      <div className="w-[320px]">
-        <div className="text-caption text-fg-muted mb-1">父容器 w-[320px]（示範等分跟父容器走）</div>
-        <SegmentedControl defaultValue="a" fullWidth>
-          <SegmentedControlItem value="day">日</SegmentedControlItem>
-          <SegmentedControlItem value="week">週</SegmentedControlItem>
-          <SegmentedControlItem value="month">月</SegmentedControlItem>
-        </SegmentedControl>
-      </div>
-    </div>
-  ),
-}
-
-export const Disabled: Story = {
-  name: '停用',
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <SegmentedControl defaultValue="a" disabled>
-        <SegmentedControlItem value="a">清單</SegmentedControlItem>
-        <SegmentedControlItem value="b">看板</SegmentedControlItem>
-        <SegmentedControlItem value="c">行事曆</SegmentedControlItem>
-      </SegmentedControl>
-      <SegmentedControl defaultValue="a">
-        <SegmentedControlItem value="a">清單</SegmentedControlItem>
-        <SegmentedControlItem value="b" disabled>看板</SegmentedControlItem>
-        <SegmentedControlItem value="c">行事曆</SegmentedControlItem>
-      </SegmentedControl>
-    </div>
-  ),
 }

@@ -28,6 +28,7 @@ type Story = StoryObj<typeof TooltipContent>
 
 /* ── 基本用法 ── */
 export const Default: Story = {
+  name: '基本用法',
   render: () => (
     <Tooltip defaultOpen>
       <TooltipTrigger asChild>

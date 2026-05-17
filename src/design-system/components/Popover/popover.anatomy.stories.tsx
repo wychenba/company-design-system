@@ -260,3 +260,15 @@ export const StateBehavior: Story = {
     </div>
   ),
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `popover.spec.md` 「A11y 預設」段。摘要:\n\nRadix Popover 自動處理：\n\n-   焦點管理  ：開啟時移動焦點進入 content；關閉時 focus return to trigger\n-   Esc 關閉  ：按 Esc 自動關閉並返回焦點\n-   Focus trap  ： modal={true}  時焦點鎖在 content 內；預設 non-modal 下焦點離開 content 樹會自動關閉\n-   ARIA  ：trigger 自動  aria-expanded  /  aria-controls ，content  role=\"dialog\" \n\nConsumer 無需額外處理 a11y，保留 Radix  data-state  屬性即可。"}</p>
+    </div>
+  ),
+}

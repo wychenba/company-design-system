@@ -91,5 +91,19 @@
     "storybook": "8.6.0",
     "typescript": "^5.5.4",
     "vite": "^5.4.0"
-  }
+  },
+  "size-limit": [
+    {
+      "name": "DS bundle(production app build)",
+      "path": "dist/assets/index-*.js",
+      "limit": "300 KB",
+      "gzip": true
+    },
+    {
+      "name": "DS CSS(globals + tokens)",
+      "path": "dist/assets/index-*.css",
+      "limit": "30 KB",
+      "gzip": true
+    }
+  ]
 }

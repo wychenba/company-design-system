@@ -54,30 +54,9 @@ export const Modes: Story = {
   ),
 }
 
-/* ── 狀態 ── */
-export const States: Story = {
-  name: '狀態',
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <div>
-        <p className="text-caption text-fg-muted mb-2">md（16px，預設）</p>
-        <RadioGroup defaultValue="a" className="flex items-center gap-4" aria-label="md radio state demo">
-          <RadioGroupItem value="a" aria-label="option a" />
-          <RadioGroupItem value="b" aria-label="option b" />
-          <RadioGroupItem value="c" disabled aria-label="option c disabled" />
-        </RadioGroup>
-      </div>
-      <div>
-        <p className="text-caption text-fg-muted mb-2">lg（20px）</p>
-        <RadioGroup defaultValue="a" className="flex items-center gap-4" aria-label="lg radio state demo">
-          <RadioGroupItem value="a" size="lg" aria-label="option a" />
-          <RadioGroupItem value="b" size="lg" aria-label="option b" />
-          <RadioGroupItem value="c" size="lg" disabled aria-label="option c disabled" />
-        </RadioGroup>
-      </div>
-    </div>
-  ),
-}
+// @story-trait-rationale: States retired 2026-05-17 per audit Dim 24 —
+//   anatomy.stories.tsx SizeMatrix + StateBehavior own size/state trait grid。
+//   展示層保留 typical real-product Group 情境(Vertical/Horizontal/Modes/Disabled)。
 
 /* ── 垂直 Group ── */
 export const VerticalGroup: Story = {

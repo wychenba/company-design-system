@@ -14,6 +14,7 @@ export default meta
 type Story = StoryObj<typeof Textarea>
 
 export const Default: Story = {
+  name: '基本用法',
   args: {
     placeholder: '請輸入多行文字...',
   },
@@ -24,36 +25,9 @@ export const Default: Story = {
   ),
 }
 
-export const Modes: Story = {
-  name: '三種 mode',
-  render: () => (
-    <div className="max-w-md flex flex-col gap-4">
-      <div>
-        <p className="text-caption text-fg-muted mb-1">edit</p>
-        <Textarea placeholder="可編輯" defaultValue="內容範例" />
-      </div>
-      <div>
-        <p className="text-caption text-fg-muted mb-1">readonly</p>
-        <Textarea mode="readonly" defaultValue="唯讀內容，可閱讀但不可修改" />
-      </div>
-      <div>
-        <p className="text-caption text-fg-muted mb-1">disabled</p>
-        <Textarea mode="disabled" defaultValue="停用內容，灰化" />
-      </div>
-    </div>
-  ),
-}
-
-export const WithError: Story = {
-  name: '錯誤狀態',
-  render: () => (
-    <div className="max-w-md">
-      <Textarea error defaultValue="格式不正確的內容" />
-    </div>
-  ),
-}
-
-// @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。
+// @story-trait-rationale: AllSizes / Modes / WithError retired per F migration 2026-05-15+17 —
+//   anatomy.stories.tsx SizeMatrix + ModeMatrix own trait matrices(state/mode/size 全 cover)。
+//   展示層保留 typical real-product 情境(Default + InField),避免跟 anatomy trait grid 重複。
 export const InField: Story = {
   name: '在 Field 內',
   render: () => (

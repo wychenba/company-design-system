@@ -774,16 +774,17 @@ CSS 變數在定義元素上解析。`:root` 的 `--foreground: var(--color-neut
 ## 禁止事項
 
 ```tsx
-// ❌ Tailwind 原始色 / 硬寫色碼      // ✅ semantic / primitive 對應場景
-<div className="bg-blue-500" />        <div className="bg-canvas" />
-<div className="bg-[#1677FF]" />       <div className="bg-primary hover:bg-primary-hover" />
-<div className="bg-[var(--color-blue-6)]" />  // ❌ semantic 場景用 primitive
-// ✅ Tag / Avatar 例外:可直接用 primitive(色不代表語義)
-
-// ❌ 深色容器硬寫 text-white         // ✅ 用 data-theme="dark" wrapper
-<TooltipContent><Tag className="text-white" /></TooltipContent>
-<div data-theme="dark"><Tag /></div>
+// ❌ 原始色 / 硬碼 → ✅ semantic / primitive
+<div className="bg-blue-500" />  <div className="bg-canvas" />
+<div className="bg-[#1677FF]" /> <div className="bg-primary hover:bg-primary-hover" />
+<div className="bg-[var(--color-blue-6)]" /> // ❌ semantic 場景用 primitive(Tag/Avatar 例外)
+// ❌ 深色硬寫 text-white → ✅ <div data-theme="dark"><Tag /></div>
 ```
+
+## 結構性保留 token canonical
+SSOT → `.claude/references/structural-token-retention.md`(6 類保留 + sub-agent triple-verify 流程)
+
+---
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

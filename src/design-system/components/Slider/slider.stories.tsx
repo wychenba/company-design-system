@@ -12,37 +12,9 @@ export default meta
 
 type Story = StoryObj<typeof Slider>
 
-// ── Single value ─────────────────────────────────────────────────────────
-
-export const Default: Story = {
-  name: '預設',
-  render: () => {
-    const [value, setValue] = React.useState([50])
-    return (
-      <div className="w-[360px] flex flex-col gap-4">
-        <Slider value={value} onValueChange={setValue} aria-label="預設 slider demo" />
-        <p className="text-caption text-fg-secondary">Value: {value[0]}</p>
-      </div>
-    )
-  },
-}
-
-// ── Range mode ───────────────────────────────────────────────────────────
-
-export const Range: Story = {
-  name: '範圍模式',
-  render: () => {
-    const [value, setValue] = React.useState([20, 80])
-    return (
-      <div className="w-[360px] flex flex-col gap-4">
-        <Slider value={value} onValueChange={setValue} />
-        <p className="text-caption text-fg-secondary">
-          Range: {value[0]} – {value[1]}
-        </p>
-      </div>
-    )
-  },
-}
+// @story-trait-rationale: Default / Range retired 2026-05-17 per audit Dim 24 —
+//   anatomy.stories.tsx Overview(含 Anatomy + Range mode 子段)已 cover baseline + range showcase。
+//   展示層保留 typical 情境(SizeAlignment / MinMaxStep / Disabled 等),避免跟 anatomy 重複。
 
 // ── Sizes(容器對齊)───────────────────────────────────────────────────
 
@@ -93,9 +65,12 @@ export const MinMaxStep: Story = {
   },
 }
 
-// ── Disabled ─────────────────────────────────────────────────────────────
-
-export const Disabled: Story = {
+// @story-trait-rationale: Disabled retired 2026-05-17 per audit Dim 24 —
+//   anatomy.stories.tsx StateBehavior 已 cover disabled state。展示層保留 SizeAlignment + MinMaxStep。
+//   (legacy Disabled body 移到 anatomy StateBehavior demo;若要看 disabled,進 anatomy 頁)
+export const Disabled_REMOVED: Story = {
+  name: '(已 retire,見 anatomy StateBehavior)',
+  tags: ['!autodocs', '!dev'],
   render: () => (
     <div className="w-[360px] flex flex-col gap-6">
       <div className="flex flex-col gap-2">

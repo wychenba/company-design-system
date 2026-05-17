@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { SearchX, FolderOpen, WifiOff, Lock, Inbox } from 'lucide-react'
+import { SearchX, WifiOff, Lock, Inbox } from 'lucide-react'
 import { Empty } from './empty'
 import { Button } from '@/design-system/components/Button/button'
 
@@ -44,21 +44,6 @@ export const NoTasks: Story = {
         title="這個 Sprint 還沒有任務"
         description="從 backlog 拖拉任務進來,或直接建立新任務"
         action={<Button variant="primary">建立任務</Button>}
-      />
-    </div>
-  ),
-}
-
-/* ── 空清單 — Notion 無 document ─────────────────────────────────── */
-export const NoDocuments: Story = {
-  name: '空清單',
-  render: () => (
-    <div className="border border-border rounded-lg p-8 max-w-md">
-      <Empty
-        icon={FolderOpen}
-        title="還沒有任何文件"
-        description="建立第一份文件,開始組織你的知識庫"
-        action={<Button variant="primary">新增文件</Button>}
       />
     </div>
   ),

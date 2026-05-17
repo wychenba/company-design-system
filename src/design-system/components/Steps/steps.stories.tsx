@@ -1,3 +1,7 @@
+// @story-trait-rationale: AllSizes retired 2026-05-15(anatomy SizeMatrix own size matrix);
+//   AllStates retired 2026-05-17 per audit Dim 46(anatomy StateBehavior own state matrix,
+//   manual trait grid 違 story-rules.md 三層定位「展示層 = 典型使用情境,不是 trait grid」)。
+//   Disabled state 由 FocusRingCombinations 內部展示(disabled + ring combo 正交)。
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { Check } from 'lucide-react'
@@ -7,7 +11,6 @@ import {
   StepLabel,
   StepDescription,
   StepContent,
-  type StepsSize,
 } from './steps'
 import { Button } from '@/design-system/components/Button/button'
 
@@ -139,45 +142,10 @@ export const Default: Story = {
   },
 }
 
-// @story-trait-rationale: AllSizes retired per F migration 2026-05-15 — anatomy.stories.tsx SizeMatrix auto-compile owns size showcase。
-// ── All content states ──────────────────────────────────────────────────
-
-export const AllStates: Story = {
-  name: '所有狀態',
-  render: () => (
-    <div className="flex gap-12">
-      {(['sm', 'md', 'lg'] as StepsSize[]).map(size => (
-        <div key={size} className="w-[240px]">
-          <div className="text-caption text-fg-muted mb-4">size = {size}</div>
-          <Steps
-            value="s-current"
-            completedValues={['s-completed']}
-            errorValues={['s-error']}
-            size={size}
-            linear={false}
-          >
-            <StepItem value="s-completed">
-              <StepLabel>已寄送</StepLabel>
-              <StepDescription>UPS 國際快遞 5/12 18:32</StepDescription>
-            </StepItem>
-            <StepItem value="s-current">
-              <StepLabel>處理中</StepLabel>
-              <StepDescription>東京物流中心轉運</StepDescription>
-            </StepItem>
-            <StepItem value="s-upcoming">
-              <StepLabel>送達</StepLabel>
-              <StepDescription>預計 5/16 14:00 前送達</StepDescription>
-            </StepItem>
-            <StepItem value="s-error">
-              <StepLabel>地址確認失敗</StepLabel>
-              <StepDescription>請補收件人電話 / 重試</StepDescription>
-            </StepItem>
-          </Steps>
-        </div>
-      ))}
-    </div>
-  ),
-}
+// @story-trait-rationale: AllSizes + AllStates retired per F migration 2026-05-17 —
+//   AllSizes retired 2026-05-15(anatomy SizeMatrix own);AllStates retired 2026-05-17
+//   per Dim 46 audit(anatomy StateBehavior 已 own state matrix,manual trait grid 違反
+//   story-rules.md 三層定位「展示層應為典型使用情境,不是 trait grid」)。
 
 // ── Focus marker 的正交示範 ─────────────────────────────────────────────
 // Ring 跟 content state 正交:任何 state + focused 都能組合

@@ -170,9 +170,11 @@ Tailwind：`h-tab-sm` / `h-tab-md` / `h-tab-lg`。
 
 應用程式 chrome 區域(Sidebar header、app top bar、主內容 page header)的高度。定義在 `globals.css`(不在 uiSize.css),因為它是**佈局層級**的 token,不是元件層級。
 
+**Cross-family canonical SSOT pointer**:chrome + overlay 兩 header 家族的完整視覺契約(border / padding / withTabs lockstep / size 對應 / Token equality enforcement)詳 `patterns/header-canonical/header-canonical.spec.md`。本節僅 codify token 本身定義 + consumer 清單。
+
 | Token | md | lg | 消費者 |
 |-------|----|----|--------|
-| `--chrome-header-height` | 48px | 56px | Sidebar header/footer、主內容 page header、app top bar、`--sidebar-width-icon`、**Overlay family chrome**(Dialog / Sheet / Popover / Coachmark header + footer,透過 `patterns/overlay-surface` 的 SurfaceHeader / SurfaceFooter `min-h-[var(--chrome-header-height)]`)|
+| `--chrome-header-height` | 48px | 56px | Sidebar header/footer、主內容 page header、app top bar、`--sidebar-width-icon`、**Overlay family chrome**(Dialog / Sheet / Popover / Coachmark header + footer,透過 `patterns/overlay-surface` 的 SurfaceHeader / SurfaceFooter `min-h-[var(--chrome-header-height)]`)、**Chrome family ChromeHeader primitive**(`patterns/header-canonical/chrome-header.tsx`,Sidebar / FileViewer Toolbar+InfoPanel 消費)|
 
 ### Canonical 意圖(AR47,2026-04-21)
 

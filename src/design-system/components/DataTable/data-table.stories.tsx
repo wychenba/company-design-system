@@ -1647,7 +1647,7 @@ function useRoadmapColumns() {
  * 採 user explicit「全部合起來」— play assertion fold 進整合 demo 不另留 separate story。
  */
 export const RoadmapAllInOne: Story = {
-  name: 'Roadmap 全功能整合 demo',
+  name: '專案排程全功能整合',
   parameters: { layout: 'fullscreen' },
   render: () => {
     // 500 top-level rows derived from ROADMAP_DATA(fold-in BigData per codex Q4.1 + user 整合 ask)。
@@ -1900,7 +1900,7 @@ export const RoadmapAllInOne: Story = {
    rich cell 內在 cost。**不動** RoadmapAllInOne demo IA(user 2026-05-10 directive 全合一)。
    對齊 codex 5-path 推薦 U + Layer A synthesize verdict。 */
 export const RoadmapPerfBudget: Story = {
-  name: 'Roadmap perf budget(feature-stack 隔離量測)',
+  name: '效能預算量測',
   parameters: { layout: 'fullscreen' },
   tags: ['!autodocs'],
   render: () => {

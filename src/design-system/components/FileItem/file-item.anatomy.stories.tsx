@@ -321,3 +321,15 @@ export const StateBehavior: Story = {
     </div>
   ),
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `fileitem.spec.md` 「A11y 預設」段。摘要:\n\n-    aria-busy  for uploading  : status=\"uploading\"  時 row 自動  aria-busy=\"true\" ,SR 朗讀「busy」避免 user 嘗試互動已 in-flight item。\n-   Error state live region  : status=\"error\"  row 自動  role=\"status\"  +  aria-live=\"polite\" ,error 訊息(label + description)即時 announce,user 不用主動 navigate 過去。 polite  不打斷既有 SR 朗讀,適合 file upload 非緊急情境。\n-   Action button labels  :Download / retry / remove 等 inline action 必傳  aria-l"}</p>
+    </div>
+  ),
+}

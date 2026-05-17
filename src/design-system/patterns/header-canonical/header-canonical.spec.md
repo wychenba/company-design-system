@@ -1,0 +1,199 @@
+---
+pattern: header-canonical
+scope: cross-component header SSOT (chrome + overlay families)
+benchmark:
+  - GitHub Primer PageHeader: https://primer.style/components/page-header/react — hasBorder auto-suppress when Navigation slot contains UnderlineNav
+  - Ant Design Tabs: https://ant.design/components/tabs — "Large size tabs are usually used in page header, and small size could be used in Modal"
+  - Material UI Tabs: https://mui.com/material-ui/react-tabs/ — Box wrapper draws border, Tabs itself does not (counter-pattern)
+  - IBM Carbon Tabs: https://carbondesignsystem.com/components/tabs/usage — defining line is implementation team responsibility, not part of line tabs component
+  - Material Design v1/v2 Tabs: https://m1.material.io/components/tabs.html — 48dp default height single size, 2dp indicator
+  - Mantine Tabs: https://mantine.dev/core/tabs/ — default variant includes bottom border (self-contained)
+---
+
+# Header Canonical 設計原則
+
+> **Foundational SSOT rationale**(cap 800):本 pattern 統一**所有 header 家族**(chrome page header + overlay header)的視覺契約 — border ownership / padding / 高度策略 / tabs 連動 / dismiss canonical。6 個 consumer(`SidebarHeader` / `FileViewer Toolbar+InfoPanel` / `DialogHeader` / `SheetHeader` / `PopoverHeader` / 未來 Drawer)pointer 指向本 SSOT,**禁各自 hardcode**。
+
+## 定位
+
+兩個 header 家族(實作 pattern 不同,**視覺契約相同**):
+
+| Family | 實作 | Consumer | Spec home |
+|---|---|---|---|
+| **A. Padding-based**(overlay)| `py-[--layout-space-tight]` + `data-unbounded` slot trick;高度由內容決定但對齊 `--chrome-header-height` | DialogHeader / SheetHeader / PopoverHeader / 未來 Drawer | `patterns/overlay-surface/overlay-surface.spec.md`(L1 SSOT)+ 本 spec(cross-family canonical) |
+| **B. Fixed-height**(chrome)| `h-[var(--chrome-header-height)]` + `items-center`,剛性高度 | SidebarHeader / FileViewer Toolbar / FileViewer InfoPanel / Page top bar | `tokens/uiSize/uiSize.spec.md` L242(`Fixed-height` 段)+ 本 spec(cross-family canonical) |
+
+**為什麼兩家族?** 因 overlay 內 slot 可能塞 multi-line content(`HoverCard` title + description)— 剛性高度會切掉。Chrome 家族 永遠 single-row(toolbar / nav)— 剛性高度給 layout 預測性。兩 pattern 並存(對齊 `tokens/uiSize/uiSize.spec.md` L240-260「Padding-based vs Fixed-h decision tree」)。
+
+---
+
+## 跨家族共同視覺契約(both A + B)
+
+### 1. Border-bottom
+
+- **Token**:`border-b border-divider`(1px / `--divider-color`)
+- **Default**:有 border(分區效果)
+- **Auto-suppress when withTabs**:見下「withTabs 連動」段
+
+### 2. Horizontal padding
+
+- **Token**:`px-[var(--layout-space-loose)]`(md=16px / lg=24px)
+- **不可 override**:tabs / content / actions 所有 slot 統一靠齊此 padding
+
+### 3. Vertical rhythm
+
+- **A 家族**:`py-[var(--layout-space-tight)]`(md=8px / lg=12px)+ `data-unbounded` slot trick → 實際高度對齊 `--chrome-header-height`
+- **B 家族**:`h-[var(--chrome-header-height)]`(md=48px / lg=56px)+ `items-center`
+
+### 4. Dismiss icon button(close X)
+
+- **Token**:`<Button iconOnly size="sm" dismiss />`(28px @ md / 32px @ lg)
+- **永遠 size="sm"**(不論家族 / density):chrome / overlay header 內 button 一律 sm
+- 對齊 既有 `dialog.tsx:132-153` + `sheet.tsx:122-139` + `popover.tsx:87-110`(Dialog/Sheet/Popover 已內建 close X)
+
+### 5. Title typography
+
+- `text-body-lg font-medium` 或 `text-h6`(細節由 family spec 自決)
+
+---
+
+## withTabs 連動(本 SSOT 最核心契約)
+
+當 header 內含 Tabs(`<Tabs>` 子元件)時,**6 條 lockstep 規則**:
+
+### Rule W1:Border ownership = semantic vs paint 拆分(對齊 GitHub Primer)
+
+**規則**:**Header 是 semantic owner**(「這 surface 需要 bottom border 分區」是 header 的概念決定),**Paint owner 隨 state 變**:
+- `withTabs={false}` → header 自畫(`border-b border-divider`)
+- `withTabs={true}` → header **auto-suppress 自己的 paint**,**TabsList 自身的 `border-b border-border` 接管實際 paint**(視覺同一條線)
+
+**這不是 reject user 直覺**(「border 該由 header 自己畫」)— 而是把「誰負責這條線存在」和「誰實際 paint」拆開。User 直覺 = semantic ownership 正確;DS 實作 = withTabs 時 delegate paint 給 TabsList,因為 tabs selected underline 是「從 1px gray border 長出 2px primary」設計 idiom(`tabs.spec.md:185-187`),paint owner 不在 tabs 會讓 underline 失去 base line。
+
+**世界級對照**:
+- GitHub Primer PageHeader verbatim:「`hasBorder` defaults true,**but border NOT rendered if Navigation child contains UnderlineNav**;UnderlineNav itself provides bottom border」(`primer.style/components/page-header/react`)
+- 我們既有 spec:`tabs.spec.md` 「出現在 Dialog / Sidebar / 任何 header」段「Consumer 把 Tabs 放在 header 區域內、移除 header 自己的 `border-b`,讓 Tabs 接管」
+- 我們既有禁止:`tabs.spec.md:258`「Dialog/Sidebar header 內不得同時有 header `border-b` 和 TabsList `border-b`——會出現雙線」
+
+**Counter-pattern(reject)**:Material UI 走「container 畫 border + tabs 不畫」(`<Box sx={{ borderBottom: 1 }}><Tabs>...</Tabs></Box>`)— 本 DS reject 此方向,理由:tabs underline 需 base line(MUI 2px indicator 浮空是另一派視覺語言,跨派遷移成本高且既有 spec 已 codify Primer 派)。
+
+### Rule W2:Tabs 水平 padding 對齊 header(by inheritance,不重複設)
+
+**規則**:TabsList **不設自己的左右 padding**,**繼承** parent header 的 `var(--layout-space-loose)` padding。視覺結果 = tabs 第一個 trigger 從 header 內邊起 = 跟 header content row 對齊。
+
+**實作機制(codified in code)**:
+- ChromeHeader/SurfaceHeader 都已含 `px-[var(--layout-space-loose)]`(`chrome-header.tsx:51` / `overlay-surface.tsx:73`)
+- TabsList **不設** `px-*`(`tabs.tsx:107` `TABS_LIST_BASE` 只含 `gap-[var(--layout-space-loose)]` 跟 `border-b border-border`,**無 px**)— 自然繼承 parent header
+- Consumer **禁** 在 TabsList 上加 `className="px-*"`(會與 header padding 疊加,破對齊)
+
+**Rationale**:對齊 Carbon verbatim「first label should always align to other content in the space」(`carbondesignsystem.com/components/tabs/usage`)。「by inheritance 不重複設」是 GitHub Primer + Material UI 隱含 idiom — tabs container 不主動畫 padding,讓外層 container 統一管。
+
+### Rule W3:Tabs size 與 header family 對應
+
+| Header family | Tabs size | Rationale |
+|---|---|---|
+| **A. Overlay header(Padding-based)** | `sm`(32/40)| 對齊 Ant verbatim「small size could be used in Modal」;overlay 內 close X 也是 sm 統一 |
+| **B. Chrome header(Fixed-h)** | `sm`(32/40)| chrome 內 buttons 全部 sm(real grep:`Sidebar / FileViewer toolbar / InfoPanel` 所有 buttons size=sm),tabs 跟齊 |
+| **C. Standalone(tabs 取代 chrome header)** | `lg`(48/56)| Tabs 直接取代 header 用,**tab 高 = chrome-header-height 像素相等**(48/56)— Ant verbatim「Large size tabs are usually used in page header」 |
+
+**Token alignment 強連動**:`--tab-height-lg` md=48 / lg=56 與 `--chrome-header-height` md=48 / lg=56 **像素完全相等**(`uiSize.css:36-79` + `globals.css:37-45`)— 這是「lg tabs 取代 chrome header」的 SSOT linkage 鐵證。**禁止任何一方獨自調整**(動 chrome-header-height 必同步 tab-height-lg,反之同)。
+
+**Enforcement = assert,不 CSS alias**(per M31 codex 比稿 Step 5):`uiSize.css` 的 `--tab-height-*` 有 `data-ui-size="md"` reset selector(component-size scope),`--chrome-header-height` 是 layout/density token(app-chrome scope)— alias 會把兩個不同 scope 綁死。**機制**:保留 duplicated literals + Phase 3 hook `check_tab_lg_chrome_header_equal.sh` parse 兩 CSS file 提取 md/lg 值 assert equality → 任一方獨自改 = BLOCKER。
+
+### Rule W4:Tabs row 與 header content row 為 flush stack(無 negative margin)
+
+**規則**:有 tabs 的 header,header content row(title + actions)在上 / tabs row 在下,中間 **gap = 0**,直接疊。
+
+**Rationale**:negative margin chain 會破 M25「Layered chain invariant 必整鏈 forward」— 任何 ancestor 改動 padding/height 都會讓 negative margin 視覺漂移。改用 flush stack(`<div className="flex flex-col">`)— 兩 row 各自管自己 vertical rhythm,zero coupling。
+
+**世界級對照**:GitHub Primer PageHeader + UnderlineNav 採 flush stack(無 negative margin)— UnderlineNav 直接 append PageHeader 下方,border 由 UnderlineNav 接管。
+
+### Rule W5:md tabs size 為 future tier,目前無 use case
+
+**規則**:`--tab-height-md`(40/48)token **保留**,但**目前無 recommended use case**;新 consumer 想用 md 必先諮詢 DS owner 取得 use case rationale。
+
+**Rationale**:
+- Header 內 tabs 對應 button-sm → tabs sm(W3 已 cover)
+- 獨立 chrome-replacement tabs → tabs lg(W3 已 cover)
+- 中間階梯(md=40)無清楚場景 — 多家世界級 DS(Material / MUI / Primer / Polaris)只有 1 個 default size(無 sm/md/lg 階梯)= sweet spot 只需 2 tier
+
+**Conservative path**:token 不刪(避免 breaking change 與 stories 維護成本);spec 明寫 future tier。
+
+### Rule W6:Default tabs size 為 sm(Phase 2 visual audit gate,不 P0)
+
+**規則**:Tabs `cva defaultVariants.size = 'sm'`(本 SSOT 提議目標 default;**Phase 2 production code 改動,經 visual audit 過 baseline diff 才 land**)。
+
+**Rationale**:既有 default = `md`(`tabs.tsx:127` TabsList + `:377` trigger cva,grep production consumer = 0 個 `<Tabs>` 在非 stories code)。Production blast radius 低 — 但 stories / anatomy demo 大量縮高 → 必過 visual baseline diff 再 land。**禁直接 P0 改 production**;Phase 2 排序:(1) 改 cva default → (2) 跑 `npm run build-storybook` → (3) Playwright baseline diff → (4) update stories labels → (5) merge。
+
+---
+
+## 連動機制(防漂移 SSOT)
+
+### Layer 1 — Token shared
+
+兩家族 consume 同組 CSS variable(機械對齊):
+- `--chrome-header-height`(globals.css:37,45)
+- `--layout-space-loose` / `--layout-space-tight`
+- `--divider-color`
+- `--tab-height-sm` / `--tab-height-lg`(uiSize.css:36-38,58-60)
+- `--field-height-sm`(button sm 透過 button family 連動)
+
+### Layer 2 — Spec pointer
+
+6 consumer spec.md 在 Header 段加 pointer:
+- `components/Sidebar/sidebar.spec.md`
+- `components/FileViewer/file-viewer.spec.md`(Toolbar + InfoPanel 兩處 header)
+- `components/Dialog/dialog.spec.md`
+- `components/Sheet/sheet.spec.md`
+- `components/Popover/popover.spec.md`
+- `tokens/uiSize/uiSize.spec.md`「消費 --chrome-header-height」段
+
+### Layer 3 — Primitive consumption(Phase 2,等 user 拍板)
+
+- A 家族:`SurfaceHeader` 已是 primitive(`overlay-surface.tsx:62-118`)— add `withTabs?: boolean` prop auto-suppress border
+- B 家族:**新建 `ChromeHeader` primitive**(`patterns/header-canonical/chrome-header.tsx`)— Sidebar / FileViewer / InfoPanel 全 migrate
+
+**ChromeHeader API(per M31 codex 比稿 Step 5 — 比 v1 更窄,避免 M21 prop variant 風險)**:
+```tsx
+<ChromeHeader
+  withTabs?: boolean              // false (default) | true → auto-suppress border + delegate to TabsList
+  lockDensity?: 'inherit' | 'lg'  // 'inherit' (default) | 'lg' → 強制 chrome-header-height lg=56(viewer 等 fullscreen chrome)
+>
+  {children}
+</ChromeHeader>
+```
+
+**不開**:`density?: 'md'|'lg'` 自由 prop(M21 違反 — 任意 density 等於 cva-on-pattern,該由 density context 決定)。`lockDensity="lg"` 是 escape hatch 給 fullscreen viewer chrome(FileViewer 永遠 lg-equivalent design intent),其餘 consumer 走 `inherit`(跟 page density)。**Grep evidence**(production 重複 contract,非 premature abstraction):`sidebar.tsx:433` + `file-viewer.tsx:333,459` 全是 `flex items-center gap-2 shrink-0 h-[var(--chrome-header-height)] border-b border-divider px-[var(--layout-space-loose)]` 一模一樣手刻 → 過 M21 prop variant test 3 條(`<Sidebar>` 等近親 grep / 3 家世界級 page-header primitive / value 結構不同)。
+
+### Layer 4 — Hook mechanical
+
+- `check_header_with_tabs_border.sh` — grep tsx 若 header 元件含 `<Tabs>` child 但未走 `withTabs` API → BLOCKER
+- `check_chrome_header_handcraft.sh` — grep 是否仍有 hardcoded `h-[var(--chrome-header-height)] border-b` 自刻 chrome header(該消費 ChromeHeader primitive)
+
+---
+
+## 禁止事項
+
+- ❌ Header 內同時有 header `border-b` 和 TabsList `border-b`(雙線)— per W1
+- ❌ Tabs underline 用 `border-b-2` 在 trigger 上實作(雙線)— per `tabs.spec.md:246`
+- ❌ Negative margin 接 header 與 tabs row(脆弱 chain)— per W4
+- ❌ Hardcode `h-16` / `h-14` / `h-12` 自寫 chrome header 高度 — 必 `--chrome-header-height`
+- ❌ Header 內 close X 用 `size="md"` 或 `size="lg"`(real grep 100% sm)
+- ❌ Tabs default 寫 `size="md"`(W5 + W6)— 等 Phase 2 改 cva default = sm
+
+---
+
+## A11y 預設
+
+- Header 用 `<header>` semantic element(SR landmark)
+- Tabs 走 Radix Tabs(原生 `role="tablist" / role="tab" / aria-selected`)
+- Dismiss button `aria-label="關閉"`(close X)
+- 鍵盤:Tabs 左右方向鍵切換(Radix);Esc 觸發 dismiss(overlay 家族)
+
+---
+
+## 跨元件參考
+
+- `patterns/overlay-surface/overlay-surface.spec.md` — A 家族 SurfaceHeader / SurfaceBody / SurfaceFooter SSOT
+- `tokens/uiSize/uiSize.spec.md` L160-289 — `--chrome-header-height` token canonical + Padding-based vs Fixed-h decision tree
+- `components/Tabs/tabs.spec.md` L122-138(size 階梯)+ L185-247(border 視覺契約)
+- `components/Button/button.spec.md` — size="sm" close X / inline action canonical

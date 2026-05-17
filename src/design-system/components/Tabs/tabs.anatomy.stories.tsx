@@ -66,7 +66,7 @@ export const Overview: Story = {
             <tbody>
               {[
                 ['Tabs', '', '', ''],
-                ['  size', "'sm' | 'md' | 'lg'", "'md'", 'tab 高度 tier(對齊 --tab-height-*)'],
+                ['  size', "'sm' | 'md' | 'lg'", "'sm'", 'tab 高度 tier(對齊 --tab-height-*);2026-05-17 從 md 改 sm,overlay/chrome 預設'],
                 ['  overflow', "'none' | 'scroll' | 'menu'", "'none'", '水平溢出處理(捲動 / 下拉選單)'],
                 ['  defaultValue / value', 'string', '—', '當前 tab 值(受控 / 非受控)'],
                 ['TabsTrigger', '', '', ''],
@@ -106,7 +106,7 @@ export const Inspector: Story = {
     },
   },
   args: {
-    size: 'md',
+    size: 'sm',
     overflow: 'none',
     value: 'overview',
     withIcons: true,
@@ -116,7 +116,7 @@ export const Inspector: Story = {
     size: {
       control: 'radio',
       options: ['sm', 'md', 'lg'],
-      description: 'sm=Dialog / dense / md★default=一般頁面 / lg=page-level hero',
+      description: 'sm★default=overlay / chrome / dense(2026-05-17 從 md 改)/ md=future tier 無 use case / lg=獨立 tabs 取代 chrome header',
     },
     overflow: {
       control: 'radio',
@@ -190,9 +190,9 @@ export const SizeMatrix: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>Size</Th><Th>Token</Th><Th>字體</Th><Th>使用場景</Th></tr></thead>
             <tbody>
-              <tr><Td mono>sm</Td><Td mono>--tab-height-sm</Td><Td>text-body</Td><Td>Dialog / Sidebar / dense</Td></tr>
-              <tr><Td mono>md ★default</Td><Td mono>--tab-height-md</Td><Td>text-body</Td><Td>一般頁面</Td></tr>
-              <tr><Td mono>lg</Td><Td mono>--tab-height-lg</Td><Td>text-body-lg</Td><Td>page-level hero</Td></tr>
+              <tr><Td mono>sm ★default</Td><Td mono>--tab-height-sm</Td><Td>text-body</Td><Td>overlay / chrome header / dense(2026-05-17 從 md 改)</Td></tr>
+              <tr><Td mono>md</Td><Td mono>--tab-height-md</Td><Td>text-body</Td><Td>future tier — 目前無 recommended use case</Td></tr>
+              <tr><Td mono>lg</Td><Td mono>--tab-height-lg</Td><Td>text-body-lg</Td><Td>獨立 tabs 取代 chrome header(像素 = --chrome-header-height)</Td></tr>
             </tbody>
           </table>
         </div>
@@ -397,6 +397,18 @@ export const SpacingTokens: Story = {
         <H3>Trigger padding</H3>
         <Desc>水平 `px-3`(sm)/ `px-4`(md, lg)對稱 padding,讓 underline 居中對齊 label。</Desc>
       </div>
+    </div>
+  ),
+}
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 Tabs 對應 Radix / Material / Polaris a11y 規範。"}</p>
     </div>
   ),
 }

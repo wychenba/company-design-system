@@ -372,7 +372,7 @@ export const FiveCategoryLimitRule: Story = {
 }
 
 export const A11yRule: Story = {
-  name: 'A11y — 顏色非唯一語義',
+  name: '顏色不是區分類別的唯一手段',
   render: () => (
     <div>
       <Rule

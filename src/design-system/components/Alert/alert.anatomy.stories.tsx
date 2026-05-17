@@ -222,3 +222,15 @@ export const StateBehavior: Story = {
     </div>
   ),
 }
+
+// ── Accessibility ─────────────────────────────────────────────────────────
+// 2026-05-17 ship per audit Dim 13(story-rules.md 6-canonical 含 Accessibility)
+export const Accessibility = {
+  name: '無障礙',
+  render: () => (
+    <div className="max-w-3xl text-body text-fg-secondary">
+      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
+      <p className="whitespace-pre-line">{"詳 `alert.spec.md` 「A11y 預設」段。摘要:\n\n-   預設  ： role=\"alert\"  +  aria-live=\"polite\" ——screen reader 在空閒時讀出 Alert 內容，不中斷使用者目前動作\n-   error variant 可升級  ： aria-live=\"assertive\"  中斷 screen reader 目前朗讀，立即讀出 Alert（僅用於真正 critical 的錯誤，避免濫用干擾）\n-   Close X 按鈕  ：必須有  aria-label (如「關閉通知」),實作見下方「Chrome corner close X canonical」\n-   CTA 按鈕  ：放在 Alert body action row 時 size 固定為  xs  tertiary,文字描述動作(「前往設定」「立即更新」)"}</p>
+    </div>
+  ),
+}

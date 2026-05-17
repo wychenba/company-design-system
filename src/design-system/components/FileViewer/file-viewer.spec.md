@@ -80,7 +80,7 @@ Family 的 canonical 規定的是「同用途同 layout」;FileViewer 用途(ful
 
 ```
 ┌──────────────────────────────────────────────────────────┐  ← data-theme="dark" subtree
-│ Toolbar(h-14,bg-surface border-b)                        │
+│ Toolbar(--chrome-header-height,bg-surface border-b)      │
 │  [icon] file.name …(ellipsis)                            │
 │                           [ZoomInput] [Info] [DL] [X]    │  ← zoom→info→download→close(影響力遞增)
 ├──────────────────────────────────────────────────────────┤
@@ -100,7 +100,7 @@ Family 的 canonical 規定的是「同用途同 layout」;FileViewer 用途(ful
 ```
 
 **分區決策**:
-- **Toolbar 固定 h-14**——與 InfoPanel header 同高,視覺對齊;不隨 density 變(viewer chrome 是穩定框架,不屬 field 系統)
+- **Toolbar 高度 = `--chrome-header-height`**(md=48 / lg=56)——與 InfoPanel header 同高,視覺對齊;**code 實作消費 token**(`file-viewer.tsx:333` + `:459` 已 `h-[var(--chrome-header-height)]`),不硬寫 `h-14`。**跨家族 SSOT pointer**:FileViewer Toolbar + InfoPanel header 屬 **Chrome header(Fixed-h)家族**,border / padding / dismiss size / withTabs 跨家族契約 SSOT 詳 `patterns/header-canonical/header-canonical.spec.md`。Phase 2 ChromeHeader primitive migration 時把這段手刻 className 抽進 primitive(`<ChromeHeader>`),viewer 若需 lock lg density 走 `lockDensity="lg"` prop。
 - **Viewport `flex-1`**——填滿剩餘空間;InfoPanel 透過 `w-80 shrink-0` 從右側切出,不吃 viewport 自然寬
 - **Filmstrip 固定 h-24**——預留 thumb 64 + padding;只在 `showFilmstrip && files.length > 1` 時顯示
 - **Prev/Next arrows 絕對定位**——避免 layout shift,只在 `files.length > 1` 渲染
@@ -255,7 +255,7 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 ## InfoPanel 規則
 
 - **寬度固定 w-80(320px)**——對齊 Figma right panel(320)的業界慣例;Google Photos 用 360 偏寬,FileViewer 走 Figma 偏窄以讓 viewport 多一些空間
-- **Header 高度 h-14**——與 Toolbar 等高,視覺對齊
+- **Header 高度 = `--chrome-header-height`**(56px @ viewer lockDensity="lg")——與 Toolbar 等高,視覺對齊;消費 `<ChromeHeader lockDensity="lg">`(`file-viewer.tsx:459`)
 - **內容分兩區**:
   - 「說明」Textarea(可編輯 / readOnly 依 `readOnly` prop)
   - 「檔案資訊」`<dl>`:檔名 / 類型 / 大小 / 自訂 metadata 條目
@@ -310,7 +310,7 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 
 **Dark mode**:FileViewer chrome 鎖 dark(`data-theme="dark"` subtree);背景頁面的 theme 不影響 viewer chrome——viewer 是獨立沉浸式 context,類似 Tooltip / 全螢幕影片播放器的 convention。
 
-**Density**:FileViewer chrome 尺寸固定(h-14 toolbar / w-80 panel / h-24 filmstrip / 64px thumb)——viewer 是展示殼不是工作區,不隨 density 放大。Toolbar 內的 `<Button size="sm">` 與 `<ZoomInput h-field-sm>` 會隨 density 微調(sm 在 md density = 28px,lg density = 32px),在 viewer 這個尺度可忽略。
+**Density**:FileViewer chrome 走 `<ChromeHeader lockDensity="lg">`(`file-viewer.tsx:333,459` Toolbar + InfoPanel header),強制 lg-equivalent chrome-header-height = 56px;Filmstrip `h-24`(96px)+ thumb 64×64 屬媒體展示框尺寸,**刻意不隨 density 放大**(viewer 是展示殼不是工作區)。Toolbar 內的 `<Button size="sm">` 與 `<ZoomInput h-field-sm>` 會隨 density 微調(sm 在 md density = 28px,lg density = 32px),在 viewer 這個尺度可忽略。
 
 ---
 

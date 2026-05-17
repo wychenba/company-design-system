@@ -1,22 +1,22 @@
 {
-  "ts": "2026-05-17T03:06:05.165Z",
+  "ts": "2026-05-17T12:48:33.953Z",
   "filesCount": {
-    "total": 375,
-    "componentTsx": 77,
-    "storiesShowcase": 67,
+    "total": 379,
+    "componentTsx": 78,
+    "storiesShowcase": 69,
     "storiesAnatomy": 61,
     "storiesPrinciples": 61,
-    "specMd": 77,
-    "tokens": 14
+    "specMd": 78,
+    "tokens": 16
   },
   "principles": {
     "mRules": 32,
     "specTraits": 11,
-    "hookInvariants": 19,
+    "hookInvariants": 24,
     "rules": 6,
-    "total": 62
+    "total": 67
   },
-  "auditDims": 51,
+  "auditDims": 53,
   "coverageGaps": 0,
   "gaps": []
 }

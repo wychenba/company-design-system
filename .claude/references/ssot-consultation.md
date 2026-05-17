@@ -17,6 +17,7 @@ CLAUDE.md `# SSOT 消費 canonical` 的詳表 + 反例。主章留核心 + point
 | **按鈕排列 / 群組 / 分隔**| `patterns/action-bar/action-bar.spec.md` |
 | **Header 高度 / chrome padding**| `tokens/uiSize/uiSize.spec.md`(`--chrome-header-height`)+ `tokens/layoutSpace/layoutSpace.spec.md` |
 | **Chrome header 選型**(fixed-h vs padding-based)| `tokens/uiSize/uiSize.spec.md`「Chrome header 選型 canonical」— decision tree + 8 家世界級對照 + checklist |
+| **Header 跨家族視覺契約**(border / padding / withTabs / dismiss size 連動)| `patterns/header-canonical/header-canonical.spec.md` — SSOT for chrome + overlay header 兩家族;含 withTabs 6 lockstep rules(W1 border auto-suppress / W2 padding align / W3 tabs size 對應 / W4 flush stack / W5 md future tier / W6 default sm)|
 | **Overlay chrome dismiss / unbounded button**| `patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical v5」 |
 | **Overlay title size**(modal 16 vs non-modal 14)| `patterns/overlay-surface/overlay-surface.spec.md`「Overlay title typography canonical」 |
 | **Form field gap**| `components/Field/field.spec.md` +「layoutSpace 規則 3:跟 block 相鄰 = tight,inline ↔ inline = loose」 |
