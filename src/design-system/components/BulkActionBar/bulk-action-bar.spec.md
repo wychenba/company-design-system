@@ -1,6 +1,6 @@
 ---
 component: BulkActionBar
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:

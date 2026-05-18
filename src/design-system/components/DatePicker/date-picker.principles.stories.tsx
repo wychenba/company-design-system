@@ -179,7 +179,7 @@ export const FormattingRule: Story = {
 }
 
 export const ClearableRule: Story = {
-  name: 'Clearable 使用',
+  name: '可清空 使用',
   render: () => {
     const [value, setValue] = React.useState<string | null>('2026-05-15')
     return (

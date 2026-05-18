@@ -179,7 +179,7 @@ export const UsageGuidance: Story = {
 
         <Rule
           title="檔案上傳 UI → 用 FileItem,不直接組 ProgressBar + 檔名 + icon"
-          note="FileItem 是檔案情境的 canonical consumer-facing primitive(檔名 / icon / 進度 / status / actions 一條龍),內部自己會消費 ProgressBar。自組 raw ProgressBar + 檔名 + Paperclip + 狀態 icon 會讓 consumer 每次重覆發明一套檔案列表 layout,視覺/行為漂移無可避免。世界級對照:Ant Design Upload 內部用 Progress,consumer 不直接拼裝。"
+          note="FileItem 是檔案情境的 標準消費端 primitive(檔名 / icon / 進度 / status / actions 一條龍),內部自己會消費 ProgressBar。自組 raw ProgressBar + 檔名 + Paperclip + 狀態 icon 會讓 consumer 每次重覆發明一套檔案列表 layout,視覺/行為漂移無可避免。世界級對照:Ant Design Upload 內部用 Progress,consumer 不直接拼裝。"
         >
           <Frame>
             <div className="flex items-center gap-2 mb-2">

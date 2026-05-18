@@ -269,7 +269,7 @@ export const ContentTypeChoice: Story = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const GroupHeaderRules: Story = {
-  name: '群組 / Label 使用原則',
+  name: '群組 / 標籤使用原則',
   render: () => (
     <div className="flex flex-col gap-10">
       <Section
@@ -350,7 +350,7 @@ export const GroupHeaderRules: Story = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const SettingsScenario: Story = {
-  name: 'Settings 類有子頁的頁面',
+  name: '設定類有子頁的頁面',
   render: () => (
     <div className="flex flex-col gap-10">
       <Section
@@ -469,7 +469,7 @@ export const IconModeRules: Story = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const ActiveState: Story = {
-  name: 'Active state 跨群組單一',
+  name: '啟用狀態跨群組單一',
   render: () => (
     <div className="flex flex-col gap-10">
       <Section

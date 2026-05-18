@@ -57,6 +57,14 @@ function useOverflowCount(
   visibleCountOverride?: number,  // 2026-05-15 Bug 3 fix:override DOM measurement(PeoplePicker stack 走 formula primitive)
 ): { visibleCount: number; ready: boolean } {
   const [state, setState] = React.useState({ visibleCount: totalCount, ready: !enabled })
+  // 2026-05-18 Round 6 fix(per Codex M31 Round 6 H7 verdict + Step 5 共識):
+  // `ofEl.offsetWidth` 在 expanded state(visibleCount === totalCount → overflow=0 →
+  // `OverflowIndicator` line 92 `return null` → ofEl wrapper empty)= 0,fallback 60;
+  // 在 collapsed state(+N rendered)= 真實寬(~28-32px)。同 `available` 在兩 state 給
+  // 不同 verdict → 臨界值區 `max(B+g+Q, B+g+O) ≤ available < B+g+F` 振盪。Cache last
+  // non-zero measurement → measurement state-independent → oscillation 收斂。
+  // 初始 60 沿用舊 fallback(無 measure 史 ok-ish over-estimate)。
+  const lastOverflowWRef = React.useRef<number>(60)
 
   // 2026-05-16 RACE FIX(user 抓「逐個 click 滿 6」vs「取消全選→再全選」same length 不同 visible):
   //
@@ -74,7 +82,12 @@ function useOverflowCount(
   //
   // 對齊 2026-05-14 I3 fix comment「user 抓『全選 vs 逐個勾 result 不同』」 — 當時 fix
   // 只加 double-rAF 但漏 cancel,本次補完 race close。
-  React.useLayoutEffect(() => {
+  // 2026-05-18 Round 5 fix(per visual test probe):useLayoutEffect 在 nested component 場景
+  // 會在 parent ref attach 前 fire(child layout effect 先於 parent ref attach)→ containerRef.current
+  // null → early return → calc never runs → setProperty never called → CSS var unset → tag overflow。
+  // 改 useEffect:fires AFTER paint,所有 refs 都 attach。double-rAF guard ensures layout done。
+  // Trade-off:可能 1-2 frame flicker,但 functional setState guard + paint target measurement 已 cover。
+  React.useEffect(() => {
     if (!enabled || totalCount === 0) { setState({ visibleCount: totalCount, ready: true }); return }
     if (visibleCountOverride !== undefined) {
       for (let i = 0; i < tagEls.current.length; i++) {
@@ -107,18 +120,30 @@ function useOverflowCount(
     const calc = () => {
       const cs = getComputedStyle(container)
       const available = container.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0)
+      // 2026-05-18 Round 5 fix(per user 拍板「那就開始做」+ Codex M31 Round 5 verdict):
+      // inject available 成 CSS var,Tag 用 explicit length 而非 cyclic percentage(避 CSS Sizing 3
+      // §5.2.1 cyclic percentage 退化問題)。
+      container.style.setProperty('--combobox-tag-area-inline-size', `${available}px`)
       for (const el of tagEls.current) if (el) el.hidden = false
       const ofEl = overflowEl.current
       if (ofEl) ofEl.hidden = false
-      const overflowW = ofEl?.offsetWidth || 60
+      // 2026-05-18 Round 6 fix:cache last non-zero ofEl width 破 expanded/collapsed state
+      // 量測二態(expanded → ofEl 空 offsetWidth=0 / collapsed → real ~28-32px)。沒 cache
+      // 之前同 `available` 在兩 state 給不同 verdict → 永動。詳本 hook 頂部 ref 註解。
+      const measuredOverflowW = ofEl?.offsetWidth || 0
+      if (measuredOverflowW > 0) lastOverflowWRef.current = measuredOverflowW
+      const overflowW = lastOverflowWRef.current
       // **#3 fix(2026-05-04)**:width-check 先於 count++,並處理 i=0 邊界(1 tag 自身就太寬 → 全 hidden 顯 +N)
       // 之前 bug:greedy `count++` 永遠至少 = 1,1-tag-too-wide case 視覺呈半個 tag clipped + +N(錯)
       // 修後:1 tag 太寬時 count = 0,全 N tags 走 +N 顯 indicator
+      // 2026-05-18 Round 5:量 paint target `[data-tag-root]` 而非 wrapper(per codex Round 5 verdict)。
+      // wrapper basis:auto 自由 grow,offsetWidth ≠ Tag actual paint width。
       let used = 0, count = 0
       for (let i = 0; i < totalCount; i++) {
         const el = tagEls.current[i]
         if (!el) continue
-        const w = el.offsetWidth
+        const tagRoot = el.querySelector('[data-tag-root]') as HTMLElement | null
+        const w = tagRoot ? tagRoot.getBoundingClientRect().width : el.offsetWidth
         const next = used + (count > 0 ? gap : 0) + w
         const remaining = totalCount - count - 1
         // width check FIRST(無 `count > 0` 短路):任何超寬都 break,包含 i=0 case
@@ -128,7 +153,23 @@ function useOverflowCount(
       }
       for (let i = 0; i < tagEls.current.length; i++) { const el = tagEls.current[i]; if (el) el.hidden = i >= count }
       if (ofEl) ofEl.hidden = count >= totalCount
-      setState({ visibleCount: count, ready: true })
+      // 2026-05-18 Round 5 last guard(per Codex Round 5 verdict):safety net 防 measurement drift
+      // (sub-pixel / rounding)。verify last visible tag rect.right ≤ container right,超出遞減 count。
+      const containerRect = container.getBoundingClientRect()
+      while (count > 0) {
+        const lastEl = tagEls.current[count - 1]
+        const tagRoot = lastEl?.querySelector('[data-tag-root]') as HTMLElement | null
+        if (!tagRoot) break
+        const tagRect = tagRoot.getBoundingClientRect()
+        if (tagRect.right <= containerRect.right + 0.5) break
+        count--
+        if (lastEl) lastEl.hidden = true
+      }
+      if (ofEl) ofEl.hidden = count >= totalCount
+      // 2026-05-18 A' fix functional setState value-equal guard(per Codex Round 3 verdict):
+      // sync calc 在 useLayoutEffect 內 + ResizeObserver re-fire 同時跑 → 若每次都 new object setState
+      // 觸發 re-render 即使值沒變,可能 cascade。回 prev 不更新 = avoid 抖動。
+      setState(prev => (prev.visibleCount === count && prev.ready) ? prev : { visibleCount: count, ready: true })
     }
 
     // 2026-05-14 I3 fix(per codex M31 verdict + user 抓「全選 vs 逐個勾 result 不同」):
@@ -138,6 +179,14 @@ function useOverflowCount(
     //
     // 2026-05-16 Race close:capture rAF IDs + cancel on cleanup(原版 race I3 沒 close
     // 完;user 抓 path A 逐個 click vs path B 取消全選再全選 same length 不同 visible)。
+    // 2026-05-18 A' fix(per Codex Round 3 共識,user 拍板「執行」)— sync calc in useLayoutEffect:
+    // React 18 `useLayoutEffect` 在 DOM commit 後、瀏覽器繪製前同步跑,sync calc 在 paint 前
+    // 完成 `el.hidden` 設定 + functional setState guard(value-equal 不更新 = 避免 ResizeObserver
+    // 抖動 cascade rerender)。double-rAF 改 fallback only(ResizeObserver / async update path)。
+    // 解 user verbatim「tag 過長 / 過多會先全顯再變 +N 閃動」root cause(per codex Round 3 cite
+    // `combobox.tsx:248 render 沒設 hidden + L129 calc imperative 寫 DOM`)。
+    // 對齊 React docs https://react.dev/reference/react/useLayoutEffect pre-paint guarantee。
+    calc()
     let rafId1 = 0, rafId2 = 0
     const scheduleCalc = () => {
       if (rafId1) { cancelAnimationFrame(rafId1); rafId1 = 0 }
@@ -235,13 +284,19 @@ function OverflowTagList({ containerRef, items, size, wrap, renderTag, renderHid
   const overflow = items.length - visibleCount
   const hiddenItems = items.slice(visibleCount)
 
+  // 2026-05-18 A' fix(per Codex Round 3 共識,user 拍板「執行」)— 撤掉舊的 `style={{ opacity: ready ? 1 : 0 }}`
+  // gate(掛在 `<span className="contents">` 上,但 CSS Display 3 spec 規定 `display:contents` 元素不產生 box,
+  // parent opacity 對 children 無效 → gate 從沒生效是 dead code)。Flicker 已改 sync calc in useLayoutEffect 解
+  // (L153 `calc()` 直跑,paint 前 hidden 設好)。`ready` state 保留供未來 instrumentation / debug,不再當 visual gate。
+  // 保留 `<span className="contents">` 維持 fragment-like rendering(parent JSX 期望 single child)。
+  void ready  // intentional: ready 留供 future debug,目前無 consumer
   return (
-    <span className="contents" style={{ opacity: ready ? 1 : 0 }}>
+    <span className="contents">
       {items.map((item, i) => (
         // 2026-05-14 I5 fix(per codex M31 verdict + user 抓「avatar stack 堆疊方向不一致」):
         // 加 z-index per-index — 前 item z 高(對齊 MultiPersonDisplay zIndex: visible.length - i
         // canonical + MUI AvatarGroup surplus pattern)。display + edit stack 堆疊方向統一。
-        <div key={item.value} ref={el => { tagEls.current[i] = el }} className={cn('shrink-0', tagWrapperClassName)} style={{ zIndex: items.length - i }}>{renderTag(item, i)}</div>
+        <div key={item.value} ref={el => { tagEls.current[i] = el }} className={cn('shrink-0 max-w-full', tagWrapperClassName)} style={{ zIndex: items.length - i }}>{renderTag(item, i)}</div>
       ))}
       <div ref={overflowEl} className={cn('shrink-0', overflowWrapperClassName)}>
         <OverflowIndicator count={overflow} shape={overflowShape} size={size}>
@@ -276,7 +331,14 @@ function ComboboxTagStack({
 
   const content = (
     <OverflowTagList containerRef={externalRef ?? ownRef} items={items} size={tagSize} wrap={wrap}
-      renderTag={(item) => <Tag size={tagSize} unbounded className={cn('shrink-0', disabledClass)}>{item.label}</Tag>} />
+      // 2026-05-18 7B' fix(per user 拍板「執行」+ Codex Round 3 共識)— 移除 `unbounded`,Tag 回預設
+      // `max-w-40` cap(160px)+ 內建 `[data-tag-text] truncate min-w-0` 自帶 ellipsis。原 unbounded 是
+      // 「cell-as-input narrow cell < 160px」設計(`tag.tsx:85-90`),但 generic Combobox tag display
+      // 應走 Tag canonical cap-with-ellipsis(per `data-table.spec.md:235`「Tag 文字內部 truncate;
+      // multiSelect 動態 +N」+ `data-table.spec.md:467`「Tag 不可被外層 overflow-hidden 裁掉邊框」)。
+      // Trade-off:長 tag 觸發 +N 提前(160 + gap + overflowW > available 較 quick)— acceptable per user。
+      // Round 2 dynamic slot maxWidth 提案經 user + codex 共識撤回(3 chicken-and-egg fatal,KISS 勝)。
+      renderTag={(item) => <Tag size={tagSize} className={cn('shrink-0', disabledClass)}>{item.label}</Tag>} />
   )
 
   if (externalRef) return content
@@ -451,7 +513,10 @@ function ReadonlyMultiSelect({
   return (
     <div ref={containerRef}
       className={cn(fieldWrapperStyles({ mode: resolvedMode, variant, size: sz }), hasTags && tagPadding[sz],
-        wrap ? 'flex-wrap py-1' : 'overflow-visible', className)}
+        // 2026-05-18 #6A Round 1 Step 1/4(per user 拍板「決策6選a」+ codex M31 Step 5 verdict cite combobox.tsx:451):
+        // readonly/disabled path 對齊 L293 display wrapper 已 ship 的 overflow-hidden fix。
+        // M10 propagation:原 overflow-visible 讓 readonly tag 越界蓋 indicator,跟 display 不對稱。
+        wrap ? 'flex-wrap py-1' : 'overflow-hidden', className)}
       style={{ gap: GAP, ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode={resolvedMode}>
       {hasTags ? (
         <ComboboxTagStack value={value} options={options} tagSize={sz} wrap={wrap}
@@ -515,7 +580,12 @@ function NativeCombobox({
       wrap && 'items-start py-1', error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
       style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode="edit" data-error={error ? '' : undefined}
       onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}>
-      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-visible')} style={{ gap: GAP }}
+      {/* 2026-05-18 F2 sync(per user verbatim「modifying 修好 PeoplePicker stack 後改壞 Combobox tag display」
+          + 「tag 應該要判斷所在空間最多可以呈現幾個tag(包括＋n)去自動判斷何時要變成+n」):
+          edit path tagArea 對齊 display path L293 已 ship 的 `overflow-hidden` fix。原 `overflow-visible`
+          讓 tag 視覺越界蓋 chevron / +N indicator(useOverflowCount measurement 對但 CSS overflow 仍露)。
+          M10 violation root cause:2026-05-15 F1 Q3 只 fix display path,edit + Native(L518)沒同步。 */}
+      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: GAP }}
         onClick={(e) => { if (e.target === e.currentTarget) { selectRef.current?.showPicker?.(); selectRef.current?.focus() } }}>
         <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
           renderTag={(item) => (
@@ -637,7 +707,10 @@ function CustomCombobox({
         error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
       style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }}
       data-field-mode="edit" data-error={error ? '' : undefined}>
-      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-visible')} style={{ gap: tagAreaGap, paddingLeft: tagAreaPaddingLeftPx }}>
+      {/* 2026-05-18 #6A Round 1 Step 2/4(per user 拍板「決策6選a」+ codex M31 Step 5 verdict cite combobox.tsx:648):
+          CustomCombobox edit non-wrap tagArea 對齊 L293 display + L451 readonly + L518 native edit 已 ship 的 overflow-hidden fix。
+          原 overflow-visible 讓 tag 越界蓋 chevron / +N indicator(user 圖三)。M10 propagation 完整 4-path align。 */}
+      <div ref={tagAreaRef} className={cn('flex-1 min-w-0 flex items-center relative', nakedCellRowModeAlign, wrap ? 'flex-wrap' : 'overflow-hidden')} style={{ gap: tagAreaGap, paddingLeft: tagAreaPaddingLeftPx }}>
         {value.length > 0 ? (
           <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
             tagWrapperClassName={tagWrapperClassName}

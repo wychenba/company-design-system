@@ -170,7 +170,7 @@ export const StateBehavior: Story = {
 }
 
 export const ColorBindingRule: Story = {
-  name: 'Range ↔ Thumb border 綁定規則',
+  name: '範圍 ↔ Thumb 邊框 綁定規則',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -229,7 +229,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 Slider 對應 Radix / Material / Polaris a11y 規範。"}</p>
+      <p className="whitespace-pre-line">{"詳 `slider.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  slider  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/slider#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — focus thumb\n- ←/→ — 微調\n- Home/End — min/max\n- PageUp/Down — 大步階\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA c"}</p>
     </div>
   ),
 }

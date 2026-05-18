@@ -33,7 +33,7 @@ export const FilterPanel: Story = {
         </PopoverHeader>
         <PopoverBody>
           {/* 此 Popover 是「多選 + footer save CTA」模式 — 勾多項按「套用」才 commit。
-              區別於 DropdownMenu「click 即觸發」。CheckboxGroup canonical 自帶 zero-gap
+              區別於 DropdownMenu「click 即觸發」。CheckboxGroup 設計準則 自帶 zero-gap
               + Context 隔離,取代既有手刻 grid div(2026-04-29 migration)。 */}
           {/* CheckboxGroup zero-gap canonical(checkbox.spec.md L225)— 取代既有手刻 grid div */}
           <CheckboxGroup>

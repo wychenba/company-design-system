@@ -1,6 +1,6 @@
 ---
 component: Sidebar
-family: null
+family: 1
 variants:
   default:
     when: "標準導覽 row — 參與 single-selection,fg-secondary → hover foreground / active neutral-selected"

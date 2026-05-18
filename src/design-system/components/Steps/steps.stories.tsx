@@ -334,7 +334,7 @@ export const MultipleExpansion: Story = {
 // 驗證 column rhythm:混用有/無 description 的 step,indicator y 位置不變
 
 export const MixedDescription: Story = {
-  name: 'Column rhythm 驗證',
+  name: '欄 節奏 驗證',
   render: () => (
     <div className="flex gap-12">
       {(['md', 'lg'] as const).map(size => (

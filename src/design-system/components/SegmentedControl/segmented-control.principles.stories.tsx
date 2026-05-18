@@ -183,7 +183,7 @@ export const SizeLimits: Story = {
 // ── iconOnly ─────────────────────────────────────────────────────────────────
 
 export const IconOnlyRule: Story = {
-  name: 'iconOnly 是 group-level 決策',
+  name: 'iconOnly 是 群組-level 決策',
   render: () => (
     <div>
       <Rule

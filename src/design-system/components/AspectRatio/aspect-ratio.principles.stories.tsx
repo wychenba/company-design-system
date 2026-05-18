@@ -179,7 +179,7 @@ export const UsageGuidance: Story = {
 }
 
 export const RatioChoice: Story = {
-  name: 'DS 標準 ratio 選擇',
+  name: 'DS 標準 比例 選擇',
   render: () => (
     <div>
       <Rule
@@ -284,7 +284,7 @@ export const ChildrenFillRule: Story = {
 }
 
 export const PlaceholderAndSkeleton: Story = {
-  name: 'bg-muted placeholder 與 Skeleton 的分界',
+  name: '背景-muted 占位 與 Skeleton 的分界',
   render: () => (
     <div>
       <Rule
@@ -311,7 +311,7 @@ export const PlaceholderAndSkeleton: Story = {
 
       <Rule
         title="分界 — 兩者可疊用,職責不同"
-        note="AspectRatio = container 鎖比例(解決 CLS);Skeleton = loading state 視覺。「鎖比例」與「標示 loading」是兩個獨立問題,疊用是 canonical pattern"
+        note="AspectRatio = container 鎖比例(解決 CLS);Skeleton = loading state 視覺。「鎖比例」與「標示 loading」是兩個獨立問題,疊用是 慣用組合"
       >
         <div className="grid grid-cols-3 gap-3 w-[480px]">
           {[1, 2, 3].map(i => (

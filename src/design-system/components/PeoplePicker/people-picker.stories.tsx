@@ -157,6 +157,6 @@ const RaceTestPicker = () => {
 }
 
 export const RaceTest: Story = {
-  name: 'race test',
+  name: '載入競態測試',
   render: () => <RaceTestPicker />,
 }

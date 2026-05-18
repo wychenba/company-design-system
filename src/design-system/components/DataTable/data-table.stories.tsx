@@ -183,7 +183,7 @@ export const ColumnResize: Story = {
 }
 
 /* ── 欄拖曳重排 — enableColumnReorder + columnDef.meta.locked ──
-   對齊 Notion / Linear / Airtable canonical:header 任一 reorderable cell 可拖,
+   對齊 Notion / Linear / Airtable 設計準則:header 任一 reorderable cell 可拖,
    drop indicator 在 target column 邊緣。SKU 標 `meta.locked=true` 鎖定不可拖,亦不可
    接受 drop(Notion 「primary column」pattern)。System column(__select__)永遠鎖。
    Pinned column 仍可 reorder 但只在自己 region 內(left/center/right 不跨 region)。 */
@@ -234,7 +234,7 @@ export const ColumnReorder: Story = {
 
 /* ── 行高模式 — autoRowHeight prop(每 row 內容驅動高度) ── */
 export const RowAutoHeightInlineEdit: Story = {
-  name: '自動行高 × 內聯編輯(verify display↔edit position)',
+  name: '自動行高 × 就地編輯(顯示與編輯位置驗證)',
   render: () => {
     // 2026-05-14 I7 fix(per codex verdict):note 初始化進 state 一次,commit 寫同一 state。
     // 原 `dataWithNotes = list.map(...)` 每 render derive 覆蓋 commit value → user 看似不能編。
@@ -609,7 +609,7 @@ export const InlineEdit: Story = {
  *   - Issue 6 viewport clip:H scroll cell out → overlay 被 panel ClipMask 裁切不溢出
  */
 export const InlineEditWithSpreadsheetOverlay: Story = {
-  name: '就地編輯 + 試算表 overlay',
+  name: '就地編輯 + 試算表浮層',
   render: () => {
     const [data, setData] = React.useState(editableSampleData)
     const editCol = createColumnHelper<EditableProduct>()
@@ -719,7 +719,7 @@ export const CellErrors: Story = {
  * 這是 per-row 行為,不是整表切換 mode。
  */
 export const CellErrorsFixedRowOverride: Story = {
-  name: '欄位錯誤訊息(固定行高 + per-row 撐高)',
+  name: '欄位錯誤訊息(固定行高 + 逐列撐高)',
   render: () => {
     const [data, setData] = React.useState(editableSampleData)
     const editCol = createColumnHelper<EditableProduct>()
@@ -808,7 +808,7 @@ const NESTED_DATA: TaskRow[] = [
 ]
 
 export const NestedRows: Story = {
-  name: '巢狀 row(tree-table)',
+  name: '巢狀列(樹狀表格)',
   render: () => {
     const [expanded, setExpanded] = React.useState<Record<string, boolean>>({ 'task-1': true, 'task-1-1': true })
     const STATUS_OPTIONS = [
@@ -850,13 +850,13 @@ export const NestedRows: Story = {
 }
 
 /* ── 巢狀 row × 拖曳重排(tree-table drag)──
-   Tree drag canonical(2026-05-06 v14.7,對齊 spec.md「Cross-parent drop 禁止」)
+   Tree drag 設計準則(2026-05-06 v14.7,對齊 spec.md「Cross-parent drop 禁止」)
    - **Top-level rows**:有 drag handle(absolute pinned to row left edge),可拖重排
    - **Sub-rows**(`row.depth > 0`):**無 handle**,不可拖(設計保守對齊 Notion)
    - **Cross-parent drop**:過濾,顯 invalid signal(handle cursor `not-allowed`)
-   - **Drop indicator**:水平 2px primary line(top/bottom)— SSOT 對齊 TreeView */
+   - **Drop indicator**:水平 2px primary line(top/bottom)— 主檔對齊 TreeView */
 export const NestedRowsWithDrag: Story = {
-  name: '巢狀 row × 拖曳重排',
+  name: '巢狀列 × 拖曳重排',
   render: () => {
     const [expanded, setExpanded] = React.useState<Record<string, boolean>>({ 'task-1': true })
     const [list, setList] = React.useState<TaskRow[]>(NESTED_DATA)
@@ -892,9 +892,9 @@ export const NestedRowsWithDrag: Story = {
     return (
       <div className="flex flex-col gap-3 max-w-3xl">
         <p className="text-caption text-fg-muted">
-          Tree-table drag canonical:**top-level rows 可拖**(handle 浮在 row 左緣),
+          Tree-table drag 設計準則:**top-level rows 可拖**(handle 浮在 row 左緣),
           **sub-rows 無 handle 不可拖**(對齊 Notion 保守)。Cross-parent drop 過濾,
-          顯 invalid signal。Drop indicator 水平 2px primary line — SSOT 對齊 TreeView。
+          顯 invalid signal。Drop indicator 水平 2px primary line — 主檔對齊 TreeView。
         </p>
         <DataTable
           columns={taskColumns}
@@ -935,7 +935,7 @@ export const VirtualScroll: Story = {
    保留 toolbar 功能(filter / sort / search 在選取期間仍可用)— 對齊 Linear / Notion /
    Apple Mail / iOS Files / ref 圖 additive 派
 
-   排版 canonical(本 showcase):
+   排版設計準則(本 showcase):
    - Toolbar:左 search input / 右 ops 群(Gmail / Linear / Notion idiom)
    - 各 chrome 元件 self-pad px-loose;table mx-loose 對齊 chrome 內容左右邊界
    - bordered=true(height="100%" 為垂直滾動 trigger,per spec)
@@ -992,7 +992,7 @@ export const WithBulkActions: Story = {
           </div>
           <div className="flex items-center gap-2">
             {/* L3 Filter:global panel(ClickUp / Airtable / Notion 派 — flat conditions MVP)
-                pressed prop:套用條件後 trigger 維持 active 視覺(toggle pressed,Button canonical) */}
+                pressed prop:套用條件後 trigger 維持 active 視覺(toggle pressed,Button 設計準則) */}
             <Popover open={filterOpen} onOpenChange={setFilterOpen}>
               <PopoverTrigger asChild>
                 <Button variant="text" size="sm" iconOnly startIcon={Filter} aria-label="篩選" pressed={isFilterTreeActive(filterTree)} />
@@ -1226,7 +1226,7 @@ export const SelectionDisabledRows: Story = {
 
 /* ────────────────────────────────────────────────────────────────────────────
    進階篩選(Filter Panel)— 2026-05-04 從 data-table-filter-panel.stories.tsx
-   inline 過來,sidebar 收斂於 DataTable/展示 同一層(Q1 canonical)
+   inline 過來,sidebar 收斂於 DataTable/展示 同一層(Q1 設計準則)
    ──────────────────────────────────────────────────────────────────────────── */
 
 const FILTER_COLUMNS = [
@@ -1392,7 +1392,7 @@ export const FilterPanelModified: Story = {
 
 /* ── 進階篩選 — 長 tag 溢出測試(A5 reproduce)── */
 export const FilterPanelLongTagOverflow: Story = {
-  name: '進階篩選 — 長 tag 溢出',
+  name: '進階篩選 — 長標籤溢出',
   render: () => {
     // 故意用 select_multi op + 多個長 label values,測試 Combobox tag overflow + +N indicator
     const longLabelColumns = [
@@ -1431,7 +1431,7 @@ export const FilterPanelLongTagOverflow: Story = {
 }
 
 /* ── 列拖曳重排(Jira-style + 3-panel pinned columns)──────────────────────
-   enableRowDrag + onRowReorder 整合範例(v3 Jira canonical):
+   enableRowDrag + onRowReorder 整合範例(v3 Jira 設計準則):
    - handle absolute 浮在 row 左 border(Button tertiary iconOnly xs = elevated chip)
    - 不佔 column 空間 — table 看起來乾淨,沒有預留拖曳欄位
    - hover row → handle 浮現(opacity 0 → 100)
@@ -1441,7 +1441,7 @@ export const FilterPanelLongTagOverflow: Story = {
    - pinned-left + pinned-right 同時存在 → mirror regions 跟動 transform(per-region useSortable
      共享同 SortableContext state) */
 export const RowDragInteractive: Story = {
-  name: '列拖曳重排（含釘選欄）',
+  name: '列拖曳重排(含釘選欄)',
   render: () => {
     const [list, setList] = React.useState<Product[]>(sampleData)
     const handleReorder = (sourceId: string, targetId: string, position: 'before' | 'after') => {
@@ -1461,7 +1461,7 @@ export const RowDragInteractive: Story = {
     return (
       <div className="flex flex-col gap-3 max-w-3xl">
         <p className="text-caption text-fg-muted">
-          handle 浮在 row 左緣（不佔 column 空間，Jira canonical）。pinned-left（SKU）+ pinned-right（Updated）+
+          handle 浮在 row 左緣（不佔 column 空間，Jira 設計準則）。pinned-left（SKU）+ pinned-right（Updated）+
           center 中段欄。拖曳任一列時，三個 region 的 row 會同步跟動 transform（per-region
           <code>useSortable</code> 共享同 SortableContext state）。
         </p>
@@ -1787,7 +1787,7 @@ export const RoadmapAllInOne: Story = {
                 {/* Issue 3(2026-05-10)+ F1 fix(2026-05-10):primitive
                     `<DataTableColumnVisibilityPanel>` + columnOrder/onColumnOrderChange wired
                     →  panel 內啟 drag handle(per user 抓「為什麼還會有偏移?為什麼沒 drag?」)。
-                    Roadmap 跟 WithBulkActions(L1050+ canonical)現在對齊 — panel 內 drag 是
+                    Roadmap 跟 WithBulkActions(L1050+ 設計準則)現在對齊 — panel 內 drag 是
                     primary reorder UX,DataTable header drag handle 是 secondary parallel
                     affordance。 */}
                 <DataTableColumnVisibilityPanel
@@ -1888,54 +1888,5 @@ export const RoadmapAllInOne: Story = {
     if (visibleCount < 5) {
       throw new Error(`Virtualization too aggressive:rendered only ${visibleCount} rows`)
     }
-  },
-}
-
-/* ── 2026-05-14 U Feature-split perf budget story(per codex perf debate verdict + user
-   「完美的解法」「沒有改壞原本的東西」directive):──────────────────────────────────────
-   獨立 perf 量測 story — 同 Roadmap 13 cols rich-cell data,但**禁用** row drag /
-   column reorder / column resize / selection / spreadsheet overlay,只保 inline edit display。
-   目的:驗證 H6 hypothesis「Roadmap 119ms 主因是 feature stack 疊加(SortableRowProvider /
-   filter/sort/columnOrder state)」。若此 story scroll <50ms = confirmed;若仍 >100ms = 純
-   rich cell 內在 cost。**不動** RoadmapAllInOne demo IA(user 2026-05-10 directive 全合一)。
-   對齊 codex 5-path 推薦 U + Layer A synthesize verdict。 */
-export const RoadmapPerfBudget: Story = {
-  name: '效能預算量測',
-  parameters: { layout: 'fullscreen' },
-  tags: ['!autodocs'],
-  render: () => {
-    const bigData = React.useMemo(() => {
-      const arr: RoadmapItem[] = []
-      for (let i = 0; i < 500; i++) {
-        const base = ROADMAP_DATA[i % ROADMAP_DATA.length]
-        const id = `RDM-${String(i + 100).padStart(3, '0')}`
-        arr.push({ ...base, id, title: `${base.title} (#${i + 1})` })
-      }
-      return arr
-    }, [])
-    const [data, setData] = React.useState(bigData)
-    const columns = useRoadmapColumns()
-    const handleCommit = (rowId: string, colId: string, value: unknown) => {
-      setData((prev) => prev.map((r) => r.id === rowId ? { ...r, [colId]: value } : r))
-    }
-    return (
-      <div className="flex flex-col h-full">
-        <div className="px-[var(--layout-space-loose)] py-3 bg-surface border-b border-divider">
-          <p className="text-caption text-fg-muted">
-            Perf budget isolation:同 Roadmap 13 cols rich-cell + 500 rows + inline-edit,但**禁** row drag / column reorder / resize / selection / spreadsheet overlay。target avg ≤ 50ms / p95 ≤ 80ms。
-          </p>
-        </div>
-        <div className="mx-[var(--layout-space-loose)] mb-[var(--layout-space-loose)]">
-          <DataTable
-            columns={columns}
-            data={data}
-            height="600px"
-            inlineEdit
-            getRowId={(row) => row.id}
-            onCellCommit={handleCommit}
-          />
-        </div>
-      </div>
-    )
   },
 }

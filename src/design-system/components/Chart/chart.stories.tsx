@@ -104,7 +104,7 @@ const departmentExpenseConfig = {
 // ── Stories ──────────────────────────────────────────────────────────────────
 
 export const BarChartRevenue: Story = {
-  name: 'Bar Chart — 月營收',
+  name: '長條 Chart — 月營收',
   render: () => (
     <div>
       <H3>六個月營收對比(Stripe dashboard 風格)</H3>
@@ -139,7 +139,7 @@ export const BarChartRevenue: Story = {
 }
 
 export const LineChartResponseTime: Story = {
-  name: 'Line Chart — 伺服器回應時間',
+  name: '折線 Chart — 伺服器回應時間',
   render: () => (
     <div>
       <H3>7 天 p50 / p95 回應時間趨勢(Datadog 風格)</H3>
@@ -188,7 +188,7 @@ export const LineChartResponseTime: Story = {
 }
 
 export const DonutChartTrafficSource: Story = {
-  name: 'Donut Chart — 流量來源分布',
+  name: '環圈 Chart — 流量來源分布',
   render: () => (
     <div>
       <H3>流量來源組成(Google Analytics 風格)</H3>
@@ -216,7 +216,7 @@ export const DonutChartTrafficSource: Story = {
 }
 
 export const StackedAreaChartExpenses: Story = {
-  name: 'Stacked Area — 部門支出',
+  name: '堆疊 面積 — 部門支出',
   render: () => (
     <div>
       <H3>半年各部門支出堆疊(Notion workspace analytics 風格,單位:萬元)</H3>

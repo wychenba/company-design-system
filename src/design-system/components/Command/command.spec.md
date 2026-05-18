@@ -1,6 +1,6 @@
 ---
 component: Command
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:

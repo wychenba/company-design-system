@@ -31,7 +31,7 @@ export const Overview: Story = {
         <H3>結構:[X] [count] [ButtonDivider] [actions]</H3>
         <Desc>
           全 sm Buttons(same-row consistency)+ gap-2(8px)+ <code>ButtonDivider</code>(自帶 mx-1 = 12px 視覺距離)。
-          Padding 對齊 SurfaceFooter / DataTable toolbar canonical:
+          Padding 對齊 SurfaceFooter / DataTable toolbar 設計準則:
           <code> px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]</code>。
           自然高度 52md / 60lg。
           Action variant 採 <code>tertiary</code>(主)/ <code>tertiary danger</code>(destructive)— <strong>不用 primary</strong>(留給 dialog 確認最終 action)。

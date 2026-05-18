@@ -271,7 +271,7 @@ export const VisualTokenRule: Story = {
 
       <Rule
         title="前後月日期 = text-fg-disabled(淡化),禁用日 = text-fg-disabled(semantic)"
-        note="前後月的補格讓使用者認得「跨月邊界」但不搶主要月份的閱讀焦點;disabled 日期保留可見(告訴使用者「這天存在但不能選」),套 `text-fg-disabled` + `pointer-events-none`(對齊 Button variant=text disabled canonical,非 opacity)。"
+        note="前後月的補格讓使用者認得「跨月邊界」但不搶主要月份的閱讀焦點;disabled 日期保留可見(告訴使用者「這天存在但不能選」),套 `text-fg-disabled` + `pointer-events-none`(對齊 Button variant=text disabled 設計準則,非 opacity)。"
       >
         <Demo title="showOutsideDays + disabled 過去日期">
           <DateGrid

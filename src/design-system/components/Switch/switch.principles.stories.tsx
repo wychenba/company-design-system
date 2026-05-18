@@ -92,7 +92,7 @@ export const UsageGuidance: Story = {
           title="vs 近親元件 — 判斷法:「旁邊有 submit / cancel button 嗎?」"
           note="有 → Checkbox(form 流程、值隨 submit 送出);沒有,是獨立 inline control → Switch(切換即生效)"
         >
-          <Label>完整三角度對照 SSOT 在 checkbox.spec.md「與 Switch 的分界」</Label>
+          <Label>完整三角度對照 完整定義在 checkbox.spec.md「與 Switch 的分界」</Label>
         </Rule>
       </div>
 

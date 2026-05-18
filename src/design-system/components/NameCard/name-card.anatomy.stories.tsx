@@ -148,7 +148,7 @@ export const Inspector: InspectorStory = {
     },
   },
   args: {
-    name: 'Ada Chen',
+    name: 'Ada Chen(範例人名)',
     subtitle: 'Design Engineer · Engineering',
     status: 'online',
     withStatusMessage: true,
@@ -201,7 +201,7 @@ export const Inspector: InspectorStory = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SectionMatrix: Story = {
-  name: 'Section 組合(minimal → full)',
+  name: '區段 組合(最小 → 完整)',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -350,7 +350,7 @@ export const ColorMatrix: Story = {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   5. HoverCardIntegration — canonical usage pattern
+   5. HoverCardIntegration — 標準用法範例
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const HoverCardIntegration: Story = {
@@ -360,12 +360,12 @@ export const HoverCardIntegration: Story = {
       <div>
         <H3>Avatar hover → NameCard 展開</H3>
         <Desc>
-          NameCard 的 canonical 消費方式:放進 HoverCardContent 內。HoverCard 負責觸發 / 定位 / 進退場,
+          NameCard 的設計準則 消費方式:放進 HoverCardContent 內。HoverCard 負責觸發 / 定位 / 進退場,
           NameCard 只專注內容。align="start" 讓 card 左邊對齊 avatar 左邊(視覺動線穩定)。
         </Desc>
         <div className="border border-border rounded-lg p-6 flex items-center gap-8">
           {[
-            { name: 'Ada Chen', subtitle: 'Design Engineer', status: 'online' as const },
+            { name: 'Ada Chen(範例人名)', subtitle: 'Design Engineer', status: 'online' as const },
             { name: 'Alice Wang', subtitle: 'Frontend Engineer', status: 'busy' as const },
             { name: 'Bob Chen', subtitle: 'PM, Growth', status: 'away' as const },
           ].map(p => (
@@ -496,7 +496,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 NameCard 對應 Radix / Material / Polaris a11y 規範。"}</p>
+      <p className="whitespace-pre-line">{"詳 `name-card.spec.md` 「A11y 預設」段。摘要:\n\n> 命名對齊 DS 設計準則(2026-05-18,per  # 命名與語言一致性 )。本節原標題「無障礙」,改「A11y 預設」與其他 spec 一致。\n\n-   Trigger 整合  :Avatar 作為 HoverCard trigger 時, onFocus  /  onBlur  與 mouseenter/leave 同時觸發由 Radix HoverCard 管理——鍵盤使用者 Tab 到 avatar 可自動顯示 card,Escape 關閉\n-   Focus 順序  :NameCard 內若有 Action button,Tab 順序為 trigger(Avatar)→ 第一個 action → 後續 action → view more;不抓取 focus 進入浮層(保留 Radix  HoverCard  預設語意,與 Popover 的 focus trap 不同)\n-   Live region 語意  :NameCard 是展示內容,非 announcement,不套  aria-live \n-   DL 語意  :Info Fields 使用 "}</p>
     </div>
   ),
 }

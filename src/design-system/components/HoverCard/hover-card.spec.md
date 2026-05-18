@@ -1,6 +1,6 @@
 ---
 component: HoverCard
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:
@@ -119,6 +119,20 @@ HoverCard 是**純行為 primitive**(只提供 hover 觸發邏輯 + 定位 + 動
 - `../NameCard/name-card.spec.md` — 人員資訊卡（HoverCard 最常見 content）
 - `../Avatar/avatar.spec.md` — 人員 Avatar 自動 hoverCard 整合
 - Popover（`components/Popover/`，shadcn passthrough 無 spec）— 點擊觸發的浮層
+
+## A11y 預設
+
+**ARIA / Pattern**:繼承 Radix `hover-card` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/hover-card#accessibility)。
+
+**Keyboard 行為**:
+
+- Tab — 進入 trigger
+- Hover / focus — 開啟 card
+- Esc — 關閉
+
+**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

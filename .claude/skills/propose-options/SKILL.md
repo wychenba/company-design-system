@@ -27,9 +27,39 @@ description: Auto-invoke when listing options / 建議 / 候選方案. Forces in
 
 ---
 
-## Workflow(強制 4 題,缺一就 reject 此 option)
+## Workflow(強制 6 題,缺一就 reject 此 option)
 
-每個 candidate option 過以下 4 題,inline 寫進回覆:
+每個 candidate option 過以下 6 題,inline 寫進回覆:
+
+### Q0 — **Pre-ASK self-verify problem 真存在**(2026-05-18 加,absorbs Sheet/inline-action/SurfaceBody 三題誤判事件)
+
+**問**:propose 給 user 拍板前,是否已**grep DS-wide + Read 相關 spec.md / tsx + Read consumer usage** 確認 problem **真存在**?
+
+**為何**:M18 / M23 / M29 都管「決策過程紀律」,但**propose 給 user 前的「problem 真存在?」基本判斷**沒 codify。本 session 我 propose 3 題(Sheet 補 / 5 元件 migrate inline-action / 5 元件 migrate SurfaceBody)**全部不是真 problem** — Sheet spec 已完整、inline-action 已全消費、SurfaceBody 有意設計不該動 — 但我 propose 給 user 拍板浪費 user 時間 + 動搖 user 信任。
+
+**強制檢查**:
+1. **grep 既有 code DS-wide** — 「該 migrate 的 X 元件」真沒消費 primitive?(`rg "<primitive>" src/design-system/components/<X>`)
+2. **Read 相關 spec.md** — spec 有沒有明文 codify 該設計是有意 / 例外 / 合法分支?(本 session 例:Tag inline-action colored host 例外是 spec L52-54 明寫的)
+3. **Read consumer usage** — 該 pattern 已在 N 處 work fine?N ≥ 3 → 該 pattern 是 working canonical,不是 problem
+4. **反問**:「如果 user 答 A,我會做什麼?該動 K 個 file?那 K 個 file 真有問題嗎?還是我假設的?」
+
+**Fail criteria**(任一命中 → reject propose,不丟給 user):
+- 沒 grep 既有就斷言「N 元件缺 X」
+- 沒讀 spec 就斷言「現況違反 canonical」
+- 「我推 A 因 X 比較統一」但 X 已是合法分支(spec 明文)
+- propose 是 mass-migration 但沒列具體哪 K file file:line 需動
+
+**Pass criteria**(全過才能 propose):
+- ✅ 列具體 file:line 證據 problem 存在
+- ✅ 列 spec.md 段落 cite 證明「現況違反 spec」
+- ✅ counter-example scan 跑過:DS 其他元件用一樣 pattern → 反證「這不是 problem」
+- ✅ 給 user 的 option list 含「C. 不動(理由)」且 C 經 grep verify 不是 cheap escape
+
+**例**:
+- ✅ "grep 結果 Input/NumberInput/LinkInput 3 file 都未消費 ItemInlineAction(file:line)+ spec.md L60 表格列為 expected consumer → 真 gap"
+- ❌ "5 元件應該 migrate"(沒 grep / 沒 cite spec / 不知道 K 元件已 migrate / 是 colored host 合法例外)
+
+**對應 hook**:`check_propose_pre_grep_verify.sh`(2026-05-18 加,Edit/Write `*.md` 內含「propose」/「請拍板」/「決策」keyword 但近 N turn 無 grep/Read tool call → P1 warn)
 
 ### Q1 — M8 World-class benchmark
 **問**:本 option ≥ 3 家 world-class DS / framework / canonical 有對照嗎?

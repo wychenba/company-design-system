@@ -53,7 +53,7 @@ export const Overview: Story = {
                 ['actions', 'ReactNode', '—', 'suffix actions(例:delete / cancel button)'],
                 ['onDownload', '() => void', '—', "hover-swap:status='completed' 時,row hover ✓ 換成 Download ↓。幾何=rich → Button xs 24(row action ≤ 24 cap)/ compact → ItemInlineAction 16"],
                 ['onRetry', '() => void', '—', "hover-swap:status='error' 時,row hover ✗ 換成 RotateCw ⟲(幾何同上 — rich xs / compact Inline Action)"],
-                ['onClick', '() => void', '—', '傳入後整個 item 變可點擊(cursor-pointer,**無 hover bg**——FileItem canonical:permanent-anchored 元件不加 hover-bg double-emphasis)'],
+                ['onClick', '() => void', '—', '傳入後整個 item 變可點擊(cursor-pointer,**無 hover bg**——FileItem 設計準則:permanent-anchored 元件不加 hover-bg double-emphasis)'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -71,7 +71,7 @@ export const Inspector: Story = {
     docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。調整 `mode` / `status` / `progress` 看 compact vs rich 佈局與狀態 icon/進度條變化。' } },
   },
   args: {
-    name: 'Q1-marketing-report.pdf',
+    name: 'Q1 行銷報告 PDF(範例檔)',
     mode: 'rich',
     status: 'uploading',
     progress: 60,
@@ -162,7 +162,7 @@ export const ColorMatrix: Story = {
       <div>
         <H3>Container background(per mode,**無 hover-bg**)</H3>
         <Desc>
-          FileItem canonical(2026-04-23):**永不顯示 hover-bg**。三種型態皆已 permanent-anchored(rich = border card / compact Type B = bg-secondary / compact Type A = 底部 progress bar),再加 hover-bg 是 double-emphasis 視覺雜。affordance 只靠 `cursor-pointer`(onClick 時)+ hover-swap icon fade。詳 spec「Hover 行為 canonical」。
+          FileItem 設計準則(2026-04-23):**永不顯示 hover-bg**。三種型態皆已 permanent-anchored(rich = border card / compact Type B = bg-secondary / compact Type A = 底部 progress bar),再加 hover-bg 是 double-emphasis 視覺雜。affordance 只靠 `cursor-pointer`(onClick 時)+ hover-swap icon fade。詳 spec「Hover 行為 canonical」。
         </Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
@@ -184,7 +184,7 @@ export const ColorMatrix: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: 'Mode 對照(compact vs rich)',
+  name: '模式 對照(緊湊 vs 豐富)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

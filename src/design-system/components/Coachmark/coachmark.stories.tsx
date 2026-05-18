@@ -149,7 +149,7 @@ export const MultiStepTour: Story = {
           </span>
         </div>
         <p className="text-footnote text-fg-muted">
-          ↑ 多步驟:`kind="new-features"` header 提示脈絡;第 1 步有 Skip,按 Next 進 2+ 步後 Skip 自動隱藏(canonical)
+          ↑ 多步驟:`kind="new-features"` header 提示脈絡;第 1 步有 Skip,按 Next 進 2+ 步後 Skip 自動隱藏(設計準則)
         </p>
       </div>
     )
@@ -228,7 +228,7 @@ export const TipsMultiStep: Story = {
           <Button variant="tertiary" size="sm" onClick={() => { setStep(0); setOpen(true) }}>重設 Tips</Button>
         </div>
         <p className="text-footnote text-fg-muted">
-          ↑ `kind="tips"` header 文字 = 「使用技巧」(vs `new-features` = 「新功能介紹」),兩者都由元件內 canonical 映射,consumer 不重寫
+          ↑ `kind="tips"` header 文字 = 「使用技巧」(vs `new-features` = 「新功能介紹」),兩者都由元件內 設計準則 映射,consumer 不重寫
         </p>
       </div>
     )

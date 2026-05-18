@@ -153,7 +153,7 @@ export const ColorMatrix: Story = {
         <H3>節點類型 × 狀態色彩對照</H3>
         <Desc>
           Breadcrumb 的色彩決定「你從哪來 / 你在這」的視覺階層——ancestor link 降低飽和度(fg-secondary)讓 current page(foreground)成為焦點。
-          互動高亮一律走 `--primary-hover`(canonical,與 Tabs / Chip 未選 hover 同 token)。
+          互動高亮一律走 `--primary-hover`(設計準則,與 Tabs / Chip 未選 hover 同 token)。
         </Desc>
         <div className="overflow-x-auto mb-4">
           <table className="text-caption border-collapse min-w-[640px]">
@@ -329,7 +329,7 @@ export const StateBehavior: Story = {
           </table>
         </div>
         <p className="text-footnote text-fg-muted mt-3">
-          Hover 色採 `primary-hover`(canonical 互動高亮),跟 Tabs / Chip 未選 hover 用同一組 token
+          Hover 色採 `primary-hover`(標準互動高亮),跟 Tabs / Chip 未選 hover 用同一組 token
           ——全系統互動 affordance 保持一致。
         </p>
       </div>
@@ -450,7 +450,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 Breadcrumb 對應 Radix / Material / Polaris a11y 規範。"}</p>
+      <p className="whitespace-pre-line">{"詳 `breadcrumb.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  slot  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/slot#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 逐個 link 導覽\n- Enter — navigate\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

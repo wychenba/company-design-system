@@ -1,6 +1,6 @@
 ---
 component: Breadcrumb
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:
@@ -218,6 +218,19 @@ ColorMatrix 已建:展示 BreadcrumbLink / Page / Separator / Ellipsis 四種節
 - `Tabs` — 切換平行 view 的導覽（不同層級的 problem，breadcrumb 是階層內，Tabs 是同層切換）
 - `Button variant="link"` — 一般文字連結按鈕
 - `Sidebar` — 主導覽（breadcrumb 用來補 sidebar 之外的「當前位置」資訊）
+
+## A11y 預設
+
+**ARIA / Pattern**:繼承 Radix `slot` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/slot#accessibility)。
+
+**Keyboard 行為**:
+
+- Tab — 逐個 link 導覽
+- Enter — navigate
+
+**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

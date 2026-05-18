@@ -1,6 +1,6 @@
 ---
 component: Tooltip
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:
@@ -111,6 +111,19 @@ Tooltip 是**單一職責 hover 提示 primitive**(一句話補充),刻意無變
 
 - `../HoverCard/hover-card.spec.md` — hover 觸發的可互動浮層（**Tooltip vs HoverCard 的分界 SSOT 在 HoverCard spec**「與 Tooltip 的分界」段落）
 - `../Button/button.spec.md` — `iconOnly` 模式自動產生 tooltip（由 aria-label 驅動）
+
+## A11y 預設
+
+**ARIA / Pattern**:繼承 Radix `tooltip` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/tooltip#accessibility)。
+
+**Keyboard 行為**:
+
+- Tab — focus trigger 時顯示
+- Esc — 關閉
+
+**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

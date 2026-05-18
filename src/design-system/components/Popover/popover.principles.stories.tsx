@@ -246,12 +246,12 @@ export const UsageGuidance: Story = {
 }
 
 export const VisualAlignmentRule: Story = {
-  name: '視覺對齊 Dialog(overlay-surface 共用)',
+  name: '視覺對齊對話框(浮層 視覺底 共用)',
   render: () => (
     <div>
       <Rule
         title="Popover 與 Dialog 共用 overlay-surface 視覺語言"
-        note="bg-surface-raised / border-border / rounded-lg / elevation-200 完全一致。Header / Body / Footer 內 padding 來自 overlay-surface pattern SSOT(px-loose py-tight)。差異只有兩點:(1) Popover 是 non-modal 無 overlay 遮罩,(2) density 永遠鎖 md(不隨頁面 density 放大)"
+        note="bg-surface-raised / border-border / rounded-lg / elevation-200 完全一致。Header / Body / Footer 內 padding 來自 overlay-surface pattern 主檔(px-loose py-tight)。差異只有兩點:(1) Popover 是 non-modal 無 overlay 遮罩,(2) density 永遠鎖 md(不隨頁面 density 放大)"
       >
         <Popover>
           <PopoverTrigger asChild>

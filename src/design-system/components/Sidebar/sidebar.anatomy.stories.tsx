@@ -538,7 +538,7 @@ const CollapsedFrame = ({
 // 2026-05-17 ship per audit Dim 45 strict re-run — cva variant matrix codify
 // SidebarMenuButton cva 有 variant: { default, meta } 兩個值,本 story 展示 default vs meta 區別
 export const VariantMatrix: Story = {
-  name: '變體對照(default vs meta)',
+  name: '變體對照(預設 vs 次要)',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div className="flex flex-col gap-2">
@@ -591,7 +591,7 @@ export const StateBehavior: Story = {
         <H3>狀態行為</H3>
         <Desc>
           Sidebar 層級特有的狀態:collapse / expand 三種模式、mobile offcanvas、active item 跨 session 還原。
-          Item-level default / hover / active / selected / disabled **色彩**由 `ColorMatrix` 作為 state-driven 矩陣完整呈現(共用 item-anatomy row primitive SSOT);本 story 展示 container 層的結構狀態切換。
+          Item-level default / hover / active / selected / disabled **色彩**由 `ColorMatrix` 作為 state-driven 矩陣完整呈現(共用 item-anatomy row primitive 主檔);本 story 展示 container 層的結構狀態切換。
         </Desc>
       </div>
 
@@ -687,7 +687,7 @@ export const StateBehavior: Story = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const ChromeTokens: Story = {
-  name: '寬度與 Chrome Token',
+  name: '寬度與框架設計變數',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-2">

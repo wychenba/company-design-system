@@ -1,0 +1,23 @@
+/**
+ * Motion tokens — hover delay tier system.
+ *
+ * 2026-05-18 ship per user 拍板 #3A(3-tier hover delay token + 確保命名世界級)。
+ *
+ * Naming convention:
+ *   --hover-delay-{tier}
+ *
+ * Tier semantics 對齊 world-class consensus(see motion.spec.md「世界級對照」段):
+ *   - plain  → passive hint  | Tooltip 文字提示    | 200ms  | Material 3 "plain tooltip" idiom + MUI Tooltip 100ms / Atlassian 300ms 中位
+ *   - rich   → rich preview  | HoverCard / NameCard | 300ms  | Material 3 "rich tooltip" idiom + 當前 Avatar HoverCard 既有值
+ *   - close  → universal exit| 全部關閉延遲          | 200ms  | UX research consensus accidental-hover 容錯
+ *
+ * Rationale 命名:不用 component name(`tooltip` 太特定)、不用純數字(`delay-200` 用值不用語意)、
+ * 不用孤立縮寫(`hd-fast` 跨人不可讀)。`plain` / `rich` / `close` 對齊 Material rich-tooltip 公開文件 +
+ * DS 既有 `compact / rich` mode 詞彙一致(per `# 命名與語言一致性` 命名 3 test)。
+ */
+
+:root {
+  --hover-delay-plain: 200ms;
+  --hover-delay-rich: 300ms;
+  --hover-delay-close: 200ms;
+}

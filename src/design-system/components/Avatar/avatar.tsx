@@ -4,6 +4,7 @@ import { User } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/design-system/components/HoverCard/hover-card'
+import { HOVER_DELAY_RICH_MS, HOVER_DELAY_CLOSE_MS } from '@/design-system/tokens/motion/motion'
 import { Badge } from '@/design-system/components/Badge/badge'
 import { useFieldContext, useTableIsScrolling } from '@/design-system/components/Field/field-context'
 
@@ -296,7 +297,7 @@ const AvatarInner = React.forwardRef<HTMLDivElement, AvatarProps>(
     if (!hoverCard || isTableScrolling) return baseEl
 
     return (
-      <HoverCard openDelay={300} closeDelay={200}>
+      <HoverCard openDelay={HOVER_DELAY_RICH_MS} closeDelay={HOVER_DELAY_CLOSE_MS}>
         <HoverCardTrigger asChild>
           {baseEl}
         </HoverCardTrigger>

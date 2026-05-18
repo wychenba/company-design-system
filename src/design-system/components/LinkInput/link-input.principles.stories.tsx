@@ -100,7 +100,7 @@ export const UsageGuidance: Story = {
 // ── 兩種顯示狀態 ───────────────────────────────────────────────────────────
 
 export const DisplayStateRule: Story = {
-  name: '兩種狀態：link display / input edit',
+  name: '兩種狀態：連結 顯示 / input 編輯',
   render: () => (
     <div>
       <Rule

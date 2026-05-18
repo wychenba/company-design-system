@@ -134,8 +134,10 @@ function checkLongFunctions(f) {
     if (!m) continue
     const indent = m[1]
     const name = m[5]
-    // Exemption: check 3 lines above for `code-quality-allow: long-function` marker
-    const exemptWindow = lines.slice(Math.max(0, i - 3), i).join('\n')
+    // Exemption: check 20 lines above for `code-quality-allow: long-function` marker
+    // (2026-05-18 widened from 3 → 20 per codex Phase B F6: Tabs marker:242 命中:247 distance 5+ /
+    //  Chip marker:220 命中:225 distance 5+ — 原 3-line window 漏抓)
+    const exemptWindow = lines.slice(Math.max(0, i - 20), i).join('\n')
     if (/code-quality-allow:\s*long-function/i.test(exemptWindow)) continue
     // Look for opening { on this line or within next 5 lines
     let openLine = -1

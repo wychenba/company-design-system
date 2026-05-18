@@ -923,7 +923,7 @@ export const Inspector = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const AlignmentThreshold = {
-  name: '對齊容器（24px 閾值）',
+  name: '對齊容器(24px 閾值)',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">
@@ -1426,17 +1426,17 @@ export const IconColorsAndPresets = {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   5. Icon Action Primitive 決策樹（canonical 2026-04-22）
+   5. Icon Action Primitive 決策樹（設計準則 2026-04-22）
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const IconActionPrimitiveDecision = {
-  name: 'Icon Action Primitive 決策',
+  name: '圖示動作通用零件決策',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">
         <H3>Icon 相關動作用哪個 primitive?(3 步決策)</H3>
         <Desc>
-          DS 跨元件 icon action 的 canonical。接到「要放一個 icon 可點擊」的需求,跑下方 3 步決策樹——
+          DS 跨元件 icon action 的設計準則。接到「要放一個 icon 可點擊」的需求,跑下方 3 步決策樹——
           不要直覺寫 <code className="font-mono">&lt;button&gt;&lt;X /&gt;&lt;/button&gt;</code>。Primitive 選錯會造成 same-row 幾何不一致、gap token 被吃掉、
           或 chrome corner close 無法跟 refresh / share 並排分群。
         </Desc>

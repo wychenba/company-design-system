@@ -38,13 +38,28 @@ HAS_DECISION=${HAS_DECISION:-0}
 
 [ "$HAS_DECISION" -eq 0 ] && exit 0
 
-# Jargon density(術語 keyword 密度)
-JARGON_RE='(M[0-9]+ |Dim [0-9]+|SSOT|@watch|frontmatter|stub|variant.*content|trait-content|backfill|@benchmark|cite battle|Layer [ABCD]|Step [0-9]+\.[0-9]+|OpenSnapshot|render path|truncate chain|min-w-0|inline-flex|hasSizes|hasVariants)'
-JARGON_COUNT=$(echo "$AI_REPLY_TEXT" | grep -oE "$JARGON_RE" 2>/dev/null | wc -l | tr -d ' ')
+# GAP 4 fix(2026-05-18 M34 codify):升級 narrow 17-keyword fixed list 到
+# Python unicode 中英夾雜 density detector(對齊 check_story_invariants.sh R5.5 fix template)。
+# Spec wording「任何沒中譯的縮寫 / 內部代號 / hook 名」廣義,hook 過去窄 keyword list 漏:
+# Earn-existence / compound-component / Polaris-aligned / wrapper-vs-primitive / Anchor preflight
+# / *-canonical-allow / L42-58 / check_xxx.sh 等。
+#
+# 升級邏輯:
+# (a) EXEMPT list:legitimate retained-English(framework/brand/DS API)
+# (b) Density measure:jargon-word count / total Chinese-char count ratio
+# (c) jargon = 英文 token 不在 EXEMPT(任何 alphanumeric word ≥ 3 char)
+JARGON_COUNT=$(python3 -c "
+import re, sys
+text = sys.stdin.read()
+EXEMPT = re.compile(r'\b(cva|Radix|Polaris|Material|Atlassian|Carbon|Ant|Apple|MUI|TanStack|shadcn|Recharts|cmdk|dnd-kit|TypeScript|JavaScript|API|UI|UX|Jira|Stripe|Notion|Figma|Linear|GitHub|Gmail|Dropbox|Slack|Spotify|Discord|Storybook|Tailwind|ARIA|WCAG|FAQ|HSL|CSS|HTML|DOM|DS|F[1-9]|TODO|FIXME|XXX|NOTE|README|MIT|JSON|YAML|TSX|CSS|HTTP|HTTPS|URL|UUID|REST|GraphQL|SDK|CDN|CI|CD|PR|RFC|MR|UI/UX|primary|secondary|tertiary|hover|focus|active|disabled|invalid|readonly|null|true|false|undefined|void)\b', re.I)
+words = re.findall(r'\b[a-zA-Z][a-zA-Z\-_]{2,}\b', text)
+jargon = [w for w in words if not EXEMPT.fullmatch(w)]
+print(len(jargon))
+" <<< "$AI_REPLY_TEXT" 2>/dev/null)
 JARGON_COUNT=${JARGON_COUNT:-0}
 
-# Threshold:含決策 prompt + jargon count ≥ 5 → warn
-THRESHOLD=5
+# Threshold:含決策 prompt + jargon count ≥ 10 → warn(Python 計數較廣,threshold 提高)
+THRESHOLD=10
 
 if [ "$JARGON_COUNT" -ge "$THRESHOLD" ]; then
   echo "🟡 check_propose_plain_chinese WARN:本 turn reply 含 user 決策 prompt + jargon 密度 ${JARGON_COUNT}(threshold ${THRESHOLD})" >&2

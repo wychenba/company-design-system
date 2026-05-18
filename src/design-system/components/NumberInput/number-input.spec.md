@@ -88,3 +88,18 @@ col.accessor('price', {
 - `../DatePicker/date-picker.spec.md` — 日期
 - `../Slider/slider.spec.md` — 視覺調整數值（音量、亮度）
 - `../Field/field-controls.spec.md` — Field Control 共用規則（mode / size / endAction / error）
+
+## A11y 預設
+
+**ARIA / Pattern**:native `<input>` element 預設 a11y;Field wrapper 補 `aria-labelledby` / `aria-invalid` / `aria-describedby`。
+
+**Keyboard 行為**:
+
+- Tab — focus
+- ↑/↓ — 加 / 減 step
+- 字母鍵 — 輸入數字
+
+**Focus**:native input focus ring;DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
+

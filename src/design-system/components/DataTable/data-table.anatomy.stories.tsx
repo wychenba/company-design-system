@@ -165,7 +165,7 @@ export const Inspector: Story = {
 }
 
 export const ColumnTypes: Story = {
-  name: 'Column Type 自動渲染',
+  name: '欄 Type 自動渲染',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -210,7 +210,7 @@ export const ColumnTypes: Story = {
 }
 
 export const RowHeightMatrix: Story = {
-  name: 'Row Height Tier(閱讀 vs 掃描模式)',
+  name: '列高階梯(閱讀 vs 掃描模式)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -478,7 +478,7 @@ export const EmptyState: Story = {
 }
 
 export const BorderedProp: Story = {
-  name: 'bordered prop(預設 true)',
+  name: 'bordered 屬性(預設 true)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -522,7 +522,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 DataTable 對應 Radix / Material / Polaris a11y 規範。"}</p>
+      <p className="whitespace-pre-line">{"詳 `data-table.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  radio-group  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/radio-group#accessibility)。\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

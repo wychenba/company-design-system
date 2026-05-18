@@ -1,6 +1,6 @@
 ---
 name: design-system-audit
-description: Systematic audit of this design system for world-class quality. Runs 46 audit dimensions covering spec hygiene / code correctness / a11y / naming / tokens / patterns / CLAUDE.md consistency / Layout Family compliance / prop value collisions / shadcn alias leakage / home-name-vs-scope fit / spec hardcoded-values, and surfaces actionable fix lists. Has explicit checkpoints where the skill MUST stop and ask user. Invoke via /design-system-audit when asked to audit, re-audit, check quality, or verify design system health.
+description: Systematic audit of this design system for world-class quality. Runs the full audit dimension list(per `## The N audit dimensions` section) covering spec hygiene / code correctness / a11y / naming / tokens / patterns / CLAUDE.md consistency / Layout Family compliance / prop value collisions / shadcn alias leakage / home-name-vs-scope fit / spec hardcoded-values, and surfaces actionable fix lists. Has explicit checkpoints where the skill MUST stop and ask user. Invoke via /design-system-audit when asked to audit, re-audit, check quality, or verify design system health.
 ---
 
 # Design System Audit (53 dimensions, Groups A–P + Future-proof preflight)
@@ -187,7 +187,7 @@ User 2026-05-15 verbatim 抓「DS 深度稽核漏 storybook content quality」+�
    - `node scripts/audit-content-quality.mjs --check` — `✅ No content drift`(16 cat)
    - `node scripts/extract-canonical-rules.mjs` — `✅ All extracted rule keywords covered`
    - violation → 列 P0
-4. Build fail → 不跑 46 dims;報 user 決定先修 OR 繼續(broken code audit 多 dim 跑不動)
+4. Build fail → 不跑全 dim;報 user 決定先修 OR 繼續(broken code audit 多 dim 跑不動)
 5. TaskList entries 建好
 
 ### Phase 0.5 — Preflight 全面盤查(2026-05-15 user-mandated P0,NO-SAMPLE 前置)

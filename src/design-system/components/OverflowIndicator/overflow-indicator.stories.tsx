@@ -91,7 +91,7 @@ const reviewers = [
 ]
 
 export const AvatarStackOverflow: Story = {
-  name: '人員頭像 stack +N',
+  name: '人員頭像 疊合 +N',
   render: () => (
     <div className="flex flex-col gap-3 max-w-sm">
       <p className="text-caption text-fg-muted">

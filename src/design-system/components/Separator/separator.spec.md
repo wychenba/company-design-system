@@ -1,6 +1,6 @@
 ---
 component: Separator
-family: null
+family: self-contained
 traits: []
 variants: {}
 sizes: {}

@@ -146,7 +146,7 @@ export const ParentControlled: Story = {
 // ── 規則 2:Ring 是 focus marker,不是 selection ──
 
 export const RingIsFocusMarker: Story = {
-  name: '規則:Ring 是 focus marker,不是 selection',
+  name: '規則:環 是 聚焦 標記,不是 選取',
   render: () => (
     <Section
       title="Ring 表達「你現在在這步」,跟 step 本身的狀態正交"
@@ -181,7 +181,7 @@ export const RingIsFocusMarker: Story = {
 // ── 規則 3:Blue connector 只跟 completedValues 走 ──
 
 export const BlueConnectorLogic: Story = {
-  name: '規則:藍色 connector 只跟 completed 走',
+  name: '規則:藍色 連線 只跟 completed 走',
   render: () => (
     <Section
       title="藍色代表實際走過的路徑,不是 focus 指向"
@@ -220,7 +220,7 @@ export const BlueConnectorLogic: Story = {
 // ── 規則 4:Column rhythm ──
 
 export const ColumnRhythm: Story = {
-  name: '規則:Indicator column rhythm',
+  name: '規則:指示 欄 節奏',
   render: () => (
     <Section
       title="Indicator 永遠對齊 label 第一行——即使同一 Steps 內混用「有/無 description」"

@@ -209,6 +209,20 @@ ColorMatrix 已建:展示 default / hover / selected / disabled 四狀態的 bg 
 - Tag — 純顯示 / dismissible tag
 - `useOverflowItems` hook (`src/design-system/hooks/use-overflow-items.ts`) — scroll / menu 的共用追蹤邏輯，Tabs 也消費同一個 hook
 
+## A11y 預設
+
+**ARIA / Pattern**:繼承 Radix `toggle-group` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/toggle-group#accessibility)。
+
+**Keyboard 行為**:
+
+- Tab — 進入 group
+- ←/→ — 切換
+- Enter / Space — toggle
+
+**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
+
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。

@@ -161,7 +161,7 @@ export const UsageGuidance: Story = {
 }
 
 export const OrientationChoice: Story = {
-  name: 'Orientation 選擇',
+  name: '方向 選擇',
   render: () => (
     <div>
       <Rule

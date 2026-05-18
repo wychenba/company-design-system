@@ -1,6 +1,6 @@
 ---
 component: Carousel
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:

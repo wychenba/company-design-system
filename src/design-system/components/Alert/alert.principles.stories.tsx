@@ -109,7 +109,7 @@ export const UsageGuidance: Story = {
 }
 
 export const VariantRule: Story = {
-  name: 'Variant 選擇',
+  name: '變體 選擇',
   render: () => (
     <div>
       <Rule
@@ -141,7 +141,7 @@ export const VariantRule: Story = {
 }
 
 export const PlacementRule: Story = {
-  name: 'Inline vs Fixed 放置',
+  name: '行內 vs 固定放置',
   render: () => (
     <div>
       <Rule
@@ -180,7 +180,7 @@ export const PlacementRule: Story = {
 }
 
 export const AppearanceRule: Story = {
-  name: 'Subtle vs Solid 選擇',
+  name: '低調 vs 實心 選擇',
   render: () => (
     <div>
       <Rule

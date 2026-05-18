@@ -122,7 +122,7 @@ export const UsageGuidance: Story = {
 
         <Rule
           title="❌ 需要放互動元素(按鈕 / 連結):用 HoverCard"
-          note="Tooltip 不能包含可點擊元素——使用者滑鼠離開 trigger 就消失,來不及點到浮層內的按鈕。需要互動內容(NameCard、link preview、action)必須用 HoverCard。完整分界 SSOT 在 hover-card.spec.md"
+          note="Tooltip 不能包含可點擊元素——使用者滑鼠離開 trigger 就消失,來不及點到浮層內的按鈕。需要互動內容(NameCard、link preview、action)必須用 HoverCard。完整分界 完整定義在 hover-card.spec.md"
         >
           <Tooltip>
             <TooltipTrigger asChild>
@@ -142,7 +142,7 @@ export const UsageGuidance: Story = {
           title="判斷法:「使用者會想移到浮層上做事嗎?」"
           note="需要 → HoverCard(停留行為可互動);不需要,純看一句話 → Tooltip"
         >
-          <Label>完整對照見 hover-card.spec.md「與 Tooltip 的分界」(SSOT owner)</Label>
+          <Label>完整對照見 hover-card.spec.md「與 Tooltip 的分界」(主檔擁有者)</Label>
         </Rule>
       </Section>
     </div>
@@ -150,7 +150,7 @@ export const UsageGuidance: Story = {
 }
 
 export const NeedsTooltipRule: Story = {
-  name: '何時需要 tooltip',
+  name: '何時需要工具提示',
   render: () => (
     <div>
       <Rule

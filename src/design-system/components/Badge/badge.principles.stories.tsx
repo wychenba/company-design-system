@@ -94,7 +94,7 @@ export const UsageGuidance: Story = {
 
       <Rule
         title="Dot — 存在性指示（「有新東西」即訊號）"
-        note="新功能提示、unsaved changes、在線狀態——具體數量不重要或無意義。Dot overlay 的 canonical:**只疊在 iconOnly button / 單一 icon / avatar 上**(容器本身就是單一視覺重心)。text + icon button 的右上角離 icon 太遠,dot 會像飄在空中的裝飾,語義不成立。"
+        note="新功能提示、unsaved changes、在線狀態——具體數量不重要或無意義。Dot overlay 的設計準則:**只疊在 iconOnly button / 單一 icon / avatar 上**(容器本身就是單一視覺重心)。text + icon button 的右上角離 icon 太遠,dot 會像飄在空中的裝飾,語義不成立。"
       >
         <div className="flex items-center gap-4">
           <Button
@@ -202,7 +202,7 @@ export const DefaultLowRule: Story = {
 }
 
 export const ContrastFloorRule: Story = {
-  name: 'Contrast floor（容器對比下限）',
+  name: '對比 下限(容器對比下限)',
   render: () => (
     <div>
       <Rule
@@ -272,8 +272,8 @@ export const ContrastFloorRule: Story = {
         note="Archive 是**歸檔/整理**動作,不是 primary CTA——本來就該是 tertiary。按鈕降級後容器 contrast floor 放寬,badge 可以用 passive 原本的 low level,semantic 跟 visual 一致,訊號清楚。「想要 primary 按鈕 + critical badge」通常是資訊架構設定錯——重看:這顆按鈕真的是頁面主 CTA 嗎?"
       >
         {/* Note: 本 story 聚焦 level semantic 對照(critical → low);幾何仍是
-            text+icon Button + overlay,非 iconOnly overlay canonical。若要幾何也對齊
-            canonical 應改為 iconOnly + `overlayBadge` prop,或移除 overlay 改 inline badge */}
+            text+icon Button + overlay,非 iconOnly overlay 設計準則。若要幾何也對齊
+            設計準則 應改為 iconOnly + `overlayBadge` prop,或移除 overlay 改 inline badge */}
         <div className="relative inline-flex">
           <Button variant="tertiary" startIcon={Archive}>Archive</Button>
           <Badge count={128} variant="low" className="absolute -top-1 -right-1" />
@@ -340,7 +340,7 @@ export const PlacementRule: Story = {
     <div>
       <Rule
         title="Overlay — 疊加在視覺重心（iconOnly / avatar / 純 icon）"
-        note="canonical API:`<Button overlayBadge={...}>` — badge 中心對齊 icon 的 top-right corner(Material BadgedBox / iOS App Icon)。不手刻 relative + absolute,避免 badge 飄到 button chrome 邊緣"
+        note="標準 API:`<Button overlayBadge={...}>` — badge 中心對齊 icon 的 top-right corner(Material BadgedBox / iOS App Icon)。不手刻 relative + absolute,避免 badge 飄到 button chrome 邊緣"
       >
         <Button
           variant="tertiary"
@@ -379,7 +379,7 @@ export const PlacementRule: Story = {
         note="同一 trigger 疊兩個不同 urgency 的**同類訊號**(count + dot 都是通知重要性)→ 使用者無法判斷哪個重要。合併成一個 badge。不同角、不同語義 OK(Avatar 右下 presence + 右上 count 是合法,見「Avatar + badgeCount + status」demo)"
       >
         {/* ❌ anti-pattern demo intentionally kept: Button `overlayBadge` prop 只支援單一 badge
-            (canonical 就是避免 signal crowding);本 rule 主軸是「不該這樣做」,用舊
+            (設計準則 就是避免 signal crowding);本 rule 主軸是「不該這樣做」,用舊
             `relative + absolute` 手刻兩個 badge 作為視覺反例 */}
         <div className="relative inline-flex">
           <Button variant="tertiary" size="sm" iconOnly startIcon={Bell} aria-label="通知" />

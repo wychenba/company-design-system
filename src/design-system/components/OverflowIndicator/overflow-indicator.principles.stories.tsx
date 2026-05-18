@@ -73,7 +73,7 @@ export const CompositionRules: Story = {
         <h4>Pattern 3 — Tabs / Breadcrumb 水平溢出</h4>
         <p>水平容器(Tabs / Breadcrumb)寬度不夠 → 搭配 <code>horizontal-overflow</code> pattern + OverflowIndicator,中段或末端收合成 `…` 或 `+N`。對齊 Material <code>Tabs scrollable</code> + 自動 overflow menu / GitHub Breadcrumb collapse。</p>
 
-        <p className="text-fg-muted">禁止:在 app code 自刻 `+N` <code>&lt;span&gt;</code>(失去 hover popover + 形狀 token 一致性)— 必消費 OverflowIndicator(對齊 M1 SSOT 消費 canonical)。</p>
+        <p className="text-fg-muted">禁止:在 app code 自刻 `+N` <code>&lt;span&gt;</code>(失去 hover popover + 形狀 token 一致性)— 必消費 OverflowIndicator(對齊 M1 主檔消費準則)。</p>
       </div>
     </div>
   ),

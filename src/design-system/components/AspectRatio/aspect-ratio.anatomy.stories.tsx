@@ -165,7 +165,7 @@ const STD_RATIOS = [
 ]
 
 export const StandardRatios: Story = {
-  name: '標準 ratio 視覺對照',
+  name: '標準 比例 視覺對照',
   render: () => (
     <div>
       <H3>DS 標準 ratio</H3>

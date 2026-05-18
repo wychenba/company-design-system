@@ -135,14 +135,15 @@ const report = {
   coverageMap: VERBOSE ? coverageMap : undefined,
 }
 
-// Persist log
-const logsDir = path.join(ROOT, '.claude/logs')
-if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true })
+// Persist log(2026-05-18 fix per codex Phase B audit:--check usage 宣稱「只 exit code,不 dump JSON」
+// 但程式無條件 writeFileSync → 對齊 usage 寫 log gated by !CHECK_ONLY)
 const date = new Date().toISOString().slice(0, 10)
-const logPath = path.join(logsDir, `audit-preflight-${date}.json`)
-fs.writeFileSync(logPath, JSON.stringify(report, null, 2))
-
 if (!CHECK_ONLY) {
+  const logsDir = path.join(ROOT, '.claude/logs')
+  if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true })
+  const logPath = path.join(logsDir, `audit-preflight-${date}.json`)
+  fs.writeFileSync(logPath, JSON.stringify(report, null, 2))
+
   console.log('=== Audit Preflight Report ===')
   console.log(`Files total: ${report.filesCount.total}`)
   console.log(`  - component tsx: ${report.filesCount.componentTsx}`)

@@ -368,6 +368,30 @@ ${CANON_HITS}
 ⚠️ story name 引用 spec:
 ${SPEC_HITS}"
 
+  # R5.5(2026-05-17 升級補 gap):中英夾雜 detection — common-word 應中文化
+  # 對齊 story-rules.md「name: 必中文人話」+ M10 proactive scan。
+  # Exempt list:framework / brand / DS API value names(中英並列習慣保留英)
+  # Python single-file 一次掃整檔(grep regex 對 unicode + word-boundary 在 macOS bash 不穩)
+  MIXED_HITS=$(python3 -c "
+import re, sys
+EXEMPT = re.compile(r'\b(cva|Radix|Polaris|Material|Atlassian|Carbon|Ant|Apple|MUI|TanStack|shadcn|Recharts|cmdk|dnd-kit|TypeScript|JavaScript|API|UI|UX|Jira|Stripe|Notion|Figma|Linear|GitHub|Gmail|Dropbox|Slack|Spotify|Discord|VS Code|Sketch|Storybook|Tailwind|onChange|onClick|ARIA|WCAG|FAQ|HSL|CSS|HTML|DOM|DS|F[1-9]|FAB|RWD|MVP|Token|Mode|Variant|Slot|Size|Field|Input|Button|Avatar|Badge|Chip|Tag|Subtle|Solid|Range|Multiple|Single|primary|secondary|tertiary|hover|focus|active|disabled|invalid|readonly|drag|drop|inline|block|naked|bare|fixed|absolute|sticky|null|true|false)\b', re.I)
+COMMON_JARGON = re.compile(r'\b(row|overlay|per-row|tree-table|chrome|offcanvas|flow|tag|tab|panel|sheet|popup)\b', re.I)
+with open('$FILE_PATH') as f:
+    for lineno, line in enumerate(f, 1):
+        m = re.search(r\"name:\s*['\\\"]([^'\\\"]+)['\\\"]\", line)
+        if not m: continue
+        name = m.group(1)
+        if not (re.search(r'[a-zA-Z]', name) and re.search(r'[\u4e00-\u9fff]', name)):
+            continue
+        stripped = EXEMPT.sub('', name)
+        if COMMON_JARGON.search(stripped):
+            print(f'{lineno}: {name}')
+" 2>/dev/null | head -10)
+  [ -n "$MIXED_HITS" ] && violations="${violations}
+⚠️ story name 中英夾雜(common-word jargon 應中文化):
+${MIXED_HITS}
+  → row→列 / overlay→浮層 / per-row→逐列 / tree-table→樹狀表格 / chrome→框架 / offcanvas→抽屜收合 / flow→流程 / tag→標籤"
+
   if [ -n "$violations" ]; then
     CTX=$(printf 'R5 name jargon:%b' "$violations")
     jq -n --arg ctx "$CTX" '{

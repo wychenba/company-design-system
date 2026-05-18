@@ -1,6 +1,6 @@
 ---
 component: SegmentedControl
-family: null
+family: 3
 variants: {}
 sizes:
   xs:
@@ -269,6 +269,20 @@ Items 之間 `-ml-px`（除了第一個）讓相鄰 border 重疊、視覺上只
 - `../Tabs/tabs.spec.md` — container 切換 vs control 切換的判斷（完整分界 SSOT 在 Tabs spec「Tabs 與 SegmentedControl 的分界」段落）
 - `../Field/field-controls.spec.md` — SegmentedControl 作為 Field control 時的 size 繼承機制
 - `../Checkbox/checkbox.spec.md` — RadioGroup 共用規則（選項數量多或需要描述文字時的替代）
+
+## A11y 預設
+
+**ARIA / Pattern**:繼承 Radix `toggle-group` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/toggle-group#accessibility)。
+
+**Keyboard 行為**:
+
+- Tab — 進入 group(focus 在第一個或選中項)
+- ←/→ — 切 segment
+- Enter / Space — 選擇
+
+**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

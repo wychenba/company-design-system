@@ -146,7 +146,7 @@ export const VsToastRule: Story = {
 }
 
 export const ActionVariantRule: Story = {
-  name: 'Action variant 規則(不用 primary)',
+  name: '動作 變體 規則(不用 主要)',
   render: () => (
     <div>
       <Rule
@@ -187,7 +187,7 @@ export const ActionVariantRule: Story = {
 }
 
 export const HintBannerRule: Story = {
-  name: 'Hint banner — 用 Alert 不自刻',
+  name: '提示 橫幅 — 用 Alert 不自刻',
   render: () => (
     <div>
       <Rule

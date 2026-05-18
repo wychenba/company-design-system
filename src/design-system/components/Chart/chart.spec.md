@@ -1,6 +1,6 @@
 ---
 component: Chart
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:

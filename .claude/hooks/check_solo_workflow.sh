@@ -17,6 +17,8 @@ set -uo pipefail
 # 後 user 第 3 次糾正才升 mechanical (markdown rule + memory file 都不夠)。
 
 source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+# SSOT approval regex(M17 + M34 + GAP 6 codify 2026-05-18)
+source "$(dirname "$0")/lib/_approval_re.sh"
 
 set -uo pipefail
 
@@ -45,7 +47,7 @@ has_push_trigger() {
   jq -r 'select(.type=="user" and .message.role=="user" and (.message.content | type == "string")) | .message.content' \
     "$TRANSCRIPT" 2>/dev/null \
     | tail -10 \
-    | grep -qE '(push|OK|好|沒問題|合進去|合 main|merge|可以|ship|上 main)'
+    | grep -qE "$APPROVAL_KEYWORD_RE"
 }
 
 # Helper: shell-aware token detect — git checkout -b claude/X(quoted-string-safe)

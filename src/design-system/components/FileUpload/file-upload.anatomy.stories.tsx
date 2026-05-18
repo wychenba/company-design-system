@@ -47,7 +47,7 @@ export const Overview: Story = {
           </li>
           <li>
             <span className="font-mono">default children</span> — 消費 <code>&lt;Empty&gt;</code> 元件
-            (`../Empty/empty.spec.md` SSOT),icon 走 Empty 的 `Avatar 48px neutral`,
+            (`../Empty/empty.spec.md` 主檔),icon 走 Empty 的 `Avatar 48px neutral`,
             title `text-body-lg font-medium`,description `text-body`,gap `mb-4` / `--item-gap-label-desc-reading-lg`(2px)。
             改視覺去 Empty 改,FileUpload 自動跟進。
           </li>
@@ -269,7 +269,7 @@ export const SizeMatrix: Story = {
         <Desc>
           FileUpload 是 self-contained primitive(獨立拖放區),不參與 field-height family。
           內部 padding 固定為 `px-6 py-10`,預設 children 的 icon / title / description 尺寸
-          由 Empty 元件 SSOT 擁有(`../Empty/empty.spec.md`)。
+          由 Empty 元件 擁有(主檔)(`../Empty/empty.spec.md`)。
           <br />
           <strong>空間大小由 consumer 以 wrapper width / min-height 控制</strong>
           ——如需窄版擺在表單欄位旁,改用小 Button + hidden input 模式
@@ -298,7 +298,7 @@ export const SizeMatrix: Story = {
               <tr>
                 <Td mono>default children</Td>
                 <Td mono>&lt;Empty /&gt;</Td>
-                <Td>icon (Avatar 48px) / title / desc gap 由 Empty SSOT 擁有</Td>
+                <Td>icon (Avatar 48px) / title / desc gap 由 Empty 擁有(主檔)</Td>
               </tr>
               <tr>
                 <Td mono>rounded-md</Td>

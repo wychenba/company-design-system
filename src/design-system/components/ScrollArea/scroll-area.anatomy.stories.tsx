@@ -174,11 +174,11 @@ export const Inspector: Story = {
             <div className="flex items-center gap-4 text-[10px]">
               <span className="inline-flex items-center gap-1">
                 <span className="w-2.5 h-2.5 rounded-md" style={{ background: 'rgba(166,208,245,0.6)', border: '1px dashed rgba(80,145,210,0.9)' }} />
-                <span className="font-medium" style={{ color: '#2d6a9f' }}>Scrollbar(10px 固定)</span>
+                <span className="font-medium" style={{ color: 'var(--color-blue-7)' }}>Scrollbar(10px 固定)</span>
               </span>
               <span className="inline-flex items-center gap-1">
                 <span className="w-2.5 h-2.5 rounded-md" style={{ background: 'rgba(194,225,154,0.6)', border: '1px dashed rgba(139,179,91,0.9)' }} />
-                <span className="font-medium" style={{ color: '#5a7a2e' }}>Thumb inset(p-[1px])</span>
+                <span className="font-medium" style={{ color: 'var(--color-green-7)' }}>Thumb inset(p-[1px])</span>
               </span>
             </div>
             <div className="flex items-center gap-3">
@@ -190,7 +190,7 @@ export const Inspector: Story = {
                   border: '1.5px dashed rgba(80,145,210,0.9)',
                 }}
               >
-                <span className="text-[11px] font-mono font-bold" style={{ color: '#2d6a9f' }}>10px</span>
+                <span className="text-[11px] font-mono font-bold" style={{ color: 'var(--color-blue-7)' }}>10px</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="font-mono text-[12px] text-fg-secondary">w-2.5 / h-2.5</span>
@@ -348,7 +348,7 @@ export const SizeMatrix: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const OrientationBehavior: Story = {
-  name: 'Orientation 行為',
+  name: '方向 行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

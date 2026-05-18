@@ -138,7 +138,7 @@ function TagDismiss({ onDismiss, label, solid, color }: { onDismiss: () => void;
 }
 
 function TagInner(
-  { className, color, size, icon: Icon, avatar, onDismiss, solid, unbounded = false, children, ...props }: TagProps,
+  { className, color, size, icon: Icon, avatar, onDismiss, solid, unbounded = false, children, style, ...props }: TagProps,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   const solidClass = solid ? SOLID_CLASSES[color ?? 'neutral'] : undefined
@@ -176,7 +176,20 @@ function TagInner(
         if (typeof forwardedRef === 'function') forwardedRef(el)
         else if (forwardedRef) (forwardedRef as React.MutableRefObject<HTMLDivElement | null>).current = el
       }}
-      className={cn(tagVariants({ color, size }), solidClass, 'w-fit min-w-0 overflow-hidden', !unbounded && 'max-w-40', className)}
+      data-tag-root=""
+      className={cn(tagVariants({ color, size }), solidClass, 'w-fit min-w-0 overflow-hidden', className)}
+      // 2026-05-18 Round 5 fix(per Codex M31 Round 5 verdict + user 拍板「那就開始做」):
+      // 用 CSS var `--combobox-tag-area-inline-size`(由 Combobox useOverflowCount JS-injected)取代
+      // `min(100%, 10rem)` cyclic percentage。CSS Sizing 3 §5.2.1:percentage 在 indefinite containing
+      // block 退化為 initial value → Round 4 的 100% 沒 enforce。改 explicit px 值(JS measured)避此 trap。
+      // unbounded=true:cap = inject 寬(回 cell-as-input narrow cell 原 behavior)
+      // default:cap = min(inject 寬, 160px)— 兩 cap 取小。fallback(無 var,Form context 等)= 100% / 10rem。
+      style={{
+        maxWidth: unbounded
+          ? 'var(--combobox-tag-area-inline-size, 100%)'
+          : 'min(var(--combobox-tag-area-inline-size, 10rem), 10rem)',
+        ...style,
+      }}
       {...props}
     >
       {Icon && <Icon size={16} aria-hidden />}

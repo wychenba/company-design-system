@@ -141,7 +141,7 @@ export const UsageGuidance: Story = {
 // ── Layout ────────────────────────────────────────────────────────────────
 
 export const LayoutRule: Story = {
-  name: 'Overflow：wrap vs scroll vs menu',
+  name: '超出處理:換行 vs 捲動 vs 選單',
   render: () => {
     const [tagsW, setTagsW] = React.useState<string[]>(['react'])
     const [tagsS, setTagsS] = React.useState<string[]>(['react'])
@@ -196,12 +196,12 @@ export const LayoutRule: Story = {
 // ── 選中視覺 ─────────────────────────────────────────────────────────────
 
 export const SelectedStyleRule: Story = {
-  name: '選中狀態：text + border 同染，不用 bg 強調',
+  name: '選中狀態：text + 邊框 同染，不用 背景 強調',
   render: () => (
     <div>
       <Rule
         title="選中 = primary-hover text + border，底色不變"
-        note="對齊 SegmentedControl / Tabs / Input 的 canonical 選中規則(primary-hover 同時染文字和線條)。用 bg 強調會讓 chip 看起來變成「按鈕」,混淆多選濾鏡的語意"
+        note="對齊 SegmentedControl / Tabs / Input 的設計準則 選中規則(primary-hover 同時染文字和線條)。用 bg 強調會讓 chip 看起來變成「按鈕」,混淆多選濾鏡的語意"
       >
         <ChipGroup type="multiple" defaultValue={['react', 'ts']}>
           <Chip value="react">React</Chip>

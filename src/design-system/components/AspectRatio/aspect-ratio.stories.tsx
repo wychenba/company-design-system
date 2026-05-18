@@ -31,7 +31,7 @@ const Figure = ({
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 export const HeroBanner16x9: Story = {
-  name: '16/9 Hero Banner',
+  name: '16:9 主視覺橫幅',
   render: () => (
     <div className="max-w-[720px]">
       <h3 className="text-body font-bold text-foreground mb-1">Airbnb listing hero</h3>
@@ -95,7 +95,7 @@ export const ProductPhoto4x3: Story = {
 }
 
 export const SquareAvatar1x1: Story = {
-  name: '1/1 Instagram post',
+  name: '1:1 社群方形貼文',
   render: () => (
     <div className="max-w-[600px]">
       <h3 className="text-body font-bold text-foreground mb-1">Instagram-style 方形貼文</h3>
@@ -118,7 +118,7 @@ export const SquareAvatar1x1: Story = {
 }
 
 export const Ultrawide21x9: Story = {
-  name: '21/9 Cinematic banner',
+  name: '21:9 影院橫幅',
   render: () => (
     <div className="max-w-[900px]">
       <h3 className="text-body font-bold text-foreground mb-1">YouTube cinematic / movie poster</h3>
@@ -137,7 +137,7 @@ export const Ultrawide21x9: Story = {
 }
 
 export const CommonRatios: Story = {
-  name: '常用 ratio 一覽',
+  name: '常用 比例 一覽',
   render: () => (
     <div className="flex flex-col gap-8 max-w-[720px]">
       <p className="text-caption text-fg-muted max-w-[600px] leading-relaxed">

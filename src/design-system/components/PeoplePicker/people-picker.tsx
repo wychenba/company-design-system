@@ -313,7 +313,10 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
               key={item.value}
               size={size}
               color="neutral"
-              unbounded
+              // 2026-05-18 7B' fix(per user 拍板「執行」+ Codex Round 3 共識,paired with Combobox L286):
+              // 拿掉 `unbounded` 對齊 Tag canonical max-w-40 cap + 內建 ellipsis。PeoplePicker pill 走
+              // Combobox tagRenderer slot,SSOT = Tag primitive 視覺(per codex Round 3 verdict)。
+              // 人名 99% < 25 chars 不觸發 cap;極端長名(複數姓 + middle name)觸發 ellipsis 是合理 UX。
               avatar={pillShowAvatar
                 ? <Avatar src={p.avatarUrl} alt={p.name} size={16} hoverCard={buildPersonNameCard(p)} />
                 : undefined}

@@ -98,7 +98,7 @@ export const UsageGuidance: Story = {
 }
 
 export const WhoDecidesRule: Story = {
-  name: '分隔的決策者:Separator vs CSS border',
+  name: '分隔的決策者:Separator vs CSS 邊框',
   render: () => (
     <div>
       <Rule

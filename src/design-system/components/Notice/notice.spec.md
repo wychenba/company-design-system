@@ -1,6 +1,6 @@
 ---
 component: Notice
-family: null
+family: 2
 variants: {}
 sizes: {}
 traits:
@@ -118,6 +118,19 @@ Notice 是 **Toast / Alert 共用的 layout primitive**,刻意不擁有尺寸與
 - `../../patterns/element-anatomy/item-anatomy.spec.md` — Notice 的 layout 共用規則
 - `../../tokens/color/color.spec.md` — color tokens 和 variant × theme 策略
 - `../../tokens/color/primitives.css` — primitives nested theme（`:root, [data-theme]` pattern）
+
+## A11y 預設
+
+**ARIA / Pattern**:對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。
+
+**Keyboard 行為**:
+
+- Tab — focus dismiss button(若 dismissible)
+- Esc — dismiss(若 dismissible)
+
+**Focus**:focus-visible ring 對齊 DS canonical(`outline: 2px solid var(--ring)`);focus management 由元件 own。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

@@ -1,6 +1,6 @@
 ---
 component: OverflowIndicator
-family: null
+family: self-contained
 variants: {}
 sizes: {}
 traits:
@@ -104,3 +104,17 @@ OverflowIndicator 是 **composite**(HoverCard trigger + tag-styled `+N` span + H
 - `../Combobox/combobox.spec.md` — 主要消費者（多選溢出）
 - `../../patterns/horizontal-overflow/horizontal-overflow.spec.md` — 水平溢出 pattern（OverflowIndicator 是其中的「menu 模式」trigger）
 - `../Avatar/avatar.spec.md` — Avatar stack 溢出場景（未來消費者）
+
+## A11y 預設
+
+**ARIA / Pattern**:對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。
+
+**Keyboard 行為**:
+
+- Tab — focus indicator
+- Enter — show overflow menu
+
+**Focus**:focus-visible ring 對齊 DS canonical(`outline: 2px solid var(--ring)`);focus management 由元件 own。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
+

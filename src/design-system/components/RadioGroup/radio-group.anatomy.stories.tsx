@@ -54,7 +54,7 @@ const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
    Shared UI Components
 
    NOTE: Kept local (not imported from `_anatomy/anatomy-utils`) because the
-   Button-family inspector layout diverges visually from the canonical helpers:
+   Button-family inspector layout diverges visually from the 通用 helpers:
    H3 `text-h6 font-semibold` (not `text-body font-bold mb-2`), Desc has no
    bottom margin, Th/Td use `p-2 border-b border-divider` row style, and
    Swatch defaults to `size="md"` for inline token chips.
@@ -674,7 +674,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 RadioGroup 對應 Radix / Material / Polaris a11y 規範。"}</p>
+      <p className="whitespace-pre-line">{"詳 `radio-group.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  radio-group  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/radio-group#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入 group\n- ↑/↓ — 切 option\n- Space — 選擇\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1"}</p>
     </div>
   ),
 }

@@ -124,7 +124,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ColumnTypeRule: Story = {
-  name: '用 column type 自動渲染,不手寫 cell',
+  name: '用 欄 type 自動渲染,不手寫 儲存格',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -213,7 +213,7 @@ export const VirtualScrollRule: Story = {
 }
 
 export const EmptyStateRule: Story = {
-  name: 'Empty / error / loading 的對應元件',
+  name: '空 / 錯誤 / 載入中 的對應元件',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [

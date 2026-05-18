@@ -1,6 +1,6 @@
 ---
 component: DescriptionList
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:

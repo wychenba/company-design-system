@@ -1,3 +1,8 @@
+// @story-trait-rationale: Inspector + ColorMatrix N/A — FieldControlGroup 是
+// self-contained layout-primitive(border-collapse 接合 N 個 Field child),
+// spec frontmatter `variants: {}` / `sizes: {}` / `traits: []`(明示 layout-primitive 無 trait variants)。
+// 無 cva color variant → ColorMatrix N/A;無 interactive prop control(僅 children layout)→ Inspector N/A。
+// 對齊 design-system-audit Dim 13 trait-rationale 例外 SSOT。
 import type { Meta, StoryObj } from '@storybook/react'
 import { FieldControlGroup } from './field-control-group'
 import { Select } from '@/design-system/components/Select/select'

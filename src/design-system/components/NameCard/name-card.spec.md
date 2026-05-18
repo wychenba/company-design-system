@@ -1,6 +1,6 @@
 ---
 component: NameCard
-family: null
+family: composite
 traits:
   - isInternal
 variants: {}
@@ -131,7 +131,9 @@ NameCard 的 default actions **是 `Chat + Audio call`**(chat app 標配,對齊 
 
 ---
 
-## 無障礙
+## A11y 預設
+
+> 命名對齊 DS canonical(2026-05-18,per `# 命名與語言一致性`)。本節原標題「無障礙」,改「A11y 預設」與其他 spec 一致。
 
 - **Trigger 整合**:Avatar 作為 HoverCard trigger 時,`onFocus` / `onBlur` 與 mouseenter/leave 同時觸發由 Radix HoverCard 管理——鍵盤使用者 Tab 到 avatar 可自動顯示 card,Escape 關閉
 - **Focus 順序**:NameCard 內若有 Action button,Tab 順序為 trigger(Avatar)→ 第一個 action → 後續 action → view more;不抓取 focus 進入浮層(保留 Radix `HoverCard` 預設語意,與 Popover 的 focus trap 不同)

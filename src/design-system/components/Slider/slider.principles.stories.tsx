@@ -188,7 +188,7 @@ export const PositionAsStateRule: Story = {
 }
 
 export const HoverUsesShadowRule: Story = {
-  name: 'Hover / active 用陰影不用色變',
+  name: '滑鼠移過 / 啟用 用陰影不用色變',
   render: () => (
     <div>
       <Rule

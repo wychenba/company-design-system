@@ -70,7 +70,7 @@ export const CompositionRules: Story = {
         <h4>Field 包覆規則</h4>
         <p>Checkbox / RadioGroup 在 form context 內 → 外層用 <LinkTo kind="Design System/Components/Field/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Field</span></LinkTo> 統一 label + helper + error(對齊 Field 4-Family Layout 慣例)。Field 處理 wrapper level 的 ARIA + error,SelectionItem 處理 row level 的 layout。</p>
 
-        <p className="text-fg-muted">禁止:在 app code 自刻 selection row(<code>&lt;label className="flex items-start gap-3 p-3"&gt;</code>)— 必消費 Checkbox / RadioGroup(對齊 M1 SSOT 消費 canonical + Family 2 baseline)。</p>
+        <p className="text-fg-muted">禁止:在 app code 自刻 selection row(<code>&lt;label className="flex items-start gap-3 p-3"&gt;</code>)— 必消費 Checkbox / RadioGroup(對齊 M1 主檔消費準則 + Family 2 baseline)。</p>
       </div>
     </div>
   ),

@@ -55,7 +55,7 @@ export const ReadOnlyProductRating: Story = {
 
 /* ── 送出評分 flow（Yelp / Google Reviews 風格）── */
 export const InteractiveReview: Story = {
-  name: '送出評分 Flow',
+  name: '送出評分流程',
   render: () => {
     const ReviewForm = () => {
       const [rating, setRating] = useState(0)

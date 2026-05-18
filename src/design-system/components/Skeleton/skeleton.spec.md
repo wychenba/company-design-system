@@ -1,6 +1,6 @@
 ---
 component: Skeleton
-family: null
+family: self-contained
 variants: {}
 sizes: {}
 traits:

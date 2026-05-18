@@ -571,7 +571,7 @@ export const CommonMistakes: Story = {
 }
 
 export const DismissVsDanger: Story = {
-  name: 'Dismiss vs Destructive 語意區分',
+  name: '取消 vs 危險動作 語意區分',
   render: () => (
     <div>
       <Rule

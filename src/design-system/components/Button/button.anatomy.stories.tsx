@@ -106,7 +106,7 @@ const VARIANT_DESC: Record<VariantKey, string> = {
    Shared UI Components
 
    NOTE: This file keeps local H3 / Desc / Th / Td / Swatch because its visual
-   style diverges from the shared canonical in `@/design-system/stories-helpers/anatomy/anatomy-utils`:
+   style diverges from the 通用設計準則 in `@/design-system/stories-helpers/anatomy/anatomy-utils`:
    - H3 uses `text-h6 font-semibold` (shared: `text-body font-bold mb-2`)
    - Desc has no bottom margin / `leading-relaxed` (shared adds both)
    - Th/Td use `p-2 border-b border-divider` row style (shared: boxed cells)
@@ -703,7 +703,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 Button 對應 Radix / Material / Polaris a11y 規範。"}</p>
+      <p className="whitespace-pre-line">{"詳 `button.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  slot  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/slot#accessibility)。\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

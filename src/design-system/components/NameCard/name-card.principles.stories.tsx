@@ -158,7 +158,7 @@ export const FixedWidthRule: Story = {
     <div>
       <Rule
         title="NameCard 永遠 320px，不隨內容伸縮"
-        note="HoverCard 浮層寬度由 NameCard 決定。若寬度隨內容變化,使用者在不同人員的卡之間切換時,浮層會左右跳動,體驗破碎。固定寬度保證穩定預測。對照 Material Snackbar 固定 344px,世界級 DS 一致採「單一元件 canonical 寬度固定」策略"
+        note="HoverCard 浮層寬度由 NameCard 決定。若寬度隨內容變化,使用者在不同人員的卡之間切換時,浮層會左右跳動,體驗破碎。固定寬度保證穩定預測。對照 Material Snackbar 固定 344px,世界級 DS 一致採「單一元件 設計準則 寬度固定」策略"
       >
         <div className="flex flex-col gap-3">
           <div className="border border-border rounded-lg">
@@ -181,7 +181,7 @@ export const FixedWidthRule: Story = {
 
       <Rule
         title="❌ 手動覆蓋 w-[xxx]"
-        note="每張卡寬度不一樣 = 整個產品的人員預覽體驗不一致。固定寬度是 canonical 設計決策,不建議 consumer 覆蓋"
+        note="每張卡寬度不一樣 = 整個產品的人員預覽體驗不一致。固定寬度是 設計準則 設計決策,不建議 consumer 覆蓋"
       >
         <Label warn>（設計規則）寬度是 NameCard 的元件級常數,不屬於可調參數</Label>
       </Rule>
@@ -192,7 +192,7 @@ export const FixedWidthRule: Story = {
 // ── 結構選擇 ────────────────────────────────────────────────────────────
 
 export const SectionRule: Story = {
-  name: 'Section 各自獨立（選擇性出現）',
+  name: 'Section 各自獨立(選擇性出現)',
   render: () => (
     <div>
       <Rule

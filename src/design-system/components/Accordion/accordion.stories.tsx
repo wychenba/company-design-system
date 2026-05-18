@@ -70,7 +70,7 @@ export const States: Story = {
 // ── FAQ(single + collapsible)——Stripe / Notion 類說明頁 ─────────
 
 export const FAQ: Story = {
-  name: 'FAQ',
+  name: 'FAQ 常見問題',
   render: () => (
     <div className="max-w-[640px]">
       <Accordion type="single" collapsible>

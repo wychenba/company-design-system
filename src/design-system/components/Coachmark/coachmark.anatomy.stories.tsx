@@ -98,7 +98,7 @@ export const Overview: Story = {
               <tr><Td mono>isLastStep</Td><Td mono>boolean</Td><Td mono>false</Td><Td>true 時 Next 文字改 Done</Td></tr>
               <tr><Td mono>side</Td><Td mono>'top' | 'right' | 'bottom' | 'left'</Td><Td mono>'bottom'</Td><Td>對齊 Popover props</Td></tr>
               <tr><Td mono>align</Td><Td mono>'start' | 'center' | 'end'</Td><Td mono>'center'</Td><Td>對齊 Popover props</Td></tr>
-              <tr><Td mono>sideOffset</Td><Td mono>number</Td><Td mono>8</Td><Td>對齊 Popover DS canonical(8px,見 `popover.spec.md`)</Td></tr>
+              <tr><Td mono>sideOffset</Td><Td mono>number</Td><Td mono>8</Td><Td>對齊 Popover DS 設計準則(8px,見 `popover.spec.md`)</Td></tr>
               <tr><Td mono>className</Td><Td mono>string</Td><Td mono>'w-80 p-0 overflow-hidden'</Td><Td>預設寬 320px(比 Popover 的 w-72 寬,因放 media + 多行文字)</Td></tr>
             </tbody>
           </table>
@@ -180,7 +180,7 @@ export const Inspector: Story = {
                 <tr><Td>Button size</Td><Td mono>sm(Previous / Skip / Next 全 sm)</Td></tr>
                 <tr><Td>Previous / Skip variant</Td><Td mono>tertiary</Td></tr>
                 <tr><Td>Next variant</Td><Td mono>primary</Td></tr>
-                <tr><Td>sideOffset</Td><Td mono>8px(對齊 Popover DS canonical)</Td></tr>
+                <tr><Td>sideOffset</Td><Td mono>8px(對齊 Popover DS 設計準則)</Td></tr>
                 <tr><Td>Density</Td><Td mono>繼承 Popover(鎖 md)</Td></tr>
               </tbody>
             </table>

@@ -1,6 +1,6 @@
 ---
 component: Accordion
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:

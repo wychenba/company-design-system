@@ -139,7 +139,7 @@ export const ColorMatrix: Story = {
 }
 
 export const PlacementMatrix: Story = {
-  name: 'Placement(inline vs fixed)',
+  name: '出現位置(內嵌 vs 固定)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -198,7 +198,7 @@ export const StateBehavior: Story = {
       <div>
         <H3>Close button 互動狀態</H3>
         <Desc>
-          Chrome corner close 用 **Button iconOnly `dismiss` size="xs"**(Notification banner family canonical,見 `overlay-surface.spec.md`「Chrome dismiss size canonical」三家族分類 — Notice / Alert / Toast 屬 notification banner,xs 為其 family canonical)。corner 屬 action group region,實務上可與 refresh / share 等 Button 並排(用 Separator 分群),必須統一 Button primitive + 同 family 全 xs。`dismiss` prop 自動套 `variant="text"` + icon `fg-muted` 弱化,hover 時恢復 foreground。
+          Chrome corner close 用 **Button iconOnly `dismiss` size="xs"**(Notification banner 家族設計準則,見 `overlay-surface.spec.md`「Chrome dismiss size canonical」三家族分類 — Notice / Alert / Toast 屬 notification banner,xs 為其 家族設計準則)。corner 屬 action group region,實務上可與 refresh / share 等 Button 並排(用 Separator 分群),必須統一 Button primitive + 同 family 全 xs。`dismiss` prop 自動套 `variant="text"` + icon `fg-muted` 弱化,hover 時恢復 foreground。
         </Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">

@@ -60,7 +60,7 @@ export const Modes: Story = {
 
 /* ── 垂直 Group ── */
 export const VerticalGroup: Story = {
-  name: '垂直 Group',
+  name: '直式群組',
   render: () => (
     <div className="flex flex-col gap-4 max-w-md">
       {(['sm', 'md', 'lg'] as const).map(size => (

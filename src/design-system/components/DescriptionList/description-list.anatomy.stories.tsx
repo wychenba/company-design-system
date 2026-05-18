@@ -100,7 +100,7 @@ export const Inspector: Story = {
 }
 
 export const ColsMatrix: Story = {
-  name: 'cols(1 / 2 / 3)',
+  name: '欄數(1 / 2 / 3)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

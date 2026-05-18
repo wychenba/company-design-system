@@ -108,7 +108,7 @@ export const InteractiveEllipsis: Story = {
 // :focus-visible / :active 處理(spec.md L107 無 element-level disabled)。
 
 export const DeclarativeAutoCollapse: Story = {
-  name: 'Declarative + Auto-collapse',
+  name: '宣告式 API + 自動收合',
   render: () => (
     <div className="flex flex-col gap-6 max-w-2xl">
       <div>
@@ -181,7 +181,7 @@ export const DeclarativeAutoCollapse: Story = {
         <p className="text-caption text-fg-muted mb-3">
           容器寬 320px,item label 過長。Root shrink:3(最先縮)→ middle shrink:2 → current
           shrink:1。各 item 內 `truncate` + ResizeObserver 偵測 → hover tooltip 顯完整文字
-          (對齊 `tooltip.principles.stories.tsx:190` canonical)。
+          (對齊 `tooltip.principles.stories.tsx:190` 設計準則)。
         </p>
         {/* @story-trait-rationale: 2026-05-14 per user 拍板「拿掉 fixed 320px 讓 resize window 測 RWD」— Breadcrumb 是純結構導覽,disabled/states 由 BreadcrumbLink :focus-visible/:hover/:active 處理(spec.md L107),trait check 沿用 file header rationale */}
         <div className="border border-dashed border-divider rounded-md p-2">
@@ -253,7 +253,7 @@ export const TwoLevels: Story = {
 // ── asChild (整合 router Link) ─────────────────────────────────────────────
 
 export const AsChildRouterLink: Story = {
-  name: 'asChild prop',
+  name: 'asChild 組合(替換 trigger 元素)',
   render: () => (
     <div className="flex flex-col gap-2">
       <div className="text-caption text-fg-muted">

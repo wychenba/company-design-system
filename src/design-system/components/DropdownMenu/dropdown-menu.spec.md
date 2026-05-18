@@ -1,6 +1,6 @@
 ---
 component: DropdownMenu
-family: null
+family: 1
 variants: {}
 sizes: {}
 traits:
@@ -207,6 +207,22 @@ Item-level default / hover / focused / selected / disabled **色彩**由 MenuIte
 - `../SelectMenu/select-menu.spec.md` — 選值（選完留在 field 裡）的對應元件
 - `../Button/button.spec.md` — 通常作為 DropdownMenuTrigger
 - `../Dialog/dialog.spec.md` — 複雜流程時的改用選擇
+
+## A11y 預設
+
+**ARIA / Pattern**:繼承 Radix `dropdown-menu` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/dropdown-menu#accessibility)。
+
+**Keyboard 行為**:
+
+- Tab — focus trigger
+- Enter / Space / ↓ — 開啟
+- ↑/↓ — 導覽 items
+- Enter — 選擇
+- Esc — 關閉
+
+**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

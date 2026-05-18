@@ -1,6 +1,6 @@
 ---
 component: Empty
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:

@@ -208,7 +208,7 @@ export const UsageGuidance: Story = {
 }
 
 export const PrecisionChoice: Story = {
-  name: 'Precision 選擇',
+  name: '精度選擇',
   render: () => (
     <div>
       <Rule

@@ -160,7 +160,7 @@ export const UsageGuidance: Story = {
 }
 
 export const MultipleRule: Story = {
-  name: 'multiple 選擇',
+  name: '多選',
   render: () => (
     <div>
       <Rule
@@ -204,7 +204,7 @@ export const MultipleRule: Story = {
 }
 
 export const DivisionOfLaborRule: Story = {
-  name: '與 FileItem 的分工',
+  name: '與 FileItem 的職責分工',
   render: () => {
     const [files, setFiles] = React.useState([
       { name: 'Q1-planning.pdf', description: '2.3 MB' },
@@ -255,7 +255,7 @@ export const DivisionOfLaborRule: Story = {
 
         <Rule
           title="❌ 不在 FileUpload 裡自己重刻 FileItem primitives"
-          note="2026-04-24 canonical 更新:DS 提供 dual path — FileUpload 可 own list via `files` prop(內部 compose `<FileItem>`);OR consumer 自組 `{files.map(f => <FileItem ... />)}`。禁止的是「自畫 status icon / thumbnail / progress bar / row layout 等 FileItem primitives 視覺規格」。世界級(Material / Ant / Carbon)都 own list composing 自家 FileItem primitive。"
+          note="2026-04-24 設計準則更新:DS 提供 dual path — FileUpload 可 own list via `files` prop(內部 compose `<FileItem>`);OR consumer 自組 `{files.map(f => <FileItem ... />)}`。禁止的是「自畫 status icon / thumbnail / progress bar / row layout 等 FileItem primitives 視覺規格」。世界級(Material / Ant / Carbon)都 own list composing 自家 FileItem primitive。"
         >
           <Label warn>⚠️ 要顯示清單 → 傳 `files` prop(DS built-in)OR 自組 FileItem map;但不要自己重畫 FileItem 內部結構</Label>
         </Rule>
@@ -265,7 +265,7 @@ export const DivisionOfLaborRule: Story = {
 }
 
 export const ErrorFeedbackRule: Story = {
-  name: 'accept + maxSize + onReject 三配套',
+  name: '檔案類型 + 最大尺寸 + 拒絕回呼 三配套',
   render: () => {
     const [errors, setErrors] = React.useState<string[]>([])
     return (

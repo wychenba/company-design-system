@@ -160,7 +160,7 @@ export const Range: Story = {
  * Notion sidebar 行事曆小卡)。不透過 popup,頁面常駐顯示。
  */
 export const Inline: Story = {
-  name: 'Inline — Dashboard 小卡',
+  name: '行內 — 儀表板小卡',
   render: () => {
     const today = new Date()
     const [deadline, setDeadline] = useState<Date | undefined>(

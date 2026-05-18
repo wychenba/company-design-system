@@ -224,7 +224,7 @@ export const SizeSelection: Story = {
 // ── Trigger 結構 ──────────────────────────────────────────────────────────────
 
 export const TriggerSlots: Story = {
-  name: 'Trigger slot 使用',
+  name: '觸發位置插槽使用',
   render: () => (
     <div>
       <Rule

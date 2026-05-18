@@ -804,7 +804,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 SelectMenu 對應 Radix / Material / Polaris a11y 規範。"}</p>
+      <p className="whitespace-pre-line">{"詳 `select-menu.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :基於  cmdk  library a11y(combobox / listbox / option role + aria-activedescendant)。詳 [cmdk a11y](https://cmdk.paco.me/#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — focus trigger\n- Enter / Space / ↓ — 開啟 menu\n- ↑/↓ — 導覽 options\n- Enter — 選擇\n- 字母鍵 — type-ahead 過濾(search 模式)\n- Esc — 關閉\n\n  Focus  :menu 開啟時 focus 第一 option / 選中項;關閉時 focus 回 trigger。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

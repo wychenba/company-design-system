@@ -96,7 +96,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ModeRule: Story = {
-  name: 'Mode 選擇（compact vs rich）',
+  name: '模式 選擇(緊湊 vs 豐富)',
   render: () => (
     <div>
       <Rule
@@ -215,7 +215,7 @@ export const StatusProgressRule: Story = {
 }
 
 export const ActionsRule: Story = {
-  name: 'Actions 使用',
+  name: '動作 使用',
   render: () => (
     <div>
       <Rule

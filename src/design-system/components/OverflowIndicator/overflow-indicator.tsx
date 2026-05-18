@@ -94,6 +94,7 @@ const OverflowIndicator = React.forwardRef<HTMLSpanElement, OverflowIndicatorPro
     const trigger = shape === 'tag' ? (
       <span
         ref={ref}
+        data-overflow-indicator=""
         className={cn(tagVariants({ color: 'neutral', size }), 'cursor-default', className)}
         {...props}
       >
@@ -102,6 +103,7 @@ const OverflowIndicator = React.forwardRef<HTMLSpanElement, OverflowIndicatorPro
     ) : (
       <span
         ref={ref}
+        data-overflow-indicator=""
         className={cn(
           'shrink-0 rounded-full inline-grid place-content-center',
           'bg-muted text-foreground font-medium leading-none cursor-default',

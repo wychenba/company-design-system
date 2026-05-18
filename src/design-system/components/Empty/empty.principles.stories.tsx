@@ -210,7 +210,7 @@ export const NextActionRule: Story = {
 }
 
 export const StructureRule: Story = {
-  name: 'Icon + Title + Description + Action 結構',
+  name: '圖示 + 標題 + 說明 + 動作 結構',
   render: () => (
     <div>
       <Rule
@@ -271,7 +271,7 @@ export const StructureRule: Story = {
 }
 
 export const CopyRule: Story = {
-  name: '文案具體化 — 不用 generic 字',
+  name: '文案具體化 — 不用 通用 字',
   render: () => (
     <div>
       <Rule

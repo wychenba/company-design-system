@@ -252,6 +252,20 @@ Select 是 **Field Controls family 成員**——互動狀態(focus / invalid / 
 - `../Switch/switch.spec.md` — 布林切換
 - `../Field/field-controls.spec.md` — Select 作為 Field control 時的共用規則（mode、size、endAction）
 
+## A11y 預設
+
+**ARIA / Pattern**:native `<input>` element 預設 a11y;Field wrapper 補 `aria-labelledby` / `aria-invalid` / `aria-describedby`。
+
+**Keyboard 行為**:
+
+- Tab — focus
+- 字母鍵 — 輸入
+- Esc — 清空(若 clearable + 有值)
+
+**Focus**:native input focus ring;DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
+
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。

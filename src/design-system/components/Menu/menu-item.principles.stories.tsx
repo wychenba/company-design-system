@@ -44,12 +44,12 @@ export const UsageGuidance: Story = {
 
       {/* vs 近親 — VsItemAnatomyRule — 原 VsItemAnatomyRule */}
       <div className="prose prose-sm max-w-prose">
-      <p>MenuItem 是 Family 1(menu)的具體實作;item-anatomy 是 Family 1+2 的 cross-element SSOT。</p>
+      <p>MenuItem 是 Family 1(menu)的具體實作;item-anatomy 是 Family 1+2 的 cross-element 主檔。</p>
       <ul>
         <li><strong>MenuItem(本元件)</strong>—runtime 元件,實裝 Family 1 row</li>
-        <li><strong>item-anatomy.spec.md</strong>—canonical doc,跨 MenuItem / Row / FileItem 共通的 anatomy 規則</li>
+        <li><strong>item-anatomy.spec.md</strong>—設計準則文件,跨 MenuItem / Row / FileItem 共通的 anatomy 規則</li>
       </ul>
-      <p className="text-fg-muted">judgment 改:動 item-anatomy.spec(SSOT);實作改:動 menu-item.tsx。</p>
+      <p className="text-fg-muted">judgment 改:動 item-anatomy.spec(主檔);實作改:動 menu-item.tsx。</p>
     </div>
     </div>
   ),
@@ -73,7 +73,7 @@ export const CompositionRules: Story = {
         <h4>Pattern 3 — ContextMenu + MenuItem(右鍵選單,未來)</h4>
         <p>右鍵觸發 contextual action → 預留消費者(Radix ContextMenu + MenuItem 同 layout primitive)。</p>
 
-        <p className="text-fg-muted">禁止:在 app code 自刻 menu row(<code>&lt;div className="flex px-2 py-1.5"&gt;</code>)— 必消費 MenuItem(對齊 SSOT 消費 canonical M1 + item-anatomy Family 1 SSOT)。Slot 對齊規則:prefix 24px / content reading-mode 垂直堆疊 / suffix optional — 詳 <code>item-anatomy.spec.md</code>。</p>
+        <p className="text-fg-muted">禁止:在 app code 自刻 menu row(<code>&lt;div className="flex px-2 py-1.5"&gt;</code>)— 必消費 MenuItem(對齊 主檔消費準則 M1 + item-anatomy Family 1 主檔)。Slot 對齊規則:prefix 24px / content reading-mode 垂直堆疊 / suffix optional — 詳 <code>item-anatomy.spec.md</code>。</p>
       </div>
     </div>
   ),

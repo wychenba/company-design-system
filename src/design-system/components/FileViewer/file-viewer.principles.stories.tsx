@@ -205,7 +205,7 @@ const notionGallery: FileInfo[] = [
 ]
 
 export const InfoPanelDefaultRule: Story = {
-  name: 'Info panel 預設關',
+  name: '檔案資訊面板預設關閉',
   render: () => {
     const [open, setOpen] = React.useState(false)
     return (
@@ -251,14 +251,14 @@ const closeOrderFiles: FileInfo[] = [
 ]
 
 export const CloseButtonPositionRule: Story = {
-  name: 'Toolbar 按鈕順序(close 永遠最右)',
+  name: '工具列 按鈕順序(關閉 永遠最右)',
   render: () => {
     const [open, setOpen] = React.useState(false)
     return (
       <div>
         <Rule
           title="✅ toolbar 順序 — zoom → info → download → close(影響力遞增)"
-          note="DS canonical 三方交集:(1) action-bar「全局 primary 在最右」影響力遞增;(2) Notice dismiss X always rightmost;(3) Dialog close 靠右的跨平台慣例(macOS / Windows / Web 一致)。zoom 影響單檔 transform / info 影響 layout / download 搬內容出 viewer / close unmount 所有 state — 影響越大越右"
+          note="DS 設計準則三方交集:(1) action-bar「全局 primary 在最右」影響力遞增;(2) Notice dismiss X always rightmost;(3) Dialog close 靠右的跨平台慣例(macOS / Windows / Web 一致)。zoom 影響單檔 transform / info 影響 layout / download 搬內容出 viewer / close unmount 所有 state — 影響越大越右"
         >
           <Button variant="tertiary" startIcon={FolderOpen} onClick={() => setOpen(true)}>
             開啟 Dashboard 設計稿
@@ -461,7 +461,7 @@ const splitFiles: FileInfo[] = [
 ]
 
 export const NoNestedOverlayRule: Story = {
-  name: '禁止 nested 浮層',
+  name: '禁止 巢狀 浮層',
   render: () => {
     const [open, setOpen] = React.useState(false)
     return (
@@ -509,7 +509,7 @@ const darkDemoFiles: FileInfo[] = [
 ]
 
 export const DarkModeLockedRule: Story = {
-  name: 'Viewer chrome 鎖 dark(不隨頁面 theme)',
+  name: '檢視器框架鎖暗色(不隨頁面主題)',
   render: () => {
     const [open, setOpen] = React.useState(false)
     return (
@@ -548,7 +548,7 @@ const kbFiles: FileInfo[] = Array.from({ length: 3 }, (_, i) => ({
 }))
 
 export const KeyboardShortcutRule: Story = {
-  name: 'Keyboard shortcut 是 power user 入口',
+  name: '鍵盤捷徑 是 進階使用者 入口',
   render: () => {
     const [open, setOpen] = React.useState(false)
     return (

@@ -1,6 +1,6 @@
 ---
 component: FileViewer
-family: null
+family: 3
 variants: {}
 sizes: {}
 traits:

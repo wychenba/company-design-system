@@ -1,6 +1,6 @@
 ---
 component: AspectRatio
-family: null
+family: self-contained
 variants: {}
 sizes: {}
 traits:

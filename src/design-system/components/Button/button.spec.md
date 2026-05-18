@@ -434,6 +434,14 @@ N/A(action trigger,無資料層)。
 - `../../patterns/action-bar/action-bar.spec.md` — 按鈕排列 / gap-2 分組規則 SSOT
 - `../Tabs/tabs.spec.md` — tab 與 `pressed` button group 的分界
 
+## A11y 預設
+
+**ARIA / Pattern**:繼承 Radix `slot` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/slot#accessibility)。
+
+**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
+
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。

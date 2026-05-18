@@ -1,6 +1,6 @@
 ---
 component: ProgressBar
-family: null
+family: self-contained
 traits: []
 variants: {}
 sizes: {}

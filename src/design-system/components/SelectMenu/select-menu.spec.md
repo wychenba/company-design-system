@@ -184,6 +184,23 @@ SelectMenu 是 **composite**(Popover trigger + Command search + 滾動 MenuItem 
 - `../PeoplePicker/people-picker.spec.md` — 永遠使用 SelectMenu 的消費者
 - `../../patterns/element-anatomy/item-anatomy.spec.md` — item-layout pattern（MenuItem 繼承）
 
+## A11y 預設
+
+**ARIA / Pattern**:基於 `cmdk` library a11y(combobox / listbox / option role + aria-activedescendant)。詳 [cmdk a11y](https://cmdk.paco.me/#accessibility)。
+
+**Keyboard 行為**:
+
+- Tab — focus trigger
+- Enter / Space / ↓ — 開啟 menu
+- ↑/↓ — 導覽 options
+- Enter — 選擇
+- 字母鍵 — type-ahead 過濾(search 模式)
+- Esc — 關閉
+
+**Focus**:menu 開啟時 focus 第一 option / 選中項;關閉時 focus 回 trigger。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
+
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。

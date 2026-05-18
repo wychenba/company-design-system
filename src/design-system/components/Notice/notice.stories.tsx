@@ -93,7 +93,7 @@ function SolidShell({
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const DeploymentSuccess: Story = {
-  name: '部署成功 banner',
+  name: '部署成功 橫幅',
   render: () => (
     <div className="max-w-2xl">
       <SubtleShell variant="success">
@@ -141,7 +141,7 @@ export const BillingFailed: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const InlineVariants: Story = {
-  name: 'Inline 通知變體對照',
+  name: '行內通知變體對照',
   render: () => {
     const items: { variant: NoticeVariant; title: string; description?: string }[] = [
       {

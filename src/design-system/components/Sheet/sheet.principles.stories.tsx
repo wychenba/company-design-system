@@ -100,7 +100,7 @@ export const UsageGuidance: Story = {
               <SheetDescription>修改此專案的基本資訊與通知偏好</SheetDescription>
             </SheetHeader>
             {/* Overlay body 長內容必用 ScrollArea 而非 native overflow-y-auto,對齊 DS
-                跨 OS 一致 canonical(避免 Windows/Linux 右側被吃 15-17px)。 */}
+                跨 OS 一致設計準則(避免 Windows/Linux 右側被吃 15-17px)。 */}
             <ScrollArea className="flex-1">
               <div className="py-4 flex flex-col gap-4">
                 <Field>
@@ -227,7 +227,7 @@ export const UsageGuidance: Story = {
 }
 
 export const SidePropRule: Story = {
-  name: 'side prop 的世界級 convention',
+  name: '位置 屬性 的世界級 慣例',
   render: () => (
     <div>
       <Rule

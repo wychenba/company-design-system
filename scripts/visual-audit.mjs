@@ -66,6 +66,21 @@ const URLS = ARGS_KV['--urls'] // CSV of URLs,overrides scenario mode
 const NO_A11Y = ARGS_SET.has('--no-a11y') // skip @axe-core/playwright(default runs)
 const NO_DIFF = ARGS_SET.has('--no-diff') // skip baseline pixel diff
 const UPDATE_BASELINE = ARGS_SET.has('--update-baseline') // copy new snapshots as baseline
+// 2026-05-18 ship per codex Phase B F5: Dim 51 theme/density/RTL matrix support
+// 用法:`--matrix=theme-density-rtl` → 對每 scenario 跑 6-cell matrix
+//   (light / dark / high-contrast) × (density-md / density-lg) × (ltr / rtl)
+// Storybook globals 對齊 .storybook/preview.tsx:57-65 — theme={light|dark|hc} density={md|lg} dir={ltr|rtl}
+const MATRIX = ARGS_KV['--matrix'] // 'theme-density-rtl' | undefined(預設不跑 matrix)
+const MATRIX_CELLS = MATRIX === 'theme-density-rtl'
+  ? [
+      { theme: 'light', density: 'md', dir: 'ltr', label: 'light-md-ltr' },
+      { theme: 'dark', density: 'md', dir: 'ltr', label: 'dark-md-ltr' },
+      { theme: 'hc', density: 'md', dir: 'ltr', label: 'hc-md-ltr' },
+      { theme: 'light', density: 'lg', dir: 'ltr', label: 'light-lg-ltr' },
+      { theme: 'light', density: 'md', dir: 'rtl', label: 'light-md-rtl' },
+      { theme: 'dark', density: 'md', dir: 'rtl', label: 'dark-md-rtl' },
+    ]
+  : []
 
 // ── 主 scenario 清單 ────────────────────────────────────────────────────────
 // 先讀 assertions.json 取 scenario,fallback 到 hardcoded
@@ -309,9 +324,15 @@ async function auditScenario(browser, scenario, opts = {}) {
   })
   const page = await context.newPage()
   // scenario 可有 .url(任意 URL,for product app routes)或 .id(Storybook story id)
+  // 2026-05-18 ship per codex Phase B F5 + Dim 51: opts.matrixCell { theme, density, dir }
+  // 注入 Storybook globals query params(對齊 .storybook/preview.tsx 全域 toolbar)
+  const matrixCell = opts.matrixCell
+  const globalsParam = matrixCell
+    ? `&globals=theme:${matrixCell.theme};density:${matrixCell.density};dir:${matrixCell.dir}`
+    : ''
   const url = scenario.url
     ? scenario.url
-    : `${STORYBOOK_URL}/iframe.html?id=${scenario.id}&viewMode=story`
+    : `${STORYBOOK_URL}/iframe.html?id=${scenario.id}&viewMode=story${globalsParam}`
 
   try {
     await page.goto(url, { waitUntil: 'networkidle', timeout: 45_000 })

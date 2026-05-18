@@ -98,7 +98,7 @@ export const UsageGuidance: Story = {
 
 // ── 原則 — Event color 是類別語意,不是 severity ─────────────────────────────
 export const ColorSemantic: Story = {
-  name: 'Event color 類別語意',
+  name: '事件顏色類別語意',
   render: () => (
     <div className="space-y-6">
       <Rule

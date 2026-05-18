@@ -140,7 +140,7 @@ export const UsageGuidance: Story = {
 }
 
 export const LayoutRule: Story = {
-  name: 'Vertical vs Horizontal(cols)',
+  name: '直式 vs 橫式(欄數對照)',
   render: () => (
     <div>
       <Rule
@@ -192,7 +192,7 @@ export const LayoutRule: Story = {
 }
 
 export const LabelAlignmentRule: Story = {
-  name: 'Label 對齊 — 一律左對齊(stacked)',
+  name: '標籤 對齊 — 一律左對齊(堆疊)',
   render: () => (
     <div>
       <Rule

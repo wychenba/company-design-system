@@ -1,6 +1,6 @@
 ---
 component: Avatar
-family: null
+family: self-contained
 variants: {}
 sizes: {}
 traits:

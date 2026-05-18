@@ -60,7 +60,7 @@ export const UsageGuidance: Story = {
           <li><strong>Alert</strong> — 永久 inline announcement(stays until dismissed)</li>
           <li><strong>Toast</strong> — 短暫 announcement(auto-dismiss)</li>
         </ul>
-        <p className="text-fg-muted">建新 announcement 類元件 → 消費 Notice 不要 hand-craft row(對齊 SSOT 消費 canonical)。</p>
+        <p className="text-fg-muted">建新 announcement 類元件 → 消費 Notice 不要 hand-craft row(對齊 主檔消費準則)。</p>
       </Section>
     </div>
   ),
@@ -94,7 +94,7 @@ export const CompositionRules: Story = {
 
       <Section title="禁止 — 自刻 announcement row">
         <div className="prose prose-sm max-w-prose">
-          <p>建新 announcement 類元件(例如 InAppNotification banner)→ 必消費 Notice primitive,不可自刻 <code>&lt;div className="flex p-3 bg-..."&gt;</code>(對齊 M1 SSOT 消費 canonical / 確保 icon 選擇 + variant token 一致)。</p>
+          <p>建新 announcement 類元件(例如 InAppNotification banner)→ 必消費 Notice primitive,不可自刻 <code>&lt;div className="flex p-3 bg-..."&gt;</code>(對齊 M1 主檔消費準則 / 確保 icon 選擇 + variant token 一致)。</p>
         </div>
       </Section>
     </div>

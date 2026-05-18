@@ -107,7 +107,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ActionRule: Story = {
-  name: 'Action 使用場景（Undo pattern）',
+  name: '動作 使用場景(Undo 模式)',
   render: () => (
     <div>
       <Rule
@@ -146,7 +146,7 @@ export const ActionRule: Story = {
 }
 
 export const VariantRule: Story = {
-  name: 'Variant 選擇',
+  name: '變體 選擇',
   render: () => (
     <div>
       <Rule
@@ -172,7 +172,7 @@ export const VariantRule: Story = {
 }
 
 export const DurationRule: Story = {
-  name: 'Duration 選擇',
+  name: '持續時間 選擇',
   render: () => (
     <div>
       <Rule

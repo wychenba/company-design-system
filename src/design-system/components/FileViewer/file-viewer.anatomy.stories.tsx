@@ -569,7 +569,7 @@ export const ColorMatrix: Story = {
                 <Td>
                   <TokenCell token="--primary" display="ring-primary" />
                 </Td>
-                <Td>與 DS 選中視覺 canonical 一致</Td>
+                <Td>與 DS 選中視覺準則 一致</Td>
               </tr>
               <tr>
                 <Td>Filmstrip thumb 預設</Td>

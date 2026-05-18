@@ -90,7 +90,7 @@ export const Overview: Story = {
 }
 
 export const UsageInButton: Story = {
-  name: '在 Button loading 狀態內',
+  name: '在 Button 載入中 狀態內',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -120,7 +120,7 @@ export const UsageInButton: Story = {
 }
 
 export const UsageInline: Story = {
-  name: 'Inline 使用',
+  name: '行內使用',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

@@ -50,7 +50,9 @@ if echo "${FULL_CONTENT:-}" | grep -qE '@header-withtabs-allow:'; then
   exit 0
 fi
 
-HEADERS=$(echo "$FULL_CONTENT" | grep -cE '<(ChromeHeader|SurfaceHeader|SidebarHeader|DialogHeader|SheetHeader|PopoverHeader)[[:space:]>]' 2>/dev/null)
+# GAP 2 fix(2026-05-18 M34 codify):broaden hardcoded 6-name allowlist 到 generic [A-Z]*Header pattern。
+# 對齊 header-canonical.spec.md「任何 header 含 Tabs」+「未來 Drawer / Card / Table header」前瞻
+HEADERS=$(echo "$FULL_CONTENT" | grep -cE '<[A-Z][a-zA-Z]*Header[[:space:]>]' 2>/dev/null)
 HEADERS=$(echo "${HEADERS:-0}" | head -1)
 TABS=$(echo "$FULL_CONTENT" | grep -cE '<(Tabs|TabsList|TabsTrigger)[[:space:]>]' 2>/dev/null)
 TABS=$(echo "${TABS:-0}" | head -1)

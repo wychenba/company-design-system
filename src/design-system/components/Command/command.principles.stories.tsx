@@ -81,7 +81,7 @@ export const CompositionRules: Story = {
     </Command.List>
   </Command>
 </Popover>`}</code></pre>
-        <p className="text-fg-muted">禁止:在 app code 自刻 search input + filter list — 必消費 Command primitive(對齊 SSOT 消費 canonical M1)。</p>
+        <p className="text-fg-muted">禁止:在 app code 自刻 search input + filter list — 必消費 Command primitive(對齊 主檔消費準則 M1)。</p>
       </div>
     </div>
   ),

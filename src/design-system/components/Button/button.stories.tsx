@@ -305,7 +305,7 @@ export const FullWidth: Story = {
 // 詳見 .claude/skills/visual-audit/SKILL.md 的「Layer A interactive state coverage」。
 
 export const HoverFocusState: Story = {
-  name: 'Hover / Focus',
+  name: '滑鼠移過 / 鍵盤聚焦',
   tags: ['!autodocs'],
   render: () => (
     <div className="flex gap-4">

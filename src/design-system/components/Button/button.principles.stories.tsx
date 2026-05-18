@@ -118,7 +118,7 @@ export const UsageGuidance: Story = {
 }
 
 export const VariantRule: Story = {
-  name: 'Variant 選擇',
+  name: '變體 選擇',
   render: () => (
     <div>
       <Rule
@@ -281,7 +281,7 @@ export const IconRule: Story = {
 
       <Rule
         title="icon + overlay 角標 — 通知類按鈕"
-        note="用 `overlayBadge` prop 傳入 Badge,Button 內部自動把 badge 中心對齊 icon top-right corner(Material BadgedBox canonical)——不手刻 `relative + absolute -top-1 -right-1` 讓 badge 飄到按鈕 chrome 邊緣"
+        note="用 `overlayBadge` prop 傳入 Badge,Button 內部自動把 badge 中心對齊 icon top-right corner(Material BadgedBox 設計準則)——不手刻 `relative + absolute -top-1 -right-1` 讓 badge 飄到按鈕 chrome 邊緣"
       >
         <Button
           variant="tertiary"

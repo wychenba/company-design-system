@@ -153,7 +153,7 @@ export const CommandPalette: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const InlineCommand: Story = {
-  name: 'Inline 搜尋清單',
+  name: '行內搜尋清單',
   render: () => (
     <div className="flex flex-col gap-3 max-w-md">
       <p className="text-caption text-fg-muted">

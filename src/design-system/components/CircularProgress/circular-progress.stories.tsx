@@ -116,7 +116,7 @@ export const InlineCellLoading: Story = {
 }
 
 export const FullScreenOverlay: Story = {
-  name: '全頁 overlay',
+  name: '全頁浮層',
   render: () => (
     <div className="relative border border-border rounded-lg w-full h-80 overflow-hidden flex items-center justify-center">
       <Empty

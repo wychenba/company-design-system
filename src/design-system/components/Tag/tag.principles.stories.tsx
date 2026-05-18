@@ -107,7 +107,7 @@ export const UsageGuidance: Story = {
 }
 
 export const VariantNotSemanticRule: Story = {
-  name: 'Variant 色彩不自動承載語意',
+  name: '變體 色彩不自動承載語意',
   render: () => (
     <div>
       <Rule
@@ -142,7 +142,7 @@ export const VariantNotSemanticRule: Story = {
 }
 
 export const SubtleVsSolidRule: Story = {
-  name: 'Subtle vs Solid 選擇',
+  name: '低調 vs 實心 選擇',
   render: () => (
     <div>
       <Rule
@@ -188,7 +188,7 @@ export const SubtleVsSolidRule: Story = {
 }
 
 export const DismissRule: Story = {
-  name: 'Dismiss 按鈕行為',
+  name: '取消 按鈕行為',
   render: () => {
     const [tags, setTags] = React.useState(['React', 'TypeScript', 'Design System'])
     return (
@@ -232,7 +232,7 @@ export const DismissRule: Story = {
 }
 
 export const IconRule: Story = {
-  name: 'icon 與 avatar 的使用',
+  name: '圖示 與 avatar 的使用',
   render: () => (
     <div>
       <Rule

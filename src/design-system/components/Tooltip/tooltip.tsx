@@ -3,10 +3,18 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "@/lib/utils"
 import { OVERLAY_SIDE_OFFSET, OVERLAY_COLLISION_PADDING } from "@/design-system/tokens/elevation/overlay-geometry"
+import { HOVER_DELAY_PLAIN_MS } from "@/design-system/tokens/motion/motion"
 
-const TooltipProvider = TooltipPrimitive.Provider
+// 2026-05-18 ship per user 拍板 #3A:Tooltip Provider 預設 delayDuration 對齊 motion token SSOT。
+// Radix 預設 700ms 過保守(被 Material 150-200 / MUI 100 / Atlassian 300 集體驗證),DS 統一用
+// `--hover-delay-plain` (200ms,JS mirror `HOVER_DELAY_PLAIN_MS`)。Consumer 仍可 per-instance override。
+const TooltipProvider = ({ delayDuration = HOVER_DELAY_PLAIN_MS, ...props }: React.ComponentProps<typeof TooltipPrimitive.Provider>) => (
+  <TooltipPrimitive.Provider delayDuration={delayDuration} {...props} />
+)
 
-const Tooltip = TooltipPrimitive.Root
+const Tooltip = ({ delayDuration = HOVER_DELAY_PLAIN_MS, ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) => (
+  <TooltipPrimitive.Root delayDuration={delayDuration} {...props} />
+)
 
 const TooltipTrigger = TooltipPrimitive.Trigger
 

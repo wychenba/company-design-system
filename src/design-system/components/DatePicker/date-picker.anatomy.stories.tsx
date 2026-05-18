@@ -65,7 +65,7 @@ const MODE_DESC: Record<ModeKey, string> = {
    Shared UI Components
 
    NOTE: Kept local (not imported from `_anatomy/anatomy-utils`) because the
-   Button-family inspector layout diverges visually from the canonical helpers:
+   Button-family inspector layout diverges visually from the 通用 helpers:
    H3 `text-h6 font-semibold` (not `text-body font-bold mb-2`), Desc has no
    bottom margin, Th/Td use `p-2 border-b border-divider` row style, and
    Swatch defaults to `size="md"` for inline token chips.
@@ -806,7 +806,7 @@ export const CalendarTokens = {
 
           {/* Token table */}
           <div className="flex-1 min-w-[420px]">
-            <span className="text-caption font-medium text-fg-secondary block mb-2">Cell state token(5 種 canonical)</span>
+            <span className="text-caption font-medium text-fg-secondary block mb-2">Cell state token(5 種 標準)</span>
             <div className="overflow-x-auto">
               <table className="border-collapse text-caption w-full">
                 <thead><tr><Th>State</Th><Th>視覺</Th><Th>Token / Class</Th><Th>備註</Th></tr></thead>

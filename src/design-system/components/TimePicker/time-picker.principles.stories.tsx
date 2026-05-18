@@ -93,7 +93,7 @@ export const RuleMinuteStepForMeetings: Story = {
  * consumer 用兩個 TimePicker + arrow 達成營業時段 / 會議時段等 range 場景。
  */
 export const RuleRangeComposition: Story = {
-  name: 'Range 用兩個 TimePicker 組合,不內建',
+  name: '時間範圍用兩個 TimePicker 組合,不內建',
   render: () => {
     const [open, setOpen] = React.useState('10:00')
     const [close, setClose] = React.useState('22:00')
@@ -117,7 +117,7 @@ export const RuleRangeComposition: Story = {
  * `<Button>清除</Button>` 作 clear。
  */
 export const RuleClearNoLabelButton: Story = {
-  name: '清除用 X inline action,不用 label button',
+  name: '清除用 X 行內動作,不用文字按鈕',
   render: () => {
     const [t, setT] = React.useState<string>('14:30')
     return (

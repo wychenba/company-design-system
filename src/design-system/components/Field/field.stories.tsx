@@ -85,7 +85,7 @@ export const Horizontal: Story = {
 // ── Horizontal 垂直對齊公式驗證 ─────────────────────────────────────────
 
 export const HorizontalLabelAlignment: Story = {
-  name: 'Horizontal — label 垂直對齊公式驗證',
+  name: '水平 — 標籤 垂直對齊公式驗證',
   render: () => (
     <div className="max-w-3xl flex flex-col gap-8">
       <div>
@@ -140,7 +140,7 @@ export const HorizontalLabelAlignment: Story = {
 // ── Checkbox / Switch 在 Field 內的高度對齊 ─────────────────────────────
 
 export const MixedControlAlignment: Story = {
-  name: '混合 Control 的 field 高度對齊',
+  name: '混合 控制元件 的 field 高度對齊',
   render: () => (
     <div className="flex flex-col gap-8 max-w-3xl">
       <div>
@@ -210,7 +210,7 @@ export const MixedControlAlignment: Story = {
 // ── SegmentedControl 在 Field 內 ────────────────────────────────────────
 
 export const SegmentedControlInField: Story = {
-  name: 'SegmentedControl 作為 Field control',
+  name: 'SegmentedControl 作為 Field 控制元件',
   render: () => (
     <div className="flex flex-col gap-8 max-w-3xl">
       <div>
@@ -300,7 +300,7 @@ export const SegmentedControlInField: Story = {
 // ── Block Control: RadioGroup ───────────────────────────────────────────
 
 export const BlockControlRadioGroup: Story = {
-  name: 'Block control — RadioGroup',
+  name: '區塊內控制元件 — RadioGroup',
   render: () => (
     <div className="flex flex-col gap-8 max-w-3xl">
       <div>
@@ -373,7 +373,7 @@ export const BlockControlRadioGroup: Story = {
 // ── Button as Data Input Affordance ─────────────────────────────────────
 
 export const ButtonAsControl: Story = {
-  name: 'Button 作為 control',
+  name: 'Button 作為 控制元件',
   render: () => (
     <div className="flex flex-col gap-8 max-w-3xl">
       <div>

@@ -103,7 +103,7 @@ export const UsageGuidance: Story = {
 // ── Resize 行為 ───────────────────────────────────────────────────────
 
 export const ResizeRule: Story = {
-  name: 'Resize 只 vertical，不允許 horizontal',
+  name: '縮放 只 垂直，不允許 水平',
   render: () => (
     <div>
       <Rule
@@ -151,7 +151,7 @@ export const ReadonlyRule: Story = {
 // ── Icon / endAction 禁止 ────────────────────────────────────────────
 
 export const NoIconRule: Story = {
-  name: '禁止:內部不放 icon / endAction',
+  name: '禁止:內部不放 圖示 / endAction',
   render: () => (
     <div>
       <Rule

@@ -134,7 +134,7 @@ export const ColorMatrix: Story = {
       <div>
         <H3>狀態 × 色彩 Token 矩陣</H3>
         <Desc>
-          Chip 採 pill-canonical 選中規則(跟 SegmentedControl 共用):selected 時 `--primary-hover` 同時染 border 和 text,
+          Chip 採 pill-設計準則 選中規則(跟 SegmentedControl 共用):selected 時 `--primary-hover` 同時染 border 和 text,
           **底色維持 `--surface` 不變**——不用 primary-subtle 底色(那是 Button subtle 的視覺語言,跟 filter chip 不同)。
           視覺輕量是 filter 語意必要條件,避免 chip 群組喧賓奪主壓過資料表格。
         </Desc>
@@ -222,7 +222,7 @@ export const ColorMatrix: Story = {
         <Desc>
           `--primary-subtle` 的 bg 染色是 Button subtle variant 的視覺語言,適用於「行為選項」(如 pagination hover);
           Chip 是「篩選條件」,多選時可能同時亮 5-10 個——若每個都填底色,filter row 會蓋過主內容表格,破壞資訊層次。
-          只染 border + text 保持背景通透,對齊 SegmentedControl / Tabs 未選 hover 的 pill-canonical。
+          只染 border + text 保持背景通透,對齊 SegmentedControl / Tabs 未選 hover 的 pill-設計準則。
         </Desc>
       </div>
     </div>
@@ -230,7 +230,7 @@ export const ColorMatrix: Story = {
 }
 
 export const SelectionMatrix: Story = {
-  name: 'Multi vs Single 選擇',
+  name: '多 vs 單 選擇',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -265,7 +265,7 @@ export const SizeMatrix: Story = {
         <H3>單一 size = h-field-sm(28 / 32 density-aware)</H3>
         <Desc>
           Chip 故意**只有一種尺寸**——對齊 Material 3 / Atlassian / Polaris 的 filter chip
-          canonical 共識。Chip 是 filter 語意,filter 列的視覺重量應該固定;如果需要多 tier,那是
+          設計準則 共識。Chip 是 filter 語意,filter 列的視覺重量應該固定;如果需要多 tier,那是
           Button 或 Tabs 的領域。
         </Desc>
         <div className="overflow-x-auto mb-4">
@@ -300,7 +300,7 @@ export const StateBehavior: Story = {
       <div>
         <H3>四種狀態 × 色彩 Token</H3>
         <Desc>
-          選中態走 pill-canonical 規則(跟 SegmentedControl 完全一致):
+          選中態走 pill-設計準則 規則(跟 SegmentedControl 完全一致):
           **primary-hover 同時染 border 和 text**,底色維持 bg-surface 不變——不用 primary-subtle
           底色(那是 Button subtle 的視覺語言,跟 chip 不同)。
         </Desc>
@@ -367,7 +367,7 @@ export const StateBehavior: Story = {
 }
 
 export const LayoutMatrix: Story = {
-  name: 'Layout(wrap / scroll / menu)',
+  name: '排版(換行 vs 捲動 vs 選單)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -416,7 +416,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 Chip 對應 Radix / Material / Polaris a11y 規範。"}</p>
+      <p className="whitespace-pre-line">{"詳 `chip.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  toggle-group  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/toggle-group#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入 group\n- ←/→ — 切換\n- Enter / Space — toggle\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast"}</p>
     </div>
   ),
 }

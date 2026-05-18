@@ -80,7 +80,7 @@ export const BulkImageUpload = {
 
 // 2026-04-24 canonical:內建 `files` prop — FileUpload own success state display
 export const WithFileList = {
-  name: '內建 files prop',
+  name: '內建 files 屬性',
   render: () => {
     type UploadItem = { id: string; name: string; size?: number; status?: 'uploading' | 'completed' | 'error'; progress?: number; description?: string }
     const [items, setItems] = useState<UploadItem[]>([

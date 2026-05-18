@@ -1,6 +1,6 @@
 ---
 component: DataTable
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:
@@ -487,6 +487,14 @@ DataTable 是 composite multi-section 元件,**不套 canonical 5**(Inspector / 
 - `../../tokens/color/color.spec.md` — 語義色彩
 - `../../tokens/elevation/elevation.spec.md` — 固定欄陰影
 - `../Field/field-controls.spec.md` — cell editable 時的 Field Control 共用規則
+
+## A11y 預設
+
+**ARIA / Pattern**:繼承 Radix `radio-group` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/radio-group#accessibility)。
+
+**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

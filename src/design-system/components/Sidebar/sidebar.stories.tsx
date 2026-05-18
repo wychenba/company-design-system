@@ -342,7 +342,7 @@ export const MixedContent: Story = {
 // ── 3. Offcanvas 模式 ─────────────────────────────────────────────────────
 
 export const Offcanvas: Story = {
-  name: 'Offcanvas 收合',
+  name: '抽屜收合(離畫面外)',
   render: () => {
     const [activeId, setActiveId] = React.useState<string>('dashboard')
 
@@ -423,7 +423,7 @@ export const IntegrationSidebar: Story = {
                     - icon items(16px)在 24px 槽內 justify-center
                     - logo items(24px)填滿 24px 槽
                     - 兩種 label x 完全對齊
-                    Notion / Raycast / Linear integrations 的 canonical 模式 */}
+                    Notion / Raycast / Linear integrations 的 標準模式 */}
                 <SidebarMenu>
                   {NAV_ITEMS.map((item) => (
                     <SidebarMenuItem key={item.id}>

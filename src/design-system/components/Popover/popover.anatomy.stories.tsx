@@ -50,7 +50,7 @@ export const Overview: Story = {
             <tbody>
               <tr><Td mono>align</Td><Td mono>'start' | 'center' | 'end'</Td><Td mono>'center'</Td><Td>相對 trigger 的對齊</Td></tr>
               <tr><Td mono>side</Td><Td mono>'top' | 'right' | 'bottom' | 'left'</Td><Td mono>'bottom'</Td><Td>浮層出現在 trigger 的哪一側</Td></tr>
-              <tr><Td mono>sideOffset</Td><Td mono>number</Td><Td mono>8 ★default</Td><Td>與 trigger 的距離(px)。DS canonical = 8(對標 Notion / Linear / Figma / Stripe)</Td></tr>
+              <tr><Td mono>sideOffset</Td><Td mono>number</Td><Td mono>8 ★default</Td><Td>與 trigger 的距離(px)。DS 設計準則 = 8(對標 Notion / Linear / Figma / Stripe)</Td></tr>
               <tr><Td mono>open / onOpenChange</Td><Td mono>{'boolean / (o) => void'}</Td><Td mono>—</Td><Td>controlled 開關(選用)</Td></tr>
               <tr><Td mono>modal</Td><Td mono>boolean</Td><Td mono>false</Td><Td>`true` 時鎖 body scroll + focus trap</Td></tr>
             </tbody>
@@ -103,7 +103,7 @@ export const Inspector: Story = {
     },
     sideOffset: {
       control: { type: 'range', min: 0, max: 24, step: 2 },
-      description: 'DS canonical = 8(對標 Notion / Linear / Figma / Stripe)',
+      description: 'DS 設計準則 = 8(對標 Notion / Linear / Figma / Stripe)',
     },
     width: {
       control: 'radio',
@@ -146,7 +146,7 @@ export const Inspector: Story = {
 }
 
 export const PlacementMatrix: Story = {
-  name: '定位(side × align)',
+  name: '定位(位置 × align)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -227,7 +227,7 @@ export const SizeMatrix: Story = {
 
       <div>
         <H3>sideOffset(與 trigger 的距離)</H3>
-        <Desc>DS canonical = **8px**(對標 Notion / Linear / Figma / Stripe)。&lt; 4px 會讓浮層貼死 trigger 失去「另一層」感;&gt; 12px 會拉斷 trigger ↔ content 的視覺關聯。consumer 通常不需改,特殊情境(如 anchored tooltip-like)可傳覆蓋。</Desc>
+        <Desc>DS 設計準則 = **8px**(對標 Notion / Linear / Figma / Stripe)。&lt; 4px 會讓浮層貼死 trigger 失去「另一層」感;&gt; 12px 會拉斷 trigger ↔ content 的視覺關聯。consumer 通常不需改,特殊情境(如 anchored tooltip-like)可傳覆蓋。</Desc>
       </div>
     </div>
   ),

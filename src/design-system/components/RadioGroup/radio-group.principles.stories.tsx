@@ -76,10 +76,10 @@ export const UsageGuidance: Story = {
 
         <Section title="vs 近親元件">
           <Rule
-            title="判斷三角度(完整 SSOT 在 Select spec)"
+            title="判斷三角度(完整 完整定義在 Select spec)"
             note="1. Progressive disclosure 成本(Select 藏 vs RadioGroup 露)2. 視覺重量(O(1) vs O(n))3. 評估深度(使用者需對比嗎)。完整對照詳見 select.spec.md「與 RadioGroup 的分界」"
           >
-            <Label>SSOT owner: Select spec(通用預設元件 own 此比較)</Label>
+            <Label>主檔擁有者:Select spec(通用預設元件 own 此比較)</Label>
           </Rule>
 
           <Rule
@@ -142,7 +142,7 @@ export const DecisionNodeRule: Story = {
 }
 
 export const MustBeInGroupRule: Story = {
-  name: 'Radio 不可單獨使用',
+  name: '單選按鈕不可單獨使用',
   render: () => {
     const [accept, setAccept] = React.useState('yes')
     return (

@@ -109,7 +109,7 @@ export const UsageGuidance: Story = {
         </Rule>
       </Section>
 
-      <Section title="vs 近親 — HoverCard vs Tooltip(SSOT)">
+      <Section title="vs 近親 — HoverCard vs Tooltip(主檔)">
         <Rule
           title="HoverCard — 內容可互動、滑鼠移到浮層上不消失"
           note="適合放按鈕、連結、需要選取的文字。使用者 hover trigger → 浮層出現 → 滑鼠移到浮層上繼續停留並點擊按鈕 / 連結都沒問題"
@@ -138,7 +138,7 @@ export const UsageGuidance: Story = {
           title="Tooltip — 純文字、不可互動、離開 trigger 即消失"
           note="適合一句話的提示(icon-only 的 aria-label、字串截斷補全)。無法互動,滑鼠離開 trigger 立刻消失。完整對照見 spec 的「與 Tooltip 的分界」"
         >
-          <Label>完整情境對照與三角度分析見 hover-card.spec.md「與 Tooltip 的分界」(SSOT)</Label>
+          <Label>完整情境對照與三角度分析見 hover-card.spec.md「與 Tooltip 的分界」(主檔)</Label>
         </Rule>
 
         <Rule

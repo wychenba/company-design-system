@@ -44,7 +44,7 @@ export const SizeAlignment: Story = {
 // ── Min / Max / Step ─────────────────────────────────────────────────────
 
 export const MinMaxStep: Story = {
-  name: 'Min / Max / Step',
+  name: '最小 / 最大 / 步階',
   render: () => {
     const [value, setValue] = React.useState([32])
     return (

@@ -137,7 +137,7 @@ export const FallbackRule: Story = {
 }
 
 export const WithBadgeOverlayRule: Story = {
-  name: 'Avatar overlay:presence dot / count badge',
+  name: '頭像疊加層:在線小點 / 計數徽章',
   render: () => (
     <div>
       <Rule
@@ -167,7 +167,7 @@ export const WithBadgeOverlayRule: Story = {
 
       <Rule
         title="❌ 同一個 Avatar 上同時顯示 status + badgeCount"
-        note="對齊 Badge canonical『一個 anchor 最多 1 個 indicator』。status(presence dot)跟 badgeCount(unread Badge)**擇一使用**,不並存 — 同時出現會讓使用者無法判斷主要訊號,違反 signal crowding 原則"
+        note="對齊 Badge 設計準則『一個 anchor 最多 1 個 indicator』。status(presence dot)跟 badgeCount(unread Badge)**擇一使用**,不並存 — 同時出現會讓使用者無法判斷主要訊號,違反 signal crowding 原則"
       >
         <div className="flex items-center gap-4">
           <Avatar alt="Ada" size={40} status="online" />
@@ -185,7 +185,7 @@ export const HoverCardIntegrationRule: Story = {
     <div>
       <Rule
         title="人員 Avatar 的 hover 預覽必須用 NameCard"
-        note="NameCard 是 DS canonical 人員 hover 內容元件(avatar + name + subtitle + actions + status + fields 統一佈局)。Avatar 的 hoverCard prop 接 NameCard,不可手刻 JSX — 手刻會漂移出 NameCard 對齊 / 間距 / status token 規則"
+        note="NameCard 是 DS 設計準則 人員 hover 內容元件(avatar + name + subtitle + actions + status + fields 統一佈局)。Avatar 的 hoverCard prop 接 NameCard,不可手刻 JSX — 手刻會漂移出 NameCard 對齊 / 間距 / status token 規則"
       >
         <Avatar
           alt="Ada Chen"
@@ -206,7 +206,7 @@ export const HoverCardIntegrationRule: Story = {
             />
           }
         />
-        <Label>↑ hover avatar 彈出 NameCard(action 列:Chat + Audio call canonical)</Label>
+        <Label>↑ hover avatar 彈出 NameCard(action 列:Chat + Audio call 設計準則)</Label>
       </Rule>
 
       <Rule
@@ -225,7 +225,7 @@ export const HoverCardIntegrationRule: Story = {
           <div className="flex flex-col gap-2">
             {/* 主畫面呈現關鍵狀態:Family 2 row 結構(avatar + label + description)由 MenuItem
                 承載——size=lg 觸發 block 對齊(avatar 跨越 label + description 中心)。
-                這正是 item-anatomy.spec.md 的 Family 2 canonical,不手刻 flex row。 */}
+                這正是 item-anatomy.spec.md 的 Family 2 設計準則,不手刻 flex row。 */}
             <div className="border border-divider rounded-lg bg-surface py-1 w-full">
               <MenuItem
                 size="lg"

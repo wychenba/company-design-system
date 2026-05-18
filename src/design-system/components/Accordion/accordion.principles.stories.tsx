@@ -149,7 +149,7 @@ export const UsageGuidance: Story = {
 }
 
 export const TypeRule: Story = {
-  name: 'single vs multiple',
+  name: '單一展開 vs 多重展開',
   render: () => (
     <div>
       <Rule
@@ -327,7 +327,7 @@ export const ContentRule: Story = {
 }
 
 export const SingleItemRule: Story = {
-  name: '單一 item 不用 Accordion',
+  name: '單一 項目 不用 Accordion',
   render: () => (
     <div>
       <Rule

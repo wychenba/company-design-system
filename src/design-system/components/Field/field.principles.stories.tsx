@@ -170,7 +170,7 @@ export const ResponsibilityRule: Story = {
 }
 
 export const OrientationRule: Story = {
-  name: 'Orientation 選擇',
+  name: '方向 選擇',
   render: () => (
     <div>
       <Rule
@@ -233,7 +233,7 @@ export const OrientationRule: Story = {
 }
 
 export const NotForFormActionsRule: Story = {
-  name: 'Form action 不是 Field control',
+  name: 'Form 動作 不是 Field 控制元件',
   render: () => (
     <div>
       <Rule

@@ -224,7 +224,7 @@ export const ColorMatrix: Story = {
       <div>
         <H3>TabsTrigger 四態色彩</H3>
         <Desc>
-          Tabs 未選狀態用 fg-secondary(不搶視覺),hover 走 canonical 互動高亮 primary-hover
+          Tabs 未選狀態用 fg-secondary(不搶視覺),hover 走 標準互動高亮 primary-hover
           (跟 Breadcrumb / Chip 一致)。Selected 用 foreground + bottom 2px primary-hover 下線
           ——下線是「當前位置」的明確指示器,不靠底色區分。
         </Desc>
@@ -330,7 +330,7 @@ export const StateBehavior: Story = {
 }
 
 export const OverflowMatrix: Story = {
-  name: 'Overflow 處理(scroll / menu)',
+  name: '超出處理(捲動 / 選單)',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -380,7 +380,7 @@ export const OverflowMatrix: Story = {
 }
 
 export const SpacingTokens: Story = {
-  name: '間距 Token',
+  name: '間距設計變數',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -408,7 +408,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 Tabs 對應 Radix / Material / Polaris a11y 規範。"}</p>
+      <p className="whitespace-pre-line">{"詳 `tabs.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  tabs  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/tabs#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入 TabList\n- ←/→ — 切 tab\n- Home/End — 第一 / 最後 tab\n- Enter / Space — activate\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。"}</p>
     </div>
   ),
 }

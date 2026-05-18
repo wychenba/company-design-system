@@ -1,6 +1,6 @@
 ---
 component: Dialog
-family: null
+family: composite
 variants: {}
 sizes: {}
 traits:

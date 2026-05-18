@@ -134,3 +134,18 @@ Textarea 是 **Field Controls family 的多行變體**,共用規則由 `../Field
 - `../Field/field-controls.spec.md` — Field Control 共用規則（mode / size / error / focus）
 - `../Field/form-validation.spec.md` — blur 驗證標準（多行輸入的驗證時機）
 - `../LinkInput/link-input.spec.md` — URL 特殊處理
+
+## A11y 預設
+
+**ARIA / Pattern**:native `<textarea>` element 預設 a11y;Field wrapper 補 `aria-labelledby` / `aria-invalid` / `aria-describedby`。
+
+**Keyboard 行為**:
+
+- Tab — focus
+- 字母鍵 — 輸入
+- Esc — 清空(若 clearable + 有值)
+
+**Focus**:native input focus ring;DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
+

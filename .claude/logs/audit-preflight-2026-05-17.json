@@ -1,5 +1,5 @@
 {
-  "ts": "2026-05-17T13:26:20.625Z",
+  "ts": "2026-05-17T17:01:41.424Z",
   "filesCount": {
     "total": 379,
     "componentTsx": 78,
@@ -12,11 +12,14 @@
   "principles": {
     "mRules": 32,
     "specTraits": 11,
-    "hookInvariants": 25,
+    "hookInvariants": 27,
     "rules": 6,
-    "total": 68
+    "total": 70
   },
   "auditDims": 53,
-  "coverageGaps": 0,
-  "gaps": []
+  "coverageGaps": 2,
+  "gaps": [
+    "hook:dim_count_drift (unmapped — 必補 principle-dim-map.json entry)",
+    "hook:propose_pre_grep_verify (unmapped — 必補 principle-dim-map.json entry)"
+  ]
 }

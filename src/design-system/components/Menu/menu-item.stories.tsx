@@ -61,7 +61,7 @@ export const Default: Story = {
 // ── startIcon + description ──
 
 export const WithDescription: Story = {
-  name: 'Start Icon + Description',
+  name: '前置圖示 + 說明文字',
   render: () => (
     <MenuContainer><MenuGroup>
       <MenuItem startIcon={Mail} description="每日摘要信件">電子郵件通知</MenuItem>
@@ -87,7 +87,7 @@ export const AvatarInline: Story = {
 // ── Avatar + description（block 32/40px) ──
 
 export const AvatarBlock: Story = {
-  name: 'Avatar + description',
+  name: '頭像 + 說明文字',
   render: () => (
     <MenuContainer><MenuGroup>
       <MenuItem avatar={{ alt: "Alice Chen", color: "indigo", hoverCard: personHover('Alice Chen', '設計部門') }} description="設計部門">Alice Chen</MenuItem>

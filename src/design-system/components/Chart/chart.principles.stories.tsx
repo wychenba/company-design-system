@@ -287,7 +287,7 @@ export const ChartTypeRule: Story = {
 }
 
 export const CategoryTokenRule: Story = {
-  name: 'ChartConfig + 類別色 token',
+  name: 'ChartConfig + 類別色 設計變數',
   render: () => (
     <div>
       <Rule

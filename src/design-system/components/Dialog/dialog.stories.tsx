@@ -61,7 +61,7 @@ function NotificationSettings() {
                   {/* --item-gap-label-desc-scanning = 2px title↔desc gap(item-anatomy canonical);neutral-8 = fg-secondary */}
                   <div className="mt-[var(--item-gap-label-desc-scanning)] text-caption text-fg-secondary">{n.desc}</div>
                 </div>
-                {/* Suffix: Switch — ItemSuffix h-[1lh] 對齊 title 第一行(≤ 24px suffix 的 canonical) */}
+                {/* Suffix: Switch — ItemSuffix h-[1lh] 對齊 title 第一行(≤ 24px suffix 的設計準則) */}
                 <ItemSuffix>
                   <Switch checked={n.checked} onCheckedChange={n.onChange} />
                 </ItemSuffix>
@@ -304,7 +304,7 @@ export const Destructive = {
  * 以下三個 item-size 範例對應不同 list-item tier(item-anatomy Family 1 reading mode):
  */
 export const ListBody = {
-  name: 'Body 放 list',
+  name: '主體 放 list',
   render: () => (
     <div className="flex flex-col gap-6 items-start">
       {/* 大 item:avatar 40 + title + description(對齊 user 期望 + Material M3 + FileItem rich) */}

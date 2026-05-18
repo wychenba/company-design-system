@@ -1,6 +1,6 @@
 ---
 component: Toast
-family: null
+family: 2
 traits:
   - hasVariants
 variants:

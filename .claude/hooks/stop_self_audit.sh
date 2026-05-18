@@ -209,6 +209,30 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ] && [ "$LAST_USER_LINE"
   fi
 fi
 
+# ── Mechanism 6: PushNotification gap(2026-05-18 user-authorized)──────────
+# Why: memory/feedback_push_always_call.md 明文「每 substantive turn 結尾必 call PushNotification」,
+# 但純 markdown rule AI 會 silently forget(本 session 中段漏 5+ turns,user 抓「為何完成回覆沒送通知」)。
+# 機械化:本 turn assistant 有 substantive output(text > 200 chars OR commit/ship/push/done 等)+
+# 無 PushNotification tool call trace → P1 warn,未來升 BLOCKER 若仍漏。
+# Allow escape:turn 純 ack(< 200 chars 確認類 reply)/ 純翻譯 / 純 grep-only 無 action。
+if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ] && [ "${LAST_USER_LINE:-0}" -gt 0 ]; then
+  ASSISTANT_LEN=$(echo "$LAST_ASSISTANT" | wc -c | tr -d ' ')
+  ASSISTANT_LEN=${ASSISTANT_LEN:-0}
+  # Substantive trigger:長 reply OR 含 commit/ship/done/push keyword
+  SUBSTANTIVE_RE='(commit|ship|push|done|完成|已 land|landed|merged|測試 PASS|verify gate PASS)'
+  IS_SUBSTANTIVE=0
+  if [ "$ASSISTANT_LEN" -gt 200 ]; then IS_SUBSTANTIVE=1; fi
+  if echo "$LAST_ASSISTANT" | grep -qiE "$SUBSTANTIVE_RE"; then IS_SUBSTANTIVE=1; fi
+  if [ "$IS_SUBSTANTIVE" = "1" ]; then
+    # Check PushNotification tool call trace in this turn
+    HAS_PUSH=$(echo "$THIS_TURN_TOOLS" | grep -ciE 'PushNotification|"name":"PushNotification"' 2>/dev/null)
+    HAS_PUSH=${HAS_PUSH:-0}
+    if [ "$HAS_PUSH" -eq 0 ]; then
+      WARNINGS="${WARNINGS}\n  • PushNotification gap:本 turn substantive output 但無 PushNotification tool call trace。per memory/feedback_push_always_call.md「每 substantive turn 結尾必 call,不自我 suppress(harness 自決)」。下輪 reply 結尾必 call PushNotification(若 terminal focused harness 自決 suppress = OK)。"
+    fi
+  fi
+fi
+
 # ── Mechanism 5: Codex transport discovery gap(2026-05-17 user-authorized)──
 # Why: SKILL.md L42-58 Step 0.4 強制 3-test discovery(node_modules/.bin/codex / which / auth.json)
 # 在啟 codex 前。Markdown rule 沒 enforce — 2026-05-17 我跑 `which codex` 失敗就斷言 unreachable

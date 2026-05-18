@@ -250,7 +250,7 @@ export const ColorMatrix: Story = {
       <div>
         <H3>Dropdown 內 MenuItem 色彩(消費 MenuItem pattern)</H3>
         <Desc>
-          Dropdown 的 row 色彩走 item-layout canonical——跟 Select / Combobox / DropdownMenu 同一套
+          Dropdown 的 row 色彩走 item-layout 設計準則——跟 Select / Combobox / DropdownMenu 同一套
           (hover = neutral-hover / selected 加 Check icon)。不使用自訂 token。
         </Desc>
         <div className="overflow-x-auto mb-4">
@@ -401,7 +401,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"[TODO] 本元件 spec.md 尚無「## A11y 預設」段。後續補:ARIA role / keyboard map / focus 行為。對齊 PeoplePicker 對應 Radix / Material / Polaris a11y 規範。"}</p>
+      <p className="whitespace-pre-line">{"詳 `people-picker.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus trigger\n- Enter / Space — 開啟 picker\n- 字母鍵 — type-ahead 搜尋\n- ↑/↓ — 導覽 people\n- Enter — 選擇 / 取消選擇\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

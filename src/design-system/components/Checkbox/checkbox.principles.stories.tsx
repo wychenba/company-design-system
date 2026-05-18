@@ -178,7 +178,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ClampPolicyRule: Story = {
-  name: 'Clamp 政策',
+  name: '夾值 政策',
   render: () => (
     <div>
       <Rule
