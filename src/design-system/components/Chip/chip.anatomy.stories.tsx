@@ -367,7 +367,7 @@ export const StateBehavior: Story = {
 }
 
 export const LayoutMatrix: Story = {
-  name: '排版(換行 vs 捲動 vs 選單)',
+  name: '排版（換行 vs 捲動 vs 選單）',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

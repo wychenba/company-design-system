@@ -370,7 +370,7 @@ export const StateBehavior: Story = {
 }
 
 export const KeyboardMatrix: Story = {
-  name: '鍵盤導覽(ARIA tree)',
+  name: '鍵盤導覽（ARIA tree）',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

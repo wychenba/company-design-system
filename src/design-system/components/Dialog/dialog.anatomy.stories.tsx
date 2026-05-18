@@ -145,7 +145,7 @@ export const Inspector: Story = {
 }
 
 export const HeightBehavior: Story = {
-  name: '高度行為(預設填滿 vs autoHeight)',
+  name: '高度行為（預設填滿 vs autoHeight）',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

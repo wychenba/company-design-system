@@ -231,7 +231,7 @@ export const LastItemRule: Story = {
 // ── 長路徑 ────────────────────────────────────────────────────────────────
 
 export const LongPathRule: Story = {
-  name: '長路徑中段折疊(保首尾)',
+  name: '長路徑中段折疊（保首尾）',
   render: () => (
     <div>
       <Rule

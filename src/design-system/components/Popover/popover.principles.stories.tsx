@@ -246,7 +246,7 @@ export const UsageGuidance: Story = {
 }
 
 export const VisualAlignmentRule: Story = {
-  name: '視覺對齊對話框(浮層 視覺底 共用)',
+  name: '視覺對齊對話框（浮層 視覺底 共用）',
   render: () => (
     <div>
       <Rule

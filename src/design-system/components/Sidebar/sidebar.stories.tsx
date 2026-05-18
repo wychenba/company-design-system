@@ -342,7 +342,7 @@ export const MixedContent: Story = {
 // ── 3. Offcanvas 模式 ─────────────────────────────────────────────────────
 
 export const Offcanvas: Story = {
-  name: '抽屜收合(離畫面外)',
+  name: '抽屜收合（離畫面外）',
   render: () => {
     const [activeId, setActiveId] = React.useState<string>('dashboard')
 

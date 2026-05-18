@@ -383,7 +383,7 @@ ${prefix === 'avatar' ? `avatar size = ${useBlock ? spec.avatarBlockPx : spec.av
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const PrefixAlignment: Story = {
-  name: 'Prefix 對齊規則(24px 閾值)',
+  name: 'Prefix 對齊規則（24px 閾值）',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

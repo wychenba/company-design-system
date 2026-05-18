@@ -210,7 +210,7 @@ export const ColumnTypes: Story = {
 }
 
 export const RowHeightMatrix: Story = {
-  name: '列高階梯(閱讀 vs 掃描模式)',
+  name: '列高階梯（閱讀 vs 掃描模式）',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -248,7 +248,7 @@ export const RowHeightMatrix: Story = {
 }
 
 export const AlignmentRule: Story = {
-  name: '對齊規則(跨產業共識)',
+  name: '對齊規則（跨產業共識）',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -286,7 +286,7 @@ export const AlignmentRule: Story = {
 }
 
 export const Features: Story = {
-  name: '功能特性(排序 / 虛擬捲動)',
+  name: '功能特性（排序 / 虛擬捲動）',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -478,7 +478,7 @@ export const EmptyState: Story = {
 }
 
 export const BorderedProp: Story = {
-  name: 'bordered 屬性(預設 true)',
+  name: 'bordered 屬性（預設 true）',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [

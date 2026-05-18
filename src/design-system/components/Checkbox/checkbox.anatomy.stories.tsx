@@ -177,7 +177,7 @@ export const Overview = {
           <div className="flex flex-col gap-2 items-start">
             <span className="text-[11px] text-fg-muted font-medium">搭配 SelectionItem</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md p-3 gap-2">
-              {[{ name: 'control (Checkbox)', color: 'info' }, { name: 'control (Checkbox)', color: 'success' }].map((s) => (
+              {[{ name: 'control （Checkbox）', color: 'info' }, { name: 'control （Checkbox）', color: 'success' }].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}

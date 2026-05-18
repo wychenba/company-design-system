@@ -253,7 +253,7 @@ export const TwoLevels: Story = {
 // ── asChild (整合 router Link) ─────────────────────────────────────────────
 
 export const AsChildRouterLink: Story = {
-  name: 'asChild 組合(替換 trigger 元素)',
+  name: 'asChild 組合（替換 trigger 元素）',
   render: () => (
     <div className="flex flex-col gap-2">
       <div className="text-caption text-fg-muted">

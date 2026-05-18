@@ -71,7 +71,10 @@ function personToSelectOption(person: PersonValue): SelectOption {
   return {
     value: p.name,
     label: p.name,
-    avatar: { src: p.avatarUrl, alt: p.name },
+    // 2026-05-18 fix(per user directive「所有 avatar hover 都要 NameCard」+ avatar.spec.md
+    // DS-wide canonical):dropdown menu items Avatar 必帶 hoverCard,跟 PersonDisplay / Tag
+    // avatar 對齊。漏掉 = user 抓「PeoplePicker 選單內 avatar 沒有 namecard」。
+    avatar: { src: p.avatarUrl, alt: p.name, hoverCard: buildPersonNameCard(p) },
     description: p.description,
   }
 }

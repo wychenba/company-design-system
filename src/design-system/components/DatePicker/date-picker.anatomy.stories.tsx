@@ -180,7 +180,7 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">edit</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               {[
-                { name: 'button trigger text (flex-1)', color: 'success' },
+                { name: 'button trigger text （flex-1）', color: 'success' },
                 { name: 'Calendar icon', color: 'info' },
               ].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
@@ -194,7 +194,7 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">edit + clearable（有值）</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               {[
-                { name: 'button trigger text (flex-1)', color: 'success' },
+                { name: 'button trigger text （flex-1）', color: 'success' },
                 { name: 'X clear', color: 'error' },
                 { name: 'Calendar icon', color: 'info' },
               ].map((s) => (

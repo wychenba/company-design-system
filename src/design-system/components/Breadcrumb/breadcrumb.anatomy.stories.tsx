@@ -412,7 +412,7 @@ export const UsageExamples: Story = {
 
 export const CollapseMatrix: Story = {
   // renumbered to 7 (was 6) to accommodate ColorMatrix(3) + UsageExamples(6)
-  name: '長路徑收合(Ellipsis)',
+  name: '長路徑收合（Ellipsis）',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

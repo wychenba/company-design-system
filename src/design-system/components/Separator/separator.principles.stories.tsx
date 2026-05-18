@@ -150,7 +150,7 @@ export const WhoDecidesRule: Story = {
 }
 
 export const DecorativeSemanticRule: Story = {
-  name: '裝飾性 vs 語意分隔(讀屏的差別)',
+  name: '裝飾性 vs 語意分隔（讀屏的差別）',
   render: () => (
     <div>
       <Rule

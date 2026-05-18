@@ -71,7 +71,7 @@ export const Inspector: Story = {
     docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。調整 `mode` / `status` / `progress` 看 compact vs rich 佈局與狀態 icon/進度條變化。' } },
   },
   args: {
-    name: 'Q1 行銷報告 PDF(範例檔)',
+    name: 'Q1 行銷報告 PDF（範例檔）',
     mode: 'rich',
     status: 'uploading',
     progress: 60,
@@ -184,7 +184,7 @@ export const ColorMatrix: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: '模式 對照(緊湊 vs 豐富)',
+  name: '模式 對照（緊湊 vs 豐富）',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

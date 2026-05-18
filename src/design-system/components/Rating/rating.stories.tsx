@@ -27,7 +27,7 @@ export const ReadOnlyProductRating: Story = {
   render: () => (
     <div className="flex flex-col gap-4 w-[420px]">
       {[
-        { name: 'AirPods Pro (第二代)', rating: 4.7, count: 12843 },
+        { name: 'AirPods Pro （第二代）', rating: 4.7, count: 12843 },
         { name: 'Kindle Paperwhite', rating: 4.5, count: 8921 },
         { name: 'Anker 快充行動電源 20000mAh', rating: 4.8, count: 23104 },
         { name: 'UNIQLO 輕量羽絨外套', rating: 4.2, count: 592 },

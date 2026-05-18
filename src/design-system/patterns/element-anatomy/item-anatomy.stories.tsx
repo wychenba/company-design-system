@@ -923,7 +923,7 @@ export const Inspector = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const AlignmentThreshold = {
-  name: '對齊容器(24px 閾值)',
+  name: '對齊容器（24px 閾值）',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">

@@ -538,7 +538,7 @@ const CollapsedFrame = ({
 // 2026-05-17 ship per audit Dim 45 strict re-run — cva variant matrix codify
 // SidebarMenuButton cva 有 variant: { default, meta } 兩個值,本 story 展示 default vs meta 區別
 export const VariantMatrix: Story = {
-  name: '變體對照(預設 vs 次要)',
+  name: '變體對照（預設 vs 次要）',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div className="flex flex-col gap-2">

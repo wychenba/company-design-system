@@ -234,7 +234,7 @@ export const ColumnReorder: Story = {
 
 /* ── 行高模式 — autoRowHeight prop(每 row 內容驅動高度) ── */
 export const RowAutoHeightInlineEdit: Story = {
-  name: '自動行高 × 就地編輯(顯示與編輯位置驗證)',
+  name: '自動行高 × 就地編輯（顯示與編輯位置驗證）',
   render: () => {
     // 2026-05-14 I7 fix(per codex verdict):note 初始化進 state 一次,commit 寫同一 state。
     // 原 `dataWithNotes = list.map(...)` 每 render derive 覆蓋 commit value → user 看似不能編。
@@ -719,7 +719,7 @@ export const CellErrors: Story = {
  * 這是 per-row 行為,不是整表切換 mode。
  */
 export const CellErrorsFixedRowOverride: Story = {
-  name: '欄位錯誤訊息(固定行高 + 逐列撐高)',
+  name: '欄位錯誤訊息（固定行高 + 逐列撐高）',
   render: () => {
     const [data, setData] = React.useState(editableSampleData)
     const editCol = createColumnHelper<EditableProduct>()
@@ -808,7 +808,7 @@ const NESTED_DATA: TaskRow[] = [
 ]
 
 export const NestedRows: Story = {
-  name: '巢狀列(樹狀表格)',
+  name: '巢狀列（樹狀表格）',
   render: () => {
     const [expanded, setExpanded] = React.useState<Record<string, boolean>>({ 'task-1': true, 'task-1-1': true })
     const STATUS_OPTIONS = [
@@ -1441,7 +1441,7 @@ export const FilterPanelLongTagOverflow: Story = {
    - pinned-left + pinned-right 同時存在 → mirror regions 跟動 transform(per-region useSortable
      共享同 SortableContext state) */
 export const RowDragInteractive: Story = {
-  name: '列拖曳重排(含釘選欄)',
+  name: '列拖曳重排（含釘選欄）',
   render: () => {
     const [list, setList] = React.useState<Product[]>(sampleData)
     const handleReorder = (sourceId: string, targetId: string, position: 'before' | 'after') => {

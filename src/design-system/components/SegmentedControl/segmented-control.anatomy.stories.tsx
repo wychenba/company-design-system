@@ -252,7 +252,7 @@ export const FullWidthMatrix: Story = {
 }
 
 export const IconOnlyMatrix: Story = {
-  name: '純圖示(群組層)',
+  name: '純圖示（群組層）',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

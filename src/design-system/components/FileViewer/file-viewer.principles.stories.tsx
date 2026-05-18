@@ -251,7 +251,7 @@ const closeOrderFiles: FileInfo[] = [
 ]
 
 export const CloseButtonPositionRule: Story = {
-  name: '工具列 按鈕順序(關閉 永遠最右)',
+  name: '工具列 按鈕順序（關閉 永遠最右）',
   render: () => {
     const [open, setOpen] = React.useState(false)
     return (
@@ -509,7 +509,7 @@ const darkDemoFiles: FileInfo[] = [
 ]
 
 export const DarkModeLockedRule: Story = {
-  name: '檢視器框架鎖暗色(不隨頁面主題)',
+  name: '檢視器框架鎖暗色（不隨頁面主題）',
   render: () => {
     const [open, setOpen] = React.useState(false)
     return (

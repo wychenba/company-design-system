@@ -330,7 +330,7 @@ export const StateBehavior: Story = {
 }
 
 export const OverflowMatrix: Story = {
-  name: '超出處理(捲動 / 選單)',
+  name: '超出處理（捲動 / 選單）',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

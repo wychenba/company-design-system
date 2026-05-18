@@ -140,7 +140,7 @@ const STRING_OPS = [
 ]
 
 export const FilterRow_RealUsage: Story = {
-  name: '篩選列(資料表進階篩選實例)',
+  name: '篩選列（資料表進階篩選實例）',
   render: () => {
     const [field, setField] = React.useState('name')
     const [op, setOp] = React.useState('contains')

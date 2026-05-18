@@ -170,7 +170,7 @@ export const ScenarioMatrix: Story = {
 }
 
 export const SlotCombinations: Story = {
-  name: '插槽組合(只有說明 → 完整)',
+  name: '插槽組合（只有說明 → 完整）',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

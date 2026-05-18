@@ -1001,7 +1001,7 @@ export const StateBehavior: Story = {
 // ─── 6. Extras:Renderer Registry ─────────────────────────────────────────────
 
 export const RendererRegistry: Story = {
-  name: '延伸機制(registerFileRenderer)',
+  name: '延伸機制（registerFileRenderer）',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

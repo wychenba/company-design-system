@@ -146,7 +146,7 @@ export const VsToastRule: Story = {
 }
 
 export const ActionVariantRule: Story = {
-  name: '動作 變體 規則(不用 主要)',
+  name: '動作 變體 規則（不用 主要）',
   render: () => (
     <div>
       <Rule

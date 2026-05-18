@@ -179,7 +179,7 @@ export const Overview = {
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               {[
                 { name: 'startIcon', color: 'info' },
-                { name: 'input (flex-1)', color: 'success' },
+                { name: 'input （flex-1）', color: 'success' },
                 { name: 'endAction', color: 'error' },
               ].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"

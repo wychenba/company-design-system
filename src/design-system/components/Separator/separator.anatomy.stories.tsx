@@ -77,7 +77,7 @@ export const Overview: Story = {
 }
 
 export const TokenMatrix: Story = {
-  name: '設計變數 規則(--divider vs --邊框)',
+  name: '設計變數 規則（--divider vs --邊框）',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

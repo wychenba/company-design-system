@@ -148,7 +148,7 @@ export const Inspector: InspectorStory = {
     },
   },
   args: {
-    name: 'Ada Chen(範例人名)',
+    name: 'Ada Chen（範例人名）',
     subtitle: 'Design Engineer · Engineering',
     status: 'online',
     withStatusMessage: true,
@@ -201,7 +201,7 @@ export const Inspector: InspectorStory = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SectionMatrix: Story = {
-  name: '區段 組合(最小 → 完整)',
+  name: '區段 組合（最小 → 完整）',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -354,7 +354,7 @@ export const ColorMatrix: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const HoverCardIntegration: Story = {
-  name: 'HoverCard 整合(觸發行為)',
+  name: 'HoverCard 整合（觸發行為）',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -365,7 +365,7 @@ export const HoverCardIntegration: Story = {
         </Desc>
         <div className="border border-border rounded-lg p-6 flex items-center gap-8">
           {[
-            { name: 'Ada Chen(範例人名)', subtitle: 'Design Engineer', status: 'online' as const },
+            { name: 'Ada Chen（範例人名）', subtitle: 'Design Engineer', status: 'online' as const },
             { name: 'Alice Wang', subtitle: 'Frontend Engineer', status: 'busy' as const },
             { name: 'Bob Chen', subtitle: 'PM, Growth', status: 'away' as const },
           ].map(p => (

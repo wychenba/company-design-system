@@ -229,7 +229,7 @@ export const Overview = {
           <div className="flex flex-col gap-2 items-start">
             <span className="text-[11px] text-fg-muted font-medium">基本</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
-              {[{ name: 'select (文字)', color: 'success' }, { name: 'select (文字)', color: 'magenta' }].map((s) => (
+              {[{ name: 'select （文字）', color: 'success' }, { name: 'select （文字）', color: 'magenta' }].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}

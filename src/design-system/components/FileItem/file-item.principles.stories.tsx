@@ -96,7 +96,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ModeRule: Story = {
-  name: '模式 選擇(緊湊 vs 豐富)',
+  name: '模式 選擇（緊湊 vs 豐富）',
   render: () => (
     <div>
       <Rule

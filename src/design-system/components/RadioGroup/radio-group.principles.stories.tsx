@@ -95,7 +95,7 @@ export const UsageGuidance: Story = {
 }
 
 export const DecisionNodeRule: Story = {
-  name: '決策節點(需對比評估)',
+  name: '決策節點（需對比評估）',
   render: () => {
     const [payment, setPayment] = React.useState('credit')
     const [plan, setPlan] = React.useState('pro')

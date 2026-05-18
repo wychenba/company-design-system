@@ -202,7 +202,7 @@ export const DefaultLowRule: Story = {
 }
 
 export const ContrastFloorRule: Story = {
-  name: '對比 下限(容器對比下限)',
+  name: '對比 下限（容器對比下限）',
   render: () => (
     <div>
       <Rule

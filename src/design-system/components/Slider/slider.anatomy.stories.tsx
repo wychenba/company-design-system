@@ -199,7 +199,7 @@ export const ColorBindingRule: Story = {
 }
 
 export const KeyboardMatrix: Story = {
-  name: '鍵盤操作(Radix 原生)',
+  name: '鍵盤操作（Radix 原生）',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

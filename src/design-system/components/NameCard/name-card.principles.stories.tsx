@@ -192,7 +192,7 @@ export const FixedWidthRule: Story = {
 // ── 結構選擇 ────────────────────────────────────────────────────────────
 
 export const SectionRule: Story = {
-  name: 'Section 各自獨立(選擇性出現)',
+  name: 'Section 各自獨立（選擇性出現）',
   render: () => (
     <div>
       <Rule

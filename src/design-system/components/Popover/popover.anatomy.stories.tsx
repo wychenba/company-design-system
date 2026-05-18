@@ -146,7 +146,7 @@ export const Inspector: Story = {
 }
 
 export const PlacementMatrix: Story = {
-  name: '定位(位置 × align)',
+  name: '定位（位置 × align）',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

@@ -139,7 +139,7 @@ export const ColorMatrix: Story = {
 }
 
 export const PlacementMatrix: Story = {
-  name: '出現位置(內嵌 vs 固定)',
+  name: '出現位置（內嵌 vs 固定）',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
