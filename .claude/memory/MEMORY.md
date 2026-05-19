@@ -26,6 +26,7 @@
 ## Project (active state)
 - [project_bug_h_windows_scrollbar_2026_05_08.md](project_bug_h_windows_scrollbar_2026_05_08.md) — Windows scrollbar interim landed;ScrollArea full migration deferred (post-v1 RFC)
 - [project_hover_overlay_decisions_2026_05_09.md](project_hover_overlay_decisions_2026_05_09.md) — Hover overlay Q1-Q7 已決 + cell picker D-path 已完成 + 路 B 拍板 spreadsheet target;Q3.6 send codex Q-A/Q-B/Q-C 比稿中
+- [codex_collab_backfill_2026-05-19.md](codex_collab_backfill_2026-05-19.md) — 14 條 codex reply 7-column audit table(3 DONE / 4 DEEP-VERIFY-PENDING / 7 TRIAGE-PENDING),Q3.1 last-verdict gate SSOT
 
 ## Reference
 - [reference_deploy_targets.md](reference_deploy_targets.md) — Storybook GitHub Pages + Netlify per-branch preview + main = production
