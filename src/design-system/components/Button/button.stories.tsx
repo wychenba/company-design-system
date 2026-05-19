@@ -69,6 +69,22 @@ const meta: Meta<typeof Button> = {
 export default meta
 type Story = StoryObj<typeof Button>
 
+// 2026-05-18 加(per user 抓「為何開頭是按下狀態」):Default story 放最頂,
+// 入口顯預設 variant 五連發(primary / secondary / tertiary / text / link),
+// 讓 user 第一眼看到按鈕長什麼樣 — 而非 transient state demo。
+export const Default: Story = {
+  name: '預設',
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button variant="primary">主要動作</Button>
+      <Button variant="secondary">次要動作</Button>
+      <Button variant="tertiary">第三動作</Button>
+      <Button variant="text">純文字</Button>
+      <Button variant="link">連結樣式</Button>
+    </div>
+  ),
+}
+
 export const Pressed: Story = {
   name: '按下狀態',
   render: () => (

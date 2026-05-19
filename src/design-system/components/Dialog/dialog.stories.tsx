@@ -4,6 +4,7 @@ import type { Meta } from '@storybook/react'
 import {
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle, DialogClose,
 } from './dialog'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/design-system/components/Tabs/tabs'
 import { Button } from '@/design-system/components/Button/button'
 import { Field, FieldLabel, FieldDescription } from '@/design-system/components/Field/field'
 import { Input } from '@/design-system/components/Input/input'
@@ -423,6 +424,57 @@ export const ListBody = {
  * 情境選用「確認刪除專案」— Jira / Linear 常見的 destructive confirmation,
  * 涵蓋 title + description + footer 雙 action 的完整 chrome。
  */
+/**
+ * 標頭內含分頁(2026-05-18 從 patterns/header-canonical/header-canonical.stories.tsx 整合過來
+ * per user「應該整合進去 dialog 吧?目前應該不需要獨立的 header canonical 資料夾來說明這些東西」)
+ *
+ * 對應 `header-canonical.spec.md` W1-W4:
+ *   W1 Tabs 自畫 full-width border-divider 接管 chrome separator
+ *   W2 TabsList 全 dialog 寬 + 內 px-loose padding 對齊 title left
+ *   W4 header content row + tabs row flush stack(gap = 0)
+ *
+ * Anatomy(consumer 寫法):`<Tabs>` wrap 整 DialogContent → `<DialogHeader tabsSlot={<TabsList>}>` →
+ *   `<DialogBody><TabsContent>...</TabsContent></DialogBody>`
+ *
+ * 注意:TabsContent 必放 DialogBody 內(scroll + chrome padding 由 DialogBody 自管),不要自加 padding。
+ */
+export const WithTabsInHeader = {
+  name: '標頭內含分頁',
+  render: () => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="secondary">打開含分頁的對話框</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <Tabs defaultValue="general">
+          <DialogHeader
+            tabsSlot={
+              <TabsList>
+                <TabsTrigger value="general">一般</TabsTrigger>
+                <TabsTrigger value="members">成員</TabsTrigger>
+                <TabsTrigger value="integrations">整合</TabsTrigger>
+              </TabsList>
+            }
+          >
+            <DialogTitle>專案設定</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <TabsContent value="general">
+              <p className="text-body">專案的名稱、描述、可見度等基本資訊。修改後立即生效。</p>
+            </TabsContent>
+            <TabsContent value="members">
+              <p className="text-body">管理專案成員與角色。邀請新成員會收到 Email 通知並自動加入。</p>
+            </TabsContent>
+            <TabsContent value="integrations">
+              <p className="text-body">串接第三方服務:Slack 通知、GitHub PR 同步、Linear issue 連動。</p>
+            </TabsContent>
+          </DialogBody>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
+  ),
+}
+
 export const OpenSnapshot = {
   name: '開啟狀態',
   tags: ['!autodocs'],

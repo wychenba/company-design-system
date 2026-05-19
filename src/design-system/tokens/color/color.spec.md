@@ -715,7 +715,7 @@ Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → ste
 |-------|------|
 | `--overlay` | dialog backdrop 遮罩 |
 | `--tooltip` | tooltip 深色底（不透明）|
-| `--chart-1` ~ `--chart-5` | 5 色類別標記（Chart 元件 data viz 用；固定到 primitive 而非 semantic — 避免 brand swap 污染 data viz 色義；light step-6 / dark step-5 / yellow 用 step-7 提對比）|
+| `--chart-1` ~ `--chart-5` | 5 色類別標記（Chart 元件 data viz 用；固定到 primitive 而非 semantic — 避免 brand swap 污染 data viz 色義；light step-6 / dark step-5 / yellow 用 step-7 提對比）。**Numbered naming = industry canonical**(Material Data Viz palette / Polaris ChartPalette / Carbon Charts colors-N / IBM data-viz / D3 schemeCategory10)— categorical color 本質無 inherent priority,只能 by-index;**1→5 順序 ≠ priority**,只是 consumer 取色 idx convention。色相選擇 rationale:blue(冷靜入門)→ purple(分類二)→ green(成長 / 正面)→ yellow(警戒對比)→ deep-orange(暖色平衡)。Brand swap 不影響 data viz(`--chart-*` 直連 primitive,跳過 `--primary` 等 semantic 中間層)。<!-- @benchmark-cited: Material Data Viz https://m3.material.io/styles/color/the-color-system/color-roles + Polaris https://polaris.shopify.com/tokens/color + Carbon https://carbondesignsystem.com/data-visualization/color-palettes/ + D3 https://d3js.org/d3-scale-chromatic/categorical --> |
 | `opacity-disabled` | disabled 元件整體透明度（0.45），用於無法改寫內部色彩的第三方元件 |
 
 `opacity-disabled` 適用場景：包裝第三方元件（如圖表、地圖）的 disabled 狀態，無法逐一替換內部顏色時，直接對容器套用透明度：
