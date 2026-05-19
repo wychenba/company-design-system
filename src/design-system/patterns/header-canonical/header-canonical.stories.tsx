@@ -69,15 +69,18 @@ export const DialogHeaderWithTabs: Story = {
             <DialogTitle>專案設定</DialogTitle>
           </DialogHeader>
           <DialogBody>
+            {/* 2026-05-18 fix(user 抓 body 字體不符 token canonical):TabsContent 內文必
+                wrap `<p className="text-body">` — 對齊 dialog.stories.tsx 11+ instances
+                既有 consumer pattern。直接放純文字會 inherit body default(瀏覽器 16px
+                lh~1.2),違反 text-body(14px lh 1.5)token canonical。*/}
             <TabsContent value="general">
-              一般設定內容。Body 由 DialogBody 自管 padding(`px-loose pt-tight pb-bottom`)
-              + ScrollArea。TabsContent 直接放內容不需 wrapper。
+              <p className="text-body">專案的名稱、描述、可見度等基本資訊。修改後立即生效。</p>
             </TabsContent>
             <TabsContent value="members">
-              成員管理內容。新增成員、調整權限。
+              <p className="text-body">管理專案成員與角色。邀請新成員會收到 Email 通知並自動加入。</p>
             </TabsContent>
             <TabsContent value="integrations">
-              第三方整合內容。串接 Slack / GitHub / Linear。
+              <p className="text-body">串接第三方服務:Slack 通知、GitHub PR 同步、Linear issue 連動。</p>
             </TabsContent>
           </DialogBody>
         </Tabs>
@@ -101,7 +104,7 @@ export const DialogHeaderDefault: Story = {
           <DialogTitle>專案設定</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          一般設定內容。Header 跟 Body 之間有一條 `border-b border-divider`,由 DialogHeader 自畫。
+          <p className="text-body">專案的名稱、描述、可見度等基本資訊。修改後立即生效。</p>
         </DialogBody>
       </DialogContent>
     </Dialog>
