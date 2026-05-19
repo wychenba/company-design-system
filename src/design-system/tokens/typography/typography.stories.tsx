@@ -103,8 +103,10 @@ export const LineHeight: Story = {
     docs: {
       description: {
         story:
-          'body token 預設 `leading-normal`（1.5），可用 `leading-compact` 覆蓋為 1.3。' +
-          '截斷文字（`line-clamp`）或標題風格短文字時使用 compact。',
+          '`text-body` / `text-body-lg`（14/16px）唯二可覆蓋行高的 token，預設 1.5（閱讀段落），' +
+          '可 `leading-compact` 覆蓋為 1.3 — 唯一合理情境是「單行固定高度容器」' +
+          '（Button / Tabs trigger / Chip / Notice / MenuItem 等），避免 1lh > chrome height 造成垂直偏移。' +
+          'h1-h6 / caption / footnote 全 lh 1.3 固定不可覆蓋。',
       },
     },
   },
@@ -123,7 +125,7 @@ export const LineHeight: Story = {
           text-body · leading-compact (1.3)
         </code>
         <p className="text-body leading-compact rounded-md bg-neutral-hover p-4">
-          適合標題、截斷文字、不需要閱讀舒適度的短段落。視線不需在行間移動太多距離。
+          適合單行固定高度容器內文字（Button / Tabs trigger / Chip / Notice / MenuItem 等），避免 1lh 大於容器高度造成垂直偏移。
         </p>
       </div>
     </div>
