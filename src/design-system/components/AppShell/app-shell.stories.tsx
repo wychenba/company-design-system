@@ -4,7 +4,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
-import { Search, Filter, ArrowUpDown, PanelRightOpen, UserCheck, CheckCircle2 } from 'lucide-react'
+import { Search, Filter, ArrowUpDown, Info, UserCheck, CheckCircle2 } from 'lucide-react'
 import { AppShell, AppShellAside } from './app-shell'
 import { AcmeSidebar, PageHeader, MAIN_NAV } from './_demo-helpers'
 import { SidebarProvider } from '@/design-system/components/Sidebar/sidebar'
@@ -162,7 +162,7 @@ function IssuesView({ selectedId, onSelectIssue }: { selectedId?: string; onSele
               variant="text"
               size="xs"
               iconOnly
-              startIcon={PanelRightOpen}
+              startIcon={Info}
               aria-label={`開啟 ${row.id} 詳情`}
               pressed={row.id === selectedId}
               onClick={() => onSelectIssue(row)}
@@ -261,8 +261,6 @@ export const PrimarySidebar: Story = {
           header={
             <PageHeader
               title={MAIN_NAV.find((n) => n.id === activeId)?.label ?? 'Inbox'}
-              onToggleAside={() => setAsideOpen(!asideOpen)}
-              asideOpen={asideOpen}
             />
           }
           aside={

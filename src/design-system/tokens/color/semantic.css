@@ -342,8 +342,9 @@
   --neutral-selected-active:  var(--color-neutral-3);
 
   /* Static Subtle — 靜態弱化背景 */
-  --muted:                var(--color-neutral-2);  /* Badge/skeleton 底色 */
-  --secondary:            var(--color-neutral-3);  /* Badge low 底色 */
+  /* 2026-05-20 fix:semantic.css 註解誤標 Badge/skeleton 用 muted,grep verified Badge 0 consumer */
+  --muted:                var(--color-neutral-2);  /* 弱化背景:Alert neutral / Calendar inactive / Skeleton / Slider disabled / anatomy <th> */
+  --secondary:            var(--color-neutral-3);  /* 稍深弱化:Badge low / Tag neutral / Slider rest track */
 
   /* Scrollbar — Lane / chrome / thumb(2026-05-09 抽 SSOT,DataTable fake + ScrollArea 共享)
      Track 用 --muted(靜態 lane,非 disabled 元件 bg);Thumb 用 --border(中性低對比 chrome)。
