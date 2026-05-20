@@ -92,6 +92,25 @@
 
 **Future-proof**:propose 新 hook 必先寫 3-column table:`Spec wording` / `Hook regex` / `Gap?(broad-vs-narrow)`。Gap → 改 broader implementation 或 codify narrower spec wording 後再 ship hook。
 
+## M35 ⚠️ Nearest same-purpose canonical usage wins(2026-05-20 codify per codex Layer B D4)
+
+**Rule**:寫 stories(或任何 UI composition)wrap 既有 primitive(`<Sidebar>` / `<ChromeHeader>` / `<DataTable>` / `<Dialog>` / `<Sheet>` / `<Popover>` 等)前,**必先 grep + Read** 該 primitive `*.stories.tsx` 的**「完整佈局」類 production-grade canonical story**(eg. `sidebar.stories.tsx#IconCollapse` / `data-table.stories.tsx#WithBulkActions`),抄該 production archetype 結構 + helper 命名 + variant/prop 選擇 — **不准憑記憶寫 simplified mock shell**。
+
+**單一 verdict source**(codex 2026-05-20):「SSOT 消費被當成引用儀式,而不是同目的 canonical usage 的機械證明」是反覆偏移的真 root cause。Cite 存在 ≠ consume 落實。最相近同目的 canonical 用法**優於**泛用 component spec / 寬鬆 pattern wording(eg. `action-bar.spec.md:141`「filter/sort 重點 → tertiary」被 `data-table.stories#WithBulkActions L998` text + pressed 真實實作 narrow scope)。
+
+**Triple test before story write**:
+1. **Registry check**:該 primitive 在 `.claude/references/story-baseline-registry.json` 有 entry?有 → 必 follow baseline + requiredHelpers + variantRules;沒 → STOP,先加 registry entry 才寫 story
+2. **Marker required**:story 檔頭必標 `// @story-baseline: <path>#<StoryName>` cite 來源
+3. **Hook enforce**:`check_story_invariants.sh R8 story_archetype_registry` 機械驗(missing marker / antiPattern match → P0 block,允許 `// @story-baseline-allow: <reason> owner=<...>` 例外)
+
+**反覆違反錨例(2026-05-20 4 類)**:
+- simplified mock(`<SidebarHeader><span>Acme</span>` 取代 `<WorkspaceBrand>` ItemAvatar block)
+- dev jargon(anatomy「Main `<main>` landmark + padding=0」「規則 1A/1B/1C 三派並存」)
+- wrong variant(toolbar filter/sort 用 tertiary,canonical 是 text)
+- 結構不消費 primitive props(`<SidebarMenuButton><Icon className="size-4"/>` 取代 `startIcon` + `tooltip` props)
+
+**對齊**:Storybook portable stories(stories 變更 auto-flow consumer)+ Polaris/Atlassian「prebuilt components first, composition with primitives, real component examples not simplified visual mocks」。
+
 ## 判斷 meta-principle 是否漏寫的 test
 
 - 同類 bug 一年內被糾正 3 次 → meta-principle 漏寫或沒執行,檢討本清單

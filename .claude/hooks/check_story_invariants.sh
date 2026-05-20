@@ -529,6 +529,76 @@ rule_story_baseline_reference() {
   fi
 }
 
+# R8 — story_archetype_registry(PreToolUse Write/Edit,2026-05-20 codify per M35 + codex Layer B D4)
+# Registry-driven nearest same-purpose canonical enforce。讀
+# `.claude/references/story-baseline-registry.json` antiPatterns regex,逐條 scan 寫入內容。
+# Severity=block → record_worst 2;severity=warn → stderr only。Allowlist
+# `// @story-baseline-allow: <reason>` 整檔豁免。
+# Ship as warn mode first(2026-05-20),確認 zero existing violation 才升 P0 BLOCKER。
+
+rule_story_archetype_registry() {
+  case "$TOOL" in
+    Write|Edit) ;;
+    *) return 0 ;;
+  esac
+
+  case "$FILE_PATH" in
+    *.stories.tsx) ;;
+    *) return 0 ;;
+  esac
+
+  # Skip self-family
+  case "$FILE_PATH" in
+    */Sidebar/*|*/DataTable/*|*/header-canonical/*|*/Dialog/*|*/Sheet/*|*/Popover/*) return 0 ;;
+  esac
+
+  local REGISTRY=".claude/references/story-baseline-registry.json"
+  [ -f "$REGISTRY" ] || return 0
+
+  local CONTENT=""
+  if [ "$TOOL" = "Write" ]; then
+    CONTENT=$(echo "$INPUT" | jq -r '.tool_input.content // ""')
+  else
+    CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // ""')
+  fi
+
+  # Allow override
+  if echo "$CONTENT" | head -10 | grep -qE '@story-baseline-allow:'; then
+    return 0
+  fi
+
+  # Read antiPatterns regex from registry(per component)
+  # Iterate Sidebar/DataTable/ChromeHeader components
+  local COMPONENTS="Sidebar DataTable ChromeHeader"
+  for COMP in $COMPONENTS; do
+    # Only check if file wraps this component
+    if ! echo "$CONTENT" | grep -qE "<${COMP}\\b"; then
+      continue
+    fi
+
+    # Read antiPatterns regex list(P0 block only — warn ship later)
+    local PATTERNS
+    PATTERNS=$(jq -r --arg c "$COMP" '.components[$c].antiPatterns[]? | select(.severity == "block") | .regex' "$REGISTRY" 2>/dev/null)
+    [ -z "$PATTERNS" ] && continue
+
+    while IFS= read -r PATTERN; do
+      [ -z "$PATTERN" ] && continue
+      if echo "$CONTENT" | grep -qE "$PATTERN"; then
+        echo "⚠️  R8 story_archetype_registry violation:" >&2
+        echo "   $FILE_PATH wrap <$COMP> matches anti-pattern:" >&2
+        echo "   regex: $PATTERN" >&2
+        echo "   per registry: .claude/references/story-baseline-registry.json#components.$COMP.antiPatterns" >&2
+        echo "" >&2
+        echo "   修法:Read baseline story + helpers,抄 production archetype。" >&2
+        echo "   或加 \`// @story-baseline-allow: <reason>\` 檔頭豁免(audit-logged)。" >&2
+        echo "   詳 .claude/rules/meta-patterns.md M35 + memory/feedback_nearest_same_purpose_canonical.md" >&2
+        # Ship as warn first(2026-05-20):not record_worst 2,exit 0
+        # Future:zero existing violation → 改 record_worst 2 升 P0 BLOCKER
+      fi
+    done <<< "$PATTERNS"
+  done
+}
+
 # ─── Run rules ───
 rule_anatomy
 rule_slot_split
@@ -537,5 +607,6 @@ rule_title_canonical
 rule_name_jargon
 rule_description_jargon
 rule_story_baseline_reference
+rule_story_archetype_registry
 
 exit $WORST

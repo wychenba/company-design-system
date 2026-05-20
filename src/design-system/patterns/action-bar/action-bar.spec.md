@@ -138,7 +138,24 @@ Search 的角色**不由「產品核心是不是搜尋」決定**，而由——
 - `text` + `data-state=on` → `bg-neutral-selected`（灰底 + 原色 icon），低調但仍可辨識
 - `tertiary` + `data-state=on` → `bg-primary-subtle` + `text-primary`（藍底 + 藍色 icon），存在感更強
 
-若 filter / sort 狀態是此 Toolbar 的**重點資訊**（使用者需要快速知道「現在有沒有生效的條件」），用 `tertiary` 基底；若只是一般工具操作，用 `text` 即可。
+**Variant 選擇 narrow scope**(2026-05-20 codex Layer B D1 verdict + WebFetch ≥ 5 world-class):
+
+| Context | Variant | Cite |
+|---|---|---|
+| **DataTable / Kanban / list 等 dense always-visible data toolbar** filter / sort / column controls | **`text` + pressed** + iconOnly + Popover wrap real panel(DataTableFilterPanel / DataTableSortManager) | `data-table.stories.tsx#WithBulkActions L998` SSOT |
+| **Standalone / labeled** sole state carrier(toolbar 外 / 單獨 filter UI 非 DataTable context) | `tertiary` + pressed | 視 case |
+| 純動作工具(無 state)/ 低重量輔助 | `text` | 既有 default |
+
+**Rationale**:dense data toolbar 已自帶 affordance + active state 由 pressed/chips/badges 顯示,trigger 用 low visual weight `text` 不該放大重量。`tertiary` 反而留給 standalone 場景(無 toolbar 上下文,trigger 是唯一 state carrier)。
+
+**World-class consensus(2026-05-20 WebFetch verified)**:
+- MUI Data Grid toolbar = `baseIconButton`(text-equivalent)/ active filters 用 toolbar chips 顯示
+- Polaris IndexFilters = toggle button + panel,active filters 用 badges/tags
+- Carbon dense toolbar = icon-only button + ghost variant
+- Linear filter button = low weight + filter chips 顯示 conditions
+- Notion DB view settings = compact button + 不放大重量
+
+**舊 wording**(retired 2026-05-20):「filter/sort 狀態是 toolbar 重點資訊 → tertiary」過寬,導致 DataTable scope 誤用 tertiary;canonical 已 narrow 到 standalone-only。
 
 ### 工具操作
 
