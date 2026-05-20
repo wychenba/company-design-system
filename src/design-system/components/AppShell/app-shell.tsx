@@ -20,6 +20,7 @@ import {
 } from '@/design-system/components/Sheet/sheet'
 import { Button } from '@/design-system/components/Button/button'
 import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
+import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
 import { useIsNarrowViewport } from '@/design-system/hooks/use-is-narrow-viewport'
 import { cn } from '@/lib/utils'
 
@@ -261,11 +262,13 @@ const AppShellAside = React.forwardRef<HTMLElement, AppShellAsideProps>(
 
     // Shared frame:always-on header(title + close X)+ body(ScrollArea + layoutSpace 規則 1B 父層 padding)
     // 對齊 codex Layer B 2026-05-20「container mode 可變,panel role/content 不該變」+ Notion/Figma right
-    // panel 共識(modal vs inline 結構相同,host wrapper 不同)。Header 用 chrome-header pattern
-    // 對齊 header-canonical.spec.md(h-chrome-header-height + border-b border-divider + px-loose + items-center gap-2)。
+    // panel 共識(modal vs inline 結構相同,host wrapper 不同)。
+    // 2026-05-20 migrate 消費 ChromeHeader primitive(撤回自刻 + 撤回 bg-surface 疊加 — 對齊
+    // `header-canonical.spec.md`「6. Background ownership」段「Nested chrome header 透明繼承
+    // parent」:aside container 自身已 bg-surface,內 header 不該再畫 bg 避免疊加 drift)。
     const frame = (
       <>
-        <header className="flex h-[var(--chrome-header-height)] shrink-0 items-center gap-2 border-b border-divider bg-surface px-[var(--layout-space-loose)]">
+        <ChromeHeader>
           <h2 className="text-body-lg font-medium flex-1 truncate">{title}</h2>
           <Button
             iconOnly
@@ -275,7 +278,7 @@ const AppShellAside = React.forwardRef<HTMLElement, AppShellAsideProps>(
             aria-label="關閉"
             onClick={() => setAsideOpen(false)}
           />
-        </header>
+        </ChromeHeader>
         <ScrollArea className="flex-1 min-h-0">
           {children}
         </ScrollArea>

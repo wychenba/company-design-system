@@ -28,7 +28,7 @@ export const Overview: Story = {
         <AppShell
           layout="primary-sidebar"
           sidebar={<AcmeSidebar />}
-          header={<PageHeader title="Dashboard" onToggleAside={() => setAsideOpen(!asideOpen)} asideOpen={asideOpen} />}
+          header={<PageHeader title="Dashboard" />}
           aside={
             <AppShellAside title="Detail panel" width={320}>
               <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">

@@ -55,6 +55,25 @@ benchmark:
 
 - `text-body-lg font-medium` 或 `text-h6`(細節由 family spec 自決)
 
+### 6. Background ownership(2026-05-20 codify per user directive,SSOT)
+
+**核心原則**:Header 自身**不該畫 bg**。bg 永遠屬於「header 所在 surface 層」的職責。違反 = 顏色疊加 / drift / 跨 consumer 視覺不一致(user 2026-05-20 抓 aside header bg-surface 疊在 aside bg-surface 上)。
+
+**3 場景分類**:
+
+| 場景 | Header bg | Parent surface | Rationale |
+|---|---|---|---|
+| **Top-level chrome header**(直接坐 canvas 上,如 PageHeader / app top bar)| **自畫 `bg-surface`**(consumer 透過 `className="bg-surface"` 注入 ChromeHeader)| Main content 是 `bg-canvas`,header 本身就是 chrome region marker 必須區分 work area | `<ChromeHeader className="bg-surface">` |
+| **Nested chrome header**(parent 已是 chrome region:SidebarHeader / AsideHeader / FileViewer InfoPanel)| **transparent**(不傳 bg className,繼承 parent)| Sidebar / Aside 自身已 `bg-surface`,header 再畫 = 同色疊加(理論透明)但給 dark mode 半透明變體留 drift 風險 | `<ChromeHeader>`(無 bg className)|
+| **Overlay header**(Dialog / Sheet / Popover)| **transparent** | Overlay 自身 `bg-surface-raised`,header 透明繼承 | `<SurfaceHeader>`(SurfaceHeader 內無 bg) |
+
+**反 pattern 錨例**(2026-05-20 修正):
+- `app-shell.tsx:268` aside built-in header `bg-surface` 疊在 aside `bg-surface`(規則 6 nested case 違反)→ 撤回
+- `_demo-helpers.tsx:131` PageHeader 自刻 `<header>` + `bg-surface` → migrate 消費 ChromeHeader + 保 `bg-surface`(top-level 合法)
+- `sidebar.stories.tsx:113` Sidebar IconCollapse demo 自刻 header + `bg-surface` → 後續一併 migrate(同 PageHeader 路徑)
+
+**Element canonical**(2026-05-20):ChromeHeader 內部用 `<header>` element(非 `<div>`)。HTML5 spec 允許 sectional content 多次 `<header>`(`role="banner"` 只 page top 一個,sectional 內 default `<header>` 不自動有 banner role)。統一 element contract 消除「何時用 header / 何時用 div」consumer drift。
+
 ---
 
 ## withTabs 連動(本 SSOT 最核心契約)

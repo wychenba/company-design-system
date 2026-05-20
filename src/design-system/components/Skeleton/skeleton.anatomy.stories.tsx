@@ -2,7 +2,8 @@
 //   Inspector / ColorMatrix / SizeMatrix / StateBehavior N/A — Skeleton 是極簡
 //   animation primitive(單一 div + pulse animation),刻意沒有 size / color /
 //   variant prop。形狀 / 尺寸完全由 consumer 的 className 決定;色彩透過
-//   bg-secondary 從 theme 繼承;loading 是唯一狀態(無 hover / focus / active)。
+//   bg-muted 從 theme 繼承(2026-05-20 修 drift,實際 skeleton.tsx:10 用 bg-muted);
+//   loading 是唯一狀態(無 hover / focus / active)。
 //   本檔僅保留 Overview + CommonShapes + DesignPrinciple 三個 story。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Skeleton } from './skeleton'
@@ -11,7 +12,7 @@ import { H3, Desc } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 /**
  * Skeleton 是極簡 animation primitive——單一 div + pulse animation,
  * **刻意沒有 size / color / variant**。形狀 / 尺寸完全由 consumer 的 className
- * (Tailwind utilities)決定。色彩透過 `currentColor` / `bg-secondary` 從 theme 繼承。
+ * (Tailwind utilities)決定。色彩透過 `currentColor` / `bg-muted` 從 theme 繼承。
  *
  * 因此本 spec 只有 Overview + 常見形狀 + 設計原則三個 story,沒有 SizeMatrix /
  * ColorMatrix / StateMatrix——這些概念對 Skeleton 不適用。完整設計規則見
@@ -31,7 +32,7 @@ export const Overview: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Anatomy</H3>
-        <Desc>Skeleton 是純 CSS animated gradient div——用灰色色塊模擬真實內容的形狀與排版,讓使用者預期即將出現的佈局。shadcn passthrough + 橋接 DS token(bg-secondary)。</Desc>
+        <Desc>Skeleton 是純 CSS animated gradient div——用灰色色塊模擬真實內容的形狀與排版,讓使用者預期即將出現的佈局。shadcn passthrough + 橋接 DS token(bg-muted)。</Desc>
         <div className="flex flex-col gap-2 max-w-md">
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-3/4" />

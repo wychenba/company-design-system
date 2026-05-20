@@ -644,38 +644,33 @@ Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → ste
 - ❌ 不得因為目前同值就合併為一個 token——語意獨立就該獨立存在
 
 
-## Static Subtle Background
+## Static Subtle Background — `bg-muted` vs `bg-secondary` 使用原則(SSOT)
 
-| Utility | Token | 用途 |
-|---------|-------|------|
-| `bg-muted` | neutral-2 | 靜態不可互動背景（table header、skeleton、status indicator） |
-| `bg-secondary` | neutral-3 | 比 muted 深一階的弱化背景（Badge low） |
+> **2026-05-20 v3 consolidation**(per user directive「全盤查 spec 是否曾寫過具體舉一反三 + 是否有矛盾」):原 L647-678 重複 3 處場景列表 + 「status indicator drift」已移除,本段為**單一 SSOT**。
 
-`bg-muted`（neutral-2）適用於 table header、tab 容器、code block、skeleton loading 等需要與主內容區做出微弱層級區分但不具備互動意義的區域。
+兩者都是靜態中性背景,但傳達的**元素狀態**不同。**核心問句**:「這個元素是『還沒準備好 / 不可操作 / placeholder』嗎?」
 
-`bg-secondary`（neutral-3）比 muted 更明顯，適用於需要在小面積元素上可見的底色（如 16px 的 Badge）。
+| Token | 答 | 語意 | 典型場景(real consumer grep verified 2026-05-20) |
+|---|---|---|---|
+| `bg-muted`(neutral-2) | **是** | **靜態非互動 surface** — 退化 / placeholder / locked 視覺 | Skeleton(`skeleton.tsx:10`) / DataTable table header(`data-table.tsx:255 HEADER_BG`) / Calendar 非當月日格(`calendar.tsx:312`)/ Alert neutral(`alert.tsx:27`)/ DataTable filter-panel inner group container(`data-table-filter-panel.tsx:780`)/ tab 容器 / code block / scrollbar track(`semantic.css:353`)/ anatomy `<th>` |
+| `bg-secondary`(neutral-3) | **否,只是視覺退後一級** | **存在且微淡可辨** — 元素是正常狀態,但需要退後一級 | Tag neutral(`tag.tsx`)/ Slider rest track(`slider.tsx`)/ FileItem compact-B progress track(`file-item.tsx`)/ Badge low(`badge.tsx:28`)/ CircularProgress track(`circular-progress.tsx:151`)/ Steps fillBg(`steps.tsx:688,701`)/ ProgressBar track(`progress-bar.tsx`)|
 
-與 `bg-neutral-hover` / `bg-neutral-active` 的區別：neutral 系列表達互動狀態（hover / 選中），muted / secondary 表達結構性的靜態層級——即使沒有互動，它永遠是這個顏色。
+**判斷法**:「這個元素是『還沒準備好 / 不可操作』嗎?」
+- 是 → `bg-muted`(退化、placeholder 語意)
+- 不是,只是視覺上需要退後 → `bg-secondary`(微淡但正常存在)
+
+**為什麼不能反過來**:Skeleton 用 `bg-secondary` 會太深,搶走真正內容出現時的視覺落差;Tag neutral 用 `bg-muted` 會太淡,小面積元素辨識度不足。深淺差一階(neutral-2 vs neutral-3)在小元素上的感知差異比大面積更明顯。
+
+**跟 `bg-neutral-hover` / `bg-neutral-active` 的區別**:neutral 系列表達**互動**狀態(hover / 選中);muted / secondary 表達**結構性的靜態層級** — 即使沒有互動,它永遠是這個顏色。
+
+**邊界 — component disabled bg 不走 muted**:Button / Input / Checkbox 等元件 disabled state 走 `--bg-disabled` semantic,不是 `--muted`(同值 neutral-2 但不同 owner — `--bg-disabled` 是 component-state token,`--muted` 是 surface-non-interactive token,per L169「同值不同語意拆 token」rule)。
 
 ```tsx
-<div className="bg-muted">table header / tab bar</div>
-<Badge variant="low" /> {/* bg-secondary — 小元素需要更明顯的底色 */}
+<Skeleton className="h-4 w-32" />            {/* bg-muted — placeholder 語意 */}
+<div className="bg-muted">table header</div>  {/* bg-muted — 靜態 surface 退化 */}
+<Tag color="neutral">Status</Tag>             {/* bg-secondary — 正常存在但退後 */}
+<Badge variant="low">5</Badge>                {/* bg-secondary — 小元素需更明顯底色 */}
 ```
-
-### bg-secondary vs bg-muted 使用原則
-
-兩者都是靜態中性背景，但傳達的**元素狀態**不同：
-
-| Token | 語意 | 典型場景 |
-|-------|------|---------|
-| `bg-muted`（neutral-2） | **靜態非互動 surface** — 退化 / placeholder / locked 視覺 | Skeleton 載入佔位、table header、tab 容器、code block、Linear-style upcoming（鎖住的未來任務）、DataTable filter-panel inner group container。**注意**:component-level disabled state（Button / Input / Checkbox 等元件 disabled bg）走 `--bg-disabled` semantic 不是 `--muted`(同值 neutral-2 但不同 owner — `--bg-disabled` 是 component-state token,`--muted` 是 surface-non-interactive token,per L169「同值不同語意拆 token」rule)|
-| `bg-secondary`（neutral-3） | **存在且微淡可辨** — 元素是正常狀態，但需要退後一級 | Tag neutral、Slider track rest、FileItem progress track、非線性 upcoming 圓圈、Badge low |
-
-**判斷法**：「這個元素是『還沒準備好 / 不可操作』嗎？」
-- 是 → `bg-muted`（退化、placeholder 語意）
-- 不是，只是視覺上需要退後 → `bg-secondary`（微淡但正常存在）
-
-**為什麼不能反過來**：Skeleton 用 `bg-secondary` 會太深，搶走真正內容出現時的視覺落差；Tag neutral 用 `bg-muted` 會太淡，小面積元素辨識度不足。深淺差一階（neutral-2 vs neutral-3）在小元素上的感知差異比大面積更明顯。
 
 
 ## 邊框 / 分隔

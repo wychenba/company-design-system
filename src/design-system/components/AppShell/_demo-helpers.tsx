@@ -12,7 +12,6 @@ import {
   Users,
   BarChart3,
   LayoutDashboard,
-  PanelRightOpen,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -26,7 +25,7 @@ import {
   SidebarFooter,
   SidebarTrigger,
 } from '@/design-system/components/Sidebar/sidebar'
-import { Button } from '@/design-system/components/Button/button'
+import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
 import {
   ItemAvatar,
 } from '@/design-system/patterns/element-anatomy/item-anatomy'
@@ -116,37 +115,18 @@ export function AcmeSidebar() {
   )
 }
 
-// ── PageHeader(對齊 sidebar.stories PageContent header pattern,SidebarTrigger + h1 緊鄰 gap-2)──
+// ── PageHeader(top-level chrome header,消費 ChromeHeader primitive)──
+// 2026-05-20 migrate 消費 ChromeHeader,撤回自刻 `<header>` + 重複 className
+// (per header-canonical.spec.md「6. Background ownership」段「Top-level chrome
+// header 自畫 bg-surface」+「Element canonical」段「ChromeHeader 內部用 `<header>`」)。
+// global header aside toggle 已撤回(2026-05-20 user「圖二 global header 不該有」)— 由
+// DataTable rowActions Info icon 主入口(row-driven)取代,page header 純 title。
 
-export function PageHeader({
-  title,
-  onToggleAside,
-  asideOpen,
-}: {
-  title: string
-  onToggleAside?: () => void
-  asideOpen?: boolean
-}) {
+export function PageHeader({ title }: { title: string }) {
   return (
-    <header className="flex h-[var(--chrome-header-height)] shrink-0 items-center gap-2 border-b border-divider bg-surface px-[var(--layout-space-loose)]">
+    <ChromeHeader className="bg-surface">
       <SidebarTrigger />
       <h1 className="text-body-lg font-medium flex-1 truncate">{title}</h1>
-      {onToggleAside && (
-        // Aside trigger canonical(2026-05-20 user 拍板統一):
-        //   tertiary + pressed={open} → primary-subtle 底 + primary 字 = open 視覺指示
-        //   per Button pressed prop spec + action-bar.spec.md L141「filter/sort 重點 → tertiary 基底」
-        //   PanelRightOpen icon (Sidebar 對稱:左 SidebarTrigger 是 PanelLeft,右 Aside 是 PanelRight)
-        <Button
-          size="sm"
-          variant="text"
-          iconOnly
-          startIcon={PanelRightOpen}
-          pressed={asideOpen}
-          aria-label={asideOpen ? '關閉詳情' : '開啟詳情'}
-          aria-pressed={asideOpen}
-          onClick={onToggleAside}
-        />
-      )}
-    </header>
+    </ChromeHeader>
   )
 }

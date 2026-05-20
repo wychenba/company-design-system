@@ -30,7 +30,7 @@ import { cn } from '@/lib/utils'
  * 不開:density?: 'md' | 'lg' 自由 prop。M21 違反 — 任意 density 等於 cva-on-pattern。
  */
 export interface ChromeHeaderProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+  extends React.HTMLAttributes<HTMLElement> {
   /**
    * 是否內含 Tabs。
    * true(無 tabsSlot)→ 移除自身 border-b,consumer 自畫。
@@ -60,7 +60,7 @@ export interface ChromeHeaderProps
   lockDensity?: 'inherit' | 'lg'
 }
 
-export const ChromeHeader = React.forwardRef<HTMLDivElement, ChromeHeaderProps>(
+export const ChromeHeader = React.forwardRef<HTMLElement, ChromeHeaderProps>(
   (
     { className, withTabs, tabsSlot, lockDensity = 'inherit', children, ...props },
     ref,
@@ -68,9 +68,12 @@ export const ChromeHeader = React.forwardRef<HTMLDivElement, ChromeHeaderProps>(
     const hasTabs = tabsSlot != null || withTabs === true
 
     // Column mode(tabsSlot 提供時)— per W2 + W4
+    // 2026-05-20:`<div>` → `<header>`(HTML5 sectional content 允許 multiple `<header>`,
+    // page-level / sectional 都 a11y safe;統一 element contract 消除「何時用 header / 何時用 div」
+    // 的 consumer drift)。 對應 header-canonical.spec.md 「Element canonical」段。
     if (tabsSlot != null) {
       return (
-        <div
+        <header
           ref={ref}
           data-density={lockDensity === 'lg' ? 'lg' : undefined}
           className={cn('flex flex-col shrink-0', className)}
@@ -93,13 +96,13 @@ export const ChromeHeader = React.forwardRef<HTMLDivElement, ChromeHeaderProps>(
           <div className="[&>[role=tablist]]:w-full [&>[role=tablist]]:px-[var(--layout-space-loose)]">
             {tabsSlot}
           </div>
-        </div>
+        </header>
       )
     }
 
     // Single-row(預設 + withTabs=true 但無 tabsSlot 的 backward compat)
     return (
-      <div
+      <header
         ref={ref}
         data-density={lockDensity === 'lg' ? 'lg' : undefined}
         className={cn(
@@ -113,7 +116,7 @@ export const ChromeHeader = React.forwardRef<HTMLDivElement, ChromeHeaderProps>(
         {...props}
       >
         {children}
-      </div>
+      </header>
     )
   },
 )

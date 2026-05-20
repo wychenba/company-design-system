@@ -341,10 +341,10 @@
   --neutral-selected-hover:   var(--color-neutral-1);
   --neutral-selected-active:  var(--color-neutral-3);
 
-  /* Static Subtle — 靜態弱化背景 */
-  /* 2026-05-20 fix:semantic.css 註解誤標 Badge/skeleton 用 muted,grep verified Badge 0 consumer */
-  --muted:                var(--color-neutral-2);  /* 弱化背景:Alert neutral / Calendar inactive / Skeleton / Slider disabled / anatomy <th> */
-  --secondary:            var(--color-neutral-3);  /* 稍深弱化:Badge low / Tag neutral / Slider rest track */
+  /* Static Subtle — 靜態弱化背景(2026-05-20 v3 註解濃縮原則,SSOT 詳 color.spec.md「Static Subtle Background」段)*/
+  /* 判斷:「這元素是『還沒準備好 / 不可操作 / placeholder』嗎?」是 → muted / 否,只是視覺退後 → secondary */
+  --muted:                var(--color-neutral-2);  /* 退化 / placeholder / locked surface:Skeleton / DataTable header / Calendar 非當月 / Alert neutral / scrollbar track */
+  --secondary:            var(--color-neutral-3);  /* 存在但視覺退後一級:Tag neutral / Slider rest / Badge low / FileItem progress / ProgressBar / CircularProgress / Steps fillBg */
 
   /* Scrollbar — Lane / chrome / thumb(2026-05-09 抽 SSOT,DataTable fake + ScrollArea 共享)
      Track 用 --muted(靜態 lane,非 disabled 元件 bg);Thumb 用 --border(中性低對比 chrome)。
