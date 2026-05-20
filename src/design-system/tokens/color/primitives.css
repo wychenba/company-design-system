@@ -61,6 +61,12 @@
    也能取得 light primitives，不依賴繼承。跟 semantic.css 的 ② 同模式。 */
 :root, [data-theme] {
 
+  /* Absolute anchors — pure white / black,給 semantic 層 base surface(canvas / surface / inverse)
+     consume,不走 alpha。2026-05-20 codify per user 抓 semantic.css 5 處 raw oklch 違反
+     「semantic 直指 primitive」規則。 */
+  --color-white: oklch(1 0 0);
+  --color-black: oklch(0 0 0);
+
   /* Neutral — 共用 alpha 步階（transparent + opaque 共享，改一次兩邊都動） */
   --_na1: 2%;  --_na2: 4%;  --_na3: 6%;  --_na4: 9%;
   --_na5: 15%; --_na6: 25%; --_na7: 45%; --_na8: 65%; --_na9: 85%;

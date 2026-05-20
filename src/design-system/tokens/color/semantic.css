@@ -152,10 +152,11 @@
    所有語義 token 都在這裡。dark 要改的在 ③ 覆寫。 */
 :root, [data-theme] {
 
-  /* Surface */
-  --canvas:               oklch(1 0 0);
-  --surface:              oklch(1 0 0);
-  --surface-raised:       oklch(1 0 0);
+  /* Surface — 2026-05-20 fix(user 抓 raw oklch 違反 semantic 直指 primitive 規則):
+     從 raw oklch(1 0 0) 改指 primitive --color-white(L66 absolute anchor) */
+  --canvas:               var(--color-white);
+  --surface:              var(--color-white);
+  --surface-raised:       var(--color-white);
   /* --surface-strong:強 emphasis 中性 surface(2026-05-07 v15.15 user 拍板 final)。
      Material 3 `surface-container-high` / Atlassian `color.background.neutral.bold` 對應。
      用途:avatar overlay dismiss button bg / overflow indicator badge / 強調中性 surface。
@@ -181,8 +182,9 @@
      為什麼獨立 token:foreground 是 neutral 文字色,warning-foreground 是 warning
      子場景 amber 底的對比,都不是「任何飽和色底的通用對比」。Polaris 叫 text-onEmphasis,
      Material 叫 on-primary/on-secondary family。我們用 on-emphasis 保持通用。
-     Dark mode 不反轉(白字在飽和色底永遠白) */
-  --on-emphasis:          oklch(1 0 0);
+     Dark mode 不反轉(白字在飽和色底永遠白)
+     2026-05-20 fix:raw oklch → primitive --color-white */
+  --on-emphasis:          var(--color-white);
 
   /* Brand / Action — 品牌主操作色
      --primary-text 為 SOP 規定的 5 件套之一，目前無消費者
@@ -286,8 +288,9 @@
      │  dark  --inverse-neutral-active = black @ 4% (= light neutral-2) │
      │                                                                  │
      │  好處：完全對稱、重用既有 tuned values、自動繼承感知補償          │
-     └────────────────────────────────────────────────────────────────┘ */
-  --inverse-fg:               oklch(1 0 0);
+     └────────────────────────────────────────────────────────────────┘
+     2026-05-20 fix:raw oklch → primitive --color-white(light)/ --black-a85(dark)*/
+  --inverse-fg:               var(--color-white);
   --inverse-neutral-hover:    var(--white-a04);
   --inverse-neutral-active:   var(--white-a08);
 
@@ -418,8 +421,9 @@
   --indigo-active:        var(--color-indigo-5);
 
   /* Inverse — dark mode 反轉（深字 + 黑色透明 overlay）
-     overlay 值為 light mode neutral-* 的鏡射（black @ 2% / 4%） */
-  --inverse-fg:               oklch(0 0 0 / 0.85);
+     overlay 值為 light mode neutral-* 的鏡射（black @ 2% / 4%）
+     2026-05-20 fix:raw oklch → primitive --black-a85(既有 alpha token,L46)*/
+  --inverse-fg:               var(--black-a85);
   --inverse-neutral-hover:    var(--black-a02);
   --inverse-neutral-active:   var(--black-a04);
 

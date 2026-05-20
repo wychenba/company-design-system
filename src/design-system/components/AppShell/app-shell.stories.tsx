@@ -4,16 +4,19 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
-import { Search, Filter, ArrowUpDown } from 'lucide-react'
+import { Search, Filter, ArrowUpDown, PanelRightOpen, UserCheck, CheckCircle2 } from 'lucide-react'
 import { AppShell, AppShellAside } from './app-shell'
 import { AcmeSidebar, PageHeader, MAIN_NAV } from './_demo-helpers'
 import { SidebarProvider } from '@/design-system/components/Sidebar/sidebar'
 import { Button } from '@/design-system/components/Button/button'
 import { Input } from '@/design-system/components/Input/input'
+import { Tag } from '@/design-system/components/Tag/tag'
 import { DataTable } from '@/design-system/components/DataTable/data-table'
 import { DataTableFilterPanel, createEmptyFilterTree, isFilterTreeActive, type FilterTree } from '@/design-system/components/DataTable/data-table-filter-panel'
 import { DataTableSortManager } from '@/design-system/components/DataTable/data-table-sort-manager'
 import { Popover, PopoverContent, PopoverTrigger } from '@/design-system/components/Popover/popover'
+import { DescriptionList, DescriptionItem } from '@/design-system/components/DescriptionList/description-list'
+import { ItemContent } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import type { SortingState } from '@tanstack/react-table'
 
 const meta: Meta<typeof AppShell> = {
@@ -58,15 +61,16 @@ const ISSUE_COLUMNS = [
 ]
 
 /**
- * Main content:Toolbar(search + filter + sort)+ DataTable。
+ * Main content:Toolbar(search + filter + sort)+ DataTable + Row actions trigger Aside。
  * @usage-ref: data-table.stories.tsx#WithBulkActions
- * @usage-consumes: Popover + DataTableFilterPanel + DataTableSortManager + Button text iconOnly pressed
+ * @usage-consumes: Popover + DataTableFilterPanel + DataTableSortManager + Button text iconOnly pressed + rowActions
  *
- * Per action-bar.spec.md:141「filter/sort 重點資訊 → tertiary 基底 / 一般工具 → text」+ Button pressed
- * prop canonical(tertiary/text + pressed → primary-subtle 底)+ data-table.stories.tsx:991-1019
- * canonical(Popover wrap real panel + iconOnly + pressed state + size sm)。
+ * Per codex Layer B D3(2026-05-20):row-driven Aside trigger 才符合 Linear/Notion/Jira/Airtable
+ * production 真實情境。row 右側 dedicated action button(`Button variant="text" size="xs" iconOnly`
+ * per data-table.spec L193 canonical)→ click 開 Aside + 被選 issue active visual(pressed prop)。
+ * AppShell header toggle 降級為 secondary show/hide 不是主入口。
  */
-function IssuesView({ onSelectIssue: _onSelectIssue }: { onSelectIssue: (issue: Issue) => void }) {
+function IssuesView({ selectedId, onSelectIssue }: { selectedId?: string; onSelectIssue: (issue: Issue) => void }) {
   const [search, setSearch] = React.useState('')
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [filterTree, setFilterTree] = React.useState<FilterTree>(() => createEmptyFilterTree('flat'))
@@ -144,20 +148,59 @@ function IssuesView({ onSelectIssue: _onSelectIssue }: { onSelectIssue: (issue: 
           </Popover>
         </div>
       </div>
-      {/* DataTable:naked structure,layoutSpace 規則 1B 父層 mx 對齊 chrome 內容左右邊界 */}
+      {/* DataTable:naked structure,layoutSpace 規則 1B 父層 mx 對齊 chrome 內容左右邊界。
+          rowActions:per data-table.spec L193 canonical(Button text xs iconOnly,固定 24px)+
+          pressed={row.id === selectedId} 顯示當前選中(per codex D3 active visual)。 */}
       <div className="flex-1 min-h-0 mx-[var(--layout-space-loose)] mb-[var(--layout-space-loose)]">
         <DataTable
           columns={ISSUE_COLUMNS as any}
           data={filtered}
           height="100%"
           bordered
+          rowActions={(row: Issue) => (
+            <Button
+              variant="text"
+              size="xs"
+              iconOnly
+              startIcon={PanelRightOpen}
+              aria-label={`開啟 ${row.id} 詳情`}
+              pressed={row.id === selectedId}
+              onClick={() => onSelectIssue(row)}
+            />
+          )}
         />
       </div>
     </div>
   )
 }
 
-/** Aside content:Issue detail panel,內容自管 padding 遵循 layoutSpace 規則 1B。 */
+// Status / Priority → Tag color mapping(per Tag spec status marker canonical)
+const STATUS_COLOR = {
+  'In Progress': 'blue',
+  'Backlog': 'neutral',
+  'In Review': 'yellow',
+  'Done': 'green',
+} as const
+
+const PRIORITY_COLOR = {
+  P0: 'red',
+  P1: 'yellow',
+  P2: 'neutral',
+} as const
+
+/**
+ * Aside content:Issue detail panel。
+ * @usage-ref: src/design-system/components/DescriptionList/description-list.stories.tsx
+ * @usage-consumes: ItemContent(entity identity)+ Tag(status/priority)+ DescriptionList(metadata)+ Button(actions)
+ *
+ * Per codex Layer B D1+D2(2026-05-20):
+ * - Entity identity(title + id 副標)→ ItemContent(item-anatomy Family 2 subtitle pattern,非 NameCard 因 scope 是 people only)
+ * - Status / Priority marker → Tag color-coded(per tag.spec.md status use case)
+ * - Metadata fields → DescriptionList + DescriptionItem(per description-list.spec.md「detail panel 屬性列表」use case)
+ * - Actions → Button(已對齊)
+ *
+ * Layout per layoutSpace.spec 規則 2 + 規則 4(內容 → action button → bottom 48)。
+ */
 function IssueDetail({ issue }: { issue: Issue | null }) {
   if (!issue) {
     return (
@@ -166,22 +209,29 @@ function IssueDetail({ issue }: { issue: Issue | null }) {
       </div>
     )
   }
-  // Per layoutSpace.spec.md 規則 2(element-first → tight)+ 規則 4 line 1(內容 → action button → bottom 48)
   return (
     <div className="flex flex-col gap-[var(--layout-space-loose)] px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]">
-      <p className="text-caption text-fg-muted">
-        {issue.id} • {issue.status} • {issue.priority}
-      </p>
-      <h2 className="text-h5 font-medium">{issue.title}</h2>
-      <dl className="grid grid-cols-[auto_1fr] gap-x-[var(--layout-space-loose)] gap-y-[var(--layout-space-tight)] text-body">
-        <dt className="text-fg-muted">Assignee</dt>
-        <dd>{issue.assignee}</dd>
-        <dt className="text-fg-muted">Due</dt>
-        <dd>{issue.due}</dd>
-      </dl>
+      <div className="flex flex-col gap-[var(--layout-space-tight)]">
+        <ItemContent
+          size="lg"
+          label={issue.title}
+          description={issue.id}
+          descriptionTone="muted"
+          labelTruncate={false}
+          labelClassName="font-medium text-foreground"
+        />
+        <div className="flex flex-wrap gap-2">
+          <Tag size="sm" color={STATUS_COLOR[issue.status]}>{issue.status}</Tag>
+          <Tag size="sm" color={PRIORITY_COLOR[issue.priority]}>{issue.priority}</Tag>
+        </div>
+      </div>
+      <DescriptionList direction="horizontal" divided>
+        <DescriptionItem label="Assignee">{issue.assignee}</DescriptionItem>
+        <DescriptionItem label="Due">{issue.due}</DescriptionItem>
+      </DescriptionList>
       <div className="flex gap-2">
-        <Button size="sm" variant="primary">分派給我</Button>
-        <Button size="sm" variant="secondary">標記完成</Button>
+        <Button size="sm" variant="primary" startIcon={UserCheck}>分派給我</Button>
+        <Button size="sm" variant="secondary" startIcon={CheckCircle2}>標記完成</Button>
       </div>
     </div>
   )
@@ -224,6 +274,7 @@ export const PrimarySidebar: Story = {
           onAsideOpenChange={setAsideOpen}
         >
           <IssuesView
+            selectedId={selected?.id}
             onSelectIssue={(issue) => {
               setSelected(issue)
               setAsideOpen(true)
