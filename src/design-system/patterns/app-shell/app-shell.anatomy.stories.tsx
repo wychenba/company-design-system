@@ -1,22 +1,13 @@
 // @benchmark-cited: anatomy 6-canonical 對齊 Polaris / Material anatomy spec
+// @story-baseline: src/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse
+// (透過 ./_demo-helpers AcmeSidebar / PageHeader / WorkspaceBrand / UserFooter 共用 baseline,
+//  避免 anatomy stories 跟 showcase + Sidebar 既有完整佈局 範例視覺偏移)
 import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import { AppShell, AppShellAside } from './app-shell'
-import {
-  Sidebar,
-  SidebarProvider,
-  SidebarHeader,
-  SidebarContent,
-  SidebarGroup,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarTrigger,
-} from '@/design-system/components/Sidebar/sidebar'
-// SidebarProvider used in story wrappers above
-import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
+import { AcmeSidebar, PageHeader } from './_demo-helpers'
+import { SidebarProvider, SidebarTrigger } from '@/design-system/components/Sidebar/sidebar'
 import { Button } from '@/design-system/components/Button/button'
-import { Inbox, Calendar, Settings } from 'lucide-react'
 
 const meta: Meta<typeof AppShell> = {
   title: 'Design System/Patterns/AppShell/設計規格',
@@ -26,63 +17,34 @@ const meta: Meta<typeof AppShell> = {
 export default meta
 type Story = StoryObj<typeof AppShell>
 
-function MockSidebar() {
-  return (
-    <Sidebar>
-      <SidebarHeader>
-        <span className="text-body font-medium px-2">Acme Inc.</span>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarMenu>
-            <SidebarMenuItem><SidebarMenuButton><Inbox className="size-4" /> Inbox</SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton><Calendar className="size-4" /> Calendar</SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton><Settings className="size-4" /> Settings</SidebarMenuButton></SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
-  )
-}
-
-function MockHeader() {
-  return (
-    <ChromeHeader>
-      <SidebarTrigger />
-      <span className="text-body font-medium flex-1 ml-2">當前頁 Header</span>
-    </ChromeHeader>
-  )
-}
-
-function MockAside() {
-  return (
-    <AppShellAside title="Detail panel" width={320}>
-      <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
-        <p className="text-body">Aside 內容</p>
-      </div>
-    </AppShellAside>
-  )
-}
-
-/** Slot 結構 + landmark role 對照 */
+/** Slot 結構 + landmark role 對照(使用 baseline AcmeSidebar / PageHeader 完整 production-grade)。 */
 export const Overview: Story = {
   name: 'Overview — slot 結構',
   render: () => {
+    const [activeId, setActiveId] = React.useState<string>('dashboard')
     const [asideOpen, setAsideOpen] = React.useState(true)
     return (
-      <SidebarProvider>
+      <SidebarProvider activeId={activeId} onActiveChange={setActiveId}>
         <AppShell
           layout="primary-sidebar"
-          sidebar={<MockSidebar />}
-          header={<MockHeader />}
-          aside={<MockAside />}
+          sidebar={<AcmeSidebar />}
+          header={<PageHeader title="Dashboard" onToggleAside={() => setAsideOpen(!asideOpen)} asideOpen={asideOpen} />}
+          aside={
+            <AppShellAside title="Detail panel" width={320}>
+              <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
+                <p className="text-body">Aside 內容(consumer 自管 padding,遵循 layoutSpace.spec.md 規則 1B 父層管)</p>
+              </div>
+            </AppShellAside>
+          }
           asideOpen={asideOpen}
           onAsideOpenChange={setAsideOpen}
         >
           <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
             <h2 className="text-h4 mb-3">Main &lt;main&gt; landmark + padding=0</h2>
             <p className="text-body text-fg-secondary">
-              內容自管 padding,遵循 layoutSpace.spec.md 6 條規則。
+              內容自管 padding,遵循 layoutSpace.spec.md 6 條規則。本 slot 自身不發明 padding —
+              consumer 內容是 bounded surface 自帶 padding(規則 1A)/ 純 layout primitive 父層管
+              (規則 1B)/ list with hover 每 item 自帶(規則 1C)三派並存。
             </p>
           </div>
         </AppShell>
@@ -91,19 +53,12 @@ export const Overview: Story = {
   },
 }
 
-/**
- * LayoutModeDiagram — 兩 mode 對照(2026-05-19 codex round 2 catch:原 LayoutModeMatrix 在 grid
- * 內 nest 2 個 AppShell,Sidebar fixed inset-y-0 從 viewport 出來覆蓋左 column → 視覺崩壞 +
- * 違反 spec.md「禁 nested AppShell」discipline)。v2:用 SVG / 描述式 diagram 取代 nested live demo,
- * 兩 mode 的 live full-page demo 在「展示」分頁(primary-sidebar Linear-style 已 ship,
- * primary-header pending Sidebar SSOT extension)。
- */
+/** Layout mode diagram:純文字 2 mode 對照(非 nested live demo,避 Sidebar fixed inset 衝突)。 */
 export const LayoutModeDiagram: Story = {
   name: 'LayoutModeDiagram — 兩 mode 對照(diagram)',
   render: () => (
     <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)] space-y-6 text-body">
       <h2 className="text-h4">兩 mode 對照</h2>
-
       <section className="space-y-2">
         <h3 className="text-h5">primary-sidebar(Linear / Notion / Figma 派)</h3>
         <div className="flex gap-px bg-divider border border-divider rounded overflow-hidden text-caption">
@@ -116,7 +71,6 @@ export const LayoutModeDiagram: Story = {
         </div>
         <p className="text-fg-muted">Header scope = 當前頁 actions。產品 single-workspace。</p>
       </section>
-
       <section className="space-y-2">
         <h3 className="text-h5">primary-header(GitHub / Slack / Gmail 派)— pending</h3>
         <div className="flex flex-col gap-px bg-divider border border-divider rounded overflow-hidden text-caption">
@@ -136,30 +90,37 @@ export const LayoutModeDiagram: Story = {
   ),
 }
 
-/** Aside 2-mode behavior(state-driven)*/
+/** Aside 2-mode state behavior(toggle + breakpoint 切換)— 用完整 baseline。 */
 export const StateBehavior: Story = {
   name: 'StateBehavior — Aside open/close + 2-mode',
   render: () => {
+    const [activeId, setActiveId] = React.useState<string>('dashboard')
     const [open, setOpen] = React.useState(false)
     return (
-      <SidebarProvider>
+      <SidebarProvider activeId={activeId} onActiveChange={setActiveId}>
         <AppShell
           layout="primary-sidebar"
-          sidebar={<MockSidebar />}
+          sidebar={<AcmeSidebar />}
           header={
-            <ChromeHeader>
+            <header className="flex h-[var(--chrome-header-height)] shrink-0 items-center gap-2 border-b border-divider bg-surface px-[var(--layout-space-loose)]">
               <SidebarTrigger />
-              <span className="text-body flex-1 ml-2">Toggle Aside demo</span>
+              <h1 className="text-body-lg font-medium flex-1 truncate">Toggle Aside demo</h1>
               <Button size="sm" variant="primary" onClick={() => setOpen(!open)}>
                 {open ? 'Close' : 'Open'} Aside (cmd+.)
               </Button>
-            </ChromeHeader>
+            </header>
           }
-          aside={<MockAside />}
+          aside={
+            <AppShellAside title="Detail panel" width={320}>
+              <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
+                <p className="text-body">Aside 內容</p>
+              </div>
+            </AppShellAside>
+          }
           asideOpen={open}
           onAsideOpenChange={setOpen}
         >
-          <div className="p-4 text-body">
+          <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)] text-body">
             <p>Aside open:{String(open)}</p>
             <p>Desktop ≥ 768px → inline standard mode(右側 panel,不蓋 mask)</p>
             <p>Mobile &lt; 768px → modal mode(Sheet from right,蓋 mask)</p>
@@ -170,7 +131,7 @@ export const StateBehavior: Story = {
   },
 }
 
-/** A11y landmark 對照 */
+/** A11y landmark 文字說明(非 live render,避無謂 nested shell)。 */
 export const Accessibility: Story = {
   name: 'Accessibility — landmark + skip-link + keyboard',
   render: () => (
@@ -191,7 +152,7 @@ export const Accessibility: Story = {
   ),
 }
 
-/** Size matrix:Aside width clamp 對照(描述式,非 DataTable consumer scenario)*/
+/** Size matrix:Aside width clamp 文字對照(非 rendered case,因 width 是 number prop)。 */
 export const SizeMatrix: Story = {
   name: 'SizeMatrix — Aside width clamp(240-640)',
   render: () => (
@@ -202,7 +163,7 @@ export const SizeMatrix: Story = {
         <li>width={'{'}200{'}'} → 240px(clamp 下限,避免過窄無法閱讀)</li>
         <li>width={'{'}400{'}'} → 400px(自訂值落在 [240, 640] 內)</li>
         <li>width={'{'}800{'}'} → 640px(clamp 上限,避免過寬擠 main)</li>
-        <li>width={'{{'} md: 320, xl: 480 {'}}'} → desktop=320 / wide=480 breakpoint-keyed</li>
+        <li>width={'{{'} md: 320, xl: 480 {'}}'} → desktop=320 / xl(≥1280px)=480 breakpoint-keyed</li>
       </ul>
       <p className="text-caption text-fg-muted">DS 不發明 width token,consumer 自決 + clamp 保護。</p>
     </div>

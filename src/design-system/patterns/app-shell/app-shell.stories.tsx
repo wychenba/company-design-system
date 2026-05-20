@@ -4,42 +4,13 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
-import {
-  Inbox,
-  Calendar,
-  Settings,
-  Users,
-  BarChart3,
-  LayoutDashboard,
-  Search,
-  Filter,
-  ArrowUpDown,
-  PanelRightOpen,
-} from 'lucide-react'
+import { Search, Filter, ArrowUpDown } from 'lucide-react'
 import { AppShell, AppShellAside } from './app-shell'
-import {
-  Sidebar,
-  SidebarProvider,
-  SidebarHeader,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-  SidebarTrigger,
-} from '@/design-system/components/Sidebar/sidebar'
+import { AcmeSidebar, PageHeader, MAIN_NAV } from './_demo-helpers'
+import { SidebarProvider } from '@/design-system/components/Sidebar/sidebar'
 import { Button } from '@/design-system/components/Button/button'
 import { Input } from '@/design-system/components/Input/input'
 import { DataTable } from '@/design-system/components/DataTable/data-table'
-import {
-  ItemAvatar,
-} from '@/design-system/patterns/element-anatomy/item-anatomy'
-import {
-  NameCard,
-  NameCardDefaultActions,
-} from '@/design-system/components/NameCard/name-card'
 
 const meta: Meta<typeof AppShell> = {
   title: 'Design System/Patterns/AppShell/展示',
@@ -49,111 +20,8 @@ const meta: Meta<typeof AppShell> = {
 export default meta
 type Story = StoryObj<typeof AppShell>
 
-// ── Helpers(對齊 sidebar.stories.tsx IconCollapse baseline)───────────────
-
-const MAIN_NAV = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'inbox', label: 'Inbox', icon: Inbox },
-  { id: 'team', label: 'Team', icon: Users },
-  { id: 'insights', label: 'Insights', icon: BarChart3 },
-  { id: 'calendar', label: 'Calendar', icon: Calendar },
-  { id: 'settings', label: 'Settings', icon: Settings },
-] as const
-
-/** Workspace brand:對齊 sidebar.stories.tsx WorkspaceBrand baseline。 */
-const WorkspaceBrand = () => (
-  <div className="flex items-center gap-2 min-w-0 group-data-[collapsible=icon]:justify-center">
-    <ItemAvatar alt="Acme Inc" shape="square" color="blue" solid />
-    <span className="text-body-lg font-medium truncate group-data-[collapsible=icon]:hidden">Acme Inc</span>
-  </div>
-)
-
-/** User footer:對齊 sidebar.stories.tsx UserFooter baseline。 */
-const UserFooter = () => (
-  <SidebarMenu>
-    <SidebarMenuItem>
-      <SidebarMenuButton asChild>
-        <div role="group" aria-label="當前使用者">
-          <ItemAvatar
-            alt="Alan Chen"
-            color="blue"
-            hoverCard={
-              <NameCard
-                name="Alan Chen"
-                subtitle="Design｜D-0042"
-                avatar={{ alt: 'Alan Chen', color: 'blue' }}
-                status="online"
-                actions={<NameCardDefaultActions />}
-              />
-            }
-          />
-          <span data-sidebar="menu-label" className="min-w-0 flex-1 truncate">Alan Chen</span>
-        </div>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  </SidebarMenu>
-)
-
-/** Acme workspace sidebar — 完整 production-grade baseline(對齊 sidebar IconCollapse story)。 */
-function AcmeSidebar() {
-  return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader>
-        <WorkspaceBrand />
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {MAIN_NAV.map((item) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    id={item.id}
-                    startIcon={item.icon}
-                    tooltip={item.label}
-                  >
-                    {item.label}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter>
-        <UserFooter />
-      </SidebarFooter>
-    </Sidebar>
-  )
-}
-
-/** Chrome header:對齊 sidebar.stories.tsx PageContent header pattern(SidebarTrigger + h1 gap-2 緊鄰)。 */
-function PageHeader({
-  title,
-  onToggleAside,
-  asideOpen,
-}: {
-  title: string
-  onToggleAside?: () => void
-  asideOpen?: boolean
-}) {
-  return (
-    <header className="flex h-[var(--chrome-header-height)] shrink-0 items-center gap-2 border-b border-divider bg-surface px-[var(--layout-space-loose)]">
-      <SidebarTrigger />
-      <h1 className="text-body-lg font-medium flex-1 truncate">{title}</h1>
-      {onToggleAside && (
-        <Button
-          size="sm"
-          variant="text"
-          iconOnly
-          startIcon={PanelRightOpen}
-          aria-label={asideOpen ? '關閉詳情' : '開啟詳情'}
-          onClick={onToggleAside}
-        />
-      )}
-    </header>
-  )
-}
+// Helpers(AcmeSidebar / PageHeader / WorkspaceBrand / UserFooter / MAIN_NAV)從 ./_demo-helpers
+// import,跟 anatomy stories 共用 single baseline source(避免 anatomy 跟 showcase 自分歧)。
 
 // ── Mock data — Linear-style issue tracker ────────────────────────────────
 
