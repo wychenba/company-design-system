@@ -368,11 +368,53 @@ export const PrimarySidebarWithTabs: Story = {
 }
 
 /**
- * primary-header mode pending Sidebar SSOT viewport-inset extension(2026-05-19 codex Layer B
- * D1 verdict)。Sidebar 既有 `fixed inset-y-0 h-svh` 會蓋住 global header → broken UI。
- * 待 Sidebar 升級 `viewportInsetTop` 能力後 ship。本 story 暫 removed,避免 broken demo。
+ * primary-header mode(GitHub / Gmail / Slack 派)— global bar 橫跨頂部 + sidebar/main/aside 在 header 下方。
+ *
+ * @usage-ref: app-shell.spec.md L74(primary-header layout)
+ * @usage-consumes: ChromeHeader + Sidebar viewportInsetTop + AcmeSidebar baseline + IssuesView
+ *
+ * 2026-05-20 unblock per Sidebar `viewportInsetTop` SSOT extension。Sidebar 加 `viewportInsetTop`
+ * prop = sidebar 從 header 下方起算(per Mantine `layout="default"` navbar inset canonical)。
+ *
+ * Header scope = global bar(account / workspace switcher / notifications / 跨頁 search)—
+ * 真正 distinguishing factor 跟 workspace 多寡無關(per spec.md「真正的 distinguishing factor」段
+ * 2026-05-20 撤回 single/multi-workspace mis-claim)。
+ *
+ * Aside 在 header 下方(per world-class GitHub / Slack / Gmail 100% 一致)— 非頂天立地。
  */
-// export const PrimaryHeader: Story = { ... }  // future tier, pending Sidebar SSOT
+export const PrimaryHeader: Story = {
+  name: 'primary-header(GitHub / Gmail / Slack 派 — global bar 頂)',
+  render: () => {
+    const [activeId, setActiveId] = React.useState<string>('inbox')
+    const [asideOpen, setAsideOpen] = React.useState(true)
+    const [selected, setSelected] = React.useState<Issue | null>(ISSUES[0])
+
+    return (
+      <SidebarProvider activeId={activeId} onActiveChange={setActiveId}>
+        <AppShell
+          layout="primary-header"
+          sidebar={<AcmeSidebar viewportInsetTop="var(--chrome-header-height)" />}
+          header={<PageHeader title="Acme Inc — Global" />}
+          aside={
+            <AppShellAside title={selected ? selected.id : '詳情'} width={360}>
+              <IssueDetail issue={selected} />
+            </AppShellAside>
+          }
+          asideOpen={asideOpen}
+          onAsideOpenChange={setAsideOpen}
+        >
+          <IssuesView
+            selectedId={selected?.id}
+            onSelectIssue={(issue) => {
+              setSelected(issue)
+              setAsideOpen(true)
+            }}
+          />
+        </AppShell>
+      </SidebarProvider>
+    )
+  },
+}
 
 // AsideModalOnMobile story retired 2026-05-20 per user directive「不要這個範例」
 // Mobile responsive behavior 已在 anatomy StateBehavior story + spec.md「Aside 2-mode」段 documented。

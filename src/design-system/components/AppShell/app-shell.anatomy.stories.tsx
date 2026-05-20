@@ -70,7 +70,7 @@ export const LayoutModeDiagram: Story = {
           </div>
           <div className="w-24 bg-surface-strong px-2 py-8 text-center text-fg-muted">Aside<br/>頂天</div>
         </div>
-        <p className="text-fg-muted">Header scope = 當前頁 actions。產品 single-workspace。</p>
+        <p className="text-fg-muted">Header scope = <strong>local toolbar</strong>(當前頁 actions / breadcrumb / page-level filter)。Workspace 多寡無關,Notion / Linear 多 workspace 也用 primary-sidebar。</p>
       </section>
       <section className="space-y-2">
         <h3 className="text-h5">primary-header(GitHub / Slack / Gmail 派)— pending</h3>
@@ -83,8 +83,8 @@ export const LayoutModeDiagram: Story = {
           </div>
         </div>
         <p className="text-fg-muted">
-          Header scope = global account / workspace / notifications。產品 multi-workspace。
-          <span className="text-warning-text">⚠️ pending Sidebar SSOT viewport-inset extension(2026-05-19)</span>
+          Header scope = <strong>global bar</strong>(account / workspace switcher / notifications / 跨頁導覽)。
+          Workspace 多寡無關 — GitHub / Gmail multi account 也用此 layout,真正的 distinguisher 是 header 是「local 還是 global」。
         </p>
       </section>
     </div>

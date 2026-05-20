@@ -268,12 +268,22 @@ const Sidebar = React.forwardRef<
   React.ComponentProps<"div"> & {
     side?: "left" | "right"
     collapsible?: "offcanvas" | "icon" | "none"
+    /**
+     * Viewport top inset(2026-05-20 ship per AppShell `primary-header` unblock)。
+     * 預設 undefined = sidebar 從 viewport top 起算(`top:0 / h:svh`,當前 default)。
+     * 提供 CSS value(eg. `'var(--chrome-header-height)'` 或 `'48px'`)時,sidebar 改
+     * 從該值起算(`top: viewportInsetTop / height: calc(100svh - viewportInsetTop)`),
+     * 讓 global header 不被覆蓋(AppShell primary-header mode 必傳)。
+     * 對齊 Mantine `layout="default"` navbar 高度扣 header 慣例。
+     */
+    viewportInsetTop?: string
   }
 >(
   (
     {
       side = "left",
       collapsible = "offcanvas",
+      viewportInsetTop,
       className,
       children,
       ...props
@@ -281,6 +291,9 @@ const Sidebar = React.forwardRef<
     ref
   ) => {
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const insetStyle: React.CSSProperties | undefined = viewportInsetTop
+      ? { top: viewportInsetTop, height: `calc(100svh - ${viewportInsetTop})` }
+      : undefined
 
     if (collapsible === "none") {
       return (
@@ -339,8 +352,11 @@ const Sidebar = React.forwardRef<
           )}
         />
         <div
+          style={insetStyle}
           className={cn(
-            "fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] min-w-[var(--sidebar-width-min)] transition-[left,right,width,min-width] duration-200 ease-linear motion-reduce:duration-0 md:flex",
+            // 2026-05-20 v3:`inset-y-0 h-svh` → 可被 viewportInsetTop prop override(per AppShell primary-header)
+            !viewportInsetTop && "inset-y-0 h-svh",
+            "fixed z-10 hidden w-[var(--sidebar-width)] min-w-[var(--sidebar-width-min)] transition-[left,right,width,min-width] duration-200 ease-linear motion-reduce:duration-0 md:flex",
             "group-data-[collapsible=icon]:!min-w-0",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"

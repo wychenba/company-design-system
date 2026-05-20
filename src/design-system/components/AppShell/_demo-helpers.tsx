@@ -83,9 +83,9 @@ export const UserFooter = () => (
 
 // ── AcmeSidebar(完整 production-grade,對齊 sidebar IconCollapse story)──
 
-export function AcmeSidebar() {
+export function AcmeSidebar({ viewportInsetTop }: { viewportInsetTop?: string } = {}) {
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" viewportInsetTop={viewportInsetTop}>
       <SidebarHeader>
         <WorkspaceBrand />
       </SidebarHeader>

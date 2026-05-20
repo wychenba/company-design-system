@@ -190,16 +190,34 @@ const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
     // AppShell 一律只 render `{aside}` 一次,AppShellAside 內部根據 isMobile 決定 render 形式。
 
     if (layout === 'primary-header') {
-      // primary-header guard(2026-05-19 codex Layer B D1 verdict):
-      // Sidebar SSOT 用 `fixed inset-y-0 h-svh` viewport-anchored → 跟 primary-header「sidebar 在 header 下」
-      // 衝突(visual probe confirmed primary-header.png sidebar 蓋 header)。production-grade ship 需
-      // 先擴 Sidebar SSOT 加 `viewportInsetTop` 能力(Sidebar 自己 own,不 AppShell customize)。
-      // Cite:Mantine `layout="default"` 規範 navbar 高度扣 header,代表 navbar 該知道 inset。
-      // 目前 throw 防 broken UI 被誤 ship,future tier 待 Sidebar SSOT 升級。
-      throw new Error(
-        '[AppShell] layout="primary-header" not yet shippable — Sidebar SSOT needs viewport-inset extension first. ' +
-          'Visual probe (2026-05-19) confirmed Sidebar fixed inset-y-0 covers header. ' +
-          'Use layout="primary-sidebar" (default) for v1 ship。See app-shell.spec.md Future extension 段。'
+      // primary-header layout(2026-05-20 ship per Sidebar `viewportInsetTop` SSOT extension):
+      // 結構:row1 header(全寬 global bar)/ row2 [sidebar][main][aside]
+      // Consumer 必傳 `<Sidebar viewportInsetTop="var(--chrome-header-height)">` 讓 sidebar
+      // 從 header 下方起算,不蓋 header(per Mantine `layout="default"` canonical)。
+      return (
+        <AppShellContext.Provider value={ctxValue}>
+          <div
+            ref={ref}
+            className={cn('flex h-svh w-full flex-col overflow-hidden bg-canvas', className)}
+            {...props}
+          >
+            <SkipToMain />
+            {/* Row 1:Global header — 橫跨整 viewport,banner role(per ARIA spec page top header)*/}
+            {header && <div className="flex-shrink-0">{header}</div>}
+            {/* Row 2:[sidebar][main][aside]horizontal row */}
+            <div className="flex flex-1 min-h-0 w-full">
+              {sidebar}
+              <main
+                id="app-shell-main"
+                tabIndex={-1}
+                className="flex-1 min-w-0 min-h-0 overflow-y-auto focus:outline-none"
+              >
+                {children}
+              </main>
+              {aside}
+            </div>
+          </div>
+        </AppShellContext.Provider>
       )
     }
 

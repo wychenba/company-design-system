@@ -1090,7 +1090,12 @@ function DataTableInner<TData>(
       const headerEl = tableRef.current.firstElementChild as HTMLElement | null
       const headerH = headerEl?.getBoundingClientRect().height ?? 0
       const next = Math.max(0, slotH - headerH)
-      if (lastValue != null && Math.abs(next - lastValue) < 1) return
+      // 2026-05-20 v3:Diff guard < 1px → < 4px(濾更多 micro-step)。
+      // 起因:Tabs / AppShell nested layout(eg. PrimarySidebarWithTabs story)初始 paint
+      // parent flex chain 多 frame settle,每 frame growth 2-4px 會繞過 < 1px guard 造成
+      // user 觀察「table 慢慢長高」。< 4px threshold 濾掉這類 micro-step,真實 resize
+      // (window resize / aside open/close)δ 都會 ≫ 4px,不會誤殺。
+      if (lastValue != null && Math.abs(next - lastValue) < 4) return
       lastValue = next
       setBodyMaxHeight(next)
     }
