@@ -5,19 +5,21 @@
      不必硬卡 Rule of 3(清既有重複 vs spec canonical 給程式表達 是兩件事)。
 
    --chrome-header-avatar-size:
-     Chrome header brand mark avatar canonical(per `sidebar.spec.md:243`
-     「Avatar: size={24}」+ 5-DS 共識:Linear / Notion / Figma / Slack / Polaris
-     chrome header brand mark 皆固定 24px,不 density-scale 也不 row-size-scale)。
+     Chrome header brand mark avatar canonical(per `header-canonical.spec.md` 4.5
+     + 5-DS 共識:Linear / Notion / Figma / Slack / Polaris chrome header brand mark
+     皆固定 24px,不 density-scale 也不 row-size-scale)。
+
+     Chrome header **不是 row context**(per `item-anatomy.spec.md:535` scope 限定
+     段)— chrome header 內 avatar 用 raw `<Avatar size={24}>`,**不用 `<ItemAvatar>`**。
 
      Consumers(2,需 sync):
-       1. WorkspaceBrand demo helper(`_demo-helpers.tsx`)透過 RowSizeProvider
-          value="md" lock + ItemAvatar 自動 lookup AVATAR_SIZE.inline.md = 24
+       1. WorkspaceBrand demo(`_demo-helpers.tsx`)hardcode `<Avatar size={24}>` + comment cite token
        2. SidebarHeader 收合 padding 公式:
           calc((var(--sidebar-width-icon) - var(--chrome-header-avatar-size)) / 2)
 
-     **Token 值必須跟 AVATAR_SIZE.inline.md(JS const)同步**。改 spec canonical
-     時 grep `--chrome-header-avatar-size` + `AVATAR_SIZE.inline` 雙向找全部
-     需 sync 點。
+     **Sync invariant**:Token 值 + WorkspaceBrand `size={24}` literal + AVATAR_SIZE.inline.md
+     (`item-anatomy.tsx:93`)三者必同 24。改 spec canonical 時 grep
+     `--chrome-header-avatar-size` + `chrome header avatar canonical` 雙向找 sync 點。
    ───────────────────────────────────────────────────────── */
 
 :root {

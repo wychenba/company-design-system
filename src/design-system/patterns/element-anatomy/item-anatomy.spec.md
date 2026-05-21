@@ -532,7 +532,9 @@ Apple Mail / Gmail / iOS Settings / Material 3 / Atlassian DSP / Polaris Resourc
 
 **關鍵**:consumer 可以自由選擇「小 avatar + description」——那是完全合法的組合,此時 avatar inline 對齊第一行 label,description 從第二行自然往下。沒有「有 desc 就必須用 block 尺寸」的規則。
 
-**程式化規則**:consumer **必須**用 `<ItemAvatar>` / `<ItemIcon>` helper 元件,**禁止** `import { AVATAR_SIZE }` 手動查表,更**禁止**硬寫 `<Avatar size={N} />`。
+**程式化規則**(scope:**row context only** — Sidebar / SelectMenu / TreeView / Combobox / Menu 等 row primitive 子樹內):consumer **必須**用 `<ItemAvatar>` / `<ItemIcon>` helper 元件,**禁止** `import { AVATAR_SIZE }` 手動查表,更**禁止**硬寫 `<Avatar size={N} />`。
+
+**Scope 例外:Chrome header 不是 row context**(per `header-canonical.spec.md` 4.5):chrome header 有自己的 spec-level avatar canonical = 24px(density-fixed / row-size-fixed),用 raw `<Avatar size={24}>` + `--chrome-header-avatar-size` CSS token。Chrome header avatar 不參與 row anatomy 對齊機制(無 sm/md/lg row size lookup 需求)。詳 `header-canonical.spec.md` 4.5「Chrome header avatar SSOT」段。
 
 ```tsx
 import { ItemAvatar, ItemIcon } from "@/design-system/patterns/element-anatomy/item-anatomy"

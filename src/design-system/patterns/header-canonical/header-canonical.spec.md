@@ -57,15 +57,18 @@ benchmark:
 
 對齊 5 家世界級共識(Linear / Notion / Figma / Slack / Polaris chrome header brand mark 皆固定 24px,不 density-scale 也不 row-size-scale)。設計理由:avatar 是品牌識別 mark,視覺穩定優於 density 緊鬆 / row size 調整(button 跟 density 走 touch target 邏輯,avatar 不該綁同邏輯)。
 
+**Chrome header 不是 row context**:無 sm/md/lg row size lookup 需求 → chrome header 內 avatar 用 **raw `<Avatar size={24}>`**,**不用 `<ItemAvatar>`**(後者是 row primitive anatomy helper,scope 是 row context — 詳 `item-anatomy.spec.md:535` scope 限定段)。
+
 **程式表達**(local pattern token,對齊 `data-table.css` 既有 local-token 先例):
-- CSS:`--chrome-header-avatar-size: 1.5rem`(`header-canonical.css`)
-- JS:`AVATAR_SIZE.inline.md = 24`(`item-anatomy.tsx:93`)— consumer 透過 `<RowSizeProvider value="md">` lock 強制 ItemAvatar lookup 此值
+- CSS:`--chrome-header-avatar-size: 1.5rem`(`header-canonical.css`)— 供 SidebarHeader 收合對齊公式消費
+- JS 端:consumer hardcode `<Avatar size={24}>` + inline comment cite token name(per Avatar API `size: number | 'fill'` 不接 CSS var)
 
 **Consumer rule**:
-- 在 chrome header 內放 avatar(SidebarHeader / GlobalHeader / PageHeader / FileViewer Toolbar 等)→ **必** wrap `<RowSizeProvider value="md">` 蓋外層 row context 污染,內用 `<ItemAvatar>`
-- SidebarHeader 收合對齊公式必消費 `var(--chrome-header-avatar-size)` 不 hardcode 24
+- 在 chrome header 內放 avatar → **必用 raw `<Avatar size={24}>`**,**禁用 `<ItemAvatar>`**(會誤啟動 row anatomy lookup)
+- SidebarHeader 收合對齊公式必消費 `var(--chrome-header-avatar-size)`,**禁** hardcode 24
+- WorkspaceBrand demo 即此 pattern 的 reference implementation(`_demo-helpers.tsx:WorkspaceBrand`)
 
-**Sync invariant**:`--chrome-header-avatar-size` CSS 值必跟 `AVATAR_SIZE.inline.md` JS 值同步(`1.5rem = 24px`)。改 spec canonical 時 grep 雙向找全部 sync 點。
+**Sync invariant**:`--chrome-header-avatar-size` CSS 值 + `<Avatar size={24}>` JS literal + `AVATAR_SIZE.inline.md = 24`(`item-anatomy.tsx:93`)三者必同 24px 值。改 spec canonical 時 grep `--chrome-header-avatar-size` + `chrome header avatar canonical` keyword 找全 sync 點。
 
 ### 5. Title typography
 

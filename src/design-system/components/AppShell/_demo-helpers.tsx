@@ -28,8 +28,8 @@ import {
 import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
 import {
   ItemAvatar,
-  RowSizeProvider,
 } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { Avatar } from '@/design-system/components/Avatar/avatar'
 import {
   NameCard,
   NameCardDefaultActions,
@@ -48,20 +48,27 @@ export const MAIN_NAV = [
 
 // ── WorkspaceBrand(對齊 sidebar.stories.tsx)────────────────────────────
 
-// 2026-05-21 v14 — Chrome header avatar SSOT lock(per user directive「header 內元素應由 header
-// 定義尺寸」+「不被外層 Sidebar.size 污染」):
+// 2026-05-21 v15 — Chrome header avatar SSOT, semantic-correct revise(per user 抓 v14
+// RowSizeProvider hijack 是 semantic 漂移 + 「想辦法在語言正確下修到正確」directive):
 //
-// `<RowSizeProvider value="md">` lock 蓋外層 SidebarProvider 的 row context,讓 ItemAvatar
-// 永遠 lookup AVATAR_SIZE.inline.md = 24,不論 Sidebar.size 為 sm/md/lg 都不影響 header avatar。
+// Chrome header **不是 row context**(per `item-anatomy.spec.md:550` 規則 scope 是 row primitive
+// consumer + `header-canonical.spec.md` 4.5 chrome header avatar SSOT)。Chrome header avatar
+// 是 spec-level canonical 24px、density-fixed、row-size-fixed,跟 row-anatomy 的 sm/md/lg
+// lookup 邏輯無關。
 //
-// 對應 `--chrome-header-avatar-size: 1.5rem` token(`header-canonical.css`),公式端透過 CSS var
-// 連動;JS 端透過 RowSizeProvider lock + AVATAR_SIZE.inline.md JS const 連動。spec canonical
-// 集中在 `header-canonical.spec.md`「chrome header avatar = 24」段。
+// 因此 chrome header 內 avatar **用 raw `<Avatar size={24}>`,不用 `<ItemAvatar>`**:
+//   - ItemAvatar 透過 RowSizeContext lookup 是 row primitive(Sidebar / SelectMenu / TreeView 等)
+//     的 anatomy helper,目的避免 asChild consumer 寫死跨 row size 漂移
+//   - Chrome header 沒有 sm/md/lg row size 概念,無 lookup 需求,用 raw Avatar 才語義正確
+//   - 父 `<div flex items-center>` 已 provide 縱向對齊,ItemPrefix wrapper(`h-[1lh]`)冗餘
+//
+// SSOT 鎖定:`<Avatar size={24}>` 對應 `--chrome-header-avatar-size: 1.5rem` token
+// (`header-canonical.css`)+ `header-canonical.spec.md` 4.5 canonical「24px raw Avatar」。
+// 公式端透過 var() 連動;JS 端透過 spec authority + comment cite 連動。改 24 → 同步 token + 此 hardcode。
 export const WorkspaceBrand = () => (
   <div className="flex items-center gap-2 min-w-0">
-    <RowSizeProvider value="md">
-      <ItemAvatar alt="Acme Inc" shape="square" color="blue" solid />
-    </RowSizeProvider>
+    {/* 24 per header-canonical.spec.md 4.5 chrome header avatar canonical; sync with `--chrome-header-avatar-size` */}
+    <Avatar size={24} shape="square" color="blue" solid alt="Acme Inc" />
     <span className="text-body-lg font-medium truncate group-data-[collapsible=icon]:hidden">Acme Inc</span>
   </div>
 )

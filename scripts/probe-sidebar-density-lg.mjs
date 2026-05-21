@@ -16,7 +16,13 @@ const probe = async (density) => {
     const css = (el, ...props) => el ? Object.fromEntries(props.map(p => [p, window.getComputedStyle(el).getPropertyValue(p)])) : null
     const html = document.documentElement
     const h = document.querySelector('[data-sidebar="header"]')
+    // Find avatar: raw Avatar (div with width matching --chrome-header-avatar-size 24)
+    // or ItemAvatar (wrapped). Use first direct child of header > div that matches 24px width.
     const avatar = h?.querySelector('[data-prefix-type], img, .rounded-md, [role="img"]')
+      || Array.from(h?.querySelectorAll('div, span') ?? []).find(el => {
+        const r = el.getBoundingClientRect()
+        return r.width === 24 && r.height === 24
+      })
     const menuBtn = document.querySelector('[data-sidebar="menu-button"]')
     const menuIcon = menuBtn?.querySelector('svg')
     const outer = document.querySelector('[data-state] > div:nth-child(2)')
