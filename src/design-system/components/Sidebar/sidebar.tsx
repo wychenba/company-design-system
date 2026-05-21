@@ -817,31 +817,23 @@ const sidebarMenuButtonVariants = cva(
     "px-[var(--layout-space-loose)]",
     "font-medium text-fg-secondary",
     "cursor-pointer select-none outline-none",
-    // 2026-05-21 v2 fix(user 抓「收起再展開高度先變小再變大」):撤回 transition-[height]。
-    // 反向解鎖時 height 從 40px 過渡到 `auto`(intrinsic)browser 無法 transition → flutter。
-    // Height 瞬切無動畫 = 穩定。Width/padding/gap/colors 仍保 200ms transition。
-    "transition-[width,padding,gap,background-color,color] duration-200 ease-linear motion-reduce:duration-0",
+    // 2026-05-21 v4 C* refactor(per codex M31 Layer C 比稿 final architecture):
+    //   撤回所有 `group-data-[collapsible=icon]:*` overrides。Sidebar outer overflow-x:hidden
+    //   自動 clip menu button 右側 label / badge / action,左側 icon 自然顯示在 sidebar-width-icon
+    //   range 內。Row geometry 永遠 stable(px-loose + items-start + gap-2 + height auto),
+    //   無 discrete property switch → 無 fly / 無 flutter / 無 jitter。
+    //
+    //   Label/badge/action 自然存在 DOM(a11y screen reader 仍讀到),只是 outer clip 視覺消失。
+    //   Tooltip 仍在 collapsed state 顯示(per L1043-1055 既有 hidden 條件)。
+    //
+    //   對齊 MUI MiniDrawer + shadcn canonical(width morph + overflow clip + row geometry 不變)。
+    "transition-[background-color,color] duration-200 ease-linear motion-reduce:duration-0",
     "hover:bg-neutral-hover hover:text-foreground",
     "focus-visible:bg-neutral-hover focus-visible:text-foreground",
     "disabled:pointer-events-none disabled:opacity-disabled",
     "aria-disabled:pointer-events-none aria-disabled:opacity-disabled",
     "data-[active=true]:bg-neutral-selected data-[active=true]:text-foreground",
     "group-has-[[data-sidebar=menu-action]]/menu-item:pr-8",
-    // Icon mode:
-    //   - 2026-05-21 真兇 fix per user「先飛右後左收」動畫:撤回 `!px-0 !justify-center`(L829-830 原版)。
-    //     `justify-content` 不可 CSS-transition,discrete 切換 center → content 瞬跳到 256 中心
-    //     (x=128)再跟 width 動畫 200ms 縮回 x=24 = fly-right-then-left。
-    //   - 維持 px-loose + items-start + justify-start 兩 mode 一致:md 密度 loose=16 / icon=16
-    //     / button=48 → 16+16+16=48 自然居中無切換。lg 密度略偏(56 寬內 24 padding + 16 icon
-    //     = 64 > 56)trade-off accepted vs fly。
-    //   - label span 仍透過子選擇器 display:none(label 隱藏不需 layout 改 → 不觸發 fly)
-    //   - !py-0 維持(高度由 size variant `field-height-*` 控制,padding-y 不該疊加)
-    // 2026-05-21 v3 補 `!items-center`(user 抓「icon 沒垂直置中」):base `items-start` 對齊頂部,
-    // collapsed mode 沒 label 時 icon 黏 button 頂部不置中(y=10 vs button center y=12,差 2px 肉眼可見)。
-    // `align-items` 雖也 discrete property,但收合時 content 只在 vertical 微調 2px 不是 horizontal 大跳,
-    // 視覺無「飛」感(per 2026-05-21 v1 fix `!justify-center` horizontal fly 區分)。
-    "group-data-[collapsible=icon]:!py-0 group-data-[collapsible=icon]:!items-center",
-    "group-data-[collapsible=icon]:[&_[data-sidebar=menu-label]]:hidden",
   ],
   {
     variants: {
@@ -849,9 +841,11 @@ const sidebarMenuButtonVariants = cva(
       // 前為 3 cva(menu / sidebar / tree)重複同一 py 公式,drift risk 已知。
       // 改用 shared SSOT 後 formula 改一處全同步。
       size: {
-        sm: [ROW_PADDING_BY_SIZE.sm, "group-data-[collapsible=icon]:!h-[var(--field-height-sm)]"],
-        md: [ROW_PADDING_BY_SIZE.md, "group-data-[collapsible=icon]:!h-[var(--field-height-md)]"],
-        lg: [ROW_PADDING_BY_SIZE.lg, "group-data-[collapsible=icon]:!h-[var(--field-height-lg)]"],
+        // 2026-05-21 v4 C*:撤回 `group-data-[collapsible=icon]:!h-[...]` height lock
+        // (per codex Layer C — row height 永遠 stable,collapsed 只 outer clip 視覺)
+        sm: ROW_PADDING_BY_SIZE.sm,
+        md: ROW_PADDING_BY_SIZE.md,
+        lg: ROW_PADDING_BY_SIZE.lg,
       },
       variant: {
         /** 預設 — 導覽 item,參與 single-selection */
