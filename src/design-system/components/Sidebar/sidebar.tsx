@@ -368,9 +368,14 @@ const Sidebar = React.forwardRef<
           )}
           {...props}
         >
+          {/* SidebarInner:永遠 full sidebar-width via inline style(Tailwind JIT 沒 compile
+              `min-w-[var(--sidebar-width)]` arbitrary class — 只 generated min-w-sidebar-width-min)。
+              Inline style 繞 JIT 確保 272px。Collapsed mode 只是 outer overflow-x:hidden clip 出
+              左側 sidebar-width-icon = visible icon rail。 */}
           <div
             data-sidebar="sidebar"
-            className="flex h-full w-full flex-col bg-surface"
+            style={{ width: 'var(--sidebar-width)', minWidth: 'var(--sidebar-width)' }}
+            className="flex h-full shrink-0 flex-col bg-surface"
           >
             {children}
           </div>
@@ -440,23 +445,19 @@ SidebarInput.displayName = "SidebarInput"
 // 會隨 density 變大。Chrome 如果不跟著放大,lg density 下 padding 會被擠壓。
 const SidebarHeader = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> & { withTabs?: boolean; tabsSlot?: React.ReactNode }
->(({ className, withTabs, tabsSlot, ...props }, ref) => {
+  React.ComponentProps<"div"> & { withTabs?: boolean; tabsSlot?: React.ReactNode; leadingRail?: React.ReactNode }
+>(({ className, withTabs, tabsSlot, leadingRail, ...props }, ref) => {
   return (
+    // 2026-05-21 v7(per user「sidebar 收合時 logo 跟下方 icon 沒水平置中」):
+    // leadingRail prop pass-through 到 ChromeHeader,讓 logo/avatar 走 sidebar-width-icon
+    // 寬度的 justify-center 容器(無 px-loose padding),center.x 自動 = 24 = menu icon center.x。
     <ChromeHeader
       ref={ref}
       withTabs={withTabs}
       tabsSlot={tabsSlot}
+      leadingRail={leadingRail}
       data-sidebar="header"
-      className={cn(
-        // 2026-05-21 撤回 icon-mode `!px-0 !justify-center`(per user「先飛右後左收」動畫真兇 fix):
-        // `justify-content` 不可 CSS-transition,discrete 變 center → 內容瞬跳到中心(展開 256
-        // 寬時 x=128)再跟 width 動畫 200ms 縮回 x=24,視覺 fly-right-then-left。
-        // Fix:維持 px-loose 在兩 mode(md 數學:16+16+16=48 ✓ 自然居中,無 justify 切換)。
-        // lg 密度時 sidebar-width-icon=56 略偏(loose 24 padding 在 56 寬內),trade-off accepted。
-        "transition-[padding] duration-200 ease-linear motion-reduce:duration-0",
-        className
-      )}
+      className={className}
       {...props}
     />
   )
@@ -834,6 +835,11 @@ const sidebarMenuButtonVariants = cva(
     "aria-disabled:pointer-events-none aria-disabled:opacity-disabled",
     "data-[active=true]:bg-neutral-selected data-[active=true]:text-foreground",
     "group-has-[[data-sidebar=menu-action]]/menu-item:pr-8",
+    // 2026-05-21 v5 restore label display:none(user 抓「label 沒消失」):
+    // C* outer overflow-x:hidden 理論 clip,但 label.x=40 在 sidebar-width-icon=48 內 → 首字
+    // 部分可見。display:none 是 instant 切換非 main animation,跟 C* 「不用 display:none 做主
+    // 動畫」不衝突(label 不參與 width 動畫,純 final state)。對齊 shadcn canonical。
+    "group-data-[collapsible=icon]:[&_[data-sidebar=menu-label]]:hidden",
   ],
   {
     variants: {

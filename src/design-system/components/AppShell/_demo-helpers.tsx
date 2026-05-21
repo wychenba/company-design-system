@@ -47,10 +47,18 @@ export const MAIN_NAV = [
 
 // ── WorkspaceBrand(對齊 sidebar.stories.tsx)────────────────────────────
 
-// 2026-05-20 撤回 group-data-[collapsible=icon]:justify-center(fix「avatar 飛右後左收」動畫)。
-// 真根因:展開 256px avatar 在 x=0,collapsible attribute 瞬切 + justify start→center,avatar
-// 瞬間 jump 到 x=128(中心)然後跟 width 縮到 x=24 → 視覺看到 fly-right-then-left。
-// Fix:avatar 永遠 left-align,sidebar 自身 side padding 視覺自然居中(對齊 VS Code / Linear 慣例)。
+// 2026-05-21 v7 final logo alignment(per user「水平置中」):
+// 撤回前 v6 wrapper(放在 ChromeHeader px-loose 內 → avatar.center 還是 28 偏 4px)。
+// 改用 SidebarHeader leadingRail 結構:avatar 走 sidebar-width-icon wide rail container 無 chrome
+// padding,justify-center → avatar.center = 24 = menu icon center 完美對齊。
+// `WorkspaceLogo` 給 leadingRail 用,`WorkspaceText` 給 SidebarHeader children 用。
+export const WorkspaceLogo = () => (
+  <ItemAvatar alt="Acme Inc" shape="square" color="blue" solid />
+)
+export const WorkspaceText = () => (
+  <span className="text-body-lg font-medium truncate group-data-[collapsible=icon]:hidden">Acme Inc</span>
+)
+// Legacy WorkspaceBrand 保留 backward compat(內部 sidebar.stories 等可能還用)
 export const WorkspaceBrand = () => (
   <div className="flex items-center gap-2 min-w-0">
     <ItemAvatar alt="Acme Inc" shape="square" color="blue" solid />
@@ -99,8 +107,10 @@ export function AcmeSidebar({
   return (
     <Sidebar collapsible="icon" viewportInsetTop={viewportInsetTop}>
       {includeWorkspaceBrand && (
-        <SidebarHeader>
-          <WorkspaceBrand />
+        // 2026-05-21 v7 用 SidebarHeader leadingRail:avatar 走 sidebar-width-icon column
+        // (無 ChromeHeader px-loose padding)→ center.x = 24 = menu icon center.x 完美對齊
+        <SidebarHeader leadingRail={<WorkspaceLogo />}>
+          <WorkspaceText />
         </SidebarHeader>
       )}
       <SidebarContent>
