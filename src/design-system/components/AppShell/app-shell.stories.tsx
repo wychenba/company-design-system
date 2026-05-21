@@ -248,7 +248,7 @@ function IssueDetail({ issue }: { issue: Issue | null }) {
  * - Aside:always-on header + close X + issue detail content
  */
 export const PrimarySidebar: Story = {
-  name: 'primary-sidebar(Linear-style issue tracker)',
+  name: '主側欄佈局 — Linear 式議題追蹤',
   render: () => {
     const [activeId, setActiveId] = React.useState<string>('inbox')
     const [asideOpen, setAsideOpen] = React.useState(true)
@@ -302,7 +302,7 @@ export const PrimarySidebar: Story = {
  * - TabsContent 放 AppShell children 內,自動 Tabs context binding
  */
 export const PrimarySidebarWithTabs: Story = {
-  name: 'primary-sidebar + 頁面 tabs (header tabsSlot 範例)',
+  name: '主側欄佈局 + 頁面分頁',
   render: () => {
     const [activeId, setActiveId] = React.useState<string>('inbox')
     const [asideOpen, setAsideOpen] = React.useState(true)
@@ -386,7 +386,7 @@ export const PrimarySidebarWithTabs: Story = {
  * - Sidebar 內**不 render WorkspaceBrand**(`includeWorkspaceBrand={false}`),avoid 重複(已在 globalHeader)
  */
 export const PrimaryHeader: Story = {
-  name: 'primary-header(GitHub / Gmail / Slack 派 — global + local 2-layer)',
+  name: '主標頭佈局 — 全域+本地兩層(GitHub/Gmail/Slack 派)',
   render: () => {
     const [activeId, setActiveId] = React.useState<string>('inbox')
     const [asideOpen, setAsideOpen] = React.useState(true)

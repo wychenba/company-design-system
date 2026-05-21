@@ -442,7 +442,11 @@ Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → ste
 | Token | 指向 primitive | dark mode swap |
 |-------|--------------|--------------|
 | `--blue-hover` / `--blue-active` | blue-5 / blue-7 | blue-7 / blue-5 |
-| `--red-hover` / `--red-active` | deep-orange-5 / deep-orange-7 | deep-orange-7 / deep-orange-5 |
+| `--red-hover` / `--red-active` | red-5 / red-7 | red-7 / red-5 |
+| `--deep-orange-hover` / `--deep-orange-active` | deep-orange-5 / deep-orange-7 | deep-orange-7 / deep-orange-5 |
+| `--orange-hover` / `--orange-active` | orange-5 / orange-7 | orange-7 / orange-5 |
+| `--amber-hover` / `--amber-active` | amber-5 / amber-7 | amber-7 / amber-5 |
+| `--lime-hover` / `--lime-active` | lime-5 / lime-7 | lime-7 / lime-5 |
 | `--green-hover` / `--green-active` | green-5 / green-7 | green-7 / green-5 |
 | `--yellow-hover` / `--yellow-active` | yellow-5 / yellow-7 | yellow-7 / yellow-5 |
 | `--turquoise-hover` / `--turquoise-active` | turquoise-5 / turquoise-7 | turquoise-7 / turquoise-5 |

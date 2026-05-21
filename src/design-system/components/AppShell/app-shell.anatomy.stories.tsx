@@ -20,7 +20,7 @@ type Story = StoryObj<typeof AppShell>
 
 /** Slot 結構 + landmark role 對照(使用 baseline AcmeSidebar / PageHeader 完整 production-grade)。 */
 export const Overview: Story = {
-  name: 'Overview — slot 結構',
+  name: '槽位結構總覽',
   render: () => {
     const [activeId, setActiveId] = React.useState<string>('dashboard')
     const [asideOpen, setAsideOpen] = React.useState(true)
@@ -56,7 +56,7 @@ export const Overview: Story = {
 
 /** Layout mode diagram:純文字 2 mode 對照(非 nested live demo,避 Sidebar fixed inset 衝突)。 */
 export const LayoutModeDiagram: Story = {
-  name: 'LayoutModeDiagram — 兩 mode 對照(diagram)',
+  name: '兩種布局模式對照圖',
   render: () => (
     <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] space-y-6 text-body">
       <h2 className="text-h4">兩 mode 對照</h2>
@@ -93,7 +93,7 @@ export const LayoutModeDiagram: Story = {
 
 /** Aside 2-mode state behavior(toggle + breakpoint 切換)— 用完整 baseline。 */
 export const StateBehavior: Story = {
-  name: 'StateBehavior — Aside open/close + 2-mode',
+  name: '右側面板開合行為(兩種模式)',
   render: () => {
     const [activeId, setActiveId] = React.useState<string>('dashboard')
     const [open, setOpen] = React.useState(false)
@@ -134,7 +134,7 @@ export const StateBehavior: Story = {
 
 /** A11y landmark 文字說明(非 live render,避無謂 nested shell)。 */
 export const Accessibility: Story = {
-  name: 'Accessibility — landmark + skip-link + keyboard',
+  name: '無障礙(地標標記 + 跳轉連結 + 鍵盤導覽)',
   render: () => (
     <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
       <h2 className="text-h4 mb-3">A11y 機制</h2>
@@ -155,7 +155,7 @@ export const Accessibility: Story = {
 
 /** Size matrix:Aside width clamp 文字對照(非 rendered case,因 width 是 number prop)。 */
 export const SizeMatrix: Story = {
-  name: 'SizeMatrix — Aside width clamp(240-640)',
+  name: '右側面板寬度範圍(240-640)',
   render: () => (
     <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] space-y-3 text-body">
       <h2 className="text-h4">Aside width clamp</h2>
