@@ -792,3 +792,9 @@ SSOT → `.claude/references/structural-token-retention.md`(6 類保留 + sub-ag
 - `progress-bar.spec.md`
 - `separator.spec.md`
 - `skeleton.spec.md`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `opacity.spec.md`

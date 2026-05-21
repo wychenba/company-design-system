@@ -149,3 +149,9 @@ HoverCard 是**純行為 primitive**(只提供 hover 觸發邏輯 + 定位 + 動
 - `carousel.spec.md`
 - `coachmark.spec.md`
 - `overflow-indicator.spec.md`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `motion.spec.md`

@@ -229,3 +229,9 @@ ColorMatrix 已建:展示 default / hover / selected / disabled 四狀態的 bg 
 
 - `badge.spec.md`
 - `tag.spec.md`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `opacity.spec.md`

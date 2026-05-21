@@ -200,3 +200,9 @@ Star icon 渲染時明確設 `stroke="none"`(Lucide Star 預設有 1.5px outline
 - **`Switch`** — 二元 on/off。Rating 是 graded，Switch 是 binary
 - **`Button iconOnly + pressed={liked}`** — 愛心 / like 的正確實作
 - **Color token 例外** — `color.spec.md`「共用 `--warning` 色相但語境不同」段落
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `uiSize.spec.md`

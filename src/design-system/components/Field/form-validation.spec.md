@@ -143,3 +143,10 @@ Form validation 的 ARIA / 鍵盤行為(對齊 WCAG 3.3.1 Error Identification +
 - `link-input.spec.md`
 - `textarea.spec.md`
 - `time-picker.spec.md`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `combobox.spec.md`
+- `date-picker.spec.md`

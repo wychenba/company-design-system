@@ -139,3 +139,10 @@ Sheet 為容器,內容由 consumer 決定;focus trap + Escape close + `aria-labe
 
 - `accordion.spec.md`
 - `scroll-area.spec.md`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `app-shell.spec.md`
+- `density.spec.md`
