@@ -18,7 +18,11 @@ import { cn } from '@/lib/utils'
 // 規則：default low, escalate with reason。見 badge.spec.md「選 level 的流程」。
 
 const badgeVariants = cva(
-  'inline-flex items-center justify-center rounded-full leading-none',
+  // 2026-05-21 F1 fix(user verbatim「決策一改leading compact不會影響badge高度的話就改，反正要確保badge高度不變」+「都給我做到好」):
+  // leading-none → leading-compact token(utility-registry.json block.leading_numeric)。
+  // 高度不變保證:Badge container 顯式 `h-4 (16px)` + `flex items-center`,內部 text-[10px] × leading-compact(1.3) = 13px line-box
+  // < 16px container → 不會撐高;dot variant `w-1.5 h-1.5` 無文字內容 leading 無關。
+  'inline-flex items-center justify-center rounded-full leading-compact',
   {
     variants: {
       variant: {

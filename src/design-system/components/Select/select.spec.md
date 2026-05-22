@@ -27,16 +27,41 @@ Select 是**單選下拉的表單 control**——從 3+ 選項中挑恰好一個
 
 ---
 
-## Controlled-only rationale(Dim 26)
+## Controlled / Uncontrolled dual-mode(Dim 26,2026-05-21 D3 audit ship)
 
-本元件刻意採 **controlled-only** 模式:`value` + `onChange` 必傳,不支援 `defaultValue` uncontrolled fallback。
+本元件支援 **dual-mode**:consumer 可選 controlled OR uncontrolled,對齊 React `<input>` / Radix Select / shadcn Select 共識。**互斥規則**:同時傳 `value` + `defaultValue` 走 controlled(value 勝),`defaultValue` 僅 first-mount 用。
 
-**為什麼**:
-- 內部狀態複雜(search filter / range / menu open state)跟 `value` 雙向 sync 會產生 race condition
-- Consumer 幾乎一定有外部 state(form library / app state),強制 controlled 消除 ambiguity
-- 世界級對照:Ant Design DatePicker / Material MUI Select 皆支援 dual-mode;我們選 controlled-only 對齊狀態一致性優先 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+### Controlled 模式(consumer 自管 state)
 
-**若未來要改 dual-mode**:需引入 `useControllableState` helper + 測試 controlled↔uncontrolled switch 場景,屬 major API 擴充,非本 session scope。
+傳 `value` + `onChange`,Select **不**自管 state:
+
+```tsx
+const [country, setCountry] = useState('tw')
+<Select value={country} onChange={setCountry} options={...} />
+```
+
+**何時用**:Form library(react-hook-form / Formik)/ Redux / 跨元件 sync / server-state driven。
+
+### Uncontrolled 模式(Select 自管 state)
+
+不傳 `value`(可傳 `defaultValue` 設初始值),Select 內部 `useState`,變更時 fire `onChange` callback 通知 consumer:
+
+```tsx
+<Select defaultValue="tw" onChange={(v) => console.log('changed:', v)} options={...} />
+```
+
+**何時用**:純展示 / 一次性表單 submit / consumer 不需要 read 當前值。
+
+### 為什麼支援 dual-mode(非 controlled-only)
+
+- **React canonical**:`<input>` / `<select>` 原生兩模式並存,Radix / shadcn / MUI / Ant 共識 form-like primitive 必支援 dual-mode
+- **Consumer ergonomics**:簡單場景不該強制管 state(prototype / 一次性 form / a11y testing)
+- **互斥規則消除 ambiguity**:`value !== undefined` 為 controlled signal,decisive 不模糊
+
+### 歷史
+
+- **2026-05-21 前**:刻意 controlled-only,理由「內部狀態複雜易 race」
+- **2026-05-21 D3 audit**:per Phase A deep audit Dim 26 verify + user verbatim「決策三照妳建議」+「都給我做到好」→ 補 `defaultValue` + `useState` internal state + 互斥 signal。實作:`select.tsx:L443 isControlled = valueProp !== undefined` + `internalValue` state + `handleValueChange` 內 `if (!isControlled) setInternalValue(v)`
 
 ---
 

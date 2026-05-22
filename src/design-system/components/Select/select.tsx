@@ -53,7 +53,7 @@ export interface SelectGroupConfig {
 // ── Types ───────────────────────────────────────────────────────────────────
 
 export interface SelectProps
-  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size' | 'value' | 'onChange'> {
+  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size' | 'value' | 'defaultValue' | 'onChange'> {
   mode?: FieldMode
   /** Field chrome variant. Default = context.variant ?? 'default'. Per-prop override. */
   variant?: FieldVariant
@@ -62,7 +62,14 @@ export interface SelectProps
   options: SelectOption[]
   /** 分組顯示(對齊 SelectMenu groups SSOT)。option.group 對應 groups[].key */
   groups?: SelectGroupConfig[]
+  /** Controlled value(consumer 自管 state)。傳 `value` + `onChange` 表示 controlled mode。 */
   value?: string | null
+  /** Uncontrolled 初始值(2026-05-21 D3 audit add per user verbatim「決策三照妳建議」+「都給我做到好」)。
+   *  不傳 `value` 時 Select 自管 internal state,以 `defaultValue` 為初始值,選變更時 fire `onChange`
+   *  callback 通知 consumer(但 state 仍歸 Select)。對齊 Radix Select(`defaultValue`)+ shadcn Input
+   *  (`defaultValue`)+ React `<input>` dual-mode canonical。
+   *  互斥規則:同時傳 `value` + `defaultValue` 走 controlled(value 勝),`defaultValue` 僅 first-mount 用。 */
+  defaultValue?: string | null
   onChange?: (value: string) => void
   placeholder?: string
   clearable?: boolean
@@ -344,13 +351,21 @@ function ReadonlyDisplay({
 
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, value, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'plain', startIcon: StartIcon, showDisplayEndIcon, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp, ...props }, ref) => {
+  ({ mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, value: valueProp, defaultValue, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'plain', startIcon: StartIcon, showDisplayEndIcon, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp, ...props }, ref) => {
     const fieldCtx = useFieldContext()
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
     const resolvedMode = disabled ? 'disabled' : mode
     const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const iconSize = getIconSize(size)
+    // 2026-05-21 D3 audit:Controlled / Uncontrolled dual-mode SSOT(同 CustomSelect)
+    const isControlled = valueProp !== undefined
+    const [internalValue, setInternalValue] = React.useState<string | null>(defaultValue ?? null)
+    const value = isControlled ? valueProp : internalValue
+    const handleNativeChange = (v: string) => {
+      if (!isControlled) setInternalValue(v)
+      onChange?.(v)
+    }
     const showClear = clearable && value && resolvedMode === 'edit'
     const isTextDisplay = display === 'plain'
     const selectRef = React.useRef<HTMLSelectElement | null>(null)
@@ -369,7 +384,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
         ref={setSelectRef}
         id={idProp ?? fieldCtx?.id}
         value={value ?? ''}
-        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+        onChange={(e) => handleNativeChange(e.target.value)}
         disabled={disabled}
         aria-invalid={error || undefined}
         aria-required={fieldCtx?.required || undefined}
@@ -384,7 +399,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
     )
 
     const clearEl = showClear ? (
-      <SelectClearButton size={size ?? 'md'} onClear={() => onChange?.('')} />
+      <SelectClearButton size={size ?? 'md'} onClear={() => handleNativeChange('')} />
     ) : null
 
     const chevronEl = (
@@ -430,13 +445,18 @@ NativeSelect.displayName = 'NativeSelect'
 
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
-  ({ mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, groups, value, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'plain', startIcon: StartIcon, searchable = false, loading, minRows, defaultOpen = false, onOpenChange, selectedItemRenderer, showDisplayEndIcon, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp, 'aria-label': ariaLabel }, ref) => {
+  ({ mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, groups, value: valueProp, defaultValue, onChange, placeholder, className, disabled: disabledProp, clearable = false, display = 'plain', startIcon: StartIcon, searchable = false, loading, minRows, defaultOpen = false, onOpenChange, selectedItemRenderer, showDisplayEndIcon, id: idProp, 'aria-describedby': ariaDescribedByProp, 'aria-errormessage': ariaErrorMessageProp, 'aria-label': ariaLabel }, ref) => {
     const fieldCtx = useFieldContext()
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
     const resolvedMode = disabled ? 'disabled' : mode
     const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const iconSize = getIconSize(size)
+    // 2026-05-21 D3 audit:Controlled / Uncontrolled dual-mode SSOT
+    // valueProp !== undefined → controlled(consumer 自管);否則 uncontrolled(Select 自管 internal state,defaultValue 為初始值)
+    const isControlled = valueProp !== undefined
+    const [internalValue, setInternalValue] = React.useState<string | null>(defaultValue ?? null)
+    const value = isControlled ? valueProp : internalValue
     const showClear = clearable && value && resolvedMode === 'edit'
     const isTextDisplay = display === 'plain'
 
@@ -493,9 +513,11 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
     const handleValueChange = React.useCallback(
       (newValue: string | string[]) => {
         const v = Array.isArray(newValue) ? newValue[0] : newValue
+        // 2026-05-21 D3:Uncontrolled mode 自動更新 internal state;controlled mode 只 forward callback。
+        if (!isControlled) setInternalValue(v)
         onChange?.(v)
       },
-      [onChange]
+      [onChange, isControlled]
     )
 
     // Early return AFTER all hooks(disabled / readonly / display mode 走 ReadonlyDisplay)

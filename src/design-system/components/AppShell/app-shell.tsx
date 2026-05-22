@@ -358,4 +358,7 @@ AppShellAside.displayName = 'AppShellAside'
 
 // ── Exports ──────────────────────────────────────────────────────────────────
 
+// code-quality-allow: dead-export useAppShell — public compound API hook(consumer 可自拼 custom aside layout,
+// 對齊 Radix `useDialogContext` / MUI `useFormControl` 慣例)。內部 AppShellAside 已消費(L294),
+// audit script 抓「無 cross-file import」是 false positive(2026-05-21 D2 codify)。
 export { AppShell, AppShellAside, useAppShell }

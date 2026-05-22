@@ -54,7 +54,11 @@ RECENT_USER_MSGS=$(tail -200 "$TRANSCRIPT_PATH" 2>/dev/null | \
 
 # Approval keywords(對齊 stop_self_audit.sh:172)+ 2026-05-15 升 numbered directive
 # (`#1 A` / `#1 ship` 等)+ 「照建議」/「照共識」/「照我的」等 reference style approval
-APPROVAL_RE='(同意|採用|採納|拍板|可以|改成|改為|執行|上吧|push|implement|go ahead|approved|OK|好|沒問題|做一做|就做|做吧|做完|全部做完|做到完|馬不停蹄|建議做|ship|合 main|^#[0-9]+|照你|照建議|照共識|照我的|按照)'
+# 2026-05-21 M34 fix(per user verbatim「都給我做到好」approval blocked by 妳/決策N coverage gap):
+#   (a) 加「妳」變體(`照妳`= `照你` 文書通用 variant)
+#   (b) 加「決策[一二三四五六七八九十1-9]」numbered directive(eg.「決策一改…」「決策3做」)
+#   (c) 加「做到好」/「都做」/「全做」auto-approve 變體
+APPROVAL_RE='(同意|採用|採納|拍板|可以|改成|改為|執行|上吧|push|implement|go ahead|approved|OK|好|沒問題|做一做|就做|做吧|做完|全部做完|做到完|做到好|都做|全做|馬不停蹄|建議做|ship|合 main|^#[0-9]+|照你|照妳|照建議|照共識|照我的|按照|決策[一二三四五六七八九十1-9])'
 HAS_APPROVAL=$(echo "$RECENT_USER_MSGS" | grep -cE "$APPROVAL_RE" 2>/dev/null)
 HAS_APPROVAL=${HAS_APPROVAL:-0}
 

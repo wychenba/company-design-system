@@ -24,6 +24,11 @@
         "rationale": "Anatomy stories Inspector panel 是 storybook-internal 教學工具 UI(展示元件結構的 side legend / footnote / uppercase header),非 DS component surface。需視覺辨識(uppercase label + 寬 letter-spacing / 小字 metadata)跟 DS 主元件 typography 分層。對齊 Carbon storybook addon、Material storybook addon 共識:tool UI 不受 token-first 約束。",
         "audit_dim_53_fix": "Dim 47 sub-agent 抓 anatomy stories tracking-wider / font-semibold / text-[NN] 多處違反 = false positive(本例外段 codify 後豁免)"
       },
+      "token_stories_section_label": {
+        "scope": "src/design-system/tokens/**/*.stories.tsx — SectionLabel helper(uppercase + wider tracking section header)",
+        "allowed_utilities": ["tracking-wider", "font-semibold"],
+        "rationale": "Token stories(color / typography / radius / elevation / opacity / uiSize / layoutSpace / density)是 token 展示 storybook,用 SectionLabel(`uppercase + tracking-wider`)分區 swatch 群組,跟 anatomy stories Inspector panel 同 storybook-internal teaching UI 性質,非 DS component surface。Phase A audit 2026-05-21 codify。"
+      },
       "principles_stories_codepre": {
         "scope": "*.principles.stories.tsx — <pre><code> code sample blocks",
         "allowed_utilities": ["text-xs", "text-sm"],
