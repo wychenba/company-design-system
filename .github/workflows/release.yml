@@ -90,6 +90,26 @@ jobs:
           generate_release_notes: true
           prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-next') }}
 
-      # TODO Phase 3 follow-up:plugin marketplace publish step
-      # - name: Publish Claude plugin
-      #   run: ...
+      # Claude plugin marketplace distribution(Phase 7 — 2026-05-23 ship per real Anthropic spec)
+      # Distribution model:**GitHub-direct**(不走 Anthropic public marketplace)
+      #   - Consumers add this repo as marketplace:`/plugin marketplace add github:your-org/design-system`
+      #   - Plugin install:`/plugin install design-system@your-org-ds`
+      #   - Version pinning:tag v0.x.x → marketplace.json + plugin.json `version` field bumped manually pre-tag
+      #     OR omit version → commit SHA used(per Anthropic plugin spec auto-versioning)
+      # No CLI publish step needed for GitHub-direct — GitHub repo IS the marketplace.
+      # Anthropic-marketplace submission(future):manual via claude.ai/settings/plugins/submit
+      - name: Verify plugin manifest version sync(if version field set)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          PLUGIN_VERSION=$(jq -r '.version' .claude-plugin/plugin.json)
+          MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name=="design-system") | .version // empty' .claude-plugin/marketplace.json)
+          echo "Tag:$TAG_VERSION / plugin.json:$PLUGIN_VERSION / marketplace.json:$MARKETPLACE_VERSION"
+          if [ "$PLUGIN_VERSION" != "$TAG_VERSION" ]; then
+            echo "::warning::plugin.json version($PLUGIN_VERSION)≠ tag($TAG_VERSION)— consumer 不會收到 /plugin update prompt"
+            echo "::warning::pre-tag bump:jq '.version=\"$TAG_VERSION\"' .claude-plugin/plugin.json + marketplace.json plugins[].version"
+          fi
+          if [ "$MARKETPLACE_VERSION" != "$TAG_VERSION" ] && [ -n "$MARKETPLACE_VERSION" ]; then
+            echo "::warning::marketplace.json plugin entry version($MARKETPLACE_VERSION)≠ tag($TAG_VERSION)"
+          fi
+          # Non-blocking warning(per Anthropic spec:omit version → commit SHA auto-version,仍 work)

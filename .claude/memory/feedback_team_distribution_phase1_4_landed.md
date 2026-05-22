@@ -1,10 +1,16 @@
 ---
-name: team_distribution_phase1_4_landed
-description: Team distribution roadmap Phase 1-4 complete 2026-05-22 / 23(npm workspace + storybook-config + Claude plugin manifest + release pipeline + Phase 5+6 templates in repo)。Pickup contract:user 完成 GitHub repo create + NPM token + plugin host pick 後,session 直接接 Phase 5 真實 setup。
+name: team_distribution_phase1_7_landed
+description: Team distribution roadmap Phase 1-7 全 complete 2026-05-22 / 23(npm workspace + storybook-config + Claude plugin real spec via symlinks + release pipeline + Phase 5+6 templates in repo with private+Netlify auth posture + Phase 7 real plugin migration)。Pickup contract:user 完成 GitHub repo create + NPM token + Renovate install + Netlify secrets 後,session 直接接 actual deployment setup。
 type: project
 ---
 
-# Team Distribution Phase 1-4 Landed(2026-05-22 / 23)
+# Team Distribution Phase 1-7 Landed(2026-05-22 / 23)
+
+## Security posture(2026-05-23 user-directed)
+
+- **DS repo**(this):**Public** + solo-work canonical(per `feedback_solo_dev_workflow.md`)— OK 因為 design-system 是公開內容
+- **product-workspace**(new repo):**Private** + Netlify auth-gated(Identity / Password / RBAC 3 options)— per user「會有具體專案內容的repo不應該直接部署到GitHub page,甚至repo也應該要是private,且應該部署到netlify並要有權限控管」
+- **Template ban**:GitHub Pages explicit ban for product workspace(public host 不適合 private content)
 
 ## Status snapshot
 
@@ -12,10 +18,11 @@ type: project
 |---|---|---|
 | 1 | ✅ DONE | `packages/design-system/`(name `@your-org/design-system`)+ vite-lib + d.ts + barrel(`scripts/gen-design-system-barrel.mjs`)+ lib/utils internalized + 504-file npm pack 1.3MB / mock install verified PASS(296 exports)|
 | 2 | ✅ DONE | `packages/storybook-config/`(addons preset + preview + dogfood)|
-| 3 | ✅ DONE(scaffold) | `.claude-plugin/marketplace.json` plugin manifest |
-| 4 | ✅ DONE(scaffold) | `.github/workflows/release.yml` + `.changeset/{config.json,README.md,initial-release.md}` + `CONTRIBUTING.md` |
-| 5 | ✅ TEMPLATE in repo | `template/product-workspace/`(boilerplate ready,user `cp -r ../template/product-workspace .` 即用)|
+| 3 | ✅ DONE | `.claude-plugin/{plugin.json,marketplace.json}` real Anthropic schema(2026-05-23 fix per WebFetch verify)|
+| 4 | ✅ DONE | `.github/workflows/release.yml`(npm publish + GitHub Release + plugin version sync verify)+ `.changeset/{config.json,README.md,initial-release.md}` + `CONTRIBUTING.md` |
+| 5 | ✅ TEMPLATE in repo | `template/product-workspace/`(boilerplate ready + private+Netlify auth posture per 2026-05-23 user directive)|
 | 6 | ✅ DOCS in repo | `template/product-workspace/docs/{01..05}.md`(5 onboarding docs + auto-update propagation explainer)|
+| 7 | ✅ DONE 2026-05-23 | Real plugin spec migration via symlinks:`skills/` → `.claude/skills/` / `commands/` → `.claude/commands/` / `hooks/scripts/` → `.claude/hooks/` / `hooks/hooks.json` 自動 generated。40 hook entries。Local dev 不破 |
 
 ## User-blocked(out of Claude session)
 

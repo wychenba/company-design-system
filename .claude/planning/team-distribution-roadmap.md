@@ -375,4 +375,22 @@ User 在 session 內逐 step 詰問 + 我答對齊 world-class benchmark:
 - Anthropic claude-plugins-community marketplace(github.com/anthropics/claude-plugins-community)
 - shadcn registry CLI(對照 distribution model)
 
-**Status**: ⏸ **DEFERRED — non-trivial restructure,等 user 拍板要不要 commit Phase 7 effort**(目前 GitHub-direct distribution 也 work — consumer `git submodule add design-system` 或 `cp -r .claude/` 都能立即 share governance,不一定需走 plugin marketplace)
+**Status**: **✅ DONE 2026-05-23 same day**(per user verbatim「做到完美啊」+「該做完的就都做完」trigger撤回 deferred):
+- skills/ symlink → .claude/skills/(22 skills 在 plugin root)
+- commands/ symlink → .claude/commands/
+- hooks/scripts/ symlink → .claude/hooks/(30+ scripts)
+- hooks/hooks.json:自動 generate from settings.json hooks section,paths 改 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/<name>.sh
+- 40 hook entries 全 mapped(PreToolUse / PostToolUse / Stop / SessionStart / UserPromptSubmit)
+- plugin.json metadata 改 reflect migration done + intentional_omissions(rules / references / memory)documented
+- release.yml 加 plugin version sync verify step(2026-05-23 follow-up)
+- Local dev 不破:.claude/ standalone layout 保留,symlinks 是 plugin layer
+
+Intentional omissions(per plugin spec 限制):
+- .claude/rules/ — plugin spec 沒明寫 path-scoped rules 機制,CLAUDE.md cite paths 仍 reach
+- .claude/references/ — 同上
+- .claude/memory/ — by design 不 distribute(user-specific)
+
+Auto-update flow now complete:
+1. DS owner push tag v0.x.y → CI publish npm + plugin marketplace catalog(GitHub-direct,no Anthropic submission needed)
+2. Consumer `/plugin marketplace update + /plugin update design-system` 拉新 commit / version
+3. Skills + hooks + commands + CLAUDE.md 自動 sync 到 consumer

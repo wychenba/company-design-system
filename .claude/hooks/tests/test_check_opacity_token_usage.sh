@@ -62,13 +62,13 @@ echo "=== check_opacity_token_usage tests ==="
 run_hook "/repo/packages/design-system/src/components/Foo/foo.tsx" '
 className="bg-surface opacity-30"
 '
-expect_warn "1. opacity-30 raw → warn" "M23 violation"
+expect_warn "1. opacity-30 raw → warn" "M23 / Dim 47 violation"
 
 # 2. raw opacity-50 → warn
 run_hook "/repo/packages/design-system/src/components/Foo/foo.tsx" '
 className="opacity-50"
 '
-expect_warn "2. opacity-50 raw → warn" "M23 violation"
+expect_warn "2. opacity-50 raw → warn" "M23 / Dim 47 violation"
 
 # 3. opacity-disabled token utility → silent
 run_hook "/repo/packages/design-system/src/components/Foo/foo.tsx" '
