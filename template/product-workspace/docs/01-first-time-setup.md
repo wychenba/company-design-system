@@ -30,13 +30,25 @@ npm install
 - 35 sub-deps(@radix-ui / @dnd-kit / lucide-react / ... 全 auto)
 - `peerDependencies`:react / react-dom / tailwindcss already 在 root
 
-### 3. Claude session 啟動
+### 3. Add DS marketplace + install plugin
+
+Per Anthropic Claude Code plugin spec(`code.claude.com/docs/en/plugins`):
 
 ```bash
-claude
+claude                                                  # 啟動 session
+
+# 一次性 setup(per workspace,只跑一次)
+/plugin marketplace add github:your-org/design-system  # add marketplace catalog
+/plugin install design-system@your-org-ds              # install plugin from catalog
 ```
 
-session-start 自動 detect `.claude/settings.json` 的 `enabledPlugins.design-system@your-org: true`,從 plugin marketplace 拉 27 skills / 37 hooks / 5 rules / CLAUDE.md instructions。
+之後 session 自動 detect plugin,load skills + hooks + rules + CLAUDE.md instructions。
+
+更新時:
+```bash
+/plugin marketplace update    # refresh catalog
+/plugin update design-system  # bump to new version(per plugin.json `version` field)
+```
 
 驗證:
 ```

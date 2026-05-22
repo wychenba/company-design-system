@@ -1,46 +1,25 @@
 {
-  "$schema": "https://anthropic.com/claude-code/plugin-marketplace.schema.json",
-  "name": "design-system@your-org",
-  "displayName": "Design System Governance Plugin",
-  "version": "0.0.0",
-  "description": "World-class design-system governance for Claude Code — bundles skills + hooks + commands + rules + CLAUDE.md as a single installable plugin. Consumers enable once and inherit all DS canonical (M-rules, audit dims, codex collab discipline, knowledge-prune cadence).",
-  "license": "UNLICENSED",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/your-org/design-system.git"
-  },
-  "exports": {
-    "instructions": "./CLAUDE.md",
-    "rules": ".claude/rules/",
-    "skills": ".claude/skills/",
-    "hooks": ".claude/hooks/",
-    "commands": ".claude/commands/",
-    "references": ".claude/references/",
-    "memory": ".claude/memory/"
-  },
-  "manifest": {
-    "claudeVersion": ">=4.0.0",
-    "topLevelInstructions": "CLAUDE.md",
-    "pathScopedRules": [
-      { "path": ".claude/rules/meta-patterns.md", "loadWhen": "always", "rationale": "31 active M-rules — fundamental governance,every session needs" },
-      { "path": ".claude/rules/spec-rules.md", "paths": ["**/*.spec.md", "src/design-system/**"] },
-      { "path": ".claude/rules/ui-development.md", "paths": ["**/*.tsx", "**/*.ts"] },
-      { "path": ".claude/rules/story-rules.md", "paths": ["**/*.stories.tsx"] },
-      { "path": ".claude/rules/self-verify.md", "paths": ["src/**", ".claude/**", "*.spec.md", "*.tsx", "*.css"] }
-    ]
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "your-org-ds",
+  "description": "Your-org Design System marketplace — distribute DS governance plugin to product workspaces",
+  "owner": {
+    "name": "Your-Org DS Owner"
   },
   "metadata": {
-    "createdAt": "2026-05-22",
-    "phase": "Phase 3 team-distribution-roadmap initial scaffold",
-    "dogfood": "This DS repo自我消費 — `.claude/` 物理檔目前直接 active;Phase 4 release pipeline 加 plugin host config 後 consumer enable",
-    "consumerSetup": {
-      "step1": "npm install @your-org/design-system @your-org/storybook-config",
-      "step2": "Add to .claude/settings.json: { \"enabledPlugins\": { \"design-system@your-org\": true } }",
-      "step3": "Restart claude session — auto-detect plugin"
-    },
-    "openQuestions": [
-      "Plugin host:Anthropic public marketplace? GitHub direct? Internal NPM registry?(roadmap Phase 3 user TBD)",
-      "Version sync strategy:plugin version 跟 npm package 是否 always lockstep?"
-    ]
-  }
+    "version": "0.1.0",
+    "pluginRoot": "."
+  },
+  "plugins": [
+    {
+      "name": "design-system",
+      "source": ".",
+      "description": "World-class DS governance — 22 skills + 37 hooks + 5 path-scoped rules + CLAUDE.md instructions + 31 active M-rules + 56 audit dims. Consumers enable once and inherit all canonical (codex collab discipline, knowledge-prune cadence, M14 5-layer pipeline, M22 benchmark cite, M29 anchor preflight, etc.)。",
+      "version": "0.1.0",
+      "author": {
+        "name": "Your-Org DS Owner"
+      },
+      "tags": ["design-system", "governance", "world-class", "ssot", "your-org"],
+      "category": "design-system"
+    }
+  ]
 }

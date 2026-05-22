@@ -83,7 +83,7 @@ your-org GitHub:
 
 ---
 
-## 3. Phase Plan(6 phases,2-3 days total)
+## 3. Phase Plan(7 phases — Phase 7 加 2026-05-23 per real Anthropic plugin spec verify)
 
 每 phase 有 deliverable + acceptance criteria + dependency。新 session pickup 看「Status」列。
 
@@ -337,3 +337,42 @@ User 在 session 內逐 step 詰問 + 我答對齊 world-class benchmark:
 7. ✅ Commit + push
 
 **禁止**:憑記憶跳 phase / 不 verify acceptance / 不 update status table。
+
+---
+
+### Phase 7 — Real Anthropic plugin spec migration(2026-05-23 加,per WebFetch verify)
+
+**Goal**:從 standalone `.claude/` 結構 migrate 到 Anthropic 真實 plugin spec,enable real auto-sync via `/plugin marketplace add` + `/plugin update`。
+
+**Background**:2026-05-23 WebFetch `code.claude.com/docs/en/plugins` + `/plugin-marketplaces` + `/plugins-reference` 發現我 2026-05-22 寫的 marketplace.json scaffold 跟真 schema 結構不一致:
+- 我寫的:plugin manifest fields(exports / pathScopedRules / manifest)塞在 marketplace.json
+- 真 schema:`.claude-plugin/marketplace.json` 是 catalog(列 plugins[] 含 source);plugin manifest 在 `<plugin-root>/.claude-plugin/plugin.json`(name / description / version / author)
+- 真 plugin layout:`skills/` + `hooks/hooks.json` + `commands/` 在 plugin root(不是 `.claude/skills/` etc.)
+
+**Deliverable**:
+- ✅ `.claude-plugin/marketplace.json` 改 catalog schema(`name`, `owner`, `plugins[]`)— 2026-05-23 已 done
+- ✅ `.claude-plugin/plugin.json` 新建(plugin manifest 符合 Anthropic spec)— 2026-05-23 已 done
+- ✅ Consumer template 改 `/plugin marketplace add + install` flow(非 settings.json enabledPlugins)— 2026-05-23 已 done
+- ⏸ `.claude/skills/` → `skills/` migration(plugin spec 預期 plugin root layout)
+- ⏸ `.claude/hooks/*.sh` → `hooks/hooks.json` + scripts referenced from hooks.json config
+- ⏸ `.claude/commands/` → `commands/` migration
+- ⏸ `.claude/rules/` plugin spec 支援?(docs 沒明寫,需 verify;若不支援 → CLAUDE.md 全部包含 rules 內容,or 用 settings.json `agent` 機制)
+- ⏸ `.claude/references/` + `.claude/memory/` plugin spec 怎包含?(memory 應為 user-specific 不 distribute)
+- ⏸ Phase 4 release.yml 加 plugin publish step(git tag → marketplace.json version bump → consumer `/plugin update` pulls)
+
+**Acceptance**:
+- DS repo 自己 enable plugin(self-dogfood)同樣全 skill / hook fire
+- 新 product-workspace `/plugin marketplace add github:your-org/design-system && /plugin install design-system@your-org-ds` 後,Claude session detect 全 DS skill / hook / CLAUDE.md instructions
+
+**Migration risk(high)**:
+- 動 `.claude/` 結構 = 整 session governance ecosystem 重組,要謹慎
+- 需 read 真實 Anthropic plugin docs 更多細節(skills/SKILL.md format 是否跟 .claude/skills/<name>/SKILL.md 相容)
+- 需 test plugin install / update flow(`/plugin marketplace add` consumer-side)
+- 過渡期可能要雙寫(`.claude/` 給 DS repo 自己用 + plugin layout 給 distribute)
+
+**World-class ref**:
+- Anthropic Claude Code plugin docs(code.claude.com/docs/en/plugins)
+- Anthropic claude-plugins-community marketplace(github.com/anthropics/claude-plugins-community)
+- shadcn registry CLI(對照 distribution model)
+
+**Status**: ⏸ **DEFERRED — non-trivial restructure,等 user 拍板要不要 commit Phase 7 effort**(目前 GitHub-direct distribution 也 work — consumer `git submodule add design-system` 或 `cp -r .claude/` 都能立即 share governance,不一定需走 plugin marketplace)

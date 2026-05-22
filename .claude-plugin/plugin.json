@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "design-system",
+  "description": "World-class DS governance — skills + hooks + rules + CLAUDE.md instructions + 31 active M-rules + 56 audit dims. Source-of-truth for product workspaces consuming @your-org/design-system npm package.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Your-Org DS Owner"
+  },
+  "homepage": "https://github.com/your-org/design-system",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/your-org/design-system.git"
+  },
+  "license": "UNLICENSED",
+  "_metadata": {
+    "createdAt": "2026-05-23",
+    "phase": "Phase 3 team-distribution-roadmap real Anthropic schema",
+    "structure_note": "Per Anthropic plugin spec(code.claude.com/docs/en/plugins),plugin components live at plugin root in standardized directories(skills/ / hooks/hooks.json / commands/ etc.)。本 repo current uses `.claude/` standalone layout — Phase 7 migration needed for full plugin distribution(see roadmap)。For now,GitHub-direct distribution via `/plugin marketplace add github:your-org/design-system`(consumer 透過 .claude-plugin/marketplace.json catalog 路徑)。",
+    "migration_path_for_full_plugin": [
+      ".claude/skills/ → skills/(per Anthropic plugin spec)",
+      ".claude/hooks/*.sh → hooks/hooks.json + scripts referenced",
+      ".claude/commands/ → commands/(legacy flat .md)",
+      ".claude/rules/ → 確認 plugin spec 支援 path-scoped rules(目前 docs 沒明寫)",
+      ".claude/references/ + .claude/memory/ → 確認 plugin spec 如何包含"
+    ]
+  }
+}

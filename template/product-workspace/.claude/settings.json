@@ -1,10 +1,14 @@
 {
-  "enabledPlugins": {
-    "design-system@your-org": true
-  },
-  "defaultMode": "auto",
   "_metadata": {
-    "purpose": "Product workspace consumes DS via Claude plugin — auto-load skills/hooks/rules/CLAUDE.md from @your-org/design-system marketplace entry",
-    "createdBy": "team-distribution-roadmap Phase 5 template(2026-05-22 / 23 ship)"
-  }
+    "purpose": "Product workspace settings. DS plugin install 透過 `/plugin marketplace add` + `/plugin install` CLI(per Anthropic plugin docs code.claude.com/docs/en/plugins),不在 settings.json 寫 enabledPlugins。",
+    "consumerSetup": [
+      "claude                                                  # start session",
+      "/plugin marketplace add github:your-org/design-system",
+      "/plugin install design-system@your-org-ds",
+      "/plugin marketplace update    # refresh catalog later",
+      "/plugin update design-system  # bump to new version"
+    ],
+    "createdBy": "team-distribution-roadmap Phase 5 template(2026-05-22 / 23 ship)— corrected per real Anthropic plugin spec 2026-05-23"
+  },
+  "_managedSettings_note": "若需要強制 marketplace allowlist + 阻擋 user-level skill override(team-wide policy),用 managed settings:strictKnownMarketplaces + strictPluginOnlyCustomization。詳 code.claude.com/docs/en/settings"
 }
