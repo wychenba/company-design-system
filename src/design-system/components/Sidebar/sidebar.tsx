@@ -30,6 +30,7 @@ import {
 } from "@/design-system/components/Tooltip/tooltip"
 // Row primitive 共用常數與 helpers——單一 source of truth
 import {
+  AVATAR_SIZE,
   ICON_SIZE,
   ItemIcon,
   ItemLabel,
@@ -229,12 +230,22 @@ const SidebarProvider = React.forwardRef<
     // true:opt-in CSS `:has()` auto-detect,混用時套用、不混用零成本(school B,Notion 慣例)
     const slotStyle = getUniformPrefixSlotStyle(size)
     const slotValue = slotStyle["--item-prefix-slot" as keyof typeof slotStyle]
+    // 2026-05-22 Approach 9 — per-row prefix size mirror(JS const → CSS var):
+    //   `--row-icon-size`    ← ICON_SIZE[size]         (sm/md=16, lg=20)
+    //   `--row-avatar-size`  ← AVATAR_SIZE.inline[size] (sm=20, md/lg=24)
+    // 供 SidebarMenuButton collapsed pl 公式消費,讓所有 prefix 中心(icon/avatar)鎖回
+    // rail center = --sidebar-width-icon/2(per user mental model:rail anchor =
+    // GlobalHeader toggle geometry,sidebar 收合所有元素 cx 對齊此 rail center)。
+    // Rail anchor 自身不動(--sidebar-menu-icon-size 維持 1rem 固定,per globals.css :root)。
     const wrapperStyle = React.useMemo<React.CSSProperties>(
       () =>
-        uniformPrefix
-          ? ({ "--mixed-prefix-slot": slotValue, ...style } as React.CSSProperties)
-          : (style ?? {}),
-      [uniformPrefix, slotValue, style]
+        ({
+          "--row-icon-size": `${ICON_SIZE[size]}px`,
+          "--row-avatar-size": `${AVATAR_SIZE.inline[size]}px`,
+          ...(uniformPrefix ? { "--mixed-prefix-slot": slotValue } : {}),
+          ...style,
+        } as React.CSSProperties),
+      [size, uniformPrefix, slotValue, style]
     )
 
     return (
@@ -245,8 +256,11 @@ const SidebarProvider = React.forwardRef<
             className={cn(
               "group/sidebar-wrapper flex min-h-svh w-full",
               // CSS :has() 偵測 — 只在 uniformPrefix=true(預設)時掛
+              // mixing detected → 同時把 --row-icon-size cascade 到 slot 寬(`!` important 蓋
+              // 過 wrapperStyle inline,讓 collapsed pl 公式知道「ItemPrefix wrapper 被撐到
+              // 24,effective prefix width = 24 非 16」)。
               uniformPrefix &&
-                "has-[[data-prefix-type=icon]]:has-[[data-prefix-type=avatar]]:[--item-prefix-slot:var(--mixed-prefix-slot)]",
+                "has-[[data-prefix-type=icon]]:has-[[data-prefix-type=avatar]]:[--item-prefix-slot:var(--mixed-prefix-slot)] has-[[data-prefix-type=icon]]:has-[[data-prefix-type=avatar]]:![--row-icon-size:var(--mixed-prefix-slot)]",
               className
             )}
             ref={ref}
@@ -876,6 +890,13 @@ const sidebarMenuButtonVariants = cva(
     // 部分可見。display:none 是 instant 切換非 main animation,跟 C* 「不用 display:none 做主
     // 動畫」不衝突(label 不參與 width 動畫,純 final state)。對齊 shadcn canonical。
     "group-data-[collapsible=icon]:[&_[data-sidebar=menu-label]]:hidden",
+    // 2026-05-22 Approach 9 — 收合時所有 prefix center 鎖回 rail center
+    // (--sidebar-width-icon/2 = GlobalHeader toggle geometry SSOT)。
+    // 公式: pl = (rail - prefix-width) / 2,prefix-width 由 SidebarProvider 注入的
+    // --row-icon-size / --row-avatar-size CSS var(JS const mirror)提供。
+    // 任何 row size(sm/md/lg)× density(md/lg)× prefix type(icon/avatar)6 cell 全對齊。
+    "group-data-[collapsible=icon]:has-[[data-prefix-type=icon]]:!pl-[calc((var(--sidebar-width-icon)-var(--row-icon-size))/2)]",
+    "group-data-[collapsible=icon]:has-[[data-prefix-type=avatar]]:!pl-[calc((var(--sidebar-width-icon)-var(--row-avatar-size))/2)]",
   ],
   {
     variants: {
