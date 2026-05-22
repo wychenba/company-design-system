@@ -4,12 +4,23 @@
     "baseUrl": ".",
     "paths": {
       "@/design-system/*": ["./src/*"],
-      "@/lib/*": ["../../src/lib/*"]
+      "@/lib/*": ["./src/lib/*"]
     },
+    "types": ["vite/client", "node"],
     "noEmit": false,
+    "emitDeclarationOnly": true,
     "declaration": true,
     "declarationMap": true,
+    "allowImportingTsExtensions": false,
+    "rootDir": "./src",
     "outDir": "./dist"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "**/*.stories.tsx",
+    "**/*.anatomy.stories.tsx",
+    "**/*.principles.stories.tsx",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }

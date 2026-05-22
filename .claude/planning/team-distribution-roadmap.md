@@ -118,10 +118,10 @@ your-org GitHub:
 - Bundle generation refinement:**deferred to Phase 4**(release pipeline)— 目前 root `npm run build` 已生 `dist/`,packages/design-system/dist/ 獨立 build 等 Phase 4 changesets / release script 階段一起配
 - npm pack 內容 verified:`files` allowlist 排 stories/spec/test/anatomy/principles → 397 files → 117 files / 1.5MB
 
-**Deferred to Phase 2-4**:
-- Lib build 獨立 `packages/design-system/vite.config.ts`(esm + cjs + d.ts)
-- Storybook config 抽出 → Phase 2 scope
-- changesets / release pipeline → Phase 4 scope
+**Deferred to Phase 2-4**(2026-05-22 follow-up,當天 land):
+- ~~Lib build 獨立~~ ✅ Done(later same day):`packages/design-system/vite.config.ts`(ESM lib mode + preserveModules + per-component output)+ `tsconfig.json`(rootDir/declaration/emitDeclarationOnly)+ root `npm run build:lib`(2-step:vite build + tsc -p)+ `src/index.ts` barrel(62 components / 6 patterns / 4 hooks / 2 lib auto-generated via `scripts/gen-design-system-barrel.mjs`)+ moved `src/lib/utils.ts` → `packages/design-system/src/lib/utils.ts`(M17 SSOT 對齊 — lib utility 該 own by DS package)+ d.ts 全 emit 到 dist/components/*/  / dist/patterns/*/ / dist/index.d.ts
+- Storybook config 抽出 → Phase 2 ✅ done
+- changesets / release pipeline → Phase 4 ✅ done
 
 ---
 

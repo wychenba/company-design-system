@@ -17,10 +17,12 @@
 
     /* Path aliases — 2026-05-22 Phase 1 team-distribution-roadmap:
        - @/design-system/* points to packages/design-system/src/* (npm workspace)
+       - @/lib/* points to packages/design-system/src/lib/* (Phase 1.5 moved from root src/lib)
        - @/* keeps mapping to ./src/* for app-level code (main.tsx / app routes etc.) */
     "baseUrl": ".",
     "paths": {
       "@/design-system/*": ["./packages/design-system/src/*"],
+      "@/lib/*": ["./packages/design-system/src/lib/*"],
       "@/*": ["./src/*"]
     },
 
