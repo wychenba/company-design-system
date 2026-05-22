@@ -64,6 +64,24 @@ benchmark:
 
 Sub-component:`<AppShellAside title={...} width={400}>`(width consumer 自決 — `number` 或 `{ md, xl }` breakpoint-keyed,clamp `min-width: 240` / `max-width: 640`;**title prop required**,modal mode 走 Sheet → `aria-labelledby` 強制,per `sheet.spec.md:98`)。
 
+### Hook export:`useAppShell()`(2026-05-21 D2 codify per Phase B codex catch)
+
+Public compound API hook,讓 consumer 自拼 custom aside / 自管 modal layout(對齊 Radix `useDialogContext` / MUI `useFormControl` / Mantine `useAppShellContext` 慣例)。
+
+```tsx
+import { useAppShell } from '@/design-system/components/AppShell/app-shell'
+
+function CustomAside() {
+  const { asideOpen, setAsideOpen, isMobile } = useAppShell()
+  // 自管 visibility / mobile sync,不必走預設 <AppShellAside>
+}
+```
+
+**Contract**:
+- 必在 `<AppShell>` 子樹內 call,否則 throw(consumer 拼 layout 必 wrap AppShell context)
+- 回傳:`{ asideOpen: boolean, setAsideOpen: (open: boolean) => void, isMobile: boolean }`
+- 設計目的:給跳出 `<AppShellAside>` 預設 sub-component 框架的 consumer 用(rare),DS 預設仍建議走 `<AppShellAside>` slot
+
 ---
 
 ## Layout mode(對齊 Mantine `layout` prop)

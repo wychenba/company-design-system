@@ -12,6 +12,7 @@ import { ItemInlineAction, ItemPrefix, ItemSuffix } from '@/design-system/patter
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
 import { useIsTouchDevice } from '@/design-system/hooks/use-is-touch-device'
+import { useControllable } from '@/design-system/hooks/use-controllable'
 import { ICON_SIZE } from '@/design-system/tokens/uiSize/icon-size'
 
 // ── Tag padding per size ────────────────────────────────────────────────────
@@ -358,14 +359,13 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
     const resolvedMode = disabled ? 'disabled' : mode
     const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const iconSize = getIconSize(size)
-    // 2026-05-21 D3 audit:Controlled / Uncontrolled dual-mode SSOT(同 CustomSelect)
-    const isControlled = valueProp !== undefined
-    const [internalValue, setInternalValue] = React.useState<string | null>(defaultValue ?? null)
-    const value = isControlled ? valueProp : internalValue
-    const handleNativeChange = (v: string) => {
-      if (!isControlled) setInternalValue(v)
-      onChange?.(v)
-    }
+    // 2026-05-21 D3 audit:Controlled / Uncontrolled dual-mode via 既有 SSOT hook(同 CustomSelect)
+    const [value, setValue] = useControllable<string | null>({
+      value: valueProp,
+      defaultValue: defaultValue ?? null,
+      onChange: onChange ? (next) => onChange(next ?? '') : undefined,
+    })
+    const handleNativeChange = (v: string) => setValue(v)
     const showClear = clearable && value && resolvedMode === 'edit'
     const isTextDisplay = display === 'plain'
     const selectRef = React.useRef<HTMLSelectElement | null>(null)
@@ -452,11 +452,14 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
     const resolvedMode = disabled ? 'disabled' : mode
     const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const iconSize = getIconSize(size)
-    // 2026-05-21 D3 audit:Controlled / Uncontrolled dual-mode SSOT
-    // valueProp !== undefined → controlled(consumer 自管);否則 uncontrolled(Select 自管 internal state,defaultValue 為初始值)
-    const isControlled = valueProp !== undefined
-    const [internalValue, setInternalValue] = React.useState<string | null>(defaultValue ?? null)
-    const value = isControlled ? valueProp : internalValue
+    // 2026-05-21 D3 audit:Controlled / Uncontrolled dual-mode via 既有 SSOT hook(M17 對齊,取代自刻 isControlled pattern)。
+    // Phase B codex 抓:之前 Custom clear 走 `onChange?.('')` 沒 setInternalValue → uncontrolled clear 失效。useControllable 統一 setter 修。
+    // onChange forward coerce null → ''(consumer 簽名 `(value: string) => void`,null 是 internal empty signal)。
+    const [value, setValue] = useControllable<string | null>({
+      value: valueProp,
+      defaultValue: defaultValue ?? null,
+      onChange: onChange ? (next) => onChange(next ?? '') : undefined,
+    })
     const showClear = clearable && value && resolvedMode === 'edit'
     const isTextDisplay = display === 'plain'
 
@@ -510,14 +513,12 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
 
     // **React #310 fix v2(2026-05-04)**:`handleValueChange` useCallback 也必在 early return 前
     //   原本 L306(early return 後)→ disabled→edit 切換時 hook count 仍變 → #310 持續
+    // 2026-05-21 D3:`useControllable` 統一 controlled / uncontrolled state + onChange forward,不再手動 if-branch。
     const handleValueChange = React.useCallback(
       (newValue: string | string[]) => {
-        const v = Array.isArray(newValue) ? newValue[0] : newValue
-        // 2026-05-21 D3:Uncontrolled mode 自動更新 internal state;controlled mode 只 forward callback。
-        if (!isControlled) setInternalValue(v)
-        onChange?.(v)
+        setValue(Array.isArray(newValue) ? newValue[0] : newValue)
       },
-      [onChange, isControlled]
+      [setValue]
     )
 
     // Early return AFTER all hooks(disabled / readonly / display mode 走 ReadonlyDisplay)
@@ -525,8 +526,9 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
       return <ReadonlyDisplay mode={resolvedMode} variant={variant} size={size} options={options} value={value} display={display} startIcon={StartIcon} className={className} placeholder={placeholder} showDisplayEndIcon={showDisplayEndIcon} />
     }
 
+    // 2026-05-21 D3 Phase B codex 抓:Custom clear 用 setValue 不直接 onChange,uncontrolled clear 才能真清 internal state。
     const clearEl = showClear ? (
-      <SelectClearButton size={size ?? 'md'} onClear={() => onChange?.('')} stopPropagation />
+      <SelectClearButton size={size ?? 'md'} onClear={() => setValue('')} stopPropagation />
     ) : null
 
     const chevronEl = (

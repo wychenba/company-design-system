@@ -20,9 +20,9 @@
       "_added": "2026-05-17 per audit Dim 47 codex 比稿後 codify;補 anatomy stories Inspector panel UI 跟 DS surface 分層 carve-out",
       "anatomy_stories_inspector": {
         "scope": "*.anatomy.stories.tsx — Inspector panel / Side legend / Section H3 decoration UI",
-        "allowed_utilities": ["tracking-wider", "font-semibold", "text-[10px]", "text-[11px]", "text-[12px]"],
-        "rationale": "Anatomy stories Inspector panel 是 storybook-internal 教學工具 UI(展示元件結構的 side legend / footnote / uppercase header),非 DS component surface。需視覺辨識(uppercase label + 寬 letter-spacing / 小字 metadata)跟 DS 主元件 typography 分層。對齊 Carbon storybook addon、Material storybook addon 共識:tool UI 不受 token-first 約束。",
-        "audit_dim_53_fix": "Dim 47 sub-agent 抓 anatomy stories tracking-wider / font-semibold / text-[NN] 多處違反 = false positive(本例外段 codify 後豁免)"
+        "allowed_utilities": ["tracking-wider", "font-semibold", "text-[10px]", "text-[11px]", "text-[12px]", "leading-none"],
+        "rationale": "Anatomy stories Inspector panel 是 storybook-internal 教學工具 UI(展示元件結構的 side legend / footnote / uppercase header),非 DS component surface。需視覺辨識(uppercase label + 寬 letter-spacing / 小字 metadata)跟 DS 主元件 typography 分層。對齊 Carbon storybook addon、Material storybook addon 共識:tool UI 不受 token-first 約束。`leading-none` 2026-05-21 D1 codex 抓 badge.anatomy L117/118 後加入(10-11px monospace inspector label 需要緊湊 line-height,跟 DS body/body-lg `leading-compact 1.3` 場景分層)。",
+        "audit_dim_53_fix": "Dim 47 sub-agent 抓 anatomy stories tracking-wider / font-semibold / text-[NN] / leading-none 多處違反 = false positive(本例外段 codify 後豁免)"
       },
       "token_stories_section_label": {
         "scope": "src/design-system/tokens/**/*.stories.tsx — SectionLabel helper(uppercase + wider tracking section header)",

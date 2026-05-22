@@ -7,7 +7,8 @@ import { HOVER_DELAY_PLAIN_MS } from "@/design-system/tokens/motion/motion"
 
 // 2026-05-18 ship per user 拍板 #3A:Tooltip Provider 預設 delayDuration 對齊 motion token SSOT。
 // Radix 預設 700ms 過保守(被 Material 150-200 / MUI 100 / Atlassian 300 集體驗證),DS 統一用
-// `--hover-delay-plain` (200ms,JS mirror `HOVER_DELAY_PLAIN_MS`)。Consumer 仍可 per-instance override。
+// `--hover-delay-plain` (500ms,JS mirror `HOVER_DELAY_PLAIN_MS`)。Consumer 仍可 per-instance override。
+// 2026-05-21 D5 Phase B codex 抓 comment 200 vs token 500 drift → 註解 500ms 對齊 motion.css:27 SSOT。
 const TooltipProvider = ({ delayDuration = HOVER_DELAY_PLAIN_MS, ...props }: React.ComponentProps<typeof TooltipPrimitive.Provider>) => (
   <TooltipPrimitive.Provider delayDuration={delayDuration} {...props} />
 )

@@ -198,7 +198,8 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ] && [ "$LAST_USER_LINE"
       # 加 5 個被前 turn 抓漏的 user 拍板 keyword(2026-05-12 sessions):做完 / 全部做完 / 做到完 / 馬不停蹄 / 建議做。
       # 2026-05-21 M34 fix:加「妳」變體 / 「決策N」 numbered directive / 「做到好」「都做」「全做」 — 對齊
       # check_substantive_edit_approval_preflight.sh sister regex(SSOT 同步)。
-      APPROVAL_RE='(同意|採用|採納|拍板|可以|改成|改為|執行|上吧|push|implement|go ahead|approved|OK|好|沒問題|做一做|就做|做吧|做完|全部做完|做到完|做到好|都做|全做|馬不停蹄|建議做|照你|照妳|照建議|照共識|照我的|按照|決策[一二三四五六七八九十1-9])'
+      # SSOT-sync with check_substantive_edit_approval_preflight.sh:61(2026-05-21 Phase B codex 抓兩 hook 不一致)
+      APPROVAL_RE='(同意|採用|採納|拍板|拍\s*[A-Z0-9]|可以|改成|改為|執行|上吧|push|implement|go ahead|approved|OK|好|沒問題|做一做|就做|做吧|做完|全部做完|做到完|做到好|都做|全做|馬不停蹄|建議做|ship|合 main|^#[0-9]+|照你|照妳|照建議|照共識|照我的|按照|決策[一二三四五六七八九十1-9]|[A-Z][0-9]+\s*(做|改|修)|先\s*[A-Z][0-9]+)'
       RECENT_USER_MSGS=$(tail -100 "$TRANSCRIPT_PATH" 2>/dev/null | \
         jq -r 'select(.message.role=="user") | .message.content // empty | if type=="string" then . else (.[]? | .text // empty) end' 2>/dev/null | tail -5)
       HAS_APPROVAL=$(echo "$RECENT_USER_MSGS" | grep -cE "$APPROVAL_RE" 2>/dev/null)
