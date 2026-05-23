@@ -11,7 +11,7 @@ const meta: Meta = {
         component: `
 圓角系統。四個選項,對應四種尺寸情境。
 
-完整規則:\`src/design-system/tokens/radius/radius.spec.md\`
+完整規則:\`packages/design-system/src/tokens/radius/radius.spec.md\`
         `,
       },
     },

@@ -147,7 +147,7 @@ SegmentedControl.displayName = 'SegmentedControl'
  *
  * 對齊 `Button.tsx` 的 `ICON_ONLY_BASE`(2026-04-25 從 padding-formula 派改 padding-free)。
  * Rule-of-3:目前 2 處 consumer(Button + SegmentedControl),尚未抽 utility/token;
- * 第 3 個 host 加入時抽到 `src/design-system/utils/`。
+ * 第 3 個 host 加入時抽到 `packages/design-system/src/utils/`。
  *
  * 舊公式 `(field-height - icon)/2` 沒扣 border 2px,造成 SegmentedControl item 從
  * 設計 spec「自然正方形」漂移為 34×32 長方形(2026-04-25 audit 發現)。

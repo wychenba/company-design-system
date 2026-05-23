@@ -1,5 +1,5 @@
-// Consumer storybook config — dogfood @your-org/storybook-config shared preset
-// 同 DS repo .storybook/main.ts pattern,只是不 import local addon(ds-devmode 是 DS-internal)
+// Consumer Storybook config — dogfood @your-org/storybook-config shared preset
+// 2026-05-23 fix per Group D audit:stories glob 必 consumer-relative,不 reuse `sharedStoryGlobs`(那是 DS-internal paths)
 import type { StorybookConfig } from '@storybook/react-vite'
 import {
   sharedAddons,
@@ -9,7 +9,7 @@ import {
 } from '@your-org/storybook-config/preset'
 
 const config: StorybookConfig = {
-  // Product apps 的 stories — adjust glob 對應你的 apps/<name>/src structure
+  // Consumer apps stories(不含 DS internal — DS docs 看 DS repo storybook deploy)
   stories: [
     '../apps/**/*.mdx',
     '../apps/**/*.stories.@(js|jsx|mjs|ts|tsx)',

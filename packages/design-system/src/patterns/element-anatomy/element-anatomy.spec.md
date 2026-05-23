@@ -9,7 +9,7 @@
 - Family 3(pill 結構)→ SSOT pointer 到 `components/Button/button.spec.md`
 - Family 4(field control 結構)→ SSOT pointer 到 `components/Field/field-controls.spec.md`
 
-Taxonomy 跟 F1+F2 runtime primitive **co-locate 在同 folder** 是 `src/design-system/README.md` L17 的 home governance 決策:**「即使跨 pattern 的 taxonomy(如 4-Family Model)也住在最相關的 pattern topic 資料夾內,folder = topic home,不需要頂層 flat 檔案」**。co-location 讓新 element 查 taxonomy 時,runtime primitive 就在隔壁,查閱效率最高。
+Taxonomy 跟 F1+F2 runtime primitive **co-locate 在同 folder** 是 `packages/design-system/src/README.md` L17 的 home governance 決策:**「即使跨 pattern 的 taxonomy(如 4-Family Model)也住在最相關的 pattern topic 資料夾內,folder = topic home,不需要頂層 flat 檔案」**。co-location 讓新 element 查 taxonomy 時,runtime primitive 就在隔壁,查閱效率最高。
 
 **與「layout」命名分家**:「anatomy」= element-level 結構分類;「layout」= page-level 版面(未來頁面設計原則的家)。世界級 DS 一致如此(Material Foundations > Layout = page grid / Polaris / Atlassian / Carbon 皆然)。
 

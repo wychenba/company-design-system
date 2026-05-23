@@ -55,8 +55,8 @@
 | 疑似要放這但其實不是 | 實際應去 | 為什麼 |
 |-------------------|---------|--------|
 | 「`cn()` Tailwind 合併」工具 | `src/lib/utils.ts` | shadcn 慣例 home,專案級非 DS 內部 |
-| 「`useControllable` 雙模式 hook」 | `src/design-system/hooks/use-controllable.ts` | 純 stateless hook,無 Context |
-| 「Toast 行為 primitive(渲染 UI)」 | `src/design-system/patterns/{name}/` | 有 visual surface |
+| 「`useControllable` 雙模式 hook」 | `packages/design-system/src/hooks/use-controllable.ts` | 純 stateless hook,無 Context |
+| 「Toast 行為 primitive(渲染 UI)」 | `packages/design-system/src/patterns/{name}/` | 有 visual surface |
 | 「formik / react-hook-form 整合」 | 不在 DS scope | DS 不耦合 form library;consumer 自己 wire |
 
 ---

@@ -20,7 +20,7 @@
 | `overlay-surface/` | `SurfaceHeader/Body/Footer` sub-components + padding SSOT | Dialog / Popover / Sheet |
 | `header-canonical/` | `<ChromeHeader>` primitive(withTabs / lockDensity 窄 API)+ cross-family canonical SSOT(chrome + overlay 兩家族 W1-W6 lockstep:border auto-suppress / token equality / tabs size 對應 / flush stack / md future tier / sm default)| Sidebar / FileViewer Toolbar / FileViewer InfoPanel(ChromeHeader 直接消費);Dialog / Sheet / Popover(SurfaceHeader 走 cross-family canonical)|
 
-> **note**:i18n 已 relocate 到 `src/design-system/lib/i18n/`(2026-05-01)— patterns/ 純化只收 visual primitive,non-visual cross-cutting 改去 `lib/`(對齊 Material `@mui/material/locale` / Ant ConfigProvider 共識)。詳 `src/design-system/lib/README.md`。
+> **note**:i18n 已 relocate 到 `packages/design-system/src/lib/i18n/`(2026-05-01)— patterns/ 純化只收 visual primitive,non-visual cross-cutting 改去 `lib/`(對齊 Material `@mui/material/locale` / Ant ConfigProvider 共識)。詳 `packages/design-system/src/lib/README.md`。
 
 ## 命名鐵律:element-level「anatomy」 vs page-level「layout」
 
@@ -36,7 +36,7 @@ element-level 結構分類永遠用 **anatomy**(Material / Polaris / Atlassian /
 | CLAUDE.md 某段太長想搬出來 | 先看 8-home flowchart:是 runtime pattern 才來這 | 「要搬出 CLAUDE.md」不等於「該放 patterns/」 |
 | 單一元件的規則 | `components/{Name}/{name}.spec.md` | 只 1 個元件影響範圍 |
 | Token 命名規則 | `tokens/` 對應 spec | |
-| Cross-cutting non-visual primitive(i18n / formatters / type modules)| `src/design-system/lib/{topic}/` | 無 visual surface — 對齊 Material `@mui/material/locale` / Ant ConfigProvider 共識 |
+| Cross-cutting non-visual primitive(i18n / formatters / type modules)| `packages/design-system/src/lib/{topic}/` | 無 visual surface — 對齊 Material `@mui/material/locale` / Ant ConfigProvider 共識 |
 
 ## 新增 pattern 的 criteria(必須全部通過)
 

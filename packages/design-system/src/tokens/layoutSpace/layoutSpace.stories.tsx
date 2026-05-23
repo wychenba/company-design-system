@@ -9,7 +9,7 @@ const meta: Meta = {
         component: `
 版面間距 token 系統。定義 pattern 層級的「鬆 / 緊 / 底」間距,跟 \`--field-height\` 等元件 token 分層。
 
-完整規則:\`src/design-system/tokens/layoutSpace/layoutSpace.spec.md\`
+完整規則:\`packages/design-system/src/tokens/layoutSpace/layoutSpace.spec.md\`
 
 **何時用 token vs Tailwind 數字 utility?**
 - pattern 結構間距(toolbar / surface header / row inside)→ token
@@ -68,7 +68,7 @@ export const Overview: Story = {
       </ul>
 
       <p className="text-caption text-fg-muted mt-6">
-        實際 CSS 值見 <code>src/design-system/tokens/layoutSpace/layoutSpace.css</code>;規則 4 條詳 spec.md。
+        實際 CSS 值見 <code>packages/design-system/src/tokens/layoutSpace/layoutSpace.css</code>;規則 4 條詳 spec.md。
       </p>
     </div>
   ),

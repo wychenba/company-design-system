@@ -9,7 +9,7 @@ const meta: Meta = {
         component: `
 字體 token 系統。token 只定義 \`font-size\` 與 \`line-height\`，\`font-weight\` 由使用端疊加。
 
-完整規則：\`src/design-system/tokens/typography/typography.spec.md\`
+完整規則：\`packages/design-system/src/tokens/typography/typography.spec.md\`
         `,
       },
     },

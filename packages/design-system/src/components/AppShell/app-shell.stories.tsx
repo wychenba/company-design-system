@@ -1,6 +1,6 @@
 // @benchmark-cited: Sidebar full-layout baseline + DataTable toolbar pattern + Linear real-product 場景。
-// @story-baseline: src/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse (Sidebar 完整佈局)
-// @story-baseline: src/design-system/components/DataTable/data-table.stories.tsx#WithBulkActions (Toolbar + DataTable)
+// @story-baseline: packages/design-system/src/components/Sidebar/sidebar.stories.tsx#IconCollapse (Sidebar 完整佈局)
+// @story-baseline: packages/design-system/src/components/DataTable/data-table.stories.tsx#WithBulkActions (Toolbar + DataTable)
 import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
@@ -191,7 +191,7 @@ const PRIORITY_COLOR = {
 
 /**
  * Aside content:Issue detail panel。
- * @usage-ref: src/design-system/components/DescriptionList/description-list.stories.tsx
+ * @usage-ref: packages/design-system/src/components/DescriptionList/description-list.stories.tsx
  * @usage-consumes: ItemContent(entity identity)+ Tag(status/priority)+ DescriptionList(metadata)+ Button(actions)
  *
  * Per codex Layer B D1+D2(2026-05-20):

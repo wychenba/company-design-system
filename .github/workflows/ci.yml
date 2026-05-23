@@ -122,7 +122,7 @@ jobs:
             echo "❌ CLAUDE.md ${claude_lines} lines exceeds 800 transition cap"
             fail=1
           fi
-          for f in src/design-system/components/*/*.spec.md; do
+          for f in packages/design-system/src/components/*/*.spec.md; do
             l=$(wc -l < "$f" | tr -d ' ')
             case "$f" in
               */item-anatomy.spec.md) cap=1200 ;;

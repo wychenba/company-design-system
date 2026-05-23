@@ -32,11 +32,11 @@
 
 ## 行數預算(Anthropic 對齊)
 
-CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory **per-file ≤ 100 lines** + **MEMORY.md index ≤ 20 entries**(soft 18 / hard 20,session-start hook 攔)。Hooks **26 soft / 40 hard**(SSOT = `session_start_governance_check.sh:173`,2026-05-18 升 35→40:DS governance complexity(53 audit dims + 33 active M-rules + codex collab + M30 wrapper-primitive-schema + M34 hook-regex-broadness 各 dedicated hook)justified raise,36 hooks 全 active 無 dead candidate;`scripts/sync-governance-counters.mjs` 自動 cross-verify)。
+CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory **per-file ≤ 100 lines** + **MEMORY.md index ≤ 20 entries**(soft 18 / hard 20,session-start hook 攔)。Hooks **26 soft / 40 hard**(SSOT = `session_start_governance_check.sh:173`)。動態值見 `scripts/sync-governance-counters.mjs` 跑出為準(2026-05-23:**31 M-rules / 56 audit dims / 37 hooks** — 不寫死避 drift,per 2026-05-22 prune codify)。
 
 ## Anti-bloat L1-L3
 
-- **L1 Pre-write**:`check_file_size_budget.sh` / `check_l3_primitive_import.sh` / `check_principles_canonical.sh`
+- **L1 Pre-write**:`check_file_size_budget.sh`(+ governance hooks listed in `.claude/hooks/` — dynamic SSOT,不在 CLAUDE.md hardcode 個別 hook)
 - **L2 Per-commit**:`log_governance_fires.sh` → `.claude/logs/hook-fires.jsonl`
 - **L3 Periodic**(季度 / `--deep`):`/knowledge-prune` skill,retire ≥ 5%
 
@@ -73,7 +73,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 
 # SSOT 消費 canonical
 
-寫視覺 code 前必查對照 — 沒列 = 自創(hook `check_ssot_consultation.sh` 攔)。**完整對照表 + 強制 checklist** → `.claude/references/ssot-consultation.md`(SSOT owner;含 9 項決策對應 SSOT + 新元件 tsx 開頭「── 消費的 SSOT ──」段強制要求)。
+寫視覺 code 前必查對照 — 沒列 = 自創。**完整對照表 + 強制 checklist** → `.claude/references/ssot-consultation.md`(SSOT owner;含 9 項決策對應 SSOT + 新元件 tsx 開頭「── 消費的 SSOT ──」段強制要求)。Hook `check_ssot_consultation.sh` 2026-05-XX 已 retired → 改靠 mindset #2 + audit dim 1 + check_canonical_propagation hook 接手檢查。
 
 # 任務導航表
 

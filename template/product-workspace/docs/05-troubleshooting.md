@@ -42,14 +42,14 @@ Claude:I don't see any custom skills or hooks loaded
 **Cause**:`.claude/settings.json` 沒寫對 OR plugin 沒 publish
 
 **Fix**:
-- check `.claude/settings.json`:
-  ```json
-  {
-    "enabledPlugins": { "design-system@your-org": true }
-  }
+- 改透過 CLI(per Anthropic plugin spec 2026,enabledPlugins settings.json 機制已 deprecated):
+  ```bash
+  claude  # start session
+  /plugin marketplace add github:your-org/design-system
+  /plugin install design-system@your-org-ds
+  /plugin marketplace update  # later refresh
   ```
-- 重啟 claude session
-- 若 plugin host 是 internal,需確認 marketplace URL set 在 user-level `~/.claude/settings.json`
+- 確認 marketplace URL set 在 user-level `~/.claude/settings.json` 或 GitHub 存取 token 有效
 
 ### Hook fire 報 false positive
 

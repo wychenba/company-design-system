@@ -9,7 +9,7 @@ const meta: Meta = {
         component: `
 透明度 token 系統。定義「禁用」「半透明遮罩」「hover overlay」等狀態的不透明度。
 
-完整規則:\`src/design-system/tokens/opacity/opacity.spec.md\`
+完整規則:\`packages/design-system/src/tokens/opacity/opacity.spec.md\`
 
 **禁:**\`opacity-0\`/\`/N\` 數字 utility(走 token,不直接寫死)。
         `,
@@ -62,7 +62,7 @@ export const Overview: Story = {
       <OpacityRow utility="opacity-divider-strong" value="0.16" usage="hover 期間強化的 divider" />
 
       <p className="text-caption text-fg-muted mt-6">
-        實際 CSS 值見 <code>src/design-system/tokens/opacity/opacity.css</code>;dark mode override 在同檔 <code>[data-theme=&quot;dark&quot;]</code> 段。
+        實際 CSS 值見 <code>packages/design-system/src/tokens/opacity/opacity.css</code>;dark mode override 在同檔 <code>[data-theme=&quot;dark&quot;]</code> 段。
       </p>
     </div>
   ),

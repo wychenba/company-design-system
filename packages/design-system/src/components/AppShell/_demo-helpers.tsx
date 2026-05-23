@@ -1,5 +1,5 @@
 // AppShell stories 共用 helper(對齊 sidebar.stories.tsx IconCollapse baseline)
-// @story-baseline: src/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse
+// @story-baseline: packages/design-system/src/components/Sidebar/sidebar.stories.tsx#IconCollapse
 //
 // **嚴格**對齊既有 production-grade Sidebar story baseline,避免 AppShell stories 跟
 // Sidebar 既有範例視覺偏移(2026-05-20 user 抓 anti-drift)。

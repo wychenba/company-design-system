@@ -14,7 +14,8 @@
     "!src/**/*.spec.md",
     "!src/**/*.spec.ts",
     "!src/**/*.test.ts",
-    "README.md"
+    "README.md",
+    "scripts"
   ],
   "exports": {
     ".": {

@@ -57,26 +57,28 @@ jobs:
       # Pre-requisite secrets(per app)in GitHub repo Settings → Secrets:
       #   NETLIFY_AUTH_TOKEN          — global personal access token
       #   NETLIFY_SITE_ID_<APP_NAME>  — per-app site ID(eg. NETLIFY_SITE_ID_ORDER_DASHBOARD)
+      # Resolve dynamic per-app secret(2026-05-23 fix:GitHub Actions secrets context 不支 dynamic name lookup)
+      # 用 oNaiPs/secrets-to-env-action 讀全 secrets 到 env,然後 shell 解 NETLIFY_SITE_ID_<APP>
+      - name: Export all secrets to env
+        uses: oNaiPs/secrets-to-env-action@v1
+        with:
+          secrets: ${{ toJSON(secrets) }}
+
       - name: Deploy to Netlify
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          # GitHub Actions doesn't support dynamic secret names directly;
-          # use action that reads secret by computed name:
-          APP_NAME_UPPER: ${{ matrix.app }}
+          APP_NAME: ${{ matrix.app }}
         run: |
           if [ -z "$NETLIFY_AUTH_TOKEN" ]; then
             echo "NETLIFY_AUTH_TOKEN not set,skip deploy"
             exit 0
           fi
 
-          # Map app name → site ID env(eg. order-dashboard → NETLIFY_SITE_ID_ORDER_DASHBOARD)
-          SITE_ID_VAR="NETLIFY_SITE_ID_$(echo $APP_NAME_UPPER | tr 'a-z-' 'A-Z_')"
-          SITE_ID=$(eval echo \$$SITE_ID_VAR)
-          # GitHub Actions secrets are not in shell env by default — use the secrets context above
-          # For now treat empty → skip(real implementation:use action that resolves secret name)
+          # 動態 resolve app site ID secret(eg. order-dashboard → NETLIFY_SITE_ID_ORDER_DASHBOARD)
+          SITE_ID_VAR="NETLIFY_SITE_ID_$(echo $APP_NAME | tr 'a-z-' 'A-Z_')"
+          SITE_ID="${!SITE_ID_VAR}"
 
           if [ -z "$SITE_ID" ]; then
-            echo "$SITE_ID_VAR not set in secrets,skip deploy ${{ matrix.app }}"
+            echo "$SITE_ID_VAR not set in secrets,skip deploy ${APP_NAME}"
             exit 0
           fi
 
@@ -84,7 +86,7 @@ jobs:
           if [ "${{ github.event_name }}" = "push" ]; then PROD_FLAG="--prod"; fi
 
           npx netlify-cli deploy \
-            --dir apps/${{ matrix.app }}/dist \
+            --dir apps/${APP_NAME}/dist \
             --site $SITE_ID \
             --auth $NETLIFY_AUTH_TOKEN \
             --message "Deploy from $GITHUB_SHA" \

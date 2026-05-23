@@ -12,7 +12,7 @@
 | `hooks/` | React hooks(跨 DS 元件共用的 `use-*.ts`) | Claude Code hooks(那屬 `.claude/hooks/`) | N/A |
 | `stories-helpers/` | Storybook 共用 helper(非 runtime,僅 `.stories.tsx` / `.anatomy.stories.tsx` 消費的 anatomy 排版 util 等) | 任何 runtime consume(應用 / 元件 / pattern code 不得 import);runtime primitive 應住 `patterns/` | N/A |
 
-## 本層級(`src/design-system/` 根)只收 `README.md`
+## 本層級(`packages/design-system/src/` 根)只收 `README.md`
 
 所有 DS 內容必屬於某個子 dir(tokens / components / patterns / hooks / stories-helpers)。即使跨 pattern 的 taxonomy(如 4-Family Model)也住在最相關的 pattern topic 資料夾內(`patterns/element-anatomy/element-anatomy.spec.md`)—— 這樣 folder = topic home,不需要頂層 flat 檔案。
 

@@ -166,7 +166,7 @@ Tabs 支援三種 overflow 策略，透過 `TabsList` 的 `overflow` prop 選擇
 
 ### 跨元件共用
 
-`useOverflowIndices` / `useScrollEdges` 在 `src/design-system/hooks/use-overflow-items.ts`,`ChipGroup` 的 `layout="scroll" | "menu"` 消費同一組 hook,確保 Tabs / Chip overflow 行為一致。
+`useOverflowIndices` / `useScrollEdges` 在 `packages/design-system/src/hooks/use-overflow-items.ts`,`ChipGroup` 的 `layout="scroll" | "menu"` 消費同一組 hook,確保 Tabs / Chip overflow 行為一致。
 
 ---
 

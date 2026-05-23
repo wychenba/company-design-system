@@ -10,7 +10,7 @@ const meta: Meta = {
         component: `
 色彩 token 系統。元件只使用語義 token，不直接引用原始色票。
 
-完整規則：\`src/design-system/tokens/color/color.spec.md\`
+完整規則：\`packages/design-system/src/tokens/color/color.spec.md\`
         `,
       },
     },

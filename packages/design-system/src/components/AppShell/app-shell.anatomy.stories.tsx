@@ -1,5 +1,5 @@
 // @benchmark-cited: anatomy 6-canonical 對齊 Polaris / Material anatomy spec
-// @story-baseline: src/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse
+// @story-baseline: packages/design-system/src/components/Sidebar/sidebar.stories.tsx#IconCollapse
 // (透過 ./_demo-helpers AcmeSidebar / PageHeader / WorkspaceBrand / UserFooter 共用 baseline,
 //  避免 anatomy stories 跟 showcase + Sidebar 既有完整佈局 範例視覺偏移)
 import type { Meta, StoryObj } from '@storybook/react'

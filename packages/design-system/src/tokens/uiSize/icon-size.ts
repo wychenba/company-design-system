@@ -1,8 +1,8 @@
 /**
  * Icon Size SSOT — cross-domain re-export entry
  *
- * Owner:`src/design-system/patterns/element-anatomy/item-anatomy.tsx:66` `ICON_SIZE`
- * Spec:`src/design-system/tokens/uiSize/uiSize.spec.md` 「Icon Size Tier」段
+ * Owner:`packages/design-system/src/patterns/element-anatomy/item-anatomy.tsx:66` `ICON_SIZE`
+ * Spec:`packages/design-system/src/tokens/uiSize/uiSize.spec.md` 「Icon Size Tier」段
  *
  * ── 為什麼 re-export 不直接動 owner ──
  * `ICON_SIZE` const codified in `item-anatomy.tsx` 是 row primitive SSOT(MenuItem / TreeView /

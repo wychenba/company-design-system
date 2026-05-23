@@ -10,7 +10,7 @@ const meta: Meta = {
         component: `
 陰影系統。兩個層級對應兩種「浮起高度」，用 CSS 變數 \`box-shadow\` 實現。Light / dark mode 自動切換。
 
-完整規則：\`src/design-system/tokens/elevation/elevation.spec.md\`
+完整規則：\`packages/design-system/src/tokens/elevation/elevation.spec.md\`
 
 **⚠️ \`--elevation-200\` 的容器必須搭配 \`bg-surface-raised\`（不透明）。**
         `,

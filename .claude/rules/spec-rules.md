@@ -2,6 +2,7 @@
 paths:
   - "**/*.spec.md"
   - "src/design-system/**"
+  - "packages/design-system/**"
 ---
 
 # Spec 規則(path-scoped)

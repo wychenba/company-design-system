@@ -2,18 +2,18 @@
   "$schema": "./utility-registry.schema.json",
   "_meta": {
     "purpose": "Single SSOT for Tailwind utility allow/block — extracted from typography/radius/opacity/elevation/color spec.md 禁止 lists. Hook reads this(not grep spec.md)to enforce token-first discipline. New token additions or removals → update here first, spec.md cite registry.",
-    "owner": "src/design-system/tokens/utility-registry.json",
+    "owner": "packages/design-system/src/tokens/utility-registry.json",
     "consumed_by": [
       ".claude/hooks/check_opacity_token_usage.sh(rename → check_tailwind_token_registry.sh)",
       ".claude/hooks/check_token_hygiene.sh",
       ".claude/skills/design-system-audit/references/audit-prompts.md Dim 5"
     ],
     "spec_sources": [
-      "src/design-system/tokens/typography/typography.spec.md L91-105",
-      "src/design-system/tokens/radius/radius.spec.md L57-71",
-      "src/design-system/tokens/opacity/opacity.spec.md L53-57",
-      "src/design-system/tokens/color/color.spec.md(hardcoded hex/rgb canonical)",
-      "src/design-system/tokens/elevation/elevation.spec.md(shadow-{sm,md,lg,xl,2xl} 禁)"
+      "packages/design-system/src/tokens/typography/typography.spec.md L91-105",
+      "packages/design-system/src/tokens/radius/radius.spec.md L57-71",
+      "packages/design-system/src/tokens/opacity/opacity.spec.md L53-57",
+      "packages/design-system/src/tokens/color/color.spec.md(hardcoded hex/rgb canonical)",
+      "packages/design-system/src/tokens/elevation/elevation.spec.md(shadow-{sm,md,lg,xl,2xl} 禁)"
     ],
     "rationale": "World-class DS(Atlassian @atlaskit/tokens / Carbon @carbon/themes / Ant ConfigProvider / Polaris polaris-tokens)用 registry + lint, 不靠 grep 各處 spec.md。Rule-of-3 violation 已存在(典型禁止 list 在 3 個 spec.md 各寫一份)— 本檔抽 SSOT。",
     "exceptions": {
@@ -25,7 +25,7 @@
         "audit_dim_53_fix": "Dim 47 sub-agent 抓 anatomy stories tracking-wider / font-semibold / text-[NN] / leading-none 多處違反 = false positive(本例外段 codify 後豁免)"
       },
       "token_stories_section_label": {
-        "scope": "src/design-system/tokens/**/*.stories.tsx — SectionLabel helper(uppercase + wider tracking section header)",
+        "scope": "packages/design-system/src/tokens/**/*.stories.tsx — SectionLabel helper(uppercase + wider tracking section header)",
         "allowed_utilities": ["tracking-wider", "font-semibold"],
         "rationale": "Token stories(color / typography / radius / elevation / opacity / uiSize / layoutSpace / density)是 token 展示 storybook,用 SectionLabel(`uppercase + tracking-wider`)分區 swatch 群組,跟 anatomy stories Inspector panel 同 storybook-internal teaching UI 性質,非 DS component surface。Phase A audit 2026-05-21 codify。"
       },
@@ -51,7 +51,7 @@
       "tracking_raw": ["tracking-tighter", "tracking-tight", "tracking-wide", "tracking-wider", "tracking-widest"],
       "tracking_raw_rationale": "Block raw Tailwind tracking-* utility(unscoped letter-spacing leaks 跨元件不一致)。需要 wider letter-spacing 場景必 codify role-specific semantic utility — 例如 `tracking-shortcut`(鍵盤快捷鍵 hint,0.1em,對應 --tracking-shortcut token)。新 role 必走 typography.css 新增 `--tracking-<role>` + `@utility tracking-<role>`,再 allow 進本 registry。",
       "inline_style": "style={{ fontSize: ..., lineHeight: ... }}",
-      "rationale_path": "src/design-system/tokens/typography/typography.spec.md L91-105"
+      "rationale_path": "packages/design-system/src/tokens/typography/typography.spec.md L91-105"
     }
   },
   "radius": {
@@ -61,7 +61,7 @@
       "ambiguous_default": "rounded(use rounded-md explicit)",
       "arbitrary_value": ["rounded-[6px]", "rounded-[var(--radius-md)]"],
       "inline_style": "style={{ borderRadius: ... }}",
-      "rationale_path": "src/design-system/tokens/radius/radius.spec.md L57-71"
+      "rationale_path": "packages/design-system/src/tokens/radius/radius.spec.md L57-71"
     }
   },
   "opacity": {
@@ -69,7 +69,7 @@
     "block": {
       "numeric_tier": ["opacity-5", "opacity-10", "opacity-20", "opacity-25", "opacity-30", "opacity-40", "opacity-50", "opacity-60", "opacity-70", "opacity-75", "opacity-80", "opacity-90", "opacity-95"],
       "arbitrary_value": "opacity-[0.N](use --opacity-disabled or token swap)",
-      "rationale_path": "src/design-system/tokens/opacity/opacity.spec.md L53-57",
+      "rationale_path": "packages/design-system/src/tokens/opacity/opacity.spec.md L53-57",
       "philosophy": "Single semantic token(0.45)vs Tailwind multi-tier(對齊 Polaris / Material / Apple 單值哲學)"
     }
   },
@@ -77,7 +77,7 @@
     "allow": ["shadow-[var(--elevation-100)]", "shadow-[var(--elevation-100-hover)]", "shadow-[var(--elevation-200)]", "shadow-[var(--elevation-200-hover)]"],
     "block": {
       "tailwind_size": ["shadow-sm", "shadow", "shadow-md", "shadow-lg", "shadow-xl", "shadow-2xl", "shadow-inner"],
-      "rationale_path": "src/design-system/tokens/elevation/elevation.spec.md",
+      "rationale_path": "packages/design-system/src/tokens/elevation/elevation.spec.md",
       "philosophy": "DS 採 2-tier elevation(100 / 200)語意而非 Tailwind size ladder"
     }
   },

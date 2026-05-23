@@ -132,7 +132,7 @@
 
 ### 消費前的 4-step check
 
-1. `ls src/design-system/patterns/element-anatomy/`(確認 item-anatomy primitive 存在)
+1. `ls packages/design-system/src/patterns/element-anatomy/`(確認 item-anatomy primitive 存在)
 2. grep 近親 consumer(MenuItem / FileItem / SelectionItem / Notice)看 slot 怎麼用
 3. 判斷 key-value vs list item(見上表)選對 primitive
 4. 內部結構不命中既有 slot → 回 item-anatomy.spec.md 擴 API,**不自刻繞過**
@@ -141,9 +141,9 @@
 
 ```bash
 # 看有沒有繞過 item-anatomy 的手刻 list item
-rg "className=\"flex.*py-[0-9].*hover:bg" src/design-system src/hooks --type tsx
+rg "className=\"flex.*py-[0-9].*hover:bg\" packages/design-system/src src/hooks --type tsx
 # 看有沒有繞過 DescriptionList 的手刻 key-value grid
-rg "grid-cols-\[[0-9]+px_1fr\]" src/design-system src/hooks --type tsx
+rg "grid-cols-\[[0-9]+px_1fr\]" packages/design-system/src src/hooks --type tsx
 ```
 
 非空 = drift,要改用 primitive。
