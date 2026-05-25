@@ -192,10 +192,6 @@ Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design 
 - `.claude/rules/ui-development.md` — paths: `**/*.tsx` + `**/*.ts`(含 Tailwind / Token / Props 命名 / shadcn)
 - `.claude/rules/story-rules.md` — paths: `**/*.stories.tsx`(三層定位 + Title + 範例最高準則)
 
-# 元件完成 checklist
+# 元件完成 + Exploration
 
-merge 前 invoke `/component-quality-gate`(45 項 + visual + clean-code 三層)。
-
-# Exploration & Prototype
-
-正式 `packages/design-system/src/`(Phase 1 後 npm workspace 內化)vs 比稿 `src/explorations/`(hook `block_prototype_imports.py` 強制隔離)。比稿 `*.v1.stories.tsx` + `notes.md`,定案升級 patterns/ 或 components/。Skills:`/prototype` / `/component-quality-gate` / `/delivery-handoff`。
+merge 前 invoke `/component-quality-gate`(45 項 + visual + clean-code 三層)。正式 `packages/design-system/src/`(Phase 1 後 npm workspace 內化)vs 比稿 `src/explorations/`(hook `block_prototype_imports.py` 強制隔離);比稿 `*.v1.stories.tsx` + `notes.md`,定案升級 patterns/ 或 components/。Skills:`/prototype` / `/component-quality-gate` / `/delivery-handoff`。
