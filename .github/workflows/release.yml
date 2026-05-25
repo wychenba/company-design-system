@@ -95,6 +95,14 @@ jobs:
         # Fail = block publish(per user verbatim「不要再耍白痴,確保自己驗證到成功」)。
         run: node scripts/dogfood-prepublish-verify.mjs
 
+      - name: Storybook story FULL smoke test(release pre-publish gate)
+        # 2026-05-25 Phase 4.13 加 — release 必跑 --full 全 947 stories runtime probe
+        # ci.yml 跑 sample mode(critical 365)以 daily fast lane;release 跑 full mode 卡 gate。
+        # Fail = block npm publish(防 runtime bug ship to consumer)。
+        run: |
+          npm run build-storybook 2>&1 | tail -5
+          node scripts/storybook-smoke-test.mjs --full
+
       - name: Publish to npm
         if: startsWith(github.ref, 'refs/tags/v')
         env:
