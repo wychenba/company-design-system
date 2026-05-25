@@ -1,0 +1,515 @@
+{
+  "_meta": {
+    "purpose": "Explicit semantic mapping: principle (M-rule / trait / hook) → audit dim cover",
+    "ssot": ".claude/memory/feedback_audit_preflight_全盤查.md + design-system-audit/SKILL.md",
+    "updated": "2026-05-18",
+    "version": "1.0",
+    "_principle": "禁 heuristic match;每原則必 explicit dim list。新原則加入必同 commit 加 entry,違 = hook BLOCK"
+  },
+  "mRules": {
+    "M1": {
+      "name": "SSOT consumption 視覺決策前必查",
+      "dims": [],
+      "note": "governance-only;審 spec 寫 SSOT 段落 by ssot-consultation.md;無獨立 audit dim"
+    },
+    "M2": {
+      "name": "3rd-party DOM verify",
+      "dims": [],
+      "note": "runtime discipline;無 mechanical dim"
+    },
+    "M3": {
+      "name": "Portal 逃逸 subtree theme",
+      "dims": [],
+      "note": "historical-bugs only;考慮加 dim Group N+ Portal-theme check"
+    },
+    "M4": {
+      "name": "_Group fieldCtx 隔離",
+      "dims": [
+        34
+      ],
+      "note": "Dim 34 disabled state precedence 隱含驗 group context"
+    },
+    "M5": {
+      "name": "State 疊加 spec coverage",
+      "dims": [
+        7
+      ],
+      "note": "Spec Rule B 邊界案例"
+    },
+    "M6": {
+      "name": "Stakeholder gate 強制進階稽核",
+      "dims": [
+        11,
+        23
+      ],
+      "note": "Tier-1 gate via component-quality-gate skill chain"
+    },
+    "M7": {
+      "name": "新 skill cross-check 既有 Meta-Principle",
+      "dims": [],
+      "note": "governance-only"
+    },
+    "M8": {
+      "name": "Cross-component canonical 必 world-class benchmark",
+      "dims": [
+        23
+      ],
+      "note": "Dim 23 benchmark cite"
+    },
+    "M9": {
+      "name": "Predicate 4 題自測",
+      "dims": [
+        22
+      ],
+      "note": "D6e predicate audit protocol"
+    },
+    "M10": {
+      "name": "Proactive exhaustive scan",
+      "dims": [],
+      "note": "由 /scan-similar-bugs skill cover + Phase 0.5 preflight DS-wide enforce"
+    },
+    "M11": {
+      "name": "7 題 interactive state walk",
+      "dims": [],
+      "note": "runtime discipline pre-present;無 audit dim"
+    },
+    "M12": {
+      "name": "Binary strict rule benchmark + invariant test",
+      "dims": [
+        23
+      ],
+      "note": "Dim 23 benchmark + propose-options 4-Q"
+    },
+    "M13": {
+      "name": "User 第 2 次提 → 截圖 verify",
+      "dims": [],
+      "note": "runtime discipline"
+    },
+    "M14": {
+      "name": "對話結論 AUTO integrate 5-layer",
+      "dims": [],
+      "note": "governance pipeline;由 ensure-canonical / codify-principle skill cover"
+    },
+    "M15": {
+      "name": "Product UI flow visual-audit coverable",
+      "dims": [],
+      "note": "考慮加 dim 47:檢查 stakeholder-facing OpenSnapshot story 存在"
+    },
+    "M16": {
+      "name": "Standalone gap canonical",
+      "dims": [
+        21
+      ],
+      "note": "Group H 連續 item list gap"
+    },
+    "M17": {
+      "name": "SSOT 可傳播 (token / primitive / utility)",
+      "dims": [
+        32
+      ],
+      "note": "Dim 32 filter operator + 通用 SSOT 消費隱含全 audit 中"
+    },
+    "M18": {
+      "name": "Propose-time 4-Q gate",
+      "dims": [],
+      "note": "propose-options skill;runtime discipline"
+    },
+    "M19": {
+      "name": "Trigger phrase auto-pipeline",
+      "dims": [],
+      "note": "ensure-canonical skill"
+    },
+    "M20": {
+      "name": "AI 自問 best-practice + 自動 self-improve",
+      "dims": [],
+      "note": "stop hook self-audit;runtime discipline"
+    },
+    "M21": {
+      "name": "新元件抽象前 prop variant test",
+      "dims": [
+        33
+      ],
+      "note": "Dim 33(b) premature abstraction"
+    },
+    "M22": {
+      "name": "Benchmark claim 必 inline cite",
+      "dims": [
+        23,
+        33
+      ],
+      "note": "Dim 23 + Dim 33(d) benchmark cite check"
+    },
+    "M23": {
+      "name": "DS-internal canonical 優先 external",
+      "dims": [
+        33
+      ],
+      "note": "Dim 33(e) DS-first"
+    },
+    "M24": {
+      "name": "Disabled > muted state precedence",
+      "dims": [
+        34
+      ],
+      "note": "Group N Dim 34"
+    },
+    "M25": {
+      "name": "Overlay scroll chain invariant",
+      "dims": [
+        35
+      ],
+      "note": "Group N Dim 35"
+    },
+    "M26": {
+      "name": "Behavior decision propose 前 WebFetch 3 source",
+      "dims": [],
+      "note": "runtime discipline;補強建議加 dim 48 cite freshness check"
+    },
+    "M28": {
+      "name": "Solo git ops grep canonical",
+      "dims": [],
+      "note": "governance-only;hook check_solo_workflow"
+    },
+    "M29": {
+      "name": "DS anchor preflight grep spec.md",
+      "dims": [],
+      "note": "runtime discipline;codex-collab Step 0.1"
+    },
+    "M30": {
+      "name": "Wrapper schema extends primitive",
+      "dims": [],
+      "note": "hook check_wrapper_primitive_schema_drift;考慮加 dim 49 DS-wide scan"
+    },
+    "M31": {
+      "name": "Codex collab 5-step canonical",
+      "dims": [],
+      "note": "codex-collab skill + hook;runtime"
+    },
+    "M32": {
+      "name": "Audit script pixel-quantified",
+      "dims": [],
+      "note": "hook check_pixel_quantified_audit;對 audit scripts 自身,不對 component"
+    },
+    "_retired": {
+      "M27": "2026-05-15 → folded into M23(c)(framework prop name conflict child)",
+      "M33": "2026-05-22 → folded into M20(AI self-correction sub-rule)",
+      "M34": "2026-05-22 → folded into M7(rule-authoring hygiene sub-rule)",
+      "M35": "2026-05-22 → folded into M23(d)(nearest same-purpose canonical sub-rule)"
+    }
+  },
+  "traits": {
+    "isInternal": {
+      "dims": [
+        44
+      ],
+      "note": "Group O Dim 44"
+    },
+    "isOverlay": {
+      "dims": [
+        31
+      ],
+      "note": "Group M Dim 31 overlay body"
+    },
+    "hasSizes": {
+      "dims": [
+        13,
+        23,
+        29,
+        45
+      ],
+      "note": "anatomy SizeMatrix + trait-based + mechanical output"
+    },
+    "hasVariants": {
+      "dims": [
+        13,
+        23,
+        29,
+        45
+      ],
+      "note": "anatomy ColorMatrix + trait-based"
+    },
+    "hasInteractiveStates": {
+      "dims": [
+        13,
+        29
+      ],
+      "note": "anatomy StateBehavior"
+    },
+    "isStructural": {
+      "dims": [],
+      "note": "考慮加 dim 50 structural-element scan"
+    },
+    "isInputLike": {
+      "dims": [
+        26,
+        34,
+        37
+      ],
+      "note": "Dim 26 dual-mode + Field state machine"
+    },
+    "isMatrixHeavy": {
+      "dims": [
+        13
+      ],
+      "note": "anatomy matrix completeness"
+    },
+    "isSelectionSingle": {
+      "dims": [
+        26,
+        34
+      ],
+      "note": "Field dual-mode"
+    },
+    "isSelectionMulti": {
+      "dims": [
+        26,
+        32,
+        34
+      ],
+      "note": "Field + filter SSOT"
+    },
+    "hasActions": {
+      "dims": [
+        38
+      ],
+      "note": "Dim 38 inline-action gap"
+    }
+  },
+  "hooks": {
+    "app_shell_primary_header_consistency": {
+      "dims": [
+        56
+      ],
+      "note": "Phase 5 AppShell global header consistency(2026-05-23 entry add per audit-preflight gap)"
+    },
+    "benchmark_citation": {
+      "dims": [
+        23
+      ]
+    },
+    "canonical_propagation": {
+      "dims": [
+        5,
+        16,
+        30
+      ],
+      "note": "1 hook 3 invariant"
+    },
+    "codex_collab_5step": {
+      "dims": [],
+      "note": "governance/runtime only,not visible audit"
+    },
+    "datatable_invariants": {
+      "dims": [],
+      "note": "考慮加 dim 51 DataTable canonical full-scan"
+    },
+    "field_controls_contracts": {
+      "dims": [
+        26,
+        34,
+        37
+      ]
+    },
+    "field_family_invariants": {
+      "dims": [
+        34,
+        35,
+        36,
+        37
+      ]
+    },
+    "file_size_budget": {
+      "dims": [],
+      "note": "governance-only"
+    },
+    "naming_and_abstraction": {
+      "dims": [
+        14,
+        17,
+        33
+      ]
+    },
+    "opacity_token_usage": {
+      "dims": [
+        5
+      ]
+    },
+    "pattern_invariants": {
+      "dims": [
+        22,
+        35,
+        38,
+        39
+      ]
+    },
+    "peoplepicker_ssot_drift": {
+      "dims": [
+        37
+      ],
+      "note": "Dim 37 Field state machine SSOT 涵蓋 PeoplePicker trigger render / placeholder / overflow 等 SSOT-bearing API 屬 Field family scope;hook 為 write-time pre-warning,本 dim batch verify 既有 consumer"
+    },
+    "select_all_canonical": {
+      "dims": [
+        17,
+        32
+      ],
+      "note": "Dim 17 SSOT propagation + Dim 32 filter SSOT consumption canonical 涵蓋 — `multi-select-ordering` primitive 屬 SSOT consumer propagation(per Ant Transfer + Table rowSelection grep 證據,Layer A + Codex M31 Round 4 共識,2026-05-16)。Hook write-time pre-warning,Dim 17/32 batch verify 既有 Select All consumer 是否 import primitive 而非自刻 `options.map(v).onValueChange` reset"
+    },
+    "pixel_quantified_audit": {
+      "dims": [],
+      "note": "對 audit scripts 自身,not component"
+    },
+    "propose_plain_chinese": {
+      "dims": [],
+      "note": "governance-only"
+    },
+    "solo_workflow": {
+      "dims": [],
+      "note": "governance-only"
+    },
+    "story_invariants": {
+      "dims": [
+        11,
+        12,
+        13,
+        23,
+        24,
+        25,
+        28,
+        29,
+        40,
+        41
+      ]
+    },
+    "substantive_edit_approval_preflight": {
+      "dims": [],
+      "note": "governance-only"
+    },
+    "wrapper_primitive_schema_drift": {
+      "dims": [],
+      "note": "考慮加 dim 52 wrapper-extends scan"
+    },
+    "audit_post_report_validator": {
+      "dims": [],
+      "note": "2026-05-17 ship;governance-only — validates `/design-system-audit` final report quality(NO-SAMPLE / 46-dim coverage / audit-prompts.md coverage / @benchmark-unverified-blanket debt drift),emit prune-chain-trigger signal。不屬 component scope"
+    },
+    "tailwind_token_registry": {
+      "dims": [
+        47
+      ],
+      "note": "2026-05-17 升級(原 opacity_token_usage 擴):讀 packages/design-system/src/tokens/utility-registry.json SSOT,擋 leading-N / tracking-* / gap-px|0.5|1.5 / w-fraction / text-(xs|sm|...) / font-(thin|light|...) / rounded-(xl|2xl|3xl) 等 untracked utility"
+    },
+    "tab_lg_chrome_header_equal": {
+      "dims": [
+        52
+      ],
+      "note": "2026-05-17 ship(Header canonical W3 token alignment):parse uiSize.css + globals.css 對等 assert(不 CSS alias 因 scope 不同)。對應 patterns/header-canonical/header-canonical.spec.md W3 + M31 codex 比稿 Step 5 共識"
+    },
+    "header_with_tabs_border": {
+      "dims": [
+        52
+      ],
+      "note": "2026-05-17 ship(Header canonical W1 border ownership):header 含 Tabs 必標 withTabs prop 讓 paint delegate;違反 = 雙線 BLOCKER。對應 patterns/header-canonical/header-canonical.spec.md W1 + GitHub Primer PageHeader auto-suppress 模式"
+    },
+    "chrome_header_handcraft": {
+      "dims": [
+        52
+      ],
+      "note": "2026-05-17 ship(Header canonical Layer 3 ChromeHeader consumption):production chrome header 自刻 h-chrome-header-height+border-b 簽名 → soft P1 warn,Phase 3 後升 P0 BLOCKER。對應 patterns/header-canonical/header-canonical.spec.md Layer 3 + M30 wrapper extends primitive"
+    },
+    "spec_class_drift": {
+      "dims": [
+        53
+      ],
+      "note": "2026-05-17 ship(audit Dim 53 reverse drift):spec.md 寫「固定 h-NN/寫死/硬寫」keyword 但對應 tsx 已消費 token → soft P1 warn。互補既有 forward direction(spec-to-code),起因 Phase 1 抓不到 FileViewer h-14 spec drift"
+    },
+    "audit_sample_escape": {
+      "dims": [],
+      "note": "2026-05-17 ship(audit canonical infra,non-component scope):PreToolUse Agent 攔截 dispatch prompt 含「sample evidence allowed / heavy agent needed / top N」escape clause → BLOCKER。Mechanical enforce NO-SAMPLE invariant。起因 user verbatim「你他媽是不是又再搞抽樣」,Dim 24/25/40-43/45/46/48 sub-agent 多次 sampled"
+    },
+    "main_branch_workbench": {
+      "dims": [],
+      "note": "2026-05-17 ship(Solo-work canonical infra,M28 sub-rule):PreToolUse Edit/Write 偵測 current branch=main + edit production code(packages/design-system/src/src/app/src/explorations)+ 近 5 條 user msg 無 branch-trigger keyword → BLOCKER。補 R1(2nd branch)R2(PR)R3(push main)沒抓的「main-as-workbench」case。起因 user verbatim 2026-05-17「不是只有我說 push 到 main 才真的會 push 到 main 嗎」,本 session AI 整個 deep audit 都在 main 上 edit。escape:doc-only(spec.md) / CLAUDE_BYPASS_MAIN_WORKBENCH=1"
+    },
+    "dim_count_drift": {
+      "dims": [],
+      "note": "2026-05-18 ship(audit SSOT integrity infra,non-component scope):PreToolUse Edit/Write 攔 chain skill / spec / rule / CLAUDE.md hardcode 具體 audit dim 數字(53 dim / 46-dim / N audit dimensions),強制 design-system-audit/SKILL.md `## The N audit dimensions` 為 SSOT,deep-audit-cross-codex 等 chain skill 自動繼承。Allowlist:SSOT file 自己 / invariant doc 引用(SSOT/禁/forbidden/example/hardcode keyword 同行)。起因 user 2026-05-18「deep-audit-cross-codex 應該要確保其中的 design system deep audit 跟 design-system-audit deep 是 ssot」"
+    },
+    "propose_pre_grep_verify": {
+      "dims": [],
+      "note": "2026-05-18 ship(M18 Q0 Pre-ASK self-verify governance infra):PreToolUse Edit/Write planning/reports/handoff *.md 偵測 propose keyword(請拍板 / 等你拍板 / 決策 N / 我推 A/B/C / 選項)但 content 無 file:line cite 證據 → P1 stderr warn。Escape:檔頭 <!-- @propose-pre-verified --> 含 rationale。起因 2026-05-18 Sheet/inline-action/SurfaceBody 三題 propose 給 user 拍板,grep 後 0 個真 gap;user verbatim「不是老早就跟你說過要我決策前請先基於我們所有的檔案包括設計原則包括 ssot 包括所有實作代碼,自主自動驗證這些問題是否真的是問題」"
+    }
+  },
+  "newDims_2026_05_17": {
+    "_principle": "Codex M31 共識:World-class tier dims 47-51,對齊 Atlassian/Carbon/Ant/Polaris/Material UI/Material Web/Apple HIG",
+    "47": {
+      "name": "Tailwind utility registry compliance",
+      "ssot": "packages/design-system/src/tokens/utility-registry.json",
+      "hook": "tailwind_token_registry"
+    },
+    "48": {
+      "name": "Unused / orphan token detector",
+      "ssot": "tokens/**/*.spec.md 消費者 段 cross-verify",
+      "hook": "TBD"
+    },
+    "49": {
+      "name": "a11y axe-core 自動 + WCAG contrast ratio",
+      "ssot": "Storybook a11y addon + axe-core CI",
+      "hook": "TBD"
+    },
+    "50": {
+      "name": "Bundle size budget per component",
+      "ssot": "package.json size-limit + per-component manifest",
+      "hook": "TBD"
+    },
+    "51": {
+      "name": "Theme / density visual matrix",
+      "ssot": "visual-audit Layer B + baseline snapshot",
+      "hook": "visual-audit Layer A chain"
+    },
+    "52": {
+      "name": "Header canonical cross-family invariants(W1-W6)",
+      "ssot": "patterns/header-canonical/header-canonical.spec.md",
+      "hook": "tab_lg_chrome_header_equal + header_with_tabs_border + chrome_header_handcraft"
+    },
+    "53": {
+      "name": "Code-to-spec reverse drift check",
+      "ssot": ".claude/skills/design-system-audit/SKILL.md Group P",
+      "hook": "spec_class_drift",
+      "note": "新加(2026-05-17):反向 grep tsx hardcoded class → 對應 spec.md 是否仍寫舊值。Phase 1 漏抓 FileViewer h-14 spec drift 升 dim,對齊 Layer A own Phase 0 全掃 + codex 共識"
+    }
+  },
+  "auditOnlyGaps": {
+    "_principle": "本節列「user mission 真實 gap」— 屬 visible audit 範疇但無 dim cover,需新增 dim",
+    "candidates": [
+      {
+        "id": "M3 Portal theme",
+        "proposedDim": "Dim 47 Portal subtree theme integrity DS-wide"
+      },
+      {
+        "id": "M15 OpenSnapshot",
+        "proposedDim": "Dim 48 Stakeholder flow OpenSnapshot coverage"
+      },
+      {
+        "id": "M26 cite freshness",
+        "proposedDim": "Dim 49 Benchmark cite WebFetch freshness (release 級)"
+      },
+      {
+        "id": "M30 wrapper extends",
+        "proposedDim": "Dim 50 Wrapper schema extends primitive DS-wide"
+      },
+      {
+        "id": "M32 audit pixel",
+        "proposedDim": "audit script self-test;不屬 component scope,保留 hook layer"
+      },
+      {
+        "id": "trait:isStructural",
+        "proposedDim": "Dim 51 Structural element 規格"
+      },
+      {
+        "id": "hook:datatable_invariants",
+        "proposedDim": "Dim 52 DataTable canonical full-scan"
+      }
+    ]
+  }
+}

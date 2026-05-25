@@ -74,7 +74,7 @@ jobs:
         run: |
           cd packages/design-system
           npm pack --dry-run 2>&1 | tee /tmp/pack.log
-          # 強制驗 dist/components/Button/index.js 在 pack 中 — 補位 beta.1-4 sliently
+          # 強制驗 dist/components/Button/index.js 在 pack 中 — 補位 beta.1-4 silently
           # 漏 dist/ 的 retro-fix(fix 2026-05-25)
           if ! grep -q "dist/components/Button" /tmp/pack.log; then
             echo "❌ dist/components/Button/ not in pack — lib build broken"
@@ -86,6 +86,14 @@ jobs:
           fi
           cd ../storybook-config
           npm pack --dry-run
+
+      - name: Dogfood pre-publish verify(fresh consumer install + vite build)
+        # 2026-05-25 Phase 4.11 加 — beta.1-10 連 ship 多次「裝完才發現少 transitive peer」
+        # bug(lucide-react / react-is 等)。release audit gates 沒 catch,只有 Netlify
+        # consumer build 才炸。此 script simulate fresh consumer install + vite build,
+        # 提前 catch missing peer dep / 壞 exports 等 packaging bug。
+        # Fail = block publish(per user verbatim「不要再耍白痴,確保自己驗證到成功」)。
+        run: node scripts/dogfood-prepublish-verify.mjs
 
       - name: Publish to npm
         if: startsWith(github.ref, 'refs/tags/v')
@@ -119,21 +127,42 @@ jobs:
       #     OR omit version → commit SHA used(per Anthropic plugin spec auto-versioning)
       # No CLI publish step needed for GitHub-direct — GitHub repo IS the marketplace.
       # Anthropic-marketplace submission(future):manual via claude.ai/settings/plugins/submit
-      - name: Verify plugin manifest version sync(if version field set)
+      - name: Verify plugin manifest version sync(BLOCKER - 2026-05-25 Phase 4.12 upgrade)
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
+          # Per user 2026-05-25「不要有偏移的情況,包括所有檔案包括所有 plugin 都是」
+          # 升 warning → error:tag push 前 package.json / plugin.json / marketplace.json
+          # 版本必對齊 = 防 npm 跟 plugin 永遠同步。
           TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          DS_VERSION=$(jq -r '.version' packages/design-system/package.json)
+          SB_VERSION=$(jq -r '.version' packages/storybook-config/package.json)
           PLUGIN_VERSION=$(jq -r '.version' .claude-plugin/plugin.json)
-          MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name=="design-system") | .version // empty' .claude-plugin/marketplace.json)
-          echo "Tag:$TAG_VERSION / plugin.json:$PLUGIN_VERSION / marketplace.json:$MARKETPLACE_VERSION"
-          if [ "$PLUGIN_VERSION" != "$TAG_VERSION" ]; then
-            echo "::warning::plugin.json version($PLUGIN_VERSION)≠ tag($TAG_VERSION)— consumer 不會收到 /plugin update prompt"
-            echo "::warning::pre-tag bump:jq '.version=\"$TAG_VERSION\"' .claude-plugin/plugin.json + marketplace.json plugins[].version"
+          MARKETPLACE_META_VERSION=$(jq -r '.metadata.version' .claude-plugin/marketplace.json)
+          MARKETPLACE_PLUGIN_VERSION=$(jq -r '.plugins[] | select(.name=="design-system") | .version // empty' .claude-plugin/marketplace.json)
+
+          echo "Tag:                $TAG_VERSION"
+          echo "design-system:      $DS_VERSION"
+          echo "storybook-config:   $SB_VERSION"
+          echo "plugin.json:        $PLUGIN_VERSION"
+          echo "marketplace.meta:   $MARKETPLACE_META_VERSION"
+          echo "marketplace.plugin: $MARKETPLACE_PLUGIN_VERSION"
+
+          fail=0
+          for label_ver in "design-system:$DS_VERSION" "storybook-config:$SB_VERSION" "plugin.json:$PLUGIN_VERSION" "marketplace.meta:$MARKETPLACE_META_VERSION" "marketplace.plugin:$MARKETPLACE_PLUGIN_VERSION"; do
+            label="${label_ver%%:*}"
+            ver="${label_ver##*:}"
+            if [ "$ver" != "$TAG_VERSION" ]; then
+              echo "::error::$label version($ver)≠ tag($TAG_VERSION)— version drift detected"
+              fail=1
+            fi
+          done
+
+          if [ "$fail" -eq 1 ]; then
+            echo "::error::Pre-tag must sync ALL 5 versions: design-system + storybook-config + plugin.json + marketplace.metadata + marketplace.plugins[design-system]"
+            echo "::error::Re-run: scripts/bump-version.mjs(future)or manual sed all 5 files before tag push."
+            exit 1
           fi
-          if [ "$MARKETPLACE_VERSION" != "$TAG_VERSION" ] && [ -n "$MARKETPLACE_VERSION" ]; then
-            echo "::warning::marketplace.json plugin entry version($MARKETPLACE_VERSION)≠ tag($TAG_VERSION)"
-          fi
-          # Non-blocking warning(per Anthropic spec:omit version → commit SHA auto-version,仍 work)
+          echo "✓ all versions in sync with tag $TAG_VERSION"
 
   repoint-latest-tag:
     name: Repoint latest dist-tag → current @beta

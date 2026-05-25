@@ -1,0 +1,79 @@
+{
+  "$schema": "./story-baseline-registry.schema.json",
+  "_meta": {
+    "purpose": "Anti-drift registry for stories wrap既有 primitive(Sidebar / ChromeHeader / DataTable / Dialog / Sheet / Popover)— machine-readable canonical archetype。Hook `check_story_invariants.sh R8` reads this(not grep spec.md / not憑 Claude judgment)to enforce nearest same-purpose canonical usage(per codex Layer B D4 2026-05-20)。新增 primitive entry 必先寫 baseline + helper list + antiPatterns regex + variantRules。",
+    "owner": ".claude/references/story-baseline-registry.json",
+    "consumed_by": [
+      ".claude/hooks/check_story_invariants.sh#R8(story_archetype_registry)",
+      ".claude/skills/story-writing/SKILL.md#Phase-0.0(load registry + read baseline + produce diff table)"
+    ],
+    "rollout": "ship as warn mode first;確認 zero existing violation → 升 P0 BLOCKER"
+  },
+  "components": {
+    "Sidebar": {
+      "baseline": "packages/design-system/src/components/Sidebar/sidebar.stories.tsx#IconCollapse",
+      "requiredHelpers": ["WorkspaceBrand", "MAIN_NAV", "SidebarHeader", "SidebarFooter"],
+      "antiPatterns": [
+        {
+          "id": "sidebar-header-simplified-span",
+          "regex": "<SidebarHeader>\\s*<span",
+          "severity": "block",
+          "rationale": "SidebarHeader 必 wrap WorkspaceBrand-like ItemAvatar block(per sidebar.stories#IconCollapse baseline);simplified <span> mock = drift"
+        },
+        {
+          "id": "sidebar-menu-button-inline-icon",
+          "regex": "<SidebarMenuButton>[^<]*<[A-Z][a-zA-Z]+\\s+className=\"size-",
+          "severity": "block",
+          "rationale": "SidebarMenuButton 必用 startIcon prop + tooltip prop;children inline icon = drift"
+        }
+      ]
+    },
+    "DataTable": {
+      "baseline": "packages/design-system/src/components/DataTable/data-table.stories.tsx#WithBulkActions",
+      "toolbar": {
+        "requiredHelpers": ["Popover", "PopoverTrigger", "PopoverContent", "Input"],
+        "filterPanel": "DataTableFilterPanel",
+        "sortManager": "DataTableSortManager",
+        "buttonCanonical": {
+          "variant": "text",
+          "size": "sm",
+          "iconOnly": true,
+          "pressed": "required(state expression)",
+          "rationale": "per codex D2 verdict 2026-05-20 + action-bar.spec.md narrow scope:dense always-visible toolbar = low visual weight + pressed/chips/badges 顯示 state;tertiary 只用 standalone/labeled context"
+        }
+      },
+      "antiPatterns": [
+        {
+          "id": "datatable-toolbar-tertiary-filter-sort",
+          "regex": "startIcon=\\{(Filter|ArrowUpDown)\\}[^>]*variant=\"tertiary\"|variant=\"tertiary\"[^>]*startIcon=\\{(Filter|ArrowUpDown)\\}",
+          "severity": "block",
+          "rationale": "DataTable toolbar filter/sort 必 variant=text(per data-table.stories#WithBulkActions L998 canonical)"
+        },
+        {
+          "id": "datatable-toolbar-button-with-label",
+          "regex": "startIcon=\\{(Filter|ArrowUpDown)\\}[^>]*>[^<]+(篩選|排序|Filter|Sort)[^<]*</Button>",
+          "severity": "block",
+          "rationale": "DataTable toolbar 必 iconOnly(per WithBulkActions L998 canonical),不掛 label"
+        },
+        {
+          "id": "datatable-toolbar-no-popover-wrap",
+          "regex": "startIcon=\\{(Filter|ArrowUpDown)\\}(?![\\s\\S]*?(DataTableFilterPanel|DataTableSortManager))",
+          "severity": "warn",
+          "rationale": "DataTable toolbar filter/sort button 必包在 Popover 內,內含真 DataTableFilterPanel / DataTableSortManager primitive"
+        }
+      ]
+    },
+    "ChromeHeader": {
+      "baseline": "packages/design-system/src/components/Sidebar/sidebar.stories.tsx#IconCollapse (PageContent helper)",
+      "requiredStructure": "SidebarTrigger + h1.text-body-lg.font-medium 緊鄰 gap-2",
+      "antiPatterns": [
+        {
+          "id": "chromeheader-span-flex-1",
+          "regex": "<ChromeHeader>[\\s\\S]*?<span\\s+className=\"[^\"]*flex-1[^\"]*\">",
+          "severity": "block",
+          "rationale": "ChromeHeader title 該用 <h1 className=\"text-body-lg font-medium\"> 緊鄰 SidebarTrigger,不該用 <span flex-1> 撐空間造成 toggle + title 巨大間距"
+        }
+      ]
+    }
+  }
+}
