@@ -28,8 +28,7 @@ That's it. One import loads the full token system in canonical order (primitives
 ## Step 3 — Use components
 
 ```tsx
-import { Button } from '@qijenchen/design-system/components/Button'
-import { Avatar } from '@qijenchen/design-system/components/Avatar'
+import { Button, Avatar } from '@qijenchen/design-system'
 
 export default function App() {
   return (
@@ -41,7 +40,9 @@ export default function App() {
 }
 ```
 
-Subpath imports (`/components/<Name>`) are recommended for optimal tree-shaking. The package marks `**/*.css` as `sideEffects` so unused components don't ship CSS.
+Top-level barrel import is the canonical pattern (aligned with Material UI / Polaris / Radix). Tree-shaking works correctly because the package marks `**/*.css` as `sideEffects` only — unused JS components are stripped by Vite / Rollup / Webpack.
+
+> **Note**: subpath imports like `@qijenchen/design-system/components/Button` are NOT supported in beta. They are planned for v1.0.0 after we resolve cross-component export name collisions (`SelectOption` / `DropPosition` etc.). For now use the top-level barrel.
 
 ## Optional — Provider setup
 
@@ -83,6 +84,7 @@ export default function App() {
 | `npm install @qijenchen/design-system` returns 404 | No `latest` tag yet. Use `@qijenchen/design-system@beta`. |
 | Tailwind utility classes like `bg-primary` not generating | Ensure `@import '@qijenchen/design-system/styles/tokens'` appears AFTER `@import 'tailwindcss'`. Tailwind v4 needs `@theme` directives loaded at scan time. |
 | `<Tooltip>` content not rendering | Wrap app root in `<TooltipProvider>`. |
+| `import from '@qijenchen/design-system/components/X'` returns 404 | Subpath imports not supported in beta. Use top-level barrel: `import { X } from '@qijenchen/design-system'`. Tree-shake still works. |
 | Dark mode colors not switching | Set `<html data-theme="dark">` on the root element. The DS color system uses `data-theme` attribute (per `tokens/color/semantic.css`). |
 
 ## SSOT canonical reference
