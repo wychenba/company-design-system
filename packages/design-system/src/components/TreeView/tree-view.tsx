@@ -69,7 +69,7 @@ const CONTEXT_PX_VAR: Record<TreeContext, string> = {
 
 /** Drag drop position — 拖放目標的三種位置 */
 // code-quality-allow: dead-export — public event/state type — consumer event handler parameter type
-export type DropPosition = 'before' | 'after' | 'inside'
+export type TreeDropPosition = 'before' | 'after' | 'inside'
 
 /** onDragEnd callback 的參數 */
 // code-quality-allow: dead-export — public event/state type — consumer event handler parameter type
@@ -79,7 +79,7 @@ export interface TreeDragEndEvent {
   /** 目標 node id */
   targetId: string
   /** 放置位置:before(同層上方)/ after(同層下方)/ inside(成為子 node) */
-  position: DropPosition
+  position: TreeDropPosition
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -112,7 +112,7 @@ interface TreeViewContextValue {
   /** 目前拖曳中的 node id(null = 沒在拖) */
   draggingId: string | null
   /** 目前 drop indicator 的位置 + depth(用於 line indent) */
-  dropTarget: { id: string; position: DropPosition; depth: number } | null
+  dropTarget: { id: string; position: TreeDropPosition; depth: number } | null
   toggleExpand: (id: string) => void
   select: (id: string) => void
   setFocusedId: (id: string | null) => void
@@ -279,7 +279,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
 
     // ── Drag state ──
     const [draggingId, setDraggingId] = React.useState<string | null>(null)
-    const [dropTarget, setDropTarget] = React.useState<{ id: string; position: DropPosition; depth: number } | null>(null)
+    const [dropTarget, setDropTarget] = React.useState<{ id: string; position: TreeDropPosition; depth: number } | null>(null)
     const autoExpandTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
     // 2026-05-16 audit codex Round 6:unmount cleanup(原 cleanup 只在 dragEnd/dragCancel,unmount-during-drag 漏 cancel)
     React.useEffect(() => () => { if (autoExpandTimerRef.current) clearTimeout(autoExpandTimerRef.current) }, [])
@@ -339,7 +339,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
       const indentStep = INDENT_STEP[size]
       const pointerIndentLevel = Math.max(0, Math.floor((currentX - treeLeft) / indentStep))
 
-      let position: DropPosition
+      let position: TreeDropPosition
       let finalDepth = targetDepth
 
       if (hasChildren) {

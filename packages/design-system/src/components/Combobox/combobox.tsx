@@ -29,8 +29,8 @@ const tagPadding: Record<string, string> = {
  * SelectMenuOption(primitive SSOT)** — 避免重蹈先前 PeoplePicker 改壞的 wrapper schema drift。
  *
  * Why `extends SelectMenuOption`(per user 「全盤檢查避免下次又改壞或是偏移」要求):
- *   原 `interface SelectOption { value: string; label: string }` 是 weak schema,跟 Select 的
- *   `SelectOption`(同名)雙重宣告但欄位不同 → TypeScript 不抓(同名 interface 在不同 file
+ *   原 `interface ComboboxOption { value: string; label: string }` 是 weak schema,跟 Select 的
+ *   `ComboboxOption`(同名)雙重宣告但欄位不同 → TypeScript 不抓(同名 interface 在不同 file
  *   各 export,consumer import 到哪個版本看 import path)→ schema drift。
  *   PeoplePicker multi-mode 走 Combobox 路徑,dropdown menu rows lose avatar / description —
  *   user 看到「single mode 有 avatar / multi mode 沒 avatar」inconsistency。
@@ -42,7 +42,7 @@ const tagPadding: Record<string, string> = {
  * 對齊 Polaris ChoiceList / Material Autocomplete / Carbon Dropdown 的 wrapper-vs-primitive
  * schema-extension idiom。Hook `check_wrapper_primitive_schema_drift.sh`(M30 機械強制)。
  */
-export interface SelectOption extends SelectMenuOption {
+export interface ComboboxOption extends SelectMenuOption {
   // (no wrapper-only fields yet — kept for future扩 + same-name SSOT cross-wrapper)
 }
 
@@ -322,7 +322,7 @@ function OverflowTagList({ containerRef, items, size, wrap, renderTag, renderHid
 function ComboboxTagStack({
   value, options, tagSize = 'md', wrap = false, containerRef: externalRef, disabled = false,
 }: {
-  value?: string[] | null; options?: SelectOption[]; tagSize?: 'sm' | 'md' | 'lg'
+  value?: string[] | null; options?: ComboboxOption[]; tagSize?: 'sm' | 'md' | 'lg'
   wrap?: boolean; containerRef?: React.RefObject<HTMLDivElement | null>; disabled?: boolean
 }) {
   const ownRef = React.useRef<HTMLDivElement>(null)
@@ -367,7 +367,7 @@ export interface ComboboxProps {
   variant?: FieldVariant
   error?: boolean
   size?: 'sm' | 'md' | 'lg'
-  options: SelectOption[]
+  options: ComboboxOption[]
   value?: string[]
   onChange?: (value: string[]) => void
   placeholder?: string
@@ -674,7 +674,7 @@ function CustomCombobox({
     [searchable, searchIn, search, options]
   )
 
-  // 轉換 SelectOption → SelectMenuOption
+  // 轉換 ComboboxOption → SelectMenuOption
   // 2026-05-10 post-Issue-4 follow-up:forward 全 SelectMenuOption surface(avatar / description /
   // disabled / icon / group)— 修先前 PeoplePicker multi-mode dropdown 漏 avatar drift bug。
   const menuOptions: SelectMenuOption[] = React.useMemo(

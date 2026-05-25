@@ -42,7 +42,9 @@ for (const dir of componentDirs.sort()) {
   ].filter(Boolean)
   const main = candidates.find(c => files.includes(c))
   if (main) {
-    exports.push(`export * from './components/${dir}/${main.replace(/\.tsx$/, '')}'`)
+    // Phase 5.1 2026-05-25:route via /index re-export(per-component index.ts gen via scripts/gen-component-indexes.mjs)
+    // → vite preserveModules emits dist/components/<Dir>/index.js matching package.json exports `./components/*`
+    exports.push(`export * from './components/${dir}/index'`)
   }
 }
 
@@ -54,7 +56,7 @@ for (const dir of patternDirs.sort()) {
   const kebab = pascalToKebab(dir)
   const main = [`${kebab}.tsx`, `${kebab}.ts`].find(c => files.includes(c))
   if (main) {
-    exports.push(`export * from './patterns/${dir}/${main.replace(/\.(tsx|ts)$/, '')}'`)
+    exports.push(`export * from './patterns/${dir}/index'`)
   }
 }
 

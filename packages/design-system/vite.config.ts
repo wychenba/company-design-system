@@ -6,6 +6,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
+import { globSync } from 'node:fs'
+
+// Phase 5.1 2026-05-25:加 per-component / per-pattern index.ts 為 explicit entries
+// → vite preserveModules 不會 inline 這些 re-export shim,emit dist/components/<Dir>/index.js
+// → package.json exports `./components/*` → `./dist/components/*/index.js` 真正可用
+const componentEntries = Object.fromEntries(
+  globSync('src/{components,patterns}/**/index.ts', { cwd: __dirname })
+    .map((p) => [
+      p.replace(/^src\//, '').replace(/\.ts$/, ''),
+      path.resolve(__dirname, p),
+    ]),
+)
 
 export default defineConfig({
   plugins: [react()],
@@ -19,7 +31,10 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'src/index.ts'),
+      entry: {
+        index: path.resolve(__dirname, 'src/index.ts'),
+        ...componentEntries,
+      },
       formats: ['es'],
       fileName: 'index',
     },
