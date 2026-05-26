@@ -9,7 +9,7 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK="$SCRIPT_DIR/../check_chrome_header_handcraft.sh"
+HOOK="$SCRIPT_DIR/../lib/_chrome_header_handcraft.sh"
 
 if [ ! -f "$HOOK" ]; then echo "FATAL: hook not found: $HOOK"; exit 1; fi
 

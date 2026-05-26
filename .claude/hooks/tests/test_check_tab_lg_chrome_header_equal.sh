@@ -15,7 +15,7 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SRC_HOOK="$SCRIPT_DIR/../check_tab_lg_chrome_header_equal.sh"
+SRC_HOOK="$SCRIPT_DIR/../lib/_tab_lg_chrome_header_equal.sh"
 LOG_FIRE_SH="$SCRIPT_DIR/../_log-fire.sh"
 
 if [ ! -f "$SRC_HOOK" ]; then echo "FATAL: hook not found: $SRC_HOOK"; exit 1; fi

@@ -11,7 +11,7 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK="$SCRIPT_DIR/../check_header_with_tabs_border.sh"
+HOOK="$SCRIPT_DIR/../lib/_header_with_tabs_border.sh"
 
 if [ ! -x "$HOOK" ]; then
   echo "FATAL: hook not executable: $HOOK"
