@@ -9,9 +9,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:lib": "npm -w @qijenchen/design-system run build && npm -w @qijenchen/design-system run build:dts",
+    "build:lib": "npm -w @qijenchen/design-system run build && npm -w @qijenchen/design-system run build:dts && npm -w @qijenchen/storybook-config run build",
     "preview": "vite preview",
+    "prestorybook": "npm -w @qijenchen/storybook-config run build",
     "storybook": "storybook dev -p 6006",
+    "prebuild-storybook": "npm -w @qijenchen/storybook-config run build",
     "build-storybook": "storybook build --output-dir storybook-static",
     "tokens:export": "node scripts/export-tokens.mjs",
     "visual-audit": "node scripts/visual-audit.mjs --auto-start",

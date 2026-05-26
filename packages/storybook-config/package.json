@@ -6,21 +6,50 @@
   "type": "module",
   "license": "UNLICENSED",
   "files": [
-    "preview.ts",
-    "preview.tsx",
-    "addons-preset.ts",
+    "dist",
     "README.md"
   ],
   "exports": {
-    ".": "./preview.tsx",
-    "./preset": "./addons-preset.ts",
-    "./preview": "./preview.tsx"
+    ".": {
+      "types": "./dist/preview.d.ts",
+      "import": "./dist/preview.js",
+      "require": "./dist/preview.js",
+      "default": "./dist/preview.js"
+    },
+    "./preset": {
+      "types": "./dist/addons-preset.d.ts",
+      "import": "./dist/addons-preset.js",
+      "require": "./dist/addons-preset.js",
+      "default": "./dist/addons-preset.js"
+    },
+    "./preview": {
+      "types": "./dist/preview.d.ts",
+      "import": "./dist/preview.js",
+      "require": "./dist/preview.js",
+      "default": "./dist/preview.js"
+    }
   },
-  "main": "./preview.tsx",
+  "main": "./dist/preview.js",
+  "types": "./dist/preview.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@storybook/addon-essentials": "^8.6.0",
+    "@storybook/addon-a11y": "^8.6.0",
+    "@storybook/addon-docs": "^8.6.0",
+    "@storybook/addon-links": "^8.6.0",
+    "@whitespace/storybook-addon-html": "^6.1.1"
+  },
   "peerDependencies": {
+    "@qijenchen/design-system": ">=0.1.0-beta.15",
     "@storybook/react": ">=8.0.0 <11.0.0",
     "@storybook/react-vite": ">=8.0.0 <11.0.0",
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
   }
 }

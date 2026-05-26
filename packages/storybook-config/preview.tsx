@@ -4,7 +4,9 @@
 
 import type { Preview } from '@storybook/react'
 import React, { useEffect } from 'react'
-import { TooltipProvider } from '../design-system/src/components/Tooltip/tooltip'
+// 2026-05-26 fix:改 import 已 published npm package(consumer node_modules layout works),
+// 不再 relative path `../design-system/src/...`(monorepo-only path,published 後 consumer 看不到)
+import { TooltipProvider } from '@qijenchen/design-system'
 
 export const sharedGlobalTypes = {
   theme: {

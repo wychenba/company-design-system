@@ -32,3 +32,16 @@ export const sharedStoryGlobs = [
   '../packages/design-system/src/**/*.mdx',
   '../packages/design-system/src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
 ]
+
+// 2026-05-26 fix consumer fork-and-go canonical:default export bundles full config
+// 對齊 consumer `.storybook/main.ts`:`import preset from '@qijenchen/storybook-config/preset'`
+// → `{ ...preset, stories: [...] }` 整套 framework + addons + docs + typescript 一鍵繼承
+// DS dogfood 走 named imports(sharedAddons / sharedFramework / etc.)— 雙路徑同 SSOT
+const preset = {
+  framework: sharedFramework,
+  addons: sharedAddons,
+  docs: sharedDocsConfig,
+  typescript: sharedTypescriptConfig,
+}
+
+export default preset
