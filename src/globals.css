@@ -22,44 +22,11 @@
 /* Sidebar layout tokens — 唯一保留的 sidebar-* 變數
    顏色一律用既有 semantic token（bg-surface / text-foreground / border-divider），
    不引入 shadcn 的 slate palette --sidebar-* 顏色家族 */
-:root {
-  /* 2026-05-21 v11 預設 15rem (240px)— user-mandated per 「sidebar的預設寬度調整為240px」+
-     世界級共識(Linear/Notion/Figma/Polaris/Material Drawer 主流 240–256,5/8 家 = 240)。
-     最小寬度 240px 是絕對下限(也是預設值;未來 drag-resize 開時拖拉地板)。
-     `--sidebar-width-min` 同時是 AppShell Aside 的 floor(`ASIDE_WIDTH_MIN = 240` 已 align),
-     兩元件 panel min width 共識 = 240px(per user「aside應該也要一起參照」). */
-  --sidebar-width: 15rem;
-  --sidebar-width-min: 240px;
-  --sidebar-width-mobile: 18rem;
-
-  /* Chrome header / footer 共享高度——sidebar header / footer、page header 都用這個 token,
-     確保跨元件同高對齊。density-responsive:md=48 / lg=56,跟內部 button(field-height)
-     同步放大,維持 padding 比例一致。
-     ── 為什麼是 48 / 56(hardcode,非公式) ──
-     世界級 app 的 header 高度集中在 40–64px,甜蜜點 48–56(Linear / Atlassian / Material small)。
-     兩個值都 snap 到 8px grid。anchor 是 field-height-md(容納 md Button + 上下呼吸空間)。
-     不寫成 calc() 公式因為 lg 無法完美遵守(54 → 56 為了 8px grid 取整),hardcode 比假公式誠實。
-     ── 2026-05-23 SSOT-home 遷移 ── --chrome-header-height 已搬到 packages/design-system/src/tokens/uiSize/uiSize.css
-     此處不再宣告,DS package 自包(允許 npm-package consumer install 後直接運作,符 M17 SSOT 鐵律) */
-
-  /* Sidebar menu icon size — tokenize per codex M31 Layer C(2026-05-21 比稿後採納):
-     default 1rem(16px)對應 sm/md row size(per uiSize/icon-size.ts ICON_SIZE.sm/md=16)。
-     Sidebar 用 size=lg(罕見)時 consumer override `--sidebar-menu-icon-size: 1.25rem`(20px)。
-     避免 hardcode `1rem` 進 calc → 未來 row size 需 size 變更時容易漂移。 */
-  --sidebar-menu-icon-size: 1rem;
-
-  /* Icon rail 寬度 = 2 × layout-space-loose + sidebar-menu-icon-size(2026-05-21 v3 per user
-     抓「icon center x 展開/收合應一致」+ codex M31 比稿確認:VS Code activity-bar-width
-     48px 固定 rail / shadcn canonical 無 justify-center switch / MUI MiniDrawer width=calc(spacing*7+1px))。
-     原 formula `var(--chrome-header-height)` 在 lg 密度(56)時 24+16+24=64 不 fit。
-     新 formula 數學保證 icon center x = loose + icon/2 兩 mode 一致:
-       md: 2×16 + 16 = 48 ✓
-       lg: 2×24 + 16 = 64(取代原 56,符合幾何)
-     副作用:sidebar-width-icon 跟 chrome-header-height 解耦(原綁定為巧合,概念上不同維度)。 */
-  --sidebar-width-icon: calc(2 * var(--layout-space-loose) + var(--sidebar-menu-icon-size));
-}
-
-/* 2026-05-23 --chrome-header-height lg override 也已搬到 packages/design-system/src/tokens/uiSize/uiSize.css */
+/* 2026-05-26 SSOT-home migration:全部 sidebar / chrome-header tokens 已搬到
+   packages/design-system/src/tokens/uiSize/uiSize.css(consumer-published)。
+   此處不再宣告,DS package 自包,符 M17 SSOT 鐵律。
+   原因:user 2026-05-26 抓 product-workspace AppShell 跑版 root cause —
+   consumer install DS 沒拿到 sidebar-width → flex layout fail。 */
 
 /* ── Base reset ── */
 @layer base {

@@ -1,5 +1,7 @@
 # tokens/ Charter
 
+> **跨 family canonical SSOT** → `token-system.spec.md`(5-layer 架構 / 命名 family-scoped 規則 / token vs hardcode 判斷 / co-location rationale)。每個 family spec.md 只 codify 自家具體規則,本 README 列 family 居住地圖,SSOT 集中在 `token-system.spec.md` 避免 drift。
+
 ## 這裡只收:design token 定義 + spec + stories
 
 每個 token 類別一個 folder:

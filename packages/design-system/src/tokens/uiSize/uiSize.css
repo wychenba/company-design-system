@@ -49,6 +49,19 @@
      不寫成 calc() 公式因為 lg 無法完美遵守(54 → 56 為了 8px grid 取整),hardcode 比假公式誠實。 */
   --chrome-header-height: 3rem; /* 48px */
 
+  /* Sidebar / Layout primitive sizing(2026-05-26 ship 進 published per consumer SSOT gap):
+     原本 declared in DS repo `src/globals.css`,沒進 npm-published tokens aggregator
+     → consumer install DS + import `@qijenchen/design-system/styles/tokens` 拿不到
+     → AppShell + Sidebar gap div 用 `var(--sidebar-width)` undefined → 解析 0px → flex 跑版
+     對齊 docs:`components/Sidebar/sidebar.spec.md` L613-614 token table
+     Why uiSize.css:layout primitive widths 是 ui sizing semantic 範疇(對齊 --field-height / --chrome-header)
+     */
+  --sidebar-width: 15rem;          /* 240px expanded sidebar */
+  --sidebar-width-min: 240px;      /* 最小寬,同時是 AppShell Aside floor(ASIDE_WIDTH_MIN) */
+  --sidebar-width-mobile: 18rem;   /* 288px mobile sheet 抽屜 */
+  --sidebar-menu-icon-size: 1rem;   /* 16px sm/md row(per ICON_SIZE.sm/md);size=lg 罕見 case 下方 override 1.25rem(20px) */
+  --sidebar-width-icon: calc(2 * var(--layout-space-loose, 1rem) + var(--sidebar-menu-icon-size));
+
   /* Tree Indent — TreeView + DataTable nested rows(SSOT,2026-05-04)
      公式:chevronSize + gap-2 = 16+8(sm/md)/ 20+8(lg)
      Consumer:TreeView depth indent / DataTable nested row depth indent */
@@ -67,6 +80,9 @@
 
 [data-ui-size="lg"],
 [data-density="lg"] {
+  /* Sidebar lg override(per src/globals.css 原 declaration:size=lg 罕見 case)*/
+  --sidebar-menu-icon-size: 1.25rem; /* 20px(lg)*/
+
   --field-height-sm: 2rem;      /* 32px */
   --field-height-md: 2.25rem;   /* 36px */
   --field-height-lg: 2.5rem;    /* 40px */
