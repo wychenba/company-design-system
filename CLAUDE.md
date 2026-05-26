@@ -32,7 +32,7 @@
 
 ## 行數預算(Anthropic 對齊)
 
-CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory **per-file ≤ 100 lines** + **MEMORY.md index ≤ 20 entries**(soft 18 / hard 20,session-start hook 攔)。Hooks **26 soft / 45 hard**(SSOT = `session_start_governance_check.sh:186`,2026-05-26 升 40→45 per backfill 5 doc-claimed-but-missing hooks)。動態值見 `scripts/sync-governance-counters.mjs` 跑出為準(2026-05-26:**31 M-rules / 61 audit dims / 41 hooks** — 不寫死避 drift)。
+CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory **per-file ≤ 100 lines** + **MEMORY.md index ≤ 20 entries**(soft 18 / hard 20,session-start hook 攔)。Hooks **26 soft / 45 hard**(SSOT = `session_start_governance_check.sh:186`,2026-05-26 升 40→45 per backfill 5 doc-claimed-but-missing hooks)。動態值見 `scripts/sync-governance-counters.mjs` 跑出為準(2026-05-26:**31 M-rules / 62 audit dims / 41 hooks** — 不寫死避 drift)。
 
 ## Anti-bloat L1-L3
 

@@ -184,7 +184,7 @@ if [ -d "$HOOKS_DIR" ]; then
   HOOK_COUNT=${HOOK_COUNT:-0}
 fi
 if [ "$HOOK_COUNT" -gt 45 ]; then
-  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 45 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-26 升 40→45:user verbatim「該程式化的都沒程式化,導致你他媽那麼容易便宜」+ 「我們做那麼多 plugin 不就是要避免這件事?結果還避不了?」backfill 5 個 doc-claimed-but-missing hooks(M29 ds_anchor / M26 propose_without_benchmark / M16 item_list_gap / M23(c) data_table_size_num / fork_user_plugin_install)+ scope extension(check_substantive_edit_approval cover apps/**)— 反 Anthropic ~15 不適用 DS governance complexity(61 audit dims + 31 M-rules + cross-family canonical + fork-user surface);real bloat = doc claim 沒 file,不是 hook 多。Re-raise 46+ 需 /knowledge-prune 評估 retire / consolidate。"
+  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 45 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-26 升 40→45:user verbatim「該程式化的都沒程式化,導致你他媽那麼容易便宜」+ 「我們做那麼多 plugin 不就是要避免這件事?結果還避不了?」backfill 5 個 doc-claimed-but-missing hooks(M29 ds_anchor / M26 propose_without_benchmark / M16 item_list_gap / M23(c) data_table_size_num / fork_user_plugin_install)+ scope extension(check_substantive_edit_approval cover apps/**)— 反 Anthropic ~15 不適用 DS governance complexity(62 audit dims + 31 M-rules + cross-family canonical + fork-user surface);real bloat = doc claim 沒 file,不是 hook 多。Re-raise 46+ 需 /knowledge-prune 評估 retire / consolidate。"
 elif [ "$HOOK_COUNT" -gt 26 ]; then
   # 2026-05-15 raised soft cap 25→26 per /knowledge-prune D2 audit:
   # 26 wired hooks reflects M30 wrapper-schema-drift 新增 dedicated hook(justified evolution
