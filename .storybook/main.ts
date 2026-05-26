@@ -19,6 +19,9 @@ const config: StorybookConfig = {
     // DS Devmode local addon — Figma Dev Mode 等級 inspect(anatomy / redline / token reverse lookup)
     // Local-only:DS repo dogfood,consumer product 不需要(他們看 storybook 不寫元件)
     './addons/ds-devmode/preset',
+    // 2026-05-26 DS-internal HTML viewer addon(2026-05-26 移出 shared preset 因 consumer 缺 peer deps)。
+    // DS repo 有 react-syntax-highlighter + prettier(via design-system devDeps),可正常 load。
+    '@whitespace/storybook-addon-html',
   ],
 
   framework: sharedFramework,
