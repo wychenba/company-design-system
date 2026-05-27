@@ -183,8 +183,8 @@ if [ -d "$HOOKS_DIR" ]; then
     2>/dev/null | wc -l | tr -d ' ')
   HOOK_COUNT=${HOOK_COUNT:-0}
 fi
-if [ "$HOOK_COUNT" -gt 50 ]; then
-  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 50 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-27 升 45→50:per user verbatim「機械無強制就不會做?為何不全部 ssot 都要強制吻合?」SSOT 全 P0 BLOCKER 不分級 directive → 3 new hooks ship(check_propose_cite_required + check_orphan_ds_css + check_layout_space_magic_numbers)。Real bloat ≠ hook count;real bloat = doc claim 沒 file。Re-raise 51+ 需 /knowledge-prune 評估 retire / consolidate。"
+if [ "$HOOK_COUNT" -gt 55 ]; then
+  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 55 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-27 升 50→55 per user「眼不見為淨」+「做產品真的要能使用跟 ds repo 一模一樣的元件」directive → 3 new hooks ship(check_consumer_no_ds_catalog + check_consumer_story_baseline + check_consumer_ds_primitive_misuse)。Re-raise 56+ 需 /knowledge-prune 評估 retire / consolidate。"
 elif [ "$HOOK_COUNT" -gt 26 ]; then
   # 2026-05-15 raised soft cap 25→26 per /knowledge-prune D2 audit:
   # 26 wired hooks reflects M30 wrapper-schema-drift 新增 dedicated hook(justified evolution

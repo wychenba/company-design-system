@@ -171,6 +171,10 @@
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_consumer_story_baseline.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_consumer_ds_primitive_misuse.sh\""
           }
         ]
       },

@@ -311,6 +311,10 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_consumer_story_baseline.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_consumer_ds_primitive_misuse.sh\""
           }
         ]
       },
