@@ -93,21 +93,32 @@ if [ -z "$URLS_FOUND" ] && [ -f "$CWD/netlify.toml" ]; then
   OWNER_REPO=$(echo "$GH_REMOTE" | sed -E 's|.*github\.com[:/]([^/]+/[^/.]+)(\.git)?$|\1|')
   OWNER=$(echo "$OWNER_REPO" | cut -d/ -f1)
 
-  # v4 multi-candidate strategy(Netlify naming conventions in order of likelihood):
-  # 1. <repo-name>.netlify.app(simple repo-only)
-  # 2. <owner>-<repo>.netlify.app(Netlify Import default)
-  # 3. <owner>.netlify.app(user-chosen handle, rare match)
-  # 4. ~/.claude/local/deploy-targets.json overrides(per-user known URLs)
+  # v5 multi-candidate strategy(Netlify naming conventions in order of likelihood):
+  # 1. ~/.claude/local/deploy-targets.json overrides(per-user known URLs)— win all
+  # 2. <owner>-<package.json.name>.netlify.app(setup-netlify script convention,per scripts/setup-netlify-access.mjs `${ghUser}-${repoName}` formula)
+  # 3. <owner>-<repo-from-remote>.netlify.app(Netlify Import default,fork users without setup script)
+  # 4. <repo-from-remote>.netlify.app(simple,rare)
   USER_OVERRIDE=""
   if [ -f "$HOME/.claude/local/deploy-targets.json" ]; then
     USER_OVERRIDE=$(jq -r --arg key "$OWNER_REPO" '.[$key] // ""' "$HOME/.claude/local/deploy-targets.json" 2>/dev/null)
+  fi
+  # Read package.json.name for setup-script convention
+  PKG_NAME=""
+  if [ -f "$CWD/package.json" ]; then
+    PKG_NAME=$(jq -r '.name // ""' "$CWD/package.json" 2>/dev/null | sed -E 's|^@[^/]+/||')  # strip npm scope
   fi
   CANDIDATES=""
   if [ -n "$USER_OVERRIDE" ]; then
     CANDIDATES="$USER_OVERRIDE"
   else
-    if [ -n "$REPO_NAME" ]; then CANDIDATES="https://${REPO_NAME}.netlify.app"; fi
-    if [ -n "$OWNER" ] && [ -n "$REPO_NAME" ]; then CANDIDATES="$CANDIDATES https://${OWNER}-${REPO_NAME}.netlify.app"; fi
+    # Setup-script convention candidate(highest match rate for fork users following docs)
+    if [ -n "$OWNER" ] && [ -n "$PKG_NAME" ]; then CANDIDATES="$CANDIDATES https://${OWNER}-${PKG_NAME}.netlify.app"; fi
+    # Netlify Import default(no setup script, manual dashboard import)
+    if [ -n "$OWNER" ] && [ -n "$REPO_NAME" ] && [ "$REPO_NAME" != "$PKG_NAME" ]; then
+      CANDIDATES="$CANDIDATES https://${OWNER}-${REPO_NAME}.netlify.app"
+    fi
+    # Simple fallback
+    if [ -n "$REPO_NAME" ]; then CANDIDATES="$CANDIDATES https://${REPO_NAME}.netlify.app"; fi
   fi
 
   REAL_URL=""
