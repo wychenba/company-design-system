@@ -183,8 +183,8 @@ if [ -d "$HOOKS_DIR" ]; then
     2>/dev/null | wc -l | tr -d ' ')
   HOOK_COUNT=${HOOK_COUNT:-0}
 fi
-if [ "$HOOK_COUNT" -gt 45 ]; then
-  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 45 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-26 升 40→45:user verbatim「該程式化的都沒程式化,導致你他媽那麼容易便宜」+ 「我們做那麼多 plugin 不就是要避免這件事?結果還避不了?」backfill 5 個 doc-claimed-but-missing hooks(M29 ds_anchor / M26 propose_without_benchmark / M16 item_list_gap / M23(c) data_table_size_num / fork_user_plugin_install)+ scope extension(check_substantive_edit_approval cover apps/**)— 反 Anthropic ~15 不適用 DS governance complexity(68 audit dims + 31 M-rules + cross-family canonical + fork-user surface);real bloat = doc claim 沒 file,不是 hook 多。Re-raise 46+ 需 /knowledge-prune 評估 retire / consolidate。"
+if [ "$HOOK_COUNT" -gt 50 ]; then
+  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 50 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-27 升 45→50:per user verbatim「機械無強制就不會做?為何不全部 ssot 都要強制吻合?」SSOT 全 P0 BLOCKER 不分級 directive → 3 new hooks ship(check_propose_cite_required + check_orphan_ds_css + check_layout_space_magic_numbers)。Real bloat ≠ hook count;real bloat = doc claim 沒 file。Re-raise 51+ 需 /knowledge-prune 評估 retire / consolidate。"
 elif [ "$HOOK_COUNT" -gt 26 ]; then
   # 2026-05-15 raised soft cap 25→26 per /knowledge-prune D2 audit:
   # 26 wired hooks reflects M30 wrapper-schema-drift 新增 dedicated hook(justified evolution
