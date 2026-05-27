@@ -17,6 +17,7 @@
 - [feedback_audit_deterministic_script_not_subagent.md](feedback_audit_deterministic_script_not_subagent.md) — Dim 40/41/42 content-quality 必 chain audit-story-quality.mjs deterministic 全掃,禁 sub-agent 抽樣(2026-05-23 anchor:user 抓「你又再抽樣?」)
 - [feedback_codex_collab_real_intent.md](feedback_codex_collab_real_intent.md) — 「trust 自己 / 不需要 codex 比稿」真意 = M31 adversarial dual-track + triple-verify,**禁** 解讀 skip Phase B(2026-05-23 anchor:user 怒糾「你搞錯我意思,你是低能兒嗎?」)
 - [feedback_codex_brief_invariants_2026_05_23.md](feedback_codex_brief_invariants_2026_05_23.md) — Codex brief 必含三 invariant(全盤閱讀 / triple-verify / 禁抽樣);ASK gate 嚴格收斂 SSOT-UI/UX 增刪改唯一條件,其他 autonomous 7-axis(2026-05-23 user 永久 directive)
+- [feedback_codex_visual_audit_dangerously_bypass.md](feedback_codex_visual_audit_dangerously_bypass.md) — Codex exec MCP visual audit 唯一可行 path = `--dangerously-bypass-approvals-and-sandbox`(user explicit authorize),feature `exec_permission_approvals` 仍 under-dev(2026-05-27,62/62 PASS)
 
 ## Feedback (DS canonical / 視覺判斷)
 > **2026-05-15 prune D3 retired 4 entries**(已完全被上游吸收,SSOT pointer):
@@ -27,9 +28,9 @@
 
 ## Project (active state)
 - [project_hover_overlay_decisions_2026_05_09.md](project_hover_overlay_decisions_2026_05_09.md) — Hover overlay Q1-Q7 已決 + cell picker D-path 已完成 + 路 B 拍板 spreadsheet target;Q3.6 send codex Q-A/Q-B/Q-C 比稿中
-- [codex_collab_backfill_2026-05-19.md](codex_collab_backfill_2026-05-19.md) — CLOSED 2026-05-26:3 DONE + 11 UNVERIFIABLE(/tmp wiped);M31 Step 4.5 gate codified prevents future backlog
 - [feedback_story_baseline_reference.md](feedback_story_baseline_reference.md) — 寫 stories wrap primitive 必 reference 既有完整佈局 baseline(per 2026-05-20 AppShell-vs-Sidebar drift)
 - [feedback_nearest_same_purpose_canonical.md](feedback_nearest_same_purpose_canonical.md) — M35 nearest same-purpose canonical wins(registry-driven + hook R8 + SKILL Phase 0.0)
+> **2026-05-27 retired**:`codex_collab_backfill_2026-05-19.md`(CLOSED 2026-05-26 per content;M31 Step 4.5 gate codified — entry 失去 active relevance)
 
 ## Reference
 - [reference_deploy_targets.md](reference_deploy_targets.md) — Storybook GitHub Pages + Netlify per-branch preview + main = production
