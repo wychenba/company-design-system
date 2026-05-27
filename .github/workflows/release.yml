@@ -169,7 +169,7 @@ jobs:
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "Dispatching ds-published event to product-workspace, version=$VERSION"
-          gh api repos/ajenchen/product-workspace/dispatches \
+          gh api repos/ajenchen/ds-product-template/dispatches \
             -f "event_type=ds-published" \
             -f "client_payload[version]=$VERSION" \
             -f "client_payload[tag]=${{ github.ref_name }}" \
@@ -228,7 +228,7 @@ jobs:
     # → Netlify auto-rebuild。免 Dependabot 24h daily 延遲,真即時同步。
     #
     # Pre-req:user 需 GitHub Settings → Secrets → Actions 加 `CROSS_REPO_TOKEN` PAT
-    #   (https://github.com/settings/tokens → Fine-grained,scope: repo:write to ajenchen/product-workspace)
+    #   (https://github.com/settings/tokens → Fine-grained,scope: repo:write to ajenchen/ds-product-template)
     # 沒設此 secret 此 job 會 skip(if guard)+ Dependabot daily 仍 fallback。
     name: Notify product-workspace(immediate sync)
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
@@ -252,7 +252,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.CROSS_REPO_TOKEN }}
-          repository: ajenchen/product-workspace
+          repository: ajenchen/ds-product-template
           event-type: design-system-published
           client-payload: |
             {

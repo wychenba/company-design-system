@@ -134,16 +134,6 @@ Form validation 的 ARIA / 鍵盤行為(對齊 WCAG 3.3.1 Error Identification +
 - **Required indicator**:label 的 `*` 必加 `aria-label="required"` 或 hidden span(SR 朗讀「required」),純視覺 `*` SR 讀「asterisk」語義不清
 - **Color-only error 警告**:error border 紅色之外必有 icon 或文字(WCAG 1.4.1 不僅靠顏色)— DS error variant 自動 prefix `<AlertCircle/>` icon
 
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
-- `field.spec.md`
-- `link-input.spec.md`
-- `textarea.spec.md`
-- `time-picker.spec.md`
-
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。

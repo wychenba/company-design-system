@@ -138,17 +138,9 @@ HoverCard 是**純行為 primitive**(只提供 hover 觸發邏輯 + 定位 + 動
 - Hover / focus — 開啟 card
 - Esc — 關閉
 
-**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+**Focus**:non-modal hover/focus surface — focus 開啟 surface,**不 trap**,focus 仍在 trigger,Esc 關閉。Visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。(2026-05-27 修正 codex M31 finding:HoverCard 非 modal,不該有 focus trap)
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
-- `carousel.spec.md`
-- `coachmark.spec.md`
-- `overflow-indicator.spec.md`
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

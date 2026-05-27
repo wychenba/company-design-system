@@ -703,11 +703,4 @@ Item-level default / hover / active / selected / disabled **色彩**完全共用
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
-- `scroll-area.spec.md`
-- `sheet.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
 - `app-shell.spec.md`

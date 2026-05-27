@@ -183,8 +183,8 @@ if [ -d "$HOOKS_DIR" ]; then
     2>/dev/null | wc -l | tr -d ' ')
   HOOK_COUNT=${HOOK_COUNT:-0}
 fi
-if [ "$HOOK_COUNT" -gt 55 ]; then
-  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 55 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-27 升 50→55 per user「眼不見為淨」+「做產品真的要能使用跟 ds repo 一模一樣的元件」directive → 3 new hooks ship(check_consumer_no_ds_catalog + check_consumer_story_baseline + check_consumer_ds_primitive_misuse)。Re-raise 56+ 需 /knowledge-prune 評估 retire / consolidate。"
+if [ "$HOOK_COUNT" -gt 60 ]; then
+  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 60 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-27 升 50→55→60 per user「眼不見為淨」+「做產品真的要能使用跟 ds repo 一模一樣的元件」directive → 3 new hooks ship(check_consumer_no_ds_catalog + check_consumer_story_baseline + check_consumer_ds_primitive_misuse)。Re-raise 56+ 需 /knowledge-prune 評估 retire / consolidate。"
 elif [ "$HOOK_COUNT" -gt 26 ]; then
   # 2026-05-15 raised soft cap 25→26 per /knowledge-prune D2 audit:
   # 26 wired hooks reflects M30 wrapper-schema-drift 新增 dedicated hook(justified evolution

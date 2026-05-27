@@ -58,7 +58,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PRODUCT_WORKSPACE_DISPATCH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          gh api repos/ajenchen/product-workspace/dispatches \
+          gh api repos/ajenchen/ds-product-template/dispatches \
             -f "event_type=ds-ssot-changed" \
             -f "client_payload[commit]=${{ github.sha }}" \
             -f "client_payload[message]=${{ github.event.head_commit.message }}" \

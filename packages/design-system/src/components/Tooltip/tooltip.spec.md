@@ -121,16 +121,9 @@ Tooltip 是**單一職責 hover 提示 primitive**(一句話補充),刻意無變
 - Tab — focus trigger 時顯示
 - Esc — 關閉
 
-**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+**Focus**:non-modal hover/focus surface — focus 開啟 surface,**不 trap**,focus 仍 在 trigger,Esc 關閉。Visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。(2026-05-27 修正 codex M31 finding:Tooltip 非 modal,不該有 focus trap,原 wording 誤導)
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
-- `coachmark.spec.md`
-- `name-card.spec.md`
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

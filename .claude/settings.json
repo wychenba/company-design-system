@@ -315,6 +315,14 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_consumer_ds_primitive_misuse.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_full_story_visual_interaction_sweep.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_overlay_open_focus_escape_probe.sh\""
           }
         ]
       },

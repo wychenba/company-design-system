@@ -11,7 +11,6 @@ Elevation 定義陰影層級，區分內容層（Card）和浮層（Modal/Popove
 <div style={{ boxShadow: 'var(--elevation-200)' }} />
 ```
 
-
 ## 層級
 
 | Token | 用途 | 對應元件 |
@@ -22,7 +21,6 @@ Elevation 定義陰影層級，區分內容層（Card）和浮層（Modal/Popove
 | `--elevation-200-hover` | 浮層，hover | — |
 
 elevation-100 < elevation-200，數字越大浮起越高。
-
 
 ## 與 Surface 的配對規則
 
@@ -39,7 +37,6 @@ elevation-100 < elevation-200，數字越大浮起越高。
 // ❌ 錯誤——浮層用了半透明 bg-surface
 <div className="bg-surface rounded-lg" style={{ boxShadow: 'var(--elevation-200)' }} />
 ```
-
 
 ## 浮層間距（sideOffset）
 
@@ -67,12 +64,6 @@ elevation-100 < elevation-200，數字越大浮起越高。
 | 圓角 | `rounded-lg` | 8px |
 | 邊框 | `border border-border` | 1px |
 | sideOffset | 8px | 與觸發元件的間距 |
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
-- `slider.spec.md`
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
