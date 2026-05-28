@@ -331,7 +331,7 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 
 - ❌ **不 nested FileViewer**——viewer 疊 viewer 焦點陷阱崩壞;要在 viewer 內展示另一個檔案,改 filmstrip 切換
 - ❌ **不用 FileViewer 做編輯**——viewer 是**檢視**殼,需 annotate / crop / mask 改用專屬編輯器
-- ❌ **不硬寫 shadow-md/lg 等 Tailwind 預設陰影**——用 `shadow-[var(--elevation-*)]`(對齊 DS 陰影 token 系統)
+- ❌ **不硬寫 shadow-md/lg 等 Tailwind 預設陰影**——用 `shadow-[var(--elevation-N)]` (N ∈ {100,200,300})(對齊 DS 陰影 token 系統)
 - ❌ **不繞過 registry 直接 switch file.mimeType 渲染**——破壞 extensibility,新檔案類型被迫改 shell;一律走 `registerFileRenderer`
 - ❌ **不把 toolbar 按鈕順序改成 close → zoom**——違反「影響力遞增」canonical,close always rightmost 是跨 DS 慣例
 - ❌ **不自包 TooltipProvider / ThemeProvider**——對齊 DS「元件不得自包 Provider」規則,共享 app-level Provider

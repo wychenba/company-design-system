@@ -6,7 +6,7 @@
 #    (these are shadcn safety-net aliases; our DS code MUST use direct tokens)
 # 2. Tailwind v4 `[--foo]` shorthand — must be `var(--foo)` wrapped; historical bug:
 #    Sidebar's `w-[--sidebar-width]` broke 8 places (silent fail, no error)
-# 3. Hardcoded Tailwind shadow — `shadow-sm/md/lg/xl/2xl` is forbidden; must use `shadow-[var(--elevation-*)]`
+# 3. Hardcoded Tailwind shadow — `shadow-sm/md/lg/xl/2xl` is forbidden; must use `shadow-[var(--elevation-N)] N∈{100,200,300}`
 # 4. Native overflow-{auto,scroll} without ScrollArea — cross-OS scrollbar drift
 #    (macOS overlay 不吃寬 / Windows always-visible 吃 17px = 跨 OS 跑版)
 #    應改用 ScrollArea(Components/ScrollArea/)— overlay scrollbar 跨 OS 一致
@@ -52,7 +52,7 @@ fi
 
 # ── Check 3: Hardcoded Tailwind shadow ────────────────────────────────────────
 # shadow-sm/md/lg/xl/2xl 是 Tailwind 預設,繞過 elevation token 系統——禁止.
-# 允許:shadow-none / shadow-[var(--elevation-*)] / shadow-[calc(...)]
+# 允許:shadow-none / shadow-[var(--elevation-N)] N∈{100,200,300} / shadow-[calc(...)]
 SHADOW_PATTERN='\bshadow-(sm|md|lg|xl|2xl|inner)\b'
 SHADOW_HITS=$(grep -nE "$SHADOW_PATTERN" "$FILE_PATH" 2>/dev/null | head -5)
 if [ -n "$SHADOW_HITS" ]; then

@@ -1,4 +1,15 @@
 @import "tailwindcss";
+
+/* Tailwind v4 scope: exclude documentation files (spec.md / .sh / planning) that
+   contain `var(--X-*)` / `var(--X-100/200/300)` wildcard EXAMPLES — not real CSS
+   classes. Tailwind v4 picks them up → generates invalid CSS → build fail.
+   Anchor 2026-05-28 beta.26/27 CI fail root cause. */
+@source not "**/*.spec.md";
+@source not "**/*.sh";
+@source not "**/ds-canonical/**";
+@source not "**/.claude/**";
+@source not "**/planning/**";
+
 @import "../packages/design-system/src/tokens/color/primitives.css";
 @import "../packages/design-system/src/tokens/color/semantic.css";
 @import "../packages/design-system/src/tokens/typography/typography.css";

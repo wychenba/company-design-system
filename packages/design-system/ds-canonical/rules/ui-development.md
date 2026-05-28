@@ -52,7 +52,7 @@ paths:
 
 1. **CSS variable 必 `var()` 包覆** — `w-[var(--foo)]` 而非 `w-[--foo]`(v4 silent 失效)
 2. **自訂 utility 必在 `lib/utils.ts` 註冊 group** — 否則 tailwind-merge 誤判 strip
-3. **禁 `shadow-sm/md/lg` / `text-xs/sm/base` / 硬寫色值** — 用 `shadow-[var(--elevation-*)]` / `text-body`
+3. **禁 `shadow-sm/md/lg` / `text-xs/sm/base` / 硬寫色值** — 用 `shadow-[var(--elevation-N)]` (N ∈ {100,200,300}) / `text-body`
 4. **禁 shadcn compat alias**(`bg-popover` / `text-muted-foreground` / `bg-accent` 等)— 用 direct token
 5. **禁 primitive 色名作 utility**(`bg-neutral-3` / `text-blue-6`)— 用 semantic utility 或 `bg-[var(--color-blue-6)]`
 

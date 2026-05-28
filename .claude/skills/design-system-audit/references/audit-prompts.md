@@ -614,7 +614,7 @@ Forbidden in our code (these SHOULD be migrated to direct tokens):
 - `bg-card` / `text-card-foreground` → `bg-surface` / `text-foreground`
 - `text-primary-foreground` → `text-white`
 - `border-input` → `border-border`
-- `shadow-md / shadow-sm / shadow-lg / shadow-xl / shadow-2xl` → `shadow-[var(--elevation-*)]`
+- `shadow-md / shadow-sm / shadow-lg / shadow-xl / shadow-2xl` → `shadow-[var(--elevation-N)]` (N ∈ {100,200,300})
 
 OK (these are OUR approved tokens, not shadcn aliases):
 - `bg-muted` (semantic.css keeps --muted as real token)

@@ -1734,7 +1734,7 @@ exec
     34	
     35	1. **CSS variable 必 `var()` 包覆** — `w-[var(--foo)]` 而非 `w-[--foo]`(v4 silent 失效)
     36	2. **自訂 utility 必在 `lib/utils.ts` 註冊 group** — 否則 tailwind-merge 誤判 strip
-    37	3. **禁 `shadow-sm/md/lg` / `text-xs/sm/base` / 硬寫色值** — 用 `shadow-[var(--elevation-*)]` / `text-body`
+    37	3. **禁 `shadow-sm/md/lg` / `text-xs/sm/base` / 硬寫色值** — 用 `shadow-[var(--elevation-N)] N∈{100,200,300}` / `text-body`
     38	4. **禁 shadcn compat alias**(`bg-popover` / `text-muted-foreground` / `bg-accent` 等)— 用 direct token
     39	5. **禁 primitive 色名作 utility**(`bg-neutral-3` / `text-blue-6`)— 用 semantic utility 或 `bg-[var(--color-blue-6)]`
     40	
@@ -2327,7 +2327,7 @@ exec
     58	
     59	| 類別 | 為什麼禁止 | 改用 |
     60	|------|----------|------|
-    61	| `shadow-sm/md/lg/xl/2xl` | 繞過 elevation token 系統,沒跟 dark mode 調整聯動 | `shadow-[var(--elevation-100/200/300)]` |
+    61	| `shadow-sm/md/lg/xl/2xl` | 繞過 elevation token 系統,沒跟 dark mode 調整聯動 | `shadow-[var(--elevation-N)] N∈{100,200,300}` |
     62	| 硬寫色值 `#xxx`, `rgb(...)`, `bg-red-500` | 繞過 semantic token,dark mode / brand swap 會斷 | 對應 semantic token |
     63	| Tailwind 預設 typography `text-xs/sm/base/lg` | 我們有自己的 `text-caption/body/body-lg/h1/h2` 系統 | 用我們的 typography token |
     64	| 硬寫 px 值 `w-[48px]` 當有 token | 失去 token 關聯,改值時零散處要一起改 | 對應 token 或 calc() |
@@ -10380,7 +10380,7 @@ zsh:1: no matches found: .claude/hooks/check_tailwind*
     53	   DS opacity 慣例:
     54	     opacity-0 / opacity-100  ← visibility toggle(允許)
     55	     opacity-disabled(0.45)   ← 元件 disabled 狀態 + drag source dim reuse
-    56	     ghost / overlay          ← 不 dim,用 shadow-[var(--elevation-*)] 表 lifted
+    56	     ghost / overlay          ← 不 dim,用 shadow-[var(--elevation-N)] N∈{100,200,300} 表 lifted
     57	
     58	   修法:reuse `opacity-disabled` 或用 alpha 色階(--white-aN / --black-aN)。
     59	   詳 tokens/opacity/opacity.spec.md + M23 「DS 內既有 canonical 優先」。
@@ -11192,7 +11192,7 @@ exec
     34	
     35	1. **CSS variable 必 `var()` 包覆** — `w-[var(--foo)]` 而非 `w-[--foo]`(v4 silent 失效)
     36	2. **自訂 utility 必在 `lib/utils.ts` 註冊 group** — 否則 tailwind-merge 誤判 strip
-    37	3. **禁 `shadow-sm/md/lg` / `text-xs/sm/base` / 硬寫色值** — 用 `shadow-[var(--elevation-*)]` / `text-body`
+    37	3. **禁 `shadow-sm/md/lg` / `text-xs/sm/base` / 硬寫色值** — 用 `shadow-[var(--elevation-N)] N∈{100,200,300}` / `text-body`
     38	4. **禁 shadcn compat alias**(`bg-popover` / `text-muted-foreground` / `bg-accent` 等)— 用 direct token
     39	5. **禁 primitive 色名作 utility**(`bg-neutral-3` / `text-blue-6`)— 用 semantic utility 或 `bg-[var(--color-blue-6)]`
     40	
@@ -11240,7 +11240,7 @@ exec
     58	
     59	| 類別 | 為什麼禁止 | 改用 |
     60	|------|----------|------|
-    61	| `shadow-sm/md/lg/xl/2xl` | 繞過 elevation token 系統,沒跟 dark mode 調整聯動 | `shadow-[var(--elevation-100/200/300)]` |
+    61	| `shadow-sm/md/lg/xl/2xl` | 繞過 elevation token 系統,沒跟 dark mode 調整聯動 | `shadow-[var(--elevation-N)] N∈{100,200,300}` |
     62	| 硬寫色值 `#xxx`, `rgb(...)`, `bg-red-500` | 繞過 semantic token,dark mode / brand swap 會斷 | 對應 semantic token |
     63	| Tailwind 預設 typography `text-xs/sm/base/lg` | 我們有自己的 `text-caption/body/body-lg/h1/h2` 系統 | 用我們的 typography token |
     64	| 硬寫 px 值 `w-[48px]` 當有 token | 失去 token 關聯,改值時零散處要一起改 | 對應 token 或 calc() |
@@ -11902,7 +11902,7 @@ exec
     53	   DS opacity 慣例:
     54	     opacity-0 / opacity-100  ← visibility toggle(允許)
     55	     opacity-disabled(0.45)   ← 元件 disabled 狀態 + drag source dim reuse
-    56	     ghost / overlay          ← 不 dim,用 shadow-[var(--elevation-*)] 表 lifted
+    56	     ghost / overlay          ← 不 dim,用 shadow-[var(--elevation-N)] N∈{100,200,300} 表 lifted
     57	
     58	   修法:reuse `opacity-disabled` 或用 alpha 色階(--white-aN / --black-aN)。
     59	   詳 tokens/opacity/opacity.spec.md + M23 「DS 內既有 canonical 優先」。
@@ -12504,7 +12504,7 @@ exec
      6	#    (these are shadcn safety-net aliases; our DS code MUST use direct tokens)
      7	# 2. Tailwind v4 `[--foo]` shorthand — must be `var(--foo)` wrapped; historical bug:
      8	#    Sidebar's `w-[--sidebar-width]` broke 8 places (silent fail, no error)
-     9	# 3. Hardcoded Tailwind shadow — `shadow-sm/md/lg/xl/2xl` is forbidden; must use `shadow-[var(--elevation-*)]`
+     9	# 3. Hardcoded Tailwind shadow — `shadow-sm/md/lg/xl/2xl` is forbidden; must use `shadow-[var(--elevation-N)] N∈{100,200,300}`
     10	# 4. Native overflow-{auto,scroll} without ScrollArea — cross-OS scrollbar drift
     11	#    (macOS overlay 不吃寬 / Windows always-visible 吃 17px = 跨 OS 跑版)
     12	#    應改用 ScrollArea(Components/ScrollArea/)— overlay scrollbar 跨 OS 一致
@@ -12550,7 +12550,7 @@ exec
     52	
     53	# ── Check 3: Hardcoded Tailwind shadow ────────────────────────────────────────
     54	# shadow-sm/md/lg/xl/2xl 是 Tailwind 預設,繞過 elevation token 系統——禁止.
-    55	# 允許:shadow-none / shadow-[var(--elevation-*)] / shadow-[calc(...)]
+    55	# 允許:shadow-none / shadow-[var(--elevation-N)] N∈{100,200,300} / shadow-[calc(...)]
     56	SHADOW_PATTERN='\bshadow-(sm|md|lg|xl|2xl|inner)\b'
     57	SHADOW_HITS=$(grep -nE "$SHADOW_PATTERN" "$FILE_PATH" 2>/dev/null | head -5)
     58	if [ -n "$SHADOW_HITS" ]; then
