@@ -106,7 +106,7 @@ Token `--font-sans` stack = `Roboto, -apple-system, BlinkMacSystemFont, "Segoe U
 
 ## Storybook(consumer 看 DS 元件用法)
 
-- Production:**https://ajenchen.github.io/design-system/**
+- Production:**https://ajenchen-design-system.netlify.app/**(GH Pages mirror: <https://ajenchen.github.io/design-system/>)
 - 看每個元件的「展示」/「設計規格」/「設計原則」3 層 stories
 
 ---
