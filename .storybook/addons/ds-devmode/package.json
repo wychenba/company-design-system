@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./preset": "./preset.ts",
+    "./preset": "./preset.cjs",
     "./manager": "./manager.tsx",
     "./preview": "./preview.ts"
   },

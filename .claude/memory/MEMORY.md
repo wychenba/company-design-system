@@ -35,3 +35,4 @@
   - Cluster B:`feedback_ai_self_audit_unreliable_mechanical_primary_2026_05_27` + `feedback_composition_fidelity_pixel_vs_structural_2026_05_27` → 合 `feedback_ai_ground_truth_unreliable_mechanical_primary.md`(AI ground-truth canonical + composition fidelity specific application)
   - Archive: `.claude/memory/retired/2026-05-28-consolidate/`
   - Net delta:20 → 18 entries(-2,軟 cap 18 達標)
+- [Storybook addon preset MUST be .cjs](feedback_storybook_addon_preset_must_be_cjs.md) — beta.27-.31 5 連敗 root cause: 強制 CJS evaluation,bypass Node ESM/esbuild-register CJS-interop 衝突(2026-05-28)
