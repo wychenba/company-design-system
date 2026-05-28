@@ -12,35 +12,31 @@
 - ❌ **GitHub Pages**:public host,private workspace 不該 expose
 - ❌ **Vercel free tier**:可,但本 template 統一 Netlify(reduce host fragmentation)
 
-## 怎麼用
+## 命名 SSOT(2026-05-29 釐清,前期 dir/repo 名 drift)
 
+- **DS-internal source dir**: `template/product-workspace/`(本目錄,scaffold source SSOT;歷史名「product-workspace」沿用,內部 path 不影響 fork user)
+- **Published GitHub Template Repository**: [`ajenchen/ds-product-template`](https://github.com/ajenchen/ds-product-template)(fork user 真實看到 / fork 的 repo,2026-05-27 從 `product-workspace` 重命名)
+- **Fork user 創的 new repo**: `<their-username>/<their-product-name>`(他們自選)
+
+## 怎麼用(2026-05-27 已升級成「Use this template」按鈕,以下為 owner setup 流程)
+
+**Owner setup once**:在 `ajenchen/ds-product-template` GitHub repo → `Settings → General → Template repository ✓` 勾選 + `Settings → General → Change visibility: Public`。本 DS repo `template/product-workspace/` 內容透過 sync 機制(or 手動 push)同步到 `ajenchen/ds-product-template`。
+
+**Fork user**:在 `ajenchen/ds-product-template` 點「Use this template」→ 自動建他自己的 repo,流程詳該 repo `README.md`「Template Usage」段。
+
+**(歷史:legacy bash 流程 — 在 template-repository 機制前用)**
 ```bash
-# 1. Create new GitHub repo(必 --private,per security posture)
-gh repo create qijenchen/product-workspace --private --confirm
-
-# 2. Clone empty
-git clone github.com/qijenchen/product-workspace
-cd product-workspace
-
-# 3. Copy template content
+gh repo create ajenchen/ds-product-template --private --confirm
+git clone github.com/ajenchen/ds-product-template
+cd ds-product-template
 cp -r /path/to/this-ds-repo/template/product-workspace/. .
-# Note:dot . at end 包含 hidden files(.claude / .storybook / .github / .gitignore)
-
-# 4. Edit placeholders
-sed -i '' 's/qijenchen/<YOUR_ORG>/g' package.json .github/CODEOWNERS renovate.json README.md
-# (or use IDE find-replace)
-
-# 5. Install + first commit
+sed -i '' 's/qijenchen/<YOUR_ORG>/g' package.json .github/CODEOWNERS README.md
 npm install
 git add . && git commit -m "chore: initial scaffold from DS template"
 git push origin main
-
-# 6. Add Renovate / Vercel apps 到 GitHub repo
-# 7. Set secrets:VERCEL_TOKEN(if deploy.yml)
-# 8. Add team collaborators + branch protection
 ```
 
-完成,team 之後從這 GitHub repo clone 開工(per [docs/01-first-time-setup.md](product-workspace/docs/01-first-time-setup.md))。
+完成,team 之後從 [`ajenchen/ds-product-template`](https://github.com/ajenchen/ds-product-template) repo 「Use this template」開工(per [docs/01-first-time-setup.md](product-workspace/docs/01-first-time-setup.md))。
 
 ## Files included
 
@@ -89,5 +85,5 @@ template/product-workspace/
 1. `@qijenchen/design-system` published to npm(or internal registry consumer can pull from)
 2. `@qijenchen/storybook-config` published(same as DS)
 3. `design-system@qijenchen` Claude plugin published to marketplace(per host decision)
-4. NPM_TOKEN(or alternative auth)distributed to product-workspace as CI secret
+4. NPM_TOKEN(or alternative auth)distributed to `ajenchen/ds-product-template` as CI secret
 5. Renovate app installed to `qijenchen` GitHub org
