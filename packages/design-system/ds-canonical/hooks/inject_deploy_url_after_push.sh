@@ -173,6 +173,10 @@ fi
 [ -z "$URLS_FOUND" ] && exit 0
 
 # Inject into AI context
-printf '%b' "Deploy URLs auto-detected(per user 2026-05-26 directive「完成部署之後都應該自動回吐連結」+ 2026-05-27「不管 repo 都要提供」):\n${URLS_FOUND}"
+# 2026-05-29 ROOT-CAUSE FIX:PostToolUse hook 的純 stdout **不會**注入 AI context(只進 transcript)→
+# 原 `printf` 輸出讓 AI 看不到 URL → AI 每次 push 都沒 relay 給 user(user verbatim「部署完都沒給我 url」)。
+# 必須輸出 JSON `hookSpecificOutput.additionalContext` 才會真注入 AI context。
+MSG=$(printf '%b' "🚀 Deploy URLs auto-detected — RELAY 給 user(per user 2026-05-26「完成部署都自動回吐連結」+ 2026-05-27「不管 repo」):\n${URLS_FOUND}\n(AI:必須把上面 URL 貼給 user,不可省略)")
+jq -n --arg ctx "$MSG" '{hookSpecificOutput:{hookEventName:"PostToolUse",additionalContext:$ctx}}'
 
 exit 0
