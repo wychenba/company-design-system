@@ -98,7 +98,7 @@ for (const path of ALLOWLIST) {
 
 // ━━━ Transform root package.json ━━━
 
-const dsRootPkg = JSON.parse(readFileSync(join(REPO_ROOT, 'package.json'), 'utf8'))
+// dsRootPkg removed 2026-05-29(codex caught dead var)— mirror root uses templatePkg as base
 const templatePkg = JSON.parse(readFileSync(join(REPO_ROOT, 'template/ds-product-template/package.json'), 'utf8'))
 
 // Get current DS version for npm dep transform

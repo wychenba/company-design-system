@@ -18,11 +18,17 @@ on:
     branches: [main]
     paths:
       # Template-affecting paths(per architecture)
+      # IMPORTANT:此 list 必與 scripts/build-published-template-mirror.mjs ALLOWLIST 同步,
+      # 否則 mirror allowlist 內的 script 改動不會自動 trigger mirror sync(per codex 2026-05-29 M13 gap)
       - 'apps/template/**'
       - 'scripts/create-app.mjs'
       - 'scripts/setup-netlify-access.mjs'
       - 'scripts/check-plugin-installed.mjs'
       - 'scripts/build-published-template-mirror.mjs'
+      - 'scripts/audit-consumer-a11y.mjs'
+      - 'scripts/deploy-url.mjs'
+      - 'scripts/lint-ds-internal-imports.mjs'
+      - 'scripts/sync-all.mjs'
       - '.devcontainer/**'
       - 'template/ds-product-template/**'
       - 'package.json'
