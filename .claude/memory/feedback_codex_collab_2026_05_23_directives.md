@@ -63,41 +63,34 @@ Codex 跑的 audit 流程 = Claude 跑的 deep audit 流程(SSOT 同源 `.claude
 
 **Anchor**:2026-05-23 我答「Phase B 未啟,因 historical『trust 自己』」→ user 怒糾「曲解!adversarial dual-track NOT skip」。「不被 codex 牽著鼻子走」(反 pass-through,要據理力爭) ≠「不用 codex」(skip)— 180° 相反。
 
+## Sub-rule 3C — Phase-A-first:codex = second opinion 非 primary(2026-05-29 fold from feedback_m31_phaseA_first)
+
+啟 codex(Phase B)前 Claude **必先跑完整自己 Phase A audit** — **跑幾個 deterministic script(tsc / test / validate)≠ Phase A**。Phase A = Claude 獨立深度 audit(dispatch Explore agent thorough read+reason,OR inline 大量 grep/Read/分析 列 P0/P1/P2),**先有 Claude findings 才 launch codex**,然後 Step 4.5 verify + Step 5 比稿。跳過 = codex 變 primary = 失 dual-track 價值。
+- **Anchor 2026-05-29**:user 要「所有 repo deep audit cross codex」,我 run test+tsc+validate 就 launch codex 跳過自己 Phase A,user 抓「codex 只是 second opinion...你確定有先跑一遍?」。補做 Explore → 抓 3 個只有 Claude 抓到的 P0(codex 另抓 3 互補;codex 1 個「canonical-only」claim 被我 cite-battle verified FALSE)。
+- **Mechanical backstop(soft warn)**:`stop_self_audit.sh` 偵測「codex reply read + 無 prior Claude-solo audit trace(Agent/Explore OR ≥5 Grep/Read)」→ soft warn(非 block:Phase-A 判斷需 context,hard block false-positive 風險)。
+
+## Sub-rule 3D — Auto-mode 不為 non-SSOT 決策 ASK(2026-05-29 fold,= Sub-rule 1 ASK gate 延伸)
+
+Auto mode 下只有 SSOT-UI/UX substantive 才 ASK;non-SSOT-UI/UX(refactor 方向 / sync direction / governance home / 架構 option / 命名 / test 策略)→ AI 自己 pick best execute,**禁列「A/B/C 你拍板」**。`/deep-audit-cross-codex` auto-chain `/knowledge-prune` 也自動跑不問。
+- **Anchor 2026-05-29**:ds-canonical sync 方向(non-SSOT governance)我列 A/B/C 問 user。user 怒「不是 auto mode 嗎?為何一直要我允許?」。正確:自己判 + 執行,不問。
+
 ## How to apply(統一)
 
-- 每次送 codex brief **必含三 invariant**(template force per `.claude/skills/codex-collab/references/brief-template.md`)
-- Codex reply 收到後必走 M31 Step 4 → 4.5 → 4.6 → 5(grep cite verify + regression + own-version 比稿),禁 pass-through
-- ASK gate 自問:(1) 真 SSOT-UI/UX 增刪改?(2) 動新 design language?(3) charter / canonical 已 codify scope? 全 YES 才 ASK,其他 autonomous
-- Borderline case(governance / 對齊 charter / 反 sample infra / CI / perf)→ default autonomous + brief 報結果
+- 送 codex brief 必含三 invariant(template `codex-collab/references/brief-template.md`);reply 必走 M31 Step 4→4.5→4.6→5(禁 pass-through)
+- Phase-A-first(3C):codex 前 Claude 必先自己 audit(script ≠ Phase A)
+- ASK gate 自問 3 題全 YES 才 ASK:真 SSOT-UI/UX 增刪改?動新 design language?canonical 未 codify scope?其他(含 governance / sync / CI / perf / borderline)→ autonomous 自己做 + 報結果,禁 A/B/C 問
 
 ## Mechanical enforcement
 
-- `check_propose_pre_grep_verify.sh` P0 PreToolUse(propose without grep evidence → BLOCK)
-- `check_substantive_edit_approval_preflight.sh` PreToolUse Edit/Write production code(無 approval → BLOCK)
-- `stop_self_audit.sh` Mechanism 4(codex-verify gap)+ Mechanism 5(codex-transport-discovery 未跑)
-- `check_codex_collab_5step.sh` commit message keyword + cite + verdict
-- `check_codex_brief_invariants.sh` brief 缺三 invariant 任一 → BLOCKER(planned)
-- `check_audit_sample_escape.sh` pre + post(2026-05-23 雙向)
-- `scripts/sync-governance-counters.mjs` + `scripts/ssot-sync-check.mjs` SSOT auto-sync
-- CLAUDE.md `# 自主執行 canonical` 2026-05-23 段(永久 codified)
+`check_propose_pre_grep_verify.sh`(propose 無 grep→BLOCK)/ `check_substantive_edit_approval_preflight.sh`(production 無 approval→BLOCK)/ `stop_self_audit.sh` M4 codex-verify + M5 transport + M31 Phase-A-first soft warn / `check_codex_collab_5step.sh` / `check_codex_brief_invariants.sh`(三 invariant)/ `check_audit_sample_escape.sh` pre+post / `sync-governance-counters.mjs` SSOT auto-sync / CLAUDE.md `# 自主執行 canonical`。
 
 ## Anti-pattern(永久 ban)
 
-- ❌ Propose / report 前沒 triple-verify(grep / Read / canonical exception)
-- ❌ Codex brief 缺三 invariant
-- ❌ 收 codex reply pass-through 不 Step 4.5 verify
-- ❌ ASK user 拍板 governance hygiene / charter 對齊 / CI / perf 等 non-UI/UX
-- ❌ ASK 用「我推 X」passing buck — 若 non-SSOT-UI/UX 直接做 X
-- ❌ 讀「trust 自己」= skip codex(180° 曲解)
-- ❌ Codex sandbox EPERM 跳 dim 沒 documented + Claude 不補
-- ❌「省工 / 下次再做 / 下個 session」defer
-- ❌ SSOT hardcode 多處不走 sync-governance-counters
+- ❌ Propose 前沒 triple-verify / codex brief 缺三 invariant / 收 reply pass-through 不 verify
+- ❌ ASK non-SSOT-UI/UX(governance / sync / CI / perf)或「我推 X」passing buck — 直接做
+- ❌ 讀「trust 自己」= skip codex(180° 曲解)/ 跑 script 當 Phase A defer codex(3C)
+- ❌ codex sandbox EPERM 跳 dim 沒補 /「省工 / 下次 / 下個 session」defer / SSOT hardcode 多處
 
 ## 對齊原則
 
-- M31 5-step adversarial dual-track(SSOT `codex-collab/SKILL.md`)
-- M18 Q0 universal pre-propose gate
-- M19 trigger phrase auto-pipeline
-- M20 self-improvement + M33 anti-defer(folded into M20)
-- mindset #1 不取巧
-- Linux kernel patch review / Google ML eng-design-review(永遠 dual reviewer)
+M31 5-step dual-track(SSOT `codex-collab/SKILL.md`)/ M18 Q0 / M19 trigger / M20+M33 / mindset #1 / Linux kernel + Google ML eng-design-review(永遠 dual reviewer)。
