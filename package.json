@@ -35,6 +35,7 @@
     "test:datatable-invariants": "node scripts/data-table-invariants.mjs",
     "sync-memory": "node scripts/sync-memory.mjs",
     "sync:ds-canonical": "node scripts/sync-ds-canonical.mjs",
+    "verify:published-deploy": "node scripts/verify-published-deploy.mjs",
     "sync-counters": "node scripts/sync-governance-counters.mjs",
     "changeset": "changeset",
     "changeset:version": "changeset version && node scripts/sync-version-to-all-manifests.mjs",
