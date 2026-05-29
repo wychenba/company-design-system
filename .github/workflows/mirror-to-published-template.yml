@@ -75,11 +75,23 @@ jobs:
             echo "本次 mirror build 已完成 in /tmp/mirror-build,但不會 push"
             exit 1
           fi
-          cd /tmp/mirror-build
-          git init -b main
+          REPO_URL="https://x-access-token:${CROSS_REPO_TOKEN}@github.com/ajenchen/ds-product-template.git"
+          # Clone-and-overlay(非 force-push 整 tree),保留 published repo 既有 .github/workflows。
+          # Why:GitHub 拒絕「PAT 推 .github/workflows/* 無 `workflow` scope」(2026-05-29 mirror 連敗 root cause)。
+          # routine scaffold sync(stories / main.ts / App.tsx / configs)只需 Contents:write → 排除 .github/workflows
+          # 即可用既有 PAT 正常 sync。Workflow 檔變更需 PAT 另加 `workflow` scope(classic)或 `Workflows: write`(fine-grained)。
+          # 用 clone+rsync(非 force-push 空 tree)→ 不會誤刪 published repo 既有 workflows。
+          git clone --depth 1 "$REPO_URL" /tmp/published
+          rsync -a --delete --exclude='.git' --exclude='.github/workflows' /tmp/mirror-build/ /tmp/published/
+          cd /tmp/published
           git config user.name "DS Mirror Bot"
           git config user.email "bot@noreply.github.com"
           git add -A
-          git commit -m "sync: mirror from DS repo ${GITHUB_SHA::8}"
-          git push --force "https://x-access-token:${CROSS_REPO_TOKEN}@github.com/ajenchen/ds-product-template.git" main
-          echo "✅ Mirror pushed to ajenchen/ds-product-template main"
+          if git diff --cached --quiet; then
+            echo "✓ published repo 已 in-sync(0 scaffold 變更)"
+            exit 0
+          fi
+          git commit -m "sync: scaffold mirror from DS repo ${GITHUB_SHA::8}(.github/workflows preserved)"
+          git push "$REPO_URL" main
+          echo "✅ Scaffold mirrored → ajenchen/ds-product-template main"
+          echo "ℹ️ .github/workflows 已保留未動(需 PAT 加 workflow scope 才同步 workflow 檔)"
