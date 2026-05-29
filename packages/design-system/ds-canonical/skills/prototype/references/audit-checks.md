@@ -22,7 +22,7 @@
 4. Chain `/ux-audit`(D4)scope 到 exploration
 5. Chain `/visual-audit`(D5 Layer B AI judgement)讀 `snapshots/*.png`
 6. **D6 真 scan**:chain `.claude/skills/design-system-audit/references/principle-audit-protocol.md` 對 exploration code 跑 4 子維;依判斷公式 auto / STOP
-7. **Self-improvement capture**(強制 Phase F step,見 CLAUDE.md `# 資訊治理 canonical`)
+7. **Self-improvement capture**(強制 Phase F step,見 CLAUDE.md `# 治理 canonical`)
 
 ## Gate 規則(嚴格)
 

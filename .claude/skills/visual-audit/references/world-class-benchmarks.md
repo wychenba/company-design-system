@@ -32,7 +32,7 @@
 | **Atlassian Button group** | 8px gap;ring/focus outline 限制在 box 內,不 overflow |
 | **Ant Design Space** | default `gap-8`,hover bg 限制 box 內 |
 
-**世界級 idiom**:**hover bg / ring / focus outline 不超出 slot box**,保護 gap token 如實呈現。這對齊 CLAUDE.md`# 同 flex 列的互動 slot 幾何鐵律`。
+**世界級 idiom**:**hover bg / ring / focus outline 不超出 slot box**,保護 gap token 如實呈現。這對齊 .claude/references/ui-dev-rules.md`# 同 flex 列的互動 slot 幾何鐵律`。
 
 ---
 

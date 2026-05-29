@@ -1,5 +1,5 @@
 #!/bin/bash
-# PostToolUse hook: catch 4 classes of token hygiene / cross-OS violations on component/pattern tsx edits.
+# PostToolUse hook: catch 5 classes of token hygiene / cross-OS violations on component/pattern tsx edits.
 #
 # Detects (ALL are silent-fail or cross-OS drift bug classes per CLAUDE.md):
 # 1. shadcn compat alias 回流 — bg-popover / text-muted-foreground / bg-accent / text-accent-foreground / text-popover-foreground / bg-destructive / bg-background / bg-card / border-input / text-primary-foreground
@@ -7,7 +7,8 @@
 # 2. Tailwind v4 `[--foo]` shorthand — must be `var(--foo)` wrapped; historical bug:
 #    Sidebar's `w-[--sidebar-width]` broke 8 places (silent fail, no error)
 # 3. Hardcoded Tailwind shadow — `shadow-sm/md/lg/xl/2xl` is forbidden; must use `shadow-[var(--elevation-N)] N∈{100,200,300}`
-# 4. Native overflow-{auto,scroll} without ScrollArea — cross-OS scrollbar drift
+# 4. primitive color name used as Tailwind utility — bg-neutral-3 / text-blue-6 silent-fail; use semantic utility or var()
+# 5. Native overflow-{auto,scroll} without ScrollArea — cross-OS scrollbar drift
 #    (macOS overlay 不吃寬 / Windows always-visible 吃 17px = 跨 OS 跑版)
 #    應改用 ScrollArea(Components/ScrollArea/)— overlay scrollbar 跨 OS 一致
 #

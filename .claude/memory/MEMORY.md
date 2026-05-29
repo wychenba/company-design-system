@@ -17,7 +17,7 @@
 - [feedback_ssot_mechanical_p0_not_p1_warn_2026_05_27.md](feedback_ssot_mechanical_p0_not_p1_warn_2026_05_27.md) — SSOT canonical = 必 P0 BLOCKER 機械強制 with per-line escape comment;禁 P1 WARN soft signal(2026-05-27)
 - [feedback_ai_ground_truth_unreliable_mechanical_primary.md](feedback_ai_ground_truth_unreliable_mechanical_primary.md) — AI self-audit unreliable;mechanical(pixel/DOM/tsc/playwright)= primary defense / AI judgement = supplementary only / new audit layer ALWAYS expand never replace(2026-05-27 + composition fidelity application,合 2 file)
 - [feedback_deploy_url_auto_detect_2026_05_27.md](feedback_deploy_url_auto_detect_2026_05_27.md) — Deploy URL auto-detection 3-strategy + per-user override + curl content sniff(2026-05-27 hook v4 ship)
-- [feedback_netlify_basic_password_canonical_2026_05_29.md](feedback_netlify_basic_password_canonical_2026_05_29.md) — Netlify Basic Password canonical + Claude Code 直連 sandbox 是雲端主路徑(不是 Codespaces)+ Codex 大 brief 死局(2026-05-29)
+- [feedback_netlify_basic_password_canonical_2026_05_29.md](feedback_netlify_basic_password_canonical_2026_05_29.md) — Netlify Basic Password canonical + Claude Code 直連 sandbox 是雲端主路徑(不是 Codespaces)+ Codex 大 brief 死局 + 兩 repo clone-on-demand 全雲端操作(2026-05-29)
 
 ## Feedback (DS canonical / 視覺判斷)
 - [feedback_story_baseline_reference.md](feedback_story_baseline_reference.md) — 寫 stories wrap primitive 必 reference 既有完整佈局 baseline(2026-05-20 AppShell-vs-Sidebar drift anchor)

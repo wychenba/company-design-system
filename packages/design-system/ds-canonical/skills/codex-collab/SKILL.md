@@ -207,7 +207,7 @@ target PR:當前 working branch 的 PR(`mcp__github__list_pull_requests` 找到 
 
 ### Step 6:User approve → Claude 實作
 
-由我(非 codex)實作,跑完整 stop hook (`stop_meta_self_audit.sh`)+ M14 5-layer pipeline。
+由我(非 codex)實作,跑完整 stop hook (`stop_self_audit.sh`)+ M14 5-layer pipeline。
 
 **Joint test case planning(D-class architectural change 必走,2026-05-07 user 拍板)**:
 
@@ -242,7 +242,7 @@ PR comment:`@codex 結論已 land at <commit>. 感謝 review.`
 
 ## Guardrails
 
-沿用既有 hook(`check_benchmark_citation.sh` / `stop_meta_self_audit.sh`),codex reply 不入 commit,hook 對 final commit 強制。**禁止**:codex commit 直接 push / 跳過 Step 4 送 user 原文 / 把 codex reply 當 ground truth。**M20 self-improvement**:codex 抓的 M-rule violation → 加 `.claude/memory/codex-caught-violations.md`。**Auto-codify(2026-05-07)**:任何 collab 新發現 → 立刻 5-layer(SKILL + memory + CLAUDE.md + planning),trigger「確保記錄起來」「不需要再對你耳提面命」「自然就知道」。
+沿用既有 hook(`check_benchmark_citation.sh` / `stop_self_audit.sh`),codex reply 不入 commit,hook 對 final commit 強制。**禁止**:codex commit 直接 push / 跳過 Step 4 送 user 原文 / 把 codex reply 當 ground truth。**M20 self-improvement**:codex 抓的 M-rule violation → 加 `.claude/memory/codex-caught-violations.md`。**Auto-codify(2026-05-07)**:任何 collab 新發現 → 立刻 5-layer(SKILL + memory + CLAUDE.md + planning),trigger「確保記錄起來」「不需要再對你耳提面命」「自然就知道」。
 
 ## Deep Audit 整合 + Cross-session persistence
 

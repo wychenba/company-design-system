@@ -354,7 +354,7 @@ skill 不再重複 scan 方法 / 判斷表。
 
 ## 本 protocol 自己也是活文件
 
-每次 audit 結束,main agent 自動回填 4 類學習(對齊 CLAUDE.md `# 資訊治理 canonical` → Audit skill Phase F 節):
+每次 audit 結束,main agent 自動回填 4 類學習(對齊 CLAUDE.md `# 治理 canonical` → Audit skill Phase F 節):
 
 1. 新 FP → 加到上方「常見 FP 記憶」
 2. 新 meta-pattern → 提議加到 CLAUDE.md `# Meta-Pattern 預警`

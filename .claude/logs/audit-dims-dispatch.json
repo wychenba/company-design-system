@@ -1,7 +1,7 @@
 {
-  "generated": "2026-05-23T07:09:35.505Z",
+  "generated": "2026-05-29T18:03:43.013Z",
   "ssotSource": ".claude/skills/design-system-audit/SKILL.md",
-  "total": 56,
+  "total": 83,
   "groups": {
     "A": {
       "name": "Correctness (bug-class guards, P0 priority)",
@@ -136,7 +136,34 @@
         53,
         54,
         55,
-        56
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83
       ]
     }
   },
@@ -401,7 +428,7 @@
     },
     {
       "n": 44,
-      "title": "Internal vs Components 分類三 test",
+      "title": "Public vs Internal classification",
       "group": "O",
       "groupName": "Storybook content quality(2026-05-15 user-mandated,gap 補)"
     },
@@ -476,6 +503,168 @@
       "title": "AppShell primary-header consistency",
       "group": "P",
       "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 57,
+      "title": "M29 DS Anchor Preflight enforcement coverage",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 58,
+      "title": "Fork-user plugin install enforcement",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 59,
+      "title": "Approval preflight scope coverage",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 60,
+      "title": "M26 propose-without-benchmark enforcement",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 61,
+      "title": "M16 item-list gap + M23(c) DataTable framework prop conflict enforcement",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 62,
+      "title": "Fork-user Netlify onboarding canonical",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 63,
+      "title": "Deploy URL auto-reply infra",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 64,
+      "title": "Post-main-push SSOT propagation canonical",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 65,
+      "title": "Chrome header avatar canonical",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 66,
+      "title": "Immediate cross-repo dispatch + visual parity gate",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 67,
+      "title": "SidebarMenuButton implicit-wrap canonical",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 68,
+      "title": "Stories-vs-spec canonical drift",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 69,
+      "title": "Consumer no-DS-catalog enforcement",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 70,
+      "title": "Consumer @story-baseline enforcement",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 71,
+      "title": "Consumer DS primitive misuse anti-pattern",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 72,
+      "title": "DS API surface tightening",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 73,
+      "title": "Full-story visual+interaction sweep enforce",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 74,
+      "title": "Overlay open/focus/Escape probe",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 75,
+      "title": "Plugin freshness session-start prompt",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 76,
+      "title": "Escape marker abuse cap",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 77,
+      "title": "Composition-fidelity visual diff (DS canonical vs consumer)",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 78,
+      "title": "Codex brief 禁列檔 invariant",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 79,
+      "title": "Tailwind v4 wildcard pattern in docs",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 80,
+      "title": "Addon subdir ship completeness",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 81,
+      "title": "Storybook addon preset 必 `.cjs` extension",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 82,
+      "title": "Consumer app story title `Apps/<app-name>/...` namespace",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
+    },
+    {
+      "n": 83,
+      "title": "Fork-context runtime + naming SSOT",
+      "group": "P",
+      "groupName": "World-class tier(2026-05-17 加,codex 共識)"
     }
   ],
   "heavyDims": [
@@ -499,8 +688,8 @@
     "mandatoryAntiSampleContract": "\n🚨 MANDATORY ANTI-SAMPLE CONTRACT(2026-05-23 user verbatim「所有稽核都要完整執行不要再抽樣」):\n\n每 dim 必走 anti-sample 機制(tier per scripts/audit-coverage-matrix.mjs):\n\n1. DETERMINISTIC tier:**MUST chain** 對應 script,output 含「N files scanned / 0 violations」cite。**禁** sub-agent 自寫 grep 替代 script。\n2. HOOK-ENFORCED tier:write-time hook 已 enforce。Audit-time report 必 grep DS-wide 確認 0 hook fire residue。\n3. PURE-JUDGMENT tier:LLM 必 DS-wide ALL files enumerate(eg. 全 82 spec.md / 全 196 stories / 全 62 components),report header 必含「Total file scanned: N」+ per-finding file:line cite。\n\n**絕對禁**(任一觸發 = audit incomplete,需 reject + restart):\n- ❌「sampled Button only」/「spot-checked」/「representative sample」/「I sampled」 sub-agent admission\n- ❌ Audit report claim「Dim N CLEAN」無 N-files-scanned cite + 無 deterministic script chain output\n- ❌「too many for exhaustive」/「heavy too many」/「context budget」 deferral excuse\n- ❌「sample top N」 dispatch prompt clause\n\n**通過 contract test**:report 必含 per-dim 2 行 — 「Tier: DETERMINISTIC/HOOK/JUDGMENT」+「Coverage: N files / scope」。\n",
     "suggestedBatches": [
       {
-        "range": "1-19",
-        "count": 19,
+        "range": "1-28",
+        "count": 28,
         "dimNumbers": [
           1,
           2,
@@ -520,17 +709,7 @@
           16,
           17,
           18,
-          19
-        ],
-        "heavyDimsInBatch": [
-          12
-        ],
-        "groupSpan": "A+B+C+D+E+F+G"
-      },
-      {
-        "range": "20-38",
-        "count": 19,
-        "dimNumbers": [
+          19,
           20,
           21,
           22,
@@ -539,7 +718,19 @@
           25,
           26,
           27,
-          28,
+          28
+        ],
+        "heavyDimsInBatch": [
+          12,
+          24,
+          25
+        ],
+        "groupSpan": "A+B+C+D+E+F+G+H+I+J+K+L"
+      },
+      {
+        "range": "29-56",
+        "count": 28,
+        "dimNumbers": [
           29,
           30,
           31,
@@ -549,18 +740,7 @@
           35,
           36,
           37,
-          38
-        ],
-        "heavyDimsInBatch": [
-          24,
-          25
-        ],
-        "groupSpan": "G+H+I+J+K+L+M+N"
-      },
-      {
-        "range": "39-56",
-        "count": 18,
-        "dimNumbers": [
+          38,
           39,
           40,
           41,
@@ -592,7 +772,42 @@
           52,
           53
         ],
-        "groupSpan": "N+O+P"
+        "groupSpan": "L+M+N+O+P"
+      },
+      {
+        "range": "57-83",
+        "count": 27,
+        "dimNumbers": [
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83
+        ],
+        "heavyDimsInBatch": [],
+        "groupSpan": "P"
       }
     ]
   }

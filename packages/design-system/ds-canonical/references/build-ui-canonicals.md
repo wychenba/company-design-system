@@ -63,7 +63,7 @@
 
 ## overflow 使用三規則(避免跨 OS 跑版)
 
-1. Design-system 元件 `.tsx` 內**禁止** raw `overflow-auto / overflow-scroll / overflow-{x,y}-{auto,scroll}`(hook `check_token_hygiene.sh` check #4 守衛)
+1. Design-system 元件 `.tsx` 內**禁止** raw `overflow-auto / overflow-scroll / overflow-{x,y}-{auto,scroll}`(hook `lib/_token_hygiene.sh` Check 5 守衛)
 2. 需捲軸且跨 OS 一致 → 用 `ScrollArea`
 3. 刻意隱藏捲軸 + fade-mask → 用 `horizontal-overflow` pattern
 4. 例外:`overlay-surface` spec 明文允許 Dialog body `flex-1 overflow-y-auto`(viewport-fill 特殊 context);若未來此場景需跨 OS 一致,遷移 ScrollArea 再更新 spec

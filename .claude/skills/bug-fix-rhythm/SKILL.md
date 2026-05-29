@@ -28,7 +28,7 @@ description: Batch-end-verify rhythm + parallel tool batch + user-listed N-rule 
 
 ## Non-goals
 
-- 不擴展到「audit 7 維」(那是 `/design-system-audit`)
+- 不擴展到「audit full-dim」(那是 `/design-system-audit`)
 - 不取代 `/scan-similar-bugs`(那是 fix 後 root-pattern scan;本 skill 是 fix-過程 rhythm)
 - 不動 canonical 語意(走 audit-vs-execute STOP 提議)
 

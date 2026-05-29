@@ -481,7 +481,7 @@ End: `N files checked, M violations across C categories.` Under 600 words. Don't
 ## 15. Cross-doc 一致性(CLAUDE.md + spec.md + tsx docblock 全域 drift)
 
 **Type**: Absolute
-**Canonical source**: 各 SSOT home(per `# 資訊治理 canonical` 8-home)
+**Canonical source**: 各 SSOT home(per `# 治理 canonical` 8-home)
 **Rationale home**: N/A — duplicated / contradictory / drift 永遠是 bug
 
 **2026-04-30 擴 scope**:從原「CLAUDE.md 自身」擴到 cross-doc(CLAUDE.md + spec.md +

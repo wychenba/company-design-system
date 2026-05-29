@@ -9,7 +9,7 @@ description: Auto-invoke when listing options / 建議 / 候選方案. Forces in
 
 **對齊**:
 - CLAUDE.md mindset #1(不取巧)+ #2(消費既有)+ #5(猶豫就問)+ #6(meta 抽象)
-- M8 benchmark / M17 SSOT / M12 binary rule / 資訊治理「加規則前 3 題」
+- M8 benchmark / M17 SSOT / M12 binary rule / 治理「加規則前 3 題」
 - 本 skill 是上述 meta 的**propose-time 落地** — meta 寫成文字不夠,要 mechanical workflow 釘住
 
 ## When to invoke
@@ -93,7 +93,7 @@ description: Auto-invoke when listing options / 建議 / 候選方案. Forces in
 
 ### Q4 — M10 下游吸收
 **問**:本 option 加入後,既有哪些 rule / memory / bug case 被吸收可刪?
-**Fail**:純 append 沒 retire,違反「上游加 = 下游減」 + 資訊治理 anti-bloat
+**Fail**:純 append 沒 retire,違反「上游加 = 下游減」 + 治理 anti-bloat
 **例**:
 - ✅ "M18 加,M12 部分 overlap 但 scope 不同共存(說明)"
 - ❌ "新加 M18,既有 M-row 全保留(沒檢查)"
@@ -170,8 +170,8 @@ User 已就「為什麼會給錯誤建議」糾正 ≥ 3 次:
 | Skill | scope |
 |---|---|
 | `pre_write_subsumption_check.sh`(hook)| Edit/Write 已發生時 |
-| `post_edit_canonical_interrogate.sh`(hook)| 寫完 canonical 後 3 題 |
-| `check_governance_compliance.sh`(hook)| 寫新 hook 7 題 |
+| `post_edit_canonical_interrogate.sh`(retired/未實作 — mindset enforcement)| 寫完 canonical 後 3 題 |
+| `check_governance_compliance.sh`(retired/未實作 — 靠 `check_propose_pre_grep_verify.sh` + 加 hook 前 3 題)| 寫新 hook 7 題 |
 | **本 skill** `/propose-options` | **propose-time(寫進 user 回覆前)4 題** |
 
 4 個正交 — propose 前 / write 前 / write 中 / write 後 全 cover。

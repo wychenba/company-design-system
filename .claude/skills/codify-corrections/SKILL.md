@@ -8,7 +8,7 @@ description: Process .claude/logs/user-corrections.jsonl — the Stop-hook-harve
 **目的**:`.claude/logs/user-corrections.jsonl` 是 `stop_harvest_corrections.sh` 從每 session transcript 抓到的「不是 / 不對 / 應該 / 糾正」訊號。骨架存在,但從 log 到實際 CLAUDE.md / memory / spec edit 原本全靠人工讀 + 決定寫哪,實務上堆積 = 骨架失靈。本 skill 把這條 loop 合上。
 
 **對齊 CLAUDE.md**:
-- 資訊治理 canonical L2(per-commit)下游
+- 治理 canonical L2(per-commit)下游
 - mindset #6「user tell me once,我不該要 tell me twice」執行面
 - M14 AUTO integrate pipeline 第 7 層(memory / CLAUDE.md 落地)
 - 稽核 vs 執行 分權:動 canonical substantive → STOP Checkpoint(本 skill 內建)

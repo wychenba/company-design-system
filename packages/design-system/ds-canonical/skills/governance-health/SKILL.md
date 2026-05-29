@@ -143,4 +143,4 @@ Snapshot 本次 metric 到 `.claude/logs/metric-snapshots.jsonl` append:
 
 - `.claude/logs/` — metric source
 - `.claude/benchmarks/` — external signal
-- CLAUDE.md `# 資訊治理 canonical` — governance rules (本 skill 執行)
+- CLAUDE.md `# 治理 canonical` — governance rules (本 skill 執行)

@@ -129,7 +129,7 @@ User 親自確認 scope / type / affected homes 是否正確,禁 AI 單方面決
 
 - `~/.../memory/MEMORY.md` — index of codified principles
 - `.claude/logs/codified-principles.jsonl` — execution log
-- CLAUDE.md `# 資訊治理 canonical` 8-home — home 識別 rules
+- CLAUDE.md `# 治理 canonical` 8-home — home 識別 rules
 - CLAUDE.md `# Meta-Pattern 預警` M14 / M19 — 上游 pipeline rules
 
 ## 範例呼叫

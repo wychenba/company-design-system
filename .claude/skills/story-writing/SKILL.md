@@ -119,4 +119,4 @@ Checkpoint: 寫完後必驗:
 
 - `.claude/rules/story-rules.md`:三層定位 + title 命名(high-level signal)
 - CLAUDE.md `# 失敗記憶索引` → 三方漂移:SegmentedControl cva defaultVariants bug
-- `.claude/hooks/check_sync_update.sh`:Edit 後自動提醒三方連動
+- M3 mindset #3「改一處看三處」+ `.claude/hooks/pre_edit_spec_check.sh`:Edit 前讀 spec、三方連動靠 mindset(`check_sync_update.sh` retired/未實作)

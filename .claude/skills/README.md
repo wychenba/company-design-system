@@ -13,7 +13,7 @@
 **Audit / Quality(5)**:
 | Skill | Invoke 時機 | Scope |
 |-------|-----------|-------|
-| `design-system-audit/` | user 要求 audit DS 本身 | DS 內部 spec/cva/SSOT 33 維度(Phase 0 自建 baseline)|
+| `design-system-audit/` | user 要求 audit DS 本身 | DS 內部 spec/cva/SSOT full-dim(Phase 0 自建 baseline)|
 | `product-ui-audit/` | 「audit 這個 UI / 檢查 DS 用對嗎」| consumer UI 6 維檢核 |
 | `component-quality-gate/` | 元件 merge / ready / check | 45+ 項 checklist + Phase 4 Ship 6 項 |
 | `visual-audit/` | 視覺對齊 / 排版問題 / gap 錯 | pixel-level Layer A + B |

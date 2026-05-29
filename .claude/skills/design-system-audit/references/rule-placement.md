@@ -68,8 +68,8 @@
 - **判斷法**:這條規則能「機械化在 tool 執行前後自動跑」嗎? 是 → hook;否 → CLAUDE.md 或 spec
 - **當前 hooks**(7 個):
   - `pre_edit_spec_check.sh` — 編輯 tsx 前讀 spec
-  - `check_sync_update.sh` — 改 spec 後連動提醒
-  - `check_token_hygiene.sh` — 硬寫 shadow / shadcn alias / raw overflow 抓違規
+  - `check_sync_update.sh`(retired/未實作 — 改靠 M3 mindset #3 + `pre_edit_spec_check.sh`)
+  - `lib/_token_hygiene.sh`(由 `post_edit_dispatcher.sh` source)— 硬寫 shadow / shadcn alias / primitive-color / raw overflow 抓違規
   - `block_prototype_imports.py` — 產品 code 禁 import explorations
   - `enforce_home_charter.sh` — Write 到 classification-sensitive dir 時注入 charter(本 audit 設計時新增)
 
@@ -143,7 +143,7 @@ Q5. 是 CLAUDE.md / SKILL.md 已有項目的「深層細節」嗎?
 | 「先不管」語意區分 | CLAUDE.md(❌ 錯放) | **`design-system-audit` Checkpoint 7** | AI↔user 對話 protocol,不是設計規則;只在 audit triage 情境需要 |
 | 22 個 audits | CLAUDE.md(❌ 若放這會污染) | **`design-system-audit` skill** | 只在 `/design-system-audit` invoke 時需要 |
 | Tech debt 清單 | CLAUDE.md(❌ 會過期變誤導) | **Memory** | 隨時間變化的 session 狀態 |
-| Spec 寫作要交叉比對 | CLAUDE.md 或 spec 或 Hook | **Hook `check_sync_update.sh`** | 能機械化在 Edit 後自動提醒 |
+| Spec 寫作要交叉比對 | CLAUDE.md 或 spec 或 Hook | **M3 mindset #3 + `pre_edit_spec_check.sh`**(`check_sync_update.sh` retired/未實作)| Edit 前讀 spec + mindset 連動 |
 | `ItemLayout` export(ghost) | 本來以為是 industry idiom | **移除,改用 `<MenuItem>` + slot components** | 實查 Material 用 `<ListItem>` / Polaris `<ResourceItem>` / Ant `<List.Item>`——都無 Layout 後綴。ItemLayout 違反「element-level 不用 layout 字」鐵律 + 不是 idiom。只是 doc 裡 ghost reference,真實 exports 是 `ItemIcon / ItemAvatar / ItemLabel / ItemSuffix / ItemInlineAction`(slot pattern)+ `MenuItem`(canonical F1) |
 | Element anatomy 放哪 / item anatomy 結構 | 3 次 iteration:nested(X)→ 頂層飛地(F)→ 合併 merge(Y)→ flat topical(Z,final) | **`patterns/element-anatomy/` flat 多檔** | Z 比 X 少一層、比 Y 保 scope 純淨(taxonomy 和 deep SSOT 分檔);對齊 Material / Polaris 的 flat topical foundations 組織法 |
 | Story 寫作完整指南 | CLAUDE.md(過度膨脹) / patterns/(類別錯) | **`story-writing` skill** | 文件撰寫 workflow,invoke-only 多步驟;不是 runtime primitive 所以不屬 patterns |

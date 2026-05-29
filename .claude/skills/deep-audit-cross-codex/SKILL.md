@@ -66,7 +66,7 @@ detect_mode() {
 
 | Mode | A.0 全盤閱讀 scope | A.1 audit dim scope | Phase B codex scope |
 |---|---|---|---|
-| **ds-repo**(DS owner workflow,含 template SSOT 編輯)| full DS canonical + spec + token + pattern + memory + `template/ds-product-template/` scaffold | 全 dim per `/design-system-audit --deep` SSOT(含 dim 83 cross-3-repo runtime audit)| 全 dim parallel verify |
+| **ds-repo**(DS owner workflow,含 template SSOT 編輯)| full DS canonical + spec + token + pattern + memory + `template/ds-product-template/` scaffold | 全 dim per `/design-system-audit --deep` SSOT(含 dim 83 cross-3-repo runtime audit)**＋ chain `/product-ui-audit` 對 `apps/template`**(DS owner dogfood 自家消費端 surface,用 fork user 同等產品標準把關)| 全 dim parallel verify |
 | **fork-user-repo**(published template repo / fork user product repo)| `node_modules/@qijenchen/design-system/CLAUDE.md` + `ds-canonical/rules/meta-patterns.md` + `apps/**` + 本 repo `CLAUDE.md` | dim 83 fork-side runtime checks(hook fire / cross-load / setup-netlify smoke / deploy URL hook live) + dim 62-67 consumer subset | 同 dim,fork-side verify;**禁** propose DS source change |
 
 ### Fork-mode safety invariants(2026-05-29 加)
@@ -88,7 +88,7 @@ detect_mode() {
 1. `CLAUDE.md` 全文
 2. `.claude/rules/{meta-patterns,spec-rules,ui-development,story-rules,self-verify}.md` 全文
 3. `.claude/references/{ssot-index,ssot-consultation,build-ui-canonicals,naming-conventions}.md`
-4. `packages/design-system/src/**/*.spec.md` 全部(60+ file,通過 Glob 列舉 + Read)
+4. `packages/design-system/src/**/*.spec.md` 全部(83 file,通過 Glob 列舉 + Read)
 5. `packages/design-system/src/tokens/**/*.spec.md` + `packages/design-system/src/patterns/**/*.spec.md` 全部
 6. 本 session 對話脈絡 + memory `~/.claude/.../memory/MEMORY.md` index + active project memory files
 

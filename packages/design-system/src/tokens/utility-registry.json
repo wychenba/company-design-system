@@ -4,8 +4,7 @@
     "purpose": "Single SSOT for Tailwind utility allow/block — extracted from typography/radius/opacity/elevation/color spec.md 禁止 lists. Hook reads this(not grep spec.md)to enforce token-first discipline. New token additions or removals → update here first, spec.md cite registry.",
     "owner": "packages/design-system/src/tokens/utility-registry.json",
     "consumed_by": [
-      ".claude/hooks/check_opacity_token_usage.sh(rename → check_tailwind_token_registry.sh)",
-      ".claude/hooks/check_token_hygiene.sh",
+      ".claude/hooks/check_opacity_token_usage.sh",
       ".claude/skills/design-system-audit/references/audit-prompts.md Dim 5"
     ],
     "spec_sources": [

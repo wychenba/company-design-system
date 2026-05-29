@@ -209,7 +209,7 @@ User / stakeholder 決定採用某 candidate 後:
 - `(c)` 混搭 A+B 新 hybrid(新 exploration)
 - `(d)` 全部不採用(保留 explorations/ 作紀錄,也是有價值的 ruled-out)
 
-**Graduation 流程**:若升級到正式,在 `explorations/_archive/` 備份 exploration(CLAUDE.md line 633:「不再使用但需保留的內容移至 _archive/」),正式 code 進 design-system/。
+**Graduation 流程**:若升級到正式,在 `explorations/_archive/` 備份 exploration(per CLAUDE.md `# 元件完成 + Exploration`:比稿定案升級 patterns/ 或 components/,舊比稿保留作紀錄),正式 code 進 design-system/。
 
 ### Phase 5 — Cleanup
 
