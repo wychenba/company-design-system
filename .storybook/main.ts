@@ -12,7 +12,11 @@ import {
 } from '@qijenchen/storybook-config/preset'
 
 const config: StorybookConfig = {
-  stories: sharedStoryGlobs,
+  // 2026-05-29 Phase 2 monorepo 2-scenario arch:
+  // DS-internal stories(sharedStoryGlobs)+ product apps stories(apps/**)。
+  // Scenario A(直 fork DS)在同個 Storybook 看 DS docs + 自己產品 apps。
+  // Namespace 區隔:`Design System/...`(DS internal)vs `Apps/<name>/...`(per check_consumer_app_story_title.sh enforced)。
+  stories: [...sharedStoryGlobs, '../apps/**/*.stories.@(tsx|mdx)'],
 
   addons: [
     ...sharedAddons,
