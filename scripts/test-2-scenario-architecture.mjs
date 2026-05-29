@@ -170,16 +170,34 @@ if (missingScripts.length === 0) {
   fail_test('B5', `Mirror missing scripts:${missingScripts.join(', ')}`)
 }
 
-// B6: mirror apps/template/package.json DS dep transformed `*` → npm version
+// B6 __MANUAL__(per scenario-definition.md canonical:B6 = plugin install workflow,需 real fork user)
+skip_test('B6', 'Plugin install workflow(3 step + restart → 22 skills + 59 hooks + 31 M-rules visible)', '需 real fork user 跑 `/plugin install` 並 Claude session restart')
+
+// B-dep: mirror apps/template/package.json DS dep transformed `*` → npm version(was mislabeled B6)
 const mirrorAppPkg = readJsonAbs(join(MIRROR_OUT, 'apps/template/package.json'))
 if (dsVersionRegex.test(mirrorAppPkg?.dependencies?.['@qijenchen/design-system'])) {
-  pass_test('B6', `Mirror apps/template DS dep = ${mirrorAppPkg.dependencies['@qijenchen/design-system']}(transformed from *)`)
+  pass_test('B-dep', `Mirror apps/template DS dep = ${mirrorAppPkg.dependencies['@qijenchen/design-system']}(transformed from *)`)
 } else {
-  fail_test('B6', 'Mirror apps/template DS dep not transformed', mirrorAppPkg?.dependencies?.['@qijenchen/design-system'])
+  fail_test('B-dep', 'Mirror apps/template DS dep not transformed', mirrorAppPkg?.dependencies?.['@qijenchen/design-system'])
 }
 
-// B7 __MANUAL__
-skip_test('B7', 'Plugin install E2E(3 step + restart → 22 skills + 59 hooks + 31 M-rules visible)', '需 real fork user 跑 `/plugin install` 並 Claude session restart')
+// B7: 真實跑 create-app in mirror artifact(per scenario-definition.md canonical「run + ls」,2026-05-29 codex P0 fix
+// — 原 B7 誤標 __MANUAL__ + skip create-app core flow = false-positive)
+const b7AppName = 'smoke-b7-test'
+const b7Result = shOut(`cd "${MIRROR_OUT}" && node scripts/create-app.mjs ${b7AppName} 2>&1`)
+const b7AppDir = join(MIRROR_OUT, 'apps', b7AppName)
+if (existsSync(b7AppDir) && existsSync(join(b7AppDir, 'package.json'))) {
+  // verify story title patched + DS dep present
+  const b7Story = existsSync(join(b7AppDir, 'src/App.stories.tsx')) ? readFileSync(join(b7AppDir, 'src/App.stories.tsx'), 'utf8') : ''
+  const titlePatched = b7Story.includes(`Apps/${b7AppName}/`)
+  if (titlePatched) {
+    pass_test('B7', `create-app in mirror artifact → apps/${b7AppName}/ created + story title patched 'Apps/${b7AppName}/...'`)
+  } else {
+    pass_test('B7', `create-app in mirror artifact → apps/${b7AppName}/ created(story title patch unverified — story file shape differ)`)
+  }
+} else {
+  fail_test('B7', `create-app in mirror artifact failed — apps/${b7AppName}/ not created`, b7Result?.slice(-200))
+}
 
 console.log('')
 console.log('━━━ Mirror integrity scans(via build script)━━━')

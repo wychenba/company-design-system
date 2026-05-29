@@ -127,13 +127,16 @@ console.log(`  ✓ Written ${OUT_DIR}/package.json`)
 
 // ━━━ Transform apps/template/package.json(workspace * → exact npm version)━━━
 
+// 2026-05-29 codex P0 fix:unconditional update(原 `=== '*'` 太 narrow — 若 apps/template
+// DS dep 改成 explicit version,mirror 不會更新到最新 → Scenario B stale。改 always sync。)
 const appTplPkgPath = join(OUT_DIR, 'apps/template/package.json')
 if (existsSync(appTplPkgPath)) {
   const appPkg = JSON.parse(readFileSync(appTplPkgPath, 'utf8'))
-  if (appPkg.dependencies?.['@qijenchen/design-system'] === '*') {
+  if (appPkg.dependencies?.['@qijenchen/design-system']) {
+    const before = appPkg.dependencies['@qijenchen/design-system']
     appPkg.dependencies['@qijenchen/design-system'] = `^${dsVersion}`
     writeFileSync(appTplPkgPath, JSON.stringify(appPkg, null, 2) + '\n')
-    console.log(`  ✓ apps/template/package.json DS dep: * → ^${dsVersion}`)
+    console.log(`  ✓ apps/template/package.json DS dep: ${before} → ^${dsVersion}`)
   }
 }
 

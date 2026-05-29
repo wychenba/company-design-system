@@ -1,6 +1,6 @@
 # Composition Fidelity Visual Diff(SSOT,2026-05-27 codify)
 
-**Mechanical 機制讓「DS components 在 consumer (product-workspace) 渲染必跟 DS canonical 一致」可被驗證**(byte-identity 不夠,需 visual diff)。
+**Mechanical 機制讓「DS components 在 consumer (ds-product-template) 渲染必跟 DS canonical 一致」可被驗證**(byte-identity 不夠,需 visual diff)。
 
 Per user 2026-05-27 verbatim directive 對應 root cause:**DS source 提供 primitive,consumer 自由 compose;npm byte-identity 不約束 compose 方式**。Consumer 可寫 `<Avatar size={32}>` 即使 DS canonical demo 用 `<Avatar size={24}>` — bytes 同但 visual drift。
 
@@ -28,15 +28,15 @@ Per user 2026-05-27 verbatim directive 對應 root cause:**DS source 提供 prim
 npm run composition-fidelity -- \
   --ds-url=http://localhost:9001 \
   --consumer-url=http://localhost:9002 \
-  --consumer-app-files=/path/to/product-workspace/apps/template/src/App.tsx \
+  --consumer-app-files=/path/to/ds-product-template/apps/template/src/App.tsx \
   --out=.claude/snapshots/composition-fidelity \
   --threshold-pct=2
 
 # CI — against built storybook-static dirs:
 npm run composition-fidelity -- \
   --ds-static=storybook-static \
-  --consumer-static=/path/to/product-workspace/storybook-static \
-  --consumer-app-files=/path/to/product-workspace/apps/template/src/App.tsx \
+  --consumer-static=/path/to/ds-product-template/storybook-static \
+  --consumer-app-files=/path/to/ds-product-template/apps/template/src/App.tsx \
   --threshold-pct=0.5
 ```
 
@@ -50,14 +50,14 @@ npm run composition-fidelity -- \
 - `2%` — typical(allows brand text difference like "Acme Inc" vs "Acme Product")
 - `5%` — initial bootstrap(consumer 多元化內容差異)
 
-**Initial product-workspace baseline 1.41%**(measured 2026-05-27):brand text + NAV labels content-level diff。Structural composition byte-equal。
+**Initial ds-product-template baseline 1.41%**(measured 2026-05-27):brand text + NAV labels content-level diff。Structural composition byte-equal。
 
 ## CI workflow(待 next-phase ship)
 
-對應 codex feature `exec_permission_approvals` graduate 後可 land 在 product-workspace repo:
+對應 codex feature `exec_permission_approvals` graduate 後可 land 在 ds-product-template repo:
 
 ```yaml
-# .github/workflows/composition-fidelity.yml(product-workspace)
+# .github/workflows/composition-fidelity.yml(ds-product-template)
 on: [push, pull_request]
 jobs:
   composition-fidelity:
@@ -80,7 +80,7 @@ jobs:
 
 ## 不該做的事
 
-- ❌ 把 baseline screenshots commit 進 product-workspace repo(stale 風險)— 改 fetch from DS Pages live
+- ❌ 把 baseline screenshots commit 進 ds-product-template repo(stale 風險)— 改 fetch from DS Pages live
 - ❌ Threshold 設 0%(content-level diff 必然有，brand text / NAV labels)
 - ❌ 跑 raw DOM diff(M32 educated:pixel-quantified verify ≠ attribute existence)
 - ❌ 抽樣 5 stories(M-rule 不抽樣 / 不少於 user 明示「所有元件」scope)
@@ -88,7 +88,7 @@ jobs:
 ## 反 pattern 錨例
 
 **2026-05-27**:user 抓 AppShell Avatar+Label drift。Triple-verify 發現:
-1. Source byte-equivalent(DS sidebar.stories.tsx WorkspaceBrand 跟 product-workspace App.tsx 同 pattern)
+1. Source byte-equivalent(DS sidebar.stories.tsx WorkspaceBrand 跟 ds-product-template App.tsx 同 pattern)
 2. Stale build artifact:DS storybook-static built BEFORE commit 4e3256c1 fix → DS render 用 ItemAvatar wrapper / consumer 用 raw Avatar
 3. User screenshot 從 stale deploy 看到「DS-rendered」vs「consumer-rendered」structural diff
 

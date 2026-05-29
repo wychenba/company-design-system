@@ -32,6 +32,10 @@ on:
       - '.devcontainer/**'
       - 'template/ds-product-template/**'
       - 'package.json'
+      # 2026-05-29 codex P0 fix:mirror build 讀這 2 個 package.json 取 DS npm dep version,
+      # 必 trigger on version bump(否則 DS release 後 mirror 停在舊 version → Scenario B stale)
+      - 'packages/design-system/package.json'
+      - 'packages/storybook-config/package.json'
       # exclude noise
       - '!**/governance-counters.json'
       - '!**/hook-fires.jsonl'

@@ -20,7 +20,6 @@
   },
   "include": [
     "apps/*/src",
-    "packages/*/src",
     "scripts"
   ],
   "exclude": [
