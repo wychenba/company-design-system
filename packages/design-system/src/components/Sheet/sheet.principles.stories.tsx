@@ -244,7 +244,7 @@ export const SidePropRule: Story = {
               <SheetDescription>#PROJ-234 · 指派給Ada Chen</SheetDescription>
             </SheetHeader>
             <div className="flex-1 py-4 text-body text-fg-secondary">
-              (詳情內容)
+              登入頁在連續輸入錯誤密碼 3 次後未顯示鎖定提示,使用者反覆嘗試仍無回饋。建議補上鎖定倒數與重設連結。
             </div>
           </SheetContent>
         </Sheet>

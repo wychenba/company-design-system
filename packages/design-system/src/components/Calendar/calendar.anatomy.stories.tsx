@@ -42,7 +42,7 @@ export const Overview: Story = {
 export const Inspector: Story = {
   name: '元件檢閱器',
   parameters: {
-    docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。view 目前只支援 `month`(week / day 為 tech debt,已 disable)。' } },
+    docs: { description: { story: '右側 Controls 切換 props 即時預覽,取代 Figma 標註。檢視目前只支援「月」(週 / 日檢視尚未實作,為後續增量,選項已停用)。' } },
     layout: 'fullscreen',
   },
   args: {
@@ -82,10 +82,11 @@ export const ColorMatrix: Story = {
     return (
       <div className="p-4 bg-canvas flex flex-col gap-10">
         <div>
-          <H3>事件類別色(6 色)</H3>
+          <H3>事件類別色</H3>
           <Desc>
-            6 個 event color 對齊 Tag primitive colors(blue / green / orange / purple / red / yellow)。
+            event color 對齊 Tag 的色票(blue / green / orange / purple / red / yellow)。
             color 是**類別語意**(同 team / 同 project),非 severity。
+            註:目前 red 與 orange 共用同一組橙色票,畫面上呈現相同顏色,實際可區分的色相為 5 種(blue / green / orange(含 red) / purple / yellow)。
           </Desc>
           <div className="h-[560px]">
             <Calendar events={colorEvents} />
@@ -161,7 +162,7 @@ export const ColorMatrix: Story = {
                 <tr>
                   <Td>一般 event(timed)</Td>
                   <Td mono>bg-[var(--color-{`{color}`}-1)] · text-[var(--color-{`{color}`}-7)] · rounded-md · px-1.5 py-0.5 · text-caption · truncate</Td>
-                  <Td>單行 tile,color 依事件類別。對齊 Tag / Badge primitive 色階(step-1 subtle 底 / step-7 文字)</Td>
+                  <Td>單行 tile,color 依事件類別。對齊 Tag / Badge 色階(step-1 淺底 / step-7 文字)。例外:red 共用 deep-orange 色票(bg-[var(--color-deep-orange-1)] · text-[var(--color-deep-orange-7)])</Td>
                 </tr>
                 <tr>
                   <Td>All-day event</Td>
@@ -175,8 +176,8 @@ export const ColorMatrix: Story = {
                 </tr>
                 <tr>
                   <Td>超出 tile 限制</Td>
-                  <Td mono>「+N more」link(對齊 Google Calendar)</Td>
-                  <Td>click 展開 popover 列表</Td>
+                  <Td mono>「+N more」純文字(text-fg-muted)</Td>
+                  <Td>每格最多顯示 3 筆事件,超出顯示「+N more」弱化計數文字,目前不可點擊(展開列表為後續增量)</Td>
                 </tr>
               </tbody>
             </table>

@@ -22,7 +22,7 @@ Calendar 是**事件檢視 canvas**,讓 user 以**月 / 週 / 日** 三種 view 
 
 **實作基礎**:
 - 自建 composite(非 DayPicker)—— DayPicker 是「date picker 選日期」primitive,event calendar 是「頁面上看事件」的頁面 layout,兩者語意完全不同
-- 消費 DS primitives:`<Button>` / `<Tabs>`(切換 view) / `<DropdownMenu>`(新增事件入口) / `<ScrollArea>`(垂直事件列表) / `<AspectRatio>`(月 view 的 cell 比例)
+- 消費 DS primitives:`<Button>`(prev / next / 今天 / 新事件 CTA) / `<SegmentedControl>`(切換 view);月 grid cell 與 event tile 為元件自身用 CSS grid + token 組合,不另外消費 primitive。日期運算用 `date-fns`
 - 日期運算用 `date-fns`(已有 dependency,輕量)——不自造 date math
 
 **與 DatePicker 的區分(重要)**:
@@ -137,7 +137,7 @@ interface CalendarEvent {
 - **一般 event(timed)**:`{color}-subtle` 底色 + `{color}-text` 文字,圓角 + 緊湊 padding + truncate(單行)
 - **All-day event**:同一般 tile 但橫跨多 cell(grid-column span)
 - **Hover tile**:用 `{color}-hover` 微暗化表示可點擊
-- **超出 tile 限制**:顯示「+N more」(對齊 Google Calendar),點擊展開 popover 列表
+- **超出 tile 限制**:每格最多顯示 3 筆事件,超出顯示「+N more」弱化計數文字(對齊 Google Calendar),目前不可點擊(點擊展開 popover 列表為後續增量)
 
 完整 cell + event tile 的 class / token 對照見 anatomy `ColorMatrix` story。
 
@@ -173,7 +173,7 @@ interface CalendarEvent {
 - Toolbar navigation 用 `<nav aria-label="calendar navigation">`
 - Month grid 用 `role="grid"`,每 cell `role="gridcell"`,日期用 `aria-label="2026 年 4 月 3 日,3 個事件"`
 - Event tile `role="button"` + descriptive `aria-label`(title + time)
-- Keyboard:方向鍵移動 cell focus / Enter 打開事件 / PageUp/Down 切月
+- Keyboard(MVP 實作現況):Tab 逐一 focus 每個日期格與其中的事件 tile;Enter / Space 啟用目前 focus 的事件 tile(觸發 `onEventClick`);toolbar 的 prev / 今天 / next / 檢視切換為標準可聚焦控件。方向鍵在格間移動、PageUp/Down 切月為後續增量(見「MVP vs 後續增量」),尚未實作
 
 ---
 
@@ -227,16 +227,17 @@ interface CalendarEvent {
 
 **ARIA / Pattern**:對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。
 
-**Keyboard 行為**:
+**Keyboard 行為(MVP 實作現況)**:
 
-- Tab — focus calendar
-- ↑/↓/←/→ — 切 day
-- PageUp/Down — 切月
-- Shift+PageUp/Down — 切年
-- Enter — 選 date
-- Esc — 取消 / 關閉
+- Tab — 逐一 focus 每個日期格與其中的事件 tile(每格為 native `<button>`)
+- Enter / Space — 啟用目前 focus 的事件 tile,觸發 `onEventClick`
+- Toolbar 的 prev / 今天 / next / 檢視切換為標準可聚焦控件,Tab 可達
 
-**Focus**:focus-visible ring 對齊 DS canonical(`outline: 2px solid var(--ring)`);focus management 由元件 own。
+**Keyboard 後續增量(尚未實作,見「MVP vs 後續增量」)**:
 
-**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
+- ↑/↓/←/→ 在日期格間 roving 移動、PageUp/Down 切月、Shift+PageUp/Down 切年、Esc 關閉 — 隨週 / 日 view 增量一併補上 roving tabindex
+
+**Focus**:focus-visible ring 對齊 DS canonical(`outline: 2px solid var(--ring)`);日期格與事件 tile 皆有 ring。
+
+**驗證**:Storybook a11y addon panel 應 0 critical violation。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

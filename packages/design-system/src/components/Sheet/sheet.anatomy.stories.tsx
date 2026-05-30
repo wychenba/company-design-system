@@ -37,8 +37,8 @@ export const Overview: Story = {
                 <SheetDescription>#PROJ-1234 · 指派給陳大明</SheetDescription>
               </SheetHeader>
               <div className="flex-1 p-4 text-body">
-                <p className="mb-3 text-fg-secondary">使用者於結帳最後一步點選「完成付款」後,頁面無回應...</p>
-                <p className="text-caption text-fg-muted">（完整 task detail 內容）</p>
+                <p className="mb-3 text-fg-secondary">使用者於結帳最後一步點選「完成付款」後,頁面卡在轉圈動畫超過 30 秒,最終回到購物車且訂單未成立。重現率約 1/5,僅出現在 Safari 17。</p>
+                <p className="text-caption text-fg-muted">優先級 P1 · 影響 230 筆訂單 · 截止 2026-04-25</p>
               </div>
               <SheetFooter>
                 <Button variant="tertiary">標記為已解決</Button>
@@ -51,7 +51,7 @@ export const Overview: Story = {
 
       <div>
         <H3>Props 速查</H3>
-        <Desc>Sheet / SheetTrigger / SheetContent / SheetHeader / SheetTitle / SheetDescription / SheetFooter / SheetClose 全部是 Radix Dialog 薄 re-export。</Desc>
+        <Desc>Sheet / SheetTrigger / SheetClose / SheetPortal 是 Radix Dialog 的薄 re-export;SheetHeader / SheetBody / SheetFooter 不是 re-export——它們各自組合了關閉 X 按鈕、捲動區域與底部分隔，並消費共用的浮層 padding；SheetTitle / SheetDescription 則在 Radix 基底上再加上字級與間距樣式。</Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
             <thead><tr><Th>Prop (SheetContent)</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
@@ -119,8 +119,8 @@ export const Inspector: Story = {
             <SheetDescription>#PROJ-1234 · 指派給陳大明</SheetDescription>
           </SheetHeader>
           <div className="flex-1 p-4 text-body">
-            <p className="mb-3 text-fg-secondary">使用者於結帳最後一步點選「完成付款」後,頁面無回應...</p>
-            <p className="text-caption text-fg-muted">(完整 task detail 內容)</p>
+            <p className="mb-3 text-fg-secondary">使用者於結帳最後一步點選「完成付款」後,頁面卡在轉圈動畫超過 30 秒,最終回到購物車且訂單未成立。重現率約 1/5,僅出現在 Safari 17。</p>
+            <p className="text-caption text-fg-muted">優先級 P1 · 影響 230 筆訂單 · 截止 2026-04-25</p>
           </div>
           {showFooter && (
             <SheetFooter>
@@ -166,7 +166,7 @@ export const SideMatrix: Story = {
               <SheetDescription>最後編輯：2026-04-18 17:32</SheetDescription>
             </SheetHeader>
             <div className="flex-1 p-4">
-              <p className="text-body">（文件內容）</p>
+              <p className="text-body text-fg-secondary">本季營收 NT$4,820 萬,較上季成長 12%;毛利率 38.5%。下方附完整損益表與部門別明細,可直接在此面板註記後送交財務複核。</p>
             </div>
             <SheetFooter>
               <Button variant="primary">儲存</Button>
@@ -215,7 +215,7 @@ export const SizeMatrix: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>Side</Th><Th>預設尺寸</Th><Th>響應式</Th></tr></thead>
             <tbody>
-              <tr><Td mono>right / left</Td><Td mono>w-3/4（手機佔 75% 寬）</Td><Td>sm:max-w-sm（桌機 384px）</Td></tr>
+              <tr><Td mono>right / left</Td><Td mono>w-3/4（手機佔 75% 寬）</Td><Td>sm:max-w-md（桌機 448px）</Td></tr>
               <tr><Td mono>top / bottom</Td><Td>auto（依內容）</Td><Td>—</Td></tr>
             </tbody>
           </table>
@@ -261,7 +261,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `sheet.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  dialog  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/dialog#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — focus trap 在 sheet 內\n- Esc — 關閉\n- Shift+Tab — 反向 focus 循環\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contras"}</p>
+      <p className="whitespace-pre-line">{"Sheet 沿用 Radix 對話框的無障礙預設,開啟後會自動標記為對話框、把標題念給螢幕報讀器聽,並把鍵盤焦點鎖在面板內。\n\n鍵盤操作:\n\n- Tab — 焦點只在面板內循環,不會跑到背景頁面\n- Shift + Tab — 反向循環焦點\n- Esc — 關閉面板\n\n焦點:開啟時自動把焦點移進面板,關閉後還回原本的觸發按鈕;鍵盤聚焦的元素會顯示清楚的外框。\n\n驗證標準:Storybook 無障礙檢查面板不應出現嚴重問題,且全程僅用鍵盤即可操作,不需滑鼠。文字對比至少 4.5:1、介面元素對比至少 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }
