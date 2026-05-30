@@ -162,6 +162,9 @@ jobs:
       - name: Governance counter SSOT(count drift fail-closed — 2026-05-30 全掃 curated docs,治「改 dim 數忘了改 plugin.json」)
         run: node scripts/sync-governance-counters.mjs --check 2>&1 | tail -20
 
+      - name: Story LinkTo target SSOT(principles LinkTo name 必命中 showcase story name — 2026-05-30 治系統性死連結)
+        run: node scripts/check-story-linkto-targets.mjs --check 2>&1 | tail -40
+
       - name: Figma Make artifacts(SSOT propagation check)
         run: node scripts/gen-figma-make-artifacts.mjs --check
 
