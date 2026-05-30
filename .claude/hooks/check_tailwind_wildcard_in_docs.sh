@@ -58,8 +58,8 @@ $(echo "$ANTI_PATTERNS" | sed 's/^/    /')
     build 死 → release CI fail。本 anchor:beta.27 6+ CI iteration 燒此問題。
 
   改用 math notation(Tailwind 不誤判):
-    var(--elevation-*)         → var(--elevation-N) N∈{100,200,300}
-    var(--elevation-100/200/300) → var(--elevation-N) N∈{100,200,300}
+    var(--elevation-*)         → var(--elevation-N) N∈{100,200}
+    var(--elevation-100/200) → var(--elevation-N) N∈{100,200}
     var(--field-height-*)      → var(--field-height-N) N∈{sm,md,lg}
     var(--layout-space-*)      → var(--layout-space-N) N∈{loose,tight}
     var(--radix-*-available-height) → var(--radix-{popover|hover-card|dialog}-content-available-height)

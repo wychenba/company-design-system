@@ -140,7 +140,7 @@ run_hook "Write" "/repo/ok.css" '.card { box-shadow: var(--elevation-100); }'
 expect_silent "N1. concrete var(--elevation-100) → silent"
 
 # N2. math-notation replacement (the prescribed fix) → silent
-run_hook "Write" "/repo/ok.spec.md" 'use var(--elevation-N) N∈{100,200,300}'
+run_hook "Write" "/repo/ok.spec.md" 'use var(--elevation-N) N∈{100,200}'
 expect_silent "N2. var(--elevation-N) math notation → silent"
 
 # N3. near-miss: Tailwind fraction utility w-1/2 (slash NOT inside var()) → silent

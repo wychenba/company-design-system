@@ -20,7 +20,7 @@ grep -nE '\b(bg-popover|text-popover-foreground|text-muted-foreground|bg-accent|
 grep -nE '\bshadow-(sm|md|lg|xl|2xl|inner)\b' {target}
 ```
 
-**Severity**: P0。**Fix**: shadow-sm → shadow-[var(--elevation-100)] / shadow-md → shadow-[var(--elevation-200)] / shadow-lg → shadow-[var(--elevation-300)]。
+**Severity**: P0。**Fix**: shadow-sm → shadow-[var(--elevation-100)] / shadow-md → shadow-[var(--elevation-200)] / shadow-lg → shadow-[var(--elevation-200)](elevation-300 不存在,最高 tier 200)。
 
 ### Check 1.3: Tailwind v4 `[--foo]` shorthand
 
