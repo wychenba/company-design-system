@@ -29,7 +29,7 @@ const CHECK = process.argv.includes('--check')
 const COVERAGE = {
   // Group A — Correctness
   1: { tier: 'HOOK-ENFORCED', mechanism: 'cva 三方漂移 — story-auto-compile-migrate + compile-stories.mjs --check chain' },
-  2: { tier: 'PURE-JUDGMENT', mechanism: 'SSOT dead link — grep + spec-rules reciprocal pointer audit;sub-agent must DS-wide 全掃 spec.md pointers' },
+  2: { tier: 'DETERMINISTIC', mechanism: 'scripts/audit-spec-deadlinks.mjs --check(掃 83 spec.md cross-ref pointer,assert target 存在;2026-05-30 從誤分 PURE-JUDGMENT 修正)' },
   3: { tier: 'DETERMINISTIC', mechanism: 'scripts/add-reciprocal-pointers.mjs(auto-maintained,Dim 3 SSOT reciprocal)' },
   4: { tier: 'HOOK-ENFORCED', mechanism: 'check_opacity_token_usage.sh + utility-registry.json — write-time block' },
   5: { tier: 'DETERMINISTIC', mechanism: 'scripts/audit-orphan-tokens.mjs --check(0 真孤兒 verdict)' },

@@ -25,7 +25,7 @@ benchmark:
 
 **SSOT 邊界**:
 - AppShell own:slot composition / layout mode / Aside inline-vs-modal mode / mobile breakpoint propagate
-- **不 own**:Sidebar 視覺(SSOT 在 `Sidebar.spec.md`)/ Header 視覺(SSOT 在 `header-canonical.spec.md`)/ Sheet 視覺(SSOT 在 `sheet.spec.md`)/ Main 內 layout(SSOT 在 `layoutSpace.spec.md` 6 條規則)
+- **不 own**:Sidebar 視覺(SSOT 在 `sidebar.spec.md`)/ Header 視覺(SSOT 在 `header-canonical.spec.md`)/ Sheet 視覺(SSOT 在 `sheet.spec.md`)/ Main 內 layout(SSOT 在 `layoutSpace.spec.md` 6 條規則)
 
 **不是**:`Sidebar`(本 shell consumer 之一)/ `Sheet`(臨時浮層)/ `ChromeHeader`(local header)/ `Page`(語意 wrapper,不存在於本 DS)。
 
@@ -146,14 +146,14 @@ function CustomAside() {
 
 選 mode = 表態「Header 是 local 還是 global」,**不是**「workspace 是 single 還是 multi」。
 
-**Sidebar toggle 按鈕位置**(消費既有 `Sidebar.spec.md:308-360` SidebarTrigger 兩 pattern,**不發明新 toggle**):
+**Sidebar toggle 按鈕位置**(消費既有 `sidebar.spec.md:308-360` SidebarTrigger 兩 pattern,**不發明新 toggle**):
 
 | Mode | 對應 Sidebar pattern | Toggle 位置 |
 |---|---|---|
-| `primary-sidebar` | `Sidebar.spec.md` Pattern A(無 global top bar) | 主內容 header 最左 |
-| `primary-header` | `Sidebar.spec.md` Pattern B(有 global top bar) | global top bar 最左 |
+| `primary-sidebar` | `sidebar.spec.md` Pattern A(無 global top bar) | 主內容 header 最左 |
+| `primary-header` | `sidebar.spec.md` Pattern B(有 global top bar) | global top bar 最左 |
 
-**唯一 invariant**(`Sidebar.spec.md:310` 既有):trigger 必在 sidebar 任何 state(offcanvas / icon / expanded)下都可見 — 收合後 sidebar 不見了,toggle 不可能留在 sidebar 內(會跟著消失)。兩 mode 結論都落在 **Header 最左**,只是該 Header 是 local toolbar(Pattern A)還是 global bar(Pattern B)。Consumer 直接 `<SidebarTrigger />` 塞 Header 最左,AppShell 不 wrap / 不發明。
+**唯一 invariant**(`sidebar.spec.md:310` 既有):trigger 必在 sidebar 任何 state(offcanvas / icon / expanded)下都可見 — 收合後 sidebar 不見了,toggle 不可能留在 sidebar 內(會跟著消失)。兩 mode 結論都落在 **Header 最左**,只是該 Header 是 local toolbar(Pattern A)還是 global bar(Pattern B)。Consumer 直接 `<SidebarTrigger />` 塞 Header 最左,AppShell 不 wrap / 不發明。
 
 **層級語意差異**:`primary-sidebar` 的 Header scope = local(當前頁);`primary-header` 的 Header scope = global(整 app)。兩者是不同 product 角色,**不互通**。Consumer 選 mode = 表態 product 是哪派。
 
@@ -270,7 +270,7 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 
 ## Future extension(目前不定義)
 
-**Multi-sidebar**(Notion / Linear 雙側欄派):API 接 `sidebar?: ReactNode | ReactNode[]` 預留 array signature,**目前 strict 取首位**,違反 dev warning。未來擴充 SSOT 在 `Sidebar.spec.md`,不在本 pattern(per user 2026-05-19「AppShell 不該 customize Sidebar」)。
+**Multi-sidebar**(Notion / Linear 雙側欄派):API 接 `sidebar?: ReactNode | ReactNode[]` 預留 array signature,**目前 strict 取首位**,違反 dev warning。未來擴充 SSOT 在 `sidebar.spec.md`,不在本 pattern(per user 2026-05-19「AppShell 不該 customize Sidebar」)。
 
 **Footer**:不 expose slot(per user 2026-05-19「不用 footer」)。Web service 通常不用 footer,consumer 若需要自貼 Main 底。
 

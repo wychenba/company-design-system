@@ -35,6 +35,7 @@
     "test:datatable-invariants": "node scripts/data-table-invariants.mjs",
     "audit:coverage-matrix": "node scripts/audit-coverage-matrix.mjs",
     "audit:datatable-row-mode": "node scripts/audit-data-table-row-mode-ssot.mjs",
+    "audit:spec-deadlinks": "node scripts/audit-spec-deadlinks.mjs",
     "test:devmode-geometry": "node scripts/test-devmode-geometry-invariant.mjs",
     "sync-memory": "node scripts/sync-memory.mjs",
     "sync:ds-canonical": "node scripts/sync-ds-canonical.mjs",

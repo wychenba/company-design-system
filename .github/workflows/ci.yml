@@ -168,6 +168,12 @@ jobs:
       - name: Layout Family frontmatter(Dim 16 deterministic backstop — 2026-05-30 從誤分 PURE-JUDGMENT 修正)
         run: node scripts/audit-layout-family-frontmatter.mjs --check 2>&1 | tail -20
 
+      - name: SSOT spec dead-link(Dim 2 deterministic backstop — 2026-05-30 從誤分 PURE-JUDGMENT 修正,治 rename spec 忘改 pointer)
+        run: node scripts/audit-spec-deadlinks.mjs --check 2>&1 | tail -30
+
+      - name: Content quality DS-wide(spec/story 人話 + 佔位符 deterministic gate — 2026-05-30 wire per task#6 orphan)
+        run: node scripts/audit-content-quality.mjs --check 2>&1 | tail -20
+
       - name: .mjs syntax gate(M6 — 抓 TS-in-mjs dead script 假綠,2026-05-30 per laziness-hunt)
         run: |
           for f in scripts/*.mjs; do node --check "$f" || { echo "❌ $f node --check failed (TS-in-mjs?)"; exit 1; }; done
