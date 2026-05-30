@@ -35,7 +35,7 @@ originSessionId: 41fa83c2-f951-431e-911e-ed3ceb185903
 | Layer | Mechanism |
 |---|---|
 | 1 spec | `tokens/README.md` 章節「DS CSS coverage canonical」(待寫) |
-| 2 hook PreToolUse | TBD `check_pre_css_drift.sh`(可選) |
+| 2 hook PreToolUse | TBD `check_pre_css_drift.sh`(未實作,可選 planned) |
 | 3 hook Stop | `check_orphan_ds_css.sh` ✅(2026-05-27 ship) |
 | 4 script | `gen-figma-make-artifacts.mjs` auto-scan ✅(2026-05-27 enhance) |
 | 5 CI | `release.yml` audit gates(`scripts/audit-content-quality.mjs --check` plumbing) |
