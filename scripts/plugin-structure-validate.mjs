@@ -83,6 +83,44 @@ check('hooks.json paths use ${CLAUDE_PLUGIN_ROOT}', () => {
   }
 })
 
+// 5.5 hooks.json(plugin)↔ settings.json(DS dev)hook-set sync
+//     2026-05-30 加 per user「更新了 A 卻忘了 B」directive:plugin hooks.json 是 fork user 拿到的
+//     hook 集;settings.json 是 DS repo dev 跑的。兩者漂移 = fork user 拿到跟 DS dev 不同的治理 →
+//     靜默削弱 fork 端 governance。by-basename 比對(plugin 用 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/X.sh,
+//     dev 用 $CLAUDE_PROJECT_DIR/.claude/hooks/X.sh,路徑前綴不同但 .sh 檔名須一致)。
+//     intentional asymmetry → 加進 EXEMPT 並註明理由(避免 silent drift)。
+check('hooks.json(plugin)↔ settings.json(dev)hook-set sync', () => {
+  const EXEMPT = new Set([
+    // 目前無 intentional asymmetry;未來若有 plugin-only / dev-only hook,列此 + 一行理由
+  ])
+  const extractScripts = (path) => {
+    const j = JSON.parse(readFileSync(path, 'utf8'))
+    const hooks = j.hooks || j
+    const set = new Set()
+    for (const ev of Object.keys(hooks)) {
+      for (const grp of hooks[ev]) {
+        for (const h of grp.hooks || []) {
+          const m = (h.command || '').match(/([a-zA-Z0-9_-]+\.sh)/)
+          if (m && !EXEMPT.has(m[1])) set.add(m[1])
+        }
+      }
+    }
+    return set
+  }
+  const plugin = extractScripts(join(REPO_ROOT, 'hooks/hooks.json'))
+  const settings = extractScripts(join(REPO_ROOT, '.claude/settings.json'))
+  const onlyPlugin = [...plugin].filter((x) => !settings.has(x)).sort()
+  const onlySettings = [...settings].filter((x) => !plugin.has(x)).sort()
+  if (onlyPlugin.length || onlySettings.length) {
+    throw new Error(
+      `hook-set drift(plugin ${plugin.size} vs dev ${settings.size}):\n` +
+      (onlyPlugin.length ? `  只在 plugin hooks.json(dev settings.json 漏)：${onlyPlugin.join(', ')}\n` : '') +
+      (onlySettings.length ? `  只在 dev settings.json(plugin hooks.json 漏 → fork user 拿不到)：${onlySettings.join(', ')}\n` : '') +
+      `  修:兩檔同步註冊該 hook;或 intentional → 加進本 check EXEMPT + 理由。`
+    )
+  }
+})
+
 // 6. Version sync(plugin.json vs marketplace.json vs package.json)
 check('Version sync across 5 manifests', () => {
   const dsPkg = JSON.parse(readFileSync(join(REPO_ROOT, 'packages/design-system/package.json'), 'utf8'))
