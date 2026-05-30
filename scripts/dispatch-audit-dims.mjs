@@ -122,10 +122,15 @@ function deriveBatches(allDims, heavy) {
   return batches
 }
 
-fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true })
-fs.writeFileSync(OUT_FILE, JSON.stringify(output, null, 2))
-
 const argv = process.argv.slice(2)
+
+// --check = read-only validation(CI + codex Phase B read-only env);只在 generation 模式寫 log。
+// 2026-05-30 codex Phase B P1:write 原本無條件在 argv parse 前 → read-only env 跑 `--check` 先炸 EPERM,
+// break 文件化的 codex self-confirm path(deep-audit-cross-codex/references/phase-b-codex-brief.md)。
+if (!argv.includes('--check')) {
+  fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true })
+  fs.writeFileSync(OUT_FILE, JSON.stringify(output, null, 2))
+}
 if (argv.includes('--summary') || argv.includes('-s')) {
   console.log(`=== Audit Dim Dispatch Plan(SSOT-driven)===`)
   console.log(`Total dims: ${output.total}`)

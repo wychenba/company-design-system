@@ -38,9 +38,11 @@ CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // .tool_input.content /
 if echo "$CONTENT" | grep -qE '@preset-cjs-skip:'; then exit 0; fi
 
 # Detect ESM/CJS interop antipatterns
-# 2026-05-30(dim 81 M7/M34 broad-vs-narrow fix):strip comments BEFORE keyword grep — 正確的 preset.ts
-# 會在 comment block 內「文件化」這些 anti-pattern(教學),raw-content grep 會假 BLOCK 合法 edit(ship 給 fork)。
-CONTENT_CODE=$(echo "$CONTENT" | grep -vE '^[[:space:]]*(//|\*|/\*|\*/)' | sed -E 's@//.*@@')
+# 2026-05-30(dim 81 M7/M34 broad-vs-narrow fix + codex Phase B P3 inline-block edge):strip line-level 註解
+# BEFORE keyword grep — 正確的 preset.ts 會在 comment 內「文件化」這些 anti-pattern(教學),raw-content
+# grep 會假 BLOCK 合法 edit(ship 給 fork)。Strip 範圍:(1) 整行 //|/*|*/|* 開頭 (2) 同行 inline /* … */ block
+# (3) 行尾 // 註解。多行 block 的中間行以 * 開頭已被 (1) 覆蓋。極罕見「同行開 /* + keyword 未閉合」→ @preset-cjs-skip: escape。
+CONTENT_CODE=$(echo "$CONTENT" | grep -vE '^[[:space:]]*(//|\*|/\*|\*/)' | sed -E 's@/\*.*\*/@@g; s@//.*@@')
 ANTIPATTERN=""
 if echo "$CONTENT_CODE" | grep -qE 'createRequire|require\.resolve'; then
   ANTIPATTERN="${ANTIPATTERN}  - createRequire / require.resolve(被 Node ESM scope 攔)\n"
