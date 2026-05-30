@@ -33,18 +33,27 @@ export const UsageGuidance: Story = {
 
       <section>
         <h2 className="text-h4 mb-2">Layout mode 怎麼選</h2>
+        <p className="text-body mb-2">
+          唯一 distinguisher = <strong>Header scope 是 local 還是 global</strong>,
+          <em>不是</em> workspace 多寡(Notion / Gmail 都支援 multi-workspace,卻分屬不同派)。
+          問自己:頂部那條 bar 服務的是「當前這一頁」還是「整個 app」?
+        </p>
         <ul className="text-body space-y-1">
           <li>
-            <strong>primary-sidebar</strong>:product-focused / single-workspace。Header scope = 當前頁 actions。
+            <strong>primary-sidebar</strong>:頂部是 <strong>local toolbar</strong> —
+            服務當前頁(breadcrumb / page-level actions / filter)。Sidebar 頂天立地,WorkspaceBrand 在 sidebar 頂。
             參考 Linear / Notion / Figma。
           </li>
           <li>
-            <strong>primary-header</strong>:multi-workspace / account-heavy / global ops。Header scope = global account + workspace switcher + notifications。
+            <strong>primary-header</strong>:多一條 <strong>global bar</strong> 橫跨頂部 —
+            服務整個 app(account / workspace switcher / 跨頁 search / notifications);local toolbar
+            <em>仍在</em> main col 頂,只是上面多了 global header。WorkspaceBrand 改放 globalHeader 左側。
             參考 GitHub / Slack / Gmail。
           </li>
         </ul>
         <p className="text-caption text-fg-muted mt-2">
           兩 mode 是 product 角色表態 — 啟動時固定,不該在 runtime 切換。
+          視覺對照圖見「設計規格 → 兩種布局模式對照圖」。
         </p>
       </section>
 

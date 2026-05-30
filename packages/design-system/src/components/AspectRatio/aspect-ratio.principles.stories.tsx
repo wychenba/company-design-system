@@ -4,6 +4,7 @@
 // RatioChoice / ChildrenFillRule / PlaceholderAndSkeleton kept as separate principles.
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
+import LinkTo from '@storybook/addon-links/react'
 import { AspectRatio } from './aspect-ratio'
 import { Skeleton } from '@/design-system/components/Skeleton/skeleton'
 

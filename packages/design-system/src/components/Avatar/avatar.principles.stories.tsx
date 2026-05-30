@@ -61,12 +61,14 @@ export const UsageGuidance: Story = {
           note="「設定」「通知」「首頁」這類功能 / 動作 / 概念不是「誰」,是「做什麼」。Icon 更適合——Avatar 用在這裡會讓使用者以為是某個人的頭像"
         >
           <div className="border border-divider rounded-lg bg-surface py-1">
-            <MenuItem avatar={{ alt: 'S' }}>❌ 設定用 Avatar</MenuItem>
+            {/* alt 用真實人名首字「S」會讓 Avatar 渲染出 initials,使用者誤以為「設定」是某位成員 */}
+            <MenuItem avatar={{ alt: 'Sam Lin' }}>設定</MenuItem>
           </div>
-          <Label warn>↑ 「S」+ icon 讓使用者誤以為是某個人(使用者 S?)。功能導覽用 Lucide icon</Label>
+          <Label warn>↑ ❌ 「設定」是功能不是「誰」,套 Avatar 後首字「S」讓使用者誤以為是某位成員(Sam?)。功能導覽應用 Lucide icon</Label>
           <div className="border border-divider rounded-lg bg-surface py-1">
-            <MenuItem startIcon={Settings}>✓ 設定用 Icon</MenuItem>
+            <MenuItem startIcon={Settings}>設定</MenuItem>
           </div>
+          <Label>↑ ✓ 功能 / 動作 / 概念用 Lucide icon,語義清楚不會誤認身份</Label>
         </Rule>
 
         <Rule

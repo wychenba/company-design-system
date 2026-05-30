@@ -695,7 +695,7 @@ End: `N specs checked, M hardcoded violations, top 5: [list]`. Under 400 words. 
 
 ---
 
-## 21. Stories / consumer code 手刻繞 DS canonical(視覺對齊盲點的可機械化前哨)
+## L1. Stories / consumer code 手刻繞 DS canonical(視覺對齊盲點的可機械化前哨)(legacy cross-ref — 不在 SKILL.md dim table;原佔 dim 21 slot,renumber 避免與現行 dim 21「連續 item list wrapper gap」撞號)
 
 **Type**: Absolute
 **Canonical source**: `.claude/rules/ui-development.md`「Story / consumer code 禁止手刻既有 DS 元件已支援的 pattern」+ 元件 spec.md(提供的 API)
@@ -753,7 +753,7 @@ End: `N files checked, V violations by signal: A=?, B=?, C=?, D=?, E=?. Top 5 wo
 
 # Group H — Principle self-audit (D6 子維,session-learned 2026-04-22)
 
-## 22. D6e Predicate coherence(對齊 CLAUDE.md Meta-Pattern M9)
+## L2. D6e Predicate coherence(對齊 CLAUDE.md Meta-Pattern M9)(legacy cross-ref — 不在 SKILL.md dim table;原佔 dim 22 slot,renumber 避免與現行 dim 22「視覺容器 inner breathing」撞號)
 
 **Type**: Consistency
 **Canonical source**: `.claude/skills/design-system-audit/references/principle-audit-protocol.md` → D6e Predicate coherence scan;CLAUDE.md `# Meta-Pattern 預警` M9(Predicate Self-Test)
@@ -791,7 +791,7 @@ Q4. **Empty category** — predicate 有 category 但 example 表沒 real case?
 End: `N predicate specs scanned, V1/V2/V3/V4 violations by Q. Top offenders: [list]`. Under 600 words. Don't fix.
 ```
 
-## 23. Benchmark-First discipline(對齊 CLAUDE.md Meta-Pattern M8)
+## L3. Benchmark-First discipline(對齊 CLAUDE.md Meta-Pattern M8)(legacy cross-ref — 不在 SKILL.md dim table;原佔 dim 23 slot,renumber 避免與現行 dim 23「Controlled / Uncontrolled dual-mode」撞號)
 
 **Type**: Consistency
 **Canonical source**: CLAUDE.md `# Meta-Pattern 預警` M8(訂 canonical 前必 benchmark 至少 3 家 world-class);principle-audit-protocol.md D6e Q3
