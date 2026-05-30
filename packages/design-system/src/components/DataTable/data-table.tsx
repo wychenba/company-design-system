@@ -299,8 +299,8 @@ function columnSizeStyle(
   // **flex-basis: baseSize(2026-05-06 v14.2)**:把 baseSize 當 explicit basis(不是 `0%`)。
   // 為什麼:flex item base = basis + padding(box-sizing: border-box content-box 行為)。前 `0%`
   // basis → cell padding 變 base 一部分。display(padding 12)vs edit(padding 0,Field 接管)
-  // 兩態 base 不同 → flex 重分配 → user 報「Price cell 進 edit 寬度縮 12px」(verify by
-  // debug-v14-1-display-edit-rect-match.mjs:Price display 130.5 → edit 118.5 = -12px)。
+  // 兩態 base 不同 → flex 重分配 → user 報「Price cell 進 edit 寬度縮 12px」
+  // (量測:Price display 130.5 → edit 118.5 = -12px)。
   // explicit basis = baseSize 讓 padding 不參與 base 計算 → display↔edit 寬度穩定。
   return { flex: `1 1 ${baseSize}px`, minWidth: baseSize, maxWidth: maxSize }
 }

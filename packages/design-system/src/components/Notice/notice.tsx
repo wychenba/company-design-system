@@ -120,6 +120,7 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
         />
 
         {(endContent || dismissible) && (
+          // @row-slot-handcraft-allow: Notice 是非-row alert（非 item-anatomy row），此 end slot 是 Notice 自身 layout 的 dismiss/endContent 容器，不是 row prefix/suffix → 不消費 ItemPrefix/ItemSuffix
           <div className="flex items-center gap-2 shrink-0 h-[1lh]">
             {endContent}
             {dismissible && (

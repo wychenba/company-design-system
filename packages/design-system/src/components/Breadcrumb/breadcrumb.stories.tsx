@@ -201,55 +201,9 @@ export const DeclarativeAutoCollapse: Story = {
   ),
 }
 
-// ── Deep hierarchy (不折疊, 完整顯示) ──────────────────────────────────────
-
-export const Deep: Story = {
-  name: '深層巢狀',
-  render: () => (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">首頁</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/org">組織</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/org/team">產品團隊</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/org/team/members">成員管理</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>Alice 的權限設定</BreadcrumbPage>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-  ),
-}
-
-// ── Two levels (最小合理深度) ─────────────────────────────────────────────
-
-export const TwoLevels: Story = {
-  name: '兩層巢狀',
-  render: () => (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/docs">文件</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>快速開始</BreadcrumbPage>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-  ),
-}
+// @story-trait-rationale: Deep(5 層)+ TwoLevels(2 層)retired 2026-05-30 per earn-existence 2-test —
+// 兩者與 Default(3 層)教的原則完全相同(BreadcrumbLink + Separator + 末項 BreadcrumbPage),差別僅「深度數字」。
+// 路徑深度變化已由 anatomy Inspector `pathLength` control(3/4/5/6/7 即時切換)+ DeclarativeAutoCollapse(5 層 + auto-collapse)涵蓋。
 
 // ── 首項 Home icon(Material / Atlassian 業界慣例,spec.md startIcon prop)──
 

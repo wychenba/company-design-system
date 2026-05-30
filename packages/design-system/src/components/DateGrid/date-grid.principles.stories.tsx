@@ -304,7 +304,7 @@ export const LocaleRule: Story = {
     <div>
       <Rule
         title="locale prop 控制週首日與星期標頭語言"
-        note="react-day-picker 接受 date-fns locale 物件。繁中用 zhTW(週首為週日)、英文用 enUS(週首為週日)、德 / 法系國家週首為週一。Consumer 決定傳哪個 locale,DateGrid 不內建語言。"
+        note="react-day-picker 接受 date-fns locale 物件。週首日由 locale 物件決定,不以語言籠統判斷:zhTW 週日起、en-US 週日起,但 en-GB / de / fr 週一起(同樣是英文,en-US 與 en-GB 週首日就不同)。Consumer 決定傳哪個 locale,DateGrid 不內建語言。"
       >
         <Demo title="zhTW(繁體中文 · 週日起)">
           <DateGrid mode="single" defaultMonth={new Date(2026, 3, 1)} locale={zhTW} />

@@ -250,6 +250,7 @@ const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
         />
 
         {(tag || endContent) && (
+          // @row-slot-handcraft-allow: MenuItem 自身即 row primitive（item-anatomy Family 1 owner），此 tag/endContent 容器是 MenuItem 自有 suffix slot 實作，非外部 consumer hand-craft → 不再 wrap ItemSuffix
           <div className={cn(
             'flex items-center gap-2 shrink-0 h-[1lh] ml-auto',
             disabled && 'opacity-disabled',

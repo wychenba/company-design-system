@@ -130,18 +130,31 @@ export const FullScreenOverlay: Story = {
   ),
 }
 
+// @story-trait-rationale: determinate 模式的真實消費場景——多檔上傳列(Google Drive /
+//   Dropbox 慣例),每列 value + affix 顯示各檔上傳進度。determinate 視覺枚舉本身由
+//   anatomy UsageInline 涵蓋;100%-swap 原則由 principles/UsageGuidance 擁有,本展示不重述,
+//   只示範「determinate 在真實 context 怎麼用」(earn-existence:檔案上傳列 = 別 story 沒教的場景)。
 export const Determinate: Story = {
   name: '確定進度',
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-6">
-        <CircularProgress value={25} />
-        <CircularProgress value={50} />
-        <CircularProgress value={75} affix="value" />
+  render: () => {
+    const uploads = [
+      { file: 'Q3-revenue-report.xlsx', value: 28 },
+      { file: 'product-roadmap.pdf', value: 64 },
+      { file: 'onboarding-deck.key', value: 91 },
+    ]
+    return (
+      <div className="flex flex-col gap-2 max-w-sm">
+        {uploads.map((u) => (
+          <div
+            key={u.file}
+            className="flex items-center gap-3 border border-border rounded-md px-3 py-2 text-body"
+          >
+            <Upload size={16} className="text-fg-muted" />
+            <span className="flex-1 truncate">{u.file}</span>
+            <CircularProgress size={16} value={u.value} affix="value" aria-label={`${u.file} 上傳 ${u.value}%`} />
+          </div>
+        ))}
       </div>
-      <p className="text-caption text-fg-muted max-w-prose">
-        達 100% 時,CircularProgress 應由 consumer <strong>swap 為完成 state</strong>(✓ 打勾 icon / 直接呈現該顯示的內容 / 切到 Empty),不保留 value=100 的 CircularProgress。世界級慣例:Gmail / Dropbox / Google Drive 上傳完成即消失。
-      </p>
-    </div>
-  ),
+    )
+  },
 }

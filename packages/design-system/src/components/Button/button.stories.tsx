@@ -91,18 +91,18 @@ export const Pressed: Story = {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-caption text-fg-muted w-24">secondary</span>
-        <Button variant="secondary">Not pressed</Button>
-        <Button variant="secondary" pressed>Pressed</Button>
+        <Button variant="secondary">顯示側欄</Button>
+        <Button variant="secondary" pressed>已顯示側欄</Button>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-caption text-fg-muted w-24">tertiary</span>
-        <Button variant="tertiary">Not pressed</Button>
-        <Button variant="tertiary" pressed>Pressed</Button>
+        <Button variant="tertiary">自動儲存</Button>
+        <Button variant="tertiary" pressed>自動儲存中</Button>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-caption text-fg-muted w-24">text</span>
-        <Button variant="text">Not pressed</Button>
-        <Button variant="text" pressed>Pressed</Button>
+        <Button variant="text">靜音</Button>
+        <Button variant="text" pressed>已靜音</Button>
       </div>
     </div>
   ),

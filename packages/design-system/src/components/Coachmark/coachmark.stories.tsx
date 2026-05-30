@@ -1,9 +1,9 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import type { LucideIcon } from 'lucide-react'
 import { Sparkles, Bot, Users, FolderPlus, Keyboard, MousePointer2, Command } from 'lucide-react'
 import { Coachmark } from './coachmark'
+import { MediaGradient } from './coachmark-story-helpers'
 import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta = {
@@ -12,34 +12,6 @@ const meta: Meta = {
 }
 export default meta
 type Story = StoryObj
-
-// ── Media helpers (placeholder gradients — avoid external image refs) ────────
-
-// Media illustration placeholder:DS-aligned icon tier + 白色 emphasis 強對比
-// (icon 走 size=32 對應 Badge / Avatar 常見 medium tier;label 走 text-body text-on-emphasis
-// 而非半透明 white/90 — 確保對比符合 WCAG AA + DS typography tier 對齊)
-//
-// ── AR40 對比修正(2026-04-21)──
-// 某些 DS primitive 色的 lightness 較高(如 `--color-yellow-6` OKLCH L=0.87),
-// 白字在上面會失去 AA 對比(< 1.5:1)。加一層 `bg-black/30` overlay 均勻壓暗,
-// 不論 gradient 色值為何都能保證 icon+label 有 ≥ 4.5:1 對比。
-const MediaGradient = ({
-  from, to, icon: Icon, label,
-}: {
-  from: string; to: string; icon: LucideIcon; label: string
-}) => (
-  <div
-    className="relative w-full h-full flex items-center justify-center"
-    style={{ background: `linear-gradient(135deg, ${from} 0%, ${to} 100%)` }}
-  >
-    {/* 均勻壓暗 overlay — 保底白字在任何 gradient 色上都 AA 通過 */}
-    <div className="absolute inset-0 bg-black/30 pointer-events-none" aria-hidden />
-    <div className="relative flex flex-col items-center gap-2 text-on-emphasis">
-      <Icon size={32} strokeWidth={1.75} />
-      <span className="text-body font-medium">{label}</span>
-    </div>
-  </div>
-)
 
 // ── Single Coachmark: Intercom-style feature discovery ──────────────────────
 

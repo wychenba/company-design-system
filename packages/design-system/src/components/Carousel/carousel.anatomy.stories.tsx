@@ -18,20 +18,26 @@ export default meta
 type Story = StoryObj
 
 // ── Sample slides ────────────────────────────────────────────────────────────
+// 2026-05-16 audit Round 6:三層(展示 / 設計規格 / 設計原則)一致用真實 picsum seeded photo
+// 取代 gradient 色塊 — gradient 抽象 block 教不到真實裁切 / 內容裁切 / 視覺層次,
+// 且要與主展示頁(carousel.stories.tsx)同源,讓設計師看到的 slide 內容跨三層一致。
+// Picsum.photos 提供 stable seeded photos(免登入 / 免 API key / 跨環境一致)。
+// 註:ColorMatrix「視覺樣本」cell 刻意保留純色 swatch(bg-foreground)——那是 token 色票
+// 非 slide 內容,用純色才能精準標 dot 的 white/60 · white/80 · white token。
 
 const slides = [
-  { label: '京都',          gradient: 'linear-gradient(135deg, #c4452a 0%, #f28b3a 60%, #ffd37a 100%)' },
-  { label: '雷克雅維克',    gradient: 'linear-gradient(135deg, #1b3b6f 0%, #3d7ea6 60%, #a8e0ff 100%)' },
-  { label: '里斯本',        gradient: 'linear-gradient(135deg, #e87d5a 0%, #f4c27a 50%, #f7e2b0 100%)' },
-  { label: '峇里島',        gradient: 'linear-gradient(135deg, #1d6a5a 0%, #4db893 60%, #c7ebd9 100%)' },
+  { label: '京都',       image: 'https://picsum.photos/seed/kyoto/720/360' },
+  { label: '雷克雅維克', image: 'https://picsum.photos/seed/reykjavik/720/360' },
+  { label: '里斯本',     image: 'https://picsum.photos/seed/lisbon/720/360' },
+  { label: '峇里島',     image: 'https://picsum.photos/seed/bali/720/360' },
 ]
 
-const SampleSlide = ({ label, gradient, height = 240 }: { label: string; gradient: string; height?: number }) => (
+const SampleSlide = ({ label, image, height = 240 }: { label: string; image: string; height?: number }) => (
   <div
-    className="rounded-lg overflow-hidden flex items-end p-6 text-white"
-    style={{ background: gradient, height }}
+    className="rounded-lg overflow-hidden flex items-end p-6 text-white bg-cover bg-center"
+    style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.6) 100%), url(${image})`, height }}
   >
-    <div>
+    <div className="relative z-10">
       <div className="text-caption opacity-90">推薦目的地</div>
       <div className="text-h3 font-bold">{label}</div>
     </div>
@@ -504,7 +510,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"本元件為純視覺呈現,無 keyboard / ARIA role / focus state 需求。Consumer 包 Carousel 進互動容器(Button / Card / Link)時 a11y 由容器決定。"}</p>
+      <p className="whitespace-pre-line">{"詳 `carousel.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA  :\n\n- 根容器 `role=\"region\"` + `aria-roledescription=\"carousel\"`\n- 每個 `CarouselItem` `role=\"group\"` + `aria-roledescription=\"slide\"`\n- Arrow 為 DS Button,帶 `aria-label`(「上一張」/「下一張」),邊界時 `disabled`\n- Dots 容器 `role=\"tablist\"` + `aria-label`;每個 dot `role=\"tab\"` + `aria-selected={...}` + `aria-label=\"跳至第 N 張\"`\n\n  Keyboard 行為  :\n\n- ←/→ — 上一張 / 下一張(根容器 `onKeyDownCapture`,`preventDefault` 避免頁面捲動)\n- Tab — roving 進入 Previous → Next → 每個 Dot\n- Enter / Space — 觸發當前 focus 的 arrow / dot(原生 `<button>`)\n\n  Focus  :arrow 預設 `opacity-0`,`focus-within` / `focus-visible` 時強制顯示(鍵盤使用者不 hover,焦點必可見);dot focus-visible 走 ring token(`ring-2 ring-ring ring-offset-2`)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;不靠滑鼠即可完整切張與跳張。"}</p>
     </div>
   ),
 }

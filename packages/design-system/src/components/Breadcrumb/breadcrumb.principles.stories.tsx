@@ -67,16 +67,13 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/Breadcrumb/展示" name="可互動省略"><span className="text-primary hover:underline font-medium cursor-pointer">可互動省略</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Breadcrumb/展示" name="Deep"><span className="text-primary hover:underline font-medium cursor-pointer">Deep</span></LinkTo>
-        </li>
-        <li>
-          <LinkTo kind="Design System/Components/Breadcrumb/展示" name="Two Levels"><span className="text-primary hover:underline font-medium cursor-pointer">Two Levels</span></LinkTo>
+          <LinkTo kind="Design System/Components/Breadcrumb/展示" name="宣告式 API + 自動收合"><span className="text-primary hover:underline font-medium cursor-pointer">深層巢狀自動收合</span></LinkTo>
         </li>
         <li>
           <LinkTo kind="Design System/Components/Breadcrumb/展示" name="整合 React Router / Next.js Link"><span className="text-primary hover:underline font-medium cursor-pointer">整合 React Router / Next.js Link</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用相近的其他元件(見下方「跟相近元件怎麼分」的範例)。</p>
     </div>
 
       {/* vs 近親 — VsTabsRule — 原 VsTabsRule */}

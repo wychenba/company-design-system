@@ -66,10 +66,6 @@ export * from './components/Tooltip/index'
 export * from './components/TreeView/index'
 
 // ─── Patterns ─────────────────────────────────────────────────────────────
-// 2026-05-27 fix(per user 抓 Avatar drift):element-anatomy 漏 public export →
-// consumer 被迫用 <Avatar size=32(default)> 代替 <ItemAvatar size=24(scanning row)> → 8px drift
-// Note:action-bar 為 spec-only pattern(無實作 tsx),無 index 可 export
-export * from './patterns/element-anatomy/index'
 export * from './patterns/horizontal-overflow/index'
 export * from './patterns/overlay-surface/index'
 export * from './patterns/resize-handle/index'

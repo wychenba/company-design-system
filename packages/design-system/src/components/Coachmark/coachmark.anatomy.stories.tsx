@@ -2,6 +2,7 @@ import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { Bot, Sparkles, Users } from 'lucide-react'
 import { Coachmark } from './coachmark'
+import { MediaGradient } from './coachmark-story-helpers'
 import { Button } from '@/design-system/components/Button/button'
 import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
@@ -11,24 +12,6 @@ const meta: Meta = {
 }
 export default meta
 type Story = StoryObj
-
-// ── Inline media helper ──────────────────────────────────────────────────────
-
-const DemoMedia = ({
-  from = '#6366f1', to = '#8b5cf6', icon: Icon = Bot, label = 'Feature',
-}: {
-  from?: string; to?: string; icon?: React.ComponentType<{ className?: string }>; label?: string
-}) => (
-  <div
-    className="w-full h-full flex items-center justify-center"
-    style={{ background: `linear-gradient(135deg, ${from} 0%, ${to} 100%)` }}
-  >
-    <div className="flex flex-col items-center gap-1.5 text-white/90">
-      <Icon className="w-8 h-8" />
-      <span className="text-footnote font-medium">{label}</span>
-    </div>
-  </div>
-)
 
 // ── 1. Overview ──────────────────────────────────────────────────────────────
 

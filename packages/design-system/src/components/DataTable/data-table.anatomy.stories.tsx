@@ -522,7 +522,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `data-table.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  radio-group  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/radio-group#accessibility)。\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"詳 `data-table.spec.md` 「八、a11y 預設」段。DataTable 採 `<div>` + ARIA grid role(非語義 `<table>`,因虛擬捲動需絕對定位 row),對齊 WAI-ARIA APG Grid pattern。摘要:\n\n  Grid role  :容器 `role=\"grid\"`、每列 `role=\"row\"`、每格 `role=\"gridcell\"`(header cell `role=\"columnheader\"`)。\n\n  排序  :sortable header 帶 `aria-sort=\"ascending | descending | none\"`,排序狀態切換時 screen reader 即時播報。\n\n  選取  :每列 checkbox 必有 `aria-label`(consumer 由 `getRowAriaLabel` 提供,fallback 「Select row」);全選 checkbox `aria-label=\"Select all visible rows\"`;selection 變更可選 `aria-live=\"polite\"` 通知。\n\n  鍵盤  :方向鍵在 cell 間移動(roving tabindex — 同一時間僅一個 cell 進 tab order);選取列 `Space` toggle / `Shift+Space` 擴 range / `Cmd/Ctrl+A` 選全可見 / `Esc` 清除。Row actions 收進 MoreVertical dropdown 確保全部鍵盤可達。\n\n  焦點  :focus-visible ring( outline: 2px solid var(--ring) ,對齊 design-system focus 準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

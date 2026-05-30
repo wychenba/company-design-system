@@ -301,7 +301,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"本元件為純視覺呈現,無 keyboard / ARIA role / focus state 需求。Consumer 包 Chart 進互動容器(Button / Card / Link)時 a11y 由容器決定。"}</p>
+      <p className="whitespace-pre-line">{"詳 `chart.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / 鍵盤  :所有 chart 範例都傳 Recharts `accessibilityLayer` prop(本 DS showcase / anatomy / principles 全預設開啟)。啟用後 Recharts 接管鍵盤焦點與讀屏語義 — ChartContainer wrapper 本身不掛 onKeyDown,鍵盤與 ARIA 由 Recharts 提供。\n\n- 方向鍵 ←/→ — 逐資料點瀏覽\n- 讀屏器 — 讀出當前資料點的類別與數值\n\n  顏色非唯一語義  :不只靠色彩區分類別,配合 legend / 軸標籤 + 圖形變化(Recharts `strokeDasharray` 虛線等),讓色盲 / 黑白列印仍可辨識。實例見 principles 的 `顏色不是區分類別的唯一手段`(iOS 實線 / Android 虛線)。\n\n  對比度  :`--chart-*` 對 canvas bg 的對比已在 token 層考量(light = step-6 / dark = step-5)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;`accessibilityLayer` 開啟後鍵盤可逐點瀏覽。"}</p>
     </div>
   ),
 }

@@ -179,69 +179,44 @@ export const UsageGuidance: Story = {
   ),
 }
 
+// @story-trait-rationale: 教「如何選 ratio」的決策邏輯(原則層),不是「5 個 ratio 長怎樣」
+//   的視覺對照——後者 SSOT 在 anatomy「標準 比例 視覺對照」(StandardRatios)。此處只給判斷準則
+//   + LinkTo,不重畫 5 張圖(per 2026-05-30 EXAMPLE_REDUNDANT prune,避免 3 file 各畫一次)。
+const RATIO_RULES = [
+  { label: '16/9', when: '橫向、寬螢幕,要「影片 / 電影」感但不到 ultra-wide', example: 'Airbnb listing hero、YouTube 縮圖、onboarding tour 截圖' },
+  { label: '4/3', when: '橫向但要更方,容納更多垂直內容', example: 'Stripe product listing、Notion gallery cover' },
+  { label: '1/1', when: 'feed grid 要對齊一致、無方向偏好', example: 'Instagram 貼文、Dribbble shot 縮圖' },
+  { label: '3/4', when: '直向,呈現「站立」視覺', example: '人物 portrait、iOS App Store screenshot' },
+  { label: '21/9', when: '極寬幅,強化 cinematic 視覺', example: 'Netflix 首頁 hero、電影海報' },
+]
+
 export const RatioChoice: Story = {
-  name: 'DS 標準 比例 選擇',
+  name: '如何選 ratio',
   render: () => (
     <div>
-      <Rule
-        title="16/9 — 寬螢幕 hero / feature 截圖 / video embed"
-        note="最主流的 web hero ratio。Vercel / Airbnb / Linear hero section 標配;onboarding tour 截圖 Intercom / Pendo / Shepherd 慣例也是 16/9"
-      >
-        <div className="w-[360px]">
-          <AspectRatio ratio={16 / 9} className="bg-muted rounded-md overflow-hidden">
-            <Img seed="choice-16-9" ratio={16 / 9} />
-          </AspectRatio>
-          <Label>Airbnb listing hero / YouTube 縮圖</Label>
-        </div>
-      </Rule>
+      <p className="text-caption text-fg-muted max-w-[720px] leading-relaxed mb-8">
+        先看內容方向(橫 / 方 / 直),再對到下方的判斷準則即可選定。五個 ratio 的並排視覺對照見{' '}
+        <LinkTo kind="Design System/Components/AspectRatio/設計規格" name="標準 比例 視覺對照">
+          <span className="text-primary hover:underline font-medium cursor-pointer">設計規格 → 標準 比例 視覺對照</span>
+        </LinkTo>
+        ,此處只講「怎麼選」的決策邏輯,不重畫圖。
+      </p>
 
-      <Rule
-        title="4/3 — 產品照 / screenshot / 傳統照片"
-        note="比 16/9 方一點。適合產品詳情、應用截圖、較老規格的照片"
-      >
-        <div className="w-[300px]">
-          <AspectRatio ratio={4 / 3} className="bg-muted rounded-md overflow-hidden">
-            <Img seed="choice-4-3" ratio={4 / 3} />
-          </AspectRatio>
-          <Label>Stripe product listing / Notion gallery cover</Label>
-        </div>
-      </Rule>
+      <div className="flex flex-col gap-5 max-w-[720px]">
+        {RATIO_RULES.map(r => (
+          <div key={r.label} className="flex gap-4 items-baseline">
+            <div className="w-[60px] shrink-0 text-body font-mono font-bold text-foreground">{r.label}</div>
+            <div className="flex-1">
+              <div className="text-body text-foreground leading-relaxed">{r.when}</div>
+              <div className="text-caption text-fg-muted mt-0.5 leading-relaxed">{r.example}</div>
+            </div>
+          </div>
+        ))}
+      </div>
 
-      <Rule
-        title="1/1 — Avatar / 方圖貼文 / icon preview"
-        note="方形是 feed grid 對齊的最佳選擇;Instagram / Dribbble / Pinterest thumbnail 慣例"
-      >
-        <div className="w-[240px]">
-          <AspectRatio ratio={1} className="bg-muted rounded-md overflow-hidden">
-            <Img seed="choice-1-1" ratio={1} />
-          </AspectRatio>
-          <Label>Instagram 貼文 / Dribbble shot 縮圖</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="3/4 — 直式 portrait / 手機截圖"
-        note="人像照、直式海報、手機螢幕截圖;比 1/1 略瘦,呈現「站立」視覺"
-      >
-        <div className="w-[220px]">
-          <AspectRatio ratio={3 / 4} className="bg-muted rounded-md overflow-hidden">
-            <Img seed="choice-3-4" ratio={3 / 4} />
-          </AspectRatio>
-          <Label>人物 portrait / iOS App Store screenshot</Label>
-        </div>
-      </Rule>
-
-      <Rule
-        title="21/9 — Ultra-wide hero banner / movie poster"
-        note="強化「電影感」的超寬幅;首頁 hero / marketing banner / 影片封面 cinematic 版本"
-      >
-        <div className="w-[420px]">
-          <AspectRatio ratio={21 / 9} className="bg-muted rounded-md overflow-hidden">
-            <Img seed="choice-21-9" ratio={21 / 9} />
-          </AspectRatio>
-          <Label>Netflix 首頁 hero / 電影海報</Label>
-        </div>
-      </Rule>
+      <p className="text-footnote text-fg-muted max-w-[720px] leading-relaxed mt-8">
+        偏離這五個標準 ratio 需提出理由——非標準比例會破壞 feed / grid 的視覺一致性。
+      </p>
     </div>
   ),
 }
