@@ -56,7 +56,7 @@ const COVERAGE = {
   20: { tier: 'PURE-JUDGMENT', mechanism: 'Spec 硬寫機械化值 — dispatch 必 grep DS-wide spec.md 找 px / hex / Tailwind class lists' },
   // Group H — Consumer
   21: { tier: 'HOOK-ENFORCED', mechanism: 'check_item_list_gap.sh write-time' },
-  22: { tier: 'HOOK-ENFORCED', mechanism: 'check_container_breathing.sh write-time' },
+  22: { tier: 'PURE-JUDGMENT', mechanism: '視覺容器 inner breathing — dispatch agent DS-wide 全掃有邊界容器是否缺 inner padding;原 check_container_breathing.sh 已 retired 無 active 替代(2026-05-31 infra-audit 修假分類,原誤標 HOOK-ENFORCED)' },
   // Group I — Story auto-compile
   23: { tier: 'DETERMINISTIC', mechanism: 'scripts/compile-stories.mjs --all --check(drift / migration pending)' },
   24: { tier: 'PURE-JUDGMENT', mechanism: 'Story 範例重複性 AI judgment;dispatch 必 per-component DS-wide 列 stories scenario matrix' },
@@ -97,7 +97,7 @@ const COVERAGE = {
   52: { tier: 'HOOK-ENFORCED', mechanism: 'check_tab_lg_chrome_header_equal.sh + check_header_with_tabs_border.sh + check_chrome_header_handcraft.sh' },
   53: { tier: 'HOOK-ENFORCED', mechanism: 'check_spec_class_drift.sh write-time' },
   54: { tier: 'HOOK-ENFORCED', mechanism: 'check_story_invariants.sh R8 story_archetype_registry + .claude/references/story-baseline-registry.json' },
-  55: { tier: 'HOOK-ENFORCED', mechanism: 'Token cross-namespace mapping integrity(semantic.css L246-273 12-hue verify)' },
+  55: { tier: 'PURE-JUDGMENT', mechanism: 'Token cross-namespace mapping integrity — dispatch agent DS-wide 全掃 semantic.css 12-hue mapping(L246-273)逐 hue 驗 →primitive step 正確;無 deterministic hook(2026-05-31 infra-audit 修假分類,原誤標 HOOK-ENFORCED 卻無 cite hook)' },
   56: { tier: 'HOOK-ENFORCED', mechanism: 'check_app_shell_primary_header_consistency.sh' },
   // Group Q* — Consumer enforcement / fork-context / packaging(57-88,2026-05-30 補滿 per codex Phase B P1:原 56/88 假完整 fix)
   57: { tier: 'HOOK-ENFORCED', mechanism: 'check_ds_anchor_preflight.sh write-time soft BLOCKER(M29 anchor)' },
@@ -163,13 +163,16 @@ for (let i = 1; i <= expected; i++) {
 // + folded-drift(SKILL/matrix 引用 standalone hook 已 fold 進 lib 卻沒更新)。標 DETERMINISTIC/HOOK 卻指向不
 // 存在的東西 = 紙上保證(綠燈 ≠ 真有兜底)。
 const stripCheck = (n) => n.replace(/^check_/, '').replace(/\.sh$/, '')
+// 2026-05-31 強化(infra-audit P1:retired hook 被當 active = dim 22 假分類漏):glob + cands 排除 retired/。
+// retired hook 不 fire = 不該支撐 HOOK-ENFORCED claim。folded 進 active lib/dispatcher 才算數。
 let allHookSrc = ''
-try { allHookSrc = fs.globSync('.claude/hooks/**/*.sh', { cwd: ROOT }).map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n') } catch {}
+try { allHookSrc = fs.globSync('.claude/hooks/**/*.sh', { cwd: ROOT }).filter((f) => !f.includes('/retired/')).map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n') } catch {}
 const hookExists = (h) => {
   const base = stripCheck(h)
-  const cands = [`.claude/hooks/${h}`, `.claude/hooks/lib/${h}`, `.claude/hooks/lib/_${base}.sh`, `.claude/hooks/_${base}.sh`, `.claude/hooks/retired/${h}`]
+  // 排除 retired/:active hook 或 lib/(被 dispatcher source)才算真 enforce
+  const cands = [`.claude/hooks/${h}`, `.claude/hooks/lib/${h}`, `.claude/hooks/lib/_${base}.sh`, `.claude/hooks/_${base}.sh`]
   if (cands.some((c) => fs.existsSync(path.join(ROOT, c)))) return true
-  return new RegExp(`原[^\\n]{0,40}${base}|\\b${base}\\b`).test(allHookSrc) // folded provenance / lib-consolidation
+  return new RegExp(`原[^\\n]{0,40}${base}|\\b${base}\\b`).test(allHookSrc) // folded provenance(active src only)
 }
 const vaporware = []
 for (const [dim, entry] of Object.entries(COVERAGE)) {
@@ -177,8 +180,17 @@ for (const [dim, entry] of Object.entries(COVERAGE)) {
   for (const m of entry.mechanism.matchAll(/scripts\/([\w-]+\.mjs)/g)) {
     if (!fs.existsSync(path.join(ROOT, 'scripts', m[1]))) vaporware.push({ dim, reason: `cited script 不存在: scripts/${m[1]}` })
   }
-  for (const m of entry.mechanism.matchAll(/\b(check_[\w]+\.sh)\b/g)) {
-    if (!hookExists(m[1])) vaporware.push({ dim, reason: `cited hook 不存在(非 folded): ${m[1]}` })
+  // hook 存在性 / 紙上-hook check 只對宣稱 hook 兜底的 tier(HOOK-ENFORCED);PURE-JUDGMENT 的 mechanism
+  // 可在說明文字提「原 check_X retired」= 非 enforcement claim,不該被當 vaporware(2026-05-31 修 dim22 reclassify 後誤抓)。
+  if (entry.tier === 'HOOK-ENFORCED') {
+    const citedHooks = [...entry.mechanism.matchAll(/\b(check_[\w]+\.sh)\b/g)]
+    for (const m of citedHooks) {
+      if (!hookExists(m[1])) vaporware.push({ dim, reason: `cited hook 不存在 / 僅在 retired(非 active folded): ${m[1]}` })
+    }
+    // HOOK-ENFORCED 卻沒 cite 任何 hook(也無 script/lib/dispatcher 兜底)= 紙上 hook claim(抓 dim 55-class)
+    if (citedHooks.length === 0 && !/[\w-]+\.mjs|dispatcher|_[\w]+\.sh|\.mts/.test(entry.mechanism)) {
+      vaporware.push({ dim, reason: `HOOK-ENFORCED 卻未 cite 任何 hook 檔名(紙上 hook): ${entry.mechanism.slice(0, 50)}` })
+    }
   }
 }
 

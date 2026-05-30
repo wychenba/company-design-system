@@ -1259,6 +1259,16 @@ Report ONLY violations。Format:
 End: `N components checked, M reverse drift gaps.` Under 400 words. Don't fix.
 ```
 
+## 55. Token cross-namespace mapping integrity(PURE-JUDGMENT,2026-05-31 reclassify — 原誤標 HOOK 無 hook)
+
+**Type**: Absolute / **Canonical**: `packages/design-system/src/tokens/color/semantic.css` 12-hue interaction mapping / **Home**: color.spec.md
+
+```
+Your job(NO-SAMPLE):讀 semantic.css 的 12-hue interaction token mapping(約 L246-273),逐 hue 驗 semantic
+→primitive step 正確一致(eg. primary→-6 / info→-5 / error→-7 / success→-1 / warning→-7 + hover/active step)。
+Enumerate 全 12 hue。Report 任何 mapping 不一致 / 缺 hue / step 錯 with semantic.css:line。End:`12 hue checked, M mapping gaps`。Don't fix.
+```
+
 ## 62. Fork Netlify onboarding canonical(PURE-JUDGMENT,2026-05-31 補 — infra-audit self-finding 漏)
 
 **Type**: Absolute / **Canonical**: `template/ds-product-template/{netlify.toml,.storybook/manager-head.html,CLAUDE.md}` + `scripts/setup-netlify-access.mjs` + `build-published-template-mirror.mjs` / **Home**: scenario-definition.md
