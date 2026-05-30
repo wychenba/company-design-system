@@ -144,7 +144,7 @@ export const Inspector: Story = {
   render: () => (
     <div>
       <H3>互動 ratio 切換</H3>
-      <Desc>點選常用 ratio,觀察容器高度變化與 Inspect 面板的 padding-bottom 計算。AspectRatio 是 pure layout primitive,無 color / size token,只有 ratio 一個決定性 prop。</Desc>
+      <Desc>點選常用 ratio,觀察容器高度變化與 Inspect 面板的 padding-bottom 計算。AspectRatio 是純佈局容器,無 color / size token,只有 ratio 一個決定性 prop。</Desc>
       <InspectorDemo />
     </div>
   ),

@@ -168,11 +168,11 @@ Consumer 必須保留 `<DialogTitle>`——即使視覺不顯示，也要用 `Vi
 
 ---
 
-## 為何無 Inspector
+## anatomy story 結構
 
-Dialog 是 modal 浮層元件,關鍵決策維度是 `maxWidth`(400/480/560/720)× `autoHeight` × `destructive` × open/close 行為——已由 `SizeMatrix`(maxWidth 4 檔) / `HeightBehavior`(viewport-fill vs autoHeight) / `DestructiveMatrix` / `StateBehavior`(open / close / ESC / overlay click) 四張矩陣 + `ColorMatrix`(layout + 視覺 token)完整覆蓋。互動 Inspector 切單一 open/close 不如結構性矩陣對照——Dialog 的正確用法是「照情境選 size / 選 autoHeight」,需要 side-by-side 比對決策。
+Dialog 是 modal 浮層元件,關鍵決策維度是 `maxWidth`(400/480/512/560/720)× `autoHeight` × `destructive` × open/close 行為。互動 `Inspector`(右側 Controls 即時切 `maxWidth` / `autoHeight` 看寬度 tier 與高度模式差異)搭配結構性矩陣 side-by-side 比對,完整呈現「照情境選 size / 選 autoHeight」的決策。
 
-對應 anatomy story:保留 `Overview` + 元件特有 `HeightBehavior` / `DestructiveMatrix` + `SizeMatrix` + `StateBehavior` + `ColorMatrix`。
+對應 anatomy story:`Overview` + `Inspector` + 元件特有 `HeightBehavior` / `DestructiveMatrix` + `SizeMatrix` + `StateBehavior` + `ColorMatrix` + `Accessibility`。
 
 ---
 

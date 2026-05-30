@@ -432,9 +432,9 @@ N/A(action trigger,無資料層)。
 
 ## A11y 預設
 
-**ARIA / Pattern**:繼承 Radix `slot` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/slot#accessibility)。
+**ARIA / Pattern**:預設渲染原生 `<button>`,自動繼承瀏覽器原生按鈕語意(button role / Enter / Space 觸發 / Tab 聚焦),無需額外 ARIA。`asChild` 時改用 Radix `Slot` 把 props 合併到 consumer child element(Slot 為純 prop-merger,a11y 仍由該 child 自負)。icon-only 模式傳入 `aria-label` 描述用途並自動包 Tooltip。`pressed` 定義時自動寫 `aria-pressed` + `data-state`。
 
-**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+**Focus**:鍵盤聚焦時(`focus-visible`)顯示 focus ring(`focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1`,以 box-shadow 實作並 `outline-none`);滑鼠點擊不觸發。Button 為單一互動元件,**不含** focus trap / focus restoration(那是 Dialog / 浮層的概念)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

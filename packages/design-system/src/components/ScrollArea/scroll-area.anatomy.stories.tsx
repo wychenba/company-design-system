@@ -77,7 +77,7 @@ export const Overview: Story = {
         <div className="border-2 border-dashed border-primary/30 rounded-lg p-4 max-w-xl">
           <div className="text-[11px] font-mono text-fg-muted mb-2">Root (relative + overflow-hidden)</div>
           <div className="border border-dashed border-info/50 rounded-md p-3 bg-info/5">
-            <div className="text-[11px] font-mono text-info mb-2">Viewport (h-full w-full · rounded-[inherit])</div>
+            <div className="text-[11px] font-mono text-info mb-2">Viewport (flex-1 min-h-0 w-full · rounded-[inherit])</div>
             <div className="border border-dashed border-success/50 rounded-md p-2 bg-success/5 text-[11px] font-mono text-success-hover">
               children (consumer 內容)
             </div>
@@ -220,7 +220,7 @@ export const Inspector: Story = {
             <InspectRow label="Scrollbar 寬"><span className="font-mono">w-2.5 / h-2.5 (10px)</span></InspectRow>
             <InspectRow label="Track inset"><span className="font-mono">p-[1px]</span></InspectRow>
             <InspectRow label="邊界"><span className="font-mono">border-l / border-t transparent</span></InspectRow>
-            <InspectRow label="Viewport"><span className="font-mono">h-full w-full rounded-[inherit]</span></InspectRow>
+            <InspectRow label="Viewport"><span className="font-mono">flex-1 min-h-0 w-full rounded-[inherit]</span></InspectRow>
           </div>
 
           {/* COLOR */}

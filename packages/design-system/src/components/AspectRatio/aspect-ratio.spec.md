@@ -110,13 +110,13 @@ AspectRatio 是 pure layout primitive(container 鎖比例),本身:
 
 ---
 
-## shadcn passthrough 例外說明
+## shadcn 薄包裝說明
 
-AspectRatio export 為 `const AspectRatio = AspectRatioPrimitive.Root`(**直接 re-export Radix primitive,無額外 wrapper**),不套 `React.forwardRef` / `displayName` / `...props` spread / `asChild` 的 shadcn canonical 五件套。
+AspectRatio 是 Radix `AspectRatioPrimitive.Root` 的薄包裝:用 `React.forwardRef` 顯式轉發 ref、把 `...props` spread 到 Radix Root、並設定 `displayName = 'AspectRatio'`(對齊 shadcn canonical)。`ratio` / `asChild` 等 props 透過 spread 原封不動傳給 Radix。
 
-**為什麼豁免**:Radix `AspectRatioPrimitive.Root` 本身已實作這五件套(forwardRef-ed / displayName 為 `"AspectRatio"` / `...props` 內部 spread 至 inner `<div>` / asChild 透過 Slot 支援)。在我們自己 wrap 一層只會 indirection 不加值,且會 **break** Radix 內建的 displayName / Slot 支援。這是 shadcn-official 模式(shadcn 元件庫的 AspectRatio 也是直接 re-export),非 drift。
+**為什麼顯式 wrap 一層**:Radix primitive 本身雖已 forwardRef,但本 DS 慣例是每個對外 export 都顯式包一層,確保在 React DevTools / Storybook Inspector 顯示正確的 `displayName`,且 props passthrough 與 ref 行為在 code 層面明確可見。這層 wrapper 不加任何預設樣式,純粹保持命名與檢視一致。
 
-**何時需要自己 wrap**:若未來要加預設 className / 自訂 ratio 常數 / 內建 consumer 視覺 guard(如強制 border-radius),再 wrap。目前無此需求。
+**何時改寫這層**:若未來要加預設 className / 自訂 ratio 常數 / 內建 consumer 視覺 guard(如強制 border-radius),在這層 wrapper 內補即可。目前 wrapper 只做 passthrough。
 
 ---
 

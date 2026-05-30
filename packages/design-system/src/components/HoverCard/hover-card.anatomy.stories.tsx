@@ -139,7 +139,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `hover-card.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  hover-card  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/hover-card#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入 trigger\n- Hover / focus — 開啟 card\n- Esc — 關閉\n\n  Focus  :non-modal hover/focus surface——focus 開啟浮層但**不 trap**,focus 仍留在 trigger,Esc 關閉。Visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast "}</p>
+      <p className="whitespace-pre-line">{"ARIA 與互動模式:沿用 Radix HoverCard 的無障礙預設(角色語意、aria-* 屬性、鍵盤導覽),不需額外設定。\n\n鍵盤操作:\n\n- Tab — 焦點移到觸發元素\n- Hover 或 focus — 開啟浮層卡片\n- Esc — 關閉卡片\n\n焦點行為:這是非阻斷(non-modal)的浮層,focus 會開啟卡片但不會把焦點鎖在裡面;焦點仍留在觸發元素,按 Esc 即可關閉。觸發元素 focus 時顯示可見的外框(2px 實線,使用 --ring 色),與整個設計系統的 focus-visible 樣式一致。\n\n驗證:Storybook 無障礙檢測面板應為 0 項嚴重違規;僅用鍵盤即可完整操作,不需滑鼠。文字對比至少 4.5:1、UI 元素對比至少 3:1,符合 WCAG AA。"}</p>
     </div>
   ),
 }
