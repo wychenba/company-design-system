@@ -159,6 +159,9 @@ jobs:
       - name: Anti-sample coverage matrix(88-dim fail-closed gate — 2026-05-30 codex Phase B P1: 補滿 56→88 + --check)
         run: npm run audit:coverage-matrix -- --check 2>&1 | tail -20
 
+      - name: Governance counter SSOT(count drift fail-closed — 2026-05-30 全掃 curated docs,治「改 dim 數忘了改 plugin.json」)
+        run: node scripts/sync-governance-counters.mjs --check 2>&1 | tail -20
+
       - name: Figma Make artifacts(SSOT propagation check)
         run: node scripts/gen-figma-make-artifacts.mjs --check
 
