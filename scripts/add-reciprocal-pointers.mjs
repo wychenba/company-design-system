@@ -20,6 +20,10 @@ import path from 'node:path'
 import { globSync } from 'node:fs'
 
 const root = process.cwd()
+// 2026-05-31(infra-audit P1):原本只是 mutator(writeFileSync)無 verify gate → dim 3 標 DETERMINISTIC
+// 卻無 --check = 紙上保證。加 --check:compare-only,reciprocal pointer 有 drift 則 exit 1(CI gate)。
+const CHECK = process.argv.includes('--check')
+const drifted = []
 const SPECS = globSync('packages/design-system/src/**/*.spec.md', { cwd: root }).map((p) => path.join(root, p))
 
 // Build pointer map
@@ -111,10 +115,25 @@ for (const [targetBase, sources] of gapsByTarget.entries()) {
   const newContent = cleaned + '\n' + newSection
 
   if (newContent !== content) {
-    fs.writeFileSync(targetPath, newContent)
-    updatedCount++
-    updated.push(`${targetBase} (${sortedSources.length} inbound)`)
+    if (CHECK) {
+      drifted.push(`${targetBase} (${sortedSources.length} inbound — reciprocal pointer 缺/過時)`)
+    } else {
+      fs.writeFileSync(targetPath, newContent)
+      updatedCount++
+      updated.push(`${targetBase} (${sortedSources.length} inbound)`)
+    }
   }
+}
+
+if (CHECK) {
+  if (drifted.length) {
+    console.log(`\n❌ Dim 3 reciprocal-pointer drift:${drifted.length} spec(s) 的「被引用」back-pointer 缺/過時:`)
+    for (const d of drifted) console.log(`  ${d}`)
+    console.log(`\n修法:跑 \`node scripts/add-reciprocal-pointers.mjs\`(無 --check)auto-regenerate 後 commit。`)
+    process.exit(1)
+  }
+  console.log('✅ Dim 3:所有 spec reciprocal pointer 同步,0 drift')
+  process.exit(0)
 }
 
 console.log(`\n✅ Updated ${updatedCount} target spec(s) with reciprocal pointers`)

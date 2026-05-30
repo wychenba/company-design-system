@@ -171,6 +171,9 @@ jobs:
       - name: SSOT spec dead-link(Dim 2 deterministic backstop — 2026-05-30 從誤分 PURE-JUDGMENT 修正,治 rename spec 忘改 pointer)
         run: node scripts/audit-spec-deadlinks.mjs --check 2>&1 | tail -30
 
+      - name: SSOT reciprocal-pointer(Dim 3 — 2026-05-31 加 --check gate,原 mutator 無 verify=紙上 DETERMINISTIC)
+        run: node scripts/add-reciprocal-pointers.mjs --check 2>&1 | tail -20
+
       - name: Content quality DS-wide(spec/story 人話 + 佔位符 deterministic gate — 2026-05-30 wire per task#6 orphan)
         run: node scripts/audit-content-quality.mjs --check 2>&1 | tail -20
 
