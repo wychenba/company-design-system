@@ -99,9 +99,53 @@ const COVERAGE = {
   54: { tier: 'HOOK-ENFORCED', mechanism: 'check_story_invariants.sh R8 story_archetype_registry + .claude/references/story-baseline-registry.json' },
   55: { tier: 'HOOK-ENFORCED', mechanism: 'Token cross-namespace mapping integrity(semantic.css L246-273 12-hue verify)' },
   56: { tier: 'HOOK-ENFORCED', mechanism: 'check_app_shell_primary_header_consistency.sh' },
+  // Group Q* — Consumer enforcement / fork-context / packaging(57-88,2026-05-30 補滿 per codex Phase B P1:原 56/88 假完整 fix)
+  57: { tier: 'HOOK-ENFORCED', mechanism: 'check_ds_anchor_preflight.sh write-time soft BLOCKER(M29 anchor)' },
+  58: { tier: 'HOOK-ENFORCED', mechanism: 'check_fork_user_plugin_install.sh SessionStart' },
+  59: { tier: 'HOOK-ENFORCED', mechanism: 'check_substantive_edit_approval_preflight.sh scope apps/** + node_modules/@qijenchen' },
+  60: { tier: 'HOOK-ENFORCED', mechanism: 'check_propose_without_benchmark.sh UserPromptSubmit(M26)' },
+  61: { tier: 'HOOK-ENFORCED', mechanism: 'check_item_list_gap.sh + check_data_table_size_num_to_meta_width.sh(M16 + M23c)' },
+  62: { tier: 'PURE-JUDGMENT', mechanism: 'Fork Netlify onboarding canonical — dispatch 必 DS-wide enumerate netlify.toml / manager-head / setup-netlify / CLAUDE.md Access-control 段' },
+  63: { tier: 'HOOK-ENFORCED', mechanism: 'inject_deploy_url_after_push.sh PostToolUse + scripts/deploy-url.mjs' },
+  64: { tier: 'HOOK-ENFORCED', mechanism: 'check_post_main_ssot_propagate.sh PostToolUse Bash' },
+  65: { tier: 'HOOK-ENFORCED', mechanism: 'check_chrome_header_avatar_canonical.sh PreToolUse multiline regex' },
+  66: { tier: 'PURE-JUDGMENT', mechanism: 'Immediate cross-repo dispatch + visual parity — dispatch 必 DS-wide enumerate release.yml dispatch step + sync workflow + visual-assertions coverage' },
+  67: { tier: 'HOOK-ENFORCED', mechanism: 'check_sidebar_menu_button_implicit_wrap.sh PreToolUse multiline regex' },
+  68: { tier: 'PURE-JUDGMENT', mechanism: 'Stories-vs-spec drift systematic — dispatch 必 DS-wide 全 stories/anatomy/principles grep anti-spec pattern(@canonical-pattern / @anti-pattern marker)' },
+  69: { tier: 'HOOK-ENFORCED', mechanism: 'check_consumer_no_ds_catalog.sh PostToolUse BLOCKER' },
+  70: { tier: 'HOOK-ENFORCED', mechanism: 'check_consumer_story_baseline.sh PostToolUse BLOCKER + ds-story-manifest.json' },
+  71: { tier: 'HOOK-ENFORCED', mechanism: 'check_consumer_ds_primitive_misuse.sh BLOCKER' },
+  72: { tier: 'PURE-JUDGMENT', mechanism: 'DS API surface tightening per-component review(tightening-roadmap.md)— dispatch 必 DS-wide enumerate ALL component API surface' },
+  73: { tier: 'HOOK-ENFORCED', mechanism: 'check_full_story_visual_interaction_sweep.sh(length === manifest.totalStories,sample = reject)' },
+  74: { tier: 'HOOK-ENFORCED', mechanism: 'check_overlay_open_focus_escape_probe.sh BLOCKER' },
+  75: { tier: 'HOOK-ENFORCED', mechanism: 'check_plugin_freshness.sh SessionStart fork-user' },
+  76: { tier: 'HOOK-ENFORCED', mechanism: 'check_escape_marker_abuse.sh(≥3 distinct OR ≥5 total BLOCK)' },
+  77: { tier: 'DETERMINISTIC', mechanism: 'scripts/composition-fidelity-visual-diff.mjs + .github/workflows/composition-fidelity.yml pixelmatch per-mapping' },
+  78: { tier: 'HOOK-ENFORCED', mechanism: 'check_codex_brief_invariants.sh 4th invariant(禁列檔)' },
+  79: { tier: 'HOOK-ENFORCED', mechanism: 'check_tailwind_wildcard_in_docs.sh P0 BLOCKER' },
+  80: { tier: 'HOOK-ENFORCED', mechanism: 'check_addon_subdir_ship.sh P0 BLOCKER' },
+  81: { tier: 'HOOK-ENFORCED', mechanism: 'check_storybook_addon_preset_cjs.sh P0 BLOCKER' },
+  82: { tier: 'HOOK-ENFORCED', mechanism: 'check_consumer_app_story_title.sh P0 BLOCKER' },
+  83: { tier: 'DETERMINISTIC', mechanism: 'scripts/verify-published-deploy.mjs(mirror run success + published main.ts === local + --live render)' },
+  84: { tier: 'DETERMINISTIC', mechanism: 'scripts/test-2-scenario-architecture.mjs(20 test + Mirror M0-M7)' },
+  85: { tier: 'DETERMINISTIC', mechanism: 'scripts/sync-ds-canonical.mjs --check(npm mirror == .claude SSOT)' },
+  86: { tier: 'DETERMINISTIC', mechanism: 'scripts/plugin-structure-validate.mjs(5-manifest version + symlink == source)' },
+  87: { tier: 'DETERMINISTIC', mechanism: 'scripts/dogfood-prepublish-verify.mjs(npm install + build-storybook consumer view)' },
+  88: { tier: 'DETERMINISTIC', mechanism: 'scripts/check-dangling-infra-ref.mjs --check + scripts/check-skill-deadref.mjs --check' },
 }
 
-const expected = 56
+// expected dim count = SSOT(governance-counters auditDims);fallback COVERAGE map size。
+// 2026-05-30 codex Phase B P1 fix:禁寫死 56(原假完整,只覆蓋 56/88)。讀真值 88;
+// 新增 dim 若未補 COVERAGE entry → gap → --check fail-closed(exit 1),強制分類。
+// SSOT 優先序:audit-dims-dispatch.json `.total`(dispatch-audit-dims.mjs 從 SKILL.md parse 的權威 dim 數)
+// → fallback COVERAGE map size。讀 dispatch total 才能 catch「SKILL 加新 dim 但 COVERAGE 沒補」→ gap → fail-closed。
+let expected
+try {
+  const dispatch = JSON.parse(fs.readFileSync(path.join(ROOT, '.claude/logs/audit-dims-dispatch.json'), 'utf8'))
+  expected = dispatch.total || Object.keys(COVERAGE).length
+} catch {
+  expected = Object.keys(COVERAGE).length
+}
 const counts = { DETERMINISTIC: 0, 'HOOK-ENFORCED': 0, 'PURE-JUDGMENT': 0, UNKNOWN: 0 }
 const gaps = []
 
@@ -129,7 +173,7 @@ if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true })
 fs.writeFileSync(path.join(LOG_DIR, 'audit-coverage-matrix.json'), JSON.stringify(report, null, 2))
 
 console.log('═════════════════════════════════════════════════════')
-console.log('▶ Audit Coverage Matrix(56 dims anti-sample tiers)')
+console.log(`▶ Audit Coverage Matrix(${expected} dims anti-sample tiers)`)
 console.log(`   DETERMINISTIC(deterministic script chain): ${counts.DETERMINISTIC}`)
 console.log(`   HOOK-ENFORCED(write-time PostToolUse): ${counts['HOOK-ENFORCED']}`)
 console.log(`   PURE-JUDGMENT(AI but DS-wide全 file enumerated): ${counts['PURE-JUDGMENT']}`)
@@ -141,5 +185,5 @@ if (gaps.length) {
   for (const g of gaps) console.error(`   Dim ${g.dim}: ${g.reason}`)
   if (CHECK) process.exit(1)
 }
-console.log('\n✅ All 56 dims classified with anti-sample mechanism')
+console.log(`\n✅ All ${expected} dims classified with anti-sample mechanism`)
 process.exit(0)

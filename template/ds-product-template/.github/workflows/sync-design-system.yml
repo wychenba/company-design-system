@@ -36,8 +36,15 @@ jobs:
       - name: Update @qijenchen/* to latest @beta
         run: |
           npm install --legacy-peer-deps
-          npm update @qijenchen/design-system @qijenchen/storybook-config --legacy-peer-deps
-          # ensure beta tag(npm update 可能拉 latest dist-tag,但兩者本是同版)
+          # 2026-05-30 codex Phase B P2 fix:`npm update` 只更新 lockfile 不改寫 package.json spec → spec drift
+          # (fork 卡 ^beta.36 而 lockfile 已 beta.38)。改 explicit `npm install @pkg@version --save` 把 spec 同步寫進
+          # package.json,用 dispatch payload version(release.yml 帶);無 payload 時 fallback @beta dist-tag。
+          VERSION="${{ github.event.client_payload.version }}"
+          if [ -n "$VERSION" ]; then
+            npm install "@qijenchen/design-system@^${VERSION}" "@qijenchen/storybook-config@^${VERSION}" --save --legacy-peer-deps
+          else
+            npm install "@qijenchen/design-system@beta" "@qijenchen/storybook-config@beta" --save --legacy-peer-deps
+          fi
           echo "---"
           npm ls @qijenchen/design-system @qijenchen/storybook-config 2>&1 | head -5
 

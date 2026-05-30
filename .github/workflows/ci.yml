@@ -156,8 +156,8 @@ jobs:
       - name: DataTable row-mode SSOT(data-table.spec.md:457「強制」— 2026-05-30 wired from orphan per codex Phase B)
         run: npm run audit:datatable-row-mode 2>&1 | tail -20
 
-      - name: Anti-sample coverage matrix(per-dim anti-sample SSOT — 2026-05-30 wired from orphan per codex Phase B)
-        run: npm run audit:coverage-matrix 2>&1 | tail -20
+      - name: Anti-sample coverage matrix(88-dim fail-closed gate — 2026-05-30 codex Phase B P1: 補滿 56→88 + --check)
+        run: npm run audit:coverage-matrix -- --check 2>&1 | tail -20
 
       - name: Figma Make artifacts(SSOT propagation check)
         run: node scripts/gen-figma-make-artifacts.mjs --check
