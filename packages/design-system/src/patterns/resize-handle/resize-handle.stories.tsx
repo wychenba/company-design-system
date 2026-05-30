@@ -31,7 +31,7 @@ export const Default: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       <ColumnDemo />
-      <p className="text-caption text-fg-muted">滑鼠移到右邊緣 → cursor 變 col-resize + line 變色</p>
+      <p className="text-caption text-fg-muted">滑鼠移到右邊緣時,游標變成左右拖拉樣式,分隔線顏色加深提示可以拖拉</p>
     </div>
   ),
 }
@@ -41,7 +41,7 @@ export const Dragging: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       <ColumnDemo isResizing />
-      <p className="text-caption text-fg-muted">isResizing=true → line bg primary blue,consumer 自管 drag state</p>
+      <p className="text-caption text-fg-muted">拖拉進行中時,整條分隔線變成主色高亮,讓使用者清楚知道正在調整尺寸</p>
     </div>
   ),
 }
@@ -51,7 +51,7 @@ export const Disabled: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       <ColumnDemo disabled />
-      <p className="text-caption text-fg-muted">disabled=true → 無 cursor, 無 role=separator(a11y tree 不入),line bg-divider 維持</p>
+      <p className="text-caption text-fg-muted">停用時不顯示拖拉游標,輔助技術也會忽略此元件,分隔線維持原本的灰色</p>
     </div>
   ),
 }

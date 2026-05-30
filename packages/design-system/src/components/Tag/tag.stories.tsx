@@ -61,8 +61,8 @@ export const Truncation: Story = {
   name: '截斷 + Tooltip',
   render: () => (
     <div className="flex flex-col gap-3" style={{ maxWidth: 300 }}>
-      <Tag color="neutral">Short</Tag>
-      <Tag color="blue">This is a very long tag label that should truncate</Tag>
+      <Tag color="neutral">Bug</Tag>
+      <Tag color="blue">Q3 Checkout Funnel Redesign — Payment Step</Tag>
       <p className="text-caption text-fg-muted">超過 160px 自動截斷，hover 顯示完整文字 tooltip</p>
     </div>
   ),

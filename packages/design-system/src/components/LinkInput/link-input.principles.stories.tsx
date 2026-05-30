@@ -62,7 +62,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/LinkInput/展示" name="Display"><span className="text-primary hover:underline font-medium cursor-pointer">Display</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:先確認這個值是不是「儲存後使用者會想直接點開的完整網址」。若不是(例如純字串代號、email、內部路徑),改用 Input。下方「vs 近親」段有正反對照範例。</p>
     </div>
 
       {/* vs 近親 — 原 VsInputRule */}

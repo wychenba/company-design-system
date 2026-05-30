@@ -116,7 +116,8 @@ LinkInput 是 **Field Controls family 成員**——互動狀態(focus / invalid
 
 - Tab — focus
 - 字母鍵 — 輸入
-- Esc — 清空(若 clearable + 有值)
+- Enter — 提交,觸發 blur 驗證
+- Esc — 取消編輯,回復原值,不觸發驗證
 
 **Focus**:native input focus ring;DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供。
 

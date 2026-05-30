@@ -50,17 +50,17 @@ function ConfigurableDemo() {
   return (
     <ButtonGroup>
       <Button
-        variant={filterActive ? 'checked' : 'text'}
+        variant="text" pressed={filterActive}
         size="sm" startIcon={Filter} iconOnly aria-label="篩選"
         onClick={() => setFilterActive(v => !v)}
       />
       <Button
-        variant={sortActive ? 'checked' : 'text'}
+        variant="text" pressed={sortActive}
         size="sm" startIcon={ArrowUpDown} iconOnly aria-label="排序"
         onClick={() => setSortActive(v => !v)}
       />
       <Button
-        variant={groupActive ? 'checked' : 'text'}
+        variant="text" pressed={groupActive}
         size="sm" startIcon={Layers} iconOnly aria-label="分組"
         onClick={() => setGroupActive(v => !v)}
       />
