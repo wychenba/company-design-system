@@ -10,18 +10,20 @@ const meta: Meta = {
 export default meta
 type Story = StoryObj
 
-type StateKey = 'idle' | 'drag-over' | 'disabled'
+type StateKey = 'idle' | 'drag-over' | 'loading' | 'disabled'
 
 const STATE_DESC: Record<StateKey, string> = {
   idle: '使用者未互動(預設)',
   'drag-over': '使用者拖檔進入區塊內',
-  disabled: 'disabled prop 為 true',
+  loading: 'loading 屬性為 true(上傳中 / 處理中)',
+  disabled: 'disabled 屬性為 true',
 }
 
 // ── Inspector 的「假」state 版本 ── 直接用 data-state 覆寫,避免真的要拖檔才能看
 const MockDropzone = ({ state }: { state: StateKey }) => (
   <FileUpload
     data-state={state}
+    loading={state === 'loading'}
     disabled={state === 'disabled'}
     onUpload={() => {}}
   />
@@ -110,11 +112,11 @@ export const Inspector: Story = {
         <div>
           <H3>State 切換</H3>
           <Desc>
-            FileUpload 有 3 個 `data-state`:idle / drag-over / disabled。預覽切換狀態後可對照右側
-            token 面板。
+            FileUpload 有 4 個狀態:idle / drag-over / loading / disabled。優先序為
+            disabled &gt; loading &gt; drag-over &gt; idle。預覽切換狀態後可對照右側 token 面板。
           </Desc>
           <div className="flex gap-2 mb-4">
-            {(['idle', 'drag-over', 'disabled'] as StateKey[]).map((s) => (
+            {(['idle', 'drag-over', 'loading', 'disabled'] as StateKey[]).map((s) => (
               <button
                 key={s}
                 onClick={() => setState(s)}
@@ -138,7 +140,7 @@ export const Inspector: Story = {
           <div>
             <div className="text-caption text-fg-muted mb-2">Layout + Token 藍圖</div>
             <div className="border border-border rounded-md p-4 text-caption font-mono flex flex-col gap-1">
-              <div>wrapper: px-6 py-10 rounded-md border-2 border-dashed</div>
+              <div>wrapper: p-[var(--layout-space-loose)] rounded-md border-2 border-dashed</div>
               <div>default children: &lt;Empty icon={'{Upload}'} title description /&gt;</div>
               <div>&nbsp;&nbsp;icon: Avatar 48px neutral (via Empty)</div>
               <div>&nbsp;&nbsp;title: text-body-lg font-medium (via Empty)</div>
@@ -162,8 +164,13 @@ export const Inspector: Story = {
               <div className="flex items-center gap-1.5">
                 text(desc): <TokenCell token="--fg-secondary" />
               </div>
+              {state === 'loading' && (
+                <div className="text-fg-secondary mt-1">
+                  + 顯示 CircularProgress 取代預設內容 + cursor-progress + pointer-events-none + aria-busy
+                </div>
+              )}
               {state === 'disabled' && (
-                <div className="text-error mt-1">+ opacity-disabled + pointer-events-none</div>
+                <div className="text-error mt-1">+ opacity-disabled + pointer-events-none + cursor-not-allowed</div>
               )}
             </div>
           </div>
@@ -180,8 +187,9 @@ export const ColorMatrix: Story = {
       <div>
         <H3>State × Token 矩陣</H3>
         <Desc>
-          三個狀態的顏色 token 對照。dashed border 在三個狀態下都維持(世界級 dropzone 共識),
-          state 差異只落在「color」而不加 scale / shadow(見 spec「不用 color 以外的 state 信號」)。
+          四個狀態的顏色 token 對照。dashed border 在所有狀態下都維持(世界級 dropzone 共識),
+          state 差異只落在「color」而不加 scale / shadow(避免視覺噪音)。loading 不變灰(跟 disabled
+          區隔),改以 CircularProgress 表達「處理中」。
         </Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
@@ -220,6 +228,19 @@ export const ColorMatrix: Story = {
                   <TokenCell token="--primary" />
                 </Td>
                 <Td>使用者拖檔進入區塊時</Td>
+              </tr>
+              <tr>
+                <Td mono>loading</Td>
+                <Td>
+                  <TokenCell token="--divider" />
+                </Td>
+                <Td>
+                  <TokenCell token="--surface" />
+                </Td>
+                <Td>
+                  <TokenCell token="--fg-muted" />
+                </Td>
+                <Td>不變灰;顯示 CircularProgress + `cursor-progress` + `pointer-events-none`</Td>
               </tr>
               <tr>
                 <Td mono>disabled</Td>

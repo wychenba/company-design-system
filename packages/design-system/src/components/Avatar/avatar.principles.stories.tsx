@@ -150,7 +150,7 @@ export const WithBadgeOverlayRule: Story = {
           <Avatar alt="Ben" size={40} status="away" />
           <Avatar alt="Bella" size={40} status="offline" />
         </div>
-        <Label>↑ online / busy / away / offline ── dot 自動 `role="status"` + aria-label</Label>
+        <Label>↑ online / busy / away / offline ── 狀態點本身不另發語音標籤,在線狀態整合進頭像的 alt 文字(例 alt="Ada(在線)"),避免一長串成員名單同時朗讀造成讀屏洪水</Label>
       </Rule>
 
       <Rule
@@ -167,7 +167,7 @@ export const WithBadgeOverlayRule: Story = {
 
       <Rule
         title="❌ 同一個 Avatar 上同時顯示 status + badgeCount"
-        note="對齊 Badge 設計準則『一個 anchor 最多 1 個 indicator』。status(presence dot)跟 badgeCount(unread Badge)**擇一使用**,不並存 — 同時出現會讓使用者無法判斷主要訊號,違反 signal crowding 原則"
+        note="對齊 Badge 設計準則『一個頭像最多顯示 1 個提示標記』。在線狀態點(status)跟未讀數字(badgeCount)**擇一使用**,不並存 — 兩個提示同時出現會互相搶注意力,使用者反而看不出哪個才是重點"
       >
         <div className="flex items-center gap-4">
           <Avatar alt="Ada" size={40} status="online" />

@@ -43,14 +43,14 @@ const COLOR_TOKENS: Record<VariantKey, Record<ColorKey, { bg: string; text: stri
   },
   solid: {
     neutral:   { bg: '--color-neutral-9',     text: '--inverse-fg' },
-    blue:      { bg: '--color-blue-6',        text: 'white (#fff)' },
-    red:       { bg: '--color-deep-orange-6', text: 'white (#fff)' },
-    green:     { bg: '--color-green-6',       text: 'white (#fff)' },
+    blue:      { bg: '--color-blue-6',        text: '--on-emphasis' },
+    red:       { bg: '--color-deep-orange-6', text: '--on-emphasis' },
+    green:     { bg: '--color-green-6',       text: '--on-emphasis' },
     yellow:    { bg: '--color-yellow-6',      text: '--warning-foreground' },
-    turquoise: { bg: '--color-turquoise-6',   text: 'white (#fff)' },
-    purple:    { bg: '--color-purple-6',      text: 'white (#fff)' },
-    magenta:   { bg: '--color-magenta-6',     text: 'white (#fff)' },
-    indigo:    { bg: '--color-indigo-6',      text: 'white (#fff)' },
+    turquoise: { bg: '--color-turquoise-6',   text: '--on-emphasis' },
+    purple:    { bg: '--color-purple-6',      text: '--on-emphasis' },
+    magenta:   { bg: '--color-magenta-6',     text: '--on-emphasis' },
+    indigo:    { bg: '--color-indigo-6',      text: '--on-emphasis' },
   },
 }
 
@@ -691,7 +691,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `avatar.spec.md` 「A11y 預設」段。摘要:\n\n-    alt  必傳  :即使有  src , alt  是 image fallback / SR 訊號雙重來源。Person avatar  alt  應含 name + presence(例  \"Alan Chen (online)\" ),entity avatar 用品牌 / 專案名,純裝飾(極罕見)用空字串  alt=\"\" ( aria-hidden )。\n-   無  alt  時 fallback  :image 模式自動降級 initials / icon;一律不靜默渲染無 SR 標的元素。\n-   Status dot SR 處理  :status dot 內部 span  aria-hidden (presence 訊號整合進 parent  alt ),避免  role=\"status\"  live region 在 member list 造成 SR 洪水(詳「"}</p>
+      <p className="whitespace-pre-line">{"・alt 必傳：即使有圖片,alt 同時是「圖片載入失敗時的文字 fallback」與「螢幕報讀時的身份說明」。人員頭像的 alt 建議含姓名與在線狀態(例:「陳冠霖(在線)」),組織 / 專案頭像用品牌或專案名;極少數純裝飾用途才用空字串。\n\n・沒有 alt 時的降級:圖片模式會自動降級為首字或 icon,不會留下沒有任何報讀內容的空頭像。\n\n・在線狀態點不另發報讀:右下角的狀態小點不會被螢幕報讀單獨朗讀,在線狀態整合進頭像本身的 alt 文字。這樣一長串成員名單就不會同時朗讀一堆「在線 / 離線」造成讀屏洪水。\n\n・hover 名片可用鍵盤抵達:當頭像帶有 hoverCard 時,頭像本身會變成可用 Tab 聚焦的按鈕並顯示聚焦框,鍵盤使用者也能打開名片浮層。"}</p>
     </div>
   ),
 }

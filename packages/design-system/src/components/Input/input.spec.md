@@ -180,9 +180,9 @@ Input 有兩個 visual chrome variant,**獨立於 mode**(mode 是 state,variant 
 
 - Tab — focus
 - 字母鍵 — 輸入
-- Esc — 清空(若 clearable + 有值)
+- 一般文字編輯鍵(方向鍵 / Backspace / Delete / 全選)由瀏覽器原生提供
 
-**Focus**:native input focus ring;DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供。
+**Focus**:原生 input outline 已關閉（`outline-none`）；focus 視覺提示由 Field wrapper 的 `focus-within:!border-primary` 提供。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

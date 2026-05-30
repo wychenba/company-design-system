@@ -59,7 +59,7 @@ export const UsageGuidance: Story = {
           title="❌ Page-level Submit / Save 不放 BulkActionBar"
           note="Page-level CTA 跟 selection 無關(沒選任何 row 也要 Submit)。耦合 BulkActionBar 生命週期會導致 selection 清空時 Submit 跟著消失,使用者卡關"
         >
-          <Label warn>Page primary 走 page footer / page header Button,不耦合 BulkActionBar</Label>
+          <Label warn>頁面主要按鈕放在頁尾或頁首,不與 BulkActionBar 耦合</Label>
         </Rule>
 
         <Rule
@@ -79,8 +79,8 @@ export const UsageGuidance: Story = {
             selection={['a', 'b', 'c']}
             actions={
               <>
-                <Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>
-                <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+                <Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>
+                <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
               </>
             }
             onClear={() => {}}
@@ -117,7 +117,7 @@ export const VsToastRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="✅ BulkActionBar = stateful selection action;Toast = transient feedback"
+        title="✅ BulkActionBar = 選取狀態下的批次操作;Toast = 事件後的短暫回饋"
         note="兩者都浮在底部,但語意完全不同。BulkActionBar 隨 selection state 決定顯示(state-driven),容納多 action,使用者主動操作;Toast 是事件後 transient 通知(event-driven),自動消失,僅 1-2 action(undo / dismiss)。對齊 Polaris BulkActions vs Toast / Material BulkActionsBar vs Snackbar 共識。"
       >
         <Label>BulkActionBar</Label>
@@ -125,8 +125,8 @@ export const VsToastRule: Story = {
           selection={['a', 'b', 'c']}
           actions={
             <>
-              <Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>
-              <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+              <Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>
+              <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
             </>
           }
         />
@@ -134,7 +134,7 @@ export const VsToastRule: Story = {
       <Rule
         title="❌ 不要用 BulkActionBar 顯示「3 個項目已封存,Undo」這類事件後通知"
       >
-        <Label warn>Should be Toast</Label>
+        <Label warn>這種情況應改用 Toast</Label>
         <p className="text-fg-muted text-body">
           事件後通知 → 用 Toast(sonner Toaster)。
           BulkActionBar 是「選了 N 項要做什麼」的選取後 toolbar,不是「我做完了」的回饋。
@@ -156,8 +156,8 @@ export const ActionVariantRule: Story = {
           selection={['a', 'b', 'c']}
           actions={
             <>
-              <Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>
-              <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+              <Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>
+              <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
             </>
           }
           onClear={() => {}}
@@ -173,8 +173,8 @@ export const ActionVariantRule: Story = {
           selection={['a', 'b', 'c']}
           actions={
             <>
-              <Button variant="primary" size="sm" startIcon={Archive}>封存</Button>
-              <Button variant="primary" size="sm" startIcon={Trash2} danger>刪除</Button>
+              <Button variant="primary" size="md" startIcon={Archive}>封存</Button>
+              <Button variant="primary" size="md" startIcon={Trash2} danger>刪除</Button>
             </>
           }
           onClear={() => {}}
@@ -210,7 +210,7 @@ export const HintBannerRule: Story = {
           <div className="border-t border-divider">
             <BulkActionBar
               selection={Array.from({ length: 50 }, (_, i) => `f-${i}`)}
-              actions={<Button variant="tertiary" size="sm">下載</Button>}
+              actions={<Button variant="tertiary" size="md">下載</Button>}
               onClear={() => {}}
             />
           </div>
@@ -232,7 +232,7 @@ export const HintBannerRule: Story = {
         <BulkActionBar
           selection={['a', 'b', 'c']}
           hiddenByFilter={2}
-          actions={<Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>}
+          actions={<Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>}
           onClear={() => {}}
         />
         <Label>↑ count 文字 inline:「已選 3 項 · 2 個被 filter 隱藏」</Label>

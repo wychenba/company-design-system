@@ -744,7 +744,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `input.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :native  <input>  element 預設 a11y;Field wrapper 補  aria-labelledby  /  aria-invalid  /  aria-describedby 。\n\n  Keyboard 行為  :\n\n- Tab — focus\n- 字母鍵 — 輸入\n- Esc — 清空(若 clearable + 有值)\n\n  Focus  :native input focus ring;DS focus-visible ring( focus-visible:!border-primary )由 Field wrapper 提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"詳「無障礙設計」段摘要:\n\n  ARIA / Pattern  :採用原生  <input>  元素,自帶基本無障礙;外層 Field 容器補上  aria-labelledby  /  aria-invalid  /  aria-describedby 。\n\n  鍵盤行為  :\n\n- Tab — 聚焦到欄位\n- 字母鍵 — 輸入文字\n- 一般文字編輯鍵(方向鍵 / Backspace / Delete / 全選)由瀏覽器原生提供\n\n  聚焦樣式  :原生 input 的外框已被關閉(outline-none);聚焦時的視覺提示由外層 Field 容器的藍色邊框( focus-within 變 border-primary )提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA 對比 ≥ 4.5:1(文字)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

@@ -192,8 +192,8 @@ export const ColorMatrix: Story = {
       <div>
         <H3>Field Control 色彩(對齊 Input / Select 同一套)</H3>
         <Desc>
-          PeoplePicker 的 field 外觀跟 Select / Combobox 完全一致——共用 `fieldWrapperStyles`。差別只在
-          prefix 多出 Avatar 視覺。所有 field-level 色彩對齊 `field-controls.spec.md`。
+          PeoplePicker 的 field 外觀跟 Select / Combobox 完全一致——共用同一套欄位外框樣式。差別只在
+          前方多出 Avatar 視覺。所有欄位層級的色彩都跟其他 Field 控制項用同一套規範。
         </Desc>
         <div className="overflow-x-auto mb-4">
           <table className="text-caption border-collapse">
@@ -226,7 +226,7 @@ export const ColorMatrix: Story = {
               </tr>
               <tr>
                 <Td mono>readonly</Td>
-                <Td><TokenCell token="--muted" display="muted(緊湊底)" /></Td>
+                <Td><TokenCell token="--bg-disabled" display="bg-disabled(鎖定底)" /></Td>
                 <Td>—(no border)</Td>
                 <Td><TokenCell token="--foreground" /></Td>
               </tr>
@@ -316,7 +316,7 @@ export const StateBehavior: Story = {
       <div>
         <H3>空狀態 — no match found</H3>
         <Desc>
-          搜尋無結果時 dropdown 顯示 `emptyText`,走共用 `Empty` primitive。Consumer 可自訂提示語。
+          搜尋無結果時,下拉選單顯示 `emptyText` 的內容,使用全站共用的空狀態元件。可自訂提示語。
         </Desc>
         <PeoplePicker
           people={SAMPLE_PEOPLE}
@@ -401,7 +401,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `people-picker.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus trigger\n- Enter / Space — 開啟 picker\n- 字母鍵 — type-ahead 搜尋\n- ↑/↓ — 導覽 people\n- Enter — 選擇 / 取消選擇\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — 聚焦到觸發按鈕\n- Enter / Space — 開啟選擇器\n- 字母鍵 — 邊打字邊搜尋\n- ↑/↓ — 在人員清單上下移動\n- Enter — 選擇 / 取消選擇\n\n  Focus  :聚焦框跟整套設計系統一致(2px solid var(--ring));焦點管理由元件自行處理。\n\n  驗證  :Storybook 無障礙檢查面板應 0 個嚴重問題;不靠滑鼠也能完整操作。文字對比 ≥ 4.5:1、介面元素對比 ≥ 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

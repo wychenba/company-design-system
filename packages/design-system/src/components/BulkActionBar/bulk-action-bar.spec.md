@@ -64,7 +64,7 @@ benchmark:
 └──────────────────────────────────────────────────────────────┘
 ```
 
-- 全 sm Buttons(`same-row consistency`,close X 同 size)
+- 全 md Buttons(`same-row consistency`,close X 同 size;2026-05-04 升 md,見下方 Size canonical)
 - `gap-2`(8px)+ `<ButtonDivider />`(自帶 mx-1 = 12px 視覺距離)
 - `px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]`
 - 自然高度 52md / 60lg(對齊 SurfaceFooter / DataTable toolbar canonical)
@@ -134,7 +134,7 @@ interface BulkActionBarProps {
   selection: readonly string[]
   /** Clear 觸發,user 點 X icon(consumer 在 page-level 監聽 Esc 觸發) */
   onClear?: () => void
-  /** 批次 actions(consumer 提供 sm Button,variant=tertiary 或 tertiary+danger,不用 primary) */
+  /** 批次 actions(consumer 提供 md Button,variant=tertiary 或 tertiary+danger,不用 primary) */
   actions?: React.ReactNode
   /** Filter 模式:hidden 數量,顯示在 count 區 inline 「{N} 已選 · {M} 個被 filter 隱藏」 */
   hiddenByFilter?: number

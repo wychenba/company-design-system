@@ -244,7 +244,7 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['mode', "'edit'|'readonly'|'disabled'", "'edit'", '顯示模式'],
+                ['mode', "'edit'|'display'|'readonly'|'disabled'", "'edit'", '顯示模式'],
                 ['error', 'boolean', 'false', '紅色邊框 + aria-invalid（僅 edit 生效）'],
                 ['size', "'sm'|'md'|'lg'", "'md'", '尺寸，與 Button 同 size 對齊'],
                 ['value', 'number | null', '—', '數值'],
@@ -780,7 +780,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `number-input.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :native  <input type=\"text\" inputMode=\"decimal\">  ;Field wrapper 補  aria-labelledby  /  aria-invalid  /  aria-describedby 。 inputMode=\"decimal\"  讓行動裝置彈出數字鍵盤。\n\n  Keyboard 行為  :\n\n- Tab — focus\n- 數字鍵 — 輸入數值\n\n  Focus  :native input focus ring;DS focus-visible ring( focus-visible:!border-primary )由 Field wrapper 提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"ARIA  :使用原生  <input type=\"text\" inputMode=\"decimal\">  ;外層 Field 自動補上標籤、錯誤狀態與描述的關聯。 inputMode=\"decimal\"  讓行動裝置彈出數字鍵盤。\n\n  鍵盤行為  :\n\n- Tab — 移入欄位\n- 數字鍵 — 輸入數值\n\n  焦點  :原生 input 焦點外框,聚焦時外框轉為主色,由外層 Field 提供。\n\n  驗證  :Storybook 無障礙檢查面板應為 0 項嚴重問題;不靠滑鼠也能完整操作。文字對比度至少 4.5:1、介面元件至少 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

@@ -174,7 +174,7 @@ export const EmptyStateRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="edit 模式 — 未選時顯示「選擇...」佔位提示"
+        title="edit 模式 — 未選時顯示「請選擇人員」佔位提示"
         note="跟 Select / Combobox 的 placeholder 行為一致。不用 em-dash,因為 edit mode 是可操作的"
       >
         <PeoplePicker value={null} onChange={() => {}} people={team} />

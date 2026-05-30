@@ -73,8 +73,8 @@ export const UsageGuidance: Story = {
           title="❌ 不用 NumberInput 做電話號碼或郵遞區號 → Input"
           note="電話不是算術數字。改用 Input + type='tel'。Stripe 的電話欄用 Input,不用 NumberInput(不該加千分位或用 step)"
         >
-          <NumberInput value={912345678} onChange={() => {}} />
-          <Label warn>↑ 電話 912-345-678 被當 912,345,678 格式化 → 數字意義錯誤</Label>
+          <NumberInput mode="readonly" value={912345678} />
+          <Label warn>↑ 電話 0912-345-678 被當數值,顯示時加上千分位 912,345,678 → 數字意義錯誤(前導零也被吃掉)</Label>
           <Input defaultValue="0912-345-678" />
           <Label>↑ 電話用 Input(可自訂 type=tel 或 pattern),保留 dash / 前導零</Label>
         </Rule>
@@ -211,8 +211,8 @@ export const DataTypeMatchRule: Story = {
         title="❌ 看起來像數字但不是算術型的資料:用 Input"
         note="電話、郵遞區號、身分證字號、產品代碼都「長得像數字」但不是算術型 value——不做加減、不做千分位、不做 step。用 NumberInput 會錯誤套用千分位(0912-345-678 變成「912,345,678」)、誤導 mobile 彈出數字鍵盤且關閉符號輸入"
       >
-        <NumberInput value={912345678} onChange={() => {}} />
-        <Label warn>↑ 電話 912-345-678 被當 912,345,678 格式化 → 數字意義錯誤</Label>
+        <NumberInput mode="readonly" value={912345678} />
+        <Label warn>↑ 電話 0912-345-678 被當數值,顯示時加上千分位 912,345,678 → 數字意義錯誤(前導零也被吃掉)</Label>
         <Input defaultValue="0912-345-678" />
         <Label>↑ 電話用 Input(可自訂 type=tel 或 pattern),保留 dash / 前導零</Label>
       </Rule>
