@@ -157,7 +157,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/Sidebar/展示" name="混合前綴"><span className="text-primary hover:underline font-medium cursor-pointer">混合前綴</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:對照下方「何時不用 / 替代元件」清單;若情境不屬於垂直持久導覽,改用對應的近親元件。</p>
     </div>
 
       {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}

@@ -27,12 +27,11 @@ export const Overview: Story = {
         <div className="flex items-start gap-8">
           <Coachmark
             open
-            image={<DemoMedia icon={Bot} label="AI 助理" />}
+            image={<MediaGradient from="var(--color-indigo-6)" to="var(--color-purple-6)" icon={Bot} label="AI 助理" />}
             title="試試新的 AI 助理"
             description="在任何文件中按下 AI 按鈕,讓 Claude 幫你摘要、翻譯或改寫內容。"
             step={{ current: 2, total: 3 }}
             onPrev={() => {}}
-            onSkip={() => {}}
             onNext={() => {}}
             side="right"
             align="start"
@@ -41,9 +40,9 @@ export const Overview: Story = {
           </Coachmark>
           <div className="text-caption text-fg-secondary max-w-[280px] leading-relaxed">
             <ul className="list-disc pl-4 space-y-1.5">
-              <li><b>Media</b> — 可選,aspect-video,邊緣對齊 rounded-t-lg</li>
+              <li><b>Media</b> — 可選,預設 16:9 比例,邊緣對齊 rounded-t-lg</li>
               <li><b>Body</b> — Title(text-body-lg font-medium) + Description(text-body text-fg-secondary)</li>
-              <li><b>Footer</b> — justify-between;左 step 計數 / 右 actions(Previous / Skip / Next)</li>
+              <li><b>Footer</b> — justify-between;左 step 計數 / 右 actions(有 Previous 時為 Previous + Next;第一步無 Previous 時為 Skip + Next)</li>
             </ul>
           </div>
         </div>
@@ -55,7 +54,7 @@ export const Overview: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>區塊</Th><Th>條件渲染</Th><Th>Padding</Th><Th>說明</Th></tr></thead>
             <tbody>
-              <tr><Td>Media</Td><Td mono>image != null</Td><Td mono>aspect-video(無 inner padding)</Td><Td>full-width bg-muted,overflow-hidden</Td></tr>
+              <tr><Td>Media</Td><Td mono>image != null</Td><Td mono>無 inner padding</Td><Td>full-width bg-muted,overflow-hidden;比例由 mediaRatio 控制(預設 16:9)</Td></tr>
               <tr><Td>Body</Td><Td mono>title || description</Td><Td mono>PopoverBody(px-loose py-tight)</Td><Td>title(body-lg)+ desc(body)垂直 stack,desc 套 mt `--item-gap-label-desc-reading-lg`(2px)</Td></tr>
               <tr><Td>Footer</Td><Td mono>step || onSkip || onNext || onPrev</Td><Td mono>PopoverFooter(px-loose py-tight)</Td><Td>justify-between(不是 justify-end)</Td></tr>
             </tbody>
@@ -72,6 +71,7 @@ export const Overview: Story = {
               <tr><Td mono>children</Td><Td mono>ReactNode</Td><Td mono>—</Td><Td>anchor trigger element(Popover asChild)</Td></tr>
               <tr><Td mono>open / onOpenChange</Td><Td mono>boolean / (o) =&gt; void</Td><Td mono>—</Td><Td>controlled 控制(多步 tour 必用)</Td></tr>
               <tr><Td mono>image</Td><Td mono>ReactNode</Td><Td mono>—</Td><Td>頂部 media 區;不傳則不渲染</Td></tr>
+              <tr><Td mono>mediaRatio</Td><Td mono>number</Td><Td mono>16/9</Td><Td>media 長寬比(寬/高);可傳 4/3 / 1/1 / 3/4 覆寫</Td></tr>
               <tr><Td mono>title</Td><Td mono>ReactNode</Td><Td mono>—</Td><Td>標題(text-body-lg font-medium)</Td></tr>
               <tr><Td mono>description</Td><Td mono>ReactNode</Td><Td mono>—</Td><Td>說明文字(text-body text-fg-secondary)</Td></tr>
               <tr><Td mono>step</Td><Td mono>{'{ current, total }'}</Td><Td mono>—</Td><Td>步驟計數;有值 footer 左顯示「2 of 3」</Td></tr>
@@ -81,7 +81,7 @@ export const Overview: Story = {
               <tr><Td mono>isLastStep</Td><Td mono>boolean</Td><Td mono>false</Td><Td>true 時 Next 文字改 Done</Td></tr>
               <tr><Td mono>side</Td><Td mono>'top' | 'right' | 'bottom' | 'left'</Td><Td mono>'bottom'</Td><Td>對齊 Popover props</Td></tr>
               <tr><Td mono>align</Td><Td mono>'start' | 'center' | 'end'</Td><Td mono>'center'</Td><Td>對齊 Popover props</Td></tr>
-              <tr><Td mono>sideOffset</Td><Td mono>number</Td><Td mono>8</Td><Td>對齊 Popover DS 設計準則(8px,見 `popover.spec.md`)</Td></tr>
+              <tr><Td mono>sideOffset</Td><Td mono>number</Td><Td mono>8</Td><Td>跟 Popover 一致的浮層間距(8px)</Td></tr>
               <tr><Td mono>className</Td><Td mono>string</Td><Td mono>'w-80 p-0 overflow-hidden'</Td><Td>預設寬 320px(比 Popover 的 w-72 寬,因放 media + 多行文字)</Td></tr>
             </tbody>
           </table>
@@ -123,7 +123,7 @@ export const Inspector: Story = {
             </div>
             <Coachmark
               open
-              image={hasImage ? <DemoMedia icon={Sparkles} label="功能介紹" /> : undefined}
+              image={hasImage ? <MediaGradient from="var(--color-indigo-6)" to="var(--color-purple-6)" icon={Sparkles} label="功能介紹" /> : undefined}
               title="試試新功能"
               description="這是 Coachmark 的說明文字;多行內容會自動換行並保持 leading 一致。"
               step={hasStep ? { current: 2, total: 3 } : undefined}
@@ -151,7 +151,7 @@ export const Inspector: Story = {
                 <tr><Td>外殼 shadow</Td><Td mono>--elevation-200</Td></tr>
                 <tr><Td>Width</Td><Td mono>w-80(320px)</Td></tr>
                 <tr><Td>Media 背景</Td><Td><TokenCell token="--muted" display="bg-muted" /></Td></tr>
-                <tr><Td>Media 比例</Td><Td mono>aspect-video(16:9)</Td></tr>
+                <tr><Td>Media 比例</Td><Td mono>mediaRatio 預設 16/9(16:9);可覆寫</Td></tr>
                 <tr><Td>Body padding</Td><Td mono>px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]</Td></tr>
                 <tr><Td>Body gap</Td><Td mono>--item-gap-label-desc-reading-lg(Title body-lg → Description body,2px)</Td></tr>
                 <tr><Td>Title typography</Td><Td mono>text-body-lg font-medium text-foreground</Td></tr>
@@ -159,7 +159,7 @@ export const Inspector: Story = {
                 <tr><Td>Footer padding</Td><Td mono>px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]</Td></tr>
                 <tr><Td>Footer layout</Td><Td mono>justify-between(左 step / 右 actions)</Td></tr>
                 <tr><Td>Footer actions gap</Td><Td mono>gap-2</Td></tr>
-                <tr><Td>Step typography</Td><Td mono>text-caption text-fg-secondary tabular-nums</Td></tr>
+                <tr><Td>Step typography</Td><Td mono>text-body text-fg-secondary tabular-nums</Td></tr>
                 <tr><Td>Button size</Td><Td mono>sm(Previous / Skip / Next 全 sm)</Td></tr>
                 <tr><Td>Previous / Skip variant</Td><Td mono>tertiary</Td></tr>
                 <tr><Td>Next variant</Td><Td mono>primary</Td></tr>
@@ -227,9 +227,9 @@ export const SizeMatrix: Story = {
       </div>
 
       <div>
-        <H3>Media 固定 aspect-video(16:9)</H3>
+        <H3>Media 比例由 mediaRatio 控制(預設 16:9)</H3>
         <Desc>
-          Media 區高度由寬度 × 9/16 決定(w-80 → media 高約 180px)——確保不同 tour 步驟視覺一致,consumer 不需自己算高度。若 media 內容比例不是 16:9,`overflow-hidden` 會裁切超出部分。
+          Media 區高度由寬度 × (1 / mediaRatio) 決定;預設 16:9(w-80 → media 高約 180px),同一段 tour 各步驟維持一致比例,consumer 不需自己算高度。需要時 consumer 可傳 mediaRatio(4/3 產品截圖 / 1/1 方圖 / 3/4 直式)覆寫。若 media 內容比例與設定不符,`overflow-hidden` 會裁切超出部分。
         </Desc>
       </div>
 
@@ -266,7 +266,7 @@ export const StateBehavior: Story = {
             <Coachmark
               open={singleOpen}
               onOpenChange={setSingleOpen}
-              image={<DemoMedia icon={Bot} label="AI" />}
+              image={<MediaGradient from="var(--color-indigo-6)" to="var(--color-purple-6)" icon={Bot} label="AI 助理" />}
               title="試試 AI 助理"
               description="單步 Coachmark,僅 Skip / Next,無 step 計數。"
               onSkip={() => setSingleOpen(false)}
@@ -289,7 +289,7 @@ export const StateBehavior: Story = {
             <Coachmark
               open={tourOpen}
               onOpenChange={setTourOpen}
-              image={<DemoMedia icon={Users} label={`Step ${tourStep + 1}`} />}
+              image={<MediaGradient from="var(--color-indigo-6)" to="var(--color-purple-6)" icon={Users} label={`Step ${tourStep + 1}`} />}
               title={`步驟 ${tourStep + 1}:${['建立 Workspace', '邀請成員', '建立專案'][tourStep]}`}
               description="多步 tour 由 consumer 管理 current step,每步渲染一個 Coachmark anchor 到對應 feature。"
               step={{ current: tourStep + 1, total: tourTotal }}

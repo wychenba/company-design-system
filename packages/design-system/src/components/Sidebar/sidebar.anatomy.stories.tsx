@@ -67,7 +67,7 @@ const Swatch = ({ value }: { value: string }) => (
 const SidebarPreview = ({
   size = 'md',
   activeId = 'dashboard',
-  width = 272,
+  width = 240,
 }: {
   size?: 'sm' | 'md' | 'lg'
   activeId?: string
@@ -277,7 +277,7 @@ export const Inspector: Story = {
   args: {
     size: 'md',
     activeId: 'dashboard',
-    width: 272,
+    width: 240,
   },
   argTypes: {
     size: {
@@ -292,7 +292,7 @@ export const Inspector: Story = {
     },
     width: {
       control: { type: 'range', min: 240, max: 360, step: 8 },
-      description: '展開寬度(預設 272 / 最小 240)',
+      description: '展開寬度(預設 240 / 最小 240)',
     },
   },
   render: (args) => {
@@ -549,11 +549,11 @@ export const VariantMatrix: Story = {
         <div className="border border-border rounded-md p-3 bg-surface flex flex-col gap-1">
           <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
             <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">專案 A</span>
+            <span className="text-caption font-medium">Mobile App</span>
           </div>
           <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
             <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">專案 B</span>
+            <span className="text-caption font-medium">Design System</span>
           </div>
         </div>
       </div>
@@ -567,11 +567,11 @@ export const VariantMatrix: Story = {
         <div className="border border-border rounded-md p-3 bg-surface flex flex-col gap-1">
           <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
             <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">專案 A</span>
+            <span className="text-caption font-medium">Checkout Revamp</span>
           </div>
           <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
             <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">專案 B</span>
+            <span className="text-caption font-medium">Billing Migration</span>
           </div>
           <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-muted)' }}>
             <span className="text-caption font-normal">+ 新增專案</span>
@@ -704,8 +704,8 @@ export const ChromeTokens: Story = {
           </thead>
           <tbody>
             <tr>
-              <Td><TkVal token="--sidebar-width" value="17rem (272px)" /></Td>
-              <Td mono>17rem</Td>
+              <Td><TkVal token="--sidebar-width" value="15rem (240px)" /></Td>
+              <Td mono>15rem</Td>
               <Td>展開寬度</Td>
             </tr>
             <tr>
@@ -763,7 +763,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `sidebar.spec.md` 「A11y 預設」段。摘要:\n\n-   Landmark  : <Sidebar>  渲染  <nav aria-label=\"Main\"> (或 consumer 傳入更精確的 label,例「Workspace navigation」),作為 page-level navigation landmark,讓 SR user 直接跳轉。\n-   Active item  : SidebarMenuButton  帶  id  + 命中  activeId  時自動加  aria-current=\"page\" ,SR 朗讀「current page」。 variant=\"meta\"  不參與 selection 不加此 attribute。\n-   快捷鍵不衝突  : Cmd+B  /  Ctrl+B  是 industry-standard(VS Code / Linear / shadcn),DS 內建並  prev"}</p>
+      <p className="whitespace-pre-line">{"-   收合切換鍵：Cmd+B(Mac)/ Ctrl+B(Windows)是業界慣例(VS Code / Linear / shadcn 都用),Sidebar 內建並會攔下這組鍵,避免穿透到瀏覽器書籤列。任何焦點位置都能觸發,文字輸入框內除外。\n\n-   收合按鈕:SidebarTrigger 帶 aria-label「展開或收合」,讓螢幕報讀使用者知道按鈕用途;consumer 可用 toggleAriaLabel 自訂文字。\n\n-   當前項目:選中的 menu item 帶 data-active,呈現選取底色(bg-neutral-selected)作為視覺指引;即使收合成 icon-only 模式,選取底色仍然保留,使用者一眼知道現在在哪一頁。\n\n-   手機尺寸:768px 以下自動切換成從旁滑出的抽屜(Sheet),內建焦點鎖定、Esc 關閉、關閉後焦點回到觸發按鈕。"}</p>
     </div>
   ),
 }

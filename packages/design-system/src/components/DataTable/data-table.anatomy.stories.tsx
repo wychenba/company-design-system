@@ -80,9 +80,9 @@ export const Overview: Story = {
             <table className="text-caption border-collapse">
               <thead><tr><Th>Level</Th><Th>責任</Th><Th>實作</Th></tr></thead>
               <tbody>
-                <tr><Td>L1 Structure</Td><Td>DOM 結構 + 捲動行為</Td><Td mono>&lt;div&gt; + ARIA role="grid/row/cell" + useVirtualizer</Td></tr>
+                <tr><Td>L1 Structure</Td><Td>DOM 結構 + 捲動行為</Td><Td mono>&lt;div&gt; + ARIA role="table/row/cell" + useVirtualizer</Td></tr>
                 <tr><Td>L2 Typography / Spacing</Td><Td>Row 高度 / Cell padding / 對齊</Td><Td mono>--table-row-* + --field-height-* token</Td></tr>
-                <tr><Td>L3 Cell Rendering</Td><Td>根據 meta.type 自動選 Display 元件</Td><Td mono>column-types.ts 註冊 text/number/currency/date/select/boolean/person/link</Td></tr>
+                <tr><Td>L3 Cell Rendering</Td><Td>根據 meta.type 自動選 Display 元件</Td><Td mono>column-types.ts 註冊 string/number/currency/date/select/boolean/person/url</Td></tr>
                 <tr><Td>L4 Interactions</Td><Td>排序 / 選取 / 欄位拖動 / frozen column</Td><Td>TanStack Table features + 自訂 state</Td></tr>
               </tbody>
             </table>
@@ -190,15 +190,15 @@ export const ColumnTypes: Story = {
             <table className="text-caption border-collapse">
               <thead><tr><Th>meta.type</Th><Th>Display 渲染</Th><Th>對齊</Th><Th>典型場景</Th></tr></thead>
               <tbody>
-                <tr><Td mono>text</Td><Td mono>{`<Input mode="display">`}</Td><Td>left</Td><Td>姓名、title、slug</Td></tr>
+                <tr><Td mono>string</Td><Td mono>{`<Input mode="display">`}</Td><Td>left</Td><Td>姓名、title、slug</Td></tr>
                 <tr><Td mono>number</Td><Td mono>{`<NumberInput mode="display">`}</Td><Td>right</Td><Td>數量、年齡</Td></tr>
                 <tr><Td mono>currency</Td><Td mono>{`<NumberInput mode="display">`}(+ prefix)</Td><Td>right</Td><Td>金額、價格</Td></tr>
                 <tr><Td mono>date</Td><Td mono>{`<DatePicker mode="display">`}</Td><Td>left</Td><Td>日期、時間戳</Td></tr>
-                <tr><Td mono>boolean</Td><Td mono>{`<Checkbox mode="display">`}(✓ / —)</Td><Td>center</Td><Td>啟用 / 可見</Td></tr>
+                <tr><Td mono>boolean</Td><Td mono>{`<Checkbox mode="display">`}(✓ / —)</Td><Td>left</Td><Td>啟用 / 可見</Td></tr>
                 <tr><Td mono>select</Td><Td mono>{`<Select mode="display">`}</Td><Td>left</Td><Td>狀態、類別</Td></tr>
-                <tr><Td mono>combobox</Td><Td mono>{`<Combobox mode="display">`}</Td><Td>left</Td><Td>多選 tags</Td></tr>
+                <tr><Td mono>multiSelect</Td><Td mono>{`<Combobox mode="display">`}</Td><Td>left</Td><Td>多選 tags</Td></tr>
                 <tr><Td mono>person</Td><Td mono>PersonDisplay / MultiPersonDisplay</Td><Td>left</Td><Td>指派者、reviewer</Td></tr>
-                <tr><Td mono>link</Td><Td mono>{`<LinkInput mode="display">`}</Td><Td>left</Td><Td>URL</Td></tr>
+                <tr><Td mono>url</Td><Td mono>{`<LinkInput mode="display">`}</Td><Td>left</Td><Td>URL</Td></tr>
               </tbody>
             </table>
           </div>
@@ -261,7 +261,7 @@ export const AlignmentRule: Story = {
       <div className="flex flex-col gap-8">
         <div>
           <H3>Column type 決定對齊(由 column-types.ts 定義,不讓 consumer 手動設)</H3>
-          <Desc>數字靠右方便縱向比較位數(Excel / 會計軟體 / 財務系統共識);文字靠左方便閱讀;boolean 置中(symbol 視覺不偏向)。Consumer 不需要設 `align`,column type 就決定了。</Desc>
+          <Desc>數字靠右方便縱向比較位數(Excel / 會計軟體 / 財務系統共識);文字靠左方便閱讀;boolean 靠左跟其他文字欄一致,維持掃視時的左緣節奏。Consumer 不需要設 `align`,column type 就決定了。</Desc>
           <DataTable columns={columns} data={SAMPLE_DATA} height="auto" />
         </div>
 
@@ -273,7 +273,7 @@ export const AlignmentRule: Story = {
               <tbody>
                 <tr><Td>text / select / person / date / link</Td><Td mono>left</Td><Td>閱讀從左到右</Td></tr>
                 <tr><Td>number / currency</Td><Td mono>right</Td><Td>縱向比較位數(小數點縱向對齊)</Td></tr>
-                <tr><Td>boolean(✓ / —)</Td><Td mono>center</Td><Td>symbol 本身無方向性,中置對稱</Td></tr>
+                <tr><Td>boolean(✓ / —)</Td><Td mono>left</Td><Td>跟其他文字欄一致靠左,維持掃視時的左緣節奏</Td></tr>
                 <tr><Td>actions(在 cell 內的按鈕)</Td><Td mono>right</Td><Td>動線尾端,不干擾資料掃視</Td></tr>
               </tbody>
             </table>
@@ -306,7 +306,7 @@ export const Features: Story = {
       <div className="flex flex-col gap-8">
         <div>
           <H3>排序(enableSorting)</H3>
-          <Desc>Column 的 `enableSorting: true` 啟用排序。點擊 header 切換 asc / desc / none 三態,header 右側顯示 ChevronUp / ChevronDown 指示。</Desc>
+          <Desc>Column 的 `enableSorting: true` 啟用排序。點擊 header 切換 asc / desc / none 三態,header 右側顯示向上 / 向下箭頭(ArrowUp / ArrowDown)指示目前排序方向。</Desc>
           <DataTable columns={columns} data={SAMPLE_DATA} height="auto" />
         </div>
 
@@ -522,7 +522,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `data-table.spec.md` 「八、a11y 預設」段。DataTable 採 `<div>` + ARIA grid role(非語義 `<table>`,因虛擬捲動需絕對定位 row),對齊 WAI-ARIA APG Grid pattern。摘要:\n\n  Grid role  :容器 `role=\"grid\"`、每列 `role=\"row\"`、每格 `role=\"gridcell\"`(header cell `role=\"columnheader\"`)。\n\n  排序  :sortable header 帶 `aria-sort=\"ascending | descending | none\"`,排序狀態切換時 screen reader 即時播報。\n\n  選取  :每列 checkbox 必有 `aria-label`(consumer 由 `getRowAriaLabel` 提供,fallback 「Select row」);全選 checkbox `aria-label=\"Select all visible rows\"`;selection 變更可選 `aria-live=\"polite\"` 通知。\n\n  鍵盤  :方向鍵在 cell 間移動(roving tabindex — 同一時間僅一個 cell 進 tab order);選取列 `Space` toggle / `Shift+Space` 擴 range / `Cmd/Ctrl+A` 選全可見 / `Esc` 清除。Row actions 收進 MoreVertical dropdown 確保全部鍵盤可達。\n\n  焦點  :focus-visible ring( outline: 2px solid var(--ring) ,對齊 design-system focus 準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"DataTable 用一般 div 搭配表格語意標記,而非原生 table 元素——因為虛擬捲動需要絕對定位每一列,而 table 的佈局模型做不到。輔助技術(螢幕報讀器)會把它當成表格朗讀。\n\n  表格語意  :最外層標記為表格、每一列標記為列、每一格標記為儲存格,表頭那一格標記為欄位標題。\n\n  排序  :可排序的表頭會標示目前的排序方向(升冪 / 降冪 / 未排序),報讀器讀得出來。\n\n  選取  :每一列的勾選框都有說明文字(由使用方傳入,沒傳就用「Select row」),全選框的說明文字是「Select all visible rows」。\n\n  鍵盤  :一般表格模式下,用 Tab 進入表格後可操作排序與勾選;方向鍵在儲存格之間移動是試算表模式(spreadsheetMode)才開啟的功能,不是預設。列上的更多操作都收進右側的「更多」選單,確保不用滑鼠也能用。\n\n  焦點  :鍵盤聚焦時顯示清楚的外框,與整個設計系統的聚焦樣式一致。\n\n  驗證  :Storybook 無障礙檢查面板應該沒有嚴重問題;全程鍵盤可操作,不必用到滑鼠;文字對比度達到無障礙標準。"}</p>
     </div>
   ),
 }

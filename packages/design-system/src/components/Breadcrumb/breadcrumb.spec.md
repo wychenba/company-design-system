@@ -233,14 +233,14 @@ ColorMatrix 已建:展示 BreadcrumbLink / Page / Separator / Ellipsis 四種節
 
 ## A11y 預設
 
-**ARIA / Pattern**:繼承 Radix `slot` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/slot#accessibility)。
+**ARIA / Pattern**:純 HTML 結構元件(nav + ol + li + a/span),無第三方 primitive。a11y 來自原生 HTML 語意 — 外層 `<nav aria-label="Breadcrumb">`、當前頁 `<span aria-current="page">`、分隔符 `aria-hidden`(不進無障礙樹)。對齊 [WAI-ARIA Breadcrumb pattern](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/)。
 
 **Keyboard 行為**:
 
 - Tab — 逐個 link 導覽
 - Enter — navigate
 
-**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+**Focus**:聚焦時顯示 visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical);連結逐個依序成為 tab stop,不攔截焦點(無 focus trap — breadcrumb 是序列式導覽,trap 反而是無障礙 bug)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

@@ -80,7 +80,7 @@ export const Inspector: InspectorStory = {
   parameters: {
     docs: {
       description: {
-        story: '右側 Controls 面板切換 size / showHomeIcon / useEllipsis / depth,即時查看 Breadcrumb 在不同字級 / 首項 icon / 路徑深度下的呈現。世界級 DS 的 Inspector = Figma inspect 替代,涵蓋全 prop 組合 visual matrix。',
+        story: '用右側 Controls 面板切換字級、首項 icon、路徑深度與收合設定,即時查看 Breadcrumb 在不同組合下的呈現。可調項目:字級(sm/md/lg)、是否顯示首頁 icon、路徑總層數、自動收合的觸發層數,以及收合後保留的前後項目數。',
       },
     },
   },
@@ -194,7 +194,7 @@ export const ColorMatrix: Story = {
                 <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--fg-muted" size="sm" /><span className="font-mono">--fg-muted</span></span></Td>
                 <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary-hover" size="sm" /><span className="font-mono">--primary-hover</span></span></Td>
                 <Td mono>ring-2 ring-ring</Td>
-                <Td mono>aria-label="顯示更多"</Td>
+                <Td mono>aria-label="顯示折疊路徑"</Td>
               </tr>
             </tbody>
           </table>
@@ -451,7 +451,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `breadcrumb.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  slot  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/slot#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 逐個 link 導覽\n- Enter — navigate\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"Breadcrumb 是純 HTML 結構元件(nav + ol + li + a/span),無第三方 primitive。摘要:\n\n  ARIA  :外層 nav 帶 aria-label=\"Breadcrumb\";當前頁 BreadcrumbPage 帶 aria-current=\"page\";分隔符 aria-hidden 不進無障礙樹。a11y 行為來自原生 HTML 語意,非任何 primitive 的預設值。\n\n  Keyboard 行為  :\n\n- Tab — 逐個 link 依序聚焦(每個連結都是獨立 tab stop,無 focus trap)\n- Enter — 觸發連結導覽\n\n  Focus  :聚焦時顯示 visible ring(outline: 2px solid var(--ring));連結逐個依序聚焦,不攔截焦點。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

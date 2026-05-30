@@ -359,10 +359,10 @@ export const MediaContentRule: Story = {
       </Rule>
 
       <Rule
-        title="Media aspect-video 固定 — 視覺一致"
-        note="多步 tour 每步的 media 都是 16:9,確保整個 tour 視覺節奏一致。使用者看到第二步不會因為 media 變高/變矮而分心,教學節奏穩定"
+        title="同一段 tour 維持一致比例 — 視覺節奏穩定"
+        note="media 比例由 mediaRatio 控制(預設 16:9)。同一段 tour 各步驟用同一個比例,確保視覺節奏一致 — 使用者看第二步不會因為 media 變高/變矮而分心。需要時 consumer 可傳 mediaRatio(4/3 / 1/1 / 3/4)覆寫"
       >
-        <Label>所有 Coachmark media 都是 aspect-video(16:9),consumer 準備素材時遵守此比例</Label>
+        <Label>預設 16:9;一段 tour 內各步驟沿用同一比例,consumer 準備素材時遵守該比例</Label>
       </Rule>
     </div>
   ),

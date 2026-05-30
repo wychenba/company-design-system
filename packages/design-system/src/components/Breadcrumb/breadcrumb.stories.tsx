@@ -180,9 +180,8 @@ export const DeclarativeAutoCollapse: Story = {
           窄容器 + 長 label — flex-shrink hierarchy + truncate + tooltip
         </h3>
         <p className="text-caption text-fg-muted mb-3">
-          容器寬 320px,item label 過長。Root shrink:3(最先縮)→ middle shrink:2 → current
-          shrink:1。各 item 內 `truncate` + ResizeObserver 偵測 → hover tooltip 顯完整文字
-          (對齊 `tooltip.principles.stories.tsx:190` 設計準則)。
+          縮放瀏覽器寬度可觀察:容器變窄時,首項最先被壓縮、中段次之、當前頁最後才縮。
+          每一項文字被截斷時自動顯示 ...,滑鼠移上去會用 tooltip 顯示完整文字;沒被截斷則不顯示 tooltip。
         </p>
         {/* @story-trait-rationale: 2026-05-14 per user 拍板「拿掉 fixed 320px 讓 resize window 測 RWD」— Breadcrumb 是純結構導覽,disabled/states 由 BreadcrumbLink :focus-visible/:hover/:active 處理(spec.md L107),trait check 沿用 file header rationale */}
         <div className="border border-dashed border-divider rounded-md p-2">
@@ -212,7 +211,7 @@ export const WithHomeIcon: Story = {
   parameters: {
     docs: {
       description: {
-        story: '首項用 House icon 強化視覺錨點,對齊 Material / Atlassian / Ant Design 慣例。Consumer 只傳 LucideIcon,DS 內部消費 BREADCRUMB_ICON_SIZE SSOT 統一管 size(sm/md=16, lg=20),禁傳 size prop 避免 drift。',
+        story: '首項用 House icon 強化視覺錨點,對齊 Material / Atlassian / Ant Design 慣例。只需傳入 icon,尺寸由元件依字級自動決定(sm/md 為 16px,lg 為 20px),確保整條麵包屑的 icon 大小一致。',
       },
     },
   },
@@ -242,7 +241,7 @@ export const PairedWithPageTitle: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Breadcrumb size 必對應頁面標題層級(spec.md size canonical)。sm 配 h4(Dialog/Panel),md 配 h3(一般頁面 header,預設),lg 配 h2(Detail page hero)。階層視覺維持平衡,breadcrumb 不搶 title 視覺權重。',
+        story: 'Breadcrumb 的字級應對應頁面標題的層級:sm 配 h4(對話框 / 側板),md 配 h3(一般頁面 header,預設),lg 配 h2(詳情頁主視覺)。讓階層視覺維持平衡,麵包屑不搶走標題的視覺權重。',
       },
     },
   },

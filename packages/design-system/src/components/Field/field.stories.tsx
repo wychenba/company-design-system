@@ -146,8 +146,8 @@ export const MixedControlAlignment: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">垂直 Field：Input / Checkbox / Switch 高度節奏一致</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          每個 Field 的 control area 都是 `min-h-field-md` + items-center。
-          Input 填滿 32px，Checkbox / Switch 維持 primitive 原生尺寸並垂直置中。
+          每個欄位的控件區都有相同的最小高度,讓整欄看起來節奏一致。
+          文字輸入框會撐滿整個高度,勾選框與開關則維持原本尺寸並在區內垂直置中。
         </p>
         <FieldGroup>
           <Field>
@@ -216,8 +216,8 @@ export const SegmentedControlInField: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">Vertical：SegmentedControl 自動繼承 Field size</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          SegmentedControl 在 Field 內透過 useFieldContext() 讀取 size，不需重複傳——跟 Button / Input 同機制。
-          整個 Field 改 size 時，SegmentedControl 跟著一起縮放。
+          分段控制器放進欄位後,會自動沿用欄位設定的尺寸,不需要再單獨指定——跟按鈕、輸入框的做法一致。
+          整個欄位改尺寸時,分段控制器也會跟著一起縮放。
         </p>
         <FieldGroup>
           <Field size="sm">
@@ -251,8 +251,8 @@ export const SegmentedControlInField: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">Horizontal：label 與 SegmentedControl 中線對齊</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          Horizontal Field 內 SegmentedControl 跟其他 control（Input / Checkbox / Switch）一樣
-          參與 field-height 韻律，label 第一行對齊 control 中線。
+          水平排列時,分段控制器跟其他控件(輸入框、勾選框、開關)一樣維持相同的行高節奏,
+          標籤的第一行會對齊控件的垂直中線。
         </p>
         <FieldGroup>
           <Field orientation="horizontal" labelWidth="120px">
@@ -306,9 +306,9 @@ export const BlockControlRadioGroup: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">Vertical:RadioGroup 在 control area 內堆疊</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          RadioGroup 的 `fieldLayout = 'block'` static 屬性讓 Field 自動切 block 模式——
-          control area 不設 min-h、改用 padding-top 公式,第一個 option 的中線錨在 field-height/2。
-          Consumer 不需要傳任何 prop。
+          單選群組會讓欄位自動切換成「多行區塊」排版——
+          控件區不固定高度,而是把第一個選項的中線對齊到單行控件的中線位置。
+          使用時不需要額外傳任何設定。
         </p>
         <div className="max-w-sm">
           <Field>
@@ -326,9 +326,8 @@ export const BlockControlRadioGroup: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">Horizontal:label 第一行對齊第一個 option 中線</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          horizontal 模式下,label 的 padding-top 公式不變,
-          control area 的 padding-top 也用同一條公式——兩者「第一行中線」都落在 field-height/2,
-          所以 label 文字精確對齊第一個 Radio 的文字中線,後續 option 往下流。
+          水平排列時,標籤與控件區用同一套對齊方式,讓兩者的「第一行中線」落在同一條基準線上,
+          所以標籤文字會精準對齊第一個單選項的文字中線,後面的選項往下排列。
         </p>
         <Field orientation="horizontal" labelWidth="120px">
           <FieldLabel>性別</FieldLabel>
@@ -343,9 +342,9 @@ export const BlockControlRadioGroup: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">Inline + Block 並排:FieldGroup 韻律不斷</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          同一個 FieldGroup 內混用 inline(Input)和 block(RadioGroup),每個 Field 的 label
-          第一行中線都落在同一條視覺基準上——姓名 Input 的中線、性別第一個 Radio(男性)的中線、Email Input 的中線。
-          這就是 field-height 韻律。
+          同一組欄位裡混用單行控件(輸入框)和多行控件(單選群組)時,每個欄位標籤的
+          第一行中線都落在同一條視覺基準上——姓名輸入框的中線、性別第一個選項(男性)的中線、Email 輸入框的中線。
+          這就是整套欄位一致的行高節奏。
         </p>
         <FieldGroup>
           <Field orientation="horizontal" labelWidth="120px" required>

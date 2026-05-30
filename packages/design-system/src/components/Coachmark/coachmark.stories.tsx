@@ -200,7 +200,7 @@ export const TipsMultiStep: Story = {
           <Button variant="tertiary" size="sm" onClick={() => { setStep(0); setOpen(true) }}>重設 Tips</Button>
         </div>
         <p className="text-footnote text-fg-muted">
-          ↑ `kind="tips"` header 文字 = 「使用技巧」(vs `new-features` = 「新功能介紹」),兩者都由元件內 設計準則 映射,consumer 不重寫
+          ↑ `kind="tips"` header 文字 = 「使用技巧」(vs `new-features` = 「新功能介紹」),兩者的標題都由元件內建對照表自動帶出,consumer 不需自己寫
         </p>
       </div>
     )

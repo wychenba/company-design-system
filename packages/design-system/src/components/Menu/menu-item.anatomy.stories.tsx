@@ -284,7 +284,7 @@ export const Overview = {
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '尺寸，對齊 field-height token'],
                 ['endContent', 'ReactNode', '—', '後綴自訂內容（DropdownMenu 的 badge/endIcon/shortcut 經由此注入）'],
                 ['labelMaxLines', "number | 'none'", '1', `標籤最大行數，'none' 不截斷`],
-                ['descMaxLines', "number | 'none'", '2', `描述最大行數，'none' 不截斷`],
+                ['descMaxLines', "number | 'none'", '1', `描述最大行數，'none' 不截斷`],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -774,7 +774,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `menu.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus container\n- ↑/↓ — 導覽 items\n- Enter — activate\n- Esc — 關閉(若在 menu context)\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"MenuItem 只負責單行的視覺排版,本身不接管鍵盤與焦點。它渲染成一個 role=\"option\" 的選項列,真正的鍵盤導覽(上下鍵切換、Enter 選取、Esc 關閉)與焦點管理由外層的選單元件(SelectMenu / DropdownMenu)負責——MenuItem 不重複實作這些行為。\n\n  選項列  :渲染為 role=\"option\",由外層選單決定哪一項目前被聚焦與選取。\n\n  焦點外觀  :聚焦時顯示 focus-visible 外框,對齊設計系統的 ring 樣式( outline: 2px solid var(--ring) )。\n\n  驗證  :Storybook a11y addon 面板應 0 critical violation;整個選單用鍵盤即可完整操作(無需滑鼠);文字對比 ≥ 4.5:1、介面元素對比 ≥ 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

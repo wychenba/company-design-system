@@ -71,7 +71,7 @@ export const Overview: Story = {
                 ['invalid', 'boolean', 'false', 'error 狀態 + context.invalid(觸發 aria-invalid)'],
                 ['disabled', 'boolean', 'false', 'context.disabled 傳給 control'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", 'context.size 傳給 control(field-height tier)'],
-                ['mode', "'edit' | 'readonly' | 'disabled'", "'edit'", 'context.mode 傳給 Field Controls'],
+                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", 'context.mode 傳給 Field Controls'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -88,7 +88,7 @@ export const Overview: Story = {
 interface InspectorArgs {
   orientation: 'vertical' | 'horizontal'
   size: 'sm' | 'md' | 'lg'
-  mode: 'edit' | 'readonly' | 'disabled'
+  mode: 'edit' | 'display' | 'readonly' | 'disabled'
   required: boolean
   invalid: boolean
   disabled: boolean
@@ -127,8 +127,8 @@ export const Inspector: Story = {
     },
     mode: {
       control: 'radio',
-      options: ['edit', 'readonly', 'disabled'],
-      description: 'Context 傳給 Field Controls(詳見 field-controls.spec.md)',
+      options: ['edit', 'display', 'readonly', 'disabled'],
+      description: 'Context 傳給控制元件:edit 可編輯 / display 純展示 / readonly 鎖定但保留輸入外觀 / disabled 停用',
     },
     required: { control: 'boolean', description: 'label 後加 * + aria-required' },
     invalid: { control: 'boolean', description: '觸發 error border + FieldError 取代 FieldDescription' },
@@ -278,7 +278,7 @@ export const StateBehavior: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Required — label 後加 * 星號</H3>
-        <Desc>Field required 傳 context,FieldLabel 自動加星號並設 aria-required。</Desc>
+        <Desc>Field 的 required 透過 context 傳遞,FieldLabel 自動在文字前加上星號(僅視覺,對讀屏隱藏);aria-required 由內部的輸入控件(如 Input)負責設定。</Desc>
         <div className="border border-dashed border-divider rounded-md p-4 max-w-md">
           <Field required>
             <FieldLabel>姓名</FieldLabel>
@@ -514,7 +514,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `field.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus internal control(Input / Select / DatePicker 等)\n- Esc — 取消 edit mode(若 cell-as-input)\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"Field 本身只是排版容器,不接管任何鍵盤事件——它把焦點、鍵盤與互動全都交給裡面的輸入控件(Input / Select / 日期選擇器等)。\n\n  鍵盤操作  :\n\n- Tab 鍵會把焦點移進裡面的輸入控件,使用者直接操作該控件,不需要滑鼠。\n- 取消編輯、按 Esc 收起等行為,由控件本身或放置它的容器(例如表格儲存格)決定,Field 不負責。\n\n  焦點外框  :焦點外框由控件自己畫(2px 實線),沿用整套設計系統一致的樣式;Field 不另外搶焦點。\n\n  驗證標準  :Storybook 的無障礙檢查面板應該沒有任何嚴重問題;只用鍵盤就能完整操作;文字對比至少 4.5:1、介面元素至少 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }
