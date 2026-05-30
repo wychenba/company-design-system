@@ -200,11 +200,14 @@ type PersonValue = string | { name: string; avatarUrl?: string; description?: st
 
 ---
 
-## 為何無 Inspector
+## Anatomy story 結構
 
-PeoplePicker 是 **composite Field Control**(Field shell + Avatar + SelectMenu),關鍵決策維度是 `mode`(single / multi)× `size` × search behavior × value type——已由 `ModeMatrix` / `SizeMatrix` / `ColorMatrix` / `StateBehavior` / `PersonValueType` 五張矩陣完整覆蓋。互動 Inspector 對 composite 元件較弱:「傳 PersonValue 陣列」需要真實資料 fixture 展示,單組合試玩無法呈現——改以 `StateBehavior` 的真實 Assignee picker 場景取代。
+PeoplePicker 是 **composite Field Control**(Field shell + Avatar + SelectMenu),anatomy 採 DS 標準結構 + 元件特有矩陣:
 
-對應 anatomy story:保留 `Overview` + 元件特有 `ModeMatrix` / `PersonValueType` + `SizeMatrix` + `ColorMatrix` + `StateBehavior`。
+- `Overview` —— 預設視覺概覽
+- `Inspector` —— 互動式 prop 試玩(`mode` × `size` × `disabled` 即時切換,搭 `SAMPLE_PEOPLE` fixture)。對齊全部同類 composite Field Control(Combobox / Select / SelectMenu / DatePicker / TimePicker / NumberInput / LinkInput 皆有 Inspector)的 DS 慣例,單組合即時試玩 prop。
+- 元件特有 `ModeMatrix`(single / multi)+ `PersonValueType`(value 結構)—— Inspector 單一組合無法同時並列的跨模式 / 多值對照,由矩陣補齊
+- 標準 `SizeMatrix` / `ColorMatrix` / `StateBehavior`(真實 Assignee picker 場景)
 
 ---
 
