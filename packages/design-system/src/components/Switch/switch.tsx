@@ -143,18 +143,9 @@ const Switch = React.forwardRef<
     const sizeKey = size ?? 'md'
     const spec = SPECS[sizeKey]
 
-    // ── mode='display' ─────────────────────────────────────────────────────
-    // 純展示模式:無互動 toggle、無 input variant,渲染 ✓ / —。
-    // 與 Checkbox display 對齊(同為 boolean primitive)— DataTable boolean cell 場景共用。
-    // 與 readonly 差異:readonly 保留 toggle 視覺 + 鎖互動;display 完全無 toggle 形體。
-    if (mode === 'display') {
-      const isChecked = props.checked === true
-      return isChecked
-        ? <span className="text-foreground">✓</span>
-        : <span className="text-fg-muted">—</span>
-    }
-
     // Field context 偵測：在 Field 內時忽略自己的 label/description，避免雙層
+    // 2026-05-31 #35:hooks(useFieldContext / useId)必在任何 conditional return 前呼叫(Rules of Hooks)。
+    // 原 mode='display' early return 寫在 hooks 之上 → runtime 切 mode 會 hook count 不一致 crash;已下移至 hooks 後。
     const fieldCtx = useFieldContext()
     const insideField = fieldCtx?.hasFieldWrapper === true
     const effectiveLabel = insideField ? undefined : label
@@ -171,6 +162,15 @@ const Switch = React.forwardRef<
     // Id 連結：優先使用 prop，再退到 Field context 的 id，最後用 useId 生成
     const generatedId = React.useId()
     const inputId = idProp ?? fieldCtx?.id ?? generatedId
+
+    // ── mode='display'(下移至所有 hooks 之後,per #35 Rules of Hooks)──────────
+    // 純展示模式:無互動 toggle、渲染 ✓ / —。與 Checkbox display 對齊(同 boolean primitive)。
+    if (mode === 'display') {
+      const isChecked = props.checked === true
+      return isChecked
+        ? <span className="text-foreground">✓</span>
+        : <span className="text-fg-muted">—</span>
+    }
 
     const rootEl = (
       <SwitchPrimitives.Root

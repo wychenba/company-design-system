@@ -135,18 +135,9 @@ const Checkbox = React.forwardRef<
     const iconPx = checkIconSize[sizeKey]
     const iconStrokeWidth = checkStrokeWidth[sizeKey]
 
-    // ── mode='display' ─────────────────────────────────────────────────────
-    // 純展示模式:無互動 primitive、無 input variant,渲染 ✓ / —。
-    // 取代既有 BooleanDisplay(2026-05-05 Phase B3 retire)— 該 helper 已併入 Checkbox。
-    // 顯示規則:checked=true → ✓(foreground);其他(false / null / undefined / indeterminate)→ —(fg-muted)
-    if (mode === 'display') {
-      const isChecked = props.checked === true
-      return isChecked
-        ? <span className="text-foreground">✓</span>
-        : <span className="text-fg-muted">—</span>
-    }
-
     // Field context:Checkbox 單獨塞進 Field(binary toggle)時,忽略自己的 label 讓 FieldLabel 接管
+    // 2026-05-31 #35:hooks(useFieldContext / useContext / useId)必在任何 conditional return 前呼叫(Rules of Hooks)。
+    // 原 mode='display' early return 寫在 hooks 之上 → runtime 切 mode 會 hook count 不一致 crash;已下移至 hooks 後。
     //
     // **例外**:Checkbox 是 CheckboxGroup 的 child 時(multi-select 情境),**每個 checkbox
     // 的 label 是它自己的選項名**,FieldLabel 只是群組名稱 — 此時 label **必須保留**,
@@ -172,6 +163,15 @@ const Checkbox = React.forwardRef<
     //      solo in Field(binary toggle)才沿用 fieldCtx.id 讓 FieldLabel htmlFor 生效。
     const generatedId = React.useId()
     const inputId = idProp ?? (insideGroup ? generatedId : (fieldCtx?.id ?? generatedId))
+
+    // ── mode='display'(下移至所有 hooks 之後,per #35 Rules of Hooks)──────────
+    // 純展示模式:無互動 primitive、渲染 ✓ / —(checked=true → ✓ / 其他 → —)。取代 BooleanDisplay。
+    if (mode === 'display') {
+      const isChecked = props.checked === true
+      return isChecked
+        ? <span className="text-foreground">✓</span>
+        : <span className="text-fg-muted">—</span>
+    }
 
     const rootEl = (
       <CheckboxPrimitive.Root
