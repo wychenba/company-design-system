@@ -79,7 +79,7 @@ sm / md 跟 Tag 同階（20/24px），lg 對齊 md（尺寸需求一致，不需
 OverflowIndicator 是**承載 count + HoverCard 的 trigger primitive**,無獨立色彩與互動狀態變體:
 
 - **無 ColorMatrix**:trigger 只有 neutral 一種色彩(`circle` 用 `bg-muted` / `tag` 用 `tagVariants` 的 neutral),無 variant 色彩選項——OverflowIndicator 是結構 primitive,色彩屬於 consumer 決策(若需要色相,trigger 的外框 / 內容由 consumer 包)。
-- **無 StateBehavior**:trigger 只有 passive display(`cursor-default`),hover 只觸發 HoverCard 開啟,本身無 hover / active / disabled / selected 變化——互動狀態屬於 HoverCard trigger 行為(見 `hover-card.spec.md`),不屬 OverflowIndicator 層級。
+- **無 StateBehavior**:trigger 為 HoverCard 觸發點(keyboard-focusable,有 focus-visible ring),hover / focus 只觸發 HoverCard 開啟,本身無 hover / active / disabled / selected 變化——互動狀態屬於 HoverCard trigger 行為(見 `hover-card.spec.md`),不屬 OverflowIndicator 層級。
 
 對應 anatomy story:保留 `Overview` / `Inspector` / `SizeMatrix`,額外追加元件特有的 `ShapeMatrix`(取代 ColorMatrix 展示 circle vs tag 兩種形狀變體)。
 
@@ -109,9 +109,9 @@ OverflowIndicator 是 **composite**(HoverCard trigger + tag-styled `+N` span + H
 
 **ARIA / Pattern**:對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。
 
-**互動行為**:trigger 是 passive 的 `+N` 計數 span(`cursor-default`,無 tabIndex / role / Enter handler),HoverCard 在 hover 或 trigger 取得 focus 時自動展開——無「按 Enter 開選單」的鍵盤指令,也沒有 click 切換。
+**互動行為**:trigger 為 `+N` 計數 span,**keyboard-focusable**(`tabIndex=0` + `role="button"` + `aria-haspopup="dialog"`,對齊 Avatar hoverCard canonical),HoverCard 在 hover 或 trigger 取得 focus 時自動展開——無「按 Enter 開選單」的鍵盤指令,也沒有 click 切換。(2026-06-01 #13:原設計純 passive 不可聚焦 → 鍵盤使用者無法開啟 HoverCard 看溢出內容,違 WCAG 2.1.1;改 focusable)
 
-**Focus**:trigger 本身不是 tab stop;HoverCard 內展開的可互動內容(如人員 tag / NameCard)由各自的內容元件負責 focus 管理。
+**Focus**:trigger 是 tab stop(keyboard 可達 + focus-visible ring,讓鍵盤使用者也能 focus 開啟 HoverCard 看溢出內容);HoverCard 內展開的可互動內容(如人員 tag / NameCard)由各自的內容元件負責 focus 管理。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;HoverCard 內容透過 hover 或 focus 自動顯示(非鍵盤指令觸發)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
