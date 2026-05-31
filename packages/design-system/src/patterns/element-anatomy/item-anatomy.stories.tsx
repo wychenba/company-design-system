@@ -96,8 +96,8 @@ const CONSUMERS: Record<ConsumerKey, ConsumerPreset> = {
     pxDesc: '選單標準水平間距',
     gap: 'gap-2 (8px)',
     gapDesc: 'prefix-content 間距',
-    suffixGap: 'gap-1 (4px)',
-    suffixGapDesc: 'value + ChevronRight 更緊湊',
+    suffixGap: 'gap-2 (8px)',
+    suffixGapDesc: 'value + endContent(menu-item.tsx 用 gap-2,同 prefix gap)',
     // Source: menu-item.tsx — label / description 都截到 1 行,維持掃視節奏
     labelMaxLines: 1,
     descMaxLines: 1,
@@ -1591,7 +1591,7 @@ export const IconActionPrimitiveDecision = {
             </div>
           </div>
           <div className="flex items-center gap-3 px-3 py-2 rounded-md border border-border bg-surface">
-            <span className="flex-1 text-caption text-fg-secondary">✅ compact row:都用 Inline Action(icon 16,hover-bg 22)</span>
+            <span className="flex-1 text-caption text-fg-secondary">✅ compact row:都用 Inline Action(icon 16,hover-bg 18,size="sm")</span>
             <div className="flex items-center gap-1">
               <ItemInlineActionButton icon={RotateCw} size="sm" aria-label="重試" />
               <ItemInlineActionButton icon={Download} size="sm" aria-label="下載" />
