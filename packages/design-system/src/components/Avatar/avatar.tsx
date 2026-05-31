@@ -204,6 +204,8 @@ const AvatarInner = React.forwardRef<HTMLDivElement, AvatarProps>(
           color: showImage ? undefined : colors.text,
         }}
         data-avatar-size={isFill ? 'fill' : numSize}
+        role={!showImage && alt && !hoverCard ? 'img' : undefined}
+        aria-label={!showImage && alt && !hoverCard ? alt : undefined}
       >
         {showImage && (
           <img

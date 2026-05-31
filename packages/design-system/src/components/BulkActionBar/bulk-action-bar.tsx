@@ -119,7 +119,8 @@ const BulkActionBar = React.forwardRef<HTMLDivElement, BulkActionBarProps>(
             理由:count 是 state-bearing 主資訊(「你在 selection mode + N items」),非裝飾
             World-class 共識:Linear/Notion/Carbon/Polaris 均用 primary foreground;muted 化弱化 state signal
             hiddenByFilter suffix 維持 muted(這是次資訊,視覺層次正確) */}
-        <span className="text-body text-foreground tabular-nums">
+        {/* 2026-05-31 #3:aria-live 通知 SR 選取數變更;#20:補 font-medium 對齊 spec L90 + 上方 comment(state-bearing 主資訊) */}
+        <span className="text-body text-foreground font-medium tabular-nums" aria-live="polite" aria-atomic="true">
           {/* 2026-05-13:totalSelected override 走 dataset 擴選後真總數,否則 fallback page-level selection.length */}
           {labels.count(typeof totalSelected === 'number' ? totalSelected : selection.length)}
           {hiddenByFilter !== undefined && hiddenByFilter > 0 && (
