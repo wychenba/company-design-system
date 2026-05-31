@@ -562,7 +562,7 @@ export const ColorMatrix: Story = {
                 <Td>
                   <TokenCell token="--fg-muted" display="text-fg-muted" />
                 </Td>
-                <Td>「說明」/「檔案資訊」小標</Td>
+                <Td>Filmstrip 非圖 thumb 的 FileText 圖示 + 副檔名 label(InfoPanel「檔案資訊」小標走 text-foreground、「說明」走 FieldLabel,皆非弱化)</Td>
               </tr>
               <tr>
                 <Td>Filmstrip thumb 當前選中</Td>
@@ -697,8 +697,8 @@ export const SizeMatrix: Story = {
             <tbody>
               <tr>
                 <Td>Panel header 高</Td>
-                <Td mono>h-14</Td>
-                <Td>與 Toolbar 等高,視覺水平對齊</Td>
+                <Td mono>--chrome-header-height</Td>
+                <Td>消費 &lt;ChromeHeader lockDensity=&quot;lg&quot;&gt;,lg = 56px;與 Toolbar 等高,視覺水平對齊</Td>
               </tr>
               <tr>
                 <Td>Body 水平 padding</Td>
@@ -707,18 +707,18 @@ export const SizeMatrix: Story = {
               </tr>
               <tr>
                 <Td>Body 垂直 padding</Td>
-                <Td mono>py-[var(--layout-space-tight)]</Td>
-                <Td>12 / 16 px(隨 density)</Td>
+                <Td mono>pt-[var(--layout-space-tight)] pb-[var(--layout-space-loose)]</Td>
+                <Td>非對稱:top tight / bottom loose(對齊 layoutSpace v6 規則 4「bounded region 容器底 = loose」)</Td>
               </tr>
               <tr>
                 <Td>Section 間 gap</Td>
-                <Td mono>gap-4</Td>
-                <Td>說明 ↔ 檔案資訊 16 px</Td>
+                <Td mono>gap-[var(--layout-space-loose)]</Td>
+                <Td>說明 ↔ 檔案資訊 24 / 32 px(隨 density;跨範疇 parallel = loose)</Td>
               </tr>
               <tr>
-                <Td>dl row 間 gap</Td>
-                <Td mono>gap-1.5</Td>
-                <Td>metadata 條目緊湊排列</Td>
+                <Td>檔案資訊 metadata</Td>
+                <Td mono>&lt;DescriptionList horizontal divided&gt;</Td>
+                <Td>消費 DescriptionList primitive,每 row py-[var(--layout-space-tight)](不再手刻 dl/dt/dd)</Td>
               </tr>
               <tr>
                 <Td>Textarea rows</Td>
@@ -809,7 +809,7 @@ export const StateBehavior: Story = {
               <tr>
                 <Td>初始</Td>
                 <Td mono>mount / 切換檔案</Td>
-                <Td>zoom=100%, centered</Td>
+                <Td>zoom=fit-page(onLoad 自動算 min(cw/iw, ch/ih) 對應 %,如 40%),centered;切換檔案 shell 不重設,renderer onLoad 重 fit-page</Td>
               </tr>
               <tr>
                 <Td>Zoom in</Td>
@@ -822,14 +822,19 @@ export const StateBehavior: Story = {
                 <Td>上一個 preset</Td>
               </tr>
               <tr>
-                <Td>Reset</Td>
-                <Td mono>0 key / 雙擊 image</Td>
-                <Td>zoom=100%</Td>
+                <Td>Reset 100%</Td>
+                <Td mono>0 key</Td>
+                <Td>固定設 zoom=100%(natural pixel size)</Td>
+              </tr>
+              <tr>
+                <Td>雙擊 toggle</Td>
+                <Td mono>雙擊 image</Td>
+                <Td>在 fit-page 附近(±5pt)→ 跳 100%;否則 → 回 fit-page(對齊 Apple Photos / Preview.app / PhotoSwipe)</Td>
               </tr>
               <tr>
                 <Td>Fit</Td>
                 <Td mono>F / ZoomInput dropdown</Td>
-                <Td>MVP 同 reset(未來 renderer own)</Td>
+                <Td>算 container/image 比例 → fit-width(寬填滿)或 fit-page(完整可見,取較小 scale);emit 回 shell 更新 zoom %</Td>
               </tr>
               <tr>
                 <Td>Pan</Td>

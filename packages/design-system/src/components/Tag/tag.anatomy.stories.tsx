@@ -29,7 +29,7 @@ const SIZES: SizeKey[] = ['sm', 'md', 'lg']
 
 const TOKEN_MAP: Record<SolidSpec, Record<VariantKey, ColorSpec>> = {
   subtle: {
-    neutral:   { bg: '--muted',               text: '--foreground',            border: 'transparent' },
+    neutral:   { bg: '--secondary',            text: '--foreground',            border: 'transparent' },
     blue:      { bg: '--color-blue-1',        text: '--color-blue-7',         border: 'transparent' },
     red:       { bg: '--color-deep-orange-1', text: '--color-deep-orange-7',  border: 'transparent' },
     green:     { bg: '--color-green-1',       text: '--color-green-7',        border: 'transparent' },
@@ -236,7 +236,7 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['variant', "'neutral'|'blue'|'red'|'green'|'yellow'|'turquoise'|'purple'|'magenta'|'indigo'", "'neutral'", '色彩 variant，語義由消費端決定'],
+                ['color', "'neutral'|'blue'|'red'|'green'|'yellow'|'turquoise'|'purple'|'magenta'|'indigo'", "'neutral'", '色彩 variant，語義由消費端決定'],
                 ['size', "'sm'|'md'|'lg'", "'md'", '尺寸（lg = md alias，子元件補齊原則）'],
                 ['icon', 'LucideIcon', '—', '左側 icon，統一 16px。與 avatar 互斥'],
                 ['avatar', 'ReactNode', '—', '左側 avatar（16px 圓形）。與 icon 互斥'],

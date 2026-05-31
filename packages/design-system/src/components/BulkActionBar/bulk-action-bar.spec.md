@@ -67,7 +67,7 @@ benchmark:
 - 全 md Buttons(`same-row consistency`,close X 同 size;2026-05-04 升 md,見下方 Size canonical)
 - `gap-2`(8px)+ `<ButtonDivider />`(自帶 mx-1 = 12px 視覺距離)
 - `px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]`
-- 自然高度 52md / 60lg(對齊 SurfaceFooter / DataTable toolbar canonical)
+- 自然高度 56md / 68lg(md Button `--field-height-md` 32/36 + `py-[var(--layout-space-tight)]` 12/16 ×2;對齊 SurfaceFooter / DataTable toolbar canonical)
 - `selection.length === 0` → 回 null 不佔 layout
 
 ### Slot
@@ -163,7 +163,7 @@ interface BulkActionBarLabels {
 - count 文字用 `aria-live="polite"` 通知 selection 變更(SR 讀「3 selected」)
 - Clear button:`aria-label="清除選取"`
 - Hint banner 用 `role="status"` + `aria-live="polite"`(state 切換時通知)
-- 鍵盤:Esc → `onClear()`(consumer 應監聽 page-level keydown 觸發);Tab 序按 actions → count → clear
+- 鍵盤:Esc → `onClear()`(consumer 應監聽 page-level keydown 觸發);Tab 序按 DOM 順序 = clear(X)→ actions(count 是純文字 span,非互動元素 → 不參與 Tab)
 - Disabled action(無權限等)用 Button `disabled` + tooltip 解釋,**不藏 action**(避免 user 困惑)
 
 ---

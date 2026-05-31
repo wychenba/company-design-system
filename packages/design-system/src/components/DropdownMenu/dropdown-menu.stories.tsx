@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Mail, Settings, User, LogOut, Plus, Trash2, Copy, Pencil, ExternalLink, Moon, Sun, Monitor, ChevronDown, FileText } from 'lucide-react'
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuCheckboxItem, DropdownMenuRadioGroup,
+  DropdownMenuCheckboxItem, DropdownMenuRadioGroup, DropdownMenuRadioItem,
   DropdownMenuLabel, DropdownMenuSeparator,
   DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
 } from './dropdown-menu'
@@ -194,13 +194,9 @@ const RadioDemo = () => {
         <DropdownMenuLabel>排序方式</DropdownMenuLabel>
         <DropdownMenuRadioGroup value={sort} onValueChange={setSort}>
           {options.map((opt) => (
-            <DropdownMenuItem
-              key={opt.value}
-              selected={sort === opt.value}
-              onSelect={() => setSort(opt.value)}
-            >
+            <DropdownMenuRadioItem key={opt.value} value={opt.value}>
               {opt.label}
-            </DropdownMenuItem>
+            </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>

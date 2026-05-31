@@ -248,14 +248,14 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['mode', "'edit' | 'readonly' | 'disabled'", "'edit'", '顯示模式，disabled 原生屬性會自動覆蓋'],
+                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", '顯示模式；display 為純內容輸出（DataTable cell 用），disabled 由原生屬性自動覆蓋'],
                 ['error', 'boolean', 'false', '紅色邊框 + aria-invalid，僅 edit 模式生效'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '高度與字體，與 Button 共用 field-height token'],
                 ['value', 'string | null', '—', 'ISO date string（YYYY-MM-DD）'],
                 ['onChange', '(value: string) => void', '—', '值變更回調'],
                 ['clearable', 'boolean', 'false', '有值時顯示 X 清除按鈕，僅 edit 模式'],
-                ['formatOptions', 'Intl.DateTimeFormatOptions', "{ year: 'numeric', month: '2-digit', day: '2-digit' }", 'readonly / disabled 格式化選項'],
-                ['locale', 'string', "'en-US'", 'Intl.DateTimeFormat locale'],
+                ['formatOptions', 'Intl.DateTimeFormatOptions', '—', '未傳 → 預設 YYYY/MM/DD 直接組（locale-independent）；傳此 prop / locale 才走 Intl.DateTimeFormat（內部 fallback options 為 year:numeric / month,day:2-digit）'],
+                ['locale', 'string', '—', '僅在傳 formatOptions / locale 啟用 Intl 時生效（fallback en-US）；未傳任何格式 prop 時不影響顯示'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -904,12 +904,12 @@ export const CalendarTokens = {
         <div className="flex flex-col gap-3">
           <span className="text-caption font-medium text-fg-secondary">架構</span>
           <pre className="text-caption font-mono bg-neutral-hover rounded-md p-4 text-fg-secondary leading-relaxed">
-{`<button fieldWrapperStyles>        ← 視覺仍是 Input wrapper(不變)
+{`<div role="combobox" tabIndex={0} fieldWrapperStyles>  ← Input wrapper 外觀;div+role 非 button(避免 nested-interactive)
   <span>格式化的日期文字</span>
-  <ItemInlineAction X />            ← 選用,clearable=true 時顯示
+  <ItemInlineAction X />            ← 選用,clearable=true 時顯示(本身是 button)
   <CalendarIcon />                   ← 右側固定
-</button>
-       │ 點擊開啟
+</div>
+       │ 點擊 / Enter / Space 開啟
        ▼
 <Popover align="start">
   <DateGrid />                      ← react-day-picker + 本 DS token

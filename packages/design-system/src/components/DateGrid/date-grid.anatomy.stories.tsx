@@ -83,7 +83,7 @@ export const Overview = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>結構(Anatomy)</H3>
-        <Desc>Calendar 由四個區塊組成:月份 caption、星期標頭、日期網格、左右 nav 按鈕。所有區塊透過 classNames prop 覆寫 react-day-picker 預設樣式,不引入原生 .rdp-* class。</Desc>
+        <Desc>DateGrid 由四個區塊組成:月份 caption、星期標頭、日期網格、左右 nav 按鈕。所有區塊透過 classNames prop 覆寫 react-day-picker 預設樣式,不引入原生 .rdp-* class。</Desc>
 
         <div className="inline-flex flex-col gap-2 border-2 border-dashed border-primary/30 rounded-lg p-4 bg-surface">
           <div className="flex items-center justify-between gap-2">
@@ -288,7 +288,7 @@ export const Inspector = {
     return (
       <div className="flex flex-col gap-4">
         <H3>元件檢閱器</H3>
-        <Desc>Calendar 的所有 layout token 一覽。theme / density 切換時色彩自動反轉,日格尺寸保持不變(浮層 / dashboard 專用,不配對 field-height family)。</Desc>
+        <Desc>DateGrid 的所有 layout token 一覽。theme / density 切換時色彩自動反轉,日格尺寸保持不變(浮層 / dashboard 專用,不配對 field-height family)。</Desc>
         <InspectorInner />
       </div>
     )
@@ -305,7 +305,7 @@ export const ColorMatrix = {
     <div className="flex flex-col gap-8">
       <div>
         <H3>日格狀態 × Token 對照</H3>
-        <Desc>日格的所有狀態對應 token。selected 為實心 primary、today 為 ring primary(框不填),兩者併存時 selected 視覺優先(實心覆蓋 ring)。</Desc>
+        <Desc>日格的所有狀態對應 token。selected 為實心 primary、today 為數字下方藍色底線 bar(非 ring,避免與 hover/focus ring 混淆),兩者併存時 selected 實心藍底勝出、bar 切白(on-emphasis)保持可見。</Desc>
       </div>
       <div className="overflow-x-auto">
         <table className="border-collapse text-caption">
@@ -371,7 +371,7 @@ export const ColorMatrix = {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   4. 尺寸對照 — Calendar 固定尺寸說明
+   4. 尺寸對照 — DateGrid 固定尺寸說明
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SizeMatrix = {
@@ -381,7 +381,7 @@ export const SizeMatrix = {
       <div>
         <H3>尺寸對照 — 隨 density 縮放</H3>
         <Desc>
-          Calendar 的日格用 h-field-sm w-[var(--field-height-sm)](28×28 md / 32×32 lg),
+          DateGrid 的日格用 h-field-sm w-[var(--field-height-sm)](28×28 md / 32×32 lg),
           隨 density token 切換而縮放,與 popup 內其他欄位(Input / Button)保持比例。
           月曆格子靠 table-native border-spacing 確保數字對齊、週間視覺節奏一致,
           參考 shadcn / Google Calendar / Notion 的共識做法。
@@ -570,6 +570,8 @@ export const Accessibility = {
         <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
           <li><kbd>←</kbd> <kbd>→</kbd> 切日(focus-only,不觸發 select)</li>
           <li><kbd>↑</kbd> <kbd>↓</kbd> 切週</li>
+          <li><kbd>Shift+←</kbd> <kbd>Shift+→</kbd> 切月(react-day-picker v9 內建)</li>
+          <li><kbd>Shift+↑</kbd> <kbd>Shift+↓</kbd> 切年(react-day-picker v9 內建)</li>
           <li><kbd>PgUp</kbd> <kbd>PgDn</kbd> 切月</li>
           <li><kbd>Shift+PgUp</kbd> <kbd>Shift+PgDn</kbd> 切年</li>
           <li><kbd>Home</kbd> <kbd>End</kbd> 行首 / 行尾</li>

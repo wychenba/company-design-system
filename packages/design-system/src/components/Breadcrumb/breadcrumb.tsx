@@ -14,7 +14,7 @@ import {
 } from '@/design-system/components/DropdownMenu/dropdown-menu'
 
 // ── TruncatedLabel ────────────────────────────────────────────────────────────
-// 同 `data-table.tsx:339 TruncateCell` + `tag.tsx:138 isTruncated` SSOT pattern
+// 同 `data-table.tsx TruncateCell` + `tag.tsx isTruncated` SSOT pattern
 // (shared ResizeObserver + scrollWidth > clientWidth → wrap Tooltip)。
 // **TODO** future:Rule-of-3 達 → 抽 `patterns/element-anatomy/truncated-text.tsx` 共用
 // (本 component / DataTable TruncateCell / Tag inner 三處同 idiom,符合 M30 SSOT 抽取門檻)。

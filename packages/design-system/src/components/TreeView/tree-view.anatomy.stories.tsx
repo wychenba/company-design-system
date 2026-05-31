@@ -46,7 +46,7 @@ export const Overview: Story = {
             <thead><tr><Th>職責</Th><Th>說明</Th></tr></thead>
             <tbody>
               <tr><Td>1. 遞迴渲染 + indent</Td><Td mono>indentStep = chevronSize + gap-2(跟 item-layout 一致)</Td></tr>
-              <tr><Td>2. 展開 / 收合狀態管理</Td><Td>Radix Collapsible(controlled / uncontrolled)</Td></tr>
+              <tr><Td>2. 展開 / 收合狀態管理</Td><Td>TreeView 自管 expand state(受控 expandedIds / 非受控 defaultExpandedIds);Radix Collapsible 僅負責子節點高度動畫</Td></tr>
               <tr><Td>3. 鍵盤導覽 + ARIA tree</Td><Td>↑↓ 移動 / → 展開 / ← 收合 / Enter 選取</Td></tr>
             </tbody>
           </table>
@@ -63,7 +63,7 @@ export const Overview: Story = {
                 ['TreeView', '', '', ''],
                 ['  selectedIds', 'Set<string>', '—', '選取的 node id(受控)'],
                 ['  onSelectedChange', '(ids: Set<string>) => void', '—', '選取變更 callback'],
-                ['  selectionMode', "'single' | 'multiple'", "'single'", "multiple 模式自動顯示 checkbox"],
+                ['  selectionMode', "'single' | 'multiple' | 'none'", "'single'", "multiple 模式自動顯示 checkbox;none=純展開展示不可選(JSON viewer)"],
                 ['  expandedIds / onExpandedChange', 'Set<string> / handler', '—', '展開狀態受控'],
                 ['  defaultExpandedIds', 'string[]', '—', '初始展開(uncontrolled)'],
                 ['  draggable / onDragEnd', 'boolean / handler', 'false', '拖曳重排'],
@@ -73,7 +73,8 @@ export const Overview: Story = {
                 ['  label', 'ReactNode', '必填', 'node 名稱'],
                 ['  icon', 'LucideIcon', '—', 'Prefix icon(資料夾 / 檔案類型)'],
                 ['  checkbox', 'ReactNode', '—', 'multiple 模式 selection checkbox(通常自動帶入)'],
-                ['  inlineActions / inlineActionsSlot', 'ReactNode', '—', 'hover suffix inline actions'],
+                ['  inlineActions', 'InlineActionConfig[]', '—', '右側 inline actions(宣告式 config,內部用 <ItemInlineAction> 渲染)'],
+                ['  inlineActionsSlot', 'ReactNode', '—', 'escape-hatch slot(放自訂元素,跟 inlineActions 互斥)'],
                 ['  disabled', 'boolean', 'false', '停用該 node'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>

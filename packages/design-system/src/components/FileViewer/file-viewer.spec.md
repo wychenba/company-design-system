@@ -20,7 +20,7 @@ benchmark:
 
 FileViewer 是**可延伸的網頁檔案預覽殼層(modal fullscreen)**——負責 overlay / toolbar / 鍵盤 / filmstrip / 詳細資訊面板一切 chrome,檔案本體由 **renderer registry** 按 file type 決定誰渲染。MVP 內建 `ImageRenderer` + `FallbackRenderer`,未來可透過 `registerFileRenderer()` 擴充 PDF / Video / Code 等 renderer 而不動 shell。
 
-**實作基礎**:自建 composite——直接消費 Radix `DialogPrimitive` 而非 DS 的 `<Dialog>` wrapper。原因:FileViewer 需要 edge-to-edge fullscreen(無 viewport inset / 無 rounded-lg / 無 maxWidth),這些全要覆寫 `<Dialog>` 預設。直接消費 Radix primitive 讓 shell 擁有完整 layout 控制權,同時保有 Radix focus trap / Esc / aria-modal 的結構優勢。內部消費 DS 元件:`<Button>` / `<Empty>` / `<Separator>` / `<AspectRatio>` / `<Textarea>` / `<Popover>` + `patterns/horizontal-overflow`。
+**實作基礎**:自建 composite——直接消費 Radix `DialogPrimitive` 而非 DS 的 `<Dialog>` wrapper。原因:FileViewer 需要 edge-to-edge fullscreen(無 viewport inset / 無 rounded-lg / 無 maxWidth),這些全要覆寫 `<Dialog>` 預設。直接消費 Radix primitive 讓 shell 擁有完整 layout 控制權,同時保有 Radix focus trap / Esc / aria-modal 的結構優勢。內部消費 DS 元件:`<Button>` / `<Input>` / `<Empty>` / `<Separator>` / `<AspectRatio>` / `<Textarea>` / `<Field>`+`<FieldLabel>` / `<DescriptionList>` / `<ScrollArea>` / `<DropdownMenu>` / `<ChromeHeader>` / `ItemInlineActionButton` + `patterns/horizontal-overflow`。
 
 **Layout Family**:**非上述 family — composite / multi-region**(Toolbar + Viewport + 可選 InfoPanel + 可選 Filmstrip)。見下「Layout Family Rationale」段。
 
@@ -210,7 +210,7 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
   - **100% 重設**(user 按 `0` 鍵 / double-click)— `centerZoomedOut: true` 讓 ≤100% 時自動 center,避免內容停在容器角落
   - 結果:user 看哪,zoom 完 **看哪**,視覺焦點不漂移 — 世界級 media viewer 共識
 - Min scale 10%,max scale 400%
-- 雙擊重設 100%
+- **雙擊 = toggle fit-page ↔ 100%**(對齊 Apple Photos / Preview.app / Imgur / PhotoSwipe canonical):當前 zoom 在 fit-page ±5pt 內 → 跳 100% natural;否則 → 回 fit-page。`0` 鍵才是固定重設 100%(`file-viewer.tsx:835`),兩者不同(`image-renderer.tsx:144`)
 - 切換檔案時 shell **不重設 zoom**——把「下一張該怎麼初始化 zoom」的決定權交給 renderer:image-renderer 自己 watch `file.url` 變化 → reset loaded → onLoad → 重 fit-page(含 cache 命中時 `<img complete>` 主動觸發,避免 onLoad 不 fire 卡在上一張的 zoom)。原本 shell `setZoom(100)` 在 cache 命中時會卡 100% 不 fit,已移除
 
 ---
@@ -244,7 +244,7 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 
 ### 同 flex 列幾何鐵律(CLAUDE.md 規則)
 
-`[−]` / `[%input]` / `[+]` 三個 slot **都是 h-field-sm(28px)**,統一高度確保 gap 不被 hover bg 吃掉。Button iconOnly size="sm" aspect-square ≈ 28×28,Input size="sm" 28 高,視覺嚴格對齊。
+`[−]` / `[%input]` / `[+]` 三個 slot **都是 h-field-sm**,統一高度確保 gap 不被 hover bg 吃掉。Toolbar 包在 `<ChromeHeader lockDensity="lg">`(`file-viewer.tsx:328`)內,subtree density = lg → h-field-sm 解析為 **32px**(對齊本 spec「Density」段 L313 + `uiSize.spec.md`:sm 在 md density = 28px / lg density = 32px)。Button iconOnly size="sm" aspect-square ≈ 32×32,Input size="sm" 32 高,視覺嚴格對齊。
 
 ### Why inline(不抽獨立 primitive)
 
@@ -359,10 +359,10 @@ Radix DialogPrimitive 自動處理:
 ## 相關
 
 - `../Dialog/dialog.spec.md` — 一般 modal 對話框(FileViewer 是 fullscreen variant,直接用 Radix primitive 而非 Dialog wrapper)
-- `../Popover/popover.spec.md` — ZoomInput dropdown 消費
+- `../DropdownMenu/dropdown-menu.spec.md` — ZoomInput preset / fit 選單消費(取代先前 Popover)
 - `../Empty/empty.spec.md` — FallbackRenderer 佈局
 - `../AspectRatio/aspect-ratio.spec.md` — Filmstrip thumb 固定比例
-- `../ScrollArea/scroll-area.spec.md` — 未有 use case(filmstrip 刻意用 fade-mask 而非 scrollbar,屬 horizontal-overflow pattern)
+- `../ScrollArea/scroll-area.spec.md` — InfoPanel body 高度受限時 scroll(`file-viewer.tsx:478`);filmstrip 不用 ScrollArea(刻意走 fade-mask,屬 horizontal-overflow pattern)
 - `../../patterns/horizontal-overflow/horizontal-overflow.spec.md` — Filmstrip 水平捲動 + fade mask
 - `../../patterns/action-bar/action-bar.spec.md` — Toolbar 按鈕順序 canonical
 - `../FileItem/file-item.spec.md` — 上傳清單列元件(與 FileViewer 不同用途,FileItem 是 list item,FileViewer 是 fullscreen preview)

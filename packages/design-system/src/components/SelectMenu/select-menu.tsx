@@ -82,9 +82,9 @@ export interface SelectMenuProps {
   /** 空選項提示 */
   emptyText?: string
   /** Loading 狀態(2026-05-15 audit B fix per user verbatim「dropdown 隨時可開,讀取在 panel 中間 CircularProgress」)
-   *  true → render `<Empty icon={<CircularProgress size={48}/>} description={loadingText} />` 取代 options;
-   *  trigger 不變,user 隨時可開 dropdown。對齊 MUI Autocomplete `loadingText` dropdown-body + Ant Select
-   *  loading idiom + DS 既有 `empty.spec.md:182` 「全頁 loading = Empty + CircularProgress compose」SSOT。
+   *  true → render `<Empty icon={<CircularProgress size={48}/>} className="py-6" />` 取代 options(純 spinner,無 description);
+   *  trigger 不變,user 隨時可開 dropdown。對齊 MUI Autocomplete loading dropdown-body + Ant Select
+   *  loading idiom + DS 既有 `empty.spec.md:191` 「全頁 loading = Empty + CircularProgress compose」SSOT。
    */
   loading?: boolean
 

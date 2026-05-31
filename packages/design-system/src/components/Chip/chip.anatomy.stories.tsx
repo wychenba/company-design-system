@@ -44,7 +44,7 @@ export const Overview: Story = {
             <thead><tr><Th>元件</Th><Th>主要 Props</Th></tr></thead>
             <tbody>
               <tr><Td mono>ChipGroup</Td><Td mono>type: 'single' | 'multiple'(必填,Radix ToggleGroup 要求),value / onValueChange,layout</Td></tr>
-              <tr><Td mono>Chip</Td><Td mono>value(必填),startIcon,disabled</Td></tr>
+              <tr><Td mono>Chip</Td><Td mono>value(必填),startIcon,badge(計數指示器,ReactNode),endIcon(如 ChevronDown),disabled</Td></tr>
             </tbody>
           </table>
         </div>

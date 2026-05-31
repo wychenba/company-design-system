@@ -70,6 +70,8 @@ export const Overview: Story = {
             <tbody>
               <tr><Td mono>children</Td><Td mono>ReactNode</Td><Td mono>—</Td><Td>anchor trigger element(Popover asChild)</Td></tr>
               <tr><Td mono>open / onOpenChange</Td><Td mono>boolean / (o) =&gt; void</Td><Td mono>—</Td><Td>controlled 控制(多步 tour 必用)</Td></tr>
+              <tr><Td mono>defaultOpen</Td><Td mono>boolean</Td><Td mono>—</Td><Td>uncontrolled 初始開啟狀態</Td></tr>
+              <tr><Td mono>kind</Td><Td mono>'tips' | 'new-features' | ReactNode</Td><Td mono>—</Td><Td>有值則渲染 Header(tour-level title);'tips'→「使用技巧」、'new-features'→「新功能介紹」、ReactNode→自訂;multi-step tour 建議傳</Td></tr>
               <tr><Td mono>image</Td><Td mono>ReactNode</Td><Td mono>—</Td><Td>頂部 media 區;不傳則不渲染</Td></tr>
               <tr><Td mono>mediaRatio</Td><Td mono>number</Td><Td mono>16/9</Td><Td>media 長寬比(寬/高);可傳 4/3 / 1/1 / 3/4 覆寫</Td></tr>
               <tr><Td mono>title</Td><Td mono>ReactNode</Td><Td mono>—</Td><Td>標題(text-body-lg font-medium)</Td></tr>
@@ -79,6 +81,7 @@ export const Overview: Story = {
               <tr><Td mono>onNext</Td><Td mono>() =&gt; void</Td><Td mono>—</Td><Td>Next 按鈕;不傳則不渲染</Td></tr>
               <tr><Td mono>onPrev</Td><Td mono>() =&gt; void</Td><Td mono>—</Td><Td>Previous 按鈕(第 2+ 步);不傳則不渲染</Td></tr>
               <tr><Td mono>isLastStep</Td><Td mono>boolean</Td><Td mono>false</Td><Td>true 時 Next 文字改 Done</Td></tr>
+              <tr><Td mono>doneLabel</Td><Td mono>string</Td><Td mono>'知道了'</Td><Td>single-step 完成 CTA 文字(僅單步驟使用)</Td></tr>
               <tr><Td mono>side</Td><Td mono>'top' | 'right' | 'bottom' | 'left'</Td><Td mono>'bottom'</Td><Td>對齊 Popover props</Td></tr>
               <tr><Td mono>align</Td><Td mono>'start' | 'center' | 'end'</Td><Td mono>'center'</Td><Td>對齊 Popover props</Td></tr>
               <tr><Td mono>sideOffset</Td><Td mono>number</Td><Td mono>8</Td><Td>跟 Popover 一致的浮層間距(8px)</Td></tr>

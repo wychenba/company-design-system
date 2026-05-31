@@ -72,7 +72,7 @@ export const LayoutModeDiagram: Story = {
         <p className="text-fg-muted">Header scope = <strong>local toolbar</strong>(當前頁 actions / breadcrumb / page-level filter)。Workspace 多寡無關,Notion / Linear 多 workspace 也用 primary-sidebar。</p>
       </section>
       <section className="space-y-2">
-        <h3 className="text-h5">primary-header(GitHub / Slack / Gmail 派)— pending</h3>
+        <h3 className="text-h5">primary-header(GitHub / Slack / Gmail 派)</h3>
         <div className="flex flex-col gap-px bg-divider border border-divider rounded overflow-hidden text-caption">
           <div className="bg-surface-strong px-2 py-1 text-center">Header(global bar,橫跨整 viewport)</div>
           <div className="flex">
@@ -139,10 +139,14 @@ export const Accessibility: Story = {
       <h2 className="text-h4 mb-3">A11y 機制</h2>
       <ul className="text-body space-y-2 list-disc pl-5">
         <li>
-          <strong>Landmark</strong>:`&lt;header&gt;` / `&lt;nav&gt;` / `&lt;aside&gt;` / `&lt;main&gt;`
-          各自有對應的無障礙地標角色。`&lt;header&gt;`(ChromeHeader)在兩種模式下都只被 `&lt;div&gt;` 包覆
+          <strong>Landmark</strong>:`&lt;header&gt;` / `&lt;aside&gt;` / `&lt;main&gt;` 各自有對應的無障礙地標角色。
+          `&lt;header&gt;`(ChromeHeader)在兩種模式下都只被 `&lt;div&gt;` 包覆
           (body-scoped、與 `&lt;main&gt;` 並排而非子層),依 W3C HTML-AAM 都得到 implicit `role=banner`
           (整站層級標頭)——`&lt;div&gt;` 外層不會 scope out banner,只有 `main/article/aside/nav/section` 才會。
+        </li>
+        <li>
+          <strong>Sidebar 導覽地標</strong>:`&lt;Sidebar&gt;` 自身渲染 `&lt;div&gt;`(不自帶 `&lt;nav&gt;` / `role=navigation`),
+          navigation landmark 責任 delegate 給 consumer——需自行用 `&lt;nav aria-label="Main"&gt;` 包住 `&lt;Sidebar&gt;`(per `sidebar.spec.md` A11y 預設)。
         </li>
         <li><strong>Skip to main</strong>:`Tab` 第一站 focus skip-link → jump 到 `#app-shell-main`(WCAG 2.4.1)</li>
         <li><strong>Keyboard shortcuts</strong>:`⌘B` / `Ctrl+B` toggle sidebar(消費 Sidebar SSOT)/ `⌘.` / `Ctrl+.` toggle aside</li>

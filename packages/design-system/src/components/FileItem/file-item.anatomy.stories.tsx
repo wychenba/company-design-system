@@ -48,7 +48,7 @@ export const Overview: Story = {
                 ['mode', "'compact' | 'rich'", "'compact'", 'compact=Paperclip 16px icon / rich=Avatar 48px 縮圖'],
                 ['status', "'uploading' | 'completed' | 'error'", '—', '上傳狀態(不傳=已上傳靜態)'],
                 ['progress', 'number', '—', '上傳進度 0-100(uploading 時顯示 bar)'],
-                ['description', 'string', '—', 'rich 任意場景 / compact 只有 error 才顯示'],
+                ['description', 'ReactNode', '—', 'rich 任意場景 / compact 只有 error 才顯示。ReactNode — 可含 inline clickable link(如「View log」)'],
                 ['thumbnailSrc', 'string', '—', 'rich mode 的縮圖 URL(圖片類檔案)'],
                 ['actions', 'ReactNode', '—', 'suffix actions(例:delete / cancel button)'],
                 ['onDownload', '() => void', '—', "hover-swap:status='completed' 時,滑鼠移上整列,綠勾 ✓ 換成下載 ↓。兩種 mode 都用 Button xs(24)iconOnly,符合列內操作 ≤ 24 上限"],
@@ -140,7 +140,7 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td mono>error</Td>
                 <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--foreground" size="sm" /><span className="font-mono">--foreground</span></span></Td>
-                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--error" size="sm" /><span className="font-mono">--error(升階)</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--error-text" size="sm" /><span className="font-mono">--error-text(升階)</span></span></Td>
                 <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--error" size="sm" /><span className="font-mono">--error</span></span></Td>
                 <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--error" size="sm" /><span className="font-mono">XCircle text-error</span></span></Td>
               </tr>

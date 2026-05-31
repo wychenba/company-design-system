@@ -64,7 +64,7 @@ export const Overview: Story = {
               <tr><Td mono>BreadcrumbList</Td><Td>flex 容器</Td><Td mono>&lt;ol&gt;</Td></tr>
               <tr><Td mono>BreadcrumbItem</Td><Td>單一層級</Td><Td mono>&lt;li&gt;</Td></tr>
               <tr><Td mono>BreadcrumbLink</Td><Td>可點擊的上層 / 中層</Td><Td mono>&lt;a&gt;</Td></tr>
-              <tr><Td mono>BreadcrumbPage</Td><Td>當前頁(最末項,不可點擊)</Td><Td mono>&lt;span aria-current="page"&gt;</Td></tr>
+              <tr><Td mono>BreadcrumbPage</Td><Td>當前頁(最末項,不可點擊)</Td><Td mono>&lt;span role="link" aria-disabled="true" aria-current="page"&gt;</Td></tr>
               <tr><Td mono>BreadcrumbSeparator</Td><Td>ChevronRight 分隔符</Td><Td mono>&lt;li role="presentation"&gt;</Td></tr>
               <tr><Td mono>BreadcrumbEllipsis</Td><Td>中間層過多時可點擊展開的省略符</Td><Td mono>&lt;button type="button"&gt;</Td></tr>
             </tbody>
@@ -154,7 +154,8 @@ export const ColorMatrix: Story = {
         <H3>節點類型 × 狀態色彩對照</H3>
         <Desc>
           Breadcrumb 的色彩決定「你從哪來 / 你在這」的視覺階層——ancestor link 降低飽和度(fg-secondary)讓 current page(foreground)成為焦點。
-          互動高亮一律走 `--primary-hover`(設計準則,與 Tabs / Chip 未選 hover 同 token)。
+          BreadcrumbLink 的互動高亮走 `--primary-hover`(設計準則,與 Tabs / Chip 未選 hover 同 token)；
+          BreadcrumbEllipsis 是 icon button(消費 `ItemInlineActionButton`),hover 走 neutral `--foreground` + neutral hover bg,不走 `--primary-hover`(對齊 inline-action primitive canonical)。
         </Desc>
         <div className="overflow-x-auto mb-4">
           <table className="text-caption border-collapse min-w-[640px]">
@@ -192,8 +193,8 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td mono>BreadcrumbEllipsis</Td>
                 <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--fg-muted" size="sm" /><span className="font-mono">--fg-muted</span></span></Td>
-                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary-hover" size="sm" /><span className="font-mono">--primary-hover</span></span></Td>
-                <Td mono>ring-2 ring-ring</Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--foreground" size="sm" /><span className="font-mono">--foreground</span> + neutral hover bg</span></Td>
+                <Td mono>outline-2 outline-ring</Td>
                 <Td mono>aria-label="顯示折疊路徑"</Td>
               </tr>
             </tbody>
@@ -322,7 +323,7 @@ export const StateBehavior: Story = {
               <tr>
                 <Td mono>BreadcrumbEllipsis</Td>
                 <Td><TokenCell token="--fg-muted" /></Td>
-                <Td><TokenCell token="--primary-hover" display="primary-hover" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground + neutral hover bg" /></Td>
                 <Td>—</Td>
                 <Td>✓(button)</Td>
               </tr>

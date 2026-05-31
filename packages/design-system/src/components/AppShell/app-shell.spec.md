@@ -80,7 +80,7 @@ function CustomAside() {
 
 **Contract**:
 - 必在 `<AppShell>` 子樹內 call,否則 throw(consumer 拼 layout 必 wrap AppShell context)
-- 回傳:`{ asideOpen: boolean, setAsideOpen: (open: boolean) => void, isMobile: boolean }`
+- 回傳:`{ layout: 'primary-sidebar' | 'primary-header', asideOpen: boolean, setAsideOpen: (open: boolean) => void, isMobile: boolean }`(hook 回傳整個 context,consumer 拼 custom layout 可讀當前 `layout` mode)
 - 設計目的:給跳出 `<AppShellAside>` 預設 sub-component 框架的 consumer 用(rare),DS 預設仍建議走 `<AppShellAside>` slot
 
 ---
@@ -238,7 +238,7 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 
 | Shortcut | Action | Cite |
 |---|---|---|
-| **`⌘B`(macOS)/ `Ctrl+B`(Windows)** | Toggle sidebar | `sidebar.spec.md:348` SSOT「industry-standard,已內建,不該改」;`sidebar.tsx:62` code key `"b"` |
+| **`⌘B`(macOS)/ `Ctrl+B`(Windows)** | Toggle sidebar | `sidebar.spec.md:348` SSOT「industry-standard,已內建,不該改」;`sidebar.tsx:63` code key `"b"` |
 | **`⌘.`(macOS)/ `Ctrl+.`(Windows)** | Toggle aside | Linear convention(新加) |
 | **Skip-to-main link** | `Tab` 第一站 focus 「Skip to content」link → `main` | A11y WCAG 2.4.1 bypass blocks;對齊 Atlassian Layout skip-link |
 
@@ -252,7 +252,7 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 |---|---|---|
 | `header`(`primary-header` mode) | `<header>` 只被 `<div>` 包覆(body-scoped)→ **`role="banner"`** implicit(global banner) | site-wide |
 | `header`(`primary-sidebar` mode) | `<header>` 只被 `<div>` 包覆、與 `<main>` 是 sibling(非 main descendant)→ 同樣 body-scoped → **`role="banner"`** implicit | per W3C HTML-AAM:只有 `main/article/aside/nav/section` descendant 的 `<header>` 才 scope out banner;`<div>` ancestor 不會 |
-| `sidebar` | `<nav aria-label="Primary navigation">` | Sidebar own |
+| `sidebar` | **無自帶 landmark** — `<Sidebar>` 渲染 `<div>`(三 collapsible 分支皆然,per `sidebar.spec.md`「A11y 預設」)| consumer 需自行用 `<nav aria-label="Main">` 包住 `<Sidebar>` 才有 navigation landmark;AppShell / Sidebar 皆**不**自帶 `<nav>` / `role="navigation"` |
 | `aside` | `<aside aria-label={title}>` | title required(modal mode `aria-labelledby` 強制) |
 | `children`(main) | `<main>` | `role="main"`(implicit)+ skip-to-main 跳轉 anchor |
 
@@ -268,7 +268,7 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 
 ## Future extension(目前不定義)
 
-**Multi-sidebar**(Notion / Linear 雙側欄派):API 接 `sidebar?: ReactNode | ReactNode[]` 預留 array signature,**目前 strict 取首位**,違反 dev warning。未來擴充 SSOT 在 `sidebar.spec.md`,不在本 pattern(per user 2026-05-19「AppShell 不該 customize Sidebar」)。
+**Multi-sidebar**(Notion / Linear 雙側欄派):**尚未實作**。目前 `sidebar` prop 僅 `React.ReactNode`(單一 slot,無 array signature、無取首位邏輯、無 dev warning)。未來若支援會擴充為 array,SSOT 放 `sidebar.spec.md`,不在本 pattern(per user 2026-05-19「AppShell 不該 customize Sidebar」)。
 
 **Footer**:不 expose slot(per user 2026-05-19「不用 footer」)。Web service 通常不用 footer,consumer 若需要自貼 Main 底。
 

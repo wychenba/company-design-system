@@ -1,10 +1,10 @@
 ---
 pattern: horizontal-overflow
 internal: true
-scope: utility primitives module (useOverflowItems hook + fade-mask + scroll-arrow helper components) — DS-internal consumer only(Tabs / ChipGroup wrap)
+scope: utility primitives module (use-overflow-items hooks: useScrollEdges + useOverflowIndices + fade-mask + scroll-arrow helper components) — DS-internal consumer only(Tabs / ChipGroup wrap)
 ---
 
-<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
+<!-- @benchmark-unverified-blanket: 對齊 horizontal-overflow.tsx:5 的 file-level retraction(M22(d))——本檔 benchmark claim 均未逐條 URL cite,視為未驗證的視覺/用法陳述,除非後續 retrofit per-claim。 -->
 
 # Horizontal Overflow 設計原則
 
@@ -66,6 +66,8 @@ scope: utility primitives module (useOverflowItems hook + fade-mask + scroll-arr
   - 必填 `aria-label`(直接傳給 Button 的 `aria-label`,無 `label` alias;由消費者決定,例如「頁籤選單(共 5 個)」)
   - `forwardRef` + `...props` spread 讓 Radix `DropdownMenuTrigger asChild` 可以接管
 
+> **元件保證行為:auto-Tooltip**——`OverflowScrollArrow` 與 `OverflowMenuTriggerButton` 都是 `iconOnly` + string `aria-label` + 非 `asChild`,因此都會觸發 Button 內建的 auto-Tooltip wrap(button.tsx:490-497)。亦即 hover 時 arrow / trigger 會自動冒出對應 `aria-label` 的 tooltip(「向左捲動」/「向右捲動」/「頁籤選單(共 N 個)」),共享全域 `Tooltip` 的 delay 與 warm-up。`DropdownMenuTrigger asChild` 仍正常運作:Radix 的 `asChild` 由 Trigger 自身消費(套到 `OverflowMenuTriggerButton` 的 forwardRef),不會傳成 Button 的 `asChild` prop,所以 tooltip wrap 與 trigger 接管互不衝突。
+
 ### Hook re-export
 
 為了消費者只 import 一處,本 module re-export `useScrollEdges` / `useOverflowIndices` from `hooks/use-overflow-items.ts`。
@@ -78,7 +80,7 @@ scope: utility primitives module (useOverflowItems hook + fade-mask + scroll-arr
 
 ### 為什麼不做成封閉的 `<HorizontalOverflowContainer>`?
 
-- Tabs 的 underline border owner 在 **list 內部**(`TABS_LIST_BASE` 套 `border-b border-divider`),outer 不畫;Chip outer 是 pill border `rounded-full border border-border`,亦不需 outer `border-b`。Owner 升 list 是 2026-05-19 fix:outer `border-b` + inner `overflow-x-auto` → browser y auto-promote(CSS overflow-3 spec:一軸 auto 時另軸 visible compute auto)→ active underline `after:bottom:-1px` 1px clip + 1px 垂直可捲 bug
+- Tabs 的 underline border owner 在 **list 內部**(`TABS_LIST_BASE` 套 `border-b border-divider`),outer 不畫;Chip 的 pill border(`rounded-full border border-border`)屬於**個別 chip item**(`chipVariants`,chip.tsx:50),overflow 容器 outer 本身是 chromeless 的 `relative`(scroll 模式,chip.tsx:170)/ `flex items-center gap-2`(menu 模式,chip.tsx:295)wrapper,既無 pill border 也不需 outer `border-b`——讓 fade mask + scroll arrow 在透明 outer 上運作。Owner 升 list 是 2026-05-19 fix:outer `border-b` + inner `overflow-x-auto` → browser y auto-promote(CSS overflow-3 spec:一軸 auto 時另軸 visible compute auto)→ active underline `after:bottom:-1px` 1px clip + 1px 垂直可捲 bug
 - Tabs 用 `TabsPrimitive.List` 作為 inner list;Chip 用 `ToggleGroupPrimitive.Root`
 - Tabs 用 `DropdownMenuItem + selected`(單選);Chip 用 `DropdownMenuCheckboxItem`(多選)
 - Tabs 有 `gap-[var(--layout-space-loose)]`;Chip 有 `gap-2`

@@ -172,7 +172,7 @@ Row actions 欄本質上是 frozen right column，左邊界也使用 full-height
 |---|---|---|---|
 | A Plain virt | `VirtualScroll` | ≤16.67/≤33/0 | hard |
 | B Rich budget | `RoadmapPerfBudget`(500×13 rich+inline-edit,fixed 600px) | ≤50/≤80/≤1 | hard |
-| C Row drag | `RowDragVirtualization` | ≤33/≤50/longest<100 | soft(DnD thermal) |
+| C Row drag | `RowDragWithVirtualization` | ≤33/≤50/longest<100 | soft(DnD thermal) |
 | D Edit isolation | `<Profiler>` TBD | skip ≥ visible−active | hard |
 
 **Anti-pattern**:`RoadmapAllInOne`(全 features stack)≈117ms 不達 B,因 SortableRowProvider/column reorder/resize/selection/overlay 同時開。Consumer:13+ cols rich-cell → 拆 detail drawer / column visibility 預設 hide,不該期 60fps + 全 feature stack。Cite + Phase 1/2 history → `cell-registry.tsx:480-499` JSDoc + commits log。
@@ -494,9 +494,9 @@ DataTable 是 composite multi-section 元件,**不套 canonical 5**(Inspector / 
 **ARIA / Pattern**:DataTable 是 composite tabular widget,**對齊 W3C ARIA Authoring Practices Guide `grid` pattern**(非 `radio-group`):
 
 - Root 套 `role="table"`(currently)或 `role="grid"`(future tier,when cell editing 普及)— 詳 [WAI-ARIA APG: grid](https://www.w3.org/WAI/ARIA/apg/patterns/grid/) + [MDN grid role](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/grid_role)
-- Column headers:`<th scope="col">` 自帶 `role="columnheader"`(implicit per HTML semantics)
-- Row headers(若有):`<th scope="row">` 自帶 `role="rowheader"`
-- Sortable column:`aria-sort="none" | "ascending" | "descending"` on `<th>`
+- Column headers:以 `<div role="columnheader">` 顯式標記(本元件用 div + ARIA role,非語義 `<table>` — 見定位段;不渲染 `<th>` / `scope`)
+- Row headers:目前無對應(平面 row,無 row header 語意;未渲染 `role="rowheader"`)
+- Sortable column:`aria-sort="none" | "ascending" | "descending"` on 該 column header `<div role="columnheader">`
 - Selection state(若啟用 selection mode):視覺以 row bg(hover / `primary-subtle` selected)+ `__select__` 欄勾選框呈現;selected row 的勾選框由 Checkbox primitive 自帶 `aria-checked` 傳達狀態(row 本身目前**未**套 `aria-selected`,`grid` root 亦未套 `aria-multiselectable` — 留待 `role="grid"` future tier)
 - 字 cell hover overlay action:overlay 為 absolute/fixed paint layer(`DataTableInteractionLayer`),trigger 目前**未**套 `aria-haspopup` / `aria-controls`(留待 future tier)
 

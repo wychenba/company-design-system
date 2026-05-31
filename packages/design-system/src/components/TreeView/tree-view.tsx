@@ -174,7 +174,7 @@ export interface TreeViewProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   size?: SizeKey
   /**
    * 使用脈絡,決定 item 的水平 padding:
-   * - `'sidebar'`(預設):頁面側邊欄,px-2(8px)
+   * - `'sidebar'`(預設):頁面側邊欄,`--layout-space-loose`(md=16px / lg=24px,隨 density 連動)
    * - `'menu'`:浮層選單 / dropdown,px-3(12px),對齊 MenuItem
    */
   context?: TreeContext

@@ -249,14 +249,8 @@ export const ColorMatrix: Story = {
               </tr>
               <tr>
                 <Td mono>hover(未選)</Td>
-                <Td><TokenCell token="--primary-hover" display="primary-hover" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
                 <Td>—(transparent)</Td>
-                <Td>—</Td>
-              </tr>
-              <tr>
-                <Td mono>active(mousedown)</Td>
-                <Td><TokenCell token="--primary-active" display="primary-active" /></Td>
-                <Td>—</Td>
                 <Td>—</Td>
               </tr>
               <tr>
@@ -400,8 +394,8 @@ export const SpacingTokens: Story = {
       </div>
 
       <div>
-        <H3>Trigger padding</H3>
-        <Desc>水平 `px-3`(sm)/ `px-4`(md, lg)對稱 padding,讓 underline 居中對齊 label。</Desc>
+        <H3>Trigger 無水平 padding</H3>
+        <Desc>Trigger **不加任何水平 padding**——寬度 = 內容寬度(hug content)。selected underline(`::after left-0 right-0`)因此剛好 fit label;若加橫向 padding,underline 會多出鬆散空白。trigger 之間的分隔靠 TabsList 的 `gap-[--layout-space-loose]`,不是 padding。</Desc>
       </div>
     </div>
   ),

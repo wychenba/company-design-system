@@ -19,7 +19,7 @@ import { useFieldContext } from '@/design-system/components/Field/field-context'
  *   lg:    track 24×48, thumb 24, 白色圓 20, check 16（= checkbox lg）
  *
  * ── 視覺狀態 ──
- *   OFF: track border (neutral-5), thumb 白色無 border 無 check
+ *   OFF: track border (neutral-5), thumb 白色 + 2px border-border(neutral-5,與 OFF track 同色)無 check
  *   ON:  track primary, thumb 白色 + 2px primary border + primary check icon
  *   disabled: opacity-disabled（整體透明度）
  *   readOnly: 視覺同一般態，但 pointer-events-none + aria-readonly

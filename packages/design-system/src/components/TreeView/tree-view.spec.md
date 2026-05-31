@@ -208,7 +208,7 @@ TreeItem row 有 5 種狀態:default / hover / focused(鍵盤) / selected / disa
 
 **預設關閉。** 大部分 tree 使用情境(sidebar nav + 全 icon)不需要。
 
-當 tree **沒有 icon** 且 **深度 ≥ 3** 時,建議開啟 guide 補充視覺層級線索。Consumer 可透過 `showGuides` prop 開啟。
+當 tree **沒有 icon** 且 **深度 ≥ 3** 時,建議開啟 guide 補充視覺層級線索。未來將提供 `showGuides` prop(初版不實作,目前無此 prop)。
 
 啟用時的規則:
 - 線條顏色:`border-divider`
@@ -275,7 +275,7 @@ Icon 尺寸跟 size tier(sm/md=16, lg=20);色 `fg-muted` → hover `foreground`;
 - **Auto-expand**:拖曳停留收合 folder 500ms → 自動展開(Figma 行為);離開或結束取消計時
 - **依賴**:`@dnd-kit/core`(`useDraggable` + `useDroppable` + `DragOverlay`);state 由 consumer `onDragEnd({sourceId, targetId, position})` callback 自行更新
 
-**視覺**(2026-05-06 v14.5 SSOT 抽 `lib/drag-visual.ts`):被拖 node 原位 `opacity-disabled`(45%)半透明殘影 / before-after drop indicator 為 2px primary 細線(`bg-primary` `h-0.5`,left 跟 indent 深度)/ inside drop target `bg-primary-subtle` 全行背景 / DragOverlay ghost 圓角 + icon + label + 半透明 + elevation shadow。**TreeView 是 DS 內最早 codified 的 drag canonical**,DataTable row drag + column reorder 都 inherit 此 pattern via `drag-visual.ts` SSOT module。視覺校驗見 story `DragAndDrop`。
+**視覺**(2026-05-06 v14.5 SSOT 抽 `lib/drag-visual.ts`):被拖 node 原位 `opacity-disabled`(45%)半透明殘影 / before-after drop indicator 為 2px primary 細線(`bg-primary` `h-0.5`,left 跟 indent 深度)/ inside drop target `bg-primary-subtle` 全行背景 / DragOverlay ghost 圓角 + icon + label + **不透明 `bg-surface`** + elevation shadow(跟 surface 拉開的視覺距離靠 shadow 不靠 opacity;半透明只用在上述原位殘影)。**TreeView 是 DS 內最早 codified 的 drag canonical**,DataTable row drag + column reorder 都 inherit 此 pattern via `drag-visual.ts` SSOT module。視覺校驗見 story `DragAndDrop`。
 
 ---
 
@@ -293,18 +293,18 @@ Checkbox 位於 icon 之後、label 之前。跟 MenuItem 的多選 checkbox 位
 
 ---
 
-## 閱讀模式
+## Label typography(掃描模式)
 
-TreeView 同時服務**掃描**和**閱讀**兩種情境:
+Tree 本質是**掃描導覽**(快速找到目標 node),所以 TreeView label 一律走**掃描模式**——row typography 由 row primitive 的 `ROW_PADDING_BY_SIZE` SSOT 鎖定:sm/md = `text-body leading-compact`、lg = `text-body-lg leading-compact`。
 
 | 情境 | Label typography | 理由 |
 |---|---|---|
-| **Sidebar nav** | `text-body leading-compact`(掃描模式) | 選單快速掃視,label 短 |
-| **File browser** | `text-body leading-compact`(掃描模式) | 檔名快速掃視 |
-| **Stepper** | `text-body`(閱讀模式) | Step 名稱需要閱讀理解 |
-| **Page tree** | `text-body leading-compact`(掃描模式) | 頁面標題快速掃視 |
+| **Sidebar nav** | `text-body leading-compact` | 選單快速掃視,label 短 |
+| **File browser** | `text-body leading-compact` | 檔名快速掃視 |
+| **Stepper** | `text-body leading-compact` | 跟其餘 node 一致,同走 row primitive |
+| **Page tree** | `text-body leading-compact` | 頁面標題快速掃視 |
 
-大部分 tree 使用情境是**掃描模式**(快速找到目標 node),所以 TreeView 預設用 `leading-compact`。Consumer 可透過 prop 切換。
+TreeView 目前**沒有**閱讀 / 掃描模式的切換 prop——所有 node 統一 `leading-compact`(對齊 `ROW_PADDING_BY_SIZE` 既定 SSOT,跨 row 元件視覺一致)。
 
 ---
 

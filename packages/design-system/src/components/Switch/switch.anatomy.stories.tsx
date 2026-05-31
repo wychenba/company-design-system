@@ -134,7 +134,7 @@ export const StateBehavior: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>State</Th><Th>Track</Th><Th>Thumb</Th><Th>Check icon</Th></tr></thead>
             <tbody>
-              <tr><Td>OFF</Td><Td><TokenCell token="--border" display="bg-border(neutral-5)" /></Td><Td mono>白色無 border</Td><Td>—</Td></tr>
+              <tr><Td>OFF</Td><Td><TokenCell token="--border" display="bg-border(neutral-5)" /></Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--border" size="sm" /><span className="font-mono">白色 + 2px border-border</span></span></Td><Td>—</Td></tr>
               <tr><Td>ON</Td><Td><TokenCell token="--primary" display="bg-primary" /></Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary" size="sm" /><span className="font-mono">白色 + 2px primary border</span></span></Td><Td><TokenCell token="--primary" display="primary check" /></Td></tr>
               <tr><Td>Disabled OFF</Td><Td>opacity-disabled 套於整體</Td><Td>同 OFF(顏色保留)</Td><Td>—</Td></tr>
               <tr><Td>Disabled ON</Td><Td>opacity-disabled 套於整體</Td><Td>同 ON(顏色保留)</Td><Td>同 ON</Td></tr>

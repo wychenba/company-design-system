@@ -359,14 +359,14 @@ export const ColorMatrix: Story = {
                 <Td>區隔 header 與 body</Td>
               </tr>
               <tr>
-                <Td>Sort icon(active)</Td>
-                <Td><TokenCell token="--foreground" display="foreground" /></Td>
-                <Td>排序中的欄位,icon 加深</Td>
+                <Td>Sort icon(排序中)</Td>
+                <Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td>
+                <Td>已套排序(0/1 欄)的欄位顯示升/降冪箭頭;multi-sort(≥2 欄)隱藏箭頭走 SortManager</Td>
               </tr>
               <tr>
-                <Td>Sort icon(inactive hover)</Td>
+                <Td>欄位選單 ⌄(hover)</Td>
                 <Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td>
-                <Td>Hover 可排序欄時出現的指示</Td>
+                <Td>Hover 可排序欄時出現於右區的欄位選單觸發鈕(ItemInlineActionButton,非 sort 箭頭)</Td>
               </tr>
             </tbody>
           </table>

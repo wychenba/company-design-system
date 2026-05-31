@@ -123,8 +123,8 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
 
 | Mode | 規則 |
 |---|---|
-| compact(預設) | 消費 item-layout 公式(py 隨 size / density 變化,padding / gap 對齊 menu item 規格) |
-| rich | py 固定(高度由 avatar 決定,不走 row 公式),padding / gap 採 rich 專屬 token(具體值見 `file-item.tsx` cva) |
+| compact(預設) | 固定 `px-3 py-2`(FileItem 無 size prop,不走 `ROW_PADDING_BY_SIZE` 公式;`gap-2` 對齊 item-anatomy row) |
+| rich | py 固定(高度由 avatar 決定,不走 row 公式),容器 inline className 固定 `px-3 py-3`(具體值見 `file-item.tsx`,非 cva——FileItem 用 conditional rendering 分流 mode×status) |
 
 ## 邊框 / 背景(AR15-21 canonical,2026-04-21 · 2026-04-22 擴充)
 
@@ -209,7 +209,7 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
 | `status` | **`undefined`**(不傳;無 progress / 無 status icon) |
 | Progress bar | 無 |
 | Status icon | 無 |
-| hover 行為 | 整 row `hover:bg-neutral-hover` + cursor-pointer |
+| hover 行為 | `cursor-pointer`(永不顯示 hover-bg,見上方「Hover 行為 canonical」——permanent-anchored 元件不加 hover-bg double-emphasis) |
 | Row-click | **`onClick` 為主要 affordance** → **預設 FileViewer 開啟**(consumer 決定,也可下載) |
 | Rich 背景 | `border card`(永遠) |
 | Compact 背景 | `bg-secondary`(區隔「這是檔案 row」;primitive `--color-neutral-3` 的 semantic 橋接名,見邊框 / 背景章節) |
@@ -442,9 +442,9 @@ Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿
 
 ---
 
-## 為何無 Inspector
+## Inspector 與矩陣的教學分工
 
-FileItem 決策維度是 `mode`(compact / rich)× `status`(uploading / completed / error / static)× `size`——已在 `ColorMatrix` / `ModeMatrix` / `SizeMatrix` / `StateBehavior` 四張矩陣完整覆蓋。互動 Inspector 不會比結構性矩陣對照更有教學價值——「選 mode 的 test / 選 status 的 test」是需要 side-by-side 比對的決策,不是單值試玩。
+FileItem 決策維度是 `mode`(compact / rich)× `status`(uploading / completed / error / static)。anatomy 同時提供 `Inspector`(右側 Controls 即時切 `mode` / `status` / `progress` / `description` 試玩單值)與 `ColorMatrix` / `SizeMatrix` / `StateBehavior` 結構矩陣——兩者分工:Inspector 給「單一組合長怎樣」的即時試玩,矩陣給「跨 status 並排比對」的 side-by-side 決策。
 
 ColorMatrix 已建:展示 status × 元素(filename / description / progress bar / status icon)色彩矩陣,明示 status 只驅動 **progress bar + status icon + description** 升階,**不染容器背景**(避免整 row 轉紅蓋過其他 metadata)。Container hover / selected / disabled 則走 item-anatomy row primitive SSOT。
 

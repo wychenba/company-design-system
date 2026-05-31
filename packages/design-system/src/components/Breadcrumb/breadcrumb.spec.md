@@ -63,12 +63,11 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
     <li>  BreadcrumbItem
       <a> BreadcrumbLink   ← clickable, 可回到上層
     </li>
-    <li>
-      <span> BreadcrumbSeparator (ChevronRight, aria-hidden)
+    <li role="presentation" aria-hidden="true"> BreadcrumbSeparator (ChevronRight)
     </li>
     ...
     <li>
-      <span> BreadcrumbPage  ← 當前頁面, 不可點, aria-current="page"
+      <span role="link" aria-disabled="true" aria-current="page"> BreadcrumbPage  ← 當前頁面, 不可點
     </li>
   </ol>
 </nav>
@@ -82,7 +81,7 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 | `BreadcrumbList` | items 清單 | `<ol>` flex row |
 | `BreadcrumbItem` | 單一項目容器 | `<li>` |
 | `BreadcrumbLink` | 可點擊路徑項（非當前）| `<a>` 或 Slot（支援 `asChild` 給 router Link）|
-| `BreadcrumbPage` | 當前頁面（非 clickable）| `<span aria-current="page">` |
+| `BreadcrumbPage` | 當前頁面（非 clickable）| `<span role="link" aria-disabled="true" aria-current="page">` |
 | `BreadcrumbSeparator` | 項目間分隔 | `<li role="presentation">` + `ChevronRight` icon |
 | `BreadcrumbEllipsis` | 省略中間路徑的 `⋯`（可點擊展開折疊路徑）| `<button type="button" aria-label="顯示折疊路徑">` + `MoreHorizontal`（消費 `ItemInlineActionButton` primitive，作為 DropdownMenuTrigger）|
 
@@ -201,7 +200,7 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 
 **為何同字重複**:breadcrumb 末位是 a11y 階層 navigation 階梯末端(`aria-current="page"`);title h2/h3/h4 是同字**視覺大字 emphasis**。兩者各司其職:小字 breadcrumb 提供路徑 context,大字 title 提供 page identity。同 SSOT 兩 view。
 
-**禁止**:breadcrumb 末位用 `BreadcrumbLink`(parent path)+ title 才顯示 current page = breadcrumb 末位 ≠ title 內容 = 違反 spec.md L142「最後一項必 BreadcrumbPage」+ 違反 world-class consensus。
+**禁止**:breadcrumb 末位用 `BreadcrumbLink`(parent path)+ title 才顯示 current page = breadcrumb 末位 ≠ title 內容 = 違反「禁止事項」段「最後一項不可是 `BreadcrumbLink`,必須用 `BreadcrumbPage`」+ 違反 world-class consensus。
 
 ---
 
@@ -233,7 +232,9 @@ ColorMatrix 已建:展示 BreadcrumbLink / Page / Separator / Ellipsis 四種節
 
 ## A11y 預設
 
-**ARIA / Pattern**:純 HTML 結構元件(nav + ol + li + a/span),無第三方 primitive。a11y 來自原生 HTML 語意 — 外層 `<nav aria-label="Breadcrumb">`、當前頁 `<span aria-current="page">`、分隔符 `aria-hidden`(不進無障礙樹)。對齊 [WAI-ARIA Breadcrumb pattern](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/)。
+**ARIA / Pattern**:純 HTML 結構元件(nav + ol + li + a/span),無第三方 primitive。a11y 來自原生 HTML 語意 — 外層 `<nav aria-label="Breadcrumb">`、當前頁 `<span role="link" aria-disabled="true" aria-current="page">`、分隔符 `aria-hidden`(不進無障礙樹)。對齊 [WAI-ARIA Breadcrumb pattern](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/)。
+
+**為何當前頁加 `role="link" aria-disabled="true"`**:BreadcrumbPage 是「被 disable 的連結」— 把它標記成連結家族(`role="link"`)讓螢幕閱讀器把整條 breadcrumb 念成同一個連結序列,再以 `aria-disabled="true"` 告知不可操作(對齊 shadcn/ui Breadcrumb canonical `BreadcrumbPage`)。WAI-ARIA APG 允許 current 用 link + `aria-current`,shadcn 加 `aria-disabled` 是合理增強。
 
 **Keyboard 行為**:
 

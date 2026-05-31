@@ -208,7 +208,7 @@ ColorMatrix 已建:展示 default / hover / selected / disabled 四狀態的 bg 
 - Button (`button.spec.md`) — Chip 內部結構對標的來源
 - SegmentedControl (`segmented-control.spec.md`) — compact 連體單選變體
 - Tag — 純顯示 / dismissible tag
-- `useOverflowItems` hook (`packages/design-system/src/hooks/use-overflow-items.ts`) — scroll / menu 的共用追蹤邏輯，Tabs 也消費同一個 hook
+- `horizontal-overflow` pattern (`patterns/horizontal-overflow/horizontal-overflow.spec.md`) — Chip 的 scroll / menu 模式實際 import 來源(`useScrollEdges` / `useScrollByPage` / `buildFadeMask` / `OverflowScrollArrow` / `OverflowMenuTriggerButton`),Tabs 也共用同一套。底層 scroll-edge 追蹤 hook 是 `useScrollEdges`(`hooks/use-overflow-items.ts`)
 
 ## A11y 預設
 

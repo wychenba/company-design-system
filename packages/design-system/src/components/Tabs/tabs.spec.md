@@ -150,7 +150,7 @@ Tabs 支援三種 overflow 策略，透過 `TabsList` 的 `overflow` prop 選擇
 |---|---|---|
 | `none` ★default | 不處理，triggers 溢出父容器 | Tabs 數量可控、一定塞得下 |
 | `scroll` | 單行橫向滾動 + 邊緣 fade mask 指示 | 動態 tabs 但不希望中斷視覺順序 |
-| `menu` | 塞不下收進 `⋯` dropdown，所有 triggers 仍在 DOM | 工具列 tabs、需要完整選項可見 |
+| `menu` | scroll + ⌄ quick-jump dropdown（列全部 tab，點選跳轉），所有 triggers 一直可見 | 工具列 tabs、需要快速跳轉到任一 tab |
 
 ### scroll 模式
 
@@ -160,13 +160,13 @@ Tabs 支援三種 overflow 策略，透過 `TabsList` 的 `overflow` prop 選擇
 
 ### menu 模式
 
-所有 TabsTrigger 仍在 DOM(保 Radix roving tabindex),溢出者套 `invisible`(visibility hidden,不接 hit test 但保 layout)。`useOverflowIndices()` 偵測溢出。右側 `<Button variant="text" iconOnly startIcon={MoreVertical} />`(overflow canonical icon)開 DropdownMenu 顯示對應 labels;點 menu item 經 Tabs context `onValueChange` 觸發,Radix 自然更新 `data-state`。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+menu = **scroll 模式 + 額外的 ⌄ quick-jump navigator**(show-all navigator pattern,對齊 Chrome 分頁下拉 / VS Code 編輯器分頁 / Discord 頻道跳轉)。全部 TabsTrigger 一直可見、留在底層 `overflow-x-auto` 捲動容器內(**不套 `invisible`、不隱藏溢出**)。右側 `OverflowMenuTriggerButton`(`ChevronDown` ⌄ icon)在有溢出空間時(`canScroll`)出現,點開 DropdownMenu **列出全部 tab**(非只溢出者);當前選中的 tab 用 DropdownMenuItem 的 `selected` 標記(`bg-neutral-selected`,跟 SelectMenu 單選同一套視覺)。點 menu item 經 Tabs context `onValueChange` 觸發切換(Radix 自然更新 `data-state`),同時 `scrollIntoView`(`inline: center`)把該 tab 捲到視圖中央。底層仍是真實捲動容器(非 `overflow-hidden`)的理由:`scrollIntoView` 與鍵盤 focus 的 auto scroll-into-view 都需要真實 scroll 容器;捲軸用 CSS 隱藏。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
-**a11y**:溢出 trigger 只視覺隱藏仍可 focus;鍵盤使用者方向鍵導覽 / Tab 到 ⋯ 用 dropdown,兩路徑並存。對齊 Ant `moreIcon` / Atlassian Navigation Tabs。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+**a11y**:全部 trigger 一直在 DOM 且可見(保 Radix roving tabindex);鍵盤使用者方向鍵導覽全部 tab,或 Tab 到 ⌄ 用 dropdown 快速跳轉,兩路徑並存。對齊 Ant Design Tabs / Atlassian Navigation Tabs。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ### 跨元件共用
 
-`useOverflowIndices` / `useScrollEdges` 在 `packages/design-system/src/hooks/use-overflow-items.ts`,`ChipGroup` 的 `layout="scroll" | "menu"` 消費同一組 hook,確保 Tabs / Chip overflow 行為一致。
+`useScrollEdges`(及 `OverflowScrollArrow` / `OverflowMenuTriggerButton`)在 `patterns/horizontal-overflow/horizontal-overflow.tsx`(re-export 自 `hooks/use-overflow-items.ts`),`ChipGroup` 的 `layout="scroll" | "menu"` 消費同一組 primitive,確保 Tabs / Chip overflow 行為一致。注意 Tabs / Chip 的 menu 模式都是 show-all navigator(用 `useScrollEdges` 偵測捲動邊界),**不用** `useOverflowIndices`(那是「動態算溢出 index」用,menu 永遠顯示全部所以不需要)。
 
 ---
 

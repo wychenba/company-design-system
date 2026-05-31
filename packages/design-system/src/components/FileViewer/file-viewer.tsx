@@ -164,8 +164,8 @@ interface ZoomInputProps {
  *
  * ── 消費 DS primitive ──
  *   - `<Button>` iconOnly size="sm" 作 ±按鈕
- *   - `<Input variant="bare" size="sm">` 作 %輸入(Toolbar inline editing canonical)
- *   - Input `endAction` slot 提供 ⌄ chevron 觸發 DropdownMenu
+ *   - `<Input size="sm" autoWidth>` 作 %輸入(Toolbar inline editing canonical;autoWidth 隨文字寬)
+ *   - Input `endSlot` escape hatch 包 `<DropdownMenuTrigger asChild>` + chevron 觸發 DropdownMenu
  *   - `<DropdownMenu>` 作 preset + fit 選單(取代原先 Popover + 手刻 button list)
  *
  * ── 為什麼 inline(不抽獨立 primitive)──
@@ -355,8 +355,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
           ── gap-2 canonical(2026-04-21 follow-up)──
           按鈕間距 **8px**(gap-2),對齊 Dialog footer `gap-2` / CLAUDE 按鈕間距 SSOT。
-          zoom group 內部例外 gap-0.5(見 ZoomInput) — 那是「連緊 segmented pill」語意,
-          跟這裡 action-group-to-action-group 的 gap-2 不同層級。 */}
+          zoom group(ZoomInput)內部同樣是 gap-2(見 `ZoomInput` L197),
+          與這裡 action-group-to-action-group 的 gap-2 一致。 */}
       <div className="flex items-center gap-2 shrink-0">
         {capabilities.zoom && (
           <>

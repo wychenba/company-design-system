@@ -13,12 +13,12 @@
      段)— chrome header 內 avatar 用 raw `<Avatar size={24}>`,**不用 `<ItemAvatar>`**。
 
      Consumers(2,需 sync):
-       1. WorkspaceBrand demo(`_demo-helpers.tsx`)hardcode `<Avatar size={24}>` + comment cite token
+       1. WorkspaceBrand demo(`components/AppShell/_demo-helpers.tsx`)hardcode `<Avatar size={24}>` + comment cite token
        2. SidebarHeader 收合 padding 公式:
           calc((var(--sidebar-width-icon) - var(--chrome-header-avatar-size)) / 2)
 
      **Sync invariant**:Token 值 + WorkspaceBrand `size={24}` literal + AVATAR_SIZE.inline.md
-     (`item-anatomy.tsx:93`)三者必同 24。改 spec canonical 時 grep
+     (`item-anatomy.tsx:94` AVATAR_SIZE.inline.md)三者必同 24。改 spec canonical 時 grep
      `--chrome-header-avatar-size` + `chrome header avatar canonical` 雙向找 sync 點。
    ───────────────────────────────────────────────────────── */
 

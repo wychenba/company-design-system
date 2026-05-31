@@ -20,31 +20,31 @@ import { Button } from '@/design-system/components/Button/button'
  * | Nav → Weekday gap | 12px(mt-3) |
  * | Weekday | text-body(14px)text-fg-secondary(neutral-8) |
  * | Cell gap(水平 + 垂直)| 4px(gap-1) |
- * | Day cell size | h-field-md w-field-height-md(32×32 md / 36×36 lg) |
+ * | Day cell size | h-field-sm w-[var(--field-height-sm)](28×28 md / 32×32 lg) |
  * | Day button | rounded-full 填滿 cell |
  *
  * ── 五種 cell state canonical ──
  *
  * | State | 視覺 | Token |
  * |-------|------|-------|
- * | today | 文字下方藍色底線 | underline decoration-primary decoration-2 underline-offset-4 |
+ * | today | 數字下方藍色短桿 | `::after` pseudo bar(bg-primary,w-40% h-1.5px rounded-full,貼近數字底)|
  * | disabled | 灰底圓圈 + disabled 字色(跟 Button disabled 一致) | [&>button]:bg-disabled [&>button]:text-fg-disabled rounded-full |
  * | outside(非本月) | text-fg-muted(neutral-7) | [&>button]:text-fg-muted |
  * | selected / range 端點 | 藍底白字圓 | [&>button]:bg-primary [&>button]:text-on-emphasis rounded-full |
- * | range middle | 灰底矩形 track(neutral-3),**高度 = button 高度**(28×28 @ md) | before pseudo: `inset-y-0.5 inset-x-0` |
+ * | range middle | 灰底矩形 track(bg-neutral-selected = neutral-2),**高度 = cell 高度**(28×28 @ md) | before pseudo: `inset-y-0 -inset-x-[2px]` |
  * | range start/end 半圓 track | 左/右半圓 + selected 圓疊在上,**圓半徑 = button 半徑** | before pseudo: `rounded-l/r-full` 加 `left-0.5` / `right-0.5` |
- * | hover(未選中) | 藍圈 outline | hover:ring-1 hover:ring-primary |
+ * | hover(未選中) | 藍圈 outline | hover:ring-[1.5px] hover:ring-primary |
  *
- * ── Range track 高度 canonical(2026-05-02 Q8 修正,M8 4 家對照)──
+ * ── Range track 高度 canonical(2026-05-03 v6,M8 4 家對照)──
  * Ant Design([picker source](https://github.com/ant-design/ant-design/blob/master/components/date-picker/style/panel.ts))/ Material X DateRangePicker([mui-x source](https://github.com/mui/mui-x/tree/master/packages/x-date-pickers-pro/src/DateRangeCalendar))/ Apple Calendar `@benchmark-unverified`(closed-source)/ Google Calendar `@benchmark-unverified`(closed-source)共識:
- * **range track 高度 = button 高度**(不是 cell 高度)— track 跟 selected 圓緊貼,
- * 不留 2px「fat」邊距(舊版 cell-level bg 在 button 上下留 2px 空白看起來「胖」)。
- * 實作:bg 走 `before:` pseudo 走 `inset-y-0.5`(top/bottom 2px 內縮),`inset-x-0`
- * 維持完整 cell 寬度 → 相鄰 cell 的 pseudo 在 cell 邊界相接 = 橫向連貫。
+ * **range track 為連續 stadium**,跟 selected 圓緊貼成連續 pill。
+ * 實作:bg 走 `before:` pseudo 用 `inset-y-0`(滿 cell 高度)+ `-inset-x-[2px]`
+ * (左右各外擴 2px bridge 相鄰 cell gap)→ 相鄰 cell 的 pseudo 連續銜接 = 橫向連貫;
+ * day cell 本身就是 button 容器(L102-105 day = h-field-sm cell),故滿 cell 高 = 滿 button 高。
  *
- * ── 為什麼 neutral-3 不 neutral-2(AR 新版 canonical)──
- * neutral-2 在 light mode 太淡(OKLCH L≈0.97),range track 跟 white bg 幾乎無對比。
- * neutral-3(L≈0.94-0.95)在 Google / Ant / Apple DateRange track 視覺明顯,維持「可見 track」。
+ * ── Range track 色用 bg-neutral-selected(= neutral-2)──
+ * 對齊 TimePicker 選中項目樣式(semantic `--neutral-selected` = neutral-2,semantic.css L84/L340)。
+ * 同 DS 內「持續選中」語意 token,不自開 neutral-3 tier。
  *
  * ── 為什麼 nav 放頂部 + 年月垂直置中(不 separate 兩行)──
  * ref/datepicker.png:chevron prev / 月份 / chevron next 同一行,24px 高(xs field height)。
@@ -200,7 +200,7 @@ export const dateGridMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: ['bg-disabled', 'bg-neutral-hover', 'bg-primary', 'bg-primary-hover', 'bg-transparent'],
+    bg: ['bg-disabled', 'bg-primary', 'bg-primary-hover', 'bg-transparent'],
     fg: ['text-fg-disabled', 'text-fg-muted', 'text-fg-secondary', 'text-foreground'],
     ring: ['ring-primary', 'ring-ring'],
   },

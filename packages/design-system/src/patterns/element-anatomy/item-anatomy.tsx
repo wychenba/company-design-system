@@ -293,6 +293,7 @@ ItemLabel.displayName = "ItemLabel"
  *   - `"secondary"`(預設):`text-fg-secondary`
  *   - `"error"`:`text-error-text`
  *   - `"muted"`:`text-fg-muted`
+ *   - `"disabled"`:`text-fg-disabled`(對齊 M24 state precedence:disabled > muted > emphasis)
  * - `descriptionWrap`:desc 多行 wrap(預設 true)/ false = truncate
  * - `labelClassName` / `descriptionClassName`:escape hatches(明文 rationale 才用)
  *
@@ -576,7 +577,7 @@ export interface ItemInlineActionButtonProps
    *
    * 預設 `group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active`。
    * 提供後**完全取代** hover + active 雙態 className,但**不影響** rest 態(永遠 bg-transparent)
-   * 與 overlay-trigger 態(`group-data-[state=open]:bg-neutral-selected`)。
+   * 與 overlay-trigger 態(`group-data-[state=open]/action:bg-neutral-hover` — 維持 host hover bg)。
    *
    * Consumer 須**同時**包含 hover + active 兩態 selector,例:
    * `'group-hover/action:bg-[var(--my-hover)] group-active/action:bg-[var(--my-active)]'`

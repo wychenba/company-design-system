@@ -229,11 +229,16 @@ export const tagMeta = {
     indigo: { purpose: '分類色（無固定語義）' },
   },
   sizes: {
-    sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
-    md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
-    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },
+    // Tag 尺寸不引用 field-height token（spec.md:180/241——Tag 與 Field 尺寸獨立）。
+    // height = Tag 自身高度（cva h-5/h-6/h-6 = 20/24/24，lg = md alias）。
+    // iconSize 全尺寸統一 16（tag.tsx:195 硬寫 size={16}）。
+    sm: { height: 20, iconSize: 16, typography: 'caption' },
+    md: { height: 24, iconSize: 16, typography: 'body' },
+    lg: { height: 24, iconSize: 16, typography: 'body' },
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  // Tag 為純展示 indicator，無互動 state（spec.md:249-256「為何無 StateBehavior」）。
+  // 唯一行為 dismiss 屬 Inline Action pattern，非 Tag 自有 state。
+  states: ['default'],
   tokens: {
     bg: ['bg-neutral-active', 'bg-neutral-hover', 'bg-secondary', 'bg-transparent'],
     fg: ['text-foreground', 'text-inverse-fg'],

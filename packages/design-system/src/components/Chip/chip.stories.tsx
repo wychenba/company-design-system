@@ -84,4 +84,5 @@ export const SingleSelection: Story = {
 
 // @story-trait-rationale: LayoutWrap / LayoutScroll / LayoutMenu retired 2026-05-17 per audit Dim 24 —
 //   anatomy.stories.tsx LayoutMatrix(3 layout values side-by-side)+ principles.stories.tsx LayoutRule
-//   已 cover layout 機制比較與業務情境。展示層保留 typical 情境(Default / WithLeftIcon / Removable 等)。
+//   已 cover layout 機制比較與業務情境。展示層保留 typical 情境(Default / States / WithBadge / SingleSelection)。
+//   注意:Chip 是 filter chip,不提供 dismiss / 可移除態(spec「禁止事項」),故無 Removable story。
