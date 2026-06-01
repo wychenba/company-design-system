@@ -233,7 +233,9 @@ filled 底色與內容色**完全由 content state 決定,不因 focused 改變*
 | completed | `bg-primary` + white ✓ | `--primary-hover` 外環 |
 | error | `bg-error` + white ✕ | `--error-hover` 外環 |
 
-> **linear vs non-linear upcoming 底色刻意不同**:linear upcoming 用 `bg-muted` + `fg-disabled`(灰、弱字 = 「還到不了/鎖住」);non-linear upcoming 用 `bg-secondary` + `foreground`(中性、可讀 = 「可導覽但非當前」)。因為 non-linear 模式所有 step 都可點(reachable),upcoming 不該呈現 linear 那種「鎖住」的 muted 感。對齊 Ant Design 非線性 Steps 中性色慣例。
+> **linear vs non-linear upcoming 底色刻意不同**:linear upcoming 用 `bg-muted` + `fg-disabled`(灰、弱字 = 「還到不了/鎖住」);non-linear upcoming 用 `bg-secondary` + `foreground`(中性、可讀 = 「可導覽但非當前」)。因為 non-linear 模式所有 step 都可點(reachable),upcoming 不該呈現 linear 那種「鎖住」的 muted 感。
+>
+> **為何 upcoming 用 `--muted`(locked surface)而非 `--bg-disabled`(互動元件 disabled)**:indicator 是 `aria-hidden` 狀態圖示(非互動 control),填色是「狀態色盤」不是「互動元件背景」;linear upcoming 恰是不可點(`isClickable`=false、無 `role=button`)的 locked 狀態。世界級 source-verified(2026-06-01 M26 benchmark):Atlassian Progress Tracker `unvisited`(`--ds-background-neutral-bold`)≠ `disabled`(`--ds-background-disabled`)為兩個獨立 status;Carbon `incomplete`(`$border-subtle`)≠ `disabled`(`$icon-disabled`);Ant Steps `wait` 用 `colorFillContent`/`colorTextLabel` 刻意避開 `colorTextDisabled`。4/5 家以 neutral/locked 語義處理 upcoming。元件真正的 disabled(`disabled` prop)走 `opacity-disabled` 疊加(保留狀態色不換 token)。
 
 **注意 linear mode 的 current 永遠 focused**,所以 linear mode 下 current step 永遠帶外環(底色仍是 filled 藍,只是多疊一圈 ring)。
 
