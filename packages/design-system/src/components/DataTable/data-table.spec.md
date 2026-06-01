@@ -64,7 +64,7 @@ TanStack Table 負責邏輯，DataTable 負責視覺與互動。
 |------|------|------|
 | **L1 基礎結構** | 骨架、尺寸、border、色彩、高度模式、行高模式 | ✅ 完成(本文件 L1 段)|
 | **L2 選取** | row selection、checkbox、單/多選、bulk action 整合 | ✅ 完成(本文件 L2 段)|
-| **L3 欄位互動** | 排序(本文件 L3)、resize、reorder、pin、顯示隱藏 | 部分完成(sort 完成,resize/reorder/pin/visibility 待 v2)|
+| **L3 欄位互動** | 排序(本文件 L3)、resize、reorder、pin、顯示隱藏 | ✅ 完成(sort + resize + reorder + pin + visibility 全 props 支援:`enableColumnResize` / `enableColumnReorder` / `columnVisibility` / `pinnedLeftColumns` / `pinnedRightColumns`,見 data-table.tsx L87-88,143,201,217)|
 | **L4 資料操作 + Cell 能力** | 進階篩選(本文件 L4 Filter)、inline edit、nested rows、row drag(本文件 L4 段)| ✅ Filter / Inline edit / Nested rows / Row drag v3 完成(Jira canonical + virtualization fix) |
 | **L5 進階** | 分組、搜尋、tree data v2 enhancements、export CSV/Excel | 待 v2 |
 

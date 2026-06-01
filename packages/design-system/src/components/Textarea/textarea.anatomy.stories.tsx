@@ -201,6 +201,13 @@ export const ColorMatrix: Story = {
                 <Td><TokenCell token="--fg-muted" display="fg-muted" /></Td>
               </tr>
               <tr>
+                <Td mono>display</Td>
+                <Td>透明（zero-chrome，host context 提供邊界）</Td>
+                <Td>透明（無邊框）</Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                <Td>—（display 無 placeholder；空值顯 — em-dash fg-muted）</Td>
+              </tr>
+              <tr>
                 <Td mono>readonly</Td>
                 <Td><TokenCell token="--bg-disabled" display="bg-disabled(填色標示閱讀區)" /></Td>
                 <Td>透明（無可見邊框，靠填色 + padding 區隔）</Td>
