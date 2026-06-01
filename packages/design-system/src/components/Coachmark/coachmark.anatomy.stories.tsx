@@ -272,6 +272,7 @@ export const StateBehavior: Story = {
               image={<MediaGradient from="var(--color-indigo-6)" to="var(--color-purple-6)" icon={Bot} label="AI 助理" />}
               title="試試 AI 助理"
               description="單步 Coachmark,僅一個完成 CTA(知道了),無 step / Skip。"
+              isLastStep
               onNext={() => setSingleOpen(false)}
               side="right"
               align="start"
