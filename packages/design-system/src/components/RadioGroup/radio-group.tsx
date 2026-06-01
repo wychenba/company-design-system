@@ -10,18 +10,12 @@ import { useFieldContext } from "@/design-system/components/Field/field-context"
 import { SelectionItem } from "@/design-system/components/SelectionControl/selection-item"
 import { EMPTY_DISPLAY } from "@/design-system/components/Field/field-wrapper"
 
-// ── RadioGroup display context ──────────────────────────────────────────────
+// ── RadioGroup display mode ─────────────────────────────────────────────────
 // RadioGroup mode='display' 時:Group 不渲染 Radix primitive(無 radio 視覺),
-// 改透過 Context 通知 child RadioGroupItem「我在 display mode、selected value 是 X」;
-// item 自決 — 命中 selected 渲染 label 純文字,未命中 render null。
-// 為什麼用 context(不是 RadioGroup 自己解析 children):children 可能是任意巢狀
-// (Field 包 RadioGroup,內含 RadioGroupItem 散在 fragment / 條件式內),強行 walk children
-// 會破壞 React composability;用 context 讓 item 自己判定是 idiom 對齊 Radix 原生模型。
-interface RadioGroupDisplayContextValue {
-  displayMode: true
-  selectedValue?: string
-}
-const RadioGroupDisplayContext = React.createContext<RadioGroupDisplayContextValue | null>(null)
+// 改由 RadioGroup 本體 walk props.children,找 control.value === selectedValue 的
+// SelectionItem,把它的 label 渲染為單一純文字 span(其他選項不顯示)。
+// 對齊 Carbon read-only single-select(只顯示 selected 內容)+ Airtable / Notion read-only。
+// 實作在 RadioGroup forwardRef 內(見下方 mode === 'display' 分支)。
 
 // ── RadioGroup ──────────────────────────────────────────────────────────────
 
@@ -30,8 +24,8 @@ export interface RadioGroupProps
   /**
    * Field mode(2026-05-05 Phase B3 align):
    *   edit     — 一般可互動 RadioGroup(預設)
-   *   display  — **純展示**:不渲染 Radix Root / 任何 radio 視覺,僅 child item 中
-   *              value === group.value 那筆把 label 渲染為純文字 span;其他 item render null。
+   *   display  — **純展示**:不渲染 Radix Root / 任何 radio 視覺;RadioGroup 本體 walk
+   *              children,僅 control.value === group.value 那筆把 label 渲染為純文字 span。
    *              對齊 Carbon read-only / DataTable single-select cell read mode。
    *   readonly — 同 child item 各自 readOnly:radio 視覺保留 + 鎖互動
    *   disabled — 同 RadioGroupPrimitive.Root disabled 屬性
@@ -176,14 +170,9 @@ const RadioGroupItem = React.forwardRef<
     const sizeKey = size ?? 'md'
     const dotPx = dotSize[sizeKey]
 
-    // ── RadioGroup mode='display' branch ──────────────────────────────────
-    // 命中 selected → 渲染 label 純文字 span;未命中 → render null(group 內只剩 selected 的 label)。
-    // 設計理由:對齊 Carbon read-only single-select 「只顯示 selected 內容、不列其他選項」原則。
-    const displayCtx = React.useContext(RadioGroupDisplayContext)
-    if (displayCtx?.displayMode) {
-      if (displayCtx.selectedValue !== props.value) return null
-      return <span className="text-foreground">{label ?? props.value}</span>
-    }
+    // 注意:RadioGroup mode='display' 的純文字渲染由 RadioGroup 本體 walk-children 處理
+    // (見上方 RadioGroup forwardRef 的 mode === 'display' 分支),RadioGroupItem 在 display
+    // mode 下不會被獨立 render,故此處無 display 分支。
 
     // 注意：Radio 的 label 語意與 Checkbox/Switch 不同——
     // Checkbox/Switch 的 label 就是該 control 的唯一 label（被 Field context 接管），

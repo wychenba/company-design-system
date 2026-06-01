@@ -26,7 +26,7 @@ import { buildPersonNameCard, resolvePerson, type PersonValue } from './person-d
 // 必經此 helper(hook `check_peoplepicker_ssot_drift.sh` 攔接 wrapper class literal in tsx)。
 //
 // **2026-05-15 SSOT alignment**(user verbatim「單選 people picker 沒壞,難道沒有 SSOT?」):
-// 單選 picker wrapper(`select.tsx:229`)= `flex-1 min-w-0 inline-flex items-center +
+// 單選 picker wrapper(`select.tsx:244` selectedItemRenderer wrapper)= `flex-1 min-w-0 inline-flex items-center +
 // nakedCellRowModeAlign` — proven working,canonical SSOT。本 helper 對齊 single SSOT,
 // **不**自定一套(spec.md §C row 1 +「length=1 視覺 = 跟單人 closed 一致」+ §E「PersonDisplay
 // 共享 renderer」)。
@@ -46,7 +46,7 @@ export const PEOPLE_PICKER_LENGTH1_WRAPPER_CLASS = `flex-1 min-w-0 inline-flex i
 // code-quality-allow: dead-export — paired helper for SSOT primitive(同上 hook + future use rationale)
 export function getPeoplePickerTagWrapperClass(selectedCount: number): string {
   return selectedCount === 1
-    ? PEOPLE_PICKER_LENGTH1_WRAPPER_CLASS  // SSOT aligned to single picker wrapper(select.tsx:229)
+    ? PEOPLE_PICKER_LENGTH1_WRAPPER_CLASS  // SSOT aligned to single picker wrapper(select.tsx:244 selectedItemRenderer wrapper)
     // length>=2 stack 視覺(spec.md §D row 1):圓形 avatar overlap + group/avatar selector for dismiss overlay
     : '-ml-0.5 first:ml-0 relative inline-flex group/avatar'
 }

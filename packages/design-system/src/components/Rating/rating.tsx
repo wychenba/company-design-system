@@ -80,7 +80,11 @@ export interface RatingProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   loading?: boolean
   /** 自訂 icon(預設 Star);傳 LucideIcon */
   icon?: LucideIcon
-  /** a11y label(readOnly 時必填,interactive 時建議填) */
+  /**
+   * a11y label。readOnly(role=img)時必填。
+   * interactive(role=slider)時:在 Field 內免填(自動 aria-labelledby 指向 FieldLabel);
+   * standalone(無 Field)時必填——role=slider 依 WAI-ARIA APG 必有 accessible name。
+   */
   'aria-label'?: string
 }
 
@@ -148,6 +152,12 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
       <div
         ref={ref}
         role={isInteractive ? 'slider' : 'img'}
+        // a11y(#30):role=slider 必有 accessible name(WAI-ARIA APG slider pattern)。
+        //   Field 內 → 自動 aria-labelledby 指向 FieldLabel 的 id(fieldCtx.labelId,免填);
+        //   Standalone → 仍需 consumer 傳 aria-label。對齊 TimePicker / DatePicker 同 canonical
+        //   (time-picker.tsx:308 / date-picker.tsx:512:aria-labelledby={fieldCtx?.labelId})。
+        //   置於 {...props} 前,consumer 顯式傳的 aria-labelledby 仍可覆寫。
+        aria-labelledby={isInteractive ? fieldCtx?.labelId : undefined}
         aria-valuenow={isInteractive ? currentValue : undefined}
         aria-valuemin={isInteractive ? 0 : undefined}
         aria-valuemax={isInteractive ? max : undefined}
@@ -236,8 +246,9 @@ function StarIcon({ Icon, sizePx, fillRatio, isHalf, interactive, onHover, onCli
         style={{ color: fill }}
         aria-hidden
       >
-        {/* stroke="none" 移除 Lucide Star 預設的 outline stroke(1.5px 黑線),
-            讓星星是純 fill-only 的 shape——fill 與 outline 同色視覺上仍有亮度差。
+        {/* stroke="none" 移除 Lucide Star 預設的 outline stroke(lucide defaultAttributes
+            strokeWidth=2 + stroke=currentColor 會畫輪廓),讓星星是純 fill-only 的 shape——
+            fill 與 outline 同色視覺上仍有亮度差。
             世界級對照:Ant Rate / Material MUI Rating 皆純 fill,無 outline stroke。*/}
         <Icon size={sizePx} fill={fill} stroke="none" className="shrink-0" />
       </span>

@@ -77,8 +77,8 @@ export interface FileUploadProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   /**
    * Uploaded / uploading 檔案清單。傳入 → FileUpload 在 drop zone 下方渲染列表。
    * 不傳 → 不顯示(consumer 可自行用 FileItem 組成,pre-2026-04-24 行為)。
-   * 每項有 status 狀態會對應 icon:
-   *   - `uploading`:CircularProgress(+ progress bar 若 progress 給)
+   * 每項由 FileItem 渲染,status 狀態對應視覺:
+   *   - `uploading`:linear ProgressBar(via FileItem;rich mode 另顯示 {progress}%)
    *   - `completed`:綠色 ✓(success 狀態視覺確認)
    *   - `error`:紅色 ✗(+ description 顯示錯誤訊息)
    */
@@ -175,7 +175,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
                 onRemove ? (
                   // Collection remove(per-file)— 不是 dismiss surface,故不套 `dismiss` prop。
                   // 視覺與 dismiss 一致(text variant + fg-muted dim)— 對齊 inline-action.spec.md
-                  // 「Dismiss canonical — X close only」L249-251:onRemove callback 不觸發 dismiss prop。
+                  // 「Dismiss canonical — X close only」(section L204);L229 明文:onRemove callback 不觸發 dismiss prop。
                   <Button
                     iconOnly
                     variant="text"
@@ -235,7 +235,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
         className={cn(
           // 寬度 w-full 填滿 consumer 容器(user 明示「寬度填滿」);高度由 padding + 內容物決定(不固定 h)
           'flex flex-col items-center justify-center gap-2 text-center w-full',
-          // 對稱 padding p-[var(--layout-space-loose)]:四邊等距,density-aware(md=24px / lg=32px),對齊 DS chrome padding canonical。
+          // 對稱 padding p-[var(--layout-space-loose)]:四邊等距,density-aware(md=16px / lg=24px),對齊 DS chrome padding canonical。
           // 不再硬寫 px-6 py-10(不對稱+非 token)。內容物(icon + title + description)垂直堆疊由 gap-2 控制
           'rounded-md border-2 border-dashed p-[var(--layout-space-loose)]',
           'cursor-pointer transition-colors',

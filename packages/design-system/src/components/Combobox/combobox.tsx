@@ -696,7 +696,7 @@ function CustomCombobox({
     <div
       ref={__triggerRef}
       id={fieldCtx?.id}
-      role="combobox" aria-expanded={open} aria-controls={listboxId} tabIndex={0}
+      role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-controls={listboxId} tabIndex={0}
       aria-label={ariaLabel}
       aria-invalid={error || undefined}
       aria-required={fieldCtx?.required || undefined}
@@ -708,7 +708,20 @@ function CustomCombobox({
         // 統一處理 — open=灰深(data-state)/ focus=藍(focus-within !important)。改一處全 control 跟動。
         error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
       style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }}
-      data-field-mode="edit" data-error={error ? '' : undefined}>
+      data-field-mode="edit" data-error={error ? '' : undefined}
+      // WAI-ARIA APG combobox 鍵盤開啟語意 — 對齊 sibling Select(select.tsx:593-598)。
+      // <div role=combobox> 不像 native <button> 自動 synthesize Enter/Space click,故顯式補:
+      //   Enter/Space → 開(searchable 時不攔,讓 inline search input 自行處理打字);
+      //   Escape → 關;ArrowDown → 開(APG required combobox 展開鍵,僅在 closed 時攔,
+      //   open 後不 preventDefault 讓方向鍵自由流向選單導覽)。
+      // 純 additive:此 trigger 原無 onKeyDown,不覆寫既有 handler;open 邏輯仍走 setOpen SSOT。
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          if (!searchable) { e.preventDefault(); setOpen(true) }
+        }
+        if (e.key === 'ArrowDown' && !open) { e.preventDefault(); setOpen(true) }
+        if (e.key === 'Escape') setOpen(false)
+      }}>
       {/* 2026-05-18 #6A Round 1 Step 2/4(per user 拍板「決策6選a」+ codex M31 Step 5 verdict cite combobox.tsx:648):
           CustomCombobox edit non-wrap tagArea 對齊 L293 display + L451 readonly + L518 native edit 已 ship 的 overflow-hidden fix。
           原 overflow-visible 讓 tag 越界蓋 chevron / +N indicator(user 圖三)。M10 propagation 完整 4-path align。 */}

@@ -119,8 +119,11 @@ const Carousel = React.forwardRef<
     }, [api, onSelect])
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (e.key === 'ArrowLeft') { e.preventDefault(); scrollPrev() }
-      else if (e.key === 'ArrowRight') { e.preventDefault(); scrollNext() }
+      // 鍵盤方向對齊內容捲動方向(APG 建議):horizontal → ←/→;vertical → ↑/↓
+      const prevKey = orientation === 'horizontal' ? 'ArrowLeft' : 'ArrowUp'
+      const nextKey = orientation === 'horizontal' ? 'ArrowRight' : 'ArrowDown'
+      if (e.key === prevKey) { e.preventDefault(); scrollPrev() }
+      else if (e.key === nextKey) { e.preventDefault(); scrollNext() }
     }
 
     const contextValue = React.useMemo(
@@ -316,7 +319,7 @@ const CarouselDots = React.forwardRef<
         className,
       )}
       role="tablist"
-      aria-label="carousel pagination"
+      aria-label="輪播指示器" /* i18n-allow: DS default; 對齊同檔其他 aria-label 語言 */
       {...props}
     >
       {scrollSnaps.map((_, i) => (

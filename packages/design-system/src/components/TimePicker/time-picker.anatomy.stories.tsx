@@ -263,7 +263,7 @@ export const Accessibility: Story = {
       <section>
         <h3 className="text-body font-bold mb-2">鍵盤導覽(WAI-ARIA listbox pattern)</h3>
         <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
-          <li>Trigger:<kbd>Space</kbd> / <kbd>Enter</kbd> 開 panel</li>
+          <li>Trigger:<kbd>Space</kbd> / <kbd>Enter</kbd> / <kbd>↓</kbd> 開 panel(對齊 APG combobox + Select)</li>
           <li>Panel 開啟:<kbd>Esc</kbd> 關閉 + focus return to trigger</li>
           <li>Column 內:<kbd>↑</kbd> <kbd>↓</kbd> 切 option</li>
           <li><kbd>Home</kbd> <kbd>End</kbd> 跳 column 首尾</li>

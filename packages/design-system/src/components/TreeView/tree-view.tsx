@@ -107,6 +107,12 @@ interface TreeViewContextValue {
   expandOnSelect: boolean
   draggable: boolean
   isKeyboardRef: React.RefObject<boolean>
+  /**
+   * Per-tree instance 前綴(React.useId),用來組每個 treeitem 的 DOM `id`
+   * (`${prefix}treeitem-${nodeId}`),讓容器的 `aria-activedescendant` 能指向目前 focused node。
+   * 多棵 TreeView 同頁 / node id 跨樹重複時不會撞 DOM id。
+   */
+  activeDescendantPrefix: string
   expandedIds: Set<string>
   selectedIds: Set<string>
   focusedId: string | null
@@ -273,6 +279,12 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
 
     // ── Focus state ──
     const [focusedId, setFocusedId] = React.useState<string | null>(null)
+
+    // ── Virtual focus id prefix ──
+    // DOM focus 永遠停在 role=tree 容器(單一 tab stop);目前 node 透過 aria-activedescendant
+    // 告知 AT(對齊 DS 既有 cmdk virtual-focus canonical:SelectMenu / Command listbox)。
+    // useId 確保多棵 TreeView 同頁 / node id 跨樹重複時 DOM id 不撞。
+    const activeDescendantPrefix = React.useId()
 
     // ── Keyboard vs mouse detection ──
     // focus ring 只在鍵盤操作時顯示,滑鼠點擊用 bg-neutral-selected 表達選中,不顯示 ring
@@ -457,6 +469,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
         expandOnSelect,
         draggable,
         isKeyboardRef,
+        activeDescendantPrefix,
         draggingId,
         dropTarget,
         expandedIds,
@@ -476,6 +489,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
         expandOnSelect,
         draggable,
         isKeyboardRef,
+        activeDescendantPrefix,
         draggingId,
         dropTarget,
         expandedIds,
@@ -591,6 +605,9 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
         ref={treeRef}
         role="tree"
         aria-multiselectable={selectionMode === 'multiple' || undefined}
+        // Virtual focus:DOM focus 停在容器(單一 tab stop),aria-activedescendant 指向目前 node
+        // 的 DOM id,讓 AT 朗讀目前焦點 node(對齊 WAI-ARIA TreeView APG aria-activedescendant 模式)。
+        aria-activedescendant={focusedId ? `${activeDescendantPrefix}treeitem-${focusedId}` : undefined}
         className={cn(
           // TreeView root 不加任何 py——呼吸空間由外層容器負責:
           //   - 在 SidebarGroup 內: SidebarGroup py-2 提供
@@ -776,6 +793,7 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
       registerNode,
       unregisterNode,
       isKeyboardRef,
+      activeDescendantPrefix,
     } = ctx
 
     const hasChildren = React.Children.count(children) > 0
@@ -877,6 +895,9 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             if (typeof ref === 'function') ref(node)
             else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node
           }}
+          // DOM id 供容器 aria-activedescendant 指向(virtual focus);與 data-tree-id 並存
+          // (data-tree-id 給內部 querySelector / drag,id 給 AT)。
+          id={`${activeDescendantPrefix}treeitem-${id}`}
           role="treeitem"
           aria-expanded={hasChildren ? isExpanded : undefined}
           aria-selected={selectionMode !== 'none' ? isSelected : undefined}

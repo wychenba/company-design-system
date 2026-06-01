@@ -286,7 +286,7 @@ function SelectMenuInspector() {
 │ │${searchable ? ' │ [🔍] 搜尋…                                           │ │' : ''}
 │ │${searchable ? ' │ min-h = field-height(${size}) + 8px / border-b              │ │' : ''}
 │ │${searchable ? ' └─────────────────────────────────────────────────────┘ │' : ''}
-│ │ ┌─ CommandList (min-h = ${3} × MenuItem) ───────────────────┐  │
+│ │ ┌─ CommandList — fit content (empty min-h=field×3+16px) ─┐  │
 │ │ │ CommandGroup (p-0 py-2)                                 │  │
 │ │ │ ▸ MenuItem size=${size} [checkbox=${multiple}] label + desc       │  │
 │ │ │ ▸ MenuItem ...                                           │  │

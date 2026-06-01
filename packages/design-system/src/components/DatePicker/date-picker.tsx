@@ -339,7 +339,9 @@ export interface DatePickerProps
 
 // Trigger uses `<div role="combobox" tabIndex={...}>` instead of `<button>` —
 // 對齊 Combobox / Select / TimePicker 同 pattern,避免 ItemInlineAction(內部 button)
-// 構成 nested-interactive(axe serious)。Radix Popover asChild 仍處理 Enter/Space 鍵盤觸發。
+// 構成 nested-interactive(axe serious)。Radix PopoverTrigger 只 compose onClick(非
+// native button → 無 Enter/Space→click),Enter/Space 開 popover 由本檔自建 onKeyDown 補
+// (對齊 select.tsx desktop trigger canonical);typeable 模式交由內層 <input> 自管鍵盤。
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
   (
@@ -518,6 +520,15 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
             aria-expanded={open}
             data-field-mode="edit"
             data-error={error ? '' : undefined}
+            // Radix PopoverTrigger 只 compose onClick(onOpenToggle),`<div>` trigger 無
+            // native Enter/Space→click → 自建 onKeyDown 開 popover(對齊 select.tsx desktop
+            // trigger canonical:Enter/Space → 開;Esc → 關)。typeable 模式不攔 — 內層
+            // <input> 自有 Enter/Esc 語意(commit / reset draft),Calendar icon click 開
+            // popover(Material/Ant typed-date idiom),避免 div 層 keydown 與 input 衝突。
+            onKeyDown={typeable ? undefined : (e) => {
+              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(true) }
+              if (e.key === 'Escape') setOpen(false)
+            }}
             className={cn(
               fieldWrapperStyles({ mode: 'edit', variant: variant, size }),
               'text-left cursor-pointer',

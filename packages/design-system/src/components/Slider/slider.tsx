@@ -128,7 +128,18 @@ const Slider = React.forwardRef<
             'data-[disabled]:cursor-not-allowed data-[disabled]:border-border',
             'data-[disabled]:hover:[box-shadow:none]',
           )}
-          aria-label={ariaLabel ? (thumbCount > 1 ? `${ariaLabel} (${i + 1})` : ariaLabel) : (thumbCount > 1 ? `Thumb ${i + 1}` : undefined)}
+          // aria-label 策略(對齊 WAI-ARIA APG multi-thumb slider + Radix 原生語意標籤):
+          //   - consumer 傳 ariaLabel:單 thumb → 原樣;多 thumb → `{label} (N)` 區分
+          //   - 沒傳 ariaLabel:回傳 undefined,讓 Radix getLabel 提供語意標籤
+          //     (2 thumb → Minimum/Maximum;>2 thumb → Value N of M;單 thumb → 無)
+          //     比硬寫 `Thumb N` 更語意化,且讓「繼承 Radix a11y 預設」名實相符
+          aria-label={
+            ariaLabel
+              ? thumbCount > 1
+                ? `${ariaLabel} (${i + 1})`
+                : ariaLabel
+              : undefined
+          }
         />
       ))}
     </SliderPrimitive.Root>
@@ -142,10 +153,13 @@ export const sliderMeta = {
   component: 'Slider',
   family: 4,
   variants: {},
+  // size 只控容器外高,對齊 Field family h-field-*(md density:28/32/36px,uiSize.css)。
+  // track 厚度 / thumb 直徑固定不隨 size 變,故無 iconSize / typography。
+  // fieldHeight key 對齊 compile-stories.mjs 消費 schema(同 Button/Checkbox/Switch)。
   sizes: {
-    sm: { px: 28, when: 'Toolbar / inline 編輯' },
-    md: { px: 36, when: '預設 — Form / cell inline edit' },
-    lg: { px: 44, when: 'Marketing / 高 touch 區' },
+    sm: { fieldHeight: 28, when: 'Toolbar / inline 編輯' },
+    md: { fieldHeight: 32, when: '預設 — Form / cell inline edit' },
+    lg: { fieldHeight: 36, when: 'Marketing / 高 touch 區' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {

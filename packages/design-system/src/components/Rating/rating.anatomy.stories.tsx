@@ -235,7 +235,8 @@ const InspectorInner = () => {
             <PropRow label="aria-valuemin">{readOnly || disabled ? '—' : '0'}</PropRow>
             <PropRow label="aria-valuemax">{readOnly || disabled ? '—' : '5'}</PropRow>
             <PropRow label="aria-valuetext">{readOnly || disabled ? '—' : `${value} of 5 stars`}</PropRow>
-            <PropRow label="aria-label">{readOnly ? '必填' : '建議填'}</PropRow>
+            <PropRow label="aria-label">{readOnly ? '必填' : 'Field 內免填 · standalone 必填'}</PropRow>
+            <PropRow label="aria-labelledby">{readOnly || disabled ? '—' : 'Field 內自動指向 FieldLabel'}</PropRow>
           </div>
         </div>
       </div>
