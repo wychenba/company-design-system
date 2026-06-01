@@ -247,8 +247,8 @@ export const NotSpreadsheetRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="DataTable 不做公式計算、不做跨 cell 選取"
-        note="DataTable 的心智模型是「結構化資料展示」——每筆資料是一 row,每個屬性是一 column。不做:Excel 的公式、跨 cell range selection(Ctrl+drag)、cell clipboard paste、pivot、跨欄運算"
+        title="DataTable 預設不做公式計算、不做跨 cell 選取"
+        note="DataTable 的心智模型是「結構化資料展示」——每筆資料是一 row,每個屬性是一 column。預設不做:Excel 的公式、跨 cell range selection(Ctrl+drag)、cell clipboard paste、pivot、跨欄運算。**逃生門**:確需 Excel-like 編輯可 opt-in `spreadsheetMode` prop(Shift+click range + 方向鍵 cell 導覽 + cell editing;仍不做公式計算),對齊 spec.md L28。"
       >
         <Label>需要試算表能力 → 用專門 library(AG Grid Enterprise / Handsontable / Luckysheet),不往 DataTable 塞</Label>
       </Rule>
