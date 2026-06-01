@@ -154,28 +154,7 @@ detect_mode() {
 
 ### B.1 — Brief codex 跑相同 Phase A 完整流程
 
-Brief format(per codex-collab/SKILL.md Step 0.05 user-verbatim faithful relay + Step 0.5 own-version invariant):
-
-```
-## User 原話(verbatim,prompt 中段引用)
-「<user 原文 quote,中英符號圖文全保>」
-
-## Claude Phase A 結果摘要
-- 全 dim audit:<N P0 / M P1 / K P2 findings>
-- SSOT-UI/UX propose:N 項(已 ASK user)
-- Autonomous landed:M 項(列具體 file:line)
-- 不 verify 但 Phase A 結論:<列出>
-
-## 請你執行 Phase A 相同流程(獨立)
-1. 全盤閱讀(CLAUDE.md / rules / spec.md ×60 / tokens / patterns / memory)
-2. 全 dim deep audit NO-SAMPLE
-3. 整理完整報告(P0 / P1 / P2 分類 + file:line + 引文 cite)
-4. 跟 Claude Phase A 結果**獨立**比對,不 frame 答案
-
-請回:Phase A 你抓但 Claude 漏的 / Claude 抓但你不同意的 / 兩邊都漏的盲區。
-```
-
-Send via `codex exec`(local CLI per M31 Step 0.4)或 cloud `@codex` 後序。
+Brief 必含 4 段(完整 template SSOT → `references/phase-b-codex-brief.md`,per codex-collab Step 0.05 user-verbatim faithful relay + Step 0.5 own-version invariant):**(1)** user 原話 verbatim(中英符號圖文全保)**(2)** Claude Phase A 結果摘要(P0/P1/P2 count + propose N 項 + landed M 項 file:line)**(3)** 請 codex 獨立跑相同 Phase A(全盤閱讀 + 全 dim NO-SAMPLE + 完整報告 + 不 frame 答案)**(4)** 回「你抓 Claude 漏 / Claude 抓你不同意 / 兩邊都漏」。Send via `codex exec`(local CLI per M31 Step 0.4)或 cloud `@codex`。
 
 ### B.2 — Receive codex report + Step 4 self-check + Step 4.5 verify
 
@@ -206,6 +185,10 @@ Send via `codex exec`(local CLI per M31 Step 0.4)或 cloud `@codex` 後序。
 ---
 
 ## Phase C — Final report + commit + push trigger gate
+
+### C.0 — 收斂判準(rerun stop gate,2026-06-01)
+
+決定「**再 rerun 嗎**」必過此 gate:deep-audit = LLM 對抗式 non-deterministic + 高假陽性,**追零 = 跑步機 + 誘發 regression**。STOP 判準 = **某輪 adversarial 二次驗證後真 material/regression = 0(只剩 marginal + false-positive)**——不追零、不過早收。收斂靠 CI gate + 寫入時紀律,非 audit loop。三分類表 + 「改一處看 N 處」→ `references/triage-rubric.md`「收斂判準」。
 
 ### C.1 — Final report(送 user)
 

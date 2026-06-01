@@ -76,7 +76,7 @@ Sub-agent dispatch prompt 必含 3 directives(verbatim,不可弱化):
 - 每 finding 必 **materiality 三分類**(material=影響使用者/contract/a11y;marginal=措辭 nit;false-positive)+ adversarial 二次驗證 filter audit 高估,再決定修不修。
 - **doc-alignment「改一處看 N 處」**:component 有多面向(spec frontmatter / tsx meta / props 表 / Inspector argTypes / ColorMatrix / ModeMatrix / Accessibility prose / principles / showcase / jsDoc),改一處要全掃 — reruns 一直抓我這缺口。
 - 收斂靠決定性 CI gate + 寫入時紀律,非稽核 loop;deep-audit = 週期性工具(release/季度)非對沒變內容反覆跑。
-- **(待 codify 進 repo M32 / deep-audit-cross-codex skill — 目前先存 memory)**
+- **已 codify(2026-06-01)**:`deep-audit-cross-codex/SKILL.md` Phase C.0 rerun-stop-gate anchor + `references/triage-rubric.md`「收斂判準」完整三分類表 + 「改一處看 N 處」。放 skill 而非新 M-rule(velocity cap + skill-specific,不增 every-session context)。
 
 ## 對齊原則
 
