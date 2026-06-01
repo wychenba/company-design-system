@@ -304,15 +304,25 @@ export const Overview = {
             <tbody>
               {[
                 ['mode', "'edit'|'display'|'readonly'|'disabled'", "'edit'", 'FieldMode 四模式——edit 可編輯 / display 純展示 / readonly 顯示值不可改 / disabled 灰化'],
+                ['variant', "'default'|'bare'|'naked'", "'default'", 'Field chrome variant(預設繼承 context.variant)'],
                 ['display', "'plain'|'tag'", "'plain'", '顯示模式——plain 純文字，tag 用 Tag 元件呈現'],
                 ['size', "'sm'|'md'|'lg'", "'md'", '尺寸，與 Button 同 size 並排高度一致'],
                 ['options', 'SelectOption[]', '—', '選項列表 { value, label }'],
-                ['value', 'string | null', '—', '目前選中的值'],
+                ['groups', 'SelectGroupConfig[]', '—', '分組顯示(option.group 對應 groups[].key)'],
+                ['value', 'string | null', '—', 'controlled 選中值'],
+                ['defaultValue', 'string | null', '—', 'uncontrolled 初始值(同時傳 value 走 controlled)'],
                 ['onChange', '(value: string) => void', '—', '值變更回呼'],
                 ['placeholder', 'string', '—', '未選值時的提示文字'],
                 ['clearable', 'boolean', 'false', '有值時顯示 clear 按鈕（僅 edit 模式）'],
+                ['searchable', 'boolean', 'false', '啟用搜尋(desktop 時 field 變 input，打字即篩選)'],
+                ['loading', 'boolean', 'false', 'dropdown 開啟時取代 options 顯 CircularProgress'],
+                ['minRows', 'number', '3', 'menu list 最小列數(空 / 選項少時視覺一致)'],
                 ['startIcon', 'LucideIcon', '—', '左側 field-level 指示 icon（muted，僅 plain 模式；代表 value 的圖示走 option.icon）'],
                 ['error', 'boolean', 'false', '紅色邊框 + aria-invalid（僅 edit 模式有視覺效果）'],
+                ['defaultOpen', 'boolean', 'false', 'uncontrolled 初始開啟(DataTable cell click→1 step open)'],
+                ['onOpenChange', '(open: boolean) => void', '—', 'open 狀態變更 callback'],
+                ['showDisplayEndIcon', 'boolean', 'false', 'display 模式渲 ChevronDown(DataTable cell 對齊)'],
+                ['selectedItemRenderer', '(opt: SelectOption) => ReactNode', '—', 'trigger 已選項目客製 render(PeoplePicker 用)'],
                 ['disabled', 'boolean', '—', '原生屬性，自動覆蓋 mode 為 disabled'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>

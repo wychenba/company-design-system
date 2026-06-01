@@ -82,7 +82,7 @@ export const Inspector: Story = {
     defaultValue: '',
   },
   argTypes: {
-    mode: { control: 'radio', options: ['edit', 'readonly', 'disabled'] },
+    mode: { control: 'radio', options: ['edit', 'display', 'readonly', 'disabled'] },
     size: { control: 'radio', options: ['sm', 'md', 'lg'] },
     rows: { control: { type: 'number', min: 1, max: 20 } },
     error: { control: 'boolean', description: 'error 視覺(border-error + aria-invalid)' },
@@ -115,7 +115,7 @@ export const SizeMatrix: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: '模式 對照（編輯 / readonly / 停用）',
+  name: '模式 對照（編輯 / 展示 / readonly / 停用）',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>
@@ -123,6 +123,15 @@ export const ModeMatrix: Story = {
         <Textarea
           rows={3}
           defaultValue="我覺得這個專案非常有潛力,建議加強 onboarding 的引導流程..."
+        />
+      </div>
+      <div>
+        <H3>display — 純展示(渲 div 取代 textarea,whitespace-pre-wrap 保留多行)</H3>
+        <Desc>對齊 Carbon read-only / Cloudscape display mode。常見於檢視已提交的留言 / 評論。</Desc>
+        <Textarea
+          mode="display"
+          rows={3}
+          value="我覺得這個專案非常有潛力,建議加強 onboarding 的引導流程..."
         />
       </div>
       <div>

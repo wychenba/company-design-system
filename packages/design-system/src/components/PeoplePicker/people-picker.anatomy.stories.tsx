@@ -66,13 +66,23 @@ export const Overview: Story = {
             <tbody>
               {[
                 ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", 'Field mode'],
+                ['variant', "'default' | 'bare' | 'naked'", "'default'", 'Field chrome variant(對齊 Select / Combobox)'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '對齊 field-height tier'],
                 ['value', 'PersonValue | PersonValue[] | null', '—', '單選 / 多選(類型決定模式)'],
-                ['onChange', '(value: PersonValue[]) => void', '—', '值變更 callback'],
+                ['onChange', '(value: PersonValue[]) => void', '—', '值變更 callback(永遠 emit array)'],
                 ['people', 'PersonValue[]', '[]', '可選人員清單(dropdown 顯示)'],
+                ['placeholder', 'string', "'請選擇人員'", 'trigger 未選值提示'],
                 ['searchPlaceholder', 'string', "'搜尋人員…'", '搜尋框 placeholder'],
-                ['emptyText', 'string', "'沒有符合的人員'", '空結果提示'],
+                ['emptyText', 'string', "'沒有符合的人員'", '搜尋無結果提示'],
+                ['multiDisplay', "'stack' | 'pill'", "'stack'", '多選顯示樣式(stack 疊合 +N / pill 標籤;single 忽略)'],
+                ['pillShowAvatar', 'boolean', 'true', "multiDisplay='pill' 時是否顯示 avatar prefix"],
+                ['pillWrap', 'boolean', 'true', 'pill 模式是否允許換行'],
+                ['searchIn', "'menu' | 'trigger'", "'menu'", '搜尋型態(menu 浮層內 / trigger inline;multi 才有意義)'],
+                ['showDisplayEndIcon', 'boolean', 'false', 'display 模式渲 ChevronDown + naked wrapper(DataTable cell 對齊)'],
+                ['defaultOpen', 'boolean', 'false', 'uncontrolled 初始開啟狀態'],
+                ['onOpenChange', '(open: boolean) => void', '—', 'open 狀態變更 callback'],
                 ['disabled', 'boolean', 'false', '停用'],
+                ['aria-label', 'string', '—', 'a11y 標籤'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
