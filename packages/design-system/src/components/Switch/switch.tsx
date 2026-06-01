@@ -264,7 +264,7 @@ Switch.displayName = SwitchPrimitives.Root.displayName
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const switchMeta = {
   component: 'Switch',
-  family: 4,
+  family: null, // self-contained primitive(對齊 spec frontmatter self-contained + body L31;非 Family 4)
   variants: {
 
   },

@@ -287,7 +287,7 @@ export const segmentedControlMeta = {
   family: null, // non-family composite / overlay / layout
   variants: {},
   sizes: {
-    xs: { fieldHeight: 24, typography: 'caption', iconSize: 14, purpose: 'row-embedded inline action / DataTable inline filter' },
+    xs: { fieldHeight: 24, typography: 'caption', iconSize: 16, purpose: 'row-embedded inline action / DataTable inline filter' },
     sm: { fieldHeight: 28, typography: 'body', iconSize: 16, purpose: 'compact chrome bar / dense toolbar' },
     md: { fieldHeight: 32, typography: 'body', iconSize: 16, purpose: '預設 — form field 對齊' },
     lg: { fieldHeight: 36, typography: 'body-lg', iconSize: 20, purpose: 'touch / prominent CTA' },

@@ -12,7 +12,7 @@ sizes:
 traits:
   - hasSizes
   - hasInteractiveStates
-  - isSelectionMulti
+  - isSelectionSingle
 benchmark:
   - Radix RadioGroup primitive: github.com/radix-ui/primitives/tree/main/packages/react/radio-group
   - Ant Design Radio: github.com/ant-design/ant-design/tree/master/components/radio

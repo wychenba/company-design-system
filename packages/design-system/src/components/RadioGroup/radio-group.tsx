@@ -229,7 +229,7 @@ RadioGroupItem.displayName = 'RadioGroupItem'
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const radioGroupMeta = {
   component: 'RadioGroup',
-  family: 4,
+  family: null, // self-contained primitive(對齊 spec frontmatter self-contained + body L31;非 Family 4 — field-controls.spec.md 成員名單不含 RadioGroup)
   variants: {
 
   },

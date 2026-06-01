@@ -497,10 +497,11 @@ export const tabsMeta = {
   variants: {
 
   },
+  // 注:`fieldHeight` 為 meta 通用 height key;Tabs **不複用 field-height**,值為 `--tab-height-*`(md density,對齊 spec.md size table + uiSize.css)
   sizes: {
-    sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
-    md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
-    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },
+    sm: { fieldHeight: 32, iconSize: 16, typography: 'body' },
+    md: { fieldHeight: 40, iconSize: 16, typography: 'body' },
+    lg: { fieldHeight: 48, iconSize: 20, typography: 'body-lg' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
