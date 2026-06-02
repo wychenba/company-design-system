@@ -198,6 +198,16 @@ const ios = {
     `bg-white/20 mt-1`, // @layout-space-magic-ok: mt-1=4px optical alignment nudge between icon tile and hero title top (intra-card bundle)
   dashProgressLabel:
     `flex justify-between text-[12px] text-white/80 mb-1`, // @layout-space-magic-ok: mb-1=4px label→bar functional dependency within bundled progress block; text-[12px]=iOS footnote (fixed typographic scale)
+
+  // ── Shared screen footer (CTA bar) ──
+  screenFooter: `px-[${loose}] pb-[${bottom}] pt-3 flex-shrink-0`, // @layout-space-magic-ok: pt-3=12px screen-content→button breathing per Apple HIG bottom CTA bar rhythm (UIKit fixed spec)
+
+  // ── Plan card ──
+  planCard: (selected: boolean) =>
+    `w-full text-left bg-white rounded-2xl p-[${loose}] border-2 transition-all ${
+      selected ? 'border-[var(--primary)] shadow-[0_4px_12px_rgba(0,107,255,0.15)]' : 'border-transparent shadow-[0_1px_3px_rgba(0,0,0,0.08)]'
+    }`,
+    // @layout-space-magic-ok: same card padding/radius as ios.groupCard; shadow values are elevation-layer not spacing
 }
 
 // ─────────────────────────────────────────────
@@ -348,8 +358,7 @@ const dark = {
     }`,
   successUsageCard: `p-[${loose}] mb-[${tight}]`,
   successUsageHeader: `flex items-center justify-between mb-3`, // @layout-space-magic-ok: mb-3=12px title→progress-bar gap
-  successFooter: `px-[${loose}] pb-[${bottom}] pt-3 flex-shrink-0 flex flex-col gap-2`, // @layout-space-magic-ok: gap-2/pt-3=8px/12px same spec as ios.successFooter
-  screenFooter: `px-[${loose}] pb-[${bottom}] pt-3 flex-shrink-0`, // @layout-space-magic-ok: pt-3=12px screen-content→button visual gap (UIKit prominent CTA bar, commitment 前 breathing); matches Apple HIG bottom safe-area CTA rhythm
+  successFooter: `px-[${loose}] pb-[${bottom}] pt-3 flex-shrink-0 flex flex-col gap-2`, // @layout-space-magic-ok: gap-2/pt-3=8px/12px stacked CTAs footer; pt-3=12px Apple HIG CTA bar rhythm
 }
 
 // ─────────────────────────────────────────────
@@ -1171,28 +1180,39 @@ const PLANS = [
   { id: 'unlimited',   name: '無限方案', data: '無限制', days: 7, price: 'NT$1,200', badge: '暢用', badgeColor: 'green'  as const, features: ['無限流量（前 10 GB 高速）', '超量降速不斷線', '7 天有效期', '熱點分享支援'], carrier: '中華電信' },
 ]
 
-function PlanScreen({ onNext, onBack }: { onNext: (p: typeof PLANS[0]) => void; onBack: () => void }) {
+function PlanScreen({ onNext, onBack, theme = 'corporate' }: { onNext: (p: typeof PLANS[0]) => void; onBack: () => void; theme?: Theme }) {
+  const isM = theme === 'modern'
+  const d = isM ? dark : ios
+  const bg = isM ? dark.screenBg : 'bg-[#f2f2f7]'
+  const subText  = isM ? 'text-white/50' : 'text-[var(--fg-muted)]'
+  const planName = isM ? 'text-[17px] font-bold text-white' : 'text-[17px] font-bold text-[#1c1c1e]'
+  const planCarrier = isM ? dark.rowSub : 'text-[13px] text-[var(--fg-muted)]'
+  const priceMain   = isM ? 'text-[24px] font-bold text-white' : 'text-[24px] font-bold text-[#1c1c1e]' // @layout-space-magic-ok: iOS title2 price display
+  const priceUnit   = isM ? dark.rowSub : 'text-[13px] text-[var(--fg-muted)]'
+  const featureText = isM ? 'text-[13px] text-white/50' : 'text-[13px] text-[var(--fg-muted)]'
+  const accentCls   = isM ? 'text-[#c8f135]' : 'text-[var(--primary)]'
+  const mutedCls    = isM ? 'text-white/40'   : 'text-[var(--fg-muted)]'
+  const checkCls    = isM ? 'text-[#c8f135] flex-shrink-0' : 'text-[var(--success)] flex-shrink-0'
   const [selected, setSelected] = useState('recommended')
 
   return (
-    <div className="flex flex-col h-full bg-[#f2f2f7]">
-      <div className={ios.navBar}>
-        <button className={ios.navBack} onClick={onBack}><ChevronLeft size={22} />返回</button>
-        <span className={ios.navTitle}>選擇方案</span>
+    <div className={`flex flex-col h-full ${bg}`}>
+      <div className={d.navBar}>
+        <button className={d.navBack} onClick={onBack}><ChevronLeft size={22} />返回</button>
+        <span className={d.navTitle}>選擇方案</span>
         <div className="w-16" />
       </div>
 
       <div className={ios.screen}>
-        <h1 className={ios.largeTitle}>推薦方案</h1>
-        <p className={`px-[${loose}] text-[15px] text-[var(--fg-muted)] mb-[${tight}]`}>根據您的出差資訊，以下方案符合需求</p>
+        <h1 className={d.largeTitle}>推薦方案</h1>
+        <p className={`px-[${loose}] text-[15px] ${subText} mb-[${tight}]`}>根據您的出差資訊，以下方案符合需求</p>
 
-        <div className={`${ios.card} mb-[${tight}]`}>
-          <div className={`px-[${loose}] py-3 flex items-center gap-[${tight}]`}>
-            {/* py-3 @layout-space-magic-ok: compact summary row = 12px bundled row */}
-            <Globe size={20} className="text-[var(--primary)]" />
+        <div className={`${isM ? dark.groupCard : ios.card} mb-[${tight}]`}>
+          <div className={ios.planSummaryRow}>
+            <Globe size={20} className={isM ? 'text-[#c8f135]' : 'text-[var(--primary)]'} />
             <div className="flex-1">
-              <p className="text-[13px] text-[var(--fg-muted)]">日本・5 天・商務會議</p>
-              <p className="text-[15px] font-medium text-[#1c1c1e]">2026/06/10 → 2026/06/14</p>
+              <p className={planCarrier}>日本・5 天・商務會議</p>
+              <p className={`text-[15px] font-medium ${isM ? 'text-white' : 'text-[#1c1c1e]'}`}>2026/06/10 → 2026/06/14</p>
             </div>
           </div>
         </div>
@@ -1204,54 +1224,41 @@ function PlanScreen({ onNext, onBack }: { onNext: (p: typeof PLANS[0]) => void; 
               <button
                 key={plan.id}
                 onClick={() => setSelected(plan.id)}
-                className={`w-full text-left bg-white rounded-2xl p-[${loose}] border-2 transition-all ${
-                  isSel ? 'border-[var(--primary)] shadow-[0_4px_12px_rgba(0,107,255,0.15)]' : 'border-transparent shadow-[0_1px_3px_rgba(0,0,0,0.08)]'
-                }`}
+                className={d.planCard(isSel)}
               >
-                <div className={`flex items-start justify-between mb-3`}>
-                  {/* mb-3 @layout-space-magic-ok: card title→specs gap = 12px, functional dependency within card (tight) */}
+                <div className={ios.planCardHeader}>
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      {/* gap-2/mb-1 @layout-space-magic-ok: badge cluster = bundled inline chip family 8px */}
-                      <span className="text-[17px] font-bold text-[#1c1c1e]">{plan.name}</span>
+                    <div className={ios.planCardBadgeRow}>
+                      <span className={planName}>{plan.name}</span>
                       <PlanBadge label={plan.badge} color={plan.badgeColor} />
                       {plan.recommended && (
-                        <span className={ios.microBadge('text-white bg-[var(--primary)]')}>★ 目前方向</span>
+                        <span className={ios.microBadge(isM ? 'text-[#0d1229] bg-[#c8f135]' : 'text-white bg-[var(--primary)]')}>★ 目前方向</span>
                       )}
                     </div>
-                    <p className="text-[13px] text-[var(--fg-muted)]">{plan.carrier}</p>
+                    <p className={planCarrier}>{plan.carrier}</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-[24px] font-bold text-[#1c1c1e]">{plan.price}</span>
-                    {/* text-[24px] @layout-space-magic-ok: iOS title2 price display */}
-                    <span className="text-[13px] text-[var(--fg-muted)]">/次</span>
+                    <span className={priceMain}>{plan.price}</span>
+                    <span className={priceUnit}>/次</span>
                   </div>
                 </div>
 
-                <div className={`flex items-center gap-[${loose}] mb-3 text-[14px] font-medium`}>
-                  {/* mb-3 @layout-space-magic-ok: specs→features gap = 12px functional dependency within card */}
-                  <div className={`${ios.iconTextPair} text-[var(--primary)]`}>
-                    <Signal size={14} />{plan.data}
-                  </div>
-                  <div className={`${ios.iconTextPair} text-[var(--fg-muted)]`}>
-                    <Clock size={14} />{plan.days} 天
-                  </div>
+                <div className={`${ios.planCardSpecRow} ${accentCls}`}>
+                  <div className={`${ios.iconTextPair} ${accentCls}`}><Signal size={14} />{plan.data}</div>
+                  <div className={`${ios.iconTextPair} ${mutedCls}`}><Clock size={14} />{plan.days} 天</div>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  {/* gap-1 @layout-space-magic-ok: feature-list line spacing = 4px bundled list family */}
+                <div className={ios.planCardFeatureList}>
                   {plan.features.map(f => (
-                    <div key={f} className="flex items-center gap-2">
-                      {/* gap-2 @layout-space-magic-ok: check-icon + feature-text = 8px bundled icon-label pair */}
-                      <Check size={14} className="text-[var(--success)] flex-shrink-0" />
-                      <span className="text-[13px] text-[var(--fg-muted)]">{f}</span>
+                    <div key={f} className={ios.planCardFeatureRow}>
+                      <Check size={14} className={checkCls} />
+                      <span className={featureText}>{f}</span>
                     </div>
                   ))}
                 </div>
 
                 {isSel && (
-                  <div className="mt-3 flex items-center justify-center gap-2 text-[var(--primary)] text-[13px] font-medium">
-                    {/* mt-3/gap-2 @layout-space-magic-ok: confirm indicator = bundled status row within card */}
+                  <div className={ios.planCardConfirmRow(accentCls)}>
                     <CheckCircle2 size={16} />已選擇此方案
                   </div>
                 )}
@@ -1262,9 +1269,8 @@ function PlanScreen({ onNext, onBack }: { onNext: (p: typeof PLANS[0]) => void; 
         <div className="h-8" />{/* @layout-space-magic-ok: scroll-bottom spacer */}
       </div>
 
-      <div className={`px-[${loose}] pb-[${bottom}] pt-3 flex-shrink-0`}>
-        {/* pt-3 @layout-space-magic-ok: content-edge→button visual gap */}
-        <button className={ios.primaryBtn} onClick={() => onNext(PLANS.find(p => p.id === selected)!)}>
+      <div className={ios.screenFooter}>
+        <button className={isM ? dark.loginBtn : ios.primaryBtn} onClick={() => onNext(PLANS.find(p => p.id === selected)!)}>
           確認方案，建立 eSIM 訂單 <ChevronRight size={20} />
         </button>
       </div>
@@ -1275,28 +1281,42 @@ function PlanScreen({ onNext, onBack }: { onNext: (p: typeof PLANS[0]) => void; 
 // ─────────────────────────────────────────────
 // Screen 5: Install
 // ─────────────────────────────────────────────
-const METHODS = [
-  { id: 'app'   as const, label: 'App 內安裝',   sub: '連結直接安裝，最快速',      badge: '★ 目前方向', icon: Smartphone, iconCls: 'text-[var(--primary)]', iconBg: 'bg-[var(--primary-subtle)]' },
-  { id: 'mdm'   as const, label: 'MDM 推送安裝', sub: '透過公司 MDM 系統部署',     badge: undefined,    icon: Shield,     iconCls: 'text-[var(--success)]', iconBg: 'bg-[var(--success-subtle)]' },
-  { id: 'email' as const, label: 'Email 超連結', sub: '導至設定 App 安裝',          badge: undefined,    icon: Download,   iconCls: 'text-[var(--fg-muted)]', iconBg: 'bg-[rgba(120,120,128,0.1)]' },
-]
+function InstallScreen({ plan, onNext, onBack, theme = 'corporate' }: { plan: typeof PLANS[0]; onNext: () => void; onBack: () => void; theme?: Theme }) {
+  const isM = theme === 'modern'
+  const d = isM ? dark : ios
+  const bg = isM ? dark.screenBg : 'bg-[#f2f2f7]'
+  const rowLabel  = isM ? dark.rowSub   : 'text-[13px] text-[var(--fg-muted)]'
+  const rowValue  = isM ? 'text-[15px] font-medium text-white' : 'text-[15px] font-medium text-[#1c1c1e]'
+  const rowNote   = isM ? 'font-normal text-white/40' : 'font-normal text-[var(--fg-muted)]'
+  const methodLabel = isM ? dark.rowTitle : 'text-[15px] font-medium text-[#1c1c1e]'
+  const methodSub   = isM ? dark.rowSub   : 'text-[13px] text-[var(--fg-muted)]'
+  const accentIcon  = isM ? 'text-[#c8f135]' : 'text-[var(--primary)]'
 
-function InstallScreen({ plan, onNext, onBack }: { plan: typeof PLANS[0]; onNext: () => void; onBack: () => void }) {
+  const METHODS_THEMED = [
+    { id: 'app'   as const, label: 'App 內安裝',   sub: '連結直接安裝，最快速',   badge: '★ 目前方向', icon: Smartphone,
+      iconCls: isM ? 'text-[#c8f135]' : 'text-[var(--primary)]', iconBg: isM ? '' : 'bg-[var(--primary-subtle)]' },
+    { id: 'mdm'   as const, label: 'MDM 推送安裝', sub: '透過公司 MDM 系統部署',   badge: undefined,    icon: Shield,
+      iconCls: isM ? 'text-white/60'  : 'text-[var(--success)]',  iconBg: isM ? '' : 'bg-[var(--success-subtle)]' },
+    { id: 'email' as const, label: 'Email 超連結', sub: '導至設定 App 安裝',       badge: undefined,    icon: Download,
+      iconCls: isM ? 'text-white/30'  : 'text-[var(--fg-muted)]', iconBg: isM ? '' : 'bg-[rgba(120,120,128,0.1)]' },
+  ]
+  const warnIconCls = `${isM ? 'text-[#c8f135]' : 'text-[#c47400]'} flex-shrink-0 mt-0.5` // @layout-space-magic-ok: mt-0.5=2px optical icon vertical alignment nudge, intra-element (not layout region)
+  const warnBodyCls = `text-[13px] mt-0.5 ${isM ? 'text-white/50' : 'text-[var(--fg-muted)]'}` // @layout-space-magic-ok: mt-0.5=2px label→body gap within bundled notice element (not layout region)
   const [method, setMethod] = useState<'app' | 'mdm' | 'email'>('app')
 
   return (
-    <div className="flex flex-col h-full bg-[#f2f2f7]">
-      <div className={ios.navBar}>
-        <button className={ios.navBack} onClick={onBack}><ChevronLeft size={22} />返回</button>
-        <span className={ios.navTitle}>確認訂單</span>
+    <div className={`flex flex-col h-full ${bg}`}>
+      <div className={d.navBar}>
+        <button className={d.navBack} onClick={onBack}><ChevronLeft size={22} />返回</button>
+        <span className={d.navTitle}>確認訂單</span>
         <div className="w-16" />
       </div>
 
       <div className={ios.screen}>
-        <h1 className={ios.largeTitle}>確認並安裝</h1>
+        <h1 className={d.largeTitle}>確認並安裝</h1>
 
-        <p className={ios.sectionLabel}>訂單摘要</p>
-        <div className={ios.groupCard}>
+        <p className={d.sectionLabel}>訂單摘要</p>
+        <div className={d.groupCard}>
           {[
             { icon: Globe,        label: '目的地',   value: '日本' },
             { icon: CalendarDays, label: '出差期間', value: '2026/06/10 — 06/14（5 天）' },
@@ -1304,57 +1324,56 @@ function InstallScreen({ plan, onNext, onBack }: { plan: typeof PLANS[0]; onNext
             { icon: Briefcase,    label: '費用',     value: plan.price, note: '（月結入帳）' },
           ].map(({ icon: Icon, label, value, note }, i, arr) => (
             <div key={label}>
-              <div className={ios.groupRow}>
-                <Icon size={20} className="text-[var(--primary)]" />
+              <div className={d.groupRow}>
+                <Icon size={20} className={accentIcon} />
                 <div className="flex-1">
-                  <p className="text-[13px] text-[var(--fg-muted)]">{label}</p>
-                  <p className="text-[15px] font-medium text-[#1c1c1e]">
-                    {value}{note && <span className="font-normal text-[var(--fg-muted)]">{note}</span>}
+                  <p className={rowLabel}>{label}</p>
+                  <p className={rowValue}>
+                    {value}{note && <span className={rowNote}>{note}</span>}
                   </p>
                 </div>
               </div>
-              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+              {i < arr.length - 1 && <div className={d.groupDivider} />}
             </div>
           ))}
         </div>
 
-        <p className={ios.sectionLabel}>eSIM 安裝方式</p>
-        <div className={ios.groupCard}>
-          {METHODS.map(({ id, label, sub, badge, icon: Icon, iconCls, iconBg }, i, arr) => (
+        <p className={d.sectionLabel}>eSIM 安裝方式</p>
+        <div className={d.groupCard}>
+          {METHODS_THEMED.map(({ id, label, sub, badge, icon: Icon, iconCls, iconBg }, i, arr) => (
             <div key={id}>
-              <button className={`${ios.groupRow} w-full text-left`} onClick={() => setMethod(id)}>
-                <div className={`${ios.iconTile} ${iconBg}`}><Icon size={16} className={iconCls} /></div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    {/* gap-2 @layout-space-magic-ok: badge inline cluster bundled */}
-                    <p className="text-[15px] font-medium text-[#1c1c1e]">{label}</p>
-                    {badge && <span className={ios.microBadge('text-[var(--primary)] bg-[var(--primary-subtle)]')}>{badge}</span>}
-                  </div>
-                  <p className="text-[13px] text-[var(--fg-muted)]">{sub}</p>
+              <button className={`${d.groupRow} w-full text-left`} onClick={() => setMethod(id)}>
+                <div className={`${isM ? dark.iconTile : `${ios.iconTile} ${iconBg}`}`}>
+                  <Icon size={16} className={iconCls} />
                 </div>
-                <div className={ios.radioOuter(method === id)}>
-                  {method === id && <div className={ios.radioDot} />}
+                <div className="flex-1">
+                  <div className={ios.installBadgeRow}>
+                    <p className={methodLabel}>{label}</p>
+                    {badge && <span className={ios.microBadge(isM ? 'text-[#0d1229] bg-[#c8f135]' : 'text-[var(--primary)] bg-[var(--primary-subtle)]')}>{badge}</span>}
+                  </div>
+                  <p className={methodSub}>{sub}</p>
+                </div>
+                <div className={d.radioOuter(method === id)}>
+                  {method === id && <div className={d.radioDot} />}
                 </div>
               </button>
-              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+              {i < arr.length - 1 && <div className={d.groupDivider} />}
             </div>
           ))}
         </div>
 
-        <div className={`mx-[${loose}] mt-[${tight}] bg-[var(--warning-subtle)] rounded-2xl p-[${loose}] flex gap-[${tight}]`}>
-          <AlertCircle size={18} className="text-[#c47400] flex-shrink-0 mt-0.5" />
-          {/* mt-0.5 @layout-space-magic-ok: 2px optical icon vertical alignment nudge, intra-element */}
+        <div className={isM ? dark.warningBox : `mx-[${loose}] mt-[${tight}] bg-[var(--warning-subtle)] rounded-2xl p-[${loose}] flex gap-[${tight}]`}>
+          <AlertCircle size={18} className={warnIconCls} />
           <div>
-            <p className="text-[13px] font-medium text-[#1c1c1e]">注意事項</p>
-            <p className="text-[13px] text-[var(--fg-muted)] mt-0.5">eSIM 安裝後須重新啟動並切換至出差網路；費用將於月結時自動入帳差旅報表。</p>
-            {/* mt-0.5 @layout-space-magic-ok: 2px label→body gap within bundled notice element */}
+            <p className={`text-[13px] font-medium ${isM ? 'text-white' : 'text-[#1c1c1e]'}`}>注意事項</p>
+            <p className={warnBodyCls}>eSIM 安裝後須重新啟動並切換至出差網路；費用將於月結時自動入帳差旅報表。</p>
           </div>
         </div>
         <div className="h-8" />{/* @layout-space-magic-ok: scroll-bottom spacer */}
       </div>
 
-      <div className={`px-[${loose}] pb-[${bottom}] pt-3 flex-shrink-0`}>
-        <button className={ios.primaryBtn} onClick={onNext}>
+      <div className={ios.screenFooter}>
+        <button className={isM ? dark.loginBtn : ios.primaryBtn} onClick={onNext}>
           <Zap size={20} />立即安裝 eSIM
         </button>
       </div>
@@ -1365,35 +1384,44 @@ function InstallScreen({ plan, onNext, onBack }: { plan: typeof PLANS[0]; onNext
 // ─────────────────────────────────────────────
 // Screen 6: Success
 // ─────────────────────────────────────────────
-function SuccessScreen({ plan }: { plan: typeof PLANS[0] }) {
+function SuccessScreen({ plan, theme = 'corporate' }: { plan: typeof PLANS[0]; theme?: Theme }) {
+  const isM = theme === 'modern'
+  const d = isM ? dark : ios
+  const bg = isM ? dark.screenBg : 'bg-[#f2f2f7]'
+  const heroTitle  = isM ? 'text-[28px] font-bold text-white' : 'text-[28px] font-bold text-[#1c1c1e]' // @layout-space-magic-ok: iOS title3
+  const heroSub    = isM ? `text-[15px] text-white/50 mt-1 text-center` : `text-[15px] text-[var(--fg-muted)] mt-1 text-center` // @layout-space-magic-ok: mt-1=4px intra-heading bundle
+  const rowLabel   = isM ? 'text-[15px] text-white/60 flex-1' : 'text-[15px] text-[#1c1c1e] flex-1'
+  const rowValue   = isM ? 'text-[15px] text-white/40' : 'text-[15px] text-[var(--fg-muted)]'
+  const successCls = isM ? 'text-[#c8f135] font-semibold' : 'text-[var(--success)] font-semibold'
+  const inlineDivider = isM ? `ml-[${loose}] border-b border-white/[0.06]` : `ml-[${loose}] border-b border-[rgba(0,0,0,0.06)]`
+  const barBg   = isM ? 'h-3 bg-white/10 rounded-full overflow-hidden' : ios.progressBar
+  const barFill = isM ? 'h-full bg-[#c8f135] rounded-full' : 'h-full bg-[var(--primary)] rounded-full'
+  const barUsed = isM ? 'text-[#c8f135] font-medium' : 'text-[var(--primary)] font-medium'
+  const barRem  = isM ? 'text-white/40' : 'text-[var(--fg-muted)]'
+  const usageCardCls = isM ? `${dark.groupCard} ${dark.successUsageCard}` : `${ios.card} ${ios.successUsageCard}`
+  const sysColors = isM
+    ? { signal: 'text-[#c8f135]', wifi: 'text-[#c8f135]', plane: 'text-white/40' }
+    : { signal: 'text-[var(--success)]', wifi: 'text-[var(--primary)]', plane: 'text-[var(--fg-muted)]' }
   const [tab, setTab] = useState<'status' | 'usage'>('status')
 
   return (
-    <div className="flex flex-col h-full bg-[#f2f2f7]">
-      <div className={`${ios.navBar} justify-center`}>
-        <span className={ios.navTitle}>eSIM 已啟用</span>
+    <div className={`flex flex-col h-full ${bg}`}>
+      <div className={`${d.navBar} justify-center`}>
+        <span className={d.navTitle}>eSIM 已啟用</span>
       </div>
 
       <div className={ios.screen}>
-        <div className={`flex flex-col items-center py-[${loose}] px-[${loose}]`}>
-          <div className={`${ios.heroCircle} bg-[var(--success-subtle)] mb-[${tight}]`}>
-            <CheckCircle2 size={52} className="text-[var(--success)]" />
+        <div className={ios.successHeroSection}>
+          <div className={`${ios.heroCircle} ${isM ? 'bg-[#c8f135]/10' : 'bg-[var(--success-subtle)]'} mb-[${tight}]`}>
+            <CheckCircle2 size={52} className={isM ? 'text-[#c8f135]' : 'text-[var(--success)]'} />
           </div>
-          <h1 className="text-[28px] font-bold text-[#1c1c1e]">eSIM 安裝成功</h1>
-          <p className="text-[15px] text-[var(--fg-muted)] mt-1 text-center">已切換至日本出差網路，準備出發！</p>
-          {/* mt-1 @layout-space-magic-ok: intra-heading bundle 4px */}
+          <h1 className={heroTitle}>eSIM 安裝成功</h1>
+          <p className={heroSub}>已切換至日本出差網路，準備出發！</p>
         </div>
 
-        {/* Segmented tab */}
-        <div className={`mx-[${loose}] mb-[${tight}] bg-[rgba(120,120,128,0.12)] rounded-xl p-1 flex`}>
-          {/* p-1 @layout-space-magic-ok: iOS UISegmentedControl track inset = 2px each side (fixed hardware metaphor) */}
+        <div className={isM ? dark.successSegmentTrack : ios.successSegmentTrack}>
           {(['status', 'usage'] as const).map(t => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`flex-1 py-1.5 rounded-lg text-[14px] font-semibold transition-all ${tab === t ? 'bg-white text-[#1c1c1e] shadow-[0_1px_2px_rgba(0,0,0,0.1)]' : 'text-[var(--fg-muted)]'}`}
-              // py-1.5 @layout-space-magic-ok: UISegmentedControl segment vertical = 6px (Apple HIG fixed hardware spec)
-            >
+            <button key={t} onClick={() => setTab(t)} className={isM ? dark.successTabBtn(tab === t) : ios.successTabBtn(tab === t)}>
               {t === 'status' ? 'eSIM 狀態' : '用量追蹤'}
             </button>
           ))}
@@ -1401,74 +1429,72 @@ function SuccessScreen({ plan }: { plan: typeof PLANS[0] }) {
 
         {tab === 'status' ? (
           <>
-            <div className={ios.groupCard}>
+            <div className={d.groupCard}>
               {[
-                { label: '電信商', value: '中華電信', cls: '' },
-                { label: '方案',   value: `${plan.name}・${plan.data}`, cls: '' },
-                { label: '有效期至', value: '2026/06/14 23:59', cls: '' },
-                { label: '狀態',   value: '啟用中', cls: 'text-[var(--success)] font-semibold' },
-              ].map(({ label, value, cls }, i, arr) => (
+                { label: '電信商',  value: '中華電信',                      special: false },
+                { label: '方案',    value: `${plan.name}・${plan.data}`,    special: false },
+                { label: '有效期至',value: '2026/06/14 23:59',              special: false },
+                { label: '狀態',    value: '啟用中',                        special: true  },
+              ].map(({ label, value, special }, i, arr) => (
                 <div key={label}>
-                  <div className={ios.groupRow}>
-                    <p className="text-[15px] text-[#1c1c1e] flex-1">{label}</p>
-                    <p className={`text-[15px] text-[var(--fg-muted)] ${cls}`}>{value}</p>
+                  <div className={d.groupRow}>
+                    <p className={rowLabel}>{label}</p>
+                    <p className={`${rowValue} ${special ? successCls : ''}`}>{value}</p>
                   </div>
-                  {i < arr.length - 1 && <div className={`ml-[${loose}] border-b border-[rgba(0,0,0,0.06)]`} />}
+                  {i < arr.length - 1 && <div className={inlineDivider} />}
                 </div>
               ))}
             </div>
 
-            <p className={ios.sectionLabel}>系統狀態</p>
-            <div className={ios.groupCard}>
+            <p className={d.sectionLabel}>系統狀態</p>
+            <div className={d.groupCard}>
               {[
-                { icon: Signal, label: '訊號強度', value: '優良',   color: 'text-[var(--success)]' },
-                { icon: Wifi,   label: '熱點分享', value: '已開啟', color: 'text-[var(--primary)]' },
-                { icon: Plane,  label: '漫遊模式', value: '出差模式', color: 'text-[var(--fg-muted)]' },
+                { icon: Signal, label: '訊號強度', value: '優良',    color: sysColors.signal },
+                { icon: Wifi,   label: '熱點分享', value: '已開啟',  color: sysColors.wifi   },
+                { icon: Plane,  label: '漫遊模式', value: '出差模式', color: sysColors.plane  },
               ].map(({ icon: Icon, label, value, color }, i, arr) => (
                 <div key={label}>
-                  <div className={ios.groupRow}>
+                  <div className={d.groupRow}>
                     <Icon size={18} className={color} />
-                    <p className="text-[15px] text-[#1c1c1e] flex-1">{label}</p>
+                    <p className={`text-[15px] ${isM ? 'text-white' : 'text-[#1c1c1e]'} flex-1`}>{label}</p>
                     <p className={`text-[14px] font-medium ${color}`}>{value}</p>
                   </div>
-                  {i < arr.length - 1 && <div className={ios.groupDivider} />}
+                  {i < arr.length - 1 && <div className={d.groupDivider} />}
                 </div>
               ))}
             </div>
           </>
         ) : (
           <>
-            <div className={`${ios.card} p-[${loose}] mb-[${tight}]`}>
-              <div className={`flex items-center justify-between mb-3`}>
-                {/* mb-3 @layout-space-magic-ok: title→progress-bar gap = 12px, functional dependency pair */}
-                <p className="text-[15px] font-semibold text-[#1c1c1e]">已使用流量</p>
-                <span className="text-[13px] text-[var(--fg-muted)]">5 GB 總量</span>
+            <div className={usageCardCls}>
+              <div className={isM ? dark.successUsageHeader : ios.successUsageHeader}>
+                <p className={`text-[15px] font-semibold ${isM ? 'text-white' : 'text-[#1c1c1e]'}`}>已使用流量</p>
+                <span className={`text-[13px] ${isM ? 'text-white/40' : 'text-[var(--fg-muted)]'}`}>5 GB 總量</span>
               </div>
-              <div className="h-3 bg-[rgba(120,120,128,0.16)] rounded-full overflow-hidden mb-2">
-                {/* h-3 @layout-space-magic-ok: progress-bar height = 12px fixed visual element; mb-2 = bar→label gap 8px bundled */}
-                <div className="h-full bg-[var(--primary)] rounded-full" style={{ width: '28%' }} />
+              <div className={barBg}>
+                <div className={barFill} style={{ width: '28%' }} />
               </div>
               <div className="flex justify-between text-[13px]">
-                <span className="text-[var(--primary)] font-medium">已用 1.4 GB</span>
-                <span className="text-[var(--fg-muted)]">剩餘 3.6 GB</span>
+                <span className={barUsed}>已用 1.4 GB</span>
+                <span className={barRem}>剩餘 3.6 GB</span>
               </div>
             </div>
 
-            <div className={ios.groupCard}>
+            <div className={d.groupCard}>
               {[
-                { label: '今日用量', sub: '06/10', value: '234 MB' },
-                { label: '昨日用量', sub: '06/09', value: '680 MB' },
-                { label: '預估費用', sub: '月結入帳', value: plan.price },
+                { label: '今日用量', sub: '06/10',   value: '234 MB'    },
+                { label: '昨日用量', sub: '06/09',   value: '680 MB'    },
+                { label: '預估費用', sub: '月結入帳', value: plan.price  },
               ].map(({ label, sub, value }, i, arr) => (
                 <div key={label}>
-                  <div className={ios.groupRow}>
+                  <div className={d.groupRow}>
                     <div className="flex-1">
-                      <p className="text-[15px] text-[#1c1c1e]">{label}</p>
-                      <p className="text-[13px] text-[var(--fg-muted)]">{sub}</p>
+                      <p className={`text-[15px] ${isM ? 'text-white' : 'text-[#1c1c1e]'}`}>{label}</p>
+                      <p className={isM ? dark.rowSub : 'text-[13px] text-[var(--fg-muted)]'}>{sub}</p>
                     </div>
-                    <p className="text-[15px] font-semibold text-[#1c1c1e]">{value}</p>
+                    <p className={`text-[15px] font-semibold ${isM ? 'text-white' : 'text-[#1c1c1e]'}`}>{value}</p>
                   </div>
-                  {i < arr.length - 1 && <div className={`ml-[${loose}] border-b border-[rgba(0,0,0,0.06)]`} />}
+                  {i < arr.length - 1 && <div className={inlineDivider} />}
                 </div>
               ))}
             </div>
@@ -1477,10 +1503,9 @@ function SuccessScreen({ plan }: { plan: typeof PLANS[0] }) {
         <div className="h-8" />{/* @layout-space-magic-ok: scroll-bottom spacer */}
       </div>
 
-      <div className={`px-[${loose}] pb-[${bottom}] pt-3 flex-shrink-0 flex flex-col gap-2`}>
-        {/* gap-2 @layout-space-magic-ok: stacked CTA buttons = 8px bundled footer sibling group */}
-        <button className={ios.primaryBtn}><BarChart2 size={18} />查看差旅費用報表</button>
-        <button className={ios.secondaryBtn}><X size={18} />停用 eSIM（回台後）</button>
+      <div className={isM ? dark.successFooter : ios.successFooter}>
+        <button className={isM ? dark.loginBtn : ios.primaryBtn}><BarChart2 size={18} />查看差旅費用報表</button>
+        <button className={isM ? dark.secondaryBtn : ios.secondaryBtn}><X size={18} />停用 eSIM（回台後）</button>
       </div>
     </div>
   )
@@ -1502,10 +1527,10 @@ export function EsimApp() {
   const isOnboarding = screen === 'login' || screen === 'checking'
 
   const activateFlow: Record<string, React.ReactNode> = {
-    travel:  <TravelInfoScreen onNext={() => setScreen('plan')}    onBack={() => setScreen('checking')} />,
-    plan:    <PlanScreen       onNext={p => { setPlan(p); setScreen('install') }} onBack={() => setScreen('travel')} />,
-    install: <InstallScreen    plan={plan} onNext={() => { setScreen('success'); setTab('esim') }} onBack={() => setScreen('plan')} />,
-    success: <SuccessScreen    plan={plan} />,
+    travel:  <TravelInfoScreen onNext={() => setScreen('plan')}    onBack={() => setScreen('checking')} theme={theme} />,
+    plan:    <PlanScreen       onNext={p => { setPlan(p); setScreen('install') }} onBack={() => setScreen('travel')} theme={theme} />,
+    install: <InstallScreen    plan={plan} onNext={() => { setScreen('success'); setTab('esim') }} onBack={() => setScreen('plan')} theme={theme} />,
+    success: <SuccessScreen    plan={plan} theme={theme} />,
   }
 
   function ActivateHome() {
@@ -1545,9 +1570,9 @@ export function EsimApp() {
   const tabContent: Record<Tab, React.ReactNode> = {
     home:     <DashboardTab onGoActivate={goActivate} theme={theme} />,
     activate: activateFlow[screen] ?? <ActivateHome />,
-    esim:     <MyEsimTab />,
-    usage:    <UsageTab />,
-    settings: <SettingsTab />,
+    esim:     <MyEsimTab theme={theme} />,
+    usage:    <UsageTab theme={theme} />,
+    settings: <SettingsTab theme={theme} />,
   }
 
   // Frame border changes by theme
@@ -1594,7 +1619,7 @@ export function EsimApp() {
         {isOnboarding ? (
           screen === 'login'
             ? <LoginScreen    onNext={() => setScreen('checking')} theme={theme} />
-            : <CheckingScreen onNext={() => { setScreen('travel'); setTab('home') }} />
+            : <CheckingScreen onNext={() => { setScreen('travel'); setTab('home') }} theme={theme} />
         ) : (
           <div className={`flex flex-col flex-1 overflow-hidden ${isModern ? dark.screenBg : ''}`}>
             <div className="flex-1 overflow-hidden">
