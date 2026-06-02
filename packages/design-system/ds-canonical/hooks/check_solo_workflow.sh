@@ -217,6 +217,34 @@ EOF
       exit 2
     fi
   fi
+
+  # === Rule 4 (Bash): push tag without release:preflight pass-marker (M28 release root-cause, 2026-06-02) ===
+  # beta.43/45 連環 push 失敗根因 = 發版前靠手動記得逐道 sync/check → 必漏。已修成單一
+  # `npm run release:preflight`(syncs + 全 gate + dogfood,全過寫 HEAD-bound marker)。
+  # 此 R4 機械強制:任何 push tag(v*)前 marker 必存在且 .head == 當前 HEAD,否則 BLOCK。
+  if echo "$COMMAND" | grep -qE 'git[[:space:]]+push' \
+     && echo "$COMMAND" | grep -qE 'git[[:space:]]+push.*([[:space:]:]v[0-9]|--tags|refs/tags/)'; then
+    PF_MARKER="$PROJECT_DIR/.claude/logs/release-preflight-pass.json"
+    PF_HEAD=$(git -C "$PROJECT_DIR" rev-parse HEAD 2>/dev/null)
+    PF_MARKER_HEAD=$(jq -r '.head // empty' "$PF_MARKER" 2>/dev/null)
+    if [ ! -f "$PF_MARKER" ] || [ "$PF_MARKER_HEAD" != "$PF_HEAD" ]; then
+      cat >&2 <<EOF
+
+┄┄┄ check_solo_workflow — R4 BLOCKER (M28 release preflight) ┄┄┄
+
+[P0 BLOCKER] git push <tag> 但 release:preflight 未跑過(或跑後 HEAD 已變)。
+   marker.head=${PF_MARKER_HEAD:0:12} vs 當前 HEAD=${PF_HEAD:0:12}
+
+❌ 發版前必跑單一指令(自動 sync version 5-manifest + ds-canonical + 全 deterministic
+   gate + build + dogfood,fail-fast,全過寫 HEAD-bound pass-marker):
+     npm run release:preflight
+   全過才准 push tag。根治 beta.43/45 連環 push 失敗(漏手動 sync 步驟)。
+
+例外 override:CLAUDE_BYPASS_SOLO_WORKFLOW=1 (audit logged)
+EOF
+      exit 2
+    fi
+  fi
 fi
 
 # === Rule 2 (MCP): create_pull_request ===
