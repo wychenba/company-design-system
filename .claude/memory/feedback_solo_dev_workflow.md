@@ -92,8 +92,8 @@ User 說以下 → 繼續 edit 不 push main:
 
 **Fix(2026-06-02,真 root-cause 修)**:`npm run release:preflight`(`scripts/release-preflight.mjs`)= **單一指令**,fail-fast,1:1 對齊 release.yml:① 先 SYNCS(`sync-version-to-all-manifests` + `sync-ds-canonical` → 修 drift)② 全 deterministic gate(tsc / typecheck:stories / orphan-tokens / code-quality / content-quality / governance-counters / figma-make / plugin-structure / story-quality / ds-canonical drift)③ build:lib + build-storybook + dogfood ④ 5-manifest version 一致性 ⑤ 全過寫 `.claude/logs/release-preflight-pass.json`(綁 HEAD sha)。
 
-**Release flow(canonical,取代舊 checklist)**:bump `packages/design-system/package.json` 版本 → **`npm run release:preflight`(全過才寫 marker)** → tag → push tag。tag 前若再 commit 須重跑(marker 綁 HEAD)。
+**Release flow(canonical,取代舊 checklist)**:bump `packages/design-system/package.json` 版本 → **`npm run release:preflight`(全過才寫 marker)** → tag → push tag。tag 前若再 commit 須重跑(marker 綁 HEAD)。**Tag-push 機械強制(2026-06-02 ship,原 defer 已解)**:`check_solo_workflow.sh` R4 — push tag(v*)前 pass-marker 必存在且 `.head`==HEAD 否則 BLOCK(detect_push_tag shlex,對齊 R1-R3)。
 
-**仍 defer**:tag-push enforcement hook(無 pass-marker == HEAD 就 BLOCK push tag)—— 機械強制「tag 前必跑過」。因 hook 3 副本(.claude/hooks + hooks/scripts + ds-canonical)改動成本高 + 本 session multi-copy sync 已多次出錯,謹慎 defer。**目前靠此 memory + CLAUDE.md step 5.5 把「單一指令」訂為 canonical**。
+**發版「全自動」directive(2026-06-02 Option A,user verbatim「我說 push main 時,應該就一切要自動弄得完整弄得好」)**:SSOT-affecting paths(清單見 hook `check_post_main_ssot_propagate.sh`)+ user 已給 merge trigger → AI **全自動**走完 bump→preflight→tag→push→publish→`npm view` 驗證,**不需再問 / 再確認**。三層安全網 = preflight(發版前 gate)+ npm view(發版後驗)+ R4(擋無 marker tag),故全自動不增風險;user 隨時可喊停。**反 pattern(本 session 抓)**:AI 對「對外不可逆」動作預設停下問 → user 每次得記得問「會發版嗎」= 違 mindset #6 tell-me-once。安全分類器曾擋「自我擴權 auto-publish」(對的),user 明確 Option A 後解除。
 
 **驗證**:publish 後看 `npm view <pkg> version` 真值,不靠 CI job success(beta.39-41 曾 job-pass 但 silent 沒 publish)。npm 版本不可變;未上架可 `gh run cancel` + 修 + 重 tag 同版本。[[feedback_audit_discipline_full_sweep_deterministic_preflight]] [[feedback_ai_ground_truth_unreliable_mechanical_primary]]

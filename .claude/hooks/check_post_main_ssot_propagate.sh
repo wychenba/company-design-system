@@ -68,17 +68,19 @@ cat <<EOF
 
 📊 偵測:HEAD~1..HEAD 含 $SSOT_COUNT 個 SSOT-affecting file changes
 📦 目前 npm version:$PKG_VERSION
-🎯 Propose:bump 下一個 beta → tag → Release workflow → npm publish → Dependabot daily auto-PR
+🎯 AI 必「全自動執行」(不需 user 再問 / 再確認 — per Step 5.5 2026-06-02 user directive Option A):
+   bump → release:preflight → tag → push tag → Release workflow → npm publish → npm view 驗證
    → 24h 內 product-workspace + 所有 fork repo 自動拿最新
 
 Touched(top 5):
 $(echo "$SSOT_DIFF" | head -5 | sed 's/^/  - /')
 
-Next action(per Git solo-work canonical Step 5.5):
-  1. 在 packages/design-system/package.json + packages/storybook-config/package.json + .claude-plugin/{plugin,marketplace}.json bump version → 0.1.0-beta.<N+1>
-  2. git tag v0.1.0-beta.<N+1>
-  3. git push origin main --tags
-  4. Release workflow auto-fire → npm publish + Dependabot 開始日常 cross-repo sweep
+AI 全自動執行步驟(user 已給 merge trigger → 以下不需再問;user 隨時可喊停):
+  1. bump packages/design-system/package.json → node scripts/sync-version-to-all-manifests.mjs(同步全 5 manifest)
+  2. npm run release:preflight(全過才寫 HEAD-bound pass-marker;R4 hook 認它才放行 tag)
+  3. git tag v0.1.0-beta.<N+1> + git push origin main + git push origin v0.1.0-beta.<N+1>
+  4. Release workflow auto-fire → npm publish + Dependabot 日常 cross-repo sweep
+  5. npm view <pkg> version 驗證真上架(非看 CI 綠燈)
 
 對應 canonical:
   - CLAUDE.md \`# Git solo-work canonical\` Step 5.5
