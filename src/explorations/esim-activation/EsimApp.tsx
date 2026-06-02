@@ -149,6 +149,9 @@ const ios = {
   progressBar:     `h-3 bg-[rgba(120,120,128,0.16)] rounded-full overflow-hidden mb-2`, // @layout-space-magic-ok: h-3=12px progress-bar fixed visual element (iOS UIProgressView height); mb-2=8px bar→label gap bundled indicator element
   activateHeroTitle: `text-[17px] font-semibold text-[#1c1c1e] mb-1`, // @layout-space-magic-ok: mb-1=4px intra-heading bundle (title→subtitle, same semantic unit, tighter than tight)
   devDots: `flex gap-1.5`, // @layout-space-magic-ok: gap-1.5=6px iOS page-indicator dot cluster — fixed motif per Apple HIG UIPageControl (not consumer layout region)
+  statusIcons: `flex items-center gap-1.5`, // @layout-space-magic-ok: gap-1.5=6px status-bar icon cluster — system chrome fixed motif (not consumer layout region)
+  devControls: `flex flex-col items-center gap-2`, // @layout-space-magic-ok: gap-2=8px toggle→dots dev-controls cluster — external dev UI, not consumer layout region
+  themeToggleTrack: (isModern: boolean) => `flex rounded-full p-0.5 ${isModern ? 'bg-white/10' : 'bg-black/10'}`, // @layout-space-magic-ok: p-0.5=2px toggle-track inset — fixed pill-control hardware metaphor (UISegmentedControl track)
 
   // ── Dashboard hero card (active plan banner) ──
   dashHero:
@@ -167,21 +170,112 @@ const ios = {
 }
 
 // ─────────────────────────────────────────────
+// Theme type + Modern (dark) style constants
+// Inspired by consumer telecom apps (Firsty / Circles / Airalo):
+// deep-navy bg + lime accent #c8f135 + glassmorphism cards
+// ─────────────────────────────────────────────
+export type Theme = 'corporate' | 'modern'
+
+const dark = {
+  // ── Outer shell ──
+  outerBg: 'bg-[#0a0f1e]',
+  frameBorder: 'border-[#2a2a3e]',
+
+  // ── Frame inner bg ──
+  screenBg: 'bg-[#0d1229]',
+
+  // ── Status bar (dark glass) ──
+  statusBar:
+    `flex items-center justify-between px-7 pt-3 pb-1 bg-transparent flex-shrink-0`, // @layout-space-magic-ok: same hardware dims as ios.statusBar; dark variant = transparent bg
+
+  // ── Tab bar (dark glassmorphism) ──
+  tabBar:
+    'flex-shrink-0 bg-[rgba(13,18,41,0.92)] border-t border-white/[0.08] backdrop-blur-sm' +
+    ' flex items-end px-2 pt-2 pb-6', // @layout-space-magic-ok: same hardware dims as ios.tabBar
+  tabItem: (active: boolean) =>
+    `flex-1 flex flex-col items-center gap-0.5 ${active ? 'text-[#c8f135]' : 'text-white/40'}`, // @layout-space-magic-ok: same gap-0.5 bundled tab-item as ios.tabItem
+
+  // ── Greeting bar ──
+  greetSub:  'text-[13px] text-white/50', // @layout-space-magic-ok: iOS caption1
+  greetName: 'text-[28px] font-bold text-white leading-tight', // @layout-space-magic-ok: iOS title3
+  avatarRing: 'w-[40px] h-[40px] rounded-full bg-[#c8f135]/20 flex items-center justify-center border border-[#c8f135]/30',
+  // @layout-space-magic-ok: avatar 40px fixed element per Apple HIG navigation avatar size
+
+  // ── Hero card (gradient) ──
+  heroCard:
+    `mx-[${loose}] rounded-3xl p-[${loose}] overflow-hidden relative` +
+    ' bg-gradient-to-br from-[#1a3a6e] via-[#0f2654] to-[#0d1229]' +
+    ' border border-white/[0.08]',
+  heroBadge:
+    `inline-flex items-center gap-1 bg-[#c8f135]/20 border border-[#c8f135]/40 rounded-full px-2 py-0.5 mb-2`, // @layout-space-magic-ok: same micro-element dims as ios.dashActiveBadge
+  heroBigNum:
+    'text-[52px] font-black text-white leading-none tracking-tight', // @layout-space-magic-ok: hero big-number display — fixed typographic motif (Firsty-style dominant metric)
+  heroUnit:
+    'text-[22px] font-bold text-white/60 ml-1', // @layout-space-magic-ok: iOS title2; ml-1=4px unit suffix optical nudge, intra-heading bundle
+  heroSub:
+    `text-[13px] text-white/50 mt-0.5`, // @layout-space-magic-ok: mt-0.5=2px optical gap, intra-hero bundle; iOS caption1
+  heroProgressLabel:
+    `flex justify-between text-[12px] text-white/50 mb-1`, // @layout-space-magic-ok: same dims as ios.dashProgressLabel
+  heroCta:
+    `w-full h-[48px] rounded-2xl bg-[#c8f135] text-[#0d1229] font-bold text-[15px]` +
+    ` flex items-center justify-center gap-[${tight}] active:opacity-90 transition-opacity mt-[${tight}]`,
+    // @layout-space-magic-ok: h-[48px] = compact CTA; mt-tight = 12px card-content→CTA functional dependency
+
+  // ── Stat tiles ──
+  statCard:
+    `flex-1 rounded-2xl p-[${tight}] flex flex-col gap-1 bg-white/[0.06] border border-white/[0.08]`, // @layout-space-magic-ok: gap-1=4px bundled stat atom (same as ios.dashStatCard)
+  statLabel: 'text-[11px] font-medium text-white/50 uppercase tracking-wide', // @layout-space-magic-ok: iOS caption2
+  statValue: 'text-[20px] font-bold text-white', // @layout-space-magic-ok: iOS title3 stat value
+  statSub:   'text-[11px] text-white/40', // @layout-space-magic-ok: iOS caption2
+
+  // ── Section header ──
+  sectionLabel:
+    `px-[${loose}] pb-1.5 pt-5 text-[13px] font-medium text-white/40 uppercase tracking-wide`, // @layout-space-magic-ok: same dims as ios.sectionLabel
+
+  // ── Glass card + row ──
+  groupCard:
+    `mx-[${loose}] rounded-2xl overflow-hidden bg-white/[0.06] border border-white/[0.08]`,
+  groupRow:
+    `flex items-center px-[${loose}] py-3.5 gap-[${tight}]`, // @layout-space-magic-ok: same 44px tap-target dims as ios.groupRow
+  groupDivider:
+    `ml-14 border-b border-white/[0.06]`, // @layout-space-magic-ok: same ml-14 inset separator as ios.groupDivider
+
+  // ── Row text ──
+  rowTitle: 'text-[15px] font-medium text-white',
+  rowSub:   'text-[13px] text-white/50', // @layout-space-magic-ok: iOS caption1
+  rowMeta:  'text-[12px] font-semibold text-[#c8f135]', // @layout-space-magic-ok: iOS footnote inline status
+
+  // ── Icon tile ──
+  iconTile:
+    `w-8 h-8 rounded-lg flex items-center justify-center bg-white/[0.1]`, // @layout-space-magic-ok: 32px iOS list icon grid spec
+
+  // ── Login CTA ──
+  loginBtn:
+    `w-full h-[54px] rounded-2xl bg-[#c8f135] text-[#0d1229] font-bold` +
+    ` text-[17px] flex items-center justify-center gap-[${tight}] active:opacity-90 transition-opacity`,
+    // @layout-space-magic-ok: same iOS prominent button spec as ios.primaryBtn
+  loginSubtitle: `text-[15px] text-white/50 mt-1`, // @layout-space-magic-ok: mt-1=4px title→subtitle intra-heading bundle (tighter than tight, same semantic unit)
+  loginFooter: `px-[${loose}] pb-[${bottom}] pt-[${tight}] flex flex-col gap-3`, // @layout-space-magic-ok: gap-3=12px CTA→footnote bundled footer pair (functional dependency, not cross-region layout)
+}
+
+// ─────────────────────────────────────────────
 // Sub-components
 // ─────────────────────────────────────────────
 
-function StatusBar() {
+function StatusBar({ theme = 'corporate' }: { theme?: Theme }) {
+  const fg = theme === 'modern' ? 'text-white' : 'text-[#1c1c1e]'
+  const islandBg = theme === 'modern' ? 'bg-white/20' : 'bg-[#1c1c1e]'
+  const barCls = theme === 'modern' ? dark.statusBar : ios.statusBar
   return (
-    <div className={ios.statusBar}>
-      <span className="text-[15px] font-semibold text-[#1c1c1e]">9:41</span>
+    <div className={barCls}>
+      <span className={`text-[15px] font-semibold ${fg}`}>9:41</span>
       {/* @layout-space-magic-ok: text-[15px] = iOS subheadline; status bar = system chrome */}
-      <div className="w-[120px] h-[34px] bg-[#1c1c1e] rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-2" />
+      <div className={`w-[120px] h-[34px] ${islandBg} rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-2`} />
       {/* @layout-space-magic-ok: Dynamic Island = 120×34px hardware dims; top-2 = fixed system position */}
-      <div className="flex items-center gap-1.5">
-        {/* gap-1.5 @layout-space-magic-ok: status-bar icon cluster = 6px system chrome, not layout region */}
-        <Signal size={16} className="text-[#1c1c1e]" />
-        <Wifi   size={15} className="text-[#1c1c1e]" />
-        <div className="w-[25px] h-[12px] rounded-sm border-[1.5px] border-[#1c1c1e] relative flex items-center px-[1.5px]">
+      <div className={ios.statusIcons}>
+        <Signal size={16} className={fg} />
+        <Wifi   size={15} className={fg} />
+        <div className={`w-[25px] h-[12px] rounded-sm border-[1.5px] ${theme === 'modern' ? 'border-white/60' : 'border-[#1c1c1e]'} relative flex items-center px-[1.5px]`}>
           {/* @layout-space-magic-ok: battery icon = 25×12px Apple HIG status-bar spec; px-[1.5px] = battery fill inset */}
           <div className="h-[7px] w-[16px] bg-[#34c759] rounded-sm" />
           {/* @layout-space-magic-ok: battery fill dimensions (fixed hardware metaphor) */}
@@ -222,11 +316,12 @@ const TAB_ITEMS: { id: Tab; label: string; Icon: LucideIcon }[] = [
   { id: 'settings', label: '設定',      Icon: Settings },
 ]
 
-function BottomTabBar({ tab, onTabChange }: { tab: Tab; onTabChange: (t: Tab) => void }) {
+function BottomTabBar({ tab, onTabChange, theme = 'corporate' }: { tab: Tab; onTabChange: (t: Tab) => void; theme?: Theme }) {
+  const t = theme === 'modern' ? dark : ios
   return (
-    <div className={ios.tabBar}>
+    <div className={t.tabBar}>
       {TAB_ITEMS.map(({ id, label, Icon }) => (
-        <button key={id} className={ios.tabItem(tab === id)} onClick={() => onTabChange(id)} aria-label={label}>
+        <button key={id} className={t.tabItem(tab === id)} onClick={() => onTabChange(id)} aria-label={label}>
           <Icon size={24} />
           <span className={ios.tabLabel}>{label}</span>
         </button>
@@ -238,11 +333,130 @@ function BottomTabBar({ tab, onTabChange }: { tab: Tab; onTabChange: (t: Tab) =>
 // ─────────────────────────────────────────────
 // Dashboard (首頁)
 // ─────────────────────────────────────────────
-function DashboardTab({ onGoActivate }: { onGoActivate: () => void }) {
+function DashboardTab({ onGoActivate, theme = 'corporate' }: { onGoActivate: () => void; theme?: Theme }) {
+  const isModern = theme === 'modern'
+
+  if (isModern) return (
+    <div className={`flex flex-col h-full ${dark.screenBg}`}>
+      {/* Greeting */}
+      <div className={`flex items-center justify-between px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
+        <div>
+          <p className={dark.greetSub}>早安，</p>
+          <h1 className={dark.greetName}>王大明</h1>
+        </div>
+        <div className={dark.avatarRing}>
+          <User size={20} className="text-[#c8f135]" />
+        </div>
+      </div>
+
+      <div className={ios.screen}>
+        {/* Hero — big data number + progress + CTA */}
+        <div className={dark.heroCard}>
+          <div className="absolute -right-6 -top-6 w-[140px] h-[140px] rounded-full bg-[#c8f135]/[0.05] pointer-events-none" />
+          {/* @layout-space-magic-ok: 140px decorative motif (fixed visual element) */}
+
+          <div className={dark.heroBadge}>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#c8f135]" />
+            {/* @layout-space-magic-ok: w-1.5/h-1.5=6px status dot fixed indicator motif */}
+            <span className="text-[11px] font-semibold text-[#c8f135]">啟用中</span>
+            {/* text-[11px] @layout-space-magic-ok: iOS caption2 */}
+          </div>
+
+          <div className="flex items-end justify-between relative z-10">
+            <div>
+              <div className="flex items-baseline">
+                <span className={dark.heroBigNum}>3.6</span>
+                <span className={dark.heroUnit}>GB 剩餘</span>
+              </div>
+              <p className={dark.heroSub}>推薦方案・日本・到期 06/14</p>
+            </div>
+            <div className={dark.iconTile}>
+              <Globe size={16} className="text-[#c8f135]" />
+            </div>
+          </div>
+
+          <div className={`mt-[${tight}]`}>
+            <div className={dark.heroProgressLabel}>
+              <span>已用 1.4 GB</span><span>共 5 GB</span>
+            </div>
+            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+              {/* h-2 @layout-space-magic-ok: 8px hero progress bar fixed visual motif */}
+              <div className="h-full bg-[#c8f135] rounded-full" style={{ width: '28%' }} />
+            </div>
+          </div>
+
+          <button className={dark.heroCta} onClick={onGoActivate}>
+            <Plane size={18} />管理方案
+          </button>
+        </div>
+
+        {/* Stat tiles */}
+        <div className={`flex gap-[${tight}] px-[${loose}] mt-[${tight}]`}>
+          <div className={dark.statCard}>
+            <p className={dark.statLabel}>今日用量</p>
+            <p className={dark.statValue}>234 MB</p>
+            <div className={`${ios.iconTextPair} text-[#c8f135] text-[11px] font-medium`}>
+              <TrendingUp size={12} />正常
+            </div>
+          </div>
+          <div className={dark.statCard}>
+            <p className={dark.statLabel}>本月費用</p>
+            <p className={dark.statValue}>NT$680</p>
+            <p className={dark.statSub}>月結入帳</p>
+          </div>
+        </div>
+
+        {/* Active devices */}
+        <p className={dark.sectionLabel}>啟用中的裝置</p>
+        <div className={dark.groupCard}>
+          {[
+            { name: 'iPhone 16 Pro', sub: 'iOS 18.3.2・主要裝置', active: true },
+            { name: 'iPad Pro 13"',  sub: 'iPadOS 18.3・已配置',  active: true },
+          ].map(({ name, sub, active }, i, arr) => (
+            <div key={name}>
+              <div className={dark.groupRow}>
+                <div className={dark.iconTile}><Smartphone size={16} className="text-[#c8f135]" /></div>
+                <div className="flex-1">
+                  <p className={dark.rowTitle}>{name}</p>
+                  <p className={dark.rowSub}>{sub}</p>
+                </div>
+                {active && <span className={dark.rowMeta}>● 線上</span>}
+              </div>
+              {i < arr.length - 1 && <div className={dark.groupDivider} />}
+            </div>
+          ))}
+        </div>
+
+        {/* Upcoming trips */}
+        <p className={dark.sectionLabel}>近期出差</p>
+        <div className={dark.groupCard}>
+          <div className={dark.groupRow}>
+            <div className={dark.iconTile}><MapPin size={16} className="text-[#c8f135]" /></div>
+            <div className="flex-1">
+              <p className={dark.rowTitle}>日本・東京</p>
+              <p className={dark.rowSub}>2026/06/10 — 06/14・商務會議</p>
+            </div>
+            <span className={dark.rowMeta}>進行中</span>
+          </div>
+          <div className={dark.groupDivider} />
+          <div className={dark.groupRow}>
+            <div className={dark.iconTile}><MapPin size={16} className="text-white/40" /></div>
+            <div className="flex-1">
+              <p className={dark.rowTitle}>美國・紐約</p>
+              <p className={dark.rowSub}>2026/07/02 — 07/06・客戶拜訪</p>
+            </div>
+            <button className="text-[13px] font-semibold text-[#c8f135]" onClick={onGoActivate}>申請</button>
+          </div>
+        </div>
+
+        <div className="h-8" />{/* @layout-space-magic-ok: scroll-bottom spacer */}
+      </div>
+    </div>
+  )
+
+  // ── Corporate theme (original) ──
   return (
     <div className="flex flex-col h-full bg-[#f2f2f7]">
-
-      {/* Greeting bar */}
       <div className={`flex items-center justify-between px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
         <div>
           <p className="text-[13px] text-[var(--fg-muted)]">早安，</p>
@@ -257,20 +471,16 @@ function DashboardTab({ onGoActivate }: { onGoActivate: () => void }) {
       </div>
 
       <div className={ios.screen}>
-
-        {/* ── Active Plan Hero Card ── */}
         <div className={ios.dashHero}>
-          {/* decorative circle — fixed brand motif */}
           <div className="absolute -right-8 -top-8 w-[120px] h-[120px] rounded-full bg-white/10 pointer-events-none" />
-          {/* @layout-space-magic-ok: 120px decorative motif (fixed visual element, not layout region) */}
+          {/* @layout-space-magic-ok: 120px decorative motif */}
           <div className="absolute -right-2 top-12 w-[80px] h-[80px] rounded-full bg-white/[0.07] pointer-events-none" />
-          {/* @layout-space-magic-ok: 80px decorative motif (fixed visual element) */}
-
+          {/* @layout-space-magic-ok: 80px decorative motif */}
           <div className="flex items-start justify-between relative z-10">
             <div>
               <div className={ios.dashActiveBadge}>
                 <div className="w-1.5 h-1.5 rounded-full bg-[#34c759]" />
-                {/* @layout-space-magic-ok: w-1.5/h-1.5=6px status dot — fixed indicator motif */}
+                {/* @layout-space-magic-ok: 6px status dot fixed indicator motif */}
                 <span className="text-[11px] font-semibold text-white">啟用中</span>
                 {/* text-[11px] @layout-space-magic-ok: iOS caption2 */}
               </div>
@@ -278,33 +488,24 @@ function DashboardTab({ onGoActivate }: { onGoActivate: () => void }) {
               {/* text-[22px] @layout-space-magic-ok: iOS title2 */}
               <p className={ios.dashHeroSub}>中華電信・5 GB・到期 2026/06/14</p>
             </div>
-            <div className={`${ios.iconTile} ${ios.dashHeroIconTile}`}>
-              <Globe size={16} className="text-white" />
-            </div>
+            <div className={`${ios.iconTile} ${ios.dashHeroIconTile}`}><Globe size={16} className="text-white" /></div>
           </div>
-
-          {/* Progress bar */}
           <div className={`mt-[${tight}]`}>
-            <div className={ios.dashProgressLabel}>
-              <span>已用 1.4 GB</span><span>剩餘 3.6 GB</span>
-            </div>
+            <div className={ios.dashProgressLabel}><span>已用 1.4 GB</span><span>剩餘 3.6 GB</span></div>
             <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-              {/* h-2 @layout-space-magic-ok: 8px progress bar in hero context — fixed visual motif (not UIProgressView; hero variant uses thinner bar) */}
+              {/* h-2 @layout-space-magic-ok: 8px hero progress bar fixed visual motif */}
               <div className="h-full bg-white rounded-full" style={{ width: '28%' }} />
             </div>
           </div>
         </div>
 
-        {/* ── 4 stat tiles ── */}
         <div className={`flex gap-[${tight}] px-[${loose}] mt-[${tight}]`}>
           <div className={ios.dashStatCard}>
             <p className="text-[11px] font-medium text-[var(--fg-muted)] uppercase tracking-wide">今日用量</p>
             {/* text-[11px] @layout-space-magic-ok: iOS caption2 stat label */}
             <p className="text-[20px] font-bold text-[#1c1c1e]">234 MB</p>
             {/* text-[20px] @layout-space-magic-ok: iOS title3 stat value */}
-            <div className={`${ios.iconTextPair} text-[var(--success)] text-[11px] font-medium`}>
-              <TrendingUp size={12} />正常
-            </div>
+            <div className={`${ios.iconTextPair} text-[var(--success)] text-[11px] font-medium`}><TrendingUp size={12} />正常</div>
           </div>
           <div className={ios.dashStatCard}>
             <p className="text-[11px] font-medium text-[var(--fg-muted)] uppercase tracking-wide">本月費用</p>
@@ -313,17 +514,16 @@ function DashboardTab({ onGoActivate }: { onGoActivate: () => void }) {
           </div>
         </div>
 
-        {/* ── Active devices ── */}
         <p className={ios.sectionLabel}>啟用中的裝置</p>
         <div className={ios.groupCard}>
           {[
-            { name: 'iPhone 16 Pro',  sub: 'iOS 18.3.2・主要裝置',  icon: Smartphone, active: true },
-            { name: 'iPad Pro 13"',   sub: 'iPadOS 18.3・已配置',   icon: Smartphone, active: true },
-          ].map(({ name, sub, icon: Icon, active }, i, arr) => (
+            { name: 'iPhone 16 Pro', sub: 'iOS 18.3.2・主要裝置', active: true },
+            { name: 'iPad Pro 13"',  sub: 'iPadOS 18.3・已配置',  active: true },
+          ].map(({ name, sub, active }, i, arr) => (
             <div key={name}>
               <div className={ios.groupRow}>
                 <div className={`${ios.iconTile} ${active ? 'bg-[var(--primary-subtle)]' : 'bg-[rgba(120,120,128,0.1)]'}`}>
-                  <Icon size={16} className={active ? 'text-[var(--primary)]' : 'text-[var(--fg-muted)]'} />
+                  <Smartphone size={16} className={active ? 'text-[var(--primary)]' : 'text-[var(--fg-muted)]'} />
                 </div>
                 <div className="flex-1">
                   <p className="text-[15px] font-medium text-[#1c1c1e]">{name}</p>
@@ -337,34 +537,25 @@ function DashboardTab({ onGoActivate }: { onGoActivate: () => void }) {
           ))}
         </div>
 
-        {/* ── Upcoming trip ── */}
         <p className={ios.sectionLabel}>近期出差</p>
         <div className={ios.groupCard}>
           <div className={ios.groupRow}>
-            <div className={`${ios.iconTile} bg-[var(--warning-subtle)]`}>
-              <MapPin size={16} className="text-[#c47400]" />
-            </div>
+            <div className={`${ios.iconTile} bg-[var(--warning-subtle)]`}><MapPin size={16} className="text-[#c47400]" /></div>
             <div className="flex-1">
               <p className="text-[15px] font-medium text-[#1c1c1e]">日本・東京</p>
               <p className="text-[13px] text-[var(--fg-muted)]">2026/06/10 — 06/14・商務會議</p>
             </div>
-            <span className={`text-[12px] font-semibold text-[var(--primary)]`}>進行中</span>
+            <span className="text-[12px] font-semibold text-[var(--primary)]">進行中</span>
+            {/* text-[12px] @layout-space-magic-ok: iOS footnote inline status */}
           </div>
           <div className={ios.groupDivider} />
           <div className={ios.groupRow}>
-            <div className={`${ios.iconTile} bg-[rgba(120,120,128,0.1)]`}>
-              <MapPin size={16} className="text-[var(--fg-muted)]" />
-            </div>
+            <div className={`${ios.iconTile} bg-[rgba(120,120,128,0.1)]`}><MapPin size={16} className="text-[var(--fg-muted)]" /></div>
             <div className="flex-1">
               <p className="text-[15px] font-medium text-[#1c1c1e]">美國・紐約</p>
               <p className="text-[13px] text-[var(--fg-muted)]">2026/07/02 — 07/06・客戶拜訪</p>
             </div>
-            <button
-              className="text-[13px] font-semibold text-[var(--primary)]"
-              onClick={onGoActivate}
-            >
-              申請
-            </button>
+            <button className="text-[13px] font-semibold text-[var(--primary)]" onClick={onGoActivate}>申請</button>
           </div>
         </div>
 
@@ -513,7 +704,49 @@ function SettingsTab() {
 // ─────────────────────────────────────────────
 // Screen 1: Login
 // ─────────────────────────────────────────────
-function LoginScreen({ onNext }: { onNext: () => void }) {
+function LoginScreen({ onNext, theme = 'corporate' }: { onNext: () => void; theme?: Theme }) {
+  if (theme === 'modern') return (
+    <div className={`flex flex-col h-full ${dark.screenBg}`}>
+      <div className={`flex-1 flex flex-col items-center justify-center px-[${loose}] gap-[${loose}]`}>
+        {/* Logo */}
+        <div className="w-[88px] h-[88px] rounded-[24px] bg-[#c8f135] flex items-center justify-center shadow-[0_8px_32px_rgba(200,241,53,0.3)]">
+          {/* @layout-space-magic-ok: 88px logo tile = fixed brand asset; 24px corner = iOS large icon corner */}
+          <Plane size={44} className="text-[#0d1229]" strokeWidth={1.75} />
+        </div>
+        <div className="text-center">
+          <h1 className="text-[28px] font-black text-white tracking-tight">eSIM 出差開通</h1>
+          {/* text-[28px] @layout-space-magic-ok: iOS title3 */}
+          <p className={dark.loginSubtitle}>快速開通出差國際上網方案</p>
+        </div>
+        <div className={`${dark.groupCard} w-full`}>
+          {[
+            { icon: Shield,    label: '員工身份驗證', sub: '自動連結公司差旅系統' },
+            { icon: Zap,       label: '一鍵自動安裝',  sub: '免手動設定，直接啟用' },
+            { icon: BarChart2, label: '用量即時追蹤', sub: '費用自動入帳月結' },
+          ].map(({ icon: Icon, label, sub }, i, arr) => (
+            <div key={label}>
+              <div className={dark.groupRow}>
+                <div className={dark.iconTile}><Icon size={18} className="text-[#c8f135]" /></div>
+                <div className="flex-1">
+                  <p className={dark.rowTitle}>{label}</p>
+                  <p className={dark.rowSub}>{sub}</p>
+                </div>
+              </div>
+              {i < arr.length - 1 && <div className={dark.groupDivider} />}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className={dark.loginFooter}>
+        <button className={dark.loginBtn} onClick={onNext}>
+          <Building2 size={20} />使用公司帳號登入
+        </button>
+        <p className="text-[13px] text-center text-white/40">使用公司 SSO 單一登入，安全驗證</p>
+        {/* text-[13px] @layout-space-magic-ok: iOS caption1 */}
+      </div>
+    </div>
+  )
+
   return (
     <div className="flex flex-col h-full bg-[#f2f2f7]">
       <div className={`flex-1 flex flex-col items-center justify-center px-[${loose}] gap-[${loose}]`}>
@@ -1107,11 +1340,11 @@ export function EsimApp() {
   const [screen, setScreen] = useState<Screen>('login')
   const [plan,   setPlan]   = useState(PLANS[1])
   const [tab,    setTab]    = useState<Tab>('home')
+  const [theme,  setTheme]  = useState<Theme>('corporate')
 
-  // Onboarding = no tab bar; main app = tab bar visible
+  const isModern     = theme === 'modern'
   const isOnboarding = screen === 'login' || screen === 'checking'
 
-  // Activate tab inner flow
   const activateFlow: Record<string, React.ReactNode> = {
     travel:  <TravelInfoScreen onNext={() => setScreen('plan')}    onBack={() => setScreen('checking')} />,
     plan:    <PlanScreen       onNext={p => { setPlan(p); setScreen('install') }} onBack={() => setScreen('travel')} />,
@@ -1119,23 +1352,30 @@ export function EsimApp() {
     success: <SuccessScreen    plan={plan} />,
   }
 
-  // Activate tab home (before starting flow)
   function ActivateHome() {
     return (
-      <div className="flex flex-col h-full bg-[#f2f2f7]">
+      <div className={`flex flex-col h-full ${isModern ? dark.screenBg : 'bg-[#f2f2f7]'}`}>
         <div className={`px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
-          <h1 className="text-[34px] font-bold text-[#1c1c1e]">出差開通</h1>
+          <h1 className={`text-[34px] font-bold leading-tight ${isModern ? 'text-white' : 'text-[#1c1c1e]'}`}>
+            {/* text-[34px] @layout-space-magic-ok: iOS largeTitle */}
+            出差開通
+          </h1>
         </div>
         <div className={ios.screen}>
           <div className={`flex flex-col items-center py-[${loose}] px-[${loose}]`}>
-            <div className={`${ios.heroCircle} bg-[var(--primary-subtle)] mb-[${tight}]`}>
-              <Plane size={44} className="text-[var(--primary)]" strokeWidth={1.75} />
+            <div className={`${ios.heroCircle} ${isModern ? 'bg-[#c8f135]/10' : 'bg-[var(--primary-subtle)]'} mb-[${tight}]`}>
+              <Plane size={44} className={isModern ? 'text-[#c8f135]' : 'text-[var(--primary)]'} strokeWidth={1.75} />
             </div>
-            <p className={ios.activateHeroTitle}>準備出差了嗎？</p>
-            <p className="text-[15px] text-[var(--fg-muted)] text-center">填寫出差資訊，一鍵開通國際 eSIM</p>
+            <p className={ios.activateHeroTitle} style={{ color: isModern ? '#ffffff' : undefined }}>準備出差了嗎？</p>
+            <p className={`text-[15px] text-center ${isModern ? 'text-white/50' : 'text-[var(--fg-muted)]'}`}>
+              填寫出差資訊，一鍵開通國際 eSIM
+            </p>
           </div>
           <div className={`px-[${loose}]`}>
-            <button className={ios.primaryBtn} onClick={() => setScreen('travel')}>
+            <button
+              className={isModern ? dark.loginBtn : ios.primaryBtn}
+              onClick={() => setScreen('travel')}
+            >
               <Plane size={20} />開始申請 eSIM
             </button>
           </div>
@@ -1147,45 +1387,69 @@ export function EsimApp() {
   const goActivate = () => { setTab('activate'); setScreen('travel') }
 
   const tabContent: Record<Tab, React.ReactNode> = {
-    home:     <DashboardTab onGoActivate={goActivate} />,
+    home:     <DashboardTab onGoActivate={goActivate} theme={theme} />,
     activate: activateFlow[screen] ?? <ActivateHome />,
     esim:     <MyEsimTab />,
     usage:    <UsageTab />,
     settings: <SettingsTab />,
   }
 
+  // Frame border changes by theme
+  const frameCls = ios.frame.replace('border-[#1c1c1e]', isModern ? dark.frameBorder : 'border-[#1c1c1e]')
+
   return (
-    <div className={`flex flex-col items-center gap-[${loose}] py-[${loose}] min-h-screen bg-[#e5e5ea]`}>
-      {/* Step indicator dots (dev navigation) */}
-      <div className={ios.devDots}>
-        {SCREENS.map(s => (
-          <button
-            key={s}
-            onClick={() => setScreen(s)}
-            className={`h-1.5 rounded-full transition-all ${screen === s ? 'w-6 bg-[var(--primary)]' : 'w-1.5 bg-[rgba(0,0,0,0.2)]'}`}
-            // h-1.5/w-1.5/w-6 @layout-space-magic-ok: iOS page-indicator dot = 6px fixed motif per Apple HIG
-            aria-label={s}
-          />
-        ))}
+    <div className={`flex flex-col items-center gap-[${loose}] py-[${loose}] min-h-screen transition-colors duration-500 ${isModern ? dark.outerBg : 'bg-[#e5e5ea]'}`}>
+
+      {/* Theme toggle + dev dots */}
+      <div className={ios.devControls}>
+        {/* Theme toggle pill */}
+        <div className={ios.themeToggleTrack(isModern)}>
+          {(['corporate', 'modern'] as Theme[]).map(t => (
+            <button
+              key={t}
+              onClick={() => setTheme(t)}
+              className={`px-3 py-1 rounded-full text-[12px] font-semibold transition-all ${// @layout-space-magic-ok: px-3/py-1=12px/4px toggle-segment micro-element (UISegmentedControl fixed hardware spec); text-[12px]=iOS footnote
+                theme === t
+                  ? isModern ? 'bg-[#c8f135] text-[#0d1229]' : 'bg-white text-[#1c1c1e] shadow-[0_1px_3px_rgba(0,0,0,0.15)]'
+                  : isModern ? 'text-white/50' : 'text-[rgba(60,60,67,0.5)]'
+              }`}
+            >
+              {t === 'corporate' ? '企業' : '現代'}
+            </button>
+          ))}
+        </div>
+
+        {/* Step indicator dots */}
+        <div className={ios.devDots}>
+          {SCREENS.map(s => (
+            <button
+              key={s}
+              onClick={() => setScreen(s)}
+              className={`h-1.5 rounded-full transition-all ${screen === s ? 'w-6 bg-[var(--primary)]' : `w-1.5 ${isModern ? 'bg-white/20' : 'bg-[rgba(0,0,0,0.2)]'}`}`}
+              // h-1.5/w-1.5/w-6 @layout-space-magic-ok: iOS page-indicator dot = 6px fixed motif per Apple HIG
+              aria-label={s}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className={ios.frame}>
-        <StatusBar />
+      <div className={frameCls}>
+        <StatusBar theme={theme} />
         {isOnboarding ? (
           screen === 'login'
-            ? <LoginScreen    onNext={() => setScreen('checking')} />
+            ? <LoginScreen    onNext={() => setScreen('checking')} theme={theme} />
             : <CheckingScreen onNext={() => { setScreen('travel'); setTab('home') }} />
         ) : (
-          <div className="flex flex-col flex-1 overflow-hidden">
+          <div className={`flex flex-col flex-1 overflow-hidden ${isModern ? dark.screenBg : ''}`}>
             <div className="flex-1 overflow-hidden">
               {tabContent[tab]}
             </div>
-            <BottomTabBar tab={tab} onTabChange={t => { setTab(t) }} />
+            <BottomTabBar tab={tab} onTabChange={t => { setTab(t) }} theme={theme} />
           </div>
         )}
       </div>
 
-      <p className="text-[12px] text-[rgba(0,0,0,0.4)]">點擊頂部圓點快速跳轉畫面</p>
+      <p className={`text-[12px] ${isModern ? 'text-white/30' : 'text-[rgba(0,0,0,0.4)]'}`}>點擊頂部圓點快速跳轉畫面</p>
       {/* text-[12px] @layout-space-magic-ok: iOS footnote hint size */}
     </div>
   )
