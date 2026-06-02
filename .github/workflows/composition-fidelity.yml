@@ -69,6 +69,13 @@ jobs:
         working-directory: design-system
         run: npx playwright install --with-deps chromium
 
+      # 2026-06-02 fix:build-storybook 前必先 build:lib(chain: DS build → DS dts → storybook-config build)。
+      # 漏這步 → storybook-config preview.tsx 的 `import @qijenchen/design-system` tsc 找不到型別 → TS2307,
+      # 此 workflow 整天連紅(不擋發版,但污染 main CI 信號)。對齊 release.yml / ci.yml 已 proven 的 build 順序。
+      - name: Build DS lib(型別宣告 — storybook-config tsc 需 @qijenchen/design-system)
+        working-directory: design-system
+        run: npm run build:lib
+
       - name: Build DS storybook-static
         working-directory: design-system
         run: npm run build-storybook
