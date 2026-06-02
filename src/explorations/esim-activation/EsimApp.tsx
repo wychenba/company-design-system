@@ -8,11 +8,12 @@
  */
 
 import { useState } from 'react'
+import type { LucideIcon } from 'lucide-react'
 import {
   Plane, Shield, Smartphone, ChevronRight, ChevronLeft, Check,
   Wifi, Signal, Globe, CalendarDays, Briefcase, Zap, Phone, X,
   AlertCircle, CheckCircle2, Clock, BarChart2, Download,
-  Building2, User, ScanLine, Loader2,
+  Building2, User, ScanLine, Loader2, Settings,
 } from 'lucide-react'
 
 // ─────────────────────────────────────────────
@@ -134,6 +135,20 @@ const ios = {
     // @layout-space-magic-ok: iOS radio = 20px fixed UI control (not layout spacing)
   radioDot: 'w-2 h-2 rounded-full bg-white',
   // @layout-space-magic-ok: radio inner dot = 8px fixed (bundled with radioOuter control)
+
+  // ── iOS UITabBarController bottom tab bar ──
+  tabBar:
+    'flex-shrink-0 bg-[rgba(242,242,247,0.92)] border-t border-[rgba(0,0,0,0.08)] backdrop-blur-sm' +
+    ' flex items-end px-2 pt-2 pb-6', // @layout-space-magic-ok: px-2=8px tab-bar side inset; pt-2=8px icon-area top; pb-6=24px safe-area for Dynamic Island devices (iOS UITabBarController safe-area)
+  tabItem: (active: boolean) =>
+    `flex-1 flex flex-col items-center gap-0.5 ${active ? 'text-[var(--primary)]' : 'text-[rgba(60,60,67,0.45)]'}`, // @layout-space-magic-ok: gap-0.5=2px icon→label optical nudge within bundled tab-item
+  tabLabel: 'text-[10px] font-medium leading-none', // @layout-space-magic-ok: iOS UITabBarItem label = 10pt (Apple HIG UITabBar fixed typographic scale)
+
+  // ── Usage tab chart section ──
+  usageChartTitle: `text-[15px] font-semibold text-[#1c1c1e] mb-3`, // @layout-space-magic-ok: mb-3=12px title→progress-bar gap, functional dependency pair within usage card bundle
+  progressBar:     `h-3 bg-[rgba(120,120,128,0.16)] rounded-full overflow-hidden mb-2`, // @layout-space-magic-ok: h-3=12px progress-bar fixed visual element (iOS UIProgressView height); mb-2=8px bar→label gap bundled indicator element
+  activateHeroTitle: `text-[17px] font-semibold text-[#1c1c1e] mb-1`, // @layout-space-magic-ok: mb-1=4px intra-heading bundle (title→subtitle, same semantic unit, tighter than tight)
+  devDots: `flex gap-1.5`, // @layout-space-magic-ok: gap-1.5=6px iOS page-indicator dot cluster — fixed motif per Apple HIG UIPageControl (not consumer layout region)
 }
 
 // ─────────────────────────────────────────────
@@ -177,6 +192,167 @@ function PlanBadge({ label, color }: { label: string; color: 'blue' | 'green' | 
     orange: 'bg-[var(--warning-subtle)] text-[#c47400]',
   }[color]
   return <span className={ios.microBadge(cls)}>{label}</span>
+}
+
+// ─────────────────────────────────────────────
+// iOS Bottom Tab Bar (UITabBarController)
+// ─────────────────────────────────────────────
+type Tab = 'activate' | 'esim' | 'usage' | 'settings'
+
+const TAB_ITEMS: { id: Tab; label: string; Icon: LucideIcon }[] = [
+  { id: 'activate', label: '出差開通', Icon: Plane },
+  { id: 'esim',     label: '我的 eSIM', Icon: Smartphone },
+  { id: 'usage',    label: '用量',      Icon: BarChart2 },
+  { id: 'settings', label: '設定',      Icon: Settings },
+]
+
+function BottomTabBar({ tab, onTabChange }: { tab: Tab; onTabChange: (t: Tab) => void }) {
+  return (
+    <div className={ios.tabBar}>
+      {TAB_ITEMS.map(({ id, label, Icon }) => (
+        <button key={id} className={ios.tabItem(tab === id)} onClick={() => onTabChange(id)} aria-label={label}>
+          <Icon size={24} />
+          <span className={ios.tabLabel}>{label}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────
+// Tab placeholder screens
+// ─────────────────────────────────────────────
+function MyEsimTab() {
+  return (
+    <div className="flex flex-col h-full bg-[#f2f2f7]">
+      <div className={`px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
+        <h1 className="text-[34px] font-bold text-[#1c1c1e]">我的 eSIM</h1>
+      </div>
+      <div className={ios.screen}>
+        <div className={ios.groupCard}>
+          {[
+            { label: '日本 出差方案', sub: '啟用中・到期 06/14', color: 'text-[var(--success)]', status: '啟用中' },
+            { label: '美國 商務方案', sub: '已停用・2026/05/03',  color: 'text-[var(--fg-muted)]', status: '已停用' },
+          ].map(({ label, sub, color, status }, i, arr) => (
+            <div key={label}>
+              <div className={ios.groupRow}>
+                <div className={`${ios.iconTile} bg-[var(--primary-subtle)]`}><Globe size={16} className="text-[var(--primary)]" /></div>
+                <div className="flex-1">
+                  <p className="text-[15px] font-medium text-[#1c1c1e]">{label}</p>
+                  <p className="text-[13px] text-[var(--fg-muted)]">{sub}</p>
+                </div>
+                <span className={`text-[13px] font-medium ${color}`}>{status}</span>
+              </div>
+              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+            </div>
+          ))}
+        </div>
+        <p className={ios.sectionLabel}>快速操作</p>
+        <div className={ios.groupCard}>
+          {[
+            { label: '開通新 eSIM', icon: Plane, color: 'text-[var(--primary)]', bg: 'bg-[var(--primary-subtle)]' },
+            { label: '查看 QR Code', icon: ScanLine, color: 'text-[var(--fg-muted)]', bg: 'bg-[rgba(120,120,128,0.1)]' },
+          ].map(({ label, icon: Icon, color, bg }, i, arr) => (
+            <div key={label}>
+              <div className={ios.groupRow}>
+                <div className={`${ios.iconTile} ${bg}`}><Icon size={16} className={color} /></div>
+                <p className="text-[15px] font-medium text-[#1c1c1e] flex-1">{label}</p>
+                <ChevronRight size={18} className="text-[rgba(60,60,67,0.3)]" />
+              </div>
+              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function UsageTab() {
+  return (
+    <div className="flex flex-col h-full bg-[#f2f2f7]">
+      <div className={`px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
+        <h1 className="text-[34px] font-bold text-[#1c1c1e]">用量</h1>
+      </div>
+      <div className={ios.screen}>
+        <div className={`${ios.card} p-[${loose}] mb-[${tight}]`}>
+          <p className={ios.usageChartTitle}>本月已使用流量</p>
+          <div className={ios.progressBar}>
+            <div className="h-full bg-[var(--primary)] rounded-full" style={{ width: '42%' }} />
+          </div>
+          <div className="flex justify-between text-[13px]">
+            <span className="text-[var(--primary)] font-medium">已用 2.1 GB</span>
+            <span className="text-[var(--fg-muted)]">總量 5 GB</span>
+          </div>
+        </div>
+        <p className={ios.sectionLabel}>費用明細</p>
+        <div className={ios.groupCard}>
+          {[
+            { label: '6 月份預估費用', value: 'NT$680', sub: '月結入帳' },
+            { label: '5 月份費用',     value: 'NT$450', sub: '已入帳' },
+            { label: '4 月份費用',     value: 'NT$0',   sub: '未出差' },
+          ].map(({ label, value, sub }, i, arr) => (
+            <div key={label}>
+              <div className={ios.groupRow}>
+                <div className="flex-1">
+                  <p className="text-[15px] text-[#1c1c1e]">{label}</p>
+                  <p className="text-[13px] text-[var(--fg-muted)]">{sub}</p>
+                </div>
+                <p className="text-[15px] font-semibold text-[#1c1c1e]">{value}</p>
+              </div>
+              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SettingsTab() {
+  const [notify, setNotify] = useState(true)
+  return (
+    <div className="flex flex-col h-full bg-[#f2f2f7]">
+      <div className={`px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
+        <h1 className="text-[34px] font-bold text-[#1c1c1e]">設定</h1>
+      </div>
+      <div className={ios.screen}>
+        <div className={`${ios.card} p-[${loose}] mb-[${tight}] flex items-center gap-[${tight}]`}>
+          <div className="w-[52px] h-[52px] rounded-full bg-[var(--primary-subtle)] flex items-center justify-center flex-shrink-0">
+            {/* @layout-space-magic-ok: avatar = 52px fixed visual element (Apple HIG profile card size) */}
+            <User size={24} className="text-[var(--primary)]" />
+          </div>
+          <div>
+            <p className="text-[17px] font-semibold text-[#1c1c1e]">王大明</p>
+            <p className="text-[13px] text-[var(--fg-muted)]">engineering@company.com</p>
+          </div>
+        </div>
+        <p className={ios.sectionLabel}>通知設定</p>
+        <div className={ios.groupCard}>
+          <div className={ios.groupRow}>
+            <div className="flex-1">
+              <p className="text-[15px] font-medium text-[#1c1c1e]">開通成功通知</p>
+              <p className="text-[13px] text-[var(--fg-muted)]">eSIM 安裝完成時通知</p>
+            </div>
+            <Toggle on={notify} onToggle={() => setNotify(n => !n)} />
+          </div>
+        </div>
+        <p className={ios.sectionLabel}>帳戶</p>
+        <div className={ios.groupCard}>
+          {['重新登入公司帳號', '聯絡 IT 支援', '使用條款'].map((label, i, arr) => (
+            <div key={label}>
+              <div className={ios.groupRow}>
+                <p className="text-[15px] text-[#1c1c1e] flex-1">{label}</p>
+                <ChevronRight size={18} className="text-[rgba(60,60,67,0.3)]" />
+              </div>
+              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+            </div>
+          ))}
+        </div>
+        <div className="h-8" />{/* @layout-space-magic-ok: scroll-bottom spacer */}
+      </div>
+    </div>
+  )
 }
 
 // ─────────────────────────────────────────────
@@ -775,21 +951,55 @@ const SCREENS: Screen[] = ['login', 'checking', 'travel', 'plan', 'install', 'su
 export function EsimApp() {
   const [screen, setScreen] = useState<Screen>('login')
   const [plan,   setPlan]   = useState(PLANS[1])
+  const [tab,    setTab]    = useState<Tab>('activate')
 
-  const views: Record<Screen, React.ReactNode> = {
-    login:    <LoginScreen    onNext={() => setScreen('checking')} />,
-    checking: <CheckingScreen onNext={() => setScreen('travel')} />,
-    travel:   <TravelInfoScreen onNext={() => setScreen('plan')} onBack={() => setScreen('checking')} />,
-    plan:     <PlanScreen onNext={p => { setPlan(p); setScreen('install') }} onBack={() => setScreen('travel')} />,
-    install:  <InstallScreen plan={plan} onNext={() => setScreen('success')} onBack={() => setScreen('plan')} />,
-    success:  <SuccessScreen plan={plan} />,
+  // Onboarding = no tab bar; main app = tab bar visible
+  const isOnboarding = screen === 'login' || screen === 'checking'
+
+  // Activate tab inner flow
+  const activateFlow: Record<string, React.ReactNode> = {
+    travel:  <TravelInfoScreen onNext={() => setScreen('plan')}    onBack={() => setScreen('checking')} />,
+    plan:    <PlanScreen       onNext={p => { setPlan(p); setScreen('install') }} onBack={() => setScreen('travel')} />,
+    install: <InstallScreen    plan={plan} onNext={() => { setScreen('success'); setTab('esim') }} onBack={() => setScreen('plan')} />,
+    success: <SuccessScreen    plan={plan} />,
+  }
+
+  // Activate tab home (before starting flow)
+  function ActivateHome() {
+    return (
+      <div className="flex flex-col h-full bg-[#f2f2f7]">
+        <div className={`px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
+          <h1 className="text-[34px] font-bold text-[#1c1c1e]">出差開通</h1>
+        </div>
+        <div className={ios.screen}>
+          <div className={`flex flex-col items-center py-[${loose}] px-[${loose}]`}>
+            <div className={`${ios.heroCircle} bg-[var(--primary-subtle)] mb-[${tight}]`}>
+              <Plane size={44} className="text-[var(--primary)]" strokeWidth={1.75} />
+            </div>
+            <p className={ios.activateHeroTitle}>準備出差了嗎？</p>
+            <p className="text-[15px] text-[var(--fg-muted)] text-center">填寫出差資訊，一鍵開通國際 eSIM</p>
+          </div>
+          <div className={`px-[${loose}]`}>
+            <button className={ios.primaryBtn} onClick={() => setScreen('travel')}>
+              <Plane size={20} />開始申請 eSIM
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const tabContent: Record<Tab, React.ReactNode> = {
+    activate: activateFlow[screen] ?? <ActivateHome />,
+    esim:     <MyEsimTab />,
+    usage:    <UsageTab />,
+    settings: <SettingsTab />,
   }
 
   return (
     <div className={`flex flex-col items-center gap-[${loose}] py-[${loose}] min-h-screen bg-[#e5e5ea]`}>
-      {/* Step indicator dots */}
-      <div className="flex gap-1.5">
-        {/* gap-1.5 @layout-space-magic-ok: page-indicator dot cluster = 6px bundled iOS indicator family */}
+      {/* Step indicator dots (dev navigation) */}
+      <div className={ios.devDots}>
         {SCREENS.map(s => (
           <button
             key={s}
@@ -803,7 +1013,18 @@ export function EsimApp() {
 
       <div className={ios.frame}>
         <StatusBar />
-        {views[screen]}
+        {isOnboarding ? (
+          screen === 'login'
+            ? <LoginScreen    onNext={() => setScreen('checking')} />
+            : <CheckingScreen onNext={() => { setScreen('travel'); setTab('activate') }} />
+        ) : (
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden">
+              {tabContent[tab]}
+            </div>
+            <BottomTabBar tab={tab} onTabChange={t => { setTab(t); if (t !== 'activate') setScreen('travel') }} />
+          </div>
+        )}
       </div>
 
       <p className="text-[12px] text-[rgba(0,0,0,0.4)]">點擊頂部圓點快速跳轉畫面</p>
