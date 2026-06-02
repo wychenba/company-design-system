@@ -50,6 +50,7 @@ originSessionId: 41fa83c2-f951-431e-911e-ed3ceb185903
 5. **歷史 M13**:user 第 2 次問同問題 = 必截圖 verify
 6. **本 session hook over-fire**:AI keyword regex heuristic 反覆 false-positive — heuristic-based AI self-judgement 系統性不可靠
 7. **2026-05-28 beta.27 release 7 CI iterations**:6 次解症狀(Tailwind wildcard)後第 7 才抓 root cause(addon subdir 漏 ship)。AI 自審不可信,需 mechanical CI feedback loop
+8. **2026-06-02 SizeMatrix crash + 多層誤判鏈(本 session,user 追問逼出)**:`{size}` JSX-undefined story crash 隨 beta.44 ship。每層誤判都靠**機械覆核**才更正,證明 agent prose / 單一假設禁 pass-through:(a) workflow Explore agents 把 jsDoc 註解 / meta 物件當 render 改動 — Tabs/DateGrid 誤判「視覺改了」、Rating 誤歸因全域 lucide → **非註解 `git diff` + `git show <anchor>:file` baseline-state** 機械覆核才抓出全是註解/既有規則;(b)「smoke SAMPLE 才漏」誤判 → 實測 smoke `--full` 只 probed **59/945**(886 靜默 skip + 不關 page)= 假綠燈,「Failures 0」≠「全掃過」;(c)「GDrive 掛載慢」誤判 → `/tmp` vs GDrive serve 對照**兩邊 945/945** → 實為 port 殭屍。**fix = 機械 gate**:`typecheck:stories`(stories 被 tsc exclude 之補)+ smoke coverage-gate(`probed == 總數` 才綠,silent skip 禁)+ deep-audit A.1b step 0 強制兩者。教訓:每「結論 / 根因」前用機械(diff / baseline / 對照實測)覆核,**禁憑 agent prose 或單一假設下結論**。
 
 ## How to apply
 
