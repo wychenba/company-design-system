@@ -153,6 +153,37 @@ const ios = {
   devControls: `flex flex-col items-center gap-2`, // @layout-space-magic-ok: gap-2=8px toggle→dots dev-controls cluster — external dev UI, not consumer layout region
   themeToggleTrack: (isModern: boolean) => `flex rounded-full p-0.5 ${isModern ? 'bg-white/10' : 'bg-black/10'}`, // @layout-space-magic-ok: p-0.5=2px toggle-track inset — fixed pill-control hardware metaphor (UISegmentedControl track)
 
+  // ── Checking screen footer CTA stack ──
+  checkingFooter: `px-[${loose}] pb-[${bottom}] pt-[${loose}] mt-auto flex flex-col gap-3`, // @layout-space-magic-ok: gap-3=12px footer CTA button stack, bundled pair (functional dependency, not cross-region layout)
+
+  // ── Chip group container ──
+  chipGroupPad: `px-[${loose}] py-3`, // @layout-space-magic-ok: py-3=12px chip-group inner padding, bundled chip-family vertical breathing (not cross-region layout)
+  chipRow: `flex flex-wrap gap-2`, // @layout-space-magic-ok: gap-2=8px chip→chip gap, bundled chip-family per inline-input analogy
+  segmentRow: `flex gap-2`, // @layout-space-magic-ok: gap-2=8px data-option chip horizontal group, bundled
+
+  // ── Plan card sub-layout ──
+  planSummaryRow: `px-[${loose}] py-3 flex items-center gap-[${tight}]`, // @layout-space-magic-ok: py-3=12px compact summary row, bundled
+  planCardHeader: `flex items-start justify-between mb-3`, // @layout-space-magic-ok: mb-3=12px card-title→specs gap, functional dependency within card bundle
+  planCardBadgeRow: `flex items-center gap-2 mb-1`, // @layout-space-magic-ok: gap-2/mb-1=8px/4px badge cluster, bundled inline chip family
+  planCardSpecRow: `flex items-center gap-[${loose}] mb-3 text-[14px] font-medium`, // @layout-space-magic-ok: mb-3=12px specs→features gap within card; text-[14px]=iOS subheadline
+  planCardFeatureList: `flex flex-col gap-1`, // @layout-space-magic-ok: gap-1=4px feature-list line spacing, bundled list family
+  planCardFeatureRow: `flex items-center gap-2`, // @layout-space-magic-ok: gap-2=8px check-icon + feature-text, bundled icon-label pair
+  planCardConfirmRow: (cls: string) => `mt-3 flex items-center justify-center gap-2 text-[13px] font-medium ${cls}`, // @layout-space-magic-ok: mt-3/gap-2=12px/8px confirm indicator row, bundled status within card
+
+  // ── Install screen method badge row ──
+  installBadgeRow: `flex items-center gap-2`, // @layout-space-magic-ok: gap-2=8px badge inline cluster, bundled
+
+  // ── Success screen header ──
+  successHeroSection: `flex flex-col items-center py-[${loose}] px-[${loose}]`,
+  successSegmentTrack: `mx-[${loose}] mb-[${tight}] bg-[rgba(120,120,128,0.12)] rounded-xl p-1 flex`, // @layout-space-magic-ok: p-1=2px iOS UISegmentedControl track inset (fixed hardware metaphor)
+  successTabBtn: (active: boolean) =>
+    `flex-1 py-1.5 rounded-lg text-[14px] font-semibold transition-all ${// @layout-space-magic-ok: py-1.5=6px UISegmentedControl segment vertical per Apple HIG
+      active ? 'bg-white text-[#1c1c1e] shadow-[0_1px_2px_rgba(0,0,0,0.1)]' : 'text-[var(--fg-muted)]'
+    }`,
+  successUsageCard: `p-[${loose}] mb-[${tight}]`,
+  successUsageHeader: `flex items-center justify-between mb-3`, // @layout-space-magic-ok: mb-3=12px title→progress-bar gap within usage card bundle
+  successFooter: `px-[${loose}] pb-[${bottom}] pt-3 flex-shrink-0 flex flex-col gap-2`, // @layout-space-magic-ok: gap-2=8px stacked CTA buttons, bundled footer sibling group; pt-3=12px content-edge→button visual gap
+
   // ── Dashboard hero card (active plan banner) ──
   dashHero:
     `mx-[${loose  }] rounded-3xl p-[${loose}] bg-[var(--primary)] text-white overflow-hidden relative`,
@@ -256,6 +287,69 @@ const dark = {
     // @layout-space-magic-ok: same iOS prominent button spec as ios.primaryBtn
   loginSubtitle: `text-[15px] text-white/50 mt-1`, // @layout-space-magic-ok: mt-1=4px title→subtitle intra-heading bundle (tighter than tight, same semantic unit)
   loginFooter: `px-[${loose}] pb-[${bottom}] pt-[${tight}] flex flex-col gap-3`, // @layout-space-magic-ok: gap-3=12px CTA→footnote bundled footer pair (functional dependency, not cross-region layout)
+
+  // ── Nav bar ──
+  navBar:
+    `flex items-center px-[${loose}] py-2` + // @layout-space-magic-ok: py-2=8px iOS UINavigationBar vertical padding (fixed system chrome, not layout region)
+    ' bg-[rgba(13,18,41,0.92)] border-b border-white/[0.06] backdrop-blur-sm flex-shrink-0',
+  navBack: `flex items-center gap-0.5 text-[#c8f135] text-[17px] font-normal`, // @layout-space-magic-ok: gap-0.5=2px chevron↔label optical nudge; text-[17px]=iOS body per Apple HIG
+  navTitle: 'text-[17px] font-semibold text-white text-center flex-1',
+
+  // ── Large title (iOS largeTitle, dark variant) ──
+  largeTitle:
+    `px-[${loose}] pt-3 pb-2 text-[34px] font-bold text-white leading-tight`, // @layout-space-magic-ok: pt-3/pb-2=iOS largeTitle vertical rhythm (UINavigationBar spec); text-[34px]=iOS title1=34pt per Apple HIG Typography
+
+  // ── Secondary CTA ──
+  secondaryBtn:
+    `w-full h-[54px] rounded-2xl border border-white/20 text-white font-semibold` +
+    ` text-[17px] flex items-center justify-center gap-[${tight}] active:opacity-80 transition-opacity`,
+    // @layout-space-magic-ok: same iOS prominent button spec as ios.secondaryBtn
+
+  // ── Selection chips ──
+  pillChip: (selected: boolean) =>
+    `px-3 py-1.5 rounded-full text-[14px] font-medium border transition-colors ${// @layout-space-magic-ok: same micro-dims as ios.pillChip
+      selected
+        ? 'bg-[#c8f135] text-[#0d1229] border-[#c8f135]'
+        : 'bg-white/[0.06] text-white border-white/20'
+    }`,
+  segmentBtn: (selected: boolean) =>
+    `flex-1 py-2 rounded-xl text-[13px] font-medium border transition-colors ${// @layout-space-magic-ok: same UISegmentedControl dims as ios.segmentBtn
+      selected
+        ? 'bg-[#c8f135] text-[#0d1229] border-[#c8f135]'
+        : 'bg-white/[0.06] text-white border-white/10'
+    }`,
+  segmentTrack: `mx-[${loose}] mb-[${tight}] bg-white/[0.08] rounded-xl p-1 flex`, // @layout-space-magic-ok: p-1=2px iOS UISegmentedControl track inset (fixed hardware metaphor)
+
+  // ── Plan card ──
+  planCard: (selected: boolean) =>
+    `w-full text-left rounded-2xl p-[${loose}] border-2 transition-all ${
+      selected
+        ? 'bg-white/[0.08] border-[#c8f135] shadow-[0_4px_12px_rgba(200,241,53,0.12)]'
+        : 'bg-white/[0.04] border-white/[0.08]'
+    }`,
+
+  // ── Warning / notice box ──
+  warningBox:
+    `mx-[${loose}] mt-[${tight}] bg-[#c8f135]/[0.08] border border-[#c8f135]/20 rounded-2xl p-[${loose}] flex gap-[${tight}]`,
+
+  // ── Radio (dark lime) ──
+  radioOuter: (on: boolean) =>
+    `w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+      on ? 'border-[#c8f135] bg-[#c8f135]' : 'border-white/30 bg-transparent'
+    }`,
+    // @layout-space-magic-ok: iOS radio = 20px fixed UI control (same as ios.radioOuter)
+  radioDot: 'w-2 h-2 rounded-full bg-[#0d1229]', // @layout-space-magic-ok: radio inner dot = 8px fixed
+
+  // ── Success screen (dark variants) ──
+  successSegmentTrack: `mx-[${loose}] mb-[${tight}] bg-white/[0.08] rounded-xl p-1 flex`, // @layout-space-magic-ok: p-1=2px UISegmentedControl track inset
+  successTabBtn: (active: boolean) =>
+    `flex-1 py-1.5 rounded-lg text-[14px] font-semibold transition-all ${// @layout-space-magic-ok: py-1.5=6px UISegmentedControl segment vertical per Apple HIG
+      active ? 'bg-white/[0.15] text-white shadow-[0_1px_2px_rgba(0,0,0,0.3)]' : 'text-white/40'
+    }`,
+  successUsageCard: `p-[${loose}] mb-[${tight}]`,
+  successUsageHeader: `flex items-center justify-between mb-3`, // @layout-space-magic-ok: mb-3=12px title→progress-bar gap
+  successFooter: `px-[${loose}] pb-[${bottom}] pt-3 flex-shrink-0 flex flex-col gap-2`, // @layout-space-magic-ok: gap-2/pt-3=8px/12px same spec as ios.successFooter
+  screenFooter: `px-[${loose}] pb-[${bottom}] pt-3 flex-shrink-0`, // @layout-space-magic-ok: pt-3=12px screen-content→button visual gap (UIKit prominent CTA bar, commitment 前 breathing); matches Apple HIG bottom safe-area CTA rhythm
 }
 
 // ─────────────────────────────────────────────
@@ -568,44 +662,58 @@ function DashboardTab({ onGoActivate, theme = 'corporate' }: { onGoActivate: () 
 // ─────────────────────────────────────────────
 // Tab placeholder screens
 // ─────────────────────────────────────────────
-function MyEsimTab() {
+function MyEsimTab({ theme = 'corporate' }: { theme?: Theme }) {
+  const isM = theme === 'modern'
+  const d = isM ? dark : ios
+  const bg = isM ? dark.screenBg : 'bg-[#f2f2f7]'
+  const titleCls = isM ? 'text-white' : 'text-[#1c1c1e]'
+  const rowTitle = isM ? dark.rowTitle : 'text-[15px] font-medium text-[#1c1c1e]'
+  const rowSub   = isM ? dark.rowSub   : 'text-[13px] text-[var(--fg-muted)]'
+  const chevron  = isM ? 'text-white/20' : 'text-[rgba(60,60,67,0.3)]'
+  const esimItems = [
+    { label: '日本 出差方案', sub: '啟用中・到期 06/14', statusCls: isM ? 'text-[#c8f135]' : 'text-[var(--success)]', status: '啟用中' },
+    { label: '美國 商務方案', sub: '已停用・2026/05/03',  statusCls: isM ? 'text-white/30'  : 'text-[var(--fg-muted)]', status: '已停用' },
+  ]
+  const quickItems = [
+    { label: '開通新 eSIM',   icon: Plane,    iconCls: isM ? 'text-[#c8f135]' : 'text-[var(--primary)]',   tileCls: isM ? '' : 'bg-[var(--primary-subtle)]' },
+    { label: '查看 QR Code',  icon: ScanLine, iconCls: isM ? 'text-white/50'  : 'text-[var(--fg-muted)]',  tileCls: isM ? '' : 'bg-[rgba(120,120,128,0.1)]' },
+  ]
   return (
-    <div className="flex flex-col h-full bg-[#f2f2f7]">
+    <div className={`flex flex-col h-full ${bg}`}>
       <div className={`px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
-        <h1 className="text-[34px] font-bold text-[#1c1c1e]">我的 eSIM</h1>
+        <h1 className={`text-[34px] font-bold ${titleCls}`}>我的 eSIM</h1>
+        {/* text-[34px] @layout-space-magic-ok: iOS largeTitle */}
       </div>
       <div className={ios.screen}>
-        <div className={ios.groupCard}>
-          {[
-            { label: '日本 出差方案', sub: '啟用中・到期 06/14', color: 'text-[var(--success)]', status: '啟用中' },
-            { label: '美國 商務方案', sub: '已停用・2026/05/03',  color: 'text-[var(--fg-muted)]', status: '已停用' },
-          ].map(({ label, sub, color, status }, i, arr) => (
+        <div className={d.groupCard}>
+          {esimItems.map(({ label, sub, statusCls, status }, i, arr) => (
             <div key={label}>
-              <div className={ios.groupRow}>
-                <div className={`${ios.iconTile} bg-[var(--primary-subtle)]`}><Globe size={16} className="text-[var(--primary)]" /></div>
-                <div className="flex-1">
-                  <p className="text-[15px] font-medium text-[#1c1c1e]">{label}</p>
-                  <p className="text-[13px] text-[var(--fg-muted)]">{sub}</p>
+              <div className={d.groupRow}>
+                <div className={`${isM ? dark.iconTile : `${ios.iconTile} bg-[var(--primary-subtle)]`}`}>
+                  <Globe size={16} className={isM ? 'text-[#c8f135]' : 'text-[var(--primary)]'} />
                 </div>
-                <span className={`text-[13px] font-medium ${color}`}>{status}</span>
+                <div className="flex-1">
+                  <p className={rowTitle}>{label}</p>
+                  <p className={rowSub}>{sub}</p>
+                </div>
+                <span className={`text-[13px] font-medium ${statusCls}`}>{status}</span>
               </div>
-              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+              {i < arr.length - 1 && <div className={d.groupDivider} />}
             </div>
           ))}
         </div>
-        <p className={ios.sectionLabel}>快速操作</p>
-        <div className={ios.groupCard}>
-          {[
-            { label: '開通新 eSIM', icon: Plane, color: 'text-[var(--primary)]', bg: 'bg-[var(--primary-subtle)]' },
-            { label: '查看 QR Code', icon: ScanLine, color: 'text-[var(--fg-muted)]', bg: 'bg-[rgba(120,120,128,0.1)]' },
-          ].map(({ label, icon: Icon, color, bg }, i, arr) => (
+        <p className={d.sectionLabel}>快速操作</p>
+        <div className={d.groupCard}>
+          {quickItems.map(({ label, icon: Icon, iconCls, tileCls }, i, arr) => (
             <div key={label}>
-              <div className={ios.groupRow}>
-                <div className={`${ios.iconTile} ${bg}`}><Icon size={16} className={color} /></div>
-                <p className="text-[15px] font-medium text-[#1c1c1e] flex-1">{label}</p>
-                <ChevronRight size={18} className="text-[rgba(60,60,67,0.3)]" />
+              <div className={d.groupRow}>
+                <div className={`${isM ? dark.iconTile : `${ios.iconTile} ${tileCls}`}`}>
+                  <Icon size={16} className={iconCls} />
+                </div>
+                <p className={`${rowTitle} flex-1`}>{label}</p>
+                <ChevronRight size={18} className={chevron} />
               </div>
-              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+              {i < arr.length - 1 && <div className={d.groupDivider} />}
             </div>
           ))}
         </div>
@@ -614,39 +722,56 @@ function MyEsimTab() {
   )
 }
 
-function UsageTab() {
+function UsageTab({ theme = 'corporate' }: { theme?: Theme }) {
+  const isM = theme === 'modern'
+  const d = isM ? dark : ios
+  const bg = isM ? dark.screenBg : 'bg-[#f2f2f7]'
+  const titleCls = isM ? 'text-white' : 'text-[#1c1c1e]'
+  const rowTitle = isM ? dark.rowTitle : 'text-[15px] text-[#1c1c1e]'
+  const rowSub   = isM ? dark.rowSub   : 'text-[13px] text-[var(--fg-muted)]'
+  const cardCls  = isM ? `${dark.groupCard} p-[${loose}] mb-[${tight}]` : `${ios.card} p-[${loose}] mb-[${tight}]`
+  const barFill  = isM ? 'bg-[#c8f135]' : 'bg-[var(--primary)]'
+  const barUsed  = isM ? 'text-[#c8f135] font-medium' : 'text-[var(--primary)] font-medium'
+  const barTotal = isM ? dark.rowSub : 'text-[var(--fg-muted)]'
+  const chartTitle = isM
+    ? `text-[15px] font-semibold text-white mb-3` // @layout-space-magic-ok: mb-3=12px title→bar gap, functional dependency pair within usage card bundle
+    : ios.usageChartTitle
+  const progressBar = isM
+    ? `h-3 bg-white/10 rounded-full overflow-hidden mb-2` // @layout-space-magic-ok: h-3=12px iOS UIProgressView; mb-2=8px bar→label bundled indicator element
+    : ios.progressBar
   return (
-    <div className="flex flex-col h-full bg-[#f2f2f7]">
+    <div className={`flex flex-col h-full ${bg}`}>
       <div className={`px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
-        <h1 className="text-[34px] font-bold text-[#1c1c1e]">用量</h1>
+        <h1 className={`text-[34px] font-bold ${titleCls}`}>用量</h1>
+        {/* text-[34px] @layout-space-magic-ok: iOS largeTitle */}
       </div>
       <div className={ios.screen}>
-        <div className={`${ios.card} p-[${loose}] mb-[${tight}]`}>
-          <p className={ios.usageChartTitle}>本月已使用流量</p>
-          <div className={ios.progressBar}>
-            <div className="h-full bg-[var(--primary)] rounded-full" style={{ width: '42%' }} />
+        <div className={cardCls}>
+          <p className={chartTitle}>本月已使用流量</p>
+          <div className={progressBar}>
+            <div className={`h-full ${barFill} rounded-full`} style={{ width: '42%' }} />
           </div>
           <div className="flex justify-between text-[13px]">
-            <span className="text-[var(--primary)] font-medium">已用 2.1 GB</span>
-            <span className="text-[var(--fg-muted)]">總量 5 GB</span>
+            <span className={barUsed}>已用 2.1 GB</span>
+            <span className={barTotal}>總量 5 GB</span>
           </div>
         </div>
-        <p className={ios.sectionLabel}>費用明細</p>
-        <div className={ios.groupCard}>
+        <p className={d.sectionLabel}>費用明細</p>
+        <div className={d.groupCard}>
           {[
             { label: '6 月份預估費用', value: 'NT$680', sub: '月結入帳' },
             { label: '5 月份費用',     value: 'NT$450', sub: '已入帳' },
             { label: '4 月份費用',     value: 'NT$0',   sub: '未出差' },
           ].map(({ label, value, sub }, i, arr) => (
             <div key={label}>
-              <div className={ios.groupRow}>
+              <div className={d.groupRow}>
                 <div className="flex-1">
-                  <p className="text-[15px] text-[#1c1c1e]">{label}</p>
-                  <p className="text-[13px] text-[var(--fg-muted)]">{sub}</p>
+                  <p className={rowTitle}>{label}</p>
+                  <p className={rowSub}>{sub}</p>
                 </div>
-                <p className="text-[15px] font-semibold text-[#1c1c1e]">{value}</p>
+                <p className={`text-[15px] font-semibold ${isM ? 'text-white' : 'text-[#1c1c1e]'}`}>{value}</p>
               </div>
-              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+              {i < arr.length - 1 && <div className={d.groupDivider} />}
             </div>
           ))}
         </div>
@@ -655,43 +780,54 @@ function UsageTab() {
   )
 }
 
-function SettingsTab() {
+function SettingsTab({ theme = 'corporate' }: { theme?: Theme }) {
+  const isM = theme === 'modern'
+  const d = isM ? dark : ios
   const [notify, setNotify] = useState(true)
+  const bg = isM ? dark.screenBg : 'bg-[#f2f2f7]'
+  const titleCls = isM ? 'text-white' : 'text-[#1c1c1e]'
+  const rowTitle = isM ? dark.rowTitle : 'text-[15px] text-[#1c1c1e]'
+  const rowSub   = isM ? dark.rowSub   : 'text-[13px] text-[var(--fg-muted)]'
+  const chevron  = isM ? 'text-white/20' : 'text-[rgba(60,60,67,0.3)]'
+  const profileCard = isM ? `${dark.groupCard} p-[${loose}] mb-[${tight}] flex items-center gap-[${tight}]` : `${ios.card} p-[${loose}] mb-[${tight}] flex items-center gap-[${tight}]`
+  const avatarRing  = isM ? dark.avatarRing : 'w-[40px] h-[40px] rounded-full bg-[var(--primary-subtle)] flex items-center justify-center flex-shrink-0'
+  const avatarIcon  = isM ? 'text-[#c8f135]' : 'text-[var(--primary)]'
   return (
-    <div className="flex flex-col h-full bg-[#f2f2f7]">
+    <div className={`flex flex-col h-full ${bg}`}>
       <div className={`px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
-        <h1 className="text-[34px] font-bold text-[#1c1c1e]">設定</h1>
+        <h1 className={`text-[34px] font-bold ${titleCls}`}>設定</h1>
+        {/* text-[34px] @layout-space-magic-ok: iOS largeTitle */}
       </div>
       <div className={ios.screen}>
-        <div className={`${ios.card} p-[${loose}] mb-[${tight}] flex items-center gap-[${tight}]`}>
-          <div className="w-[52px] h-[52px] rounded-full bg-[var(--primary-subtle)] flex items-center justify-center flex-shrink-0">
-            {/* @layout-space-magic-ok: avatar = 52px fixed visual element (Apple HIG profile card size) */}
-            <User size={24} className="text-[var(--primary)]" />
+        <div className={profileCard}>
+          <div className={avatarRing}>
+            {/* @layout-space-magic-ok: avatar 40/52px fixed element per Apple HIG profile card size */}
+            <User size={24} className={avatarIcon} />
           </div>
           <div>
-            <p className="text-[17px] font-semibold text-[#1c1c1e]">王大明</p>
-            <p className="text-[13px] text-[var(--fg-muted)]">engineering@company.com</p>
+            <p className={`text-[17px] font-semibold ${isM ? 'text-white' : 'text-[#1c1c1e]'}`}>王大明</p>
+            <p className={rowSub}>engineering@company.com</p>
           </div>
         </div>
-        <p className={ios.sectionLabel}>通知設定</p>
-        <div className={ios.groupCard}>
-          <div className={ios.groupRow}>
+        <p className={d.sectionLabel}>通知設定</p>
+        <div className={d.groupCard}>
+          <div className={d.groupRow}>
             <div className="flex-1">
-              <p className="text-[15px] font-medium text-[#1c1c1e]">開通成功通知</p>
-              <p className="text-[13px] text-[var(--fg-muted)]">eSIM 安裝完成時通知</p>
+              <p className={`text-[15px] font-medium ${isM ? 'text-white' : 'text-[#1c1c1e]'}`}>開通成功通知</p>
+              <p className={rowSub}>eSIM 安裝完成時通知</p>
             </div>
             <Toggle on={notify} onToggle={() => setNotify(n => !n)} />
           </div>
         </div>
-        <p className={ios.sectionLabel}>帳戶</p>
-        <div className={ios.groupCard}>
+        <p className={d.sectionLabel}>帳戶</p>
+        <div className={d.groupCard}>
           {['重新登入公司帳號', '聯絡 IT 支援', '使用條款'].map((label, i, arr) => (
             <div key={label}>
-              <div className={ios.groupRow}>
-                <p className="text-[15px] text-[#1c1c1e] flex-1">{label}</p>
-                <ChevronRight size={18} className="text-[rgba(60,60,67,0.3)]" />
+              <div className={d.groupRow}>
+                <p className={`${rowTitle} flex-1`}>{label}</p>
+                <ChevronRight size={18} className={chevron} />
               </div>
-              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+              {i < arr.length - 1 && <div className={d.groupDivider} />}
             </div>
           ))}
         </div>
@@ -800,7 +936,15 @@ function LoginScreen({ onNext, theme = 'corporate' }: { onNext: () => void; them
 // ─────────────────────────────────────────────
 // Screen 2: Checking
 // ─────────────────────────────────────────────
-function CheckingScreen({ onNext }: { onNext: () => void }) {
+function CheckingScreen({ onNext, theme = 'corporate' }: { onNext: () => void; theme?: Theme }) {
+  const isM = theme === 'modern'
+  const d = isM ? dark : ios
+  const bg = isM ? dark.screenBg : 'bg-[#f2f2f7]'
+  const titleCls = isM ? 'text-white' : 'text-[#1c1c1e]'
+  const subCls   = isM ? 'text-white/50 mt-1' : 'text-[var(--fg-muted)] mt-1' // @layout-space-magic-ok: mt-1=4px intra-heading bundle (title→subtitle same semantic unit, tighter than tight)
+  const rowTitle = isM ? dark.rowTitle : 'text-[15px] font-medium text-[#1c1c1e]'
+  const rowSub   = isM ? dark.rowSub   : 'text-[13px] text-[var(--fg-muted)]'
+  const devCls   = isM ? 'text-white/40' : 'text-[var(--fg-muted)]'
   const [step, setStep] = useState(0)
   const steps = [
     { label: '驗證員工身份',   sub: '確認 SSO 登入狀態',       icon: User },
@@ -810,77 +954,85 @@ function CheckingScreen({ onNext }: { onNext: () => void }) {
   const done = step >= steps.length
 
   return (
-    <div className="flex flex-col h-full bg-[#f2f2f7]">
+    <div className={`flex flex-col h-full ${bg}`}>
       <div className={`px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
-        <h1 className="text-[28px] font-bold text-[#1c1c1e]">資格確認中</h1>
-        <p className="text-[15px] text-[var(--fg-muted)] mt-1">正在驗證您的身份與裝置</p>
-        {/* mt-1 @layout-space-magic-ok: intra-heading bundle gap 4px */}
+        <h1 className={`text-[28px] font-bold ${titleCls}`}>資格確認中</h1>
+        {/* text-[28px] @layout-space-magic-ok: iOS title3 */}
+        <p className={`text-[15px] ${subCls}`}>正在驗證您的身份與裝置</p>
       </div>
 
       <div className={`flex justify-center py-[${loose}]`}>
         {done ? (
-          <div className={`${ios.heroCircle} bg-[var(--success-subtle)]`}>
-            <CheckCircle2 size={44} className="text-[var(--success)]" />
+          <div className={`${ios.heroCircle} ${isM ? 'bg-[#c8f135]/10' : 'bg-[var(--success-subtle)]'}`}>
+            <CheckCircle2 size={44} className={isM ? 'text-[#c8f135]' : 'text-[var(--success)]'} />
           </div>
         ) : (
-          <div className={`${ios.heroCircle} bg-[var(--primary-subtle)]`}>
-            <Loader2 size={44} className="text-[var(--primary)] animate-spin" />
+          <div className={`${ios.heroCircle} ${isM ? 'bg-white/[0.06]' : 'bg-[var(--primary-subtle)]'}`}>
+            <Loader2 size={44} className={isM ? 'text-[#c8f135] animate-spin' : 'text-[var(--primary)] animate-spin'} />
           </div>
         )}
       </div>
 
-      <div className={ios.groupCard}>
+      <div className={d.groupCard}>
         {steps.map(({ label, sub, icon: Icon }, i) => {
           const isDone   = i < step
           const isActive = i === step
+          const stepIconBg = isDone
+            ? (isM ? 'bg-[#c8f135]' : 'bg-[var(--success)]')
+            : isActive
+              ? (isM ? 'bg-[#c8f135]/20 border border-[#c8f135]/40' : 'bg-[var(--primary)]')
+              : (isM ? 'bg-white/[0.08]' : 'bg-[rgba(120,120,128,0.16)]')
+          const stepIconColor = isDone
+            ? (isM ? 'text-[#0d1229]' : 'text-white')
+            : isActive ? (isM ? 'text-[#c8f135]' : 'text-white')
+            : devCls
           return (
             <div key={label}>
-              <div className={ios.groupRow}>
-                <div className={`${ios.iconTile} rounded-full ${isDone ? 'bg-[var(--success)]' : isActive ? 'bg-[var(--primary)]' : 'bg-[rgba(120,120,128,0.16)]'}`}>
-                  {isDone ? <Check size={16} className="text-white" /> : <Icon size={16} className={isActive ? 'text-white' : 'text-[var(--fg-muted)]'} />}
+              <div className={d.groupRow}>
+                <div className={`${ios.iconTile} rounded-full ${stepIconBg}`}>
+                  {isDone ? <Check size={16} className={stepIconColor} /> : <Icon size={16} className={stepIconColor} />}
                 </div>
                 <div className="flex-1">
-                  <p className={`text-[15px] font-medium ${isDone || isActive ? 'text-[#1c1c1e]' : 'text-[var(--fg-muted)]'}`}>{label}</p>
-                  <p className="text-[13px] text-[var(--fg-muted)]">{sub}</p>
+                  <p className={`text-[15px] font-medium ${isDone || isActive ? (isM ? 'text-white' : 'text-[#1c1c1e]') : devCls}`}>{label}</p>
+                  <p className={rowSub}>{sub}</p>
                 </div>
-                {isDone   && <Check  size={16} className="text-[var(--success)]" />}
-                {isActive && <Loader2 size={16} className="text-[var(--primary)] animate-spin" />}
+                {isDone   && <Check   size={16} className={isM ? 'text-[#c8f135]' : 'text-[var(--success)]'} />}
+                {isActive && <Loader2 size={16} className={`${isM ? 'text-[#c8f135]' : 'text-[var(--primary)]'} animate-spin`} />}
               </div>
-              {i < steps.length - 1 && <div className={ios.groupDivider} />}
+              {i < steps.length - 1 && <div className={d.groupDivider} />}
             </div>
           )
         })}
       </div>
 
-      <p className={ios.sectionLabel}>裝置資訊</p>
-      <div className={ios.groupCard}>
+      <p className={d.sectionLabel}>裝置資訊</p>
+      <div className={d.groupCard}>
         {[
           { label: 'iPhone 16 Pro', sub: 'iOS 18.3.2' },
           { label: 'eSIM 支援',     sub: '最多可儲存 8 組' },
           { label: '受管裝置',     sub: '公司 MDM 已註冊' },
         ].map(({ label, sub }, i, arr) => (
           <div key={label}>
-            <div className={ios.groupRow}>
-              <Smartphone size={18} className="text-[var(--fg-muted)]" />
+            <div className={d.groupRow}>
+              <Smartphone size={18} className={devCls} />
               <div className="flex-1">
-                <p className="text-[15px] font-medium text-[#1c1c1e]">{label}</p>
-                <p className="text-[13px] text-[var(--fg-muted)]">{sub}</p>
+                <p className={rowTitle}>{label}</p>
+                <p className={rowSub}>{sub}</p>
               </div>
-              <Check size={16} className="text-[var(--success)]" />
+              <Check size={16} className={isM ? 'text-[#c8f135]' : 'text-[var(--success)]'} />
             </div>
-            {i < arr.length - 1 && <div className={ios.groupDivider} />}
+            {i < arr.length - 1 && <div className={d.groupDivider} />}
           </div>
         ))}
       </div>
 
-      <div className={`px-[${loose}] pb-[${bottom}] pt-[${loose}] mt-auto flex flex-col gap-3`}>
-        {/* gap-3 @layout-space-magic-ok: footer button stack 12px bundled */}
+      <div className={ios.checkingFooter}>
         {!done ? (
-          <button className={ios.secondaryBtn} onClick={() => setStep(s => Math.min(s + 1, steps.length))}>
+          <button className={isM ? dark.secondaryBtn : ios.secondaryBtn} onClick={() => setStep(s => Math.min(s + 1, steps.length))}>
             模擬下一步驗證
           </button>
         ) : (
-          <button className={ios.primaryBtn} onClick={onNext}>
+          <button className={isM ? dark.loginBtn : ios.primaryBtn} onClick={onNext}>
             繼續 <ChevronRight size={20} />
           </button>
         )}
@@ -896,7 +1048,15 @@ const COUNTRIES     = ['日本', '美國', '英國', '德國', '新加坡', '泰
 const DATA_OPTIONS  = ['1 GB', '3 GB', '5 GB', '10 GB', '無限']
 const PURPOSE_OPTIONS = ['商務會議', '客戶拜訪', '展覽參展', '內部培訓', '其他']
 
-function TravelInfoScreen({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+function TravelInfoScreen({ onNext, onBack, theme = 'corporate' }: { onNext: () => void; onBack: () => void; theme?: Theme }) {
+  const isM = theme === 'modern'
+  const d = isM ? dark : ios
+  const bg = isM ? dark.screenBg : 'bg-[#f2f2f7]'
+  const rowTitle = isM ? dark.rowTitle : 'text-[15px] font-medium text-[#1c1c1e]'
+  const rowSub   = isM ? dark.rowSub   : 'text-[13px] text-[var(--fg-muted)]'
+  const chevron  = isM ? 'text-white/20' : 'text-[rgba(60,60,67,0.3)]'
+  const chipLabel = isM ? 'text-[13px] text-white/40 mb-2' : 'text-[13px] text-[var(--fg-muted)] mb-2' // @layout-space-magic-ok: mb-2=8px chip-group label→chips, functional dependency within bundled chip-group
+
   const [country,    setCountry]    = useState('日本')
   const [purpose,    setPurpose]    = useState('商務會議')
   const [dataAmount, setDataAmount] = useState('5 GB')
@@ -904,93 +1064,90 @@ function TravelInfoScreen({ onNext, onBack }: { onNext: () => void; onBack: () =
   const [hotspot,    setHotspot]    = useState(true)
 
   return (
-    <div className="flex flex-col h-full bg-[#f2f2f7]">
-      <div className={ios.navBar}>
-        <button className={ios.navBack} onClick={onBack}><ChevronLeft size={22} />返回</button>
-        <span className={ios.navTitle}>出差資訊</span>
+    <div className={`flex flex-col h-full ${bg}`}>
+      <div className={d.navBar}>
+        <button className={d.navBack} onClick={onBack}><ChevronLeft size={22} />返回</button>
+        <span className={d.navTitle}>出差資訊</span>
         <div className="w-16" />{/* @layout-space-magic-ok: iOS nav spacer mirrors back-button width for centering */}
       </div>
 
       <div className={ios.screen}>
-        <h1 className={ios.largeTitle}>出差資訊</h1>
+        <h1 className={d.largeTitle}>出差資訊</h1>
 
-        <p className={ios.sectionLabel}>目的地</p>
-        <div className={ios.groupCard}>
-          <div className={`px-[${loose}] py-3`}>
-            {/* py-3 @layout-space-magic-ok: chip-group inner padding = 12px; bundled chip-family vertical breathing (not cross-region layout) */}
-            <p className="text-[13px] text-[var(--fg-muted)] mb-2">選擇國家 / 地區</p>
-            {/* mb-2 @layout-space-magic-ok: chip-group label→chips = 8px; functional dependency pair within bundled chip-group */}
-            <div className="flex flex-wrap gap-2">
-              {/* gap-2 @layout-space-magic-ok: chip→chip = 8px; bundled chip-family per rule 5 inline input analogy */}
+        <p className={d.sectionLabel}>目的地</p>
+        <div className={d.groupCard}>
+          <div className={ios.chipGroupPad}>
+            <p className={chipLabel}>選擇國家 / 地區</p>
+            <div className={ios.chipRow}>
               {COUNTRIES.map(c => (
-                <button key={c} onClick={() => setCountry(c)} className={ios.pillChip(country === c)}>{c}</button>
+                <button key={c} onClick={() => setCountry(c)} className={d.pillChip(country === c)}>{c}</button>
               ))}
             </div>
           </div>
         </div>
 
-        <p className={ios.sectionLabel}>出差日期</p>
-        <div className={ios.groupCard}>
+        <p className={d.sectionLabel}>出差日期</p>
+        <div className={d.groupCard}>
           {[
             { label: '出發日', value: '2026/06/10' },
             { label: '返回日', value: '2026/06/14' },
           ].map(({ label, value }, i, arr) => (
             <div key={label}>
-              <div className={ios.groupRow}>
-                <CalendarDays size={20} className="text-[var(--primary)]" />
+              <div className={d.groupRow}>
+                <CalendarDays size={20} className={isM ? 'text-[#c8f135]' : 'text-[var(--primary)]'} />
                 <div className="flex-1">
-                  <p className="text-[13px] text-[var(--fg-muted)]">{label}</p>
-                  <p className="text-[15px] font-medium text-[#1c1c1e]">{value}</p>
+                  <p className={rowSub}>{label}</p>
+                  <p className={rowTitle}>{value}</p>
                 </div>
-                <ChevronRight size={18} className="text-[rgba(60,60,67,0.3)]" />
+                <ChevronRight size={18} className={chevron} />
               </div>
-              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+              {i < arr.length - 1 && <div className={d.groupDivider} />}
             </div>
           ))}
         </div>
 
-        <p className={ios.sectionLabel}>出差用途</p>
-        <div className={ios.groupCard}>
-          <div className={`px-[${loose}] py-3`}>
-            {/* py-3 @layout-space-magic-ok: chip-group inner padding */}
-            <div className="flex flex-wrap gap-2">
-              {/* gap-2 @layout-space-magic-ok: chip-to-chip bundled family */}
+        <p className={d.sectionLabel}>出差用途</p>
+        <div className={d.groupCard}>
+          <div className={ios.chipGroupPad}>
+            <div className={ios.chipRow}>
               {PURPOSE_OPTIONS.map(p => (
-                <button key={p} onClick={() => setPurpose(p)} className={ios.pillChip(purpose === p)}>{p}</button>
+                <button key={p} onClick={() => setPurpose(p)} className={d.pillChip(purpose === p)}>{p}</button>
               ))}
             </div>
           </div>
         </div>
 
-        <p className={ios.sectionLabel}>預估流量需求</p>
-        <div className={ios.groupCard}>
-          <div className={`px-[${loose}] py-3`}>
-            {/* py-3 @layout-space-magic-ok: chip-group inner padding */}
-            <div className="flex gap-2">
-              {/* gap-2 @layout-space-magic-ok: data option chips bundled horizontal */}
-              {DATA_OPTIONS.map(d => (
-                <button key={d} onClick={() => setDataAmount(d)} className={ios.segmentBtn(dataAmount === d)}>{d}</button>
+        <p className={d.sectionLabel}>預估流量需求</p>
+        <div className={d.groupCard}>
+          <div className={ios.chipGroupPad}>
+            <div className={ios.segmentRow}>
+              {DATA_OPTIONS.map(o => (
+                <button key={o} onClick={() => setDataAmount(o)} className={d.segmentBtn(dataAmount === o)}>{o}</button>
               ))}
             </div>
           </div>
         </div>
 
-        <p className={ios.sectionLabel}>額外需求</p>
-        <div className={ios.groupCard}>
-          <div className={ios.groupRow}>
-            <div className={`${ios.iconTile} bg-[var(--primary-subtle)]`}><Phone size={16} className="text-[var(--primary)]" /></div>
+        <p className={d.sectionLabel}>額外需求</p>
+        <div className={d.groupCard}>
+          <div className={d.groupRow}>
+            <div className={`${isM ? dark.iconTile : `${ios.iconTile} bg-[var(--primary-subtle)]`}`}>
+              <Phone size={16} className={isM ? 'text-[#c8f135]' : 'text-[var(--primary)]'} />
+            </div>
             <div className="flex-1">
-              <p className="text-[15px] font-medium text-[#1c1c1e]">語音漫遊</p>
-              <p className="text-[13px] text-[var(--fg-muted)]">中華電信用戶可勾選</p>
+              <p className={rowTitle}>語音漫遊</p>
+              <p className={rowSub}>中華電信用戶可勾選</p>
             </div>
             <Toggle on={roaming} onToggle={() => setRoaming(r => !r)} />
           </div>
-          <div className={ios.groupDivider} />
-          <div className={ios.groupRow}>
-            <div className={`${ios.iconTile} bg-[var(--success-subtle)]`}><Wifi size={16} className="text-[var(--success)]" /></div>
+          <div className={d.groupDivider} />
+          <div className={d.groupRow}>
+            <div className={`${isM ? dark.iconTile : `${ios.iconTile} bg-[var(--success-subtle)]`}`}>
+              <Wifi size={16} className={isM ? 'text-[#c8f135]' : 'text-[var(--success)]'} />
+            </div>
             <div className="flex-1">
-              <p className="text-[15px] font-medium text-[#1c1c1e]">Wi-Fi 熱點分享</p>
-              <p className="text-[13px] text-[var(--fg-muted)]">中華電信 eSIM 支援</p>
+              <p className={rowTitle}>Wi-Fi 熱點分享</p>
+              <p className={rowSub}>中華電信 eSIM 支援</p>
             </div>
             <Toggle on={hotspot} onToggle={() => setHotspot(h => !h)} />
           </div>
@@ -998,9 +1155,8 @@ function TravelInfoScreen({ onNext, onBack }: { onNext: () => void; onBack: () =
         <div className="h-8" />{/* @layout-space-magic-ok: scroll-bottom spacer, non-semantic */}
       </div>
 
-      <div className={`px-[${loose}] pb-[${bottom}] pt-3 flex-shrink-0`}>
-        {/* pt-3 @layout-space-magic-ok: screen-content→button visual gap = 12px; commitment前留白 handled by pb-bottom */}
-        <button className={ios.primaryBtn} onClick={onNext}>查看推薦方案 <ChevronRight size={20} /></button>
+      <div className={ios.screenFooter}>
+        <button className={isM ? dark.loginBtn : ios.primaryBtn} onClick={onNext}>查看推薦方案 <ChevronRight size={20} /></button>
       </div>
     </div>
   )
