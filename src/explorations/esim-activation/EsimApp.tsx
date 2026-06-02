@@ -13,7 +13,7 @@ import {
   Plane, Shield, Smartphone, ChevronRight, ChevronLeft, Check,
   Wifi, Signal, Globe, CalendarDays, Briefcase, Zap, Phone, X,
   AlertCircle, CheckCircle2, Clock, BarChart2, Download,
-  Building2, User, ScanLine, Loader2, Settings,
+  Building2, User, ScanLine, Loader2, Settings, Home, TrendingUp, MapPin,
 } from 'lucide-react'
 
 // ─────────────────────────────────────────────
@@ -149,6 +149,21 @@ const ios = {
   progressBar:     `h-3 bg-[rgba(120,120,128,0.16)] rounded-full overflow-hidden mb-2`, // @layout-space-magic-ok: h-3=12px progress-bar fixed visual element (iOS UIProgressView height); mb-2=8px bar→label gap bundled indicator element
   activateHeroTitle: `text-[17px] font-semibold text-[#1c1c1e] mb-1`, // @layout-space-magic-ok: mb-1=4px intra-heading bundle (title→subtitle, same semantic unit, tighter than tight)
   devDots: `flex gap-1.5`, // @layout-space-magic-ok: gap-1.5=6px iOS page-indicator dot cluster — fixed motif per Apple HIG UIPageControl (not consumer layout region)
+
+  // ── Dashboard hero card (active plan banner) ──
+  dashHero:
+    `mx-[${loose  }] rounded-3xl p-[${loose}] bg-[var(--primary)] text-white overflow-hidden relative`,
+  dashHeroSub: `text-[13px] font-medium text-white/70 mt-0.5`, // @layout-space-magic-ok: mt-0.5=2px optical gap, intra-hero bundle
+  dashStatCard:
+    `flex-1 bg-white rounded-2xl p-[${tight}] flex flex-col gap-1`, // @layout-space-magic-ok: gap-1=4px label→value pair, bundled stat atom
+  dashActiveBadge:
+    `inline-flex items-center gap-1 bg-white/20 rounded-full px-2 py-0.5 mb-2`, // @layout-space-magic-ok: px-2/py-0.5=8px/2px hero badge-pill micro-element (fixed visual chip, not layout-region); mb-2=8px badge→title functional dependency within hero card bundle
+  dashIconTileOffset:
+    `${'' /* placeholder — computed below */}`, // unused; see dashHeroIconTile
+  dashHeroIconTile:
+    `bg-white/20 mt-1`, // @layout-space-magic-ok: mt-1=4px optical alignment nudge between icon tile and hero title top (intra-card bundle)
+  dashProgressLabel:
+    `flex justify-between text-[12px] text-white/80 mb-1`, // @layout-space-magic-ok: mb-1=4px label→bar functional dependency within bundled progress block; text-[12px]=iOS footnote (fixed typographic scale)
 }
 
 // ─────────────────────────────────────────────
@@ -197,9 +212,10 @@ function PlanBadge({ label, color }: { label: string; color: 'blue' | 'green' | 
 // ─────────────────────────────────────────────
 // iOS Bottom Tab Bar (UITabBarController)
 // ─────────────────────────────────────────────
-type Tab = 'activate' | 'esim' | 'usage' | 'settings'
+type Tab = 'home' | 'activate' | 'esim' | 'usage' | 'settings'
 
 const TAB_ITEMS: { id: Tab; label: string; Icon: LucideIcon }[] = [
+  { id: 'home',     label: '首頁',      Icon: Home },
   { id: 'activate', label: '出差開通', Icon: Plane },
   { id: 'esim',     label: '我的 eSIM', Icon: Smartphone },
   { id: 'usage',    label: '用量',      Icon: BarChart2 },
@@ -215,6 +231,145 @@ function BottomTabBar({ tab, onTabChange }: { tab: Tab; onTabChange: (t: Tab) =>
           <span className={ios.tabLabel}>{label}</span>
         </button>
       ))}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────
+// Dashboard (首頁)
+// ─────────────────────────────────────────────
+function DashboardTab({ onGoActivate }: { onGoActivate: () => void }) {
+  return (
+    <div className="flex flex-col h-full bg-[#f2f2f7]">
+
+      {/* Greeting bar */}
+      <div className={`flex items-center justify-between px-[${loose}] pt-[${loose}] pb-[${tight}]`}>
+        <div>
+          <p className="text-[13px] text-[var(--fg-muted)]">早安，</p>
+          {/* text-[13px] @layout-space-magic-ok: iOS caption1 */}
+          <h1 className="text-[28px] font-bold text-[#1c1c1e] leading-tight">王大明</h1>
+          {/* text-[28px] @layout-space-magic-ok: iOS title3 */}
+        </div>
+        <div className="w-[40px] h-[40px] rounded-full bg-[var(--primary-subtle)] flex items-center justify-center">
+          {/* @layout-space-magic-ok: avatar 40px fixed element per Apple HIG navigation avatar size */}
+          <User size={20} className="text-[var(--primary)]" />
+        </div>
+      </div>
+
+      <div className={ios.screen}>
+
+        {/* ── Active Plan Hero Card ── */}
+        <div className={ios.dashHero}>
+          {/* decorative circle — fixed brand motif */}
+          <div className="absolute -right-8 -top-8 w-[120px] h-[120px] rounded-full bg-white/10 pointer-events-none" />
+          {/* @layout-space-magic-ok: 120px decorative motif (fixed visual element, not layout region) */}
+          <div className="absolute -right-2 top-12 w-[80px] h-[80px] rounded-full bg-white/[0.07] pointer-events-none" />
+          {/* @layout-space-magic-ok: 80px decorative motif (fixed visual element) */}
+
+          <div className="flex items-start justify-between relative z-10">
+            <div>
+              <div className={ios.dashActiveBadge}>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#34c759]" />
+                {/* @layout-space-magic-ok: w-1.5/h-1.5=6px status dot — fixed indicator motif */}
+                <span className="text-[11px] font-semibold text-white">啟用中</span>
+                {/* text-[11px] @layout-space-magic-ok: iOS caption2 */}
+              </div>
+              <p className="text-[22px] font-bold text-white leading-tight">推薦方案・日本</p>
+              {/* text-[22px] @layout-space-magic-ok: iOS title2 */}
+              <p className={ios.dashHeroSub}>中華電信・5 GB・到期 2026/06/14</p>
+            </div>
+            <div className={`${ios.iconTile} ${ios.dashHeroIconTile}`}>
+              <Globe size={16} className="text-white" />
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className={`mt-[${tight}]`}>
+            <div className={ios.dashProgressLabel}>
+              <span>已用 1.4 GB</span><span>剩餘 3.6 GB</span>
+            </div>
+            <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+              {/* h-2 @layout-space-magic-ok: 8px progress bar in hero context — fixed visual motif (not UIProgressView; hero variant uses thinner bar) */}
+              <div className="h-full bg-white rounded-full" style={{ width: '28%' }} />
+            </div>
+          </div>
+        </div>
+
+        {/* ── 4 stat tiles ── */}
+        <div className={`flex gap-[${tight}] px-[${loose}] mt-[${tight}]`}>
+          <div className={ios.dashStatCard}>
+            <p className="text-[11px] font-medium text-[var(--fg-muted)] uppercase tracking-wide">今日用量</p>
+            {/* text-[11px] @layout-space-magic-ok: iOS caption2 stat label */}
+            <p className="text-[20px] font-bold text-[#1c1c1e]">234 MB</p>
+            {/* text-[20px] @layout-space-magic-ok: iOS title3 stat value */}
+            <div className={`${ios.iconTextPair} text-[var(--success)] text-[11px] font-medium`}>
+              <TrendingUp size={12} />正常
+            </div>
+          </div>
+          <div className={ios.dashStatCard}>
+            <p className="text-[11px] font-medium text-[var(--fg-muted)] uppercase tracking-wide">本月費用</p>
+            <p className="text-[20px] font-bold text-[#1c1c1e]">NT$680</p>
+            <p className="text-[11px] text-[var(--fg-muted)]">月結入帳</p>
+          </div>
+        </div>
+
+        {/* ── Active devices ── */}
+        <p className={ios.sectionLabel}>啟用中的裝置</p>
+        <div className={ios.groupCard}>
+          {[
+            { name: 'iPhone 16 Pro',  sub: 'iOS 18.3.2・主要裝置',  icon: Smartphone, active: true },
+            { name: 'iPad Pro 13"',   sub: 'iPadOS 18.3・已配置',   icon: Smartphone, active: true },
+          ].map(({ name, sub, icon: Icon, active }, i, arr) => (
+            <div key={name}>
+              <div className={ios.groupRow}>
+                <div className={`${ios.iconTile} ${active ? 'bg-[var(--primary-subtle)]' : 'bg-[rgba(120,120,128,0.1)]'}`}>
+                  <Icon size={16} className={active ? 'text-[var(--primary)]' : 'text-[var(--fg-muted)]'} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[15px] font-medium text-[#1c1c1e]">{name}</p>
+                  <p className="text-[13px] text-[var(--fg-muted)]">{sub}</p>
+                </div>
+                {active && <span className="text-[12px] font-semibold text-[var(--success)]">● 線上</span>}
+                {/* text-[12px] @layout-space-magic-ok: iOS footnote inline status */}
+              </div>
+              {i < arr.length - 1 && <div className={ios.groupDivider} />}
+            </div>
+          ))}
+        </div>
+
+        {/* ── Upcoming trip ── */}
+        <p className={ios.sectionLabel}>近期出差</p>
+        <div className={ios.groupCard}>
+          <div className={ios.groupRow}>
+            <div className={`${ios.iconTile} bg-[var(--warning-subtle)]`}>
+              <MapPin size={16} className="text-[#c47400]" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[15px] font-medium text-[#1c1c1e]">日本・東京</p>
+              <p className="text-[13px] text-[var(--fg-muted)]">2026/06/10 — 06/14・商務會議</p>
+            </div>
+            <span className={`text-[12px] font-semibold text-[var(--primary)]`}>進行中</span>
+          </div>
+          <div className={ios.groupDivider} />
+          <div className={ios.groupRow}>
+            <div className={`${ios.iconTile} bg-[rgba(120,120,128,0.1)]`}>
+              <MapPin size={16} className="text-[var(--fg-muted)]" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[15px] font-medium text-[#1c1c1e]">美國・紐約</p>
+              <p className="text-[13px] text-[var(--fg-muted)]">2026/07/02 — 07/06・客戶拜訪</p>
+            </div>
+            <button
+              className="text-[13px] font-semibold text-[var(--primary)]"
+              onClick={onGoActivate}
+            >
+              申請
+            </button>
+          </div>
+        </div>
+
+        <div className="h-8" />{/* @layout-space-magic-ok: scroll-bottom spacer */}
+      </div>
     </div>
   )
 }
@@ -951,7 +1106,7 @@ const SCREENS: Screen[] = ['login', 'checking', 'travel', 'plan', 'install', 'su
 export function EsimApp() {
   const [screen, setScreen] = useState<Screen>('login')
   const [plan,   setPlan]   = useState(PLANS[1])
-  const [tab,    setTab]    = useState<Tab>('activate')
+  const [tab,    setTab]    = useState<Tab>('home')
 
   // Onboarding = no tab bar; main app = tab bar visible
   const isOnboarding = screen === 'login' || screen === 'checking'
@@ -989,7 +1144,10 @@ export function EsimApp() {
     )
   }
 
+  const goActivate = () => { setTab('activate'); setScreen('travel') }
+
   const tabContent: Record<Tab, React.ReactNode> = {
+    home:     <DashboardTab onGoActivate={goActivate} />,
     activate: activateFlow[screen] ?? <ActivateHome />,
     esim:     <MyEsimTab />,
     usage:    <UsageTab />,
@@ -1016,13 +1174,13 @@ export function EsimApp() {
         {isOnboarding ? (
           screen === 'login'
             ? <LoginScreen    onNext={() => setScreen('checking')} />
-            : <CheckingScreen onNext={() => { setScreen('travel'); setTab('activate') }} />
+            : <CheckingScreen onNext={() => { setScreen('travel'); setTab('home') }} />
         ) : (
           <div className="flex flex-col flex-1 overflow-hidden">
             <div className="flex-1 overflow-hidden">
               {tabContent[tab]}
             </div>
-            <BottomTabBar tab={tab} onTabChange={t => { setTab(t); if (t !== 'activate') setScreen('travel') }} />
+            <BottomTabBar tab={tab} onTabChange={t => { setTab(t) }} />
           </div>
         )}
       </div>
