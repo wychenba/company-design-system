@@ -101,7 +101,7 @@ export const ColorMatrix: Story = {
         <H3>Status × 元素 色彩矩陣</H3>
         <Desc>
           FileItem 本身無色彩變體——text 走 item-anatomy row primitive 共用 token
-          (`--foreground` / `--fg-secondary`);background 依 mode 固定(rich = `--surface` + border / compact Type B = `--secondary` / compact Type A = transparent),**無 hover-bg**(見下方 Container background table)。
+          (`--foreground` / `--fg-secondary`);background 依 mode 固定(rich = `--surface` + border / compact 無 status = `--secondary` / compact 有 status = transparent),**無 hover-bg**(見下方 Container background table)。
           Status 才驅動色彩:progress bar 色(inProgress / success / error)+ status icon 色(check / X)+ description 色(error 時升階)。
         </Desc>
         <div className="overflow-x-auto mb-4">
@@ -162,7 +162,7 @@ export const ColorMatrix: Story = {
       <div>
         <H3>Container background(per mode,**無 hover-bg**)</H3>
         <Desc>
-          FileItem 設計準則(2026-04-23):**永不顯示 hover-bg**。三種型態皆已 permanent-anchored(rich = border card / compact Type B = bg-secondary / compact Type A = 底部 progress bar),再加 hover-bg 是 double-emphasis 視覺雜。affordance 只靠 `cursor-pointer`(onClick 時)+ hover-swap icon fade。詳 spec「Hover 行為 canonical」。
+          FileItem 設計準則(2026-04-23):**永不顯示 hover-bg**。三種型態皆已 permanent-anchored(rich = border card / compact 無 status = bg-secondary / compact 有 status = 底部 progress bar),再加 hover-bg 是 double-emphasis 視覺雜。affordance 只靠 `cursor-pointer`(onClick 時)+ hover-swap icon fade。詳 spec「Hover 行為 canonical」。
         </Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
@@ -171,8 +171,8 @@ export const ColorMatrix: Story = {
             </thead>
             <tbody>
               <tr><Td mono>rich(all status)</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--surface" size="sm" /><span className="font-mono">--surface</span> + border</span></Td><Td>永遠是 card(border + rounded + bg-surface)</Td></tr>
-              <tr><Td mono>compact Type B(no status)</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--secondary" size="sm" /><span className="font-mono">--secondary</span>(= neutral-3)</span></Td><Td>靜態 pill,對齊 Badge low / ProgressBar track SSOT</Td></tr>
-              <tr><Td mono>compact Type A(with status)</Td><Td><span className="font-mono">transparent</span></Td><Td>底部 progress bar 作 permanent affordance(分隔線型)</Td></tr>
+              <tr><Td mono>compact 無 status</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--secondary" size="sm" /><span className="font-mono">--secondary</span>(= neutral-3)</span></Td><Td>靜態 pill,對齊 Badge low / ProgressBar track SSOT</Td></tr>
+              <tr><Td mono>compact 有 status</Td><Td><span className="font-mono">transparent</span></Td><Td>底部 progress bar 作 permanent affordance(分隔線型)</Td></tr>
               <tr><Td mono>hover(任意 mode)</Td><Td><span className="font-mono">無變化</span></Td><Td>permanent-anchored → 不加 hover-bg。cursor-pointer 作 affordance(onClick 時)</Td></tr>
               <tr><Td mono>error</Td><Td><span className="font-mono">容器不變</span></Td><Td>只升階 description / bar / icon,不染容器——避免整 row 轉紅蓋過其他 metadata</Td></tr>
             </tbody>

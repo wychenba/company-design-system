@@ -12,7 +12,7 @@ export default meta
 type Story = StoryObj
 
 // 2026-06-03:loading 從 showcase 移除 — 其唯一用途(無清單單檔/頭像替換)deferred(待定義);
-// 有清單的上傳進度走 FileItem(Type A)。loading prop 在 tsx 保留供未來該場景,但不在此 3-state showcase 呈現。
+// 有清單的上傳進度走 FileItem 自身 progress bar(status=uploading)。loading prop 在 tsx 保留供未來該場景,但不在此 3-state showcase 呈現。
 type StateKey = 'idle' | 'drag-over' | 'disabled'
 
 const STATE_DESC: Record<StateKey, string> = {

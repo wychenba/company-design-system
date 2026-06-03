@@ -39,7 +39,7 @@ const deleteBtnXs = deleteBtn
 export const Rich = {
   name: '豐富樣式',
   render: () => (
-    // Type A upload manager:所有 item 都有 status + progress bar(含 completed 100%)
+    // rich(預設 form surface)各 status 展示:uploading / completed(保留 100% 完成條)/ error
     // 也可傳 onClick/onDownload 讓整 row 點開(預設 FileViewer,consumer 決定)
     // Rich 永遠 border card → list wrapper `gap-2` 防邊框相黏
     <div className="flex flex-col gap-2 max-w-md">
@@ -58,7 +58,7 @@ export const Rich = {
 export const Compact = {
   name: '緊湊樣式',
   render: () => (
-    // Compact + status(永遠有 progress bar)= Type A upload manager
+    // compact + status 各狀態展示(uploading / completed / error,永遠有 progress bar)
     // list wrapper `gap-1`(4px)簡化 canonical — compact list 統一 gap-1,不論純/混合(2026-04-23)
     <div className="flex flex-col gap-1 max-w-md">
       <FileItem mode="compact" name="UXP T-Phone.csv" status="uploading" progress={60} actions={deleteBtnXs} />
@@ -187,11 +187,11 @@ export const Clickable = {
 export const CompactMixed = {
   name: 'Compact 混合',
   render: () => (
-    // Real-world:email 草稿 — 新上傳中(Type A active)+ 舊已存附件(Type B 靜態)混在同 list
-    // **重要 invariant**:Type A **completed**(bar 100% + ✓)跟 Type B(無 bar)不共存
-    // —— Type A completed 是「剛完成的 upload session」,Type B 是「已存 attachment」,
-    //    業務語義互斥(完成後 consumer 會把 item 轉成 Type B)。
-    // 這 mixed 情境只含:Type A active(uploading/error)+ Type B(saved attachments)
+    // Real-world:email 草稿 — 新上傳中(status=uploading/error)+ 舊已存附件(無 status 靜態)混在同 list
+    // **重要 invariant**:upload-manager 的 **completed**(bar 100% + ✓)跟靜態(無 bar)不共存
+    // —— completed-保留 是「剛完成的 upload session」,無 status 是「已存 attachment」,
+    //    業務語義互斥(表單情境完成後 consumer 會清掉 status 轉靜態)。
+    // 這 mixed 情境只含:上傳中(uploading/error)+ 已存附件(saved attachments,無 status)
     <div className="flex flex-col gap-1 max-w-md">
       <FileItem mode="compact" name="圖片草稿.png" status="uploading" progress={40} actions={deleteBtnXs} />
       <FileItem mode="compact" name="回覆範本.docx" onClick={noop} actions={deleteBtnXs} />
@@ -203,9 +203,9 @@ export const CompactMixed = {
   ),
 }
 
-// surface="upload-manager":Google Drive / Dropbox 背景上傳 box。面板組合 canonical(2026-06-03 圖五 user 校準):
-//   - 面板左右 padding 一律 loose(16px)→ item 內容左緣跟 header 標題切齊(compact/rich 同)
-//   - 面板「上下 padding == 列間 gap」(每 list 內垂直對稱);rich list 兩值都 tight(12px),compact 兩值都 4px
+// surface="upload-manager":Google Drive / Dropbox 上傳管理面板。面板組合 canonical(2026-06-03 圖五 user 校準):
+//   - 面板「外框 padding」固定 = 左右 loose(16px)+ 上下 tight(12px),compact/rich 同(一致的面板框,左右對齊 header)
+//   - 「列間 gap」反映密度:rich = tight(12px,卡片+48 縮圖)/ compact = 4px(密集文字列)
 //   - rich item 拿掉全部 padding(px-0 py-0,列高靠 avatar 48);左右交給面板,避免雙重 L/R。對比 surface=form 的 border card。
 export const UploadManagerSurface = {
   name: 'Upload manager · 豐富(無邊框)',
@@ -229,8 +229,8 @@ export const UploadManagerSurface = {
   ),
 }
 
-// surface="upload-manager" 的 compact list:同樣 header 對齊(左右 loose),但「上下 padding == gap」兩值都 4px
-// (密集文字列,無 avatar 撐高 → item 自身保留 py-2 作列高來源)。對比上面 rich panel 的 16px 對稱,demo 兩 mode 間距差異。
+// surface="upload-manager" 的 compact list:外框 padding 跟 rich 面板同(左右 loose 16 / 上下 tight 12),
+// 但列間 gap 只 4px(密集文字列,item 自身保留 py-2 作列高來源)。對比上面 rich panel 的 12px gap,demo 兩 mode 密度差異。
 export const UploadManagerCompactSurface = {
   name: 'Upload manager · 精簡(無邊框)',
   render: () => (
@@ -240,8 +240,8 @@ export const UploadManagerCompactSurface = {
         <span className="text-body font-medium text-foreground">同步 3 個檔案</span>
         <Button size="xs" iconOnly variant="text" startIcon={ChevronDown} aria-label="收合" onClick={noop} />
       </div>
-      {/* compact list:px loose 對齊 header;上下 py-1 + 列間 gap-1 對稱 4px(密集文字列) */}
-      <div className="flex flex-col gap-1 px-[var(--layout-space-loose)] py-1">
+      {/* compact list:外框 px loose(16)+ py tight(12,跟 rich 面板同 frame);列間 gap-1(4px,密集列)*/}
+      <div className="flex flex-col gap-1 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
         <FileItem mode="compact" surface="upload-manager" name="季度報告.docx" status="uploading" progress={60}
           onClick={noop} actions={deleteBtn} />
         <FileItem mode="compact" surface="upload-manager" name="客戶名單.csv" status="completed"

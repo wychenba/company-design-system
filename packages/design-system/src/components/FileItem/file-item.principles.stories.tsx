@@ -175,7 +175,7 @@ export const StatusProgressRule: Story = {
 
       <Rule
         title="completed — 成功 icon + 100% 完成條"
-        note="完成後保留 100% 綠色完成條(Type A upload manager narrative,Dropbox / Google Drive 慣例),成功 icon 再加一層明確表達「完成」。檔案變可點擊(下載)"
+        note="完成後保留 100% 綠色完成條(surface=upload-manager narrative —— 上傳狀態是重點,Dropbox / Google Drive 慣例),成功 icon 再加一層明確表達「完成」。檔案變可點擊(下載)"
       >
         <FileItem
           name="users-export.csv"

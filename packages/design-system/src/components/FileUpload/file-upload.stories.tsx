@@ -137,7 +137,7 @@ export const CustomChildren = {
 }
 
 // variant="button":表單內緊湊上傳(*Excel file 欄位場景)— 大 dropzone 太重時用按鈕觸發,
-// 檔案清單在按鈕下方(Type B compact)。2026-06-03 加 — FileUpload 常出現在 form。
+// 檔案清單在按鈕下方(form compact 靜態)。2026-06-03 加 — FileUpload 常出現在 form。
 export const ButtonVariant = {
   name: '按鈕觸發(表單內)',
   render: () => {

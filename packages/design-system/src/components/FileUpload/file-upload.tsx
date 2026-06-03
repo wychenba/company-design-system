@@ -73,7 +73,7 @@ export interface FileUploadProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   /**
    * Loading 狀態(async 上傳 / 伺服器處理中)。
    * - 2026-06-03 **deferred**:其唯一用途(無清單單檔 / 頭像替換)場景尚未定義,故已從 3-state showcase
-   *   移除、不作為當前 feature 呈現;prop 保留供未來該場景。有清單的上傳進度走 FileItem(Type A）。
+   *   移除、不作為當前 feature 呈現;prop 保留供未來該場景。有清單的上傳進度走 FileItem 自身 progress bar(status=uploading）。
    * - 顯示 CircularProgress 取代預設 Empty 內容;`cursor-progress`;互動由 handleClick/handlers 的 isBlocked guard 擋
    * - 宣告 `aria-busy="true"` 讓 screen reader 感知處理中
    */
