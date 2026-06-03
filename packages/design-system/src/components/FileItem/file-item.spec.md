@@ -291,9 +291,11 @@ upload-manager 的 completed(100% bar + ✓)屬「剛完成的 upload session」
 `surface=upload-manager` 的 FileItem list 裝在獨立浮層面板(header + 列表),item 拿掉的左右 / 上下邊距改由容器負責:
 
 - **左右**:一律 `px-[var(--layout-space-loose)]`(16px,item 內容左緣對齊 header 標題)。
-- **上下邊緣 → 首/末 item 內容距離 = `var(--layout-space-tight)`(12px),兩 mode 視覺一致**。但 container `py` 值需扣掉 item 自身 py(避免重複計入):**rich** item py=0 → container `py-[var(--layout-space-tight)]`(12px);**compact** item 自帶 `py-2`(8px)→ container `py-1`(**4px**,4+8=12)。
+- **上下:目標 = 邊緣到 item「ink」(可見內容)距離 `var(--layout-space-tight)`(12px),兩 mode + 上下都一致**。通則:**容器該側 padding = 12 − item 在該側自己的留白(ink inset)**。
+  - **rich**:item 上下 ink inset 皆 0(avatar 頂、bar/content 底貼齊)→ container `py-[var(--layout-space-tight)]`(12px / 12px 對稱)。
+  - **compact**:item 上方自帶 `py-2`(8px)→ container `pt-1`(4px,4+8=12);**進度條 `absolute bottom-0` 貼 item 底、下方無留白(inset 0)**→ container `pb-[var(--layout-space-tight)]`(12px,12+0=12)。故 compact 容器**上下不對稱** `pt-1 pb-[tight]`。
 - **列間 gap 反映密度**:rich `gap-[var(--layout-space-tight)]`(12px,卡片 + 48 縮圖)/ compact `gap-1`(4px,密集文字列)。
-- **為何 compact container py = 4px 不是 12px**(2026-06-03 圖一研究校準):compact item 自帶 py-2 作列高,若 container 也用 12px → 邊緣變 20px、比 rich 的 12px 更空(反而 compact 看起來比 rich 鬆)。container 取 4px 讓 4+8=12 對齊 rich 邊緣。世界級對照:密集 list / dropdown 容器上下 padding 慣例 4–8px(Atlassian space.050–100 / 8px-base 共識),12px(space.150)屬「較不密集」級距。
+- **為何 compact container 上下不對稱**(2026-06-03 圖一研究校準):compact 進度條 absolute 貼底,item 的 py-2 那 8px 落在「文字↔bar」之間、bar 下方無 padding;若上下都用同值 → 下邊距(bar→邊緣)只剩容器值、比上邊距(含 item 8px)小。故用「12 − ink inset」逐側補。世界級對照:密集 list / dropdown 容器上下 padding 慣例 4–8px(Atlassian space.050–100 / 8px-base 共識);此處目標 12px 是「邊緣→ink」視覺值(含 item 自身留白),非容器裸值。
 - Demo:`file-item.stories.tsx` 的 `UploadManagerSurface`(rich)/ `UploadManagerCompactSurface`(compact)。
 
 **Rich + Compact 不可混用**(見 Invariant 1 上方),故無「混用 gap」決策。
