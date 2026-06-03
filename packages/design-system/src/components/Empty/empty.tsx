@@ -29,7 +29,7 @@ export interface EmptyProps extends React.HTMLAttributes<HTMLDivElement> {
   action?: React.ReactNode
   /**
    * Disabled context(2026-06-03 加 — FileUpload disabled 等情境消費):title / description 轉
-   * `text-fg-disabled`(語意 disabled token,非 opacity)。icon(Avatar)維持 neutral(icon-circle muted)。
+   * `text-fg-disabled`(語意 disabled token,非 opacity)。icon glyph 也 → fg-disabled(icon 是文字一環);icon-circle bg 維持 muted。
    * 預設 false,不影響既有 consumer。
    */
   disabled?: boolean
@@ -51,7 +51,8 @@ const Empty = React.forwardRef<HTMLDivElement, EmptyProps>(
         iconElement = icon
       } else {
         const Icon = icon as LucideIcon
-        iconElement = <Avatar icon={Icon} size={48} color="neutral" />
+        // disabled:glyph → fg-disabled([&_svg]:!… 蓋過 Avatar 內聯 color;circle bg 維持 muted)。icon 是文字一環,隨 disabled 變淡。
+        iconElement = <Avatar icon={Icon} size={48} color="neutral" className={disabled ? '[&_svg]:!text-fg-disabled' : undefined} />
       }
     }
 

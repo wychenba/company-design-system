@@ -1,3 +1,4 @@
+// @anatomy-exempt: 設計規格 anatomy 文件用 token-matrix / props doc 表格(教學對照,非 list-item raw-table 反 pattern)
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { FileUpload } from './file-upload'
@@ -10,12 +11,13 @@ const meta: Meta = {
 export default meta
 type Story = StoryObj
 
-type StateKey = 'idle' | 'drag-over' | 'loading' | 'disabled'
+// 2026-06-03:loading 從 showcase 移除 — 其唯一用途(無清單單檔/頭像替換)deferred(待定義);
+// 有清單的上傳進度走 FileItem(Type A)。loading prop 在 tsx 保留供未來該場景,但不在此 3-state showcase 呈現。
+type StateKey = 'idle' | 'drag-over' | 'disabled'
 
 const STATE_DESC: Record<StateKey, string> = {
   idle: '使用者未互動(預設)',
   'drag-over': '使用者拖檔進入區塊內',
-  loading: 'loading 屬性為 true(上傳中 / 處理中)',
   disabled: 'disabled 屬性為 true',
 }
 
@@ -23,7 +25,6 @@ const STATE_DESC: Record<StateKey, string> = {
 const MockDropzone = ({ state }: { state: StateKey }) => (
   <FileUpload
     data-state={state}
-    loading={state === 'loading'}
     disabled={state === 'disabled'}
     onUpload={() => {}}
   />
@@ -84,12 +85,12 @@ export const Overview: Story = {
                 ['multiple', 'boolean', 'false', '允許多檔。false 時拖多檔只取第一個(Ant 慣例)'],
                 ['accept', 'string', '—', 'MIME filter,支援 .pdf / image/* / application/pdf'],
                 ['maxSize', 'number', '—', '單檔最大 bytes;超過進 onReject'],
-                ['disabled', 'boolean', 'false', '完全停用(pointer-events-none + cursor-not-allowed)'],
+                ['disabled', 'boolean', 'false', '完全停用(語意 token bg-disabled + cursor-not-allowed;互動由 handler isBlocked guard 擋,非 pointer-events-none)'],
                 ['title', 'string', "'Click or drag file here to upload'", '預設結構(Empty)的主標題'],
                 ['description', 'string', '單/多檔字串自動切換', '預設結構(Empty)的副標題'],
                 ['children', 'ReactNode', '—', '傳入則整個覆寫預設 Empty 結構(consumer 完全客製)'],
-                ['loading', 'boolean', 'false', '上傳 / 處理中:以 CircularProgress 取代預設內容、阻擋新互動、aria-busy=true'],
-                ['loadingTitle', 'string', "'上傳中…'", 'loading 狀態的文字標題'],
+                ['loading', 'boolean', 'false', '(deferred — 頭像/無清單單檔場景待定義,已從 showcase 移除)async 處理中:CircularProgress 取代內容、isBlocked guard 擋互動、aria-busy=true'],
+                ['loadingTitle', 'string', "'上傳中…'", 'loading 狀態的文字標題(deferred)'],
                 ['files', 'FileUploadStatus[]', '—', '內建檔案清單。傳入 → drop zone 下方渲染列表(經由 FileItem);不傳 → 不顯示'],
                 ['fileListMode', "'compact' | 'rich'", "'compact'", '清單每項顯示模式。rich = 含 thumbnail / size / linear progress bar'],
                 ['onRemove', '(id: string) => void', '—', '清單移除 callback。有值 → 每項右側顯示 X 移除鈕;無 → view-only'],
@@ -119,11 +120,12 @@ export const Inspector: Story = {
         <div>
           <H3>State 切換</H3>
           <Desc>
-            FileUpload 有 4 個狀態:idle / drag-over / loading / disabled。優先序為
-            disabled &gt; loading &gt; drag-over &gt; idle。預覽切換狀態後可對照右側 token 面板。
+            FileUpload 有 3 個狀態:idle / drag-over / disabled。優先序為 disabled &gt; drag-over &gt; idle。
+            hover 與 drag-over 視覺統一(純 border-driven)。預覽切換狀態後可對照右側 token 面板。
+            (loading 已 deferred — 見上方 type 註解)
           </Desc>
           <div className="flex gap-2 mb-4">
-            {(['idle', 'drag-over', 'loading', 'disabled'] as StateKey[]).map((s) => (
+            {(['idle', 'drag-over', 'disabled'] as StateKey[]).map((s) => (
               <button
                 key={s}
                 onClick={() => setState(s)}
@@ -155,32 +157,30 @@ export const Inspector: Story = {
               <div>&nbsp;&nbsp;gaps: mb-4 / --item-gap-label-desc-reading-lg (via Empty)</div>
               <hr className="my-2 border-divider" />
               <div className="flex items-center gap-1.5">
-                bg: <TokenCell token={state === 'drag-over' ? '--primary-subtle' : '--surface'} />
+                bg: <TokenCell token={state === 'disabled' ? '--disabled' : '--surface'} />
+                <span className="text-fg-muted">(hover/drag-over 底維持 surface,不變)</span>
               </div>
               <div className="flex items-center gap-1.5">
                 border:{' '}
-                <TokenCell token={state === 'drag-over' ? '--primary' : '--divider'} />
+                <TokenCell token={state === 'drag-over' ? '--primary' : '--border'} />
+                <span className="text-fg-muted">(idle `--border` 元件邊框;hover=drag-over 統一 `--primary`,純 border-driven)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                icon glyph: <TokenCell token="--foreground" />
-                <span className="text-fg-muted">(via Empty→Avatar neutral,不隨 state 變色)</span>
+                icon glyph: <TokenCell token={state === 'disabled' ? '--fg-disabled' : '--foreground'} />
+                <span className="text-fg-muted">(via Empty→Avatar neutral;disabled 時 glyph → fg-disabled)</span>
               </div>
               <div className="flex items-center gap-1.5">
                 icon bg circle: <TokenCell token="--muted" />
+                <span className="text-fg-muted">(disabled 時不變)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                text(title): <TokenCell token="--foreground" />
+                text(title): <TokenCell token={state === 'disabled' ? '--fg-disabled' : '--foreground'} />
               </div>
               <div className="flex items-center gap-1.5">
-                text(desc): <TokenCell token="--fg-secondary" />
+                text(desc): <TokenCell token={state === 'disabled' ? '--fg-disabled' : '--fg-secondary'} />
               </div>
-              {state === 'loading' && (
-                <div className="text-fg-secondary mt-1">
-                  + 顯示 CircularProgress 取代預設內容 + cursor-progress + pointer-events-none + aria-busy
-                </div>
-              )}
               {state === 'disabled' && (
-                <div className="text-error mt-1">+ opacity-disabled + pointer-events-none + cursor-not-allowed</div>
+                <div className="text-fg-secondary mt-1">+ 語意 token disabled(bg-disabled,非 opacity)+ cursor-not-allowed(互動由 handler isBlocked guard 擋,非 pointer-events-none)</div>
               )}
             </div>
           </div>
@@ -197,9 +197,8 @@ export const ColorMatrix: Story = {
       <div>
         <H3>State × Token 矩陣</H3>
         <Desc>
-          四個狀態的顏色 token 對照。dashed border 在所有狀態下都維持(世界級 dropzone 共識),
-          state 差異只落在「color」而不加 scale / shadow(避免視覺噪音)。loading 不變灰(跟 disabled
-          區隔),改以 CircularProgress 表達「處理中」。
+          三個狀態的顏色 token 對照(2026-06-03 更新)。dashed border 在所有狀態下都維持(世界級 dropzone 共識),
+          state 差異純靠「border color」(hover=drag-over 統一,底色不變);disabled 走語意 token(非 opacity)。
         </Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
@@ -208,7 +207,7 @@ export const ColorMatrix: Story = {
                 <Th>State</Th>
                 <Th>Border</Th>
                 <Th>Background</Th>
-                <Th>Icon color</Th>
+                <Th>Icon / text color</Th>
                 <Th>說明</Th>
               </tr>
             </thead>
@@ -216,7 +215,7 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td mono>idle ★default</Td>
                 <Td>
-                  <TokenCell token="--divider" />
+                  <TokenCell token="--border" />
                 </Td>
                 <Td>
                   <TokenCell token="--surface" />
@@ -224,46 +223,33 @@ export const ColorMatrix: Story = {
                 <Td>
                   <TokenCell token="--foreground" />
                 </Td>
-                <Td>hover 另加 `bg-neutral-hover`</Td>
+                <Td>`--border` 元件邊框(非 `--divider`);hover → border 切 `--primary`(同 drag-over)</Td>
               </tr>
               <tr>
-                <Td mono>drag-over</Td>
+                <Td mono>drag-over = hover</Td>
                 <Td>
                   <TokenCell token="--primary" />
-                </Td>
-                <Td>
-                  <TokenCell token="--primary-subtle" />
-                </Td>
-                <Td>
-                  <TokenCell token="--foreground" />
-                </Td>
-                <Td>使用者拖檔進入區塊時(icon 不變色,僅 border / bg 切 primary)</Td>
-              </tr>
-              <tr>
-                <Td mono>loading</Td>
-                <Td>
-                  <TokenCell token="--divider" />
                 </Td>
                 <Td>
                   <TokenCell token="--surface" />
                 </Td>
                 <Td>
-                  <TokenCell token="--primary" />
+                  <TokenCell token="--foreground" />
                 </Td>
-                <Td>不變灰;預設 icon 換成 CircularProgress(arc `--primary`) + `cursor-progress` + `pointer-events-none`</Td>
+                <Td>hover 與 drag-over 統一:純 border-driven(只切 `--primary` 邊框,底色維持 surface,對齊 Ant Dragger)</Td>
               </tr>
               <tr>
                 <Td mono>disabled</Td>
                 <Td>
-                  <TokenCell token="--divider" />
+                  <TokenCell token="--border" />
                 </Td>
                 <Td>
-                  <TokenCell token="--surface" />
+                  <TokenCell token="--disabled" />
                 </Td>
                 <Td>
-                  <TokenCell token="--foreground" />
+                  <TokenCell token="--fg-disabled" />
                 </Td>
-                <Td>整體套 `opacity-disabled` + `pointer-events-none`(icon 仍 `--foreground`,由 wrapper opacity 變淡)</Td>
+                <Td>語意 token(非 opacity):bg→`--disabled`、邊框不變色、文字 + icon glyph → `--fg-disabled`(icon-circle 維持 muted)+ `cursor-not-allowed`</Td>
               </tr>
             </tbody>
           </table>
@@ -365,7 +351,7 @@ export const StateBehavior: Story = {
               <tr>
                 <Td mono>dragenter</Td>
                 <Td>檔案拖入區塊</Td>
-                <Td>`data-state="drag-over"`(border-primary + bg-primary-subtle)</Td>
+                <Td>`data-state="drag-over"`(border-primary;底色維持 surface,純 border-driven = hover)</Td>
               </tr>
               <tr>
                 <Td mono>dragleave</Td>
@@ -436,8 +422,9 @@ export const StateBehavior: Story = {
       <div>
         <H3>Disabled 時的行為</H3>
         <Desc>
-          disabled 時整塊 `pointer-events-none`——drag / click / Enter / Space 全部無反應,hidden
-          input 也帶 `disabled`,避免 screen reader 聚焦。
+          disabled 時 drag / click / Enter / Space 全部無反應 —— 由各 handler 的 `isBlocked` guard 擋
+          (2026-06-03 改:不用 `pointer-events-none`,否則 `cursor-not-allowed` 會失效);hidden input 也帶
+          `disabled`,避免 screen reader 聚焦。視覺走語意 token(`bg-disabled` + 文字/icon `fg-disabled`,非 opacity)。
         </Desc>
       </div>
     </div>

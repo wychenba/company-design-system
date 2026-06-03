@@ -72,10 +72,10 @@ export interface FileUploadProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   buttonLabel?: string
   /**
    * Loading 狀態(async 上傳 / 伺服器處理中)。
-   * - 顯示 CircularProgress 取代預設 Empty 內容
-   * - 阻擋新點擊 / drag 事件(避免 double-submit)
+   * - 2026-06-03 **deferred**:其唯一用途(無清單單檔 / 頭像替換)場景尚未定義,故已從 3-state showcase
+   *   移除、不作為當前 feature 呈現;prop 保留供未來該場景。有清單的上傳進度走 FileItem(Type A）。
+   * - 顯示 CircularProgress 取代預設 Empty 內容;`cursor-progress`;互動由 handleClick/handlers 的 isBlocked guard 擋
    * - 宣告 `aria-busy="true"` 讓 screen reader 感知處理中
-   * - Consumer 負責在上傳完成後自己切回 `loading={false}`
    */
   loading?: boolean
   /** Loading 狀態的文字標題(預設「上傳中…」) */
@@ -229,7 +229,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             onChange={(e) => filterAndDispatch(e.target.files)}
           />
           <Button
-            variant="secondary"
+            variant="tertiary"
             startIcon={UploadIcon}
             loading={loading}
             disabled={disabled}
