@@ -121,10 +121,14 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
 
 ## Padding
 
-| Mode | 規則 |
+| Mode × surface | 規則 |
 |---|---|
-| compact(預設) | 固定 `px-3 py-2`(FileItem 無 size prop,不走 `ROW_PADDING_BY_SIZE` 公式;`gap-2` 對齊 item-anatomy row) |
-| rich | py 固定(高度由 avatar 決定,不走 row 公式),容器 inline className 固定 `px-3 py-3`(具體值見 `file-item.tsx`,非 cva——FileItem 用 conditional rendering 分流 mode×status) |
+| compact(`surface=form` 預設) | `px-3 py-2`(FileItem 無 size prop,不走 `ROW_PADDING_BY_SIZE` 公式;`gap-2` 對齊 item-anatomy row) |
+| compact(`surface=upload-manager`) | **`py-2` 保留 + 左右 padding 拿掉**(`px-0`)。py 是**純文字列高來源**(無 avatar 撐高)不可拿;左右拿掉讓列對齊面板 loose L/R |
+| rich(`surface=form` 預設) | `px-3 py-3` border card(py 固定,高度由 avatar 決定不走 row 公式)|
+| rich(`surface=upload-manager`) | **左右 + 上下 padding 全拿掉**(`px-0 py-0`)。**列高靠 avatar 48(content `minHeight`)**,卡片移除後 py 多餘 → 由面板 + gap 控制間距(2026-06-03 user 校準:rich 拿上下、compact 保留上下,因列高來源不同)|
+
+**upload-manager 面板 composition canonical**(2026-06-03,consumer 組面板用):面板提供 `px-[var(--layout-space-loose)]`(16px,與 header 內容對齊)+ 上下 padding + 列間 gap;**compact/rich 兩種 list 的面板上下 padding + gap 用同值(4px)= 視覺對稱**。item 只負責「不該由容器控的內距」(compact `py-2` 列高 / rich `0` 靠 avatar);左右一律交給面板(避免雙重 L/R padding + 對齊 header)。
 
 ## 邊框 / 背景(AR15-21 canonical,2026-04-21 · 2026-04-22 擴充)
 

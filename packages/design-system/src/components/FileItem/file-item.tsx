@@ -244,10 +244,12 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
         <div
           ref={ref}
           className={cn(
-            'group/row flex items-start gap-2 px-3 py-3 w-full text-body leading-compact transition-colors',
+            'group/row flex items-start gap-2 w-full text-body leading-compact transition-colors',
             // surface=form → border card(自立輪廓);surface=upload-manager → 無邊框(box 自身是容器,
             // avatar 作 item 邊界)。2026-06-03 codify rich-borderless(原僅 spec 旁註,consumer 自己移除)。
-            surface === 'upload-manager' ? 'rounded-md' : 'border border-divider rounded-md bg-surface',
+            // 2026-06-03 圖五:upload-manager rich 拿掉 px+py(卡片移除後 py 多餘,列高靠 avatar 48 的 content minHeight;
+            // 容器 + gap 控制間距)。form 保留 px-3 py-3 卡片內距。
+            surface === 'upload-manager' ? 'rounded-md' : 'px-3 py-3 border border-divider rounded-md bg-surface',
             hoverClass,
             className,
           )}
@@ -282,7 +284,9 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       <div
         ref={ref}
         className={cn(
-          'group/row relative flex items-start gap-2 px-3 py-2 w-full text-body leading-compact transition-colors rounded-md',
+          'group/row relative flex items-start gap-2 py-2 w-full text-body leading-compact transition-colors rounded-md',
+          // 2026-06-03 圖五:upload-manager compact 只拿掉左右 padding(對齊面板 loose L/R);py-2 保留(純文字列高來源)
+          surface === 'upload-manager' ? '' : 'px-3',
           compactStaticBg,
           hoverClass,
           className,

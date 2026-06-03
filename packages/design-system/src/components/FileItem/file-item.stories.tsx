@@ -1,7 +1,7 @@
 // @story-trait-rationale: hasInteractiveStates 由 anatomy.stories.tsx StateBehavior auto-compile owns(2026-05-15 F-migration);Default scenario 由 Rich / Compact / HoverSwap 等真實上傳情境 story 覆蓋,Disabled state 由 status="error" / "uploading" 真實 state 體現。
 import * as React from 'react'
 import type { Meta } from '@storybook/react'
-import { Trash2 } from 'lucide-react'
+import { Trash2, ChevronDown } from 'lucide-react'
 import { FileItem } from './file-item'
 import { Button } from '@/design-system/components/Button/button'
 import { FileViewer, type FileInfo } from '@/design-system/components/FileViewer/file-viewer'
@@ -203,18 +203,28 @@ export const CompactMixed = {
   ),
 }
 
-// surface="upload-manager":Google Drive / Dropbox 背景上傳 box — rich 無邊框(box 自身是容器,
-// avatar 作每筆 item 邊界),列間 4px(無邊框 → 跟 compact 同間距)。對比預設 surface=form 的 border card。
+// surface="upload-manager":Google Drive / Dropbox 背景上傳 box。面板組合 canonical(2026-06-03 圖五):
+//   - rich item 拿掉全部 padding(px-0 py-0,列高靠 avatar 48),compact item 保留上下 py-2(純文字列高來源)
+//   - 面板提供 px-[var(--layout-space-loose)](16px,跟 header 標題左緣切齊)+ 上下 py-1 + 列間 gap-1 對稱 4px
+//   - item 不自帶左右 padding → 避免雙重 L/R + 跟 header 對齊。對比預設 surface=form 的 border card。
 export const UploadManagerSurface = {
   name: 'Upload manager(無邊框)',
   render: () => (
-    <div className="flex flex-col gap-1 max-w-md rounded-md border border-divider bg-surface p-2">
-      <FileItem mode="rich" surface="upload-manager" name="Alan Profile.png" status="uploading" progress={40}
-        description="5.7 MB of 7.5MB" thumbnailSrc="https://i.pravatar.cc/80?u=alan" actions={deleteBtn} />
-      <FileItem mode="rich" surface="upload-manager" name="Q1 營收報表.xlsx" status="completed"
-        description="2.4 MB" thumbnailSrc="https://i.pravatar.cc/80?u=xls" onDownload={noop} actions={deleteBtn} />
-      <FileItem mode="rich" surface="upload-manager" name="合約草案 v3.pdf" status="error"
-        description="There's something wrong. View log" thumbnailSrc="https://i.pravatar.cc/80?u=pdf" onRetry={noop} actions={deleteBtn} />
+    <div className="max-w-md rounded-md border border-divider bg-surface shadow-[var(--elevation-200)]">
+      {/* header:上傳進度標題列。px loose 與下方 item 內容左緣切齊 */}
+      <div className="flex items-center justify-between px-[var(--layout-space-loose)] py-2 border-b border-divider">
+        <span className="text-body font-medium text-foreground">正在上傳 3 個項目</span>
+        <Button size="xs" iconOnly variant="text" startIcon={ChevronDown} aria-label="收合" onClick={noop} />
+      </div>
+      {/* list:px loose 對齊 header;上下 py-1 + 列間 gap-1 對稱 4px(無邊框 rich → 跟 compact 同間距) */}
+      <div className="flex flex-col gap-1 px-[var(--layout-space-loose)] py-1">
+        <FileItem mode="rich" surface="upload-manager" name="Alan Profile.png" status="uploading" progress={40}
+          description="5.7 MB of 7.5 MB" thumbnailSrc="https://i.pravatar.cc/80?u=alan" actions={deleteBtn} />
+        <FileItem mode="rich" surface="upload-manager" name="Q1 營收報表.xlsx" status="completed"
+          description="2.4 MB" thumbnailSrc="https://i.pravatar.cc/80?u=xls" onDownload={noop} actions={deleteBtn} />
+        <FileItem mode="rich" surface="upload-manager" name="合約草案 v3.pdf" status="error"
+          description={errorDescWithLog} thumbnailSrc="https://i.pravatar.cc/80?u=pdf" onRetry={noop} actions={deleteBtn} />
+      </div>
     </div>
   ),
 }
