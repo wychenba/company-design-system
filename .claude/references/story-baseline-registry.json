@@ -16,13 +16,13 @@
       "antiPatterns": [
         {
           "id": "sidebar-header-simplified-span",
-          "regex": "<SidebarHeader>\\s*<span",
+          "regex": "<SidebarHeader>[[:space:]]*<span",
           "severity": "block",
           "rationale": "SidebarHeader 必 wrap WorkspaceBrand-like ItemAvatar block(per sidebar.stories#IconCollapse baseline);simplified <span> mock = drift"
         },
         {
           "id": "sidebar-menu-button-inline-icon",
-          "regex": "<SidebarMenuButton>[^<]*<[A-Z][a-zA-Z]+\\s+className=\"size-",
+          "regex": "<SidebarMenuButton>[^<]*<[A-Z][a-zA-Z]+[[:space:]]+className=\"size-",
           "severity": "block",
           "rationale": "SidebarMenuButton 必用 startIcon prop + tooltip prop;children inline icon = drift"
         }
@@ -69,7 +69,7 @@
       "antiPatterns": [
         {
           "id": "chromeheader-span-flex-1",
-          "regex": "<ChromeHeader>[\\s\\S]*?<span\\s+className=\"[^\"]*flex-1[^\"]*\">",
+          "regex": "<ChromeHeader>.{0,160}<span[[:space:]]+className=\"[^\"]*flex-1[^\"]*\">",
           "severity": "block",
           "rationale": "ChromeHeader title 該用 <h1 className=\"text-body-lg font-medium\"> 緊鄰 SidebarTrigger,不該用 <span flex-1> 撐空間造成 toggle + title 巨大間距"
         }

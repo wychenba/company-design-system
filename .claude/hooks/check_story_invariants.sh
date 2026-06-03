@@ -581,9 +581,14 @@ rule_story_archetype_registry() {
     PATTERNS=$(jq -r --arg c "$COMP" '.components[$c].antiPatterns[]? | select(.severity == "block") | .regex' "$REGISTRY" 2>/dev/null)
     [ -z "$PATTERNS" ] && continue
 
+    # 2026-06-03 修:CONTENT 換行 → 空格再 grep。真實 JSX 是多行(<ChromeHeader> 與 <span> 分行),
+    # 而 grep -E 是 line-oriented + registry regex 用 [[:space:]] 可攜語法 → 不正規化的話多行 antiPattern
+    # 靜默漏 = 假 P0(對抗稽核抓到)。tr 後整段成單行,[[:space:]]* / .* 才能跨原換行匹配。
+    local CONTENT_FLAT
+    CONTENT_FLAT=$(echo "$CONTENT" | tr '\n' ' ')
     while IFS= read -r PATTERN; do
       [ -z "$PATTERN" ] && continue
-      if echo "$CONTENT" | grep -qE "$PATTERN"; then
+      if echo "$CONTENT_FLAT" | grep -qE "$PATTERN"; then
         echo "⚠️  R8 story_archetype_registry violation:" >&2
         echo "   $FILE_PATH wrap <$COMP> matches anti-pattern:" >&2
         echo "   regex: $PATTERN" >&2

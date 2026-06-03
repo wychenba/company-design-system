@@ -119,10 +119,12 @@ jobs:
             const reportPath = 'design-system/.claude/snapshots/composition-fidelity/report.json'
             if (!fs.existsSync(reportPath)) return
             const report = JSON.parse(fs.readFileSync(reportPath, 'utf-8'))
-            // status 真值來自 script L421:PASS / DOM_FAIL / PIXEL_FAIL / BOTH_FAIL(無裸 'FAIL')+ SIZE_MISMATCH / TIMEOUT。
+            // status 真值來自 script result.status(overallStatus):PASS / DOM_FAIL / PIXEL_FAIL / BOTH_FAIL(無裸 'FAIL')+ SIZE_MISMATCH / TIMEOUT。
             // 2026-06-03 修:原 filter 找 'FAIL' 抓不到 DOM_FAIL/PIXEL_FAIL/BOTH_FAIL → drift 時 job 紅但 PR comment 空白。
             const fails = (report.results || []).filter(r => ['DOM_FAIL', 'PIXEL_FAIL', 'BOTH_FAIL', 'SIZE_MISMATCH', 'TIMEOUT'].includes(r.status))
             if (fails.length === 0) return
-            const rows = fails.map(r => `| \`${r.consumerStoryId}\` | \`${r.baselineStoryId}\` | ${r.status} | ${r.diffPct ?? '—'}% | ${r.threshold ?? '—'}% |`).join('\n')
+            // 2026-06-03 修:diffPct 巢狀在 r.pixel.diffPct(非頂層)+ 生效 threshold 在 r.pixel.threshold(r.threshold 是 marker 值常 null)
+            // → 原讀 r.diffPct/r.threshold 讓每行永遠顯示 '—%'。TIMEOUT/SIZE_MISMATCH 無 pixel 物件 → ?. 優雅退 fallback。
+            const rows = fails.map(r => `| \`${r.consumerStoryId}\` | \`${r.baselineStoryId}\` | ${r.status} | ${r.pixel?.diffPct ?? '—'}% | ${r.pixel?.threshold ?? r.threshold ?? report.threshold ?? '—'}% |`).join('\n')
             const body = `## ⚠️ Composition fidelity drift detected (${fails.length} mapping(s))\n\n| Consumer story | DS baseline | Status | Diff % | Threshold |\n|---|---|---|---|---|\n${rows}\n\n**Action**:download \`composition-fidelity-artifacts\` from this run to view baseline/consumer/diff PNGs. Fix consumer composition (or update threshold if intentional via \`@composition-fidelity-threshold: <pct>\` marker).`
             github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body })

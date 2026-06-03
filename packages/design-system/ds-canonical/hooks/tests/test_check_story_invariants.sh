@@ -14,7 +14,7 @@
 #      block-severity antiPattern → P0 record_worst 2,2026-06-02 升 P0)
 #
 # Test 重點:silent skip / 各 rule fire / allowlist marker escape。
-# 不測 R3(需 spec.md frontmatter);R8 P0 block-severity 已測(#11,2026-06-02)。
+# 不測 R3(需 spec.md frontmatter);R8 P0 block-severity 已測(#11 單行 / #12-14 多行回歸防護,2026-06-03)。
 
 set -u
 
@@ -214,6 +214,53 @@ export const Default = () => (
 );
 '
 expect_block "11. R8 simplified-mock <SidebarHeader><span> → P0 BLOCK" "R8 story_archetype_registry"
+
+# 12. R8 MULTI-LINE Sidebar drift(2026-06-03 回歸防護;修前 grep -E line-oriented + \s 當字面 's' → 多行靜默漏 = 假 P0):
+#     <SidebarHeader> 與 <span> 分行(真實 JSX 縮排格式)→ 修後(hook tr 換行→空格 + regex [[:space:]])應 BLOCK
+run_hook "PreToolUse" "Write" "$STORIES_R8" '
+// @story-baseline: @qijenchen/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse
+export const Default = () => (
+  <Sidebar>
+    <SidebarHeader>
+      <span>Acme</span>
+    </SidebarHeader>
+  </Sidebar>
+);
+'
+expect_block "12. R8 多行 <SidebarHeader> 換行 <span> → P0 BLOCK(回歸防護)" "R8 story_archetype_registry"
+
+# 13. R8 MULTI-LINE ChromeHeader drift:<ChromeHeader> 與 <span flex-1> 分行 → 修後應 BLOCK
+#     (修前 [\s\S]*? 在 BSD grep -E 是字元類非「任意字元」+ line-oriented → 雙重漏)
+STORIES_CH="/foo/my-project/packages/design-system/src/components/AppShell/app-shell-ch.stories.tsx"
+run_hook "PreToolUse" "Write" "$STORIES_CH" '
+// @story-baseline: @qijenchen/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse
+export const Default = () => (
+  <ChromeHeader>
+    <SidebarTrigger />
+    <span className="flex-1 text-body-lg">儀表板</span>
+  </ChromeHeader>
+);
+'
+expect_block "13. R8 多行 <ChromeHeader> 換行 <span flex-1> → P0 BLOCK" "R8 story_archetype_registry"
+
+# 14. R8 false-positive 防護:正確多行 ChromeHeader(h1 緊鄰、無 flex-1 span)+ 另一 story 遠處(距 >160 字)
+#     有無關 flex-1 span → .{0,160} 長度界擋住跨 story 誤匹配(greedy .* boolean 等同 lazy,故必設界)→ NO block
+run_hook "PreToolUse" "Write" "$STORIES_CH" '
+// @story-baseline: @qijenchen/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse
+export const Correct = () => (
+  <ChromeHeader>
+    <SidebarTrigger />
+    <h1 className="text-body-lg font-medium">儀表板</h1>
+  </ChromeHeader>
+);
+export const Unrelated = () => (
+  <div className="grid grid-cols-3 gap-4 rounded-lg border border-border bg-surface p-6 mt-4">
+    <div className="text-body-sm text-muted">統計面板區塊內容說明文字</div>
+    <span className="flex-1">無關的彈性間距元素</span>
+  </div>
+);
+'
+expect_pass_silent "14. R8 正確多行 ChromeHeader + 遠處無關 flex-1(>160 字)→ 不誤判"
 
 echo ""
 echo "=== Summary ==="
