@@ -5,8 +5,8 @@ import { Trash2, ChevronDown } from 'lucide-react'
 import { FileItem } from './file-item'
 import { Button } from '@/design-system/components/Button/button'
 import { FileViewer, type FileInfo } from '@/design-system/components/FileViewer/file-viewer'
-// upload-manager 面板消費 overlay-surface header SSOT(非手刻)—— 跟 Popover/Dialog 同一個 header primitive
-import { SurfaceHeader } from '@/design-system/patterns/overlay-surface/overlay-surface'
+// upload-manager 面板消費 overlay-surface header + body SSOT(非手刻)—— 跟 Popover/Dialog 同一組 primitive
+import { SurfaceHeader, SurfaceBody } from '@/design-system/patterns/overlay-surface/overlay-surface'
 import { PopoverTitle } from '@/design-system/components/Popover/popover'
 
 // 錯誤 description 範例(含 clickable "View log"):consumer 自由 ReactNode,通常用底線 link 表 clickable
@@ -221,15 +221,16 @@ export const UploadManagerSurface = {
         <div className="flex-1 min-w-0"><PopoverTitle>正在上傳 3 個項目</PopoverTitle></div>
         <Button iconOnly variant="text" size="sm" startIcon={ChevronDown} aria-label="收合" onClick={noop} />
       </SurfaceHeader>
-      {/* rich list:px loose(16px,對齊 header);py + gap 都 tight(12px)= 垂直對稱 */}
-      <div className="flex flex-col gap-[var(--layout-space-tight)] px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
+      {/* body 消費 overlay-surface SurfaceBody(非手刻;含 px-loose py-tight + flex-1 scroll 鏈)。
+          rich:py-tight(SurfaceBody 預設)+ gap-tight = 垂直對稱 12px */}
+      <SurfaceBody className="flex flex-col gap-[var(--layout-space-tight)]">
         <FileItem mode="rich" surface="upload-manager" name="Alan Profile.png" status="uploading" progress={40}
           description="5.7 MB of 7.5 MB" thumbnailSrc="https://i.pravatar.cc/80?u=alan" actions={deleteBtn} />
         <FileItem mode="rich" surface="upload-manager" name="Q1 營收報表.xlsx" status="completed"
           description="2.4 MB" thumbnailSrc="https://i.pravatar.cc/80?u=xls" onDownload={noop} actions={deleteBtn} />
         <FileItem mode="rich" surface="upload-manager" name="合約草案 v3.pdf" status="error"
           description={errorDescWithLog} thumbnailSrc="https://i.pravatar.cc/80?u=pdf" onRetry={noop} actions={deleteBtn} />
-      </div>
+      </SurfaceBody>
     </div>
   ),
 }
@@ -245,17 +246,19 @@ export const UploadManagerCompactSurface = {
         <div className="flex-1 min-w-0"><PopoverTitle>同步 3 個檔案</PopoverTitle></div>
         <Button iconOnly variant="text" size="sm" startIcon={ChevronDown} aria-label="收合" onClick={noop} />
       </SurfaceHeader>
-      {/* compact list:px loose(16)。上下不對稱 = 「12 − item 那側留白」:
-          pt-1(4px,item 文字上方自帶 8px → 4+8=12);pb-tight(12px,進度條 absolute 貼底、下方無 item 留白 → 容器補滿 12)。
-          列間 gap-1(4px,密集列)。詳 spec「為何 compact container 上下不對稱」。 */}
-      <div className="flex flex-col gap-1 px-[var(--layout-space-loose)] pt-1 pb-[var(--layout-space-tight)]">
+      {/* body 消費 SurfaceBody(px-loose + pb-tight 自 SSOT);compact 只 override top:`!pt-1`(4px,
+          item 文字上方自帶 8px → 4+8=12;bottom 留 SurfaceBody 預設 py-tight=12,因進度條貼底無留白)。
+          用 `!`(important)而非 `pt-1`:twMerge 不 strip 基底 py-[tight] → 非 important 時 top 12/4 競爭看
+          stylesheet 生成順序(非決定性);`!` 強制 top=4 決定性勝(對齊 List-as-region `!px-0` override 慣例)。
+          列間 gap-1(4px,密集列)。 */}
+      <SurfaceBody className="flex flex-col gap-1 !pt-1">
         <FileItem mode="compact" surface="upload-manager" name="季度報告.docx" status="uploading" progress={60}
           onClick={noop} actions={deleteBtn} />
         <FileItem mode="compact" surface="upload-manager" name="客戶名單.csv" status="completed"
           onClick={noop} actions={deleteBtn} />
         <FileItem mode="compact" surface="upload-manager" name="封面.png" status="error"
           description={errorDescWithLog} onRetry={noop} actions={deleteBtn} />
-      </div>
+      </SurfaceBody>
     </div>
   ),
 }

@@ -290,13 +290,17 @@ upload-manager 的 completed(100% bar + ✓)屬「剛完成的 upload session」
 
 `surface=upload-manager` 的 FileItem list 裝在獨立浮層面板(header + 列表),item 拿掉的左右 / 上下邊距改由容器負責:
 
-- **面板殼 + header 必消費 overlay-surface SSOT(禁手刻)**:殼用 Popover 同款 chrome token `rounded-lg border border-border bg-surface-raised shadow-[var(--elevation-200)]`;header 用 `<SurfaceHeader className="justify-between [--chrome-slot-h:1.25rem]">` + `<PopoverTitle>`(輕量浮層 header SSOT,跟 Popover/Dialog 同一個 primitive,padding = px-loose py-tight + border-b + unbounded-slot 負 my trick)。**禁手刻 `<div px-loose py-2 border-b>`**(2026-06-03 user 抓 drift:py-2≠py-tight / rounded-md≠lg / border-divider≠border / bg-surface≠raised)。
-- FileItem list body 走 **「List-as-region in overlay body」canonical**(見 popover.tsx):不用 generic SurfaceBody(其對稱 py-tight 會跟 compact item 自身 py-2 疊加),改用下列 list-specific padding。
+- **它是 popover-class 浮層 surface,但不是 Radix `<Popover>`**(常駐面板:不靠 trigger 開、不 outside-click 關、用 chevron 收合非 X dismiss)→ **不包 `<Popover>`**,而是直接消費 overlay-surface 三件套 primitive。
+- **殼 + header + body 全消費 overlay-surface SSOT(禁手刻)**:
+  - 殼:用 Popover 同款 chrome token `rounded-lg border border-border bg-surface-raised shadow-[var(--elevation-200)] flex flex-col`(DS 無獨立 shell primitive — `PopoverContent`/`DialogContent` 各自套這組 token;常駐面板鏡像同值)。
+  - header:`<SurfaceHeader className="justify-between [--chrome-slot-h:1.25rem]">` + `<PopoverTitle>`(輕量浮層 header SSOT,padding = px-loose py-tight + border-b + unbounded-slot 負 my trick)。
+  - body:**`<SurfaceBody>`(body SSOT,含 px-loose py-tight + flex-1 scroll 鏈)**,FileItem-specific padding 用 className override(見下)。**這不是「List-as-region」**(那專指 edge-to-edge 選單清單:item hover-bg 貼容器、px-0;Cmd+K / menu / nav)—— upload-manager list 有 px-loose、item 無 hover-bg、是 chrome-padded body,故就用 SurfaceBody。
+  - **禁手刻**:`<div px-loose py-2 border-b>`(header)/ 手刻 `<div px-loose py-tight>`(body)= drift(2026-06-03/04 user 抓:py-2≠py-tight / 殼 token 全偏 / body 重刻 SurfaceBody)。Hook `check_story_invariants.sh R9` 機械攔手刻 header。
 
-- **左右**:一律 `px-[var(--layout-space-loose)]`(16px,item 內容左緣對齊 header 標題)。
+- **左右**:`SurfaceBody` 預設 `px-[var(--layout-space-loose)]`(16px,item 內容左緣對齊 header 標題),不需 override。
 - **上下:目標 = 邊緣到 item「ink」(可見內容)距離 `var(--layout-space-tight)`(12px),兩 mode + 上下都一致**。通則:**容器該側 padding = 12 − item 在該側自己的留白(ink inset)**。
-  - **rich**:item 上下 ink inset 皆 0(avatar 頂、bar/content 底貼齊)→ container `py-[var(--layout-space-tight)]`(12px / 12px 對稱)。
-  - **compact**:item 上方自帶 `py-2`(8px)→ container `pt-1`(4px,4+8=12);**進度條 `absolute bottom-0` 貼 item 底、下方無留白(inset 0)**→ container `pb-[var(--layout-space-tight)]`(12px,12+0=12)。故 compact 容器**上下不對稱** `pt-1 pb-[tight]`。
+  - **rich**:item 上下 ink inset 皆 0(avatar 頂、bar/content 底貼齊)→ 用 `SurfaceBody` 預設 `py-[var(--layout-space-tight)]`(12 / 12 對稱,不需 override)。
+  - **compact**:item 上方自帶 `py-2`(8px)→ top 補 `4`(4+8=12);**進度條 `absolute bottom-0` 貼 item 底、下方無留白(inset 0)**→ bottom 留 SurfaceBody 預設 `py-tight`(12,12+0=12)。故 compact 用 **`SurfaceBody className="!pt-1"`** override 成上下不對稱(top=4 / bottom=12)。**為何用 `!`(important)**:twMerge 不 strip SurfaceBody 基底 `py-[tight]`,非 important 的 `pt-1` 跟基底 `py` 競爭 top 看 Tailwind stylesheet 生成順序(非決定性 → 可能 silent 變 12);`!pt-1` 強制決定性勝。對齊 List-as-region `!px-0` SurfaceBody override 慣例。
 - **列間 gap 反映密度**:rich `gap-[var(--layout-space-tight)]`(12px,卡片 + 48 縮圖)/ compact `gap-1`(4px,密集文字列)。
 - **為何 compact container 上下不對稱**(2026-06-03 圖一研究校準):compact 進度條 absolute 貼底,item 的 py-2 那 8px 落在「文字↔bar」之間、bar 下方無 padding;若上下都用同值 → 下邊距(bar→邊緣)只剩容器值、比上邊距(含 item 8px)小。故用「12 − ink inset」逐側補。世界級對照:密集 list / dropdown 容器上下 padding 慣例 4–8px(Atlassian space.050–100 / 8px-base 共識);此處目標 12px 是「邊緣→ink」視覺值(含 item 自身留白),非容器裸值。
 - Demo:`file-item.stories.tsx` 的 `UploadManagerSurface`(rich)/ `UploadManagerCompactSurface`(compact)。
