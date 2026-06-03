@@ -276,7 +276,7 @@ function Step2Form({ invoiceNumber, invoiceNo, seqNo, state, onChange }: {
         <div><div className="text-caption text-fg-secondary mb-1">發票號碼</div><div>{invoiceNo || '-'}</div></div>
         <div><div className="text-caption text-fg-secondary mb-1">序號</div><div>{seqNo}</div></div>
       </div>
-      <Notice variant="info">
+      <Notice variant="info" title="注意">
         自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
         <span className="text-primary cursor-pointer underline">專區</span>請款。
       </Notice>
@@ -922,7 +922,7 @@ function CreateFormPage({ formId, onBack }: { formId: string; onBack: () => void
             </div>
 
             {/* 注意事項 */}
-            <Notice variant="info">
+            <Notice variant="info" title="注意事項">
               <div className="font-medium mb-1">注意事項</div>
               <div>預計付款日為申請單簽核完畢後的下個月一般付款日 (每月最後工作日)，若有緊急付款需求，請參考下列簽核層級：</div>
               <ul className="mt-1 space-y-0.5 list-disc pl-4">
