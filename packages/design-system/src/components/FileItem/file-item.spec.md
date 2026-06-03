@@ -128,11 +128,7 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
 | rich(`surface=form` 預設) | `px-3 py-3` border card(py 固定,高度由 avatar 決定不走 row 公式)|
 | rich(`surface=upload-manager`) | **左右 + 上下 padding 全拿掉**(`px-0 py-0`)。**列高靠 avatar 48(content `minHeight`)**,卡片移除後 py 多餘 → 由面板 + gap 控制間距(2026-06-03 user 校準:rich 拿上下、compact 保留上下,因列高來源不同)|
 
-**upload-manager 面板 composition canonical**(2026-06-03 user 校準,consumer 組面板用):
-
-- **左右 padding**:compact / rich **一律 `px-[var(--layout-space-loose)]`(16px)** → item 內容左緣跟 header 標題切齊(避免雙重 L/R)。
-- **上下 padding == 列間 gap(每種 list 內垂直對稱 = 最整齊)**,但兩 mode 取不同值:**compact list → `4px`**(`py-1` + `gap-1`,密集文字列);**rich list → `var(--layout-space-tight)`(12px)**(`py-[var(--layout-space-tight)]` + `gap-[var(--layout-space-tight)]`,卡片 + 48 縮圖列)。左右則**不**跟上下相等:一律 loose(16px),故 rich = 「左右 16 / 上下+gap 12」、compact = 「左右 16 / 上下+gap 4」。
-- **item 只控「容器不該管的內距」**:compact `py-2`(純文字列高來源,無 avatar 撐高)/ rich `0`(列高靠 avatar 48);左右一律交給面板。
+**item 與容器分工**:item 只控「容器不該管的內距」—— compact `py-2`(純文字列高來源,無 avatar 撐高)/ rich `0`(列高靠 avatar 48);左右一律拿掉交給容器。**`surface=upload-manager` 浮層面板(容器)的左右 / 上下 padding / 列間 gap → 見「List wrapper canonical」的「upload-manager 浮層面板 composition」段**(SSOT 不在此重述,避免 drift)。
 
 ## 邊框 / 背景(AR15-21 canonical,2026-04-21 · 2026-04-22 擴充)
 
@@ -279,15 +275,23 @@ Type A completed(100% bar + ✓)屬「剛完成的 upload session」視覺;Type 
 
 ## List wrapper canonical(多 item 間距)
 
-**單一規則(2026-06-03 統一）:gap 由「item 有無邊框」決定 —— 有邊框 card → `gap-2`(8px,邊框不相黏);無邊框 / bg-pill → `gap-1`(4px)。**
+**規則:gap 由「item 視覺密度」決定** —— rich form(有邊框 card)`gap-2`(8px,邊框不相黏);rich `surface=upload-manager`(無邊框)`gap-[var(--layout-space-tight)]`(12px);compact(所有情境)`gap-1`(4px)。
 
 | Mode × surface | List wrapper gap | Rationale |
 |------|----------------|-----------|
 | **Rich + `surface=form`**(border card)| `gap-2`(8px) | card 邊框不相黏(standalone card invariant) |
-| **Rich + `surface=upload-manager`**(無邊框)| `gap-1`(4px) | 拿掉邊框 → 與無邊框 compact 同間距(2026-06-03 user 校準:「沒邊框就跟 compact 一樣 4px」)|
+| **Rich + `surface=upload-manager`**(無邊框浮層面板)| `gap-[var(--layout-space-tight)]`(12px)| 卡片 + 48 縮圖列需垂直呼吸;面板上下 padding 取同值(對稱)。**2026-06-03 圖五 user 校準:原「沒邊框 = 4px」已被覆蓋為 tight(12px)**,因 rich 列比 compact 大 |
 | **Compact**(所有情境)| `gap-1`(4px) | 統一 — Type A only / Type B only / mixed 都 gap-1(2026-04-23 user 指示簡化:原條件式「全 Type A → 0 gap」是 consumer 心智負擔 + state 轉換時 fragile,故捨棄 0-gap)|
 
-**control→list gap(FileUpload 內建 list 消費)**:dropzone / button 控制項 ↔ 第一個 FileItem 的間距 = **同上「有無邊框」規則的同值**（card 8px / borderless 4px），由 `file-upload.tsx` 依 `fileListMode` 套用。判準是 **item 有無邊框,非控制項類型**（控制項一律有邊框,不影響）。
+**control→list gap(FileUpload 內建 list 消費)**:dropzone / button 控制項 ↔ 第一個 FileItem 的間距 = **同上 form gap 同值**(rich card 8px / compact bg-pill 4px),由 `file-upload.tsx` 依 `fileListMode` 套用。**FileUpload 內建 list 一律 `surface=form`**(dropzone 是表單上傳框,非獨立浮層 upload manager),故不套用下方 upload-manager 的 12px / 面板 padding。
+
+### upload-manager 浮層面板 composition(Google Drive 右下角類獨立面板,**非** FileUpload dropzone)
+
+`surface=upload-manager` 的 FileItem list 裝在獨立浮層面板(header + 列表),item 拿掉的左右 / 上下邊距改由容器負責:
+
+- **左右 padding**:compact / rich 一律 `px-[var(--layout-space-loose)]`(16px)→ item 內容左緣跟 header 標題切齊(避免雙重 L/R)。
+- **上下 padding == 列間 gap(每 list 內垂直對稱)**,兩 mode 不同值:**compact → `4px`**(`py-1` + `gap-1`);**rich → `var(--layout-space-tight)`(12px)**(`py-[…tight]` + `gap-[…tight]`)。左右**不**跟上下相等(左右恆 loose 16px),故 rich =「左右16 / 上下+gap12」、compact =「左右16 / 上下+gap4」。
+- Demo:`file-item.stories.tsx` 的 `UploadManagerSurface`(rich)/ `UploadManagerCompactSurface`(compact)。
 
 **Rich + Compact 不可混用**(見 Invariant 1 上方),故無「混用 gap」決策。
 
@@ -308,8 +312,8 @@ Type A completed(100% bar + ✓)屬「剛完成的 upload session」視覺;Type 
   {files.map(f => <FileItem key={f.id} mode="compact" {...f} />)}
 </div>
 
-// ✅ Compact Type A only(upload manager,全有 status)
-<div className="flex flex-col">
+// ✅ Compact Type A only(全有 status,uploading/error/completed)
+<div className="flex flex-col gap-1">
   {files.map(f => <FileItem key={f.id} mode="compact" status={f.status} progress={f.progress} {...f} />)}
 </div>
 
