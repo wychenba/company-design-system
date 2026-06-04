@@ -68,7 +68,7 @@ export interface TagProps
   avatar?: React.ReactNode
   /** 可移除——Tag 自動渲染 dismiss 按鈕並控制尺寸與互動樣式 */
   onDismiss?: () => void
-  /** 深底白字模式（step-6 背景 + 白色前景，warning 例外） */
+  /** 深底模式（step-6 背景 + on-emphasis 配對前景;亮色 hue yellow/amber/orange/lime 用深字 --on-emphasis-dark,green 白字例外） */
   solid?: boolean
   /**
    * 2026-05-15 Q3 真 SSOT fix(per user verbatim「同空間兩判斷點」+「不要冰山一角」):

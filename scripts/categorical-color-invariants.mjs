@@ -1,11 +1,13 @@
 #!/usr/bin/env node
-// categorical-color-invariants.mjs — 守 categorical 色相 SSOT 的 3 條不變條件:
+// categorical-color-invariants.mjs — 守 categorical 色相 SSOT 的 4 條不變條件:
 //   (I1) 1:1 名實一致(零 offset):map 的 key X 的值只能引用 X 的色相 token
 //        ——`--color-X-*`(bg/border/text)或 `--X-hover` / `--X-active`(互動)。
 //        根治「red variant 接 --color-deep-orange」這類 categorical-vs-semantic 混淆。
 //   (I2) 完整性:全 12 色相(CATEGORICAL_HUES)都必出現在每個 map(無漏色相)。
 //   (I3) Token 存在性:categorical-color.ts 引用的每個 `var(--token)` 都必在
 //        primitives.css / semantic.css 真實定義(catch typo / 不存在的 token,如 lime-hover scare)。
+//   (I4) Solid 文字對比:CAT_SOLID 每 hue 的 on-solid 文字(白 --on-emphasis / 深 --on-emphasis-dark)
+//        實測 WCAG contrast 必 ≥3:1(oklch→相對亮度,green documented exception exempt)。
 //
 // 改 categorical-color.ts / 加色相必跑此 script。fail → exit 1。
 // Run: `node scripts/categorical-color-invariants.mjs`(release-preflight 已 chain)。
