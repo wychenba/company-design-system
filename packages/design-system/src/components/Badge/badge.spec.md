@@ -69,7 +69,7 @@ Badge 的 level **反映內容的緊急程度，不是 container 的視覺權重
 | `low`（起點）★ cva default | 灰底灰字（neutral-3 + neutral-7） | **無影響**——只是「目前有這麼多」的資訊，不讀也沒關係 |
 | `medium` | 淺藍底藍字（bg-info-subtle） | **輕微不便**——少了資訊但不影響主要流程 |
 | `high` | 藍底白字（bg-info） | **有感影響**——工作會堆積、待辦會過期，但不是立即傷害 |
-| `critical` | 紅底白字（bg-notification） | **直接傷害**——錯過訊息會造成資料遺失 / 錯過機會 / 帳戶問題 |
+| `critical` | deep-orange 底白字（bg-notification = `--color-deep-orange-6`,hue 38;非 categorical red hue 25） | **直接傷害**——錯過訊息會造成資料遺失 / 錯過機會 / 帳戶問題 |
 
 ### 選 level 的流程
 

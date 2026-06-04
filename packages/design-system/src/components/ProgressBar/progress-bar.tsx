@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils'
  * vs `Progress`(Upload.List 內部用 Progress,consumer 不直接用 Progress 做上傳 UI)。
  *
  * ── 3 狀態,單一 size ──
- * status: inProgress(進行中藍) / success(完成綠) / error(失敗紅)
+ * status: inProgress(進行中藍) / success(完成綠) / error(失敗 deep-orange,bg-error=--color-deep-orange-6)
  *   ^ 命名理由:`status` 是 lifecycle(在途 / 終態),不是視覺 emphasis 階。前身
  *   `primary` 會撞 Button `variant="primary"`(emphasis 最高階),改用世界級
  *   lifecycle 慣例(Polaris `inProgress` / Ant Progress `active`)。

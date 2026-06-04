@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 //   low（預設） — 灰底灰字（neutral-3 + neutral-7），被動計數
 //   medium      — 淺藍底藍字（bg-info-subtle + text-info-text），可延後看
 //   high        — 藍底白字（bg-info），有感影響的待辦
-//   critical    — 紅底白字（bg-notification），立即處理
+//   critical    — deep-orange 底白字（bg-notification = --color-deep-orange-6,hue 38;非 categorical red hue 25），立即處理
 //
 // 規則：default low, escalate with reason。見 badge.spec.md「選 level 的流程」。
 
@@ -84,7 +84,7 @@ export const badgeMeta = {
   component: 'Badge',
   family: 3,
   variants: {
-    critical: { purpose: '紅底白字（bg-notification）' },
+    critical: { purpose: 'deep-orange 底白字（bg-notification = deep-orange-6）' },
     high: { purpose: '藍底白字（bg-info）' },
     medium: { purpose: '淺藍底藍字（bg-info-subtle）' },
     low: { purpose: '使用者切 tab 才看，不需搶注意力' },

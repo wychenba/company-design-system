@@ -107,7 +107,7 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: LucideIcon
   /** Icon / text fallback 的背景色，預設 neutral */
   color?: ColorKey
-  /** 深底白字模式（step-6 背景 + 白色前景，warning 例外），預設 false */
+  /** 深底模式（step-6 背景 + on-emphasis 配對前景；亮色 hue yellow/amber/orange/lime 用深字 --on-emphasis-dark），預設 false */
   solid?: boolean
   /**
    * 在線狀態指示器(presence),顯示在 avatar **右下角**。

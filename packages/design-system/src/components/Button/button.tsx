@@ -350,6 +350,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       loading = false,
       fullWidth = false,
       pressed,
+      pressedTone, // 2026-06-05 fix(deep-audit P0):原漏 destructure → 落入 ...props 噴到 DOM + 永遠用 cva default
       children,
       disabled,
       ...props
@@ -432,7 +433,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const buttonEl = (
       <Comp
         className={cn(
-          buttonVariants({ variant: resolvedVariant, danger: resolvedDanger, size: resolvedSize, className }),
+          buttonVariants({ variant: resolvedVariant, danger: resolvedDanger, size: resolvedSize, pressedTone, className }),
           // iconOnly 鐵律:padding-free + aspect-square + flex-center (Polaris idiom)
           // 0 magic-number 0 公式自動正方形。詳 ICON_ONLY_BASE rationale。
           resolvedIconOnly && ICON_ONLY_BASE,
