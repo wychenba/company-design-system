@@ -2,28 +2,24 @@ import { useState } from 'react'
 import {
   AppShell, SidebarProvider, Sidebar, SidebarContent, SidebarFooter,
   SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarHeader,
-  SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarTrigger,
+  SidebarMenu, SidebarMenuItem, SidebarMenuButton,
   TooltipProvider, Tooltip, TooltipTrigger, TooltipContent,
   Avatar, ItemAvatar, Button,
   Tabs, TabsList, TabsTrigger, TabsContent,
   Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle,
-  Steps, StepItem, StepLabel,
   Input, Select, Textarea, Checkbox,
   RadioGroup, RadioGroupItem,
   Field, FieldLabel,
-  Tag, Notice, Separator,
+  Tag, Notice,
   Toaster, toast,
-  Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage,
 } from '@qijenchen/design-system'
 import {
   Home, FileText, Upload, ClipboardList, Users, BookOpen,
-  MessageSquare, Plus, Pencil, Copy, Trash2, Download,
-  Info, ChevronDown, ChevronUp, Paperclip,
+  MessageSquare, Plus, Pencil, Trash2, Download,
+  Info, ChevronDown, Check,
 } from 'lucide-react'
 
-// ─────────────────────────────────────────────────────────────
-// Constants
-// ─────────────────────────────────────────────────────────────
+// ─── Constants ───────────────────────────────────────────────
 
 const VOUCHER_TYPES = [
   { value: 'e-invoice-25', label: '電子統一發票 (25)' },
@@ -69,10 +65,9 @@ const CATEGORIES: Record<string, string[]> = {
   '系統用': ['Legal'],
 }
 
-const CATEGORY_OPTIONS = Object.keys(CATEGORIES).map((k) => ({ value: k, label: k }))
+const CATEGORY_OPTIONS = Object.keys(CATEGORIES).map(k => ({ value: k, label: k }))
 const TAX_RATES = [{ value: '5', label: '5%' }, { value: '0', label: '0%' }, { value: 'exempt', label: '免稅' }]
 const CURRENCY_OPTIONS = [{ value: 'TWD', label: 'TWD' }, { value: 'USD', label: 'USD' }, { value: 'EUR', label: 'EUR' }, { value: 'JPY', label: 'JPY' }]
-const PAYEE_OPTIONS = [{ value: 'employee', label: '員工' }, { value: 'vendor', label: '廠商' }, { value: 'talent', label: '達人' }]
 
 type StatusKey = 'draft' | 'reviewing' | 'manager-rejected' | 'acct-rejected' | 'approved' | 'finance-cleared' | 'acct-posted' | 'modifying' | 'abandoned' | 'advance-cleared'
 const STATUS_META: Record<StatusKey, { label: string; color: 'neutral' | 'blue' | 'red' | 'green' | 'yellow' | 'turquoise' }> = {
@@ -88,24 +83,67 @@ const STATUS_META: Record<StatusKey, { label: string; color: 'neutral' | 'blue' 
   'advance-cleared': { label: '預支款銷帳', color: 'blue' },
 }
 
-// ─────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────
+// ─── Types ───────────────────────────────────────────────────
 
-interface LineItem { id: string; category: string; subCategory: string; costCenter: string; accountCode: string; description: string; total: string; taxRate: string; contractNo: string }
-interface InvoiceCard { id: string; number: string; status: StatusKey; payee: string; date: string; voucherType: string; voucherTypeLabel: string; invoiceNo: string; currency: string; subtotal: string; tax: string; total: number; lineItems: LineItem[]; expanded: boolean }
-interface AttachmentItem { id: string; type: string; description: string; fileName: string }
-interface DraftEntry { id: string; date: string; company: string; applicant: string; payee: string; total: number; urgentDate: string; reason: string; status: StatusKey }
+interface DraftEntry {
+  id: string
+  number: string
+  date: string
+  company: string
+  applicant: string
+  payee: string
+  total: number
+  urgentDate: string
+  reason: string
+  status: StatusKey
+}
 
-// ─────────────────────────────────────────────────────────────
-// InfoTooltip
-// ─────────────────────────────────────────────────────────────
+interface Step1State {
+  payee: string
+  voucherType: string
+  date: string
+  invoiceNo: string
+  currency: string
+  subtotal: string
+  tax: string
+  taxId: string
+  usePartialAmount: boolean
+}
+
+interface Step2State {
+  category: string
+  subCategory: string
+  costCenter: string
+  accountCode: string
+  description: string
+  total: string
+  taxRate: string
+  contractProvided: 'yes' | 'no' | 'not-required'
+}
+
+interface Step3State {
+  attachmentType: 'invoice' | 'auxiliary'
+  attachmentDesc: string
+}
+
+// ─── Initial data ────────────────────────────────────────────
+
+const INITIAL_ENTRIES: DraftEntry[] = [
+  { id: '1', number: 'PAE20260525001', date: '2026/5/29', company: 'TA01', applicant: '林間宜 (023156)', payee: '員工', total: 1600, urgentDate: '-', reason: '-', status: 'reviewing' },
+  { id: '2', number: 'PAE20260525002', date: '2026/5/28', company: 'TA01', applicant: '林間宜 (023156)', payee: '員工', total: 2400, urgentDate: '-', reason: '-', status: 'draft' },
+  { id: '3', number: 'PAE20260525003', date: '2026/5/27', company: 'TA01', applicant: '林間宜 (023156)', payee: '員工', total: 3800, urgentDate: '-', reason: '-', status: 'draft' },
+]
+
+// ─── InfoTooltip ─────────────────────────────────────────────
 
 function InfoTooltip({ content }: { content: string }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <button className="inline-flex items-center justify-center text-fg-tertiary hover:text-fg-secondary transition-colors" aria-label="說明">
+        <button
+          className="inline-flex items-center justify-center text-fg-tertiary hover:text-fg-secondary transition-colors"
+          aria-label="說明"
+        >
           <Info size={14} />
         </button>
       </TooltipTrigger>
@@ -114,20 +152,19 @@ function InfoTooltip({ content }: { content: string }) {
   )
 }
 
-// ─────────────────────────────────────────────────────────────
-// Sidebar
-// ─────────────────────────────────────────────────────────────
+// ─── Sidebar nav ──────────────────────────────────────────────
 
 const WORK_NAV = [
   { id: 'drafts', label: '暫存申請單', icon: FileText },
-  { id: 'bulk-import', label: '批次匯入紀錄', icon: Upload },
-  { id: 'my-tasks', label: '我的工作清單', icon: ClipboardList },
+  { id: 'bulk', label: '批次匯入紀錄', icon: Upload },
+  { id: 'tasks', label: '我的工作清單', icon: ClipboardList },
 ] as const
 
 const MGMT_NAV = [
-  { id: 'view-requests', label: '查看申請單', icon: BookOpen },
-  { id: 'review-tasks', label: '審核工作清單', icon: Users },
-  { id: 'secretary-tasks', label: '秘書工作清單', icon: ClipboardList },
+  { id: 'view', label: '查看申請單', icon: BookOpen },
+  { id: 'review', label: '審核工作清單', icon: Users },
+  { id: 'secretary', label: '秘書工作清單', icon: ClipboardList },
+  { id: 'survey', label: '使用者體驗調查', icon: MessageSquare },
 ] as const
 
 function AppSidebar({ activeId, onActiveChange }: { activeId: string; onActiveChange: (id: string) => void }) {
@@ -167,18 +204,9 @@ function AppSidebar({ activeId, onActiveChange }: { activeId: string; onActiveCh
             <SidebarMenu>
               {MGMT_NAV.map(({ id, label, icon }) => (
                 <SidebarMenuItem key={id}>
-                  <SidebarMenuButton id={id} startIcon={icon} tooltip={label} onClick={() => onActiveChange(id)}>{label}</SidebarMenuButton>
+                  <SidebarMenuButton id={id} startIcon={icon} tooltip={label} data-active={activeId === id ? true : undefined} onClick={() => onActiveChange(id)}>{label}</SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton id="feedback" startIcon={MessageSquare} tooltip="使用者體驗調查" onClick={() => onActiveChange('feedback')}>使用者體驗調查</SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -199,478 +227,453 @@ function AppSidebar({ activeId, onActiveChange }: { activeId: string; onActiveCh
   )
 }
 
-// ─────────────────────────────────────────────────────────────
-// Step1Form — 填寫請款資訊
-// ─────────────────────────────────────────────────────────────
+// ─── ModalStepper ────────────────────────────────────────────
 
-interface Step1State { voucherType: string; date: string; invoiceNo: string; currency: string; subtotal: string; tax: string }
-const defaultStep1 = (): Step1State => ({ voucherType: '', date: '', invoiceNo: '', currency: 'TWD', subtotal: '', tax: '' })
+const STEP_LABELS = ['填寫請款資訊', '填寫付款細項', '新增憑證/證明'] as const
 
-function Step1Form({ invoiceNumber, state, onChange }: { invoiceNumber: string; state: Step1State; onChange: (s: Step1State) => void }) {
+function ModalStepper({ current }: { current: 1 | 2 | 3 }) {
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4 rounded-lg bg-surface-raised p-3 text-body">
-        <div><div className="text-caption text-fg-secondary mb-1">請款單號</div><div className="font-medium">{invoiceNumber}</div></div>
-        <div><div className="text-caption text-fg-secondary mb-1">狀態</div><Tag color="neutral" size="sm">草稿</Tag></div>
-      </div>
-      <Field><FieldLabel required>收款人/廠商</FieldLabel><Input value="林間宜 (023156)" readOnly /></Field>
-      <Field>
-        <FieldLabel required>憑證類型</FieldLabel>
-        <Select placeholder="請選擇" options={VOUCHER_TYPES} value={state.voucherType} onChange={(v) => onChange({ ...state, voucherType: v as string })} />
-      </Field>
-      <div className="grid grid-cols-2 gap-4">
-        <Field>
-          <FieldLabel required>日期</FieldLabel>
-          <Input placeholder="填寫日期" value={state.date} onChange={(e) => onChange({ ...state, date: e.target.value })} />
-        </Field>
-        <Field>
-          <FieldLabel>發票號碼</FieldLabel>
-          <Input placeholder="填寫發票號碼" value={state.invoiceNo} onChange={(e) => onChange({ ...state, invoiceNo: e.target.value })} />
-        </Field>
-      </div>
-      <Field>
-        <FieldLabel required>幣別</FieldLabel>
-        <Select options={CURRENCY_OPTIONS} value={state.currency} onChange={(v) => onChange({ ...state, currency: v as string })} />
-      </Field>
-      <div className="grid grid-cols-2 gap-4">
-        <Field>
-          <FieldLabel required>合計金額（未稅）</FieldLabel>
-          <Input value={state.subtotal} onChange={(e) => onChange({ ...state, subtotal: e.target.value })} />
-        </Field>
-        <Field>
-          <FieldLabel>稅額 <InfoTooltip content="稅額 = 合計金額 × 稅率" /></FieldLabel>
-          <Input value={state.tax} onChange={(e) => onChange({ ...state, tax: e.target.value })} />
-        </Field>
-      </div>
-      <div className="grid grid-cols-2 gap-4 rounded-lg bg-surface-raised p-3 text-body">
-        <div>
-          <div className="text-caption text-fg-secondary">稅後金額</div>
-          <div>{state.subtotal ? String(parseFloat(state.subtotal) + parseFloat(state.tax || '0')) : '-'}</div>
-          <div className="text-caption text-fg-tertiary mt-0.5">當地稅後金額 <InfoTooltip content="以匯率換算為當地幣別" /> -</div>
-        </div>
-        <div>
-          <div className="text-caption text-fg-secondary">匯率</div>
-          <div>-</div>
-          <div className="text-caption text-fg-tertiary mt-0.5">更新時間 -</div>
-        </div>
-      </div>
+    <div className="flex items-center mb-6">
+      {STEP_LABELS.map((label, idx) => {
+        const step = (idx + 1) as 1 | 2 | 3
+        const done = step < current
+        const active = step === current
+        return (
+          <div key={step} className="flex items-center flex-1 last:flex-none min-w-0">
+            <div className="flex items-center gap-2 shrink-0">
+              <div
+                className={[
+                  'size-6 rounded-full flex items-center justify-center text-xs font-semibold',
+                  done || active
+                    ? 'bg-[var(--color-blue-9)] text-white'
+                    : 'bg-[var(--color-neutral-3)] text-fg-tertiary',
+                ].join(' ')}
+              >
+                {done ? <Check size={12} strokeWidth={3} /> : step}
+              </div>
+              <span
+                className={[
+                  'text-sm whitespace-nowrap',
+                  active ? 'text-fg-primary font-medium' : done ? 'text-fg-primary' : 'text-fg-tertiary',
+                ].join(' ')}
+              >
+                {label}
+              </span>
+            </div>
+            {idx < STEP_LABELS.length - 1 && (
+              <div
+                className={[
+                  'flex-1 h-px mx-3',
+                  done ? 'bg-[var(--color-blue-9)]' : 'bg-[var(--color-neutral-3)]',
+                ].join(' ')}
+              />
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
 
-// ─────────────────────────────────────────────────────────────
-// Step2Form — 填寫付款細項
-// ─────────────────────────────────────────────────────────────
+// ─── Default form state ──────────────────────────────────────
 
-interface Step2State { category: string; subCategory: string; costCenter: string; accountCode: string; description: string; total: string; taxRate: string; contractNo: string }
-const defaultStep2 = (): Step2State => ({ category: '', subCategory: '', costCenter: '', accountCode: '', description: '', total: '', taxRate: '5', contractNo: 'none' })
+const defaultStep1 = (): Step1State => ({
+  payee: '林間宜 (023156)',
+  voucherType: '',
+  date: '',
+  invoiceNo: '',
+  currency: 'TWD',
+  subtotal: '',
+  tax: '',
+  taxId: '',
+  usePartialAmount: false,
+})
 
-function Step2Form({ invoiceNumber, invoiceNo, seqNo, state, onChange }: {
-  invoiceNumber: string; invoiceNo: string; seqNo: number; state: Step2State; onChange: (s: Step2State) => void
-}) {
-  const subOpts = state.category ? (CATEGORIES[state.category] ?? []).map((v) => ({ value: v, label: v })) : []
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4 rounded-lg bg-surface-raised p-3 text-body">
-        <div><div className="text-caption text-fg-secondary mb-1">請款單號</div><div className="font-medium">{invoiceNumber}</div></div>
-        <div><div className="text-caption text-fg-secondary mb-1">發票號碼</div><div>{invoiceNo || '-'}</div></div>
-        <div><div className="text-caption text-fg-secondary mb-1">序號</div><div>{seqNo}</div></div>
-      </div>
-      <Notice variant="info" title="注意">
-        自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
-        <span className="text-primary cursor-pointer underline">專區</span>請款。
-      </Notice>
-      <div className="grid grid-cols-2 gap-4">
-        <Field>
-          <FieldLabel required>分類</FieldLabel>
-          <Select placeholder="請選擇" options={CATEGORY_OPTIONS} value={state.category} onChange={(v) => onChange({ ...state, category: v as string, subCategory: '' })} />
-        </Field>
-        <Field>
-          <FieldLabel required>子分類</FieldLabel>
-          <Select placeholder="請選擇" options={subOpts} value={state.subCategory} onChange={(v) => onChange({ ...state, subCategory: v as string })} disabled={!state.category} />
-        </Field>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <Field>
-          <FieldLabel required>成本中心 <InfoTooltip content="請填寫所屬部門成本中心代號，例如：00690" /></FieldLabel>
-          <Input value={state.costCenter} onChange={(e) => onChange({ ...state, costCenter: e.target.value })} />
-        </Field>
-        <Field>
-          <FieldLabel>會計科目 <InfoTooltip content="請填寫對應的會計科目代號，例如：613000" /></FieldLabel>
-          <Input value={state.accountCode} onChange={(e) => onChange({ ...state, accountCode: e.target.value })} />
-        </Field>
-      </div>
-      <Field><FieldLabel>描述</FieldLabel><Input value={state.description} onChange={(e) => onChange({ ...state, description: e.target.value })} /></Field>
-      <div className="grid grid-cols-3 gap-4">
-        <Field>
-          <FieldLabel required>總額</FieldLabel>
-          <Input placeholder="填寫總額" value={state.total} onChange={(e) => onChange({ ...state, total: e.target.value })} />
-        </Field>
-        <Field>
-          <FieldLabel>稅率 <InfoTooltip content="預設 5% 加值稅，請依實際情況選擇" /></FieldLabel>
-          <Select placeholder="請選擇" options={TAX_RATES} value={state.taxRate} onChange={(v) => onChange({ ...state, taxRate: v as string })} />
-        </Field>
-        <Field>
-          <FieldLabel>稅額</FieldLabel>
-          <Input readOnly value={state.total && state.taxRate === '5' ? String(Math.round(parseFloat(state.total) * 0.05)) : ''} />
-        </Field>
-      </div>
-      <Field>
-        <FieldLabel>是否提供合約編號</FieldLabel>
-        <RadioGroup value={state.contractNo} onValueChange={(v) => onChange({ ...state, contractNo: v })} orientation="horizontal">
-          <RadioGroupItem value="yes" label="是" />
-          <RadioGroupItem value="no" label="否" />
-          <RadioGroupItem value="none" label="無需提供" />
-        </RadioGroup>
-      </Field>
-    </div>
-  )
-}
+const defaultStep2 = (): Step2State => ({
+  category: '',
+  subCategory: '',
+  costCenter: '',
+  accountCode: '',
+  description: '',
+  total: '',
+  taxRate: '',
+  contractProvided: 'not-required',
+})
 
-// ─────────────────────────────────────────────────────────────
-// Add/Edit Invoice Modal (3-step)
-// ─────────────────────────────────────────────────────────────
+const defaultStep3 = (): Step3State => ({
+  attachmentType: 'invoice',
+  attachmentDesc: '',
+})
 
-interface InvoiceModalProps {
+// ─── AddInvoiceModal ─────────────────────────────────────────
+
+function AddInvoiceModal({
+  open,
+  onClose,
+  onSubmit,
+}: {
   open: boolean
-  onOpenChange: (open: boolean) => void
-  invoiceNumber: string
-  initialData?: InvoiceCard
-  onComplete: (card: Partial<InvoiceCard> & { id?: string }) => void
-}
+  onClose: () => void
+  onSubmit: (newNumber: string) => void
+}) {
+  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [s1, setS1] = useState<Step1State>(defaultStep1)
+  const [s2, setS2] = useState<Step2State>(defaultStep2)
+  const [s3, setS3] = useState<Step3State>(defaultStep3)
 
-function InvoiceModal({ open, onOpenChange, invoiceNumber, initialData, onComplete }: InvoiceModalProps) {
-  const isEdit = !!initialData
-  const [step, setStep] = useState<'step1' | 'step2' | 'step3'>('step1')
-  const [s1, setS1] = useState<Step1State>(() => initialData
-    ? { voucherType: initialData.voucherType, date: initialData.date, invoiceNo: initialData.invoiceNo, currency: initialData.currency, subtotal: initialData.subtotal, tax: initialData.tax }
-    : defaultStep1()
-  )
-  const [s2, setS2] = useState<Step2State>(() => initialData?.lineItems[0]
-    ? { category: initialData.lineItems[0].category, subCategory: initialData.lineItems[0].subCategory, costCenter: initialData.lineItems[0].costCenter, accountCode: initialData.lineItems[0].accountCode, description: initialData.lineItems[0].description, total: initialData.lineItems[0].total, taxRate: initialData.lineItems[0].taxRate ?? '5', contractNo: initialData.lineItems[0].contractNo ?? 'none' }
-    : defaultStep2()
-  )
-  const [s3, setS3] = useState({ attachType: 'invoice', description: '', fileName: '' })
-
-  const stepOrder = ['step1', 'step2', 'step3'] as const
-  const idx = stepOrder.indexOf(step)
+  const today = new Date()
+  const mm = String(today.getMonth() + 1).padStart(2, '0')
+  const dd = String(today.getDate()).padStart(2, '0')
+  const invoiceNumber = `PAGE${today.getFullYear()}${mm}${dd}001-1`
 
   function reset() {
-    setStep('step1')
-    setS1(initialData ? { voucherType: initialData.voucherType, date: initialData.date, invoiceNo: initialData.invoiceNo, currency: initialData.currency, subtotal: initialData.subtotal, tax: initialData.tax } : defaultStep1())
-    setS2(initialData?.lineItems[0] ? { category: initialData.lineItems[0].category, subCategory: initialData.lineItems[0].subCategory, costCenter: initialData.lineItems[0].costCenter, accountCode: initialData.lineItems[0].accountCode, description: initialData.lineItems[0].description, total: initialData.lineItems[0].total, taxRate: initialData.lineItems[0].taxRate ?? '5', contractNo: initialData.lineItems[0].contractNo ?? 'none' } : defaultStep2())
-    setS3({ attachType: 'invoice', description: '', fileName: '' })
+    setStep(1)
+    setS1(defaultStep1())
+    setS2(defaultStep2())
+    setS3(defaultStep3())
   }
 
-  function handleClose() { onOpenChange(false); reset() }
+  function handleClose() {
+    reset()
+    onClose()
+  }
 
   function handleSubmit() {
-    const voucherTypeLabel = VOUCHER_TYPES.find((v) => v.value === s1.voucherType)?.label ?? s1.voucherType
-    const lineItem: LineItem = { id: initialData?.lineItems[0]?.id ?? '1', category: s2.category, subCategory: s2.subCategory, costCenter: s2.costCenter, accountCode: s2.accountCode, description: s2.description, total: s2.total, taxRate: s2.taxRate, contractNo: s2.contractNo }
-    onComplete({
-      id: initialData?.id,
-      number: invoiceNumber, status: 'draft', payee: '林間宜 (023156)',
-      date: s1.date || '2026/05/25', voucherType: s1.voucherType, voucherTypeLabel,
-      invoiceNo: s1.invoiceNo, currency: s1.currency, subtotal: s1.subtotal, tax: s1.tax,
-      total: parseFloat(s1.subtotal || '0') + parseFloat(s1.tax || '0'),
-      lineItems: s2.category ? [lineItem] : [],
-      expanded: true,
-    })
-    handleClose()
+    const newNumber = `PAE${today.getFullYear()}${mm}${dd}${String(Math.floor(Math.random() * 900) + 100)}`
+    onSubmit(newNumber)
+    reset()
   }
 
+  const subCategoryOptions = s2.category
+    ? (CATEGORIES[s2.category] ?? []).map(s => ({ value: s, label: s }))
+    : []
+
+  const taxAfter = s1.subtotal && s1.tax
+    ? (Number(s1.subtotal) + Number(s1.tax)).toLocaleString()
+    : '-'
+
+  const computedTax = s2.total && s2.taxRate && s2.taxRate !== 'exempt'
+    ? String(Math.round(Number(s2.total) * Number(s2.taxRate) / 100))
+    : ''
+
+  const MODAL_TITLES = { 1: '新增發票', 2: '新增付款細項', 3: '新增附件' } as const
+
   return (
-    <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>
-      <DialogContent maxWidth={720} autoHeight>
-        <DialogHeader><DialogTitle>{isEdit ? '編輯發票' : '新增發票'}</DialogTitle></DialogHeader>
+    <Dialog open={open} onOpenChange={o => !o && handleClose()}>
+      <DialogContent className="max-w-[754px] w-full">
+        <DialogHeader>
+          <DialogTitle>{MODAL_TITLES[step]}</DialogTitle>
+        </DialogHeader>
         <DialogBody>
-          <div className="pb-5">
-            <Steps value={step} onValueChange={(v) => setStep(v as typeof step)} completedValues={stepOrder.slice(0, idx) as string[]} orientation="horizontal" size="sm">
-              <StepItem value="step1"><StepLabel>填寫請款資訊</StepLabel></StepItem>
-              <StepItem value="step2"><StepLabel>填寫付款細項</StepLabel></StepItem>
-              <StepItem value="step3"><StepLabel>檢附憑證/證明</StepLabel></StepItem>
-            </Steps>
-          </div>
-          {step === 'step1' && <Step1Form invoiceNumber={invoiceNumber} state={s1} onChange={setS1} />}
-          {step === 'step2' && <Step2Form invoiceNumber={invoiceNumber} invoiceNo={s1.invoiceNo} seqNo={1} state={s2} onChange={setS2} />}
-          {step === 'step3' && (
+          <ModalStepper current={step} />
+
+          {/* ── Step 1: 填寫請款資訊 ─────────────────────── */}
+          {step === 1 && (
+            <div className="space-y-4">
+              {/* Read-only info bar */}
+              <div className="grid grid-cols-2 gap-6 p-3 rounded-lg bg-surface-raised border border-divider">
+                <div>
+                  <p className="text-caption text-fg-tertiary mb-0.5">請款單號</p>
+                  <p className="text-sm font-medium">{invoiceNumber}</p>
+                </div>
+                <div>
+                  <p className="text-caption text-fg-tertiary mb-0.5">狀態</p>
+                  <Tag color="neutral" size="sm">Draft</Tag>
+                </div>
+              </div>
+
+              <Field>
+                <FieldLabel required>收款人/廠商</FieldLabel>
+                <Input value={s1.payee} onChange={e => setS1(p => ({ ...p, payee: e.target.value }))} />
+              </Field>
+
+              <Field>
+                <FieldLabel required>憑證類型</FieldLabel>
+                <Select
+                  placeholder="請選擇"
+                  options={VOUCHER_TYPES}
+                  value={s1.voucherType}
+                  onChange={v => setS1(p => ({ ...p, voucherType: v as string }))}
+                />
+              </Field>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel required>日期</FieldLabel>
+                  <Input
+                    type="date"
+                    value={s1.date}
+                    onChange={e => setS1(p => ({ ...p, date: e.target.value }))}
+                    placeholder="填寫日期"
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>發票號碼</FieldLabel>
+                  <Input
+                    value={s1.invoiceNo}
+                    onChange={e => setS1(p => ({ ...p, invoiceNo: e.target.value }))}
+                    placeholder="填寫發票號碼"
+                  />
+                </Field>
+              </div>
+
+              <Field>
+                <FieldLabel required>幣別</FieldLabel>
+                <Select
+                  options={CURRENCY_OPTIONS}
+                  value={s1.currency}
+                  onChange={v => setS1(p => ({ ...p, currency: v as string }))}
+                />
+              </Field>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel required>合計金額（未稅）</FieldLabel>
+                  <Input
+                    type="number"
+                    value={s1.subtotal}
+                    onChange={e => setS1(p => ({ ...p, subtotal: e.target.value }))}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>
+                    稅額&nbsp;<InfoTooltip content="稅額依憑證類型計算" />
+                  </FieldLabel>
+                  <Input
+                    type="number"
+                    value={s1.tax}
+                    onChange={e => setS1(p => ({ ...p, tax: e.target.value }))}
+                  />
+                </Field>
+              </div>
+
+              {/* Computed row */}
+              <div className="grid grid-cols-2 gap-4 p-3 rounded-lg bg-surface-raised border border-divider text-sm">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-fg-tertiary whitespace-nowrap">稅後金額</span>
+                  <span className="font-medium">{taxAfter}</span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-fg-tertiary">匯率</span>
+                  <span className="font-medium">-</span>
+                </div>
+                <div className="flex items-center gap-1 text-fg-tertiary">
+                  <span>當地稅後金額</span>
+                  <InfoTooltip content="以當前匯率換算後的當地金額" />
+                  <span className="text-fg-primary font-medium ml-1">-</span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-fg-tertiary">更新時間</span>
+                  <span className="font-medium">-</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel>
+                    稅號&nbsp;<InfoTooltip content="統一編號（選填）" />
+                  </FieldLabel>
+                  <Input
+                    value={s1.taxId}
+                    onChange={e => setS1(p => ({ ...p, taxId: e.target.value }))}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>二代健保</FieldLabel>
+                  <Input disabled value="" />
+                </Field>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="partial"
+                  checked={s1.usePartialAmount}
+                  onCheckedChange={v => setS1(p => ({ ...p, usePartialAmount: !!v }))}
+                />
+                <label htmlFor="partial" className="text-sm cursor-pointer select-none">
+                  使用不足額請款
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* ── Step 2: 填寫付款細項 ─────────────────────── */}
+          {step === 2 && (
+            <div className="space-y-4">
+              {/* Read-only header */}
+              <div className="grid grid-cols-3 gap-4 p-3 rounded-lg bg-surface-raised border border-divider">
+                <div>
+                  <p className="text-caption text-fg-tertiary mb-0.5">請款單號</p>
+                  <p className="text-sm font-medium">{invoiceNumber}</p>
+                </div>
+                <div>
+                  <p className="text-caption text-fg-tertiary mb-0.5">發票號碼</p>
+                  <p className="text-sm font-medium">{s1.invoiceNo || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-caption text-fg-tertiary mb-0.5">序號</p>
+                  <p className="text-sm font-medium">1</p>
+                </div>
+              </div>
+
+              <Notice variant="info" title="注意事項">
+                自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
+                <span className="underline cursor-pointer text-[var(--color-blue-9)]">專區</span>請款。
+              </Notice>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel required>分類</FieldLabel>
+                  <Select
+                    placeholder="請選擇"
+                    options={CATEGORY_OPTIONS}
+                    value={s2.category}
+                    onChange={v => setS2(p => ({ ...p, category: v as string, subCategory: '' }))}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel required>子分類</FieldLabel>
+                  <Select
+                    placeholder="請選擇"
+                    options={subCategoryOptions}
+                    value={s2.subCategory}
+                    onChange={v => setS2(p => ({ ...p, subCategory: v as string }))}
+                    disabled={!s2.category}
+                  />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel required>
+                    成本中心&nbsp;<InfoTooltip content="填寫您的成本中心代碼" />
+                  </FieldLabel>
+                  <Input value={s2.costCenter} onChange={e => setS2(p => ({ ...p, costCenter: e.target.value }))} />
+                </Field>
+                <Field>
+                  <FieldLabel>
+                    會計科目&nbsp;<InfoTooltip content="填寫對應的會計科目" />
+                  </FieldLabel>
+                  <Input value={s2.accountCode} onChange={e => setS2(p => ({ ...p, accountCode: e.target.value }))} />
+                </Field>
+              </div>
+
+              <Field>
+                <FieldLabel>描述</FieldLabel>
+                <Textarea
+                  value={s2.description}
+                  onChange={e => setS2(p => ({ ...p, description: e.target.value }))}
+                  rows={2}
+                />
+              </Field>
+
+              <div className="grid grid-cols-3 gap-4">
+                <Field>
+                  <FieldLabel required>總額</FieldLabel>
+                  <Input
+                    type="number"
+                    placeholder="填寫總額"
+                    value={s2.total}
+                    onChange={e => setS2(p => ({ ...p, total: e.target.value }))}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>
+                    稅率&nbsp;<InfoTooltip content="請選擇適用的稅率" />
+                  </FieldLabel>
+                  <Select
+                    placeholder="請選擇"
+                    options={TAX_RATES}
+                    value={s2.taxRate}
+                    onChange={v => setS2(p => ({ ...p, taxRate: v as string }))}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>稅額</FieldLabel>
+                  <Input disabled value={computedTax} placeholder="-" />
+                </Field>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-2">是否提供合約編號</p>
+                <RadioGroup
+                  value={s2.contractProvided}
+                  onValueChange={v => setS2(p => ({ ...p, contractProvided: v as Step2State['contractProvided'] }))}
+                >
+                  <div className="flex items-center gap-6">
+                    <label className="flex items-center gap-2 cursor-pointer text-sm">
+                      <RadioGroupItem value="yes" />是
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm">
+                      <RadioGroupItem value="no" />否
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm">
+                      <RadioGroupItem value="not-required" />無需提供
+                    </label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+          )}
+
+          {/* ── Step 3: 新增附件 ─────────────────────────── */}
+          {step === 3 && (
             <div className="space-y-4">
               <Field>
                 <FieldLabel required>附件類型</FieldLabel>
-                <RadioGroup value={s3.attachType} onValueChange={(v) => setS3((p) => ({ ...p, attachType: v }))} orientation="horizontal">
-                  <RadioGroupItem value="invoice" label="發票" />
-                  <RadioGroupItem value="support" label="輔助文件" />
+                <RadioGroup
+                  value={s3.attachmentType}
+                  onValueChange={v => setS3(p => ({ ...p, attachmentType: v as Step3State['attachmentType'] }))}
+                >
+                  <div className="flex items-center gap-6">
+                    <label className="flex items-center gap-2 cursor-pointer text-sm">
+                      <RadioGroupItem value="invoice" />發票
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm">
+                      <RadioGroupItem value="auxiliary" />輔助文件
+                    </label>
+                  </div>
                 </RadioGroup>
               </Field>
+
               <Field>
                 <FieldLabel>附件說明</FieldLabel>
-                <Input placeholder="填寫附件說明" value={s3.description} onChange={(e) => setS3((p) => ({ ...p, description: e.target.value }))} />
+                <Input
+                  placeholder="填寫附件說明"
+                  value={s3.attachmentDesc}
+                  onChange={e => setS3(p => ({ ...p, attachmentDesc: e.target.value }))}
+                />
               </Field>
-              <div
-                className="flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-divider bg-surface-subtle p-10 cursor-pointer hover:border-primary transition-colors"
-                onClick={() => setS3((p) => ({ ...p, fileName: p.attachType === 'invoice' ? 'Computer-invoice.png' : 'Supportdoc.png' }))}
-              >
-                {s3.fileName ? (
-                  <div className="flex items-center gap-2 text-primary"><Paperclip size={20} /><span className="text-body">{s3.fileName}</span></div>
-                ) : (
-                  <>
-                    <div className="rounded-lg bg-surface-raised p-3"><Upload size={24} className="text-fg-secondary" /></div>
-                    <span className="text-body-lg font-medium">點擊或拖曳到此上傳檔案</span>
-                    <span className="text-caption text-fg-secondary">每個檔案大小不得超過 20 MB</span>
-                  </>
-                )}
+
+              <div className="border-2 border-dashed border-divider rounded-lg p-12 flex flex-col items-center gap-3 cursor-pointer hover:border-[var(--color-neutral-6)] hover:bg-surface-raised transition-colors">
+                <div className="size-10 rounded-lg bg-surface-raised flex items-center justify-center text-fg-tertiary">
+                  <Upload size={24} />
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-fg-primary">點擊或拖曳到此上傳檔案</p>
+                  <p className="text-sm text-fg-tertiary mt-0.5">每個檔案大小不得超過 20 MB</p>
+                </div>
               </div>
             </div>
           )}
         </DialogBody>
+
         <DialogFooter>
-          <div className="flex w-full items-center justify-between">
-            <div>{idx > 0 && <Button variant="ghost" size="md" onClick={() => setStep(stepOrder[idx - 1])}>上一步</Button>}</div>
-            <div className="flex gap-2">
-              <Button variant="secondary" size="md" onClick={handleClose}>取消</Button>
-              {idx < 2
-                ? <Button variant="primary" size="md" onClick={() => setStep(stepOrder[idx + 1])}>下一步</Button>
-                : <Button variant="primary" size="md" onClick={handleSubmit}>{isEdit ? '儲存' : '新增'}</Button>
-              }
+          <div className="flex items-center justify-between w-full">
+            <div>
+              {step > 1 && (
+                <Button variant="ghost" onClick={() => setStep(s => (s - 1) as 1 | 2 | 3)}>
+                  上一步
+                </Button>
+              )}
             </div>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// Line Item Modal — 新增/編輯付款細項 (single step)
-// ─────────────────────────────────────────────────────────────
-
-interface LineItemModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  invoiceNumber: string
-  invoiceNo: string
-  seqNo: number
-  initialData?: LineItem
-  onComplete: (li: LineItem) => void
-}
-
-function LineItemModal({ open, onOpenChange, invoiceNumber, invoiceNo, seqNo, initialData, onComplete }: LineItemModalProps) {
-  const isEdit = !!initialData
-  const [state, setState] = useState<Step2State>(() => initialData
-    ? { category: initialData.category, subCategory: initialData.subCategory, costCenter: initialData.costCenter, accountCode: initialData.accountCode, description: initialData.description, total: initialData.total, taxRate: initialData.taxRate ?? '5', contractNo: initialData.contractNo ?? 'none' }
-    : defaultStep2()
-  )
-
-  function handleClose() { onOpenChange(false); if (!initialData) setState(defaultStep2()) }
-
-  function handleSave() {
-    onComplete({ id: initialData?.id ?? Date.now().toString(), category: state.category, subCategory: state.subCategory, costCenter: state.costCenter, accountCode: state.accountCode, description: state.description, total: state.total, taxRate: state.taxRate, contractNo: state.contractNo })
-    handleClose()
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>
-      <DialogContent maxWidth={720} autoHeight>
-        <DialogHeader><DialogTitle>{isEdit ? '編輯付款細項' : '新增付款細項'}</DialogTitle></DialogHeader>
-        <DialogBody>
-          <Step2Form invoiceNumber={invoiceNumber} invoiceNo={invoiceNo} seqNo={seqNo} state={state} onChange={setState} />
-        </DialogBody>
-        <DialogFooter>
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" size="md" onClick={handleClose}>取消</Button>
-            <Button variant="primary" size="md" onClick={handleSave}>{isEdit ? '儲存' : '新增'}</Button>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// Add Standalone Attachment Modal
-// ─────────────────────────────────────────────────────────────
-
-function AddAttachmentModal({ open, onOpenChange, onComplete }: { open: boolean; onOpenChange: (v: boolean) => void; onComplete: (a: AttachmentItem) => void }) {
-  const [attachType, setAttachType] = useState('invoice')
-  const [description, setDescription] = useState('')
-  const [fileName, setFileName] = useState('')
-
-  function handleClose() { onOpenChange(false); setAttachType('invoice'); setDescription(''); setFileName('') }
-  function handleAdd() {
-    onComplete({ id: Date.now().toString(), type: attachType === 'invoice' ? '電腦發票' : '證明文件', description, fileName: fileName || 'Supportdoc.png' })
-    handleClose()
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>
-      <DialogContent maxWidth={720} autoHeight>
-        <DialogHeader><DialogTitle>新增附件</DialogTitle></DialogHeader>
-        <DialogBody>
-          <div className="space-y-4">
-            <Field>
-              <FieldLabel required>附件類型</FieldLabel>
-              <RadioGroup value={attachType} onValueChange={setAttachType} orientation="horizontal">
-                <RadioGroupItem value="invoice" label="發票" />
-                <RadioGroupItem value="support" label="輔助文件" />
-              </RadioGroup>
-            </Field>
-            <Field>
-              <FieldLabel>附件說明</FieldLabel>
-              <Input placeholder="填寫附件說明" value={description} onChange={(e) => setDescription(e.target.value)} />
-            </Field>
-            <div
-              className="flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-divider bg-surface-subtle p-10 cursor-pointer hover:border-primary transition-colors"
-              onClick={() => setFileName(attachType === 'invoice' ? 'Computer-invoice.png' : 'Supportdoc.png')}
-            >
-              {fileName ? (
-                <div className="flex items-center gap-2 text-primary"><Paperclip size={20} /><span className="text-body">{fileName}</span></div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleClose}>取消</Button>
+              {step < 3 ? (
+                <Button onClick={() => setStep(s => (s + 1) as 1 | 2 | 3)}>下一步</Button>
               ) : (
-                <>
-                  <div className="rounded-lg bg-surface-raised p-3"><Upload size={24} className="text-fg-secondary" /></div>
-                  <span className="text-body-lg font-medium">點擊或拖曳到此上傳檔案</span>
-                  <span className="text-caption text-fg-secondary">每個檔案大小不得超過 20 MB</span>
-                </>
+                <Button onClick={handleSubmit}>新增</Button>
               )}
-            </div>
-          </div>
-        </DialogBody>
-        <DialogFooter>
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" size="md" onClick={handleClose}>取消</Button>
-            <Button variant="primary" size="md" onClick={handleAdd}>新增</Button>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// Preview Modal
-// ─────────────────────────────────────────────────────────────
-
-function PreviewModal({ open, onOpenChange, invoices, attachments, onSubmit }: { open: boolean; onOpenChange: (v: boolean) => void; invoices: InvoiceCard[]; attachments: AttachmentItem[]; onSubmit: () => void }) {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({ basic: false, invoices: false, attachments: false, approval: true })
-  const [comment, setComment] = useState('')
-  const total = invoices.reduce((sum, inv) => sum + inv.total, 0)
-  function toggle(k: string) { setExpanded((s) => ({ ...s, [k]: !s[k] })) }
-
-  const SectionHeader = ({ label, sectionKey }: { label: string; sectionKey: string }) => (
-    <button className="flex w-full items-center justify-between px-4 py-3 text-left" onClick={() => toggle(sectionKey)}>
-      <span className="text-body-lg font-semibold">{label}</span>
-      <div className="flex items-center gap-1.5 text-body text-fg-secondary">
-        {expanded[sectionKey] ? <>收合資訊 <ChevronUp size={16} /></> : <>更多資訊 <ChevronDown size={16} /></>}
-      </div>
-    </button>
-  )
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent maxWidth={960} autoHeight>
-        <DialogHeader><DialogTitle>申請單預覽</DialogTitle></DialogHeader>
-        <DialogBody>
-          <div className="space-y-3">
-            <div className="rounded-lg border border-divider">
-              <SectionHeader label="基本資訊" sectionKey="basic" />
-              {expanded.basic && (
-                <div className="border-t border-divider px-4 py-3">
-                  <div className="grid grid-cols-3 gap-4 text-body">
-                    <div><div className="text-caption text-fg-secondary">公司代號</div><div>TA01</div></div>
-                    <div><div className="text-caption text-fg-secondary">申請人</div><div>林間宜 (023156)</div></div>
-                    <div><div className="text-caption text-fg-secondary">收款對象</div><div>員工</div></div>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="rounded-lg border border-divider">
-              <SectionHeader label="請款資訊" sectionKey="invoices" />
-              {expanded.invoices && (
-                <div className="border-t border-divider px-4 py-3 space-y-2">
-                  {invoices.map((inv) => (
-                    <div key={inv.id} className="rounded-lg border border-divider p-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-body font-medium">{inv.number}</span>
-                        <span className="text-body font-medium">{inv.currency} {inv.total.toLocaleString()}</span>
-                      </div>
-                      <div className="text-caption text-fg-secondary mt-1">{inv.voucherTypeLabel} | {inv.date}</div>
-                    </div>
-                  ))}
-                  <div className="text-body-lg font-semibold text-right pt-1">合計：TWD {total.toLocaleString()}</div>
-                </div>
-              )}
-            </div>
-            <div className="rounded-lg border border-divider">
-              <SectionHeader label="憑證附件資訊" sectionKey="attachments" />
-              {expanded.attachments && (
-                <div className="border-t border-divider px-4 py-3">
-                  {attachments.length === 0 ? <span className="text-body text-fg-secondary">尚未上傳附件</span> : (
-                    <div className="divide-y divide-divider">
-                      {attachments.map((a) => (
-                        <div key={a.id} className="flex items-center justify-between py-2">
-                          <span className="text-body">{a.type}</span>
-                          <span className="text-body text-primary">{a.fileName}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="rounded-lg border border-divider">
-              <div className="flex items-center justify-between px-4 py-3">
-                <button className="flex flex-1 items-center justify-between text-left" onClick={() => toggle('approval')}>
-                  <span className="text-body-lg font-semibold">審核流程</span>
-                  <div className="flex items-center gap-1.5 text-body text-fg-secondary">
-                    {expanded.approval ? <>收合資訊 <ChevronUp size={16} /></> : <>展開資訊 <ChevronDown size={16} /></>}
-                  </div>
-                </button>
-              </div>
-              {expanded.approval && (
-                <div className="border-t border-divider px-4 py-3 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <p className="text-body text-fg-secondary">您可以依照需求新增審核人員。</p>
-                    <Button variant="secondary" size="sm" startIcon={Plus}>新增審核人員</Button>
-                  </div>
-                  <table className="w-full text-body">
-                    <thead>
-                      <tr className="border-b border-divider text-caption text-fg-secondary">
-                        {['流程角色', '任務擁有者', '指派', '執行人員', '動作', '評論', '更新日期', ''].map((h) => (
-                          <th key={h} className="pb-2 text-left font-normal">{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-divider">
-                      {[
-                        { role: '申請人', owner: '150986 陳文憶', date: '2025/7/10', canDelete: false },
-                        { role: '主管', owner: '109964 洪挺鈞', date: '2025/7/12', canDelete: true },
-                        { role: '會計', owner: '060069 黃蓉芬', date: '2025/7/16', canDelete: false },
-                      ].map((row) => (
-                        <tr key={row.role}>
-                          <td className="py-2">{row.role}</td><td className="py-2">{row.owner}</td>
-                          <td className="py-2 text-fg-tertiary">-</td><td className="py-2 text-fg-tertiary">-</td>
-                          <td className="py-2 text-fg-tertiary">-</td><td className="py-2 text-fg-tertiary">-</td>
-                          <td className="py-2">{row.date}</td>
-                          <td className="py-2">{row.canDelete && <Button variant="ghost" size="sm" startIcon={Trash2} iconOnly aria-label="刪除" />}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-            <div className="rounded-lg border border-divider p-4 space-y-2">
-              <div className="text-body-lg font-semibold">簽核補充說明</div>
-              <p className="text-body text-fg-secondary">您可以填寫簽核補充說明，協助下一階段簽核人員快速完成審核</p>
-              <Textarea placeholder="請填寫補充說明" value={comment} onChange={(e) => setComment(e.target.value)} rows={3} />
-            </div>
-          </div>
-        </DialogBody>
-        <DialogFooter>
-          <div className="flex w-full items-center justify-between">
-            <Button variant="ghost" size="md" onClick={() => onOpenChange(false)}>上一步</Button>
-            <div className="flex gap-2">
-              <Button variant="secondary" size="md" onClick={() => onOpenChange(false)}>取消</Button>
-              <Button variant="primary" size="md" onClick={onSubmit}>送出</Button>
             </div>
           </div>
         </DialogFooter>
@@ -679,416 +682,133 @@ function PreviewModal({ open, onOpenChange, invoices, attachments, onSubmit }: {
   )
 }
 
-// ─────────────────────────────────────────────────────────────
-// Invoice Card Row
-// ─────────────────────────────────────────────────────────────
+// ─── DraftListPage ───────────────────────────────────────────
 
-interface InvoiceCardRowProps {
-  card: InvoiceCard
-  onToggle: () => void
-  onDelete: () => void
-  onEdit: () => void
-  onAddLineItem: () => void
-  onEditLineItem: (li: LineItem) => void
-  onDeleteLineItem: (liId: string) => void
-}
-
-function InvoiceCardRow({ card, onToggle, onDelete, onEdit, onAddLineItem, onEditLineItem, onDeleteLineItem }: InvoiceCardRowProps) {
-  const s = STATUS_META[card.status]
+function DraftListPage({
+  entries,
+  onAdd,
+}: {
+  entries: DraftEntry[]
+  onAdd: () => void
+}) {
   return (
-    <div className="rounded-lg border border-divider">
-      <div className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <button onClick={onToggle} className="text-fg-secondary hover:text-fg-primary transition-colors shrink-0">
-            {card.expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
-          <span className="text-body font-medium">{card.number}</span>
-          <Tag color={s.color} size="sm">{s.label}</Tag>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-body font-medium">{card.currency} {card.total.toLocaleString()}</span>
-          <Button variant="ghost" size="sm" startIcon={Pencil} iconOnly aria-label="編輯" onClick={onEdit} />
-          <Button variant="ghost" size="sm" startIcon={Copy} iconOnly aria-label="複製" />
-          <Button variant="ghost" size="sm" startIcon={Trash2} iconOnly aria-label="刪除" onClick={onDelete} />
-        </div>
-      </div>
-      <div className="text-caption text-fg-secondary px-4 pb-2">收款人：{card.payee} ｜ 日期：{card.date}</div>
-      {card.expanded && (
-        <div className="border-t border-divider px-4 py-3 space-y-3">
-          <div className="grid grid-cols-4 gap-4 text-body">
-            <div><div className="text-caption text-fg-secondary">憑證類型</div><div className="truncate">{card.voucherTypeLabel || '-'}</div></div>
-            <div><div className="text-caption text-fg-secondary">發票號碼</div><div>{card.invoiceNo || '-'}</div></div>
-            <div><div className="text-caption text-fg-secondary">合計金額（未稅）</div><div>{card.subtotal ? `${card.currency} ${card.subtotal}` : '-'}</div></div>
-            <div><div className="text-caption text-fg-secondary">稅額</div><div>{card.tax || '0'}</div></div>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span className="text-body font-medium">付款細項：{card.lineItems.length} 項</span>
-            <div className="flex gap-2">
-              <Button variant="secondary" size="sm" startIcon={Download}>批次匯入</Button>
-              <Button variant="secondary" size="sm" startIcon={Plus} onClick={onAddLineItem}>新增細項</Button>
+    <div className="p-6 max-w-screen-xl">
+      <h1 className="text-xl font-semibold mb-6">暫存申請單</h1>
+
+      <Tabs defaultValue="general">
+        <TabsList>
+          <TabsTrigger value="general">一般</TabsTrigger>
+          <TabsTrigger value="bonus">現金獎金</TabsTrigger>
+          <TabsTrigger value="domestic">國內差旅</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general" className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-medium text-fg-primary">一般暫存申請</h2>
+            <div className="flex items-center gap-2">
+              <Button startIcon={Plus} onClick={onAdd}>
+                新增
+                <ChevronDown size={14} className="ml-1" />
+              </Button>
+              <Button variant="outline" startIcon={Download}>下載 Excel 範本</Button>
             </div>
           </div>
-          {card.lineItems.length > 0 && (
-            <table className="w-full text-body">
-              <thead>
-                <tr className="border-b border-divider text-caption text-fg-secondary">
-                  {['序號', '分類', '子分類', '成本中心', '會計科目', '描述', ''].map((h) => (
-                    <th key={h} className="pb-2 text-left font-normal">{h}</th>
-                  ))}
+
+          <div className="rounded-lg border border-divider overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-surface-raised border-b border-divider">
+                <tr>
+                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">單號</th>
+                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">申請日期</th>
+                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">公司代號</th>
+                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">申請人</th>
+                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">收款對象</th>
+                  <th className="text-right px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">總額</th>
+                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">緊急/指定付款日期</th>
+                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">申請原因</th>
+                  <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-divider">
-                {card.lineItems.map((li, i) => (
-                  <tr key={li.id}>
-                    <td className="py-2">{i + 1}</td>
-                    <td className="py-2 max-w-[130px]"><div className="truncate" title={li.category}>{li.category}</div></td>
-                    <td className="py-2 max-w-[150px]"><div className="truncate" title={li.subCategory}>{li.subCategory}</div></td>
-                    <td className="py-2">{li.costCenter || '-'}</td>
-                    <td className="py-2">{li.accountCode || '-'}</td>
-                    <td className="py-2">{li.description || '-'}</td>
-                    <td className="py-2">
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" startIcon={Pencil} iconOnly aria-label="編輯" onClick={() => onEditLineItem(li)} />
-                        <Button variant="ghost" size="sm" startIcon={Trash2} iconOnly aria-label="刪除" onClick={() => onDeleteLineItem(li.id)} />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {entries.map(entry => {
+                  const meta = STATUS_META[entry.status]
+                  return (
+                    <tr key={entry.id} className="hover:bg-surface-raised transition-colors">
+                      <td className="px-4 py-3">
+                        <p className="font-medium text-fg-primary">{entry.number}</p>
+                        <div className="mt-1">
+                          <Tag color={meta.color} size="sm">{meta.label}</Tag>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-fg-secondary">{entry.date}</td>
+                      <td className="px-4 py-3 text-fg-secondary">{entry.company}</td>
+                      <td className="px-4 py-3 text-fg-secondary">{entry.applicant}</td>
+                      <td className="px-4 py-3 text-fg-secondary">{entry.payee}</td>
+                      <td className="px-4 py-3 text-fg-secondary text-right">{entry.total.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-fg-secondary">{entry.urgentDate}</td>
+                      <td className="px-4 py-3 text-fg-secondary">{entry.reason}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-0.5">
+                          <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="查看">
+                            <Info size={14} />
+                          </button>
+                          <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
+                            <Pencil size={14} />
+                          </button>
+                          <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
-          )}
-        </div>
-      )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="bonus" className="mt-6">
+          <div className="rounded-xl border border-divider bg-surface py-16 text-center text-body text-fg-tertiary">
+            現金獎金申請請至專區請款
+          </div>
+        </TabsContent>
+
+        <TabsContent value="domestic" className="mt-6">
+          <div className="rounded-xl border border-divider bg-surface py-16 text-center text-body text-fg-tertiary">
+            國內差旅申請請至差旅專區
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
 
-// ─────────────────────────────────────────────────────────────
-// Create Form Page
-// ─────────────────────────────────────────────────────────────
-
-function CreateFormPage({ formId, onBack }: { formId: string; onBack: () => void }) {
-  const [invoices, setInvoices] = useState<InvoiceCard[]>([])
-  const [attachments, setAttachments] = useState<AttachmentItem[]>([])
-  const [reason, setReason] = useState('')
-  const [urgentPayment, setUrgentPayment] = useState(false)
-  const [urgentDate, setUrgentDate] = useState('')
-
-  // Modal state
-  const [invoiceModal, setInvoiceModal] = useState<{ open: boolean; editTarget?: InvoiceCard }>({ open: false })
-  const [lineItemModal, setLineItemModal] = useState<{ open: boolean; invoiceId: string; editTarget?: LineItem }>({ open: false, invoiceId: '' })
-  const [showAddAttachment, setShowAddAttachment] = useState(false)
-  const [showPreview, setShowPreview] = useState(false)
-
-  const nextInvoiceNumber = `${formId}-${invoices.length + 1}`
-
-  // Invoice CRUD
-  function handleInvoiceComplete(data: Partial<InvoiceCard> & { id?: string }) {
-    if (data.id) {
-      setInvoices((prev) => prev.map((inv) => inv.id === data.id ? { ...inv, ...data } as InvoiceCard : inv))
-    } else {
-      setInvoices((prev) => [...prev, { ...data, id: Date.now().toString() } as InvoiceCard])
-    }
-  }
-
-  // Line item CRUD within an invoice
-  function handleLineItemComplete(invoiceId: string, li: LineItem) {
-    setInvoices((prev) => prev.map((inv) => {
-      if (inv.id !== invoiceId) return inv
-      const exists = inv.lineItems.find((x) => x.id === li.id)
-      return { ...inv, lineItems: exists ? inv.lineItems.map((x) => x.id === li.id ? li : x) : [...inv.lineItems, li] }
-    }))
-  }
-
-  function handleSubmit() {
-    setShowPreview(false)
-    toast({ variant: 'success', title: `${formId} 送出成功` })
-    onBack()
-  }
-
-  const isFilled = invoices.length > 0
-  const editingInvoice = invoiceModal.editTarget
-  const lineItemInvoice = invoices.find((inv) => inv.id === lineItemModal.invoiceId)
-
-  return (
-    <>
-      <div className="flex flex-col h-full">
-        {/* Chrome header */}
-        <div className="flex items-center justify-between h-[var(--chrome-header-height)] px-6 border-b border-divider bg-surface shrink-0">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink onClick={onBack} className="cursor-pointer hover:underline">暫存申請單</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbItem><BreadcrumbPage>一般項目申請單</BreadcrumbPage></BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-          <Button variant="secondary" size="md" startIcon={Upload}>批次匯入申請</Button>
-        </div>
-
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-auto bg-surface-subtle">
-          <div className="max-w-4xl mx-auto px-6 py-6 space-y-4">
-            <h1 className="text-h4 font-semibold">一般項目申請單 {formId}</h1>
-
-            {/* 基本資訊 */}
-            <div className="rounded-xl border border-divider bg-surface p-6 space-y-4">
-              <h2 className="text-body-lg font-semibold">基本資訊</h2>
-              <Field>
-                <FieldLabel>公司代號 <InfoTooltip content="請選擇您所屬的公司代號" /></FieldLabel>
-                <Select options={[{ value: 'TA01', label: 'TA01' }]} value="TA01" />
-              </Field>
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel required>申請人 <InfoTooltip content="申請人為目前登入的員工，無法修改" /></FieldLabel>
-                  <Input value="林間宜 (023156)" readOnly />
-                </Field>
-                <Field>
-                  <FieldLabel required>收款對象 <InfoTooltip content="請選擇本次請款的收款對象類型" /></FieldLabel>
-                  <Select options={PAYEE_OPTIONS} defaultValue="employee" />
-                </Field>
-              </div>
-            </div>
-
-            {/* 請款資訊 */}
-            <div className="rounded-xl border border-divider bg-surface p-6 space-y-4">
-              <h2 className="text-body-lg font-semibold">請款資訊</h2>
-              <Button variant="secondary" size="md" startIcon={Plus} onClick={() => setInvoiceModal({ open: true })}>新增請款</Button>
-              {invoices.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-divider py-12 text-center text-body text-fg-tertiary">沒有任何資料</div>
-              ) : (
-                <div className="space-y-3">
-                  {invoices.map((inv) => (
-                    <InvoiceCardRow
-                      key={inv.id}
-                      card={inv}
-                      onToggle={() => setInvoices((prev) => prev.map((x) => x.id === inv.id ? { ...x, expanded: !x.expanded } : x))}
-                      onDelete={() => setInvoices((prev) => prev.filter((x) => x.id !== inv.id))}
-                      onEdit={() => setInvoiceModal({ open: true, editTarget: inv })}
-                      onAddLineItem={() => setLineItemModal({ open: true, invoiceId: inv.id })}
-                      onEditLineItem={(li) => setLineItemModal({ open: true, invoiceId: inv.id, editTarget: li })}
-                      onDeleteLineItem={(liId) => setInvoices((prev) => prev.map((x) => x.id === inv.id ? { ...x, lineItems: x.lineItems.filter((l) => l.id !== liId) } : x))}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* 檢附憑證 / 證明 */}
-            <div className="rounded-xl border border-divider bg-surface p-6 space-y-4">
-              <h2 className="text-body-lg font-semibold">檢附憑證 / 證明</h2>
-              <Button variant="secondary" size="md" startIcon={Plus} onClick={() => setShowAddAttachment(true)}>新增附件</Button>
-              {attachments.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-divider py-12 text-center text-body text-fg-tertiary">沒有任何資料</div>
-              ) : (
-                <table className="w-full text-body">
-                  <thead>
-                    <tr className="border-b border-divider text-caption text-fg-secondary">
-                      {['類型', '描述', '附件', ''].map((h) => <th key={h} className="pb-2 text-left font-normal">{h}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-divider">
-                    {attachments.map((a) => (
-                      <tr key={a.id}>
-                        <td className="py-2">{a.type}</td>
-                        <td className="py-2 text-fg-secondary">{a.description || '-'}</td>
-                        <td className="py-2 text-primary">{a.fileName}</td>
-                        <td className="py-2">
-                          <div className="flex gap-1">
-                            <Button variant="ghost" size="sm" startIcon={Pencil} iconOnly aria-label="編輯" />
-                            <Button variant="ghost" size="sm" startIcon={Trash2} iconOnly aria-label="刪除" onClick={() => setAttachments((prev) => prev.filter((x) => x.id !== a.id))} />
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-
-            {/* 補充資訊 */}
-            <div className="rounded-xl border border-divider bg-surface p-6">
-              <Field>
-                <FieldLabel required>
-                  申請原因
-                  <InfoTooltip content="1. 跨組織舉辦之研討會宣導活動-贈送禮品禮券 / 聘請外部講師或是機構 / 用品及其他費用，請填寫參與單位，並於附件提供海報。&#10;2. 形象廣告費-國內 / 國際，請於附件提供企業公共關係處 (PR) 核准的信件" />
-                </FieldLabel>
-                <Textarea placeholder="填寫申請原因，最多 250 字" value={reason} onChange={(e) => setReason(e.target.value)} rows={4} maxLength={250} />
-              </Field>
-            </div>
-
-            {/* 注意事項 */}
-            <Notice variant="info" title="注意事項">
-              <div className="font-medium mb-1">注意事項</div>
-              <div>預計付款日為申請單簽核完畢後的下個月一般付款日 (每月最後工作日)，若有緊急付款需求，請參考下列簽核層級：</div>
-              <ul className="mt-1 space-y-0.5 list-disc pl-4">
-                <li>一般付款日：100,000 TWD 以下簽核至處長，以上簽核至副總</li>
-                <li>特殊付款日：一律簽核至副總</li>
-              </ul>
-            </Notice>
-
-            {/* 緊急付款 */}
-            <div className="rounded-xl border border-divider bg-surface p-6 space-y-3">
-              <Checkbox checked={urgentPayment} onCheckedChange={(v) => setUrgentPayment(v === true)} label="使用緊急/指定付款" />
-              {urgentPayment && (
-                <Field>
-                  <FieldLabel>緊急/指定付款日</FieldLabel>
-                  <Input placeholder="請選擇" value={urgentDate} onChange={(e) => setUrgentDate(e.target.value)} className="max-w-xs" />
-                </Field>
-              )}
-            </div>
-            <div className="h-16" />
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div className="shrink-0 flex items-center justify-end gap-3 px-6 py-4 border-t border-divider bg-surface">
-          <Button variant="danger-outline" size="md" onClick={onBack}>取消申請</Button>
-          <Button variant="secondary" size="md">存成草稿</Button>
-          {isFilled
-            ? <Button variant="primary" size="md" onClick={() => setShowPreview(true)}>送出預覽</Button>
-            : <Button variant="primary" size="md">下一步</Button>
-          }
-        </div>
-      </div>
-
-      {/* Modals */}
-      <InvoiceModal
-        open={invoiceModal.open}
-        onOpenChange={(o) => setInvoiceModal((s) => ({ ...s, open: o }))}
-        invoiceNumber={editingInvoice ? editingInvoice.number : nextInvoiceNumber}
-        initialData={editingInvoice}
-        onComplete={handleInvoiceComplete}
-      />
-      <LineItemModal
-        open={lineItemModal.open}
-        onOpenChange={(o) => setLineItemModal((s) => ({ ...s, open: o }))}
-        invoiceNumber={lineItemInvoice?.number ?? ''}
-        invoiceNo={lineItemInvoice?.invoiceNo ?? ''}
-        seqNo={(lineItemInvoice?.lineItems.length ?? 0) + (lineItemModal.editTarget ? 0 : 1)}
-        initialData={lineItemModal.editTarget}
-        onComplete={(li) => handleLineItemComplete(lineItemModal.invoiceId, li)}
-      />
-      <AddAttachmentModal
-        open={showAddAttachment}
-        onOpenChange={setShowAddAttachment}
-        onComplete={(a) => setAttachments((prev) => [...prev, a])}
-      />
-      <PreviewModal
-        open={showPreview}
-        onOpenChange={setShowPreview}
-        invoices={invoices}
-        attachments={attachments}
-        onSubmit={handleSubmit}
-      />
-    </>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// Draft List Page
-// ─────────────────────────────────────────────────────────────
-
-const INITIAL_DRAFTS: DraftEntry[] = [
-  { id: 'PAE20260525001', date: '2026/5/29', company: 'TA01', applicant: '林間宜 (023156)', payee: '員工', total: 1600, urgentDate: '-', reason: '-', status: 'reviewing' },
-  { id: 'PAE20260525002', date: '2026/5/28', company: 'TA01', applicant: '林間宜 (023156)', payee: '員工', total: 2400, urgentDate: '-', reason: '-', status: 'draft' },
-  { id: 'PAE20260525003', date: '2026/5/27', company: 'TA01', applicant: '林間宜 (023156)', payee: '員工', total: 3800, urgentDate: '-', reason: '-', status: 'draft' },
-]
-
-function DraftListPage({ onCreateNew, onOpenForm }: { onCreateNew: () => void; onOpenForm: (id: string) => void }) {
-  const [drafts, setDrafts] = useState<DraftEntry[]>(INITIAL_DRAFTS)
-
-  return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between h-[var(--chrome-header-height)] px-6 border-b border-divider bg-surface shrink-0">
-        <div className="flex items-center gap-2">
-          <SidebarTrigger />
-          <h1 className="text-body-lg font-medium">暫存申請單</h1>
-        </div>
-        <Button variant="secondary" size="md" startIcon={Upload}>批次匯入申請</Button>
-      </div>
-      <div className="flex-1 overflow-auto px-6 py-4 bg-surface-subtle">
-        <Tabs defaultValue="general">
-          <TabsList>
-            <TabsTrigger value="general">一般</TabsTrigger>
-            <TabsTrigger value="bonus">現金獎金</TabsTrigger>
-            <TabsTrigger value="travel">國內差旅</TabsTrigger>
-          </TabsList>
-          <TabsContent value="general">
-            <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-body-lg font-semibold">一般暫存申請</h2>
-                <div className="flex gap-2">
-                  <Button variant="primary" size="md" startIcon={Plus} onClick={onCreateNew}>新增</Button>
-                  <Button variant="secondary" size="md" startIcon={Download}>下載 Excel 範本</Button>
-                </div>
-              </div>
-              <div className="rounded-xl border border-divider bg-surface overflow-hidden">
-                <table className="w-full text-body">
-                  <thead>
-                    <tr className="bg-surface-subtle text-caption text-fg-secondary border-b border-divider">
-                      {['單號', '申請日期', '公司代號', '申請人', '收款對象', '總額', '緊急/指定付款日期', '申請原因', ''].map((h) => (
-                        <th key={h} className="px-4 py-3 text-left font-normal">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-divider">
-                    {drafts.map((d) => {
-                      const s = STATUS_META[d.status]
-                      return (
-                        <tr key={d.id} className="hover:bg-surface-subtle transition-colors">
-                          <td className="px-4 py-3">
-                            <button className="text-primary hover:underline font-medium block" onClick={() => onOpenForm(d.id)}>{d.id}</button>
-                            <Tag color={s.color} size="sm">{s.label}</Tag>
-                          </td>
-                          <td className="px-4 py-3">{d.date}</td>
-                          <td className="px-4 py-3">{d.company}</td>
-                          <td className="px-4 py-3">{d.applicant}</td>
-                          <td className="px-4 py-3">{d.payee}</td>
-                          <td className="px-4 py-3">{d.total.toLocaleString()}</td>
-                          <td className="px-4 py-3 text-fg-tertiary">{d.urgentDate}</td>
-                          <td className="px-4 py-3 text-fg-tertiary">{d.reason}</td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-1">
-                              <Button variant="ghost" size="sm" startIcon={Info} iconOnly aria-label="詳情" />
-                              <Button variant="ghost" size="sm" startIcon={Pencil} iconOnly aria-label="編輯" onClick={() => onOpenForm(d.id)} />
-                              <Button variant="ghost" size="sm" startIcon={Trash2} iconOnly aria-label="刪除" onClick={() => setDrafts((prev) => prev.filter((x) => x.id !== d.id))} />
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </TabsContent>
-          <TabsContent value="bonus">
-            <div className="mt-4 rounded-xl border border-divider bg-surface py-16 text-center text-body text-fg-tertiary">現金獎金申請請至專區請款</div>
-          </TabsContent>
-          <TabsContent value="travel">
-            <div className="mt-4 rounded-xl border border-divider bg-surface py-16 text-center text-body text-fg-tertiary">國內差旅申請請至差旅專區</div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// App Root
-// ─────────────────────────────────────────────────────────────
-
-type AppView = { page: 'list' } | { page: 'form'; formId: string }
+// ─── App Root ────────────────────────────────────────────────
 
 export default function App() {
   const [activeNav, setActiveNav] = useState('drafts')
-  const [view, setView] = useState<AppView>({ page: 'list' })
-  const nextId = `PAE2026052500${INITIAL_DRAFTS.length + 1}`
+  const [entries, setEntries] = useState<DraftEntry[]>(INITIAL_ENTRIES)
+  const [modalOpen, setModalOpen] = useState(false)
+
+  function handleSubmit(newNumber: string) {
+    const today = new Date()
+    const newEntry: DraftEntry = {
+      id: String(Date.now()),
+      number: newNumber,
+      date: `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`,
+      company: 'TA01',
+      applicant: '林間宜 (023156)',
+      payee: '員工',
+      total: 0,
+      urgentDate: '-',
+      reason: '-',
+      status: 'draft',
+    }
+    setEntries(prev => [newEntry, ...prev])
+    setModalOpen(false)
+    toast({ variant: 'success', title: `${newNumber} 送出成功` })
+  }
 
   return (
     <TooltipProvider delayDuration={300} skipDelayDuration={100}>
@@ -1097,16 +817,14 @@ export default function App() {
           layout="primary-sidebar"
           sidebar={<AppSidebar activeId={activeNav} onActiveChange={setActiveNav} />}
         >
-          {view.page === 'list' ? (
-            <DraftListPage
-              onCreateNew={() => setView({ page: 'form', formId: nextId })}
-              onOpenForm={(id) => setView({ page: 'form', formId: id })}
-            />
-          ) : (
-            <CreateFormPage formId={view.formId} onBack={() => setView({ page: 'list' })} />
-          )}
+          <DraftListPage entries={entries} onAdd={() => setModalOpen(true)} />
         </AppShell>
       </SidebarProvider>
+      <AddInvoiceModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleSubmit}
+      />
       <Toaster />
     </TooltipProvider>
   )
