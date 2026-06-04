@@ -624,16 +624,23 @@ rule_story_archetype_registry() {
 #   只比 h-[chrome-header-height] signature)、R7/R8(只比已註冊 primitive 名)。adversarial workflow 確認。
 # ─────────────────────────────────────────────────────────────────────────────
 rule_handcraft_overlay_header() {
-  # skip primitive / overlay 家(它們定義 / 示範 header primitive 本身)
+  # skip primitive / overlay 家(它們定義 / 示範 header primitive 本身)。
+  # 含全部 isOverlay 元件家(2026-06-04 adversarial workflow R9-SKIP-001:補 HoverCard/Tooltip/DropdownMenu/FileViewer)。
   case "$FILE_PATH" in
-    */overlay-surface/*|*/header-canonical/*|*/ChromeHeader/*|*/Dialog/*|*/Sheet/*|*/Popover/*|*/Coachmark/*|*/Tabs/*) return 0 ;;
+    */overlay-surface/*|*/header-canonical/*|*/ChromeHeader/*|*/Dialog/*|*/Sheet/*|*/Popover/*|*/Coachmark/*|*/Tabs/*|*/HoverCard/*|*/Tooltip/*|*/DropdownMenu/*|*/FileViewer/*) return 0 ;;
   esac
   # allow escape(檔頭 OR 本次片段)
   if echo "$NEW_CONTENT" | head -10 | grep -qE '@story-baseline-allow:'; then return 0; fi
   if [ -f "$FILE_PATH" ] && head -10 "$FILE_PATH" 2>/dev/null | grep -qE '@story-baseline-allow:'; then return 0; fi
   local FLAT
-  FLAT=$(echo "$NEW_CONTENT" | tr '\n' ' ')
-  if echo "$FLAT" | grep -qE '<div[^>]*px-\[var\(--layout-space-loose\)\][^>]*border-b border-divider|<div[^>]*border-b border-divider[^>]*px-\[var\(--layout-space-loose\)\]'; then
+  # 2026-06-04 adversarial workflow 抓 R9 regex 3 漏洞,robustify:
+  #   (1) drop 純註解行(^//、^*、^/*、^{/*)再 flatten → 避免 commented-out / 描述用 JSX 含 pattern 誤判(FP-002);
+  #       不 strip 行內 // (避免 mutilate https:// URL 造成 FN)。
+  #   (2) token 間用 [^">]*(非 [^>]*)→ px-loose 與 border-b 必在「同一 className 字串」內,不跨 " 屬性邊界
+  #       (FP-001:data-style="border-b border-divider" 不再誤判)。
+  #   (3) border-b[[:space:]]+border-divider(非單空格)→ 多行 className flatten 後多空格不漏(FN-001,同 R8 multiline bug class)。
+  FLAT=$(echo "$NEW_CONTENT" | grep -vE '^[[:space:]]*(//|\*|/\*|\{/\*)' | tr '\n' ' ')
+  if echo "$FLAT" | grep -qE '<div[^>]*px-\[var\(--layout-space-loose\)\][^">]*border-b[[:space:]]+border-divider|<div[^>]*border-b[[:space:]]+border-divider[^">]*px-\[var\(--layout-space-loose\)\]'; then
     {
       echo "❌ R9 hand-craft overlay / chrome header:${FILE_PATH}"
       echo "   偵測到 <div ... px-[var(--layout-space-loose)] ... border-b border-divider> = 手刻浮層 / chrome header。"

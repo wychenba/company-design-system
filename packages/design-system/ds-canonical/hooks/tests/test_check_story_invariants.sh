@@ -314,6 +314,37 @@ export const P = () => (<div className="px-[var(--layout-space-loose)] py-2 bord
 '
 expect_pass_silent "19. R9 @story-baseline-allow 豁免 → 不擋"
 
+# 20. R9 FN-001 回歸(2026-06-04 adversarial workflow):多行 className flatten 後多空格 → 仍 BLOCK
+#     (修前單空格 regex 漏;改 border-b[[:space:]]+border-divider)
+run_hook "PreToolUse" "Write" "$TMP_DIR/r9-multispace.stories.tsx" 'export const P = () => (
+  <div
+    className="flex justify-between px-[var(--layout-space-loose)] py-2
+      border-b
+      border-divider"
+  >正在上傳</div>
+);
+'
+expect_block "20. R9 多行/多空格 className 手刻 header → BLOCK(FN-001 修)" "R9 hand-craft overlay"
+
+# 21. R9 FP-001 防護:border-b border-divider 在 data-* 屬性(非 className)→ 不擋
+#     (修前 [^>]* 跨屬性誤判;改 [^\">]* 限同 className 字串)
+run_hook "PreToolUse" "Write" "$TMP_DIR/r9-crossattr.stories.tsx" '
+export const P = () => (<div className="px-[var(--layout-space-loose)]" data-x="border-b border-divider">x</div>);
+'
+expect_pass_silent "21. R9 border-divider 在 data-* 屬性 → 不誤判(FP-001 修)"
+
+# 22. R9 FP-002 防護:純註解行含 pattern → 不擋(drop comment-only line 後 flatten)
+run_hook "PreToolUse" "Write" "$TMP_DIR/r9-comment.stories.tsx" '// 範例(禁): <div className="px-[var(--layout-space-loose)] border-b border-divider">
+export const P = () => (<SurfaceHeader>x</SurfaceHeader>);
+'
+expect_pass_silent "22. R9 純註解行含 pattern → 不誤判(FP-002 修)"
+
+# 23. R9 skip-list 補 isOverlay 家(FileViewer)→ 不擋(R9-SKIP-001)
+run_hook "PreToolUse" "Write" "/foo/my-project/packages/design-system/src/components/FileViewer/fv.stories.tsx" '
+export const P = () => (<div className="px-[var(--layout-space-loose)] border-b border-divider">x</div>);
+'
+expect_pass_silent "23. R9 skip FileViewer(isOverlay 家)→ 不檢查"
+
 echo ""
 echo "=== Summary ==="
 echo "Passed: $PASS / $((PASS + FAIL))"
