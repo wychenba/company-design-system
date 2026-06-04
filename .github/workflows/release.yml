@@ -98,8 +98,12 @@ jobs:
         run: npm run build:lib
 
       - name: Audit gates(must PASS before publish)
+        # 2026-06-04 SSOT 對齊:補 typecheck:stories + story-quality:check + ds-canonical drift —— 原 release.yml
+        # Audit gates 漏這 3 道,但 release-preflight.mjs 有(兩者應 1:1,否則「沒跑 preflight 直接 push tag」會漏掉)。
+        # 此 step 為直接指令(無 pipe)→ bash -e errexit 任一非 0 即停,不需 pipefail。
         run: |
           npx tsc -b
+          npm run --silent typecheck:stories
           node scripts/audit-orphan-tokens.mjs --check
           node scripts/categorical-color-invariants.mjs
           node scripts/code-quality-audit.mjs --scope=packages/design-system/src/components --check
@@ -107,6 +111,8 @@ jobs:
           node scripts/sync-governance-counters.mjs --check
           node scripts/gen-figma-make-artifacts.mjs --check
           node scripts/plugin-structure-validate.mjs
+          npm run --silent story-quality:check
+          node scripts/sync-ds-canonical.mjs --check
 
       - name: Build Storybook
         run: npm run build-storybook

@@ -11,17 +11,32 @@ on:
 permissions:
   contents: read
 
+# 2026-06-04 SSOT 假綠根治:bash -eo pipefail(同 ci.yml)→ `| tail` 不再吞 exit code。
+defaults:
+  run:
+    shell: bash -eo pipefail {0}
+
 jobs:
   a11y-axe:
     name: a11y(axe-core WCAG 2A+AA, Dim 49)
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    continue-on-error: true  # 2026-05-23 ship — advisory until baseline established(Carbon AVT 同 pattern)
+    # 2026-06-04:仍 advisory(continue-on-error)—— 但「真實 advisory」非假綠。先前此 job 連 axe 都沒跑
+    #(缺 build:lib → storybook-config tsc 失敗 → 無 storybook-static → axe 早夭,且被 pipefail-mask +
+    # continue-on-error 三重塗綠)。已補 build:lib 讓 axe 真的跑、產出真實 report(artifact)。
+    # 之所以暫留 advisory:axe 全掃含 anatomy 文件表雜訊(~703 color-contrast 多為 doc-table 小字/色票),
+    # 需先 scope 到 production story + 建 baseline 才能轉 hard-gate(否則每次 push 紅 = 另一種紙老虎)。
+    # → 轉 enforce 是獨立 follow-up(scope + baseline),非本次。
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: 'npm' }
       - run: npm ci
+      # 2026-06-04 fix(missing-build-dep):build-storybook 的 prebuild 跑 storybook-config tsc,需 DS dist 型別。
+      # 漏此步 → tsc error code 2 → 無 storybook-static → axe 沒跑。對齊 size-limit job + ci.yml + release.yml。
+      - name: Build DS lib + types(storybook-config tsc + Storybook 前置)
+        run: npm run build:lib 2>&1 | tail -10
       - run: npm run build-storybook 2>&1 | tail -20
       - name: Run axe-core against all stories
         run: npm run a11y:check 2>&1 | tail -60

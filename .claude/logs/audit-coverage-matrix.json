@@ -1,11 +1,11 @@
 {
-  "ts": "2026-05-30T07:13:33.992Z",
+  "ts": "2026-06-04T14:53:27.015Z",
   "expected_dims": 88,
   "classified": 88,
   "tier_counts": {
-    "DETERMINISTIC": 22,
-    "HOOK-ENFORCED": 42,
-    "PURE-JUDGMENT": 24,
+    "DETERMINISTIC": 23,
+    "HOOK-ENFORCED": 39,
+    "PURE-JUDGMENT": 26,
     "UNKNOWN": 0
   },
   "gaps": [],
@@ -15,16 +15,16 @@
       "mechanism": "cva 三方漂移 — story-auto-compile-migrate + compile-stories.mjs --check chain"
     },
     "2": {
-      "tier": "PURE-JUDGMENT",
-      "mechanism": "SSOT dead link — grep + spec-rules reciprocal pointer audit;sub-agent must DS-wide 全掃 spec.md pointers"
+      "tier": "DETERMINISTIC",
+      "mechanism": "scripts/audit-spec-deadlinks.mjs --check(掃 83 spec.md cross-ref pointer,assert target 存在;2026-05-30 從誤分 PURE-JUDGMENT 修正)"
     },
     "3": {
       "tier": "DETERMINISTIC",
-      "mechanism": "scripts/add-reciprocal-pointers.mjs(auto-maintained,Dim 3 SSOT reciprocal)"
+      "mechanism": "scripts/add-reciprocal-pointers.mjs --check(2026-05-31 加 --check verify gate;原本只 mutator 無 gate=紙上 DETERMINISTIC,infra-audit 修)"
     },
     "4": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_opacity_token_usage.sh + utility-registry.json — write-time block"
+      "mechanism": "check_opacity_token_usage.sh(write-time WARN — 印 9 類 violation 到 stderr 但 exit 0 不 block;2026-05-31 infra-audit 修:原寫「write-time block」是假 guarantee)+ utility-registry.json SSOT + audit-time DS-wide grep 確認 residue"
     },
     "5": {
       "tier": "DETERMINISTIC",
@@ -43,8 +43,8 @@
       "mechanism": "7-維對標 AI judgment;dispatch 必 DS-wide 全 spec.md;每 spec 7-dim per row"
     },
     "9": {
-      "tier": "HOOK-ENFORCED",
-      "mechanism": "check_codex_collab_5step.sh + shadcn passthrough grep(forwardRef / displayName)— dispatch 全 components/*.tsx 全掃"
+      "tier": "PURE-JUDGMENT",
+      "mechanism": "shadcn passthrough 完整度 — dispatch agent DS-wide 全掃 components/*.tsx 驗 forwardRef/displayName/asChild/...props/data-state 齊;無 write-time hook(2026-05-31 infra-audit 修:原誤標 HOOK-ENFORCED 且 cite 無關的 check_codex_collab_5step.sh(codex hook+soft-warn),實際是 audit-time grep)"
     },
     "10": {
       "tier": "PURE-JUDGMENT",
@@ -80,7 +80,7 @@
     },
     "18": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_token_hygiene.sh(folded lib/_token_hygiene.sh — shadcn compat alias ban write-time)+ DS-wide grep audit-time;2026-05-30 M4 修 stale ref check_shadcn_alias"
+      "mechanism": "post_edit_dispatcher.sh → lib/_token_hygiene.sh(shadcn compat alias ban write-time;dispatcher 已 registered settings.json)+ DS-wide grep audit-time;2026-05-31 字串精確化(原寫 check_token_hygiene.sh standalone 不存在,實際 active 路徑是 dispatcher source lib)"
     },
     "19": {
       "tier": "PURE-JUDGMENT",
@@ -92,11 +92,11 @@
     },
     "21": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_item_list_gap.sh write-time"
+      "mechanism": "check_item_list_gap.sh write-time WARN(exit 0 additionalContext,非 block)+ audit-time grep backstop"
     },
     "22": {
-      "tier": "HOOK-ENFORCED",
-      "mechanism": "check_container_breathing.sh write-time"
+      "tier": "PURE-JUDGMENT",
+      "mechanism": "視覺容器 inner breathing — dispatch agent DS-wide 全掃有邊界容器是否缺 inner padding;原 check_container_breathing.sh 已 retired 無 active 替代(2026-05-31 infra-audit 修假分類,原誤標 HOOK-ENFORCED)"
     },
     "23": {
       "tier": "DETERMINISTIC",
@@ -132,7 +132,7 @@
     },
     "31": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_overlay_handcraft.sh + grep ban stripped-padding boolean variant"
+      "mechanism": "post_edit_dispatcher.sh → lib/_overlay_handcraft.sh WARN(exit 0,2026-05-31 修 dangling ref:原寫 check_overlay_handcraft.sh standalone 不存在,已 fold 成 lib helper)+ grep ban stripped-padding boolean variant audit-time"
     },
     "32": {
       "tier": "PURE-JUDGMENT",
@@ -196,7 +196,7 @@
     },
     "47": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_token_hygiene.sh(folded lib/_token_hygiene.sh)+ utility-registry.json SSOT;2026-05-30 M4 修 stale ref check_tailwind_token_registry"
+      "mechanism": "post_edit_dispatcher.sh → lib/_token_hygiene.sh(utility-registry.json SSOT compliance write-time)+ DS-wide grep audit-time;2026-05-31 字串精確化(原寫 check_token_hygiene.sh standalone 不存在)"
     },
     "48": {
       "tier": "DETERMINISTIC",
@@ -216,27 +216,27 @@
     },
     "52": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_tab_lg_chrome_header_equal.sh + check_header_with_tabs_border.sh + check_chrome_header_handcraft.sh"
+      "mechanism": "chrome_header_dispatcher.sh:tab_lg_equal + header_with_tabs_border BLOCKER(exit 2 傳播,2026-05-31 folded-hook-audit);chrome_header_handcraft WARN(Phase 3 未升)"
     },
     "53": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_spec_class_drift.sh write-time"
+      "mechanism": "check_spec_class_drift.sh write-time WARN(exit 0,非 block)+ audit-time grep backstop"
     },
     "54": {
       "tier": "HOOK-ENFORCED",
       "mechanism": "check_story_invariants.sh R8 story_archetype_registry + .claude/references/story-baseline-registry.json"
     },
     "55": {
-      "tier": "HOOK-ENFORCED",
-      "mechanism": "Token cross-namespace mapping integrity(semantic.css L246-273 12-hue verify)"
+      "tier": "PURE-JUDGMENT",
+      "mechanism": "Token cross-namespace mapping integrity — dispatch agent DS-wide 全掃 semantic.css 12-hue mapping(L246-273)逐 hue 驗 →primitive step 正確;無 deterministic hook(2026-05-31 infra-audit 修假分類,原誤標 HOOK-ENFORCED 卻無 cite hook)"
     },
     "56": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_app_shell_primary_header_consistency.sh"
+      "mechanism": "chrome_header_dispatcher.sh:_app_shell_primary_header_consistency BLOCKER(exit 2 傳播,2026-05-31 修 stdin parsing + dispatcher propagate;escape @app-shell-primary-header-allow)"
     },
     "57": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_ds_anchor_preflight.sh write-time soft BLOCKER(M29 anchor)"
+      "mechanism": "check_ds_anchor_preflight.sh write-time WARN(exit 0,inject context 讓 AI 自決,L130-132;M29 anchor)+ stop_self_audit Stop hook backstop。2026-05-31 誠實標 WARN(原寫「soft BLOCKER」是矛盾詞)"
     },
     "58": {
       "tier": "HOOK-ENFORCED",
@@ -252,7 +252,7 @@
     },
     "61": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_item_list_gap.sh + check_data_table_size_num_to_meta_width.sh(M16 + M23c)"
+      "mechanism": "check_item_list_gap.sh + check_data_table_size_num_to_meta_width.sh(M16 + M23c)WARN(exit 0,非 block)+ audit-time grep backstop"
     },
     "62": {
       "tier": "PURE-JUDGMENT",
@@ -268,7 +268,7 @@
     },
     "65": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_chrome_header_avatar_canonical.sh PreToolUse multiline regex"
+      "mechanism": "check_chrome_header_avatar_canonical.sh PreToolUse multiline regex BLOCKER(exit 2,2026-05-31 folded-hook-audit 升級;verified clean on canonical + env escape CLAUDE_BYPASS_CHROME_HEADER_AVATAR)"
     },
     "66": {
       "tier": "PURE-JUDGMENT",
@@ -276,7 +276,7 @@
     },
     "67": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_sidebar_menu_button_implicit_wrap.sh PreToolUse multiline regex"
+      "mechanism": "check_sidebar_menu_button_implicit_wrap.sh PreToolUse multiline regex BLOCKER(exit 2,2026-05-31 folded-hook-audit 升級;verified clean on canonical + env escape CLAUDE_BYPASS_SIDEBAR_MENU_BUTTON_WRAP)"
     },
     "68": {
       "tier": "PURE-JUDGMENT",
@@ -312,7 +312,7 @@
     },
     "76": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_escape_marker_abuse.sh(≥3 distinct OR ≥5 total BLOCK)"
+      "mechanism": "check_escape_marker_abuse.sh(≥3 distinct OR ≥5 total BLOCK [consumer] + per-line justification gate 空理由 BLOCK [consumer+DS] + 廣義 *-allow regex,2026-05-31)"
     },
     "77": {
       "tier": "DETERMINISTIC",

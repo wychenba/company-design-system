@@ -19,6 +19,14 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+# 2026-06-04 SSOT 假綠根治:所有 run: step 一律 bash -eo pipefail。
+# GitHub Actions 預設 bash -e 但「無 pipefail」→ `cmd 2>&1 | tail` 的 pipe exit = tail = 0,
+# cmd 失敗被吞 = 假綠(原只有 Storybook build 一步手動 set -o pipefail,其餘 ~17 步全漏)。
+# workflow-level default 一次涵蓋所有 step,取代逐步 set -o pipefail(SSOT)。
+defaults:
+  run:
+    shell: bash -eo pipefail {0}
+
 jobs:
   verify:
     name: Verify(tsc + tests + compile + build)

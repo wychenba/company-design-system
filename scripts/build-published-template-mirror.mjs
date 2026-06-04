@@ -87,16 +87,26 @@ const ALLOWLIST = [
 // Files within template/ds-product-template/ get "flattened" to mirror root
 const FLATTEN_PREFIX = 'template/ds-product-template/'
 
+// 2026-06-04 fix(gate-not-wired 假綠):allowlist entry 缺失原本只 warn + skip → mirror 靜默不完整、
+// 沒人知道(published template 少檔 = consumer 拿到壞的 scaffold)。改 fail-closed:收集所有缺失 → 結尾 exit 1。
+// allowlist 是「該複製什麼」的契約,缺 = 要嘛 allowlist stale 要嘛真檔不見,兩者都該擋下要求修。
+const missingEntries = []
 for (const path of ALLOWLIST) {
   const src = join(REPO_ROOT, path)
   if (!existsSync(src)) {
-    console.warn(`  ⚠️ allowlist entry missing: ${path}(skip)`)
+    console.error(`  ❌ allowlist entry missing: ${path}`)
+    missingEntries.push(path)
     continue
   }
   const dest = join(OUT_DIR, path.startsWith(FLATTEN_PREFIX) ? path.slice(FLATTEN_PREFIX.length) : path)
   mkdirSync(dirname(dest), { recursive: true })
   cpSync(src, dest, { recursive: true })
   console.log(`  ✓ ${path}${path.startsWith(FLATTEN_PREFIX) ? ' → ' + dest.replace(OUT_DIR + '/', '') : ''}`)
+}
+if (missingEntries.length > 0) {
+  console.error(`\n❌ ${missingEntries.length} allowlist entry(ies) missing — published-template mirror 會不完整。修:更新 ALLOWLIST 或補回缺檔。`)
+  console.error(`   缺:${missingEntries.join(', ')}`)
+  process.exit(1)
 }
 
 // ━━━ Transform root package.json ━━━
