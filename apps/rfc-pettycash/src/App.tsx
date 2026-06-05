@@ -6,6 +6,7 @@ import {
   TooltipProvider, Tooltip, TooltipTrigger, TooltipContent,
   Avatar, ItemAvatar, Button,
   Tabs, TabsList, TabsTrigger, TabsContent,
+  Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle,
   Input, Select, Textarea, Checkbox,
   RadioGroup, RadioGroupItem,
   Field, FieldLabel,
@@ -16,7 +17,7 @@ import {
 import {
   Home, FileText, Upload, ClipboardList, Users, BookOpen,
   MessageSquare, Plus, Pencil, Trash2, Download,
-  Info, ChevronDown, Check, ChevronLeft,
+  Info, ChevronDown, Check, Copy,
 } from 'lucide-react'
 
 // ─── Constants ───────────────────────────────────────────────
@@ -68,6 +69,7 @@ const CATEGORIES: Record<string, string[]> = {
 const CATEGORY_OPTIONS = Object.keys(CATEGORIES).map(k => ({ value: k, label: k }))
 const TAX_RATES = [{ value: '5', label: '5%' }, { value: '0', label: '0%' }, { value: 'exempt', label: '免稅' }]
 const CURRENCY_OPTIONS = [{ value: 'TWD', label: 'TWD' }, { value: 'USD', label: 'USD' }, { value: 'EUR', label: 'EUR' }, { value: 'JPY', label: 'JPY' }]
+const PAYEE_OPTIONS = [{ value: '員工', label: '員工' }, { value: '廠商', label: '廠商' }, { value: '其他', label: '其他' }]
 
 type StatusKey = 'draft' | 'reviewing' | 'manager-rejected' | 'acct-rejected' | 'approved' | 'finance-cleared' | 'acct-posted' | 'modifying' | 'abandoned' | 'advance-cleared'
 const STATUS_META: Record<StatusKey, { label: string; color: 'neutral' | 'blue' | 'red' | 'green' | 'yellow' | 'turquoise' }> = {
@@ -96,6 +98,23 @@ interface DraftEntry {
   urgentDate: string
   reason: string
   status: StatusKey
+}
+
+interface Invoice {
+  id: string
+  number: string
+  payee: string
+  date: string
+  invoiceNo: string
+  currency: string
+  subtotal: string
+  tax: string
+}
+
+interface Attachment {
+  id: string
+  type: 'invoice' | 'auxiliary'
+  desc: string
 }
 
 interface Step1State {
@@ -300,33 +319,51 @@ const defaultStep2 = (): Step2State => ({
   contractProvided: 'not-required',
 })
 
-const defaultStep3 = (): Step3State => ({
-  attachmentType: 'invoice',
-  attachmentDesc: '',
-})
+// ─── AddInvoiceModal (3-step) ─────────────────────────────────
 
-// ─── CreateFormPage ──────────────────────────────────────────
-
-function CreateFormPage({
-  onBack,
+function AddInvoiceModal({
+  open,
+  onClose,
   onSubmit,
 }: {
-  onBack: () => void
-  onSubmit: (newNumber: string) => void
+  open: boolean
+  onClose: () => void
+  onSubmit: (invoice: Invoice) => void
 }) {
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [s1, setS1] = useState<Step1State>(defaultStep1)
   const [s2, setS2] = useState<Step2State>(defaultStep2)
-  const [s3, setS3] = useState<Step3State>(defaultStep3)
 
   const today = new Date()
   const mm = String(today.getMonth() + 1).padStart(2, '0')
   const dd = String(today.getDate()).padStart(2, '0')
+  const invoiceSeq = String(Math.floor(Math.random() * 900) + 100)
   const invoiceNumber = `PAGE${today.getFullYear()}${mm}${dd}001-1`
 
+  function reset() {
+    setStep(1)
+    setS1(defaultStep1())
+    setS2(defaultStep2())
+  }
+
+  function handleClose() {
+    reset()
+    onClose()
+  }
+
   function handleSubmit() {
-    const newNumber = `PAE${today.getFullYear()}${mm}${dd}${String(Math.floor(Math.random() * 900) + 100)}`
-    onSubmit(newNumber)
+    onSubmit({
+      id: String(Date.now()),
+      number: invoiceNumber,
+      payee: s1.payee,
+      date: s1.date || `${today.getFullYear()}/${mm}/${dd}`,
+      invoiceNo: s1.invoiceNo,
+      currency: s1.currency,
+      subtotal: s1.subtotal || '0',
+      tax: s1.tax || '0',
+    })
+    reset()
+    onClose()
   }
 
   const subCategoryOptions = s2.category
@@ -341,299 +378,269 @@ function CreateFormPage({
     ? String(Math.round(Number(s2.total) * Number(s2.taxRate) / 100))
     : ''
 
+  const MODAL_TITLES = { 1: '新增請款', 2: '新增付款細項', 3: '新增憑證/證明' } as const
+
   return (
-    <div className="p-6 w-full">
-      {/* Page header */}
-      <div className="flex items-center gap-2 mb-6">
-        <button
-          onClick={onBack}
-          className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors"
-          aria-label="返回"
-        >
-          <ChevronLeft size={18} />
-        </button>
-        <h1 className="text-xl font-semibold">新增發票</h1>
-      </div>
+    <Dialog open={open} onOpenChange={o => !o && handleClose()}>
+      <DialogContent className="max-w-[754px] w-full">
+        <DialogHeader>
+          <DialogTitle>{MODAL_TITLES[step]}</DialogTitle>
+        </DialogHeader>
+        <DialogBody>
+          <ModalStepper current={step} />
 
-      <div className="max-w-[754px]">
-        <ModalStepper current={step} />
-
-        {/* ── Step 1: 填寫請款資訊 ─────────────────────── */}
-        {step === 1 && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-6 p-3 rounded-lg bg-surface-raised border border-divider">
-              <div>
-                <p className="text-caption text-fg-tertiary mb-0.5">請款單號</p>
-                <p className="text-sm font-medium">{invoiceNumber}</p>
-              </div>
-              <div>
-                <p className="text-caption text-fg-tertiary mb-0.5">狀態</p>
-                <Tag color="neutral" size="sm">Draft</Tag>
-              </div>
-            </div>
-
-            <Field>
-              <FieldLabel required>收款人/廠商</FieldLabel>
-              <Input value={s1.payee} onChange={e => setS1(p => ({ ...p, payee: e.target.value }))} />
-            </Field>
-
-            <Field>
-              <FieldLabel required>憑證類型</FieldLabel>
-              <Select
-                placeholder="請選擇"
-                options={VOUCHER_TYPES}
-                value={s1.voucherType}
-                onChange={v => setS1(p => ({ ...p, voucherType: v as string }))}
-              />
-            </Field>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel required>日期</FieldLabel>
-                <Input
-                  type="date"
-                  value={s1.date}
-                  onChange={e => setS1(p => ({ ...p, date: e.target.value }))}
-                  placeholder="填寫日期"
-                />
-              </Field>
-              <Field>
-                <FieldLabel>發票號碼</FieldLabel>
-                <Input
-                  value={s1.invoiceNo}
-                  onChange={e => setS1(p => ({ ...p, invoiceNo: e.target.value }))}
-                  placeholder="填寫發票號碼"
-                />
-              </Field>
-            </div>
-
-            <Field>
-              <FieldLabel required>幣別</FieldLabel>
-              <Select
-                options={CURRENCY_OPTIONS}
-                value={s1.currency}
-                onChange={v => setS1(p => ({ ...p, currency: v as string }))}
-              />
-            </Field>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel required>合計金額（未稅）</FieldLabel>
-                <Input
-                  type="number"
-                  value={s1.subtotal}
-                  onChange={e => setS1(p => ({ ...p, subtotal: e.target.value }))}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>
-                  稅額&nbsp;<InfoTooltip content="稅額依憑證類型計算" />
-                </FieldLabel>
-                <Input
-                  type="number"
-                  value={s1.tax}
-                  onChange={e => setS1(p => ({ ...p, tax: e.target.value }))}
-                />
-              </Field>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 p-3 rounded-lg bg-surface-raised border border-divider text-sm">
-              <div className="flex items-baseline gap-2">
-                <span className="text-fg-tertiary whitespace-nowrap">稅後金額</span>
-                <span className="font-medium">{taxAfter}</span>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-fg-tertiary">匯率</span>
-                <span className="font-medium">-</span>
-              </div>
-              <div className="flex items-center gap-1 text-fg-tertiary">
-                <span>當地稅後金額</span>
-                <InfoTooltip content="以當前匯率換算後的當地金額" />
-                <span className="text-fg-primary font-medium ml-1">-</span>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-fg-tertiary">更新時間</span>
-                <span className="font-medium">-</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel>
-                  稅號&nbsp;<InfoTooltip content="統一編號（選填）" />
-                </FieldLabel>
-                <Input
-                  value={s1.taxId}
-                  onChange={e => setS1(p => ({ ...p, taxId: e.target.value }))}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>二代健保</FieldLabel>
-                <Input disabled value="" />
-              </Field>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="partial"
-                checked={s1.usePartialAmount}
-                onCheckedChange={v => setS1(p => ({ ...p, usePartialAmount: !!v }))}
-              />
-              <label htmlFor="partial" className="text-sm cursor-pointer select-none">
-                使用不足額請款
-              </label>
-            </div>
-          </div>
-        )}
-
-        {/* ── Step 2: 填寫付款細項 ─────────────────────── */}
-        {step === 2 && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4 p-3 rounded-lg bg-surface-raised border border-divider">
-              <div>
-                <p className="text-caption text-fg-tertiary mb-0.5">請款單號</p>
-                <p className="text-sm font-medium">{invoiceNumber}</p>
-              </div>
-              <div>
-                <p className="text-caption text-fg-tertiary mb-0.5">發票號碼</p>
-                <p className="text-sm font-medium">{s1.invoiceNo || '-'}</p>
-              </div>
-              <div>
-                <p className="text-caption text-fg-tertiary mb-0.5">序號</p>
-                <p className="text-sm font-medium">1</p>
-              </div>
-            </div>
-
-            <Notice variant="info" title="注意事項">
-              自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
-              <span className="underline cursor-pointer text-[var(--color-blue-9)]">專區</span>請款。
-            </Notice>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel required>分類</FieldLabel>
-                <Select
-                  placeholder="請選擇"
-                  options={CATEGORY_OPTIONS}
-                  value={s2.category}
-                  onChange={v => setS2(p => ({ ...p, category: v as string, subCategory: '' }))}
-                />
-              </Field>
-              <Field>
-                <FieldLabel required>子分類</FieldLabel>
-                <Select
-                  placeholder="請選擇"
-                  options={subCategoryOptions}
-                  value={s2.subCategory}
-                  onChange={v => setS2(p => ({ ...p, subCategory: v as string }))}
-                  disabled={!s2.category}
-                />
-              </Field>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel required>
-                  成本中心&nbsp;<InfoTooltip content="填寫您的成本中心代碼" />
-                </FieldLabel>
-                <Input value={s2.costCenter} onChange={e => setS2(p => ({ ...p, costCenter: e.target.value }))} />
-              </Field>
-              <Field>
-                <FieldLabel>
-                  會計科目&nbsp;<InfoTooltip content="填寫對應的會計科目" />
-                </FieldLabel>
-                <Input value={s2.accountCode} onChange={e => setS2(p => ({ ...p, accountCode: e.target.value }))} />
-              </Field>
-            </div>
-
-            <Field>
-              <FieldLabel>描述</FieldLabel>
-              <Textarea
-                value={s2.description}
-                onChange={e => setS2(p => ({ ...p, description: e.target.value }))}
-                rows={2}
-              />
-            </Field>
-
-            <div className="grid grid-cols-3 gap-4">
-              <Field>
-                <FieldLabel required>總額</FieldLabel>
-                <Input
-                  type="number"
-                  placeholder="填寫總額"
-                  value={s2.total}
-                  onChange={e => setS2(p => ({ ...p, total: e.target.value }))}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>
-                  稅率&nbsp;<InfoTooltip content="請選擇適用的稅率" />
-                </FieldLabel>
-                <Select
-                  placeholder="請選擇"
-                  options={TAX_RATES}
-                  value={s2.taxRate}
-                  onChange={v => setS2(p => ({ ...p, taxRate: v as string }))}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>稅額</FieldLabel>
-                <Input disabled value={computedTax} placeholder="-" />
-              </Field>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium mb-2">是否提供合約編號</p>
-              <RadioGroup
-                value={s2.contractProvided}
-                onValueChange={v => setS2(p => ({ ...p, contractProvided: v as Step2State['contractProvided'] }))}
-              >
-                <div className="flex items-center gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer text-sm">
-                    <RadioGroupItem value="yes" />是
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer text-sm">
-                    <RadioGroupItem value="no" />否
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer text-sm">
-                    <RadioGroupItem value="not-required" />無需提供
-                  </label>
+          {/* Step 1 */}
+          {step === 1 && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-6 p-3 rounded-lg bg-surface-raised border border-divider">
+                <div>
+                  <p className="text-caption text-fg-tertiary mb-0.5">請款單號</p>
+                  <p className="text-sm font-medium">{invoiceNumber}</p>
                 </div>
-              </RadioGroup>
+                <div>
+                  <p className="text-caption text-fg-tertiary mb-0.5">狀態</p>
+                  <Tag color="neutral" size="sm">Draft</Tag>
+                </div>
+              </div>
+
+              <Field>
+                <FieldLabel required>收款人/廠商</FieldLabel>
+                <Input value={s1.payee} onChange={e => setS1(p => ({ ...p, payee: e.target.value }))} />
+              </Field>
+
+              <Field>
+                <FieldLabel required>憑證類型</FieldLabel>
+                <Select placeholder="請選擇" options={VOUCHER_TYPES} value={s1.voucherType} onChange={v => setS1(p => ({ ...p, voucherType: v as string }))} />
+              </Field>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel required>日期</FieldLabel>
+                  <Input type="date" value={s1.date} onChange={e => setS1(p => ({ ...p, date: e.target.value }))} placeholder="填寫日期" />
+                </Field>
+                <Field>
+                  <FieldLabel>發票號碼</FieldLabel>
+                  <Input value={s1.invoiceNo} onChange={e => setS1(p => ({ ...p, invoiceNo: e.target.value }))} placeholder="填寫發票號碼" />
+                </Field>
+              </div>
+
+              <Field>
+                <FieldLabel required>幣別</FieldLabel>
+                <Select options={CURRENCY_OPTIONS} value={s1.currency} onChange={v => setS1(p => ({ ...p, currency: v as string }))} />
+              </Field>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel required>合計金額（未稅）</FieldLabel>
+                  <Input type="number" value={s1.subtotal} onChange={e => setS1(p => ({ ...p, subtotal: e.target.value }))} />
+                </Field>
+                <Field>
+                  <FieldLabel>稅額&nbsp;<InfoTooltip content="稅額依憑證類型計算" /></FieldLabel>
+                  <Input type="number" value={s1.tax} onChange={e => setS1(p => ({ ...p, tax: e.target.value }))} />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 p-3 rounded-lg bg-surface-raised border border-divider text-sm">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-fg-tertiary whitespace-nowrap">稅後金額</span>
+                  <span className="font-medium">{taxAfter}</span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-fg-tertiary">匯率</span>
+                  <span className="font-medium">-</span>
+                </div>
+                <div className="flex items-center gap-1 text-fg-tertiary">
+                  <span>當地稅後金額</span>
+                  <InfoTooltip content="以當前匯率換算後的當地金額" />
+                  <span className="text-fg-primary font-medium ml-1">-</span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-fg-tertiary">更新時間</span>
+                  <span className="font-medium">-</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel>稅號&nbsp;<InfoTooltip content="統一編號（選填）" /></FieldLabel>
+                  <Input value={s1.taxId} onChange={e => setS1(p => ({ ...p, taxId: e.target.value }))} />
+                </Field>
+                <Field>
+                  <FieldLabel>二代健保</FieldLabel>
+                  <Input disabled value="" />
+                </Field>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Checkbox id="partial" checked={s1.usePartialAmount} onCheckedChange={v => setS1(p => ({ ...p, usePartialAmount: !!v }))} />
+                <label htmlFor="partial" className="text-sm cursor-pointer select-none">使用不足額請款</label>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2 */}
+          {step === 2 && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-4 p-3 rounded-lg bg-surface-raised border border-divider">
+                <div>
+                  <p className="text-caption text-fg-tertiary mb-0.5">請款單號</p>
+                  <p className="text-sm font-medium">{invoiceNumber}</p>
+                </div>
+                <div>
+                  <p className="text-caption text-fg-tertiary mb-0.5">發票號碼</p>
+                  <p className="text-sm font-medium">{s1.invoiceNo || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-caption text-fg-tertiary mb-0.5">序號</p>
+                  <p className="text-sm font-medium">1</p>
+                </div>
+              </div>
+
+              <Notice variant="info" title="注意事項">
+                自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
+                <span className="underline cursor-pointer text-[var(--color-blue-9)]">專區</span>請款。
+              </Notice>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel required>分類</FieldLabel>
+                  <Select placeholder="請選擇" options={CATEGORY_OPTIONS} value={s2.category} onChange={v => setS2(p => ({ ...p, category: v as string, subCategory: '' }))} />
+                </Field>
+                <Field>
+                  <FieldLabel required>子分類</FieldLabel>
+                  <Select placeholder="請選擇" options={subCategoryOptions} value={s2.subCategory} onChange={v => setS2(p => ({ ...p, subCategory: v as string }))} disabled={!s2.category} />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel required>成本中心&nbsp;<InfoTooltip content="填寫您的成本中心代碼" /></FieldLabel>
+                  <Input value={s2.costCenter} onChange={e => setS2(p => ({ ...p, costCenter: e.target.value }))} />
+                </Field>
+                <Field>
+                  <FieldLabel>會計科目&nbsp;<InfoTooltip content="填寫對應的會計科目" /></FieldLabel>
+                  <Input value={s2.accountCode} onChange={e => setS2(p => ({ ...p, accountCode: e.target.value }))} />
+                </Field>
+              </div>
+
+              <Field>
+                <FieldLabel>描述</FieldLabel>
+                <Textarea value={s2.description} onChange={e => setS2(p => ({ ...p, description: e.target.value }))} rows={2} />
+              </Field>
+
+              <div className="grid grid-cols-3 gap-4">
+                <Field>
+                  <FieldLabel required>總額</FieldLabel>
+                  <Input type="number" placeholder="填寫總額" value={s2.total} onChange={e => setS2(p => ({ ...p, total: e.target.value }))} />
+                </Field>
+                <Field>
+                  <FieldLabel>稅率&nbsp;<InfoTooltip content="請選擇適用的稅率" /></FieldLabel>
+                  <Select placeholder="請選擇" options={TAX_RATES} value={s2.taxRate} onChange={v => setS2(p => ({ ...p, taxRate: v as string }))} />
+                </Field>
+                <Field>
+                  <FieldLabel>稅額</FieldLabel>
+                  <Input disabled value={computedTax} placeholder="-" />
+                </Field>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-2">是否提供合約編號</p>
+                <RadioGroup value={s2.contractProvided} onValueChange={v => setS2(p => ({ ...p, contractProvided: v as Step2State['contractProvided'] }))}>
+                  <div className="flex items-center gap-6">
+                    <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="yes" />是</label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="no" />否</label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="not-required" />無需提供</label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3 */}
+          {step === 3 && (
+            <div className="space-y-4">
+              <div className="border-2 border-dashed border-divider rounded-lg p-12 flex flex-col items-center gap-3 cursor-pointer hover:border-[var(--color-neutral-6)] hover:bg-surface-raised transition-colors">
+                <div className="size-10 rounded-lg bg-surface-raised flex items-center justify-center text-fg-tertiary">
+                  <Upload size={24} />
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-fg-primary">點擊或拖曳到此上傳檔案</p>
+                  <p className="text-sm text-fg-tertiary mt-0.5">每個檔案大小不得超過 20 MB</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogBody>
+
+        <DialogFooter>
+          <div className="flex items-center justify-between w-full">
+            <div>
+              {step > 1 && (
+                <Button variant="ghost" onClick={() => setStep(s => (s - 1) as 1 | 2 | 3)}>上一步</Button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleClose}>取消</Button>
+              {step < 3 ? (
+                <Button onClick={() => setStep(s => (s + 1) as 1 | 2 | 3)}>下一步</Button>
+              ) : (
+                <Button onClick={handleSubmit}>新增</Button>
+              )}
             </div>
           </div>
-        )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
 
-        {/* ── Step 3: 新增附件 ─────────────────────────── */}
-        {step === 3 && (
+// ─── AddAttachmentModal ───────────────────────────────────────
+
+function AddAttachmentModal({
+  open,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean
+  onClose: () => void
+  onSubmit: (att: Omit<Attachment, 'id'>) => void
+}) {
+  const [attType, setAttType] = useState<'invoice' | 'auxiliary'>('invoice')
+  const [desc, setDesc] = useState('')
+
+  function handleClose() {
+    setAttType('invoice')
+    setDesc('')
+    onClose()
+  }
+
+  function handleSubmit() {
+    onSubmit({ type: attType, desc })
+    handleClose()
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={o => !o && handleClose()}>
+      <DialogContent className="max-w-[480px] w-full">
+        <DialogHeader>
+          <DialogTitle>新增附件</DialogTitle>
+        </DialogHeader>
+        <DialogBody>
           <div className="space-y-4">
             <Field>
               <FieldLabel required>附件類型</FieldLabel>
-              <RadioGroup
-                value={s3.attachmentType}
-                onValueChange={v => setS3(p => ({ ...p, attachmentType: v as Step3State['attachmentType'] }))}
-              >
+              <RadioGroup value={attType} onValueChange={v => setAttType(v as 'invoice' | 'auxiliary')}>
                 <div className="flex items-center gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer text-sm">
-                    <RadioGroupItem value="invoice" />發票
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer text-sm">
-                    <RadioGroupItem value="auxiliary" />輔助文件
-                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="invoice" />發票</label>
+                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="auxiliary" />輔助文件</label>
                 </div>
               </RadioGroup>
             </Field>
-
             <Field>
               <FieldLabel>附件說明</FieldLabel>
-              <Input
-                placeholder="填寫附件說明"
-                value={s3.attachmentDesc}
-                onChange={e => setS3(p => ({ ...p, attachmentDesc: e.target.value }))}
-              />
+              <Input placeholder="填寫附件說明" value={desc} onChange={e => setDesc(e.target.value)} />
             </Field>
-
-            <div className="border-2 border-dashed border-divider rounded-lg p-12 flex flex-col items-center gap-3 cursor-pointer hover:border-[var(--color-neutral-6)] hover:bg-surface-raised transition-colors">
+            <div className="border-2 border-dashed border-divider rounded-lg p-10 flex flex-col items-center gap-3 cursor-pointer hover:border-[var(--color-neutral-6)] hover:bg-surface-raised transition-colors">
               <div className="size-10 rounded-lg bg-surface-raised flex items-center justify-center text-fg-tertiary">
                 <Upload size={24} />
               </div>
@@ -643,25 +650,290 @@ function CreateFormPage({
               </div>
             </div>
           </div>
-        )}
+        </DialogBody>
+        <DialogFooter>
+          <div className="flex justify-end gap-2 w-full">
+            <Button variant="outline" onClick={handleClose}>取消</Button>
+            <Button onClick={handleSubmit}>新增</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
 
-        {/* Footer */}
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-divider">
-          <div>
-            {step > 1 && (
-              <Button variant="ghost" onClick={() => setStep(s => (s - 1) as 1 | 2 | 3)}>上一步</Button>
-            )}
+// ─── CreateFormPage ───────────────────────────────────────────
+
+function CreateFormPage({
+  onBack,
+  onSubmit,
+}: {
+  onBack: () => void
+  onSubmit: (newNumber: string) => void
+}) {
+  const [payee, setPayee] = useState('員工')
+  const [reason, setReason] = useState('')
+  const [useUrgentDate, setUseUrgentDate] = useState(false)
+  const [urgentDate, setUrgentDate] = useState('')
+  const [invoices, setInvoices] = useState<Invoice[]>([])
+  const [attachments, setAttachments] = useState<Attachment[]>([])
+  const [invoiceModalOpen, setInvoiceModalOpen] = useState(false)
+  const [attachmentModalOpen, setAttachmentModalOpen] = useState(false)
+
+  const today = new Date()
+  const mm = String(today.getMonth() + 1).padStart(2, '0')
+  const dd = String(today.getDate()).padStart(2, '0')
+  const formNumber = `PAE${today.getFullYear()}${mm}${dd}001`
+
+  function handleAddInvoice(invoice: Invoice) {
+    setInvoices(prev => [...prev, invoice])
+  }
+
+  function handleRemoveInvoice(id: string) {
+    setInvoices(prev => prev.filter(i => i.id !== id))
+  }
+
+  function handleAddAttachment(att: Omit<Attachment, 'id'>) {
+    setAttachments(prev => [...prev, { ...att, id: String(Date.now()) }])
+  }
+
+  function handleRemoveAttachment(id: string) {
+    setAttachments(prev => prev.filter(a => a.id !== id))
+  }
+
+  function handleSubmit() {
+    onSubmit(formNumber)
+  }
+
+  const ATT_TYPE_LABEL: Record<Attachment['type'], string> = {
+    invoice: '電腦發票',
+    auxiliary: '證明文件',
+  }
+
+  return (
+    <div className="p-6 w-full">
+      {/* Page header */}
+      <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+        <div>
+          <div className="flex items-center gap-1 text-sm text-fg-tertiary mb-1">
+            <button
+              onClick={onBack}
+              className="hover:text-fg-secondary transition-colors"
+            >
+              暫存申請單
+            </button>
+            <span>/</span>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={onBack}>取消</Button>
-            {step < 3 ? (
-              <Button onClick={() => setStep(s => (s + 1) as 1 | 2 | 3)}>下一步</Button>
-            ) : (
-              <Button onClick={handleSubmit}>新增</Button>
-            )}
+          <h1 className="text-2xl font-semibold">一般項目申請單 {formNumber}</h1>
+        </div>
+        <Button variant="outline" startIcon={Upload}>批次匯入申請</Button>
+      </div>
+
+      {/* Form sections */}
+      <div className="space-y-4 max-w-[860px]">
+
+        {/* 基本資訊 */}
+        <section className="bg-surface border border-divider rounded-lg p-6">
+          <h2 className="text-base font-semibold mb-4">基本資訊</h2>
+          <div className="space-y-4">
+            <Field>
+              <FieldLabel>
+                公司代號&nbsp;<InfoTooltip content="請選擇您所屬的公司代號" />
+              </FieldLabel>
+              <Select
+                value="TA01"
+                options={[{ value: 'TA01', label: 'TA01' }]}
+                onChange={() => {}}
+              />
+            </Field>
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel required>
+                  申請人&nbsp;<InfoTooltip content="自動帶入登入者" />
+                </FieldLabel>
+                <Input value="林間宜 (023156)" disabled />
+              </Field>
+              <Field>
+                <FieldLabel required>
+                  收款對象&nbsp;<InfoTooltip content="請選擇本次請款的收款對象" />
+                </FieldLabel>
+                <Select
+                  options={PAYEE_OPTIONS}
+                  value={payee}
+                  onChange={v => setPayee(v as string)}
+                />
+              </Field>
+            </div>
           </div>
+        </section>
+
+        {/* 請款資訊 */}
+        <section className="bg-surface border border-divider rounded-lg p-6">
+          <h2 className="text-base font-semibold mb-4">請款資訊</h2>
+          <Button variant="outline" startIcon={Plus} onClick={() => setInvoiceModalOpen(true)}>
+            新增請款
+          </Button>
+
+          {invoices.length === 0 ? (
+            <div className="mt-4 rounded-lg border border-divider py-12 text-center text-sm text-fg-tertiary">
+              沒有任何資料
+            </div>
+          ) : (
+            <div className="mt-4 space-y-2">
+              {invoices.map(invoice => (
+                <div key={invoice.id} className="border border-divider rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-medium text-fg-primary shrink-0">{invoice.number}</span>
+                      <Tag color="neutral" size="sm">Draft</Tag>
+                      <span className="text-fg-secondary shrink-0">
+                        {invoice.currency} {Number(invoice.subtotal).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-0.5 shrink-0 ml-2">
+                      <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
+                        <Pencil size={14} />
+                      </button>
+                      <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="複製">
+                        <Copy size={14} />
+                      </button>
+                      <button
+                        className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors"
+                        aria-label="刪除"
+                        onClick={() => handleRemoveInvoice(invoice.id)}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-fg-tertiary mt-1">
+                    收款人：{invoice.payee}&nbsp;|&nbsp;日期：{invoice.date}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* 檢附憑證 / 證明 */}
+        <section className="bg-surface border border-divider rounded-lg p-6">
+          <h2 className="text-base font-semibold mb-4">檢附憑證 / 證明</h2>
+          <Button variant="outline" startIcon={Plus} onClick={() => setAttachmentModalOpen(true)}>
+            新增附件
+          </Button>
+
+          {attachments.length === 0 ? (
+            <div className="mt-4 rounded-lg border border-divider py-12 text-center text-sm text-fg-tertiary">
+              沒有任何資料
+            </div>
+          ) : (
+            <div className="mt-4 rounded-lg border border-divider overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-surface-raised border-b border-divider">
+                  <tr>
+                    <th className="text-left px-4 py-2 font-medium text-fg-secondary">類型</th>
+                    <th className="text-left px-4 py-2 font-medium text-fg-secondary">描述</th>
+                    <th className="text-left px-4 py-2 font-medium text-fg-secondary">附件</th>
+                    <th className="px-4 py-2"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-divider">
+                  {attachments.map(att => (
+                    <tr key={att.id} className="hover:bg-surface-raised transition-colors">
+                      <td className="px-4 py-3 text-fg-secondary">{ATT_TYPE_LABEL[att.type]}</td>
+                      <td className="px-4 py-3 text-fg-secondary">{att.desc || '-'}</td>
+                      <td className="px-4 py-3 text-fg-tertiary">-</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-0.5">
+                          <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors"
+                            aria-label="刪除"
+                            onClick={() => handleRemoveAttachment(att.id)}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        {/* 補充資訊 */}
+        <section className="bg-surface border border-divider rounded-lg p-6">
+          <Field>
+            <FieldLabel required>
+              申請原因&nbsp;<InfoTooltip content="說明本次請款的用途，最多 250 字" />
+            </FieldLabel>
+            <Textarea
+              value={reason}
+              onChange={e => setReason(e.target.value)}
+              rows={4}
+              placeholder="填寫申請原因，最多 250 字"
+            />
+          </Field>
+
+          <div className="mt-4">
+            <Notice variant="info" title="注意事項">
+              預計付款日為申請單簽核完畢後的下個月一般付款日（每月最後工作日），若有緊急付款需求，請參考下列簽核層級：
+              <ul className="list-disc ml-4 mt-1 space-y-0.5 text-sm">
+                <li>一般付款日：100,000 TWD 以下簽核至處長，以上簽核至副總</li>
+                <li>特殊付款日：一律簽核至副總</li>
+              </ul>
+            </Notice>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="urgent"
+                checked={useUrgentDate}
+                onCheckedChange={v => setUseUrgentDate(!!v)}
+              />
+              <label htmlFor="urgent" className="text-sm cursor-pointer select-none">
+                使用緊急/指定付款
+              </label>
+            </div>
+            <Field>
+              <FieldLabel>緊急/指定付款日</FieldLabel>
+              <Input
+                type="date"
+                value={urgentDate}
+                onChange={e => setUrgentDate(e.target.value)}
+                disabled={!useUrgentDate}
+                placeholder="請選擇"
+              />
+            </Field>
+          </div>
+        </section>
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between mt-6 pt-4 border-t border-divider max-w-[860px]">
+        <Button variant="primary" danger onClick={onBack}>取消申請</Button>
+        <div className="flex gap-2">
+          <Button variant="outline">存成草稿</Button>
+          <Button onClick={handleSubmit}>下一步</Button>
         </div>
       </div>
+
+      {/* Modals */}
+      <AddInvoiceModal
+        open={invoiceModalOpen}
+        onClose={() => setInvoiceModalOpen(false)}
+        onSubmit={handleAddInvoice}
+      />
+      <AddAttachmentModal
+        open={attachmentModalOpen}
+        onClose={() => setAttachmentModalOpen(false)}
+        onSubmit={handleAddAttachment}
+      />
     </div>
   )
 }
@@ -798,7 +1070,7 @@ export default function App() {
     }
     setEntries(prev => [newEntry, ...prev])
     setPage('list')
-    toast({ variant: 'success', title: `${newNumber} 送出成功` })
+    toast({ variant: 'success', title: `${newNumber} 存成草稿` })
   }
 
   return (
