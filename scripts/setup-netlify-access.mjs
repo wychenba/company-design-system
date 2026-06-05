@@ -1,13 +1,19 @@
 #!/usr/bin/env node
 // scripts/setup-netlify-access.mjs — fork-and-go Netlify setup automation
 //
-// 2026-05-29 重寫:flip default from Identity → Basic Password。
+// 2026-06-05 修正:免費 access control = _headers Basic Auth(env var 注入),不是 dashboard Password。
 //
 // Why Identity removed:
 //   - Netlify 2024 公告 Identity service deprecated;新帳號可能看不到 Identity menu
 //   - `netlify api provisionSiteIdentity` 在新 site 已不穩定 / 不可用
-//   - Team protection (proper SSO) 鎖 Pro plan $19/mo,fork user 不該被迫付費
-//   - Free-tier 唯一真擋陌生人方法 = Basic Password protection
+//
+// Free-tier 真實可用 access control(2026-06-05 官方 docs 證實):
+//   - Netlify Dashboard 的「Password protection / Basic protection」是 **Pro 方案專屬**($20/mo),
+//     free-tier 沒這個開關(按下去會被要求升級付費 — 這就是 fork user 卡住的原因)。
+//   - 免費要擋陌生人 → HTTP Basic Auth via `_headers`(所有方案含 free 都支援,edge 層擋,瀏覽器原生帳密彈窗)。
+//   - 本 template 已內建:build 後 `scripts/inject-basic-auth.mjs` 從 Netlify env var `STORYBOOK_BASIC_AUTH`
+//     (格式 "user:pass",多組空格分隔)寫 `storybook-static/_headers` 的 Basic-Auth;未設 env var = no-op 公開。
+//     密碼只存 Netlify 後台 env var(public repo 不能 commit 明文)。
 //
 // What's automated:
 //   1. Install Netlify CLI(若未裝)
@@ -15,9 +21,9 @@
 //   3. `netlify login`(瀏覽器 OAuth)
 //   4. Auto `netlify sites:create` + `netlify link`(non-interactive)
 //
-// What's NOT automatable(Netlify CLI 不提供 password protection API,2026-05-29 verified):
-//   5. 設 Basic Password — script 印 dashboard URL + step-by-step,user 點 2 radio button + 輸 password
-//   6. 分享 password 給 stakeholder — team Slack / DM 私訊
+// What's NOT automatable(Netlify CLI 不提供 env var protection 的 one-shot setup;走 dashboard 設 env var):
+//   5. 設 STORYBOOK_BASIC_AUTH env var — script 印 dashboard URL + step-by-step,user 加一條 env var(30 秒)
+//   6. 分享 帳密 給 stakeholder — team Slack / DM 私訊
 //
 // Usage:
 //   npm run setup:netlify
@@ -41,12 +47,12 @@ function shOut(cmd) {
 const args = new Set(process.argv.slice(2))
 const skipPrompts = args.has('--skip-prompts')
 
-console.log('🔒 Netlify access control setup(2026-05-29 — Basic Password 為 free-tier 唯一可用方案)')
+console.log('🔒 Netlify access control setup(免費方案 = _headers Basic Auth,從 STORYBOOK_BASIC_AUTH env var 注入)')
 console.log('')
 console.log('━━━ 流程概覽 ━━━')
 console.log('  自動: CLI install + gh check + OAuth login + site 建 + 連 repo')
-console.log('  手動: 開 dashboard URL → 點 2 radio button + 輸 password + Save(30 秒)')
-console.log('  分享: 把 site URL + password 私訊 stakeholder')
+console.log('  手動: 開 dashboard URL → Environment variables 加 STORYBOOK_BASIC_AUTH = user:password(30 秒)')
+console.log('  分享: 把 site URL + 帳密 私訊 stakeholder')
 console.log('')
 console.log('Netlify = 免費 deploy 平台(100GB bandwidth / per-branch preview / 0 maintenance)')
 console.log('因為 fork 本 repo 必有 GitHub 帳號,Netlify 走 GitHub OAuth 自動建 account(<5 秒)')
@@ -112,53 +118,56 @@ const siteSlug = state.siteSlug || siteId
 console.log(`✓ Linked site: ${siteId}`)
 console.log('')
 
-// Step 4: Print dashboard URL + Basic Password guidance(無法自動 — Netlify CLI 不提供 password API)
-const dashboardUrl = `https://app.netlify.com/projects/${siteSlug}/configuration/visitor-access`
+// Step 4: Print dashboard URL + env-var Basic Auth guidance(免費 — build 時 inject-basic-auth.mjs 寫 _headers)
+const dashboardUrl = `https://app.netlify.com/projects/${siteSlug}/configuration/env`
 const siteUrl = `https://${siteSlug}.netlify.app`
 
-console.log('━━━ 🔒 Basic Password Protection 設定(30 秒手動,無法 CLI 自動)━━━')
+console.log('━━━ 🔒 免費密碼保護設定(30 秒,設一條 env var)━━━')
 console.log('')
-console.log('Netlify CLI 不提供 password protection 的 API(2026-05-29 verified)。')
-console.log('以下 3 step 在 browser 完成:')
+console.log('免費方案的擋人方法 = HTTP Basic Auth via _headers(所有 Netlify 方案含 free 都支援)。')
+console.log('本 template 已內建 build-time 注入(netlify.toml build command 跑 scripts/inject-basic-auth.mjs),')
+console.log('你只需在 Netlify 後台加一條 env var,deploy 後站台自動跳帳密彈窗。')
+console.log('(Dashboard 的「Password protection」開關是 Pro 專屬 $20/mo,免費用不到 — 改用下面這招。)')
 console.log('')
-console.log(`  Step 1. 開啟 dashboard:`)
+console.log(`  Step 1. 開啟 dashboard → Environment variables:`)
 console.log(`          ${dashboardUrl}`)
 console.log('')
-console.log('  Step 2. Password Protection 區塊:')
-console.log('          • Protected by: 選「Basic protection」')
-console.log('          • 輸入 password(建議 ≥12 字,團隊好記)')
-console.log('          • Access restricted to: 預設「All deploys」')
-console.log('          • 點 Save')
+console.log('  Step 2. Add a variable:')
+console.log('          • Key:   STORYBOOK_BASIC_AUTH')
+console.log('          • Value: user:password(自取帳密;多組空格分隔 "alice:pw1 bob:pw2")')
+console.log('          • Save')
 console.log('')
-console.log('  Step 3. 把以下兩條私訊 stakeholder(Slack / team chat / DM):')
+console.log('  Step 3. 觸發一次 deploy(push main 或 Netlify「Trigger deploy」)→ 站台自動上密碼。')
+console.log('')
+console.log('  Step 4. 把以下兩條私訊 stakeholder(Slack / team chat / DM):')
 console.log(`          • Site URL: ${siteUrl}`)
-console.log('          • Password: <你剛才設的>')
+console.log('          • 帳密:    <你剛才設的 user:password>')
 console.log('')
-console.log('Free-tier 鎖住的選項(不用點):')
-console.log('  • Team protection 🔒 — 要 Pro plan $19/mo')
-console.log('  • Non-production deploys only 🔒 — 要 Pro plan')
+console.log('進階(非必須,要更好體驗才升級):')
+console.log('  • Pro Password Protection $20/mo — dashboard 開關,美化密碼頁、可只擋 deploy preview 放行 production')
+console.log('  • Cloudflare Access(免費 50 user 真 SSO)— 需自架 Cloudflare proxy 在 Netlify 前面')
 console.log('')
 
 if (!skipPrompts) {
-  const done = await rl.question('已在 browser 設好 Basic Password?(y/N)> ')
+  const done = await rl.question('已在 Netlify 設好 STORYBOOK_BASIC_AUTH env var?(y/N)> ')
   if (!/^y/i.test(done)) {
-    console.log('⚠️ Site 目前公開(任何人有 URL 即可看)。再跑一次 script 或自己回 dashboard 設。')
+    console.log('⚠️ 未設 env var = 站台公開(任何人有 URL 即可看)。回 dashboard 加 STORYBOOK_BASIC_AUTH 再 deploy。')
   } else {
-    console.log('✅ Basic Password 設好')
+    console.log('✅ env var 設好,下次 deploy 站台自動上密碼')
   }
 }
 console.log('')
 
 console.log('━━━ 後續驗證 ━━━')
-console.log(`  1. push main 後 2-3 min,Netlify Dashboard 看 ${siteUrl} 部署狀態`)
-console.log('  2. 試開 site URL(無痕視窗)→ 應該見 password prompt')
-console.log('  3. 輸入剛才設的 password → 看 storybook')
+console.log(`  1. push main(或 Trigger deploy)後 2-3 min,Netlify Dashboard 看 ${siteUrl} 部署狀態`)
+console.log('  2. 試開 site URL(無痕視窗)→ 應該見瀏覽器原生帳密彈窗')
+console.log('  3. 輸入剛才設的 user:password → 看 storybook')
 console.log('')
 console.log('━━━ Defense-in-depth(已 ship in netlify.toml)━━━')
 console.log('  • X-Robots-Tag: noindex — Google 不收錄 URL')
 console.log('  • X-Frame-Options: SAMEORIGIN — 防 iframe 嵌入')
 console.log('  • Referrer-Policy: strict-origin-when-cross-origin')
-console.log('  ⚠️ Header 只防 SEO + iframe 嵌入,**真擋陌生人靠 Basic Password 那層**')
+console.log('  ⚠️ Header 只防 SEO + iframe 嵌入,**真擋陌生人靠 _headers Basic Auth 那層(env var 注入)**')
 console.log('')
 
 console.log('✅ Setup complete!')

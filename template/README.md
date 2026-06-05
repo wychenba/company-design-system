@@ -6,7 +6,7 @@
 
 **Repo**:**Private**(team member-only collaborators,non-member 看不到 source)
 **App / Storybook host**:**Netlify**(non-GitHub Pages — public host 不適合 private workspace)
-**權限控管**:**Netlify Basic Password**(free-tier 唯一可用,共用 password)OR Pro Team protection($19/mo,per-account login)OR Cloudflare Access(免費 50 user,自架 SSO)— 2026-05-29 改 from Identity(已 deprecated)
+**權限控管**:**免費 = HTTP Basic Auth via `_headers`**(本 template 內建 `STORYBOOK_BASIC_AUTH` env-var build-time 注入,Netlify 含 free 全方案 edge 層支援,瀏覽器原生帳密彈窗)OR **Pro Password Protection**($20/mo dashboard 開關,美化密碼頁 + 可只擋 preview 放行 production)OR **Cloudflare Access**(免費 50 user 真 SSO,需自架 Cloudflare proxy 在 Netlify 前)。注意:Netlify dashboard 的「Password protection」是 Pro 專屬($20/mo),free-tier 沒此開關(按下去要求升 Pro)→ 免費方法走 `_headers`,非 dashboard password
 
 不適用 host(本 template 已 ban):
 - ❌ **GitHub Pages**:public host,private workspace 不該 expose
