@@ -930,7 +930,7 @@ function CreateFormPage({
       <div className="flex items-center justify-end mt-6 pt-4 border-t border-divider max-w-[860px]">
         <div className="flex gap-2">
           <Button variant="primary" danger onClick={onBack}>取消申請</Button>
-          <Button variant="outline">存成草稿</Button>
+          <Button variant="tertiary">存成草稿</Button>
           <Button onClick={handleSubmit}>下一步</Button>
         </div>
       </div>
