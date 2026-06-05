@@ -50,7 +50,7 @@ const badgeVariants = cva(
 
 type BadgeBaseProps = Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'>
 
-interface BadgeDotProps extends BadgeBaseProps {
+export interface BadgeDotProps extends BadgeBaseProps {
   /** dot 模式：6×6px 純色圓點，無文字 */
   dot: true
   /** dot 只接高訊號 attention 色:critical(立即)/ high(有感)。預設 critical。
@@ -61,7 +61,7 @@ interface BadgeDotProps extends BadgeBaseProps {
   max?: never
 }
 
-interface BadgeCountProps extends BadgeBaseProps {
+export interface BadgeCountProps extends BadgeBaseProps {
   dot?: false
   /** 四級 severity（low→critical),見 badge.spec.md「選 level 的流程」 */
   variant?: 'critical' | 'high' | 'medium' | 'low'
