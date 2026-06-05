@@ -12,6 +12,7 @@ import {
   Field, FieldLabel,
   Tag, Notice,
   Toaster, toast,
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from '@qijenchen/design-system'
 import {
   Home, FileText, Upload, ClipboardList, Users, BookOpen,
@@ -686,10 +687,12 @@ function AddInvoiceModal({
 
 function DraftListPage({
   entries,
-  onAdd,
+  onAddSingle,
+  onAddExcel,
 }: {
   entries: DraftEntry[]
-  onAdd: () => void
+  onAddSingle: () => void
+  onAddExcel: () => void
 }) {
   return (
     <div className="p-6 max-w-screen-xl">
@@ -706,10 +709,24 @@ function DraftListPage({
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-medium text-fg-primary">一般暫存申請</h2>
             <div className="flex items-center gap-2">
-              <Button startIcon={Plus} onClick={onAdd}>
-                新增
-                <ChevronDown size={14} className="ml-1" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button startIcon={Plus}>
+                    新增
+                    <ChevronDown size={14} className="ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={onAddSingle}>
+                    <FileText size={14} />
+                    單筆申請
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onAddExcel}>
+                    <Download size={14} />
+                    Excel 申請
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button variant="outline" startIcon={Download}>下載 Excel 範本</Button>
             </div>
           </div>
@@ -817,7 +834,11 @@ export default function App() {
           layout="primary-sidebar"
           sidebar={<AppSidebar activeId={activeNav} onActiveChange={setActiveNav} />}
         >
-          <DraftListPage entries={entries} onAdd={() => setModalOpen(true)} />
+          <DraftListPage
+            entries={entries}
+            onAddSingle={() => setModalOpen(true)}
+            onAddExcel={() => toast({ variant: 'info', title: 'Excel 申請', description: '請下載範本填寫後上傳' })}
+          />
         </AppShell>
       </SidebarProvider>
       <AddInvoiceModal
