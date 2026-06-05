@@ -325,10 +325,8 @@ export const AccessibilityRule: Story = {
         <div className="flex items-center gap-4">
           <Badge dot variant="critical" aria-label="緊急" />
           <Badge dot variant="high" aria-label="重要" />
-          <Badge dot variant="medium" aria-label="一般" />
-          <Badge dot variant="low" aria-label="被動" />
         </div>
-        <Label>↑ 4 個 dot 差異只在顏色——必須靠 aria-label 明確語意,不能只靠「紅色代表緊急」</Label>
+        <Label>↑ critical(橘)vs high(藍)只靠顏色——color-blind 使用者分不清,必須靠 aria-label 明確語意,不能只靠顏色</Label>
       </Rule>
     </div>
   ),

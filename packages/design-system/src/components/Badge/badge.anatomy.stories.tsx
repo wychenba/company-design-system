@@ -227,14 +227,14 @@ const InspectorInner = () => {
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-fg-muted w-16 shrink-0">Variant</span>
           <div className="flex flex-wrap gap-1.5">
-            {VARIANTS.map((v) => <Tab key={v} active={variant === v} onClick={() => setVariant(v)}>{v}</Tab>)}
+            {(isDot ? VARIANTS.filter((v) => v === 'critical' || v === 'high') : VARIANTS).map((v) => <Tab key={v} active={variant === v} onClick={() => setVariant(v)}>{v}</Tab>)}
           </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-fg-muted w-16 shrink-0">Mode</span>
           <div className="flex gap-1.5">
             <Tab active={mode === 'count'} onClick={() => setMode('count')}>count</Tab>
-            <Tab active={mode === 'dot'} onClick={() => setMode('dot')}>dot</Tab>
+            <Tab active={mode === 'dot'} onClick={() => { setMode('dot'); if (variant !== 'critical' && variant !== 'high') setVariant('critical') }}>dot</Tab>
           </div>
         </div>
         {!isDot && (
@@ -253,7 +253,7 @@ const InspectorInner = () => {
         <div className="flex flex-col gap-5 min-w-[280px]">
           <div className="px-10 py-8 rounded-lg bg-canvas border border-divider flex items-center justify-center">
             {isDot
-              ? <Badge dot variant={variant} />
+              ? <Badge dot variant={variant === 'high' ? 'high' : 'critical'} />
               : <Badge count={count} variant={variant} max={count > 99 ? 99 : undefined} />
             }
           </div>
@@ -440,7 +440,7 @@ export const ColorMatrix = {
                   <tr key={v}>
                     <td className="p-3 border-b border-divider font-mono text-caption font-medium align-middle">{v}</td>
                     <td className="p-3 border-b border-divider align-middle">
-                      <Badge dot variant={v} />
+                      {(v === 'critical' || v === 'high') ? <Badge dot variant={v} /> : <span className="text-fg-muted text-caption">—</span>}
                     </td>
                     <td className="p-3 border-b border-divider align-middle">
                       <span className="inline-flex items-center gap-1.5">
@@ -558,7 +558,7 @@ export const SizeMatrix = {
                   <td className="p-3 border-b border-divider align-middle"><Badge count={3} variant={v} /></td>
                   <td className="p-3 border-b border-divider align-middle"><Badge count={42} variant={v} /></td>
                   <td className="p-3 border-b border-divider align-middle"><Badge count={150} variant={v} max={99} /></td>
-                  <td className="p-3 border-b border-divider align-middle"><Badge dot variant={v} /></td>
+                  <td className="p-3 border-b border-divider align-middle">{(v === 'critical' || v === 'high') ? <Badge dot variant={v} /> : <span className="text-fg-muted text-caption">—</span>}</td>
                 </tr>
               ))}
             </tbody>
