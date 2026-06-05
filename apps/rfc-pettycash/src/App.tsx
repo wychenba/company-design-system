@@ -970,10 +970,10 @@ function DraftListPage({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={onAddSingle}>單筆申請</DropdownMenuItem>
-                  <DropdownMenuItem onClick={onAddExcel}>Excel 申請</DropdownMenuItem>
+                  <DropdownMenuItem onClick={onAddExcel} disabled>Excel 申請</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button variant="tertiary" startIcon={Download}>下載 Excel 範本</Button>
+              <Button variant="tertiary" startIcon={Download} disabled>下載 Excel 範本</Button>
             </div>
           </div>
 
