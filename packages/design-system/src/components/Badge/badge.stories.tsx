@@ -45,7 +45,7 @@ export const Shape: Story = {
 
 /* ── Dot 模式 ── */
 export const Dot: Story = {
-  name: 'Dot 模式',
+  name: '圓點模式',
   render: () => (
     <div className="flex items-center gap-4">
       <Badge dot variant="critical" />
@@ -59,7 +59,7 @@ export const Dot: Story = {
 
 /* ── Max 上限 ── */
 export const MaxCount: Story = {
-  name: 'Max 上限',
+  name: '數量上限',
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3">

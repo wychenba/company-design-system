@@ -111,7 +111,7 @@ export const Pressed: Story = {
 // ── danger prop ─────────────────────────────────────────────────
 
 export const Danger: Story = {
-  name: 'Danger 語意',
+  name: '危險 語意',
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-3">

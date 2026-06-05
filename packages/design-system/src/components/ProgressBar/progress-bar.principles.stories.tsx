@@ -208,7 +208,7 @@ export const UsageGuidance: Story = {
 }
 
 export const StatusRule: Story = {
-  name: 'Status 語意',
+  name: '狀態語意',
   render: () => (
     <div>
       <Rule

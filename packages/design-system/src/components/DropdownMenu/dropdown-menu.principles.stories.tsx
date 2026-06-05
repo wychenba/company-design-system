@@ -200,7 +200,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ItemTypeRule: Story = {
-  name: 'Item 類型選擇',
+  name: '項目類型選擇',
   render: () => {
     const [showStatus, setShowStatus] = React.useState(true)
     const [showAssignee, setShowAssignee] = React.useState(true)
@@ -310,7 +310,7 @@ export const DestructiveRule: Story = {
 }
 
 export const SuffixRule: Story = {
-  name: 'Suffix 使用規則',
+  name: '後綴使用規則',
   render: () => (
     <div>
       <Rule

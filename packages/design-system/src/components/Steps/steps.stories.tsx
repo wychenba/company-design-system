@@ -151,7 +151,7 @@ export const Default: Story = {
 // Ring 跟 content state 正交:任何 state + focused 都能組合
 
 export const FocusRingCombinations: Story = {
-  name: 'Ring 正交示範',
+  name: '聚焦環正交示範',
   render: () => {
     const [value, setValue] = React.useState('step-2')
     return (
@@ -279,7 +279,7 @@ export const Horizontal: Story = {
 // ── Multiple expansion ─────────────────────────────────────────────────
 
 export const MultipleExpansion: Story = {
-  name: 'Multiple 展開模式',
+  name: '多重展開模式',
   render: () => (
     <div className="w-[480px]">
       <p className="text-caption text-fg-secondary mb-4">

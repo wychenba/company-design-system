@@ -50,7 +50,7 @@ const formatRange = (from?: Date, to?: Date) => {
  * Stripe 發票到期日輸入)。最常用的 mode,DatePicker 消費此模式。
  */
 export const Single: Story = {
-  name: 'Single — 生日 / 到期日',
+  name: '單日 — 生日 / 到期日',
   render: () => {
     const [date, setDate] = useState<Date | undefined>(new Date(1995, 5, 12))
     return (
@@ -83,7 +83,7 @@ export const Single: Story = {
  * Notion project 可用日標記)。不連續多選。
  */
 export const Multiple: Story = {
-  name: 'Multiple — 活動可參加日期',
+  name: '多日 — 活動可參加日期',
   render: () => {
     const today = new Date()
     const [dates, setDates] = useState<Date[]>([
@@ -123,7 +123,7 @@ export const Multiple: Story = {
  * Vercel Analytics 報表期間、Airbnb 訂房 check-in/check-out)。
  */
 export const Range: Story = {
-  name: 'Range — 分析時段 / 訂單範圍',
+  name: '範圍 — 分析時段 / 訂單範圍',
   render: () => {
     const today = new Date()
     const [range, setRange] = useState<DateRange | undefined>({

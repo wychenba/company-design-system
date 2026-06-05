@@ -253,7 +253,7 @@ export const HeightBehaviorRule: Story = {
 }
 
 export const FooterActionRule: Story = {
-  name: 'Footer 按鈕配對',
+  name: '頁尾按鈕配對',
   render: () => (
     <div>
       <Rule

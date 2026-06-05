@@ -117,7 +117,7 @@ export const DeploymentSuccess: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const BillingFailed: Story = {
-  name: 'Workspace 付款失敗',
+  name: '工作區付款失敗',
   render: () => (
     <div className="max-w-2xl">
       <SolidShell variant="error">
@@ -238,7 +238,7 @@ export const ToastLikeSolid: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const NeutralTitleOnly: Story = {
-  name: 'Neutral 純文字',
+  name: '中性 純文字',
   render: () => (
     <div className="max-w-2xl">
       <SubtleShell variant="neutral">

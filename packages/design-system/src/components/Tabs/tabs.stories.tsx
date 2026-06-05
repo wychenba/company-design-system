@@ -117,7 +117,7 @@ export const OverflowScroll: Story = {
 }
 
 export const OverflowMenu: Story = {
-  name: '溢出處理 — ⌄ navigator 選單',
+  name: '溢出處理 — ⌄ 導覽選單',
   // 2026-05-18 加:narrow 320px container + 8 tabs 強制觸發 → 右側出現 ⌄ navigator(OverflowMenuTriggerButton),DropdownMenu 列全部 tab 快速跳轉;全 trigger 仍在捲動容器內可見。
   render: () => (
     <div className="w-[320px] border border-divider rounded-md p-2">

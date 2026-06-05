@@ -73,7 +73,7 @@ export const Compact = {
 }
 
 export const HoverSwap = {
-  name: 'Hover 替換',
+  name: '懸停替換',
   render: () => (
     <div className="flex flex-col max-w-md gap-4">
       <div>
@@ -188,7 +188,7 @@ export const Clickable = {
 }
 
 export const CompactMixed = {
-  name: 'Compact 混合',
+  name: '緊湊 混合',
   render: () => (
     // Real-world:email 草稿 — 新上傳中(status=uploading/error)+ 舊已存附件(無 status 靜態)混在同 list
     // **重要 invariant**:upload-manager 的 **completed**(bar 100% + ✓)跟靜態(無 bar)不共存
@@ -212,7 +212,7 @@ export const CompactMixed = {
 //   - 列間 gap 反映密度:rich = tight(12px,卡片+48 縮圖)/ compact = 4px(密集文字列)
 //   - rich item 拿掉全部 padding(px-0 py-0,列高靠 avatar 48);左右交給面板,避免雙重 L/R。對比 surface=form 的 border card。
 export const UploadManagerSurface = {
-  name: 'Upload manager · 豐富(無邊框)',
+  name: '上傳管理器 · 豐富(無邊框)',
   render: () => (
     <div className="max-w-md flex flex-col rounded-lg border border-border bg-surface-raised shadow-[var(--elevation-200)]">
       {/* header 消費 overlay-surface SurfaceHeader + PopoverTitle(輕量浮層 chrome SSOT,非手刻):
@@ -239,7 +239,7 @@ export const UploadManagerSurface = {
 // top !pt-1=4(item 自帶 py-2 的 8 + 4 = 12),bottom 12(進度條貼底、item 下方無留白);gap 只 4px(密集列)。
 // 對比 rich panel(item py-0 → 上下對稱 12 / gap 12),demo 兩 mode 密度差異。
 export const UploadManagerCompactSurface = {
-  name: 'Upload manager · 精簡(無邊框)',
+  name: '上傳管理器 · 緊湊(無邊框)',
   render: () => (
     <div className="max-w-md flex flex-col rounded-lg border border-border bg-surface-raised shadow-[var(--elevation-200)]">
       {/* header 消費同一個 overlay-surface SurfaceHeader + PopoverTitle SSOT(同 rich panel)*/}

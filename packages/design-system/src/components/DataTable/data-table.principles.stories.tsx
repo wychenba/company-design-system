@@ -118,7 +118,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ColumnTypeRule: Story = {
-  name: '用 欄 type 自動渲染,不手寫 儲存格',
+  name: '用 欄類型 自動渲染,不手寫 儲存格',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [

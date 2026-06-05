@@ -177,7 +177,7 @@ export const OverflowList: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const RepoCard: Story = {
-  name: 'Repository 資訊卡',
+  name: '儲存庫資訊卡',
   render: () => (
     <div className="flex flex-col gap-3 max-w-xl">
       <p className="text-caption text-fg-muted">
@@ -236,7 +236,7 @@ export const RepoCard: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const TriggerShowcase: Story = {
-  name: 'Trigger 類型與 delay',
+  name: '觸發點類型與延遲',
   render: () => (
     <div className="flex flex-col gap-6 max-w-xl">
       <p className="text-caption text-fg-muted">

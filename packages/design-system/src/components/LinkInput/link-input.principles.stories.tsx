@@ -100,7 +100,7 @@ export const UsageGuidance: Story = {
 // ── 兩種顯示狀態 ───────────────────────────────────────────────────────────
 
 export const DisplayStateRule: Story = {
-  name: '兩種狀態：連結 顯示 / input 編輯',
+  name: '兩種狀態:連結顯示 / 輸入框編輯',
   render: () => (
     <div>
       <Rule
@@ -134,7 +134,7 @@ export const DisplayStateRule: Story = {
 // ── 驗證 ────────────────────────────────────────────────────────────────
 
 export const ValidationRule: Story = {
-  name: '驗證時機：blur，不即時',
+  name: '驗證時機:失焦,不即時',
   render: () => {
     const [url, setUrl] = React.useState('')
     return (

@@ -134,7 +134,7 @@ export const CalendarRule: Story = {
 }
 
 export const FormattingRule: Story = {
-  name: 'Display 格式化',
+  name: '顯示格式化',
   render: () => (
     <div>
       <Rule

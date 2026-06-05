@@ -117,7 +117,7 @@ export const UsageGuidance: Story = {
 }
 
 export const FallbackRule: Story = {
-  name: 'Fallback 順序',
+  name: '後備順序',
   render: () => (
     <div>
       <Rule

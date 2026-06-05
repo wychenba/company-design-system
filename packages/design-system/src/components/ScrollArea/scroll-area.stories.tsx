@@ -56,7 +56,7 @@ const STATUS_COLORS: Record<string, string> = {
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 export const VerticalIssueList: Story = {
-  name: '垂直捲動 — Linear issue 清單',
+  name: '垂直捲動 — Linear 議題清單',
   render: () => (
     <div className="max-w-xl">
       <p className="text-caption text-fg-muted mb-3">
@@ -81,7 +81,7 @@ export const VerticalIssueList: Story = {
 }
 
 export const SidebarNav: Story = {
-  name: '垂直捲動 — Notion sidebar 導覽',
+  name: '垂直捲動 — Notion 側欄 導覽',
   render: () => (
     <div className="w-[260px]">
       <p className="text-caption text-fg-muted mb-3">

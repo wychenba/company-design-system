@@ -1200,7 +1200,7 @@ export const ReadingModes = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const IconColorsAndPresets = {
-  name: 'Icon 色彩 + 消費元件預設',
+  name: '圖示色彩 + 消費元件預設',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">

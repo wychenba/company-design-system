@@ -317,7 +317,7 @@ export const SidePropRule: Story = {
 }
 
 export const HeaderFooterStructureRule: Story = {
-  name: 'Header / Footer 結構',
+  name: '頁首 / 頁尾 結構',
   render: () => (
     <div>
       <Rule

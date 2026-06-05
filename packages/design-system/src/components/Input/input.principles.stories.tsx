@@ -105,7 +105,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ModeRule: Story = {
-  name: 'Mode 選擇',
+  name: '模式選擇',
   render: () => (
     <div>
       <Rule
@@ -235,7 +235,7 @@ export const EndActionRule: Story = {
 }
 
 export const ErrorRule: Story = {
-  name: 'Error 呈現',
+  name: '錯誤呈現',
   render: () => (
     <div>
       <Rule

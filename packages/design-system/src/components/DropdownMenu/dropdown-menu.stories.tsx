@@ -249,7 +249,7 @@ export const OpenSnapshot: StoryObj = {
 // 詳見 .claude/skills/visual-audit/SKILL.md 的「Layer A interactive state coverage」。
 
 export const ItemHover: StoryObj = {
-  name: 'Item Hover 高亮',
+  name: '選項懸停高亮',
   tags: ['!autodocs'],
   render: () => (
     <DropdownMenu defaultOpen>

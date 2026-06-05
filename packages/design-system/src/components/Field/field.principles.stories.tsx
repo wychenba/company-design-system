@@ -233,7 +233,7 @@ export const OrientationRule: Story = {
 }
 
 export const NotForFormActionsRule: Story = {
-  name: 'Form 動作 不是 Field 控制元件',
+  name: '表單動作 不是 Field 控制元件',
   render: () => (
     <div>
       <Rule

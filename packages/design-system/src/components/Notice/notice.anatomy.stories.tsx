@@ -369,7 +369,7 @@ text-body = 14px   leading-compact = 1.3
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const VariantIconMap: Story = {
-  name: '變體 × icon 對照',
+  name: '變體 × 圖示 對照',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

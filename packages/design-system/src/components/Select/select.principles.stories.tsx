@@ -194,7 +194,7 @@ export const DisplayModeRule: Story = {
 }
 
 export const ImmediateVsSubmitRule: Story = {
-  name: '即時套用 vs 隨 form 送出',
+  name: '即時套用 vs 隨表單送出',
   render: () => {
     const [immediate, setImmediate] = React.useState('in_stock')
     const [draft, setDraft] = React.useState('electronics')
@@ -241,7 +241,7 @@ export const ImmediateVsSubmitRule: Story = {
 }
 
 export const SearchableRule: Story = {
-  name: 'Searchable 開啟判斷',
+  name: '可搜尋 開啟判斷',
   render: () => (
     <div>
       <Rule
@@ -285,7 +285,7 @@ export const SearchableRule: Story = {
 }
 
 export const NativeSelectRule: Story = {
-  name: '桌機自建選單 vs 手機原生 picker',
+  name: '桌機自建選單 vs 手機原生選擇器',
   render: () => {
     const [value, setValue] = React.useState('electronics')
     return (

@@ -305,7 +305,7 @@ export const Destructive = {
  * 以下三個 item-size 範例對應不同 list-item tier(item-anatomy Family 1 reading mode):
  */
 export const ListBody = {
-  name: '主體 放 list',
+  name: '主體放清單',
   render: () => (
     <div className="flex flex-col gap-6 items-start">
       {/* 大 item:avatar 40 + title + description(對齊 user 期望 + Material M3 + FileItem rich) */}

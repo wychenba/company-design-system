@@ -115,7 +115,7 @@ export const SizeMatrix: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: '模式 對照（編輯 / 展示 / readonly / 停用）',
+  name: '模式 對照（編輯 / 展示 / 唯讀 / 停用）',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>

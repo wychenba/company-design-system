@@ -187,7 +187,7 @@ export const LayoutRule: Story = {
 // ── 選中視覺 ─────────────────────────────────────────────────────────────
 
 export const SelectedStyleRule: Story = {
-  name: '選中狀態：text + 邊框 同染，不用 背景 強調',
+  name: '選中狀態：文字 + 邊框 同染，不用背景強調',
   render: () => (
     <div>
       <Rule

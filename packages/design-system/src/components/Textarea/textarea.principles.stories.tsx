@@ -124,7 +124,7 @@ export const ResizeRule: Story = {
 // ── Readonly 保留邊框 ───────────────────────────────────────────────────
 
 export const ReadonlyRule: Story = {
-  name: 'Readonly 用底色標示閱讀區（不同於 Input）',
+  name: '唯讀模式用底色標示閱讀區（不同於 Input）',
   render: () => (
     <div>
       <Rule

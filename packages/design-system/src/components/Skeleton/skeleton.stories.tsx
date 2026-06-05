@@ -42,7 +42,7 @@ export const UserProfileCard: Story = {
 }
 
 export const TaskListLoading: Story = {
-  name: 'Task 列表載入',
+  name: '任務列表載入',
   render: () => (
     <div className="flex flex-col gap-1 max-w-2xl border border-border rounded-lg divide-y divide-border">
       {Array.from({ length: 5 }).map((_, i) => (

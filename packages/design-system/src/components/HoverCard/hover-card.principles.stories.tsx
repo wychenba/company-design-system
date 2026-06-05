@@ -172,7 +172,7 @@ export const UsageGuidance: Story = {
 }
 
 export const PureBehaviorPrimitiveRule: Story = {
-  name: '純行為 primitive——視覺由 consumer 決定',
+  name: '純行為元件——視覺由使用方決定',
   render: () => (
     <div>
       <Rule

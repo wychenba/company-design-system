@@ -215,7 +215,7 @@ export const UsageGuidance: Story = {
 }
 
 export const MultiStepBestPracticesRule: Story = {
-  name: '多步 Tour 最佳實踐',
+  name: '多步導覽最佳實踐',
   render: () => (
     <div>
       <Rule

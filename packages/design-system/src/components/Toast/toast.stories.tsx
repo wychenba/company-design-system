@@ -73,7 +73,7 @@ function modeLabel(variant: NoticeVariant, pageTheme: 'light' | 'dark') {
 }
 
 export const WithDescription = {
-  name: '有 Title + Description',
+  name: '有標題與描述',
   render: () => (
     <div className="flex gap-16">
       <div className="flex flex-col gap-4">

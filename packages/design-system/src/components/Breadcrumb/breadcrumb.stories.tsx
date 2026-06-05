@@ -207,7 +207,7 @@ export const DeclarativeAutoCollapse: Story = {
 // ── 首項 Home icon(Material / Atlassian 業界慣例,spec.md startIcon prop)──
 
 export const WithHomeIcon: Story = {
-  name: '首項配 Home icon',
+  name: '首項配首頁圖示',
   parameters: {
     docs: {
       description: {

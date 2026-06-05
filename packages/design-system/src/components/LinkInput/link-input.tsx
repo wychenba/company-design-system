@@ -272,7 +272,6 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          readOnly={resolvedMode === 'readonly'}
           aria-invalid={(error || fieldCtx?.invalid) || undefined}
           aria-required={fieldCtx?.required || undefined}
           aria-describedby={ariaDescribedByProp ?? fieldCtx?.descriptionId}

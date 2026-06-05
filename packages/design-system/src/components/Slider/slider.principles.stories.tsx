@@ -125,7 +125,7 @@ export const UsageGuidance: Story = {
 }
 
 export const PositionAsStateRule: Story = {
-  name: '位置/長度是 state,不是顏色',
+  name: '位置/長度是狀態,不是顏色',
   render: () => (
     <div>
       <Rule

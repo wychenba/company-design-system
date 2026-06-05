@@ -80,6 +80,11 @@ detect_mode() {
 
 **PURE-JUDGMENT dim 真跑證據強制(2026-05-30 generalize,user 問「包括所有 infra 稽核?」)**:judgment dim(無 deterministic script / write-time hook 兜底者,含 infra 62/66/68/72 fork-onboarding/runtime/API-surface)report 必逐 dim show「DS-wide N files scanned + file:line findings / 或『0 after 全掃』」真跑證據,**禁只 mention dim 號**。report-validator `check_audit_post_report_validator.sh` Validator G 機械強制(evidence marker 數 < judgment dim 數 = BLOCKER)。DETERMINISTIC(22)+ HOOK(42)dim 由 CI / write-time hook 兜底(含 22/26 infra dim),不在此 risk。
 
+**🚨 反抽樣鐵律 — 「機械涵蓋」必先 breadth-verify(2026-06-05 user 抓 story-title 又抽樣,verbatim「這個問題已經問你一百次了結果你還是抽樣」)**:把某 judgment dim 標為「DETERMINISTIC/HOOK 已兜底、不在 judgment risk」**= 一種抽樣**,除非該 gate 的偵測廣度被**證明**對齊 canonical。**強制兩步,缺一即視同抽樣**:
+1. **Breadth-test**:對該 gate 注入一個「已知違規」樣本 → 跑 gate → 確認被抓(exit 1)→ revert。沒通過 = 該 gate **不算**涵蓋該 dim,退回 PURE-JUDGMENT 跑完整枚舉。
+2. **完整枚舉 + partition-review**(judgment dim sample-proof 跑法):deterministic 腳本枚舉**全部單元**(eg. `extract-story-names.mjs` 全 926 name)→ 機械 auto-pass 明確合規者 → 剩餘 candidate **切 N chunk,每 chunk agent 審它每一個**(chunk 互斥涵蓋全集 → 每單元剛好審一次,數學上不可能漏)。**禁** agent 自選 top N。
+- **錨例**:dim 40/41/43 被當「story-quality:check 已涵蓋」排除 NO-SAMPLE → 但 gate 有 detection gap(只抓 100%-English,漏中英混雜)+ scope gap(漏 anatomy/principles)→ 放過 84 違規,還回報「0 violations」假綠燈。修:gate 補 `name_mixed_english`(Dim 41b)+ 全 storyFiles scope + breadth-verified(注入 `Hover Compact 測試` 確認抓到)。對齊 M7 子規則 M34「spec broad + hook narrow = gap 必補」。
+
 ### A.1b — Claim-vs-code + docblock + spec-internal adversarial verification(MANDATORY,NO-SAMPLE,per-component)
 
 **2026-05-30 anchor(user verbatim 質問「之前他媽都在偷懶?」)**:獨立 adversarial 再審抓到 **403 findings / 64 單元 / 0 全乾淨**,其中 **202 個 FALSE_CLAIM**(anatomy/a11y/principles/spec 系統性記載 code 根本沒有的行為:Calendar 宣稱方向鍵導覽 / Tooltip·HoverCard 宣稱 focus trap / Alert 記不存在的 `actions` prop / Select 宣稱「用原生 select」但桌機自建 cmdk / AspectRatio spec 說「無 wrapper」但 code wrap)。**根因**:前期 audit 把 story-content dim(12/24/25/30/43 等)當「散文層 looks-fine 掃」跑,**沒 adversarial 讀 .tsx(+ wrap 的 lib)逐句比對宣稱**。這是「偷懶」的具體 failure mode。

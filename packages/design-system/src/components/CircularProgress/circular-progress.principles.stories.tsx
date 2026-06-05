@@ -227,7 +227,7 @@ export const UsageScenarioRule: Story = {
 }
 
 export const SizeMatchContextRule: Story = {
-  name: 'Size 對應使用情境',
+  name: '尺寸對應使用情境',
   render: () => (
     <div>
       <Rule

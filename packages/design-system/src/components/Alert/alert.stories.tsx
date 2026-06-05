@@ -35,7 +35,7 @@ const D: Record<string, string> = {
 const actionBtn = <Button variant="tertiary" size="xs">查看詳情</Button>
 
 export const SubtleSingleLine = {
-  name: 'Subtle 單行',
+  name: '低調 單行',
   render: () => (
     <div className="flex flex-col gap-3 max-w-lg">
       {ALL.map((v) => <Alert key={v} variant={v} appearance="subtle" title={L[v]} endContent={actionBtn} />)}
@@ -44,7 +44,7 @@ export const SubtleSingleLine = {
 }
 
 export const SolidSingleLine = {
-  name: 'Solid 單行',
+  name: '實心 單行',
   render: () => (
     <div className="flex flex-col gap-3 max-w-lg">
       {ALL.map((v) => <Alert key={v} variant={v} appearance="solid" title={L[v]} endContent={actionBtn} />)}

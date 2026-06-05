@@ -166,7 +166,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ModeRule: Story = {
-  name: 'Mode 選擇',
+  name: '模式 選擇',
   render: () => {
     const ModeDemo = () => {
       const today = new Date()
@@ -248,7 +248,7 @@ export const ModeRule: Story = {
 }
 
 export const VisualTokenRule: Story = {
-  name: '視覺 token 統一',
+  name: '視覺設計變數 統一',
   render: () => (
     <div>
       <Rule

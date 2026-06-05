@@ -232,7 +232,7 @@ export const DismissRule: Story = {
 }
 
 export const IconRule: Story = {
-  name: '圖示 與 avatar 的使用',
+  name: '圖示與頭像的使用',
   render: () => (
     <div>
       <Rule

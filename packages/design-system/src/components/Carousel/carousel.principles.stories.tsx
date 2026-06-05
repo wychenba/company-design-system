@@ -209,7 +209,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ArrowHoverOnly: Story = {
-  name: '箭頭 滑鼠移過-only 顯示',
+  name: '箭頭僅滑鼠移過時顯示',
   render: () => (
     <div>
       <Rule

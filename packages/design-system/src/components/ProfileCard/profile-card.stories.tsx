@@ -42,7 +42,7 @@ function ProfileCardHover({ name, src, subtitle }: { name: string; src: string; 
 }
 
 export const Default = {
-  name: 'Hover 展開 ProfileCard',
+  name: '懸停展開 ProfileCard',
   render: () => (
     <div className="p-16 flex flex-col gap-6">
       <ProfileCardHover name="Hanamizuki Yukinome 花水木雪乃芽" src="https://i.pravatar.cc/128?u=hana" subtitle="Design｜D-0042｜EMP-1001" />

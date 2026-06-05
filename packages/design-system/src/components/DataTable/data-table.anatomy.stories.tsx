@@ -165,7 +165,7 @@ export const Inspector: Story = {
 }
 
 export const ColumnTypes: Story = {
-  name: '欄 Type 自動渲染',
+  name: '欄類型自動渲染',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [

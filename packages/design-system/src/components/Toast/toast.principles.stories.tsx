@@ -108,7 +108,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ActionRule: Story = {
-  name: '動作 使用場景（Undo 模式）',
+  name: '動作 使用場景(復原 模式)',
   render: () => (
     <div>
       <Rule

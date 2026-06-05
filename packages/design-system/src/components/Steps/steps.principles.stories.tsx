@@ -110,7 +110,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ParentControlled: Story = {
-  name: '規則:Parent 管理狀態',
+  name: '規則:狀態由父層管理',
   render: () => (
     <Section
       title="狀態由 parent 單一來源管理"
@@ -181,7 +181,7 @@ export const RingIsFocusMarker: Story = {
 // ── 規則 3:Blue connector 只跟 completedValues 走 ──
 
 export const BlueConnectorLogic: Story = {
-  name: '規則:藍色 連線 只跟 completed 走',
+  name: '規則:藍色 連線 只跟 已完成 走',
   render: () => (
     <Section
       title="藍色代表實際走過的路徑,不是 focus 指向"
@@ -259,7 +259,7 @@ export const ColumnRhythm: Story = {
 // ── 規則 5:Linear 點 completed 不自動 unmark ──
 
 export const LinearBackClickDoesNotMutate: Story = {
-  name: '規則:Linear 點回 completed 不改狀態',
+  name: '規則:Linear 點回 完成項 不改狀態',
   render: () => {
     const [value, setValue] = React.useState('review')
     const [completed] = React.useState(['info', 'account'])

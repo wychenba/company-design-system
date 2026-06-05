@@ -138,7 +138,7 @@ export const SizeAlignment: Story = {
 
 /* ── DatePicker.Range — Ant-style 區間選擇(2026-04-21 新增)── */
 export const RangePicker: Story = {
-  name: 'Range:訂房 / 訂機票情境',
+  name: '範圍模式:訂房 / 訂機票情境',
   render: () => {
     const [range, setRange] = React.useState<[string | null, string | null]>(['2026-04-15', '2026-04-20'])
     return (
@@ -197,7 +197,7 @@ export const ShowTime: Story = {
 
 /* ── OpenSnapshot:Range popover 內 range track 視覺驗證(M15)── */
 export const RangePopoverOpen: Story = {
-  name: 'Range:浮層展開狀態',
+  name: '範圍:浮層展開狀態',
   parameters: { docs: { description: { story: 'Visual-audit OpenSnapshot — popover 內 DateGrid mode=range,verify range track 高度 = button 高度(28×28 @ md),不留 cell 上下 2px 多餘空白(Q8 設計準則 2026-05-02)。' } } },
   render: () => {
     const [range, setRange] = React.useState<[string | null, string | null]>(['2026-05-04', '2026-05-12'])
@@ -236,7 +236,7 @@ export const ShowTimePopoverOpen: Story = {
 
 /* ── OpenSnapshot:showTime Range popover(activeEnd='start')── */
 export const ShowTimeRangePopoverOpen: Story = {
-  name: 'showTime Range:浮層展開狀態',
+  name: 'showTime 範圍:浮層展開狀態',
   parameters: { docs: { description: { story: 'Visual-audit — Range showTime popover:numberOfMonths=1(只渲 active end 月份)+ TimePickerSidePanel + footer。Verify Ant idiom「一次 edit 一端」(設計準則 2026-05-02)。' } } },
   render: () => {
     const [range, setRange] = React.useState<[string | null, string | null]>([
@@ -299,7 +299,7 @@ export const RangeMiddleHoverState: Story = {
 
 /* ── showTime + Range:活動時段 ── */
 export const ShowTimeRange: Story = {
-  name: 'showTime Range:活動時段',
+  name: 'showTime 範圍:活動時段',
   render: () => {
     const [range, setRange] = React.useState<[string | null, string | null]>([
       '2026-04-15T09:00:00',

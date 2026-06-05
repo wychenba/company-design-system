@@ -414,7 +414,7 @@ export const ButtonAsControl: Story = {
 // ── Label Width 變化 ────────────────────────────────────────────────────
 
 export const LabelWidth: Story = {
-  name: 'Label 寬度',
+  name: '標籤 寬度',
   render: () => (
     <div className="max-w-2xl flex flex-col gap-4">
       <p className="text-caption text-fg-muted">labelWidth 支援任何 CSS length 值</p>

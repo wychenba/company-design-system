@@ -179,7 +179,7 @@ export const UsageGuidance: Story = {
 }
 
 export const LastItemRule: Story = {
-  name: '最後一項是位置標示，不是 link',
+  name: '最後一項是位置標示，不是連結',
   render: () => (
     <div>
       <Rule

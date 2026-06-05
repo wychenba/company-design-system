@@ -420,7 +420,7 @@ export const SettingsScenario: Story = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const IconModeRules: Story = {
-  name: 'Icon 模式的 4 條鐵律',
+  name: '圖示模式的 4 條鐵律',
   render: () => (
     <div className="flex flex-col gap-10">
       <Section

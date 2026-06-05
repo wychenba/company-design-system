@@ -776,7 +776,7 @@ export const StateBehavior = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const CalendarTokens = {
-  name: 'Calendar 內部 token',
+  name: 'Calendar 內部設計變數',
   render: () => {
     const [selected, setSelected] = useState<Date | undefined>(new Date(2026, 4, 15)) // 2026-05-15 專案截止日
     return (

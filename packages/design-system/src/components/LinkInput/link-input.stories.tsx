@@ -54,7 +54,7 @@ export const Empty: Story = {
 
 /* ── 格式驗證 ── */
 export const Validation: Story = {
-  name: 'Blur 驗證',
+  name: '失焦驗證',
   render: () => {
     const [value, setValue] = React.useState('')
     return (

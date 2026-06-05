@@ -109,7 +109,7 @@ const syncData: SyncRow[] = [
 ]
 
 export const InlineCellLoading: Story = {
-  name: 'Cell 局部載入',
+  name: '儲存格局部載入',
   render: () => (
     <div className="max-w-2xl">
       <DataTable columns={syncColumns} data={syncData} />

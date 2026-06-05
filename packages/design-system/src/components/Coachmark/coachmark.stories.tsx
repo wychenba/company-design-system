@@ -67,7 +67,7 @@ const tourSteps = [
 ]
 
 export const MultiStepTour: Story = {
-  name: '多步 Onboarding Tour',
+  name: '多步 新手導覽',
   render: () => {
     const [step, setStep] = React.useState(0)
     const [open, setOpen] = React.useState(true)
@@ -155,7 +155,7 @@ const tipSteps = [
 ]
 
 export const TipsMultiStep: Story = {
-  name: '多步 Tips',
+  name: '多步提示',
   render: () => {
     const [step, setStep] = React.useState(0)
     const [open, setOpen] = React.useState(true)

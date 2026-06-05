@@ -364,7 +364,7 @@ const unknownFile: FileInfo[] = [
 ]
 
 export const FallbackUnknownType: Story = {
-  name: 'Fallback — 不支援的檔案類型',
+  name: '後備顯示 — 不支援的檔案類型',
   render: () => {
     const [open, setOpen] = React.useState(false)
 

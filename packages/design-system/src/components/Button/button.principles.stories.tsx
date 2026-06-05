@@ -177,7 +177,7 @@ export const VariantRule: Story = {
 }
 
 export const PrimaryRule: Story = {
-  name: 'Primary 限制',
+  name: '主要按鈕限制',
   render: () => (
     <div>
       <Rule title="✅ 正確 — 唯一的 primary">
@@ -207,7 +207,7 @@ export const PrimaryRule: Story = {
 }
 
 export const DangerRule: Story = {
-  name: 'Danger 時機',
+  name: '危險 時機',
   render: () => (
     <div>
       <Rule
@@ -243,7 +243,7 @@ export const DangerRule: Story = {
 }
 
 export const IconRule: Story = {
-  name: 'Icon 語意',
+  name: '圖示語意',
   render: () => (
     <div>
       <Rule

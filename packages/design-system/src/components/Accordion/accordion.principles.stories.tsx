@@ -264,7 +264,7 @@ export const NoNestingRule: Story = {
 }
 
 export const ContentRule: Story = {
-  name: 'Content 內容限制',
+  name: '內容限制',
   render: () => (
     <div>
       <Rule

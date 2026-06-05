@@ -76,7 +76,7 @@ export const Overview: Story = {
 }
 
 export const VisualVariants: Story = {
-  name: 'Consumer 的兩種常見視覺',
+  name: '使用方的兩種常見視覺',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
