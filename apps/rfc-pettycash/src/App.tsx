@@ -10,7 +10,7 @@ import {
   Input, Select, Textarea, Checkbox,
   RadioGroup, RadioGroupItem,
   Field, FieldLabel,
-  Tag, Notice,
+  Tag, Alert,
   Toaster, toast,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from '@qijenchen/design-system'
@@ -496,7 +496,7 @@ function AddInvoiceModal({
                 </div>
               </div>
 
-              <Notice
+              <Alert
                 variant="info"
                 title="注意事項"
                 description={
@@ -886,7 +886,7 @@ function CreateFormPage({
           </Field>
 
           <div className="mt-4">
-            <Notice
+            <Alert
               variant="info"
               title="注意事項"
               description={
