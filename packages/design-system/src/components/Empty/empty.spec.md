@@ -73,7 +73,7 @@ Outer padding 由 **consumer 容器** 決定(Table 空狀態需較大留白、Se
 ## Typography
 
 - **Title**:body-lg + medium 字重 / foreground 色(主要閱讀重量)
-- **Description**:字級跟 `RowSizeContext` 對齊——standalone(無 context,fallback `md`)或 `sm`/`md` row 子樹 = body tier(14px);渲染在 `lg` 的 `RowSizeContext` 子樹(如 lg menu)內時自動升 body-lg(16px),對齊該 menu items 字級 / **`fg-muted` placeholder 等級色**(跟 input placeholder 同色,提示「這裡暫時沒內容」)
+- **Description**:字級跟 `RowSizeContext` 對齊——standalone(無 context,fallback `md`)或 `sm`/`md` row 子樹 = body tier(14px);渲染在 `lg` 的 `RowSizeContext` 子樹(如 lg menu)內時自動升 body-lg(16px),對齊該 menu items 字級。色彩條件式:有 title / action 時走 **`fg-secondary`**(次要閱讀色,與 title 形成主次層級);孤身 description(無 title / action)時走 **`fg-muted` placeholder 等級色**(跟 input placeholder 同色,提示「這裡暫時沒內容」);disabled context 時走 `fg-disabled`
 
 完整 slot / gap / typography 的 class 與 px 對照見 anatomy `Overview`(Slot 與 Spacing)+ `SlotCombinations`(Slot 間距規則)stories。
 
@@ -175,9 +175,9 @@ Empty 是 **non-interactive layout primitive**——本身無 ARIA role(讓 cons
 
 Empty 是 **pure layout primitive**(排列 icon / title / description / action 成居中垂直堆疊),不是 variant-driven 元件,也無互動狀態:
 
-- **無 ColorMatrix**:Empty 自身不帶任何色彩,bg transparent,text color 全部走 semantic token(`text-foreground` / `text-fg-muted`)。Avatar icon 的色彩由 consumer 透過 `<Avatar color="...">` 決定,非 Empty 層級 variant。
+- **無 ColorMatrix**:Empty 自身不帶任何色彩,bg transparent,text color 全部走 semantic token(`text-foreground` title / `text-fg-secondary` description-with-title / `text-fg-muted` 孤身 description / `text-fg-disabled` disabled context)。Avatar icon 的色彩由 consumer 透過 `<Avatar color="...">` 決定,非 Empty 層級 variant。
 - **無 SizeMatrix**:Empty 無 `size` prop,垂直 padding 由 consumer 容器決定(Table `py-12` / SelectMenu `py-6` / Page `py-16`),固定間距不隨 density 變(展示性元件,見本 spec「間距」段)。
-- **無 StateBehavior**:Empty 是非互動展示元件,無 hover / focus / active / selected / disabled。CTA button 的互動狀態屬 Button 層級,不屬 Empty。
+- **無 StateBehavior**:Empty 是非互動展示元件,無 hover / focus / active / selected 互動狀態。CTA button 的互動狀態屬 Button 層級,不屬 Empty。**唯一例外是 disabled context state**(`disabled?: boolean` prop):非互動狀態,但元件支援——disabled 時 title / description 轉 `text-fg-disabled`、icon glyph 轉 fg-disabled(供 FileUpload disabled 等情境消費),不影響既有 consumer(預設 false)。
 
 **Inspector**:提供互動切換式 Inspector(右側 Controls 面板切換 icon / title / description / action),讓 consumer 即時查看 Empty 在不同 slot 組合下的呈現——slot 組合(description only → full)是 Empty 唯一的關鍵決策。
 

@@ -420,7 +420,7 @@ ValueShape ↔ DS picker 對照(canonical 2026-05-02):
 | number / currency | click cell | `<NumberInput>` |
 | date | click cell | `<DatePicker>` |
 | select / multiSelect | click cell | `<Select>` / `<Combobox>` |
-| person / multiPerson | click cell | `<Input>` v1 fallback |
+| person / multiPerson | click cell | `<PeoplePicker variant="naked">`(選人 picker) |
 | **boolean** | direct toggle | `<Checkbox>` 無 mode 切換 |
 | **url** | **hover cell → Pencil 按鈕(xs iconOnly tertiary)→ click** | `<Input>`(read 永遠是連結;cell click 走 anchor 開連結,**不**進 edit)|
 
@@ -442,11 +442,11 @@ Row drag + column reorder + TreeView 共用 `lib/drag-visual.ts`:source `opacity
 
 ### Row drag(Jira canonical,v3 已 ship)
 
-`enableRowDrag?: boolean` + `onRowReorder?: (sourceId, targetId, 'before' | 'after')`。Library:@dnd-kit/sortable + @dnd-kit/core。**必填 `getRowId`**(否則 dnd 用 row.index reorder 後錯位)。
+`enableRowDrag?: boolean` + `onRowReorder?: (sourceId, targetId, 'before' | 'after')`。Library:@dnd-kit/core(v15.0 Path B 用 `useDraggable` + `useDroppable`,不用 `@dnd-kit/sortable`)。**必填 `getRowId`**(否則 dnd 用 row.index reorder 後錯位)。
 
 - **Handle**:`<Button variant="tertiary" iconOnly size="xs" startIcon={GripVertical} />` 24px chip,所有 state(idle / hover / aria-disabled)統一 `bg-surface-raised`(border / shadow 已 retire,2026-05-12 per user「我有叫你加 elevation 嗎」),`absolute left-1 top-1/2 -translate-y-1/2` 4px inset 不佔 column 空間;**hover-reveal** `opacity-0 group-hover/row:opacity-100`。對齊 Jira backlog(@benchmark-unverified,M22)。Tertiary chip 非 ItemInlineAction 因透明背景撞 table border。
 - **Sort × Drag 互斥**:sort.length>0 → handle disabled+Tooltip。**Top-level only**(`row.depth>0` 不顯 handle)。**Position**:active vs over 視覺位置 → `'after'`/`'before'` 對齊 `arrayMove`。**Consumer-managed mutation**:`onRowReorder(sourceId, targetId, position)`,DS 不持 row order(Notion/Airtable/Linear)。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
-- **Virtualization 整合**(v3 2026-05-05):enableRowDrag 自動 `overscan≥10` + drag 期 freeze `measureElement` + `modifiers={[restrictToVerticalAxis]}` 鎖 Y 軸。**3-panel mirror sync**:各 region 共享 SortableContext.items 自然同 transform;handle 只 render primary region(left 優先 → center)避雙觸發。**Cross-parent drop 禁止**(已知 limit):nested 只同 top-level 重排,collisionDetection 過濾,顯 invalid signal。
+- **Virtualization 整合**(v3 2026-05-05):enableRowDrag 自動把 overscan 拉到 `Math.max(overscan, 5)` + drag 期 freeze `measureElement` + `modifiers={[snapToCursorModifier]}`(ghost top-left 對齊 cursor,不鎖軸)。**3-panel mirror sync**:各 region 對同 row id 各呼叫 `useDraggable` + `useDroppable`,mirror 自然取得相同 transform;handle 只 render primary region(left 優先 → center)避雙觸發。**Cross-parent drop 禁止**(已知 limit):nested 只同 top-level 重排,collisionDetection 過濾,顯 invalid signal。
 
 ---
 

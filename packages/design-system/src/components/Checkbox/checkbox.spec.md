@@ -147,7 +147,7 @@ Checkbox/Radio 不內建 label。Label 組合使用 `SelectionItem` 元件。
 
 | | 垂直 | 水平 |
 |---|---|---|
-| Item 間距 | 0（padding 處理） | 24px（gap-6） |
+| Item 間距 | 0（padding 處理） | 16px（gap-4，見 Orientation 段） |
 | Item padding | `py = (field-height - 1lh) / 2` | 同左 |
 | Label ↔ Description | 2px（`--item-gap-label-desc-reading` / `-reading-lg`,size-aware） | 同左 |
 | 單行高度 | = field-height（對齊 Input） | 同左 |

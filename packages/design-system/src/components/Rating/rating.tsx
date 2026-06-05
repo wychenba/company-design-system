@@ -155,7 +155,7 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
         // a11y(#30):role=slider 必有 accessible name(WAI-ARIA APG slider pattern)。
         //   Field 內 → 自動 aria-labelledby 指向 FieldLabel 的 id(fieldCtx.labelId,免填);
         //   Standalone → 仍需 consumer 傳 aria-label。對齊 TimePicker / DatePicker 同 canonical
-        //   (time-picker.tsx:308 / date-picker.tsx:512:aria-labelledby={fieldCtx?.labelId})。
+        //   (time-picker.tsx:313 / date-picker.tsx:514:aria-labelledby={fieldCtx?.labelId})。
         //   置於 {...props} 前,consumer 顯式傳的 aria-labelledby 仍可覆寫。
         aria-labelledby={isInteractive ? fieldCtx?.labelId : undefined}
         aria-valuenow={isInteractive ? currentValue : undefined}
@@ -288,7 +288,7 @@ function StarIcon({ Icon, sizePx, fillRatio, isHalf, interactive, onHover, onCli
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const ratingMeta = {
   component: 'Rating',
-  family: 4,
+  family: null, // self-contained primitive(對齊 spec frontmatter self-contained + body L24;非 Family 4)
   variants: {
 
   },

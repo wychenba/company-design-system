@@ -133,7 +133,7 @@ export const SurfaceHeader = React.forwardRef<
 
   // Padding-based(預設) — Dialog/Sheet 用 body-lg title (16/24)，自然撐 max(24 title, 24 button slot) = 24
   // → header = 24 + py-tight 12×2 = 48 chrome-header-height ✓ 穩定無需 min-h
-  // Popover 等輕量 chrome 走 PopoverHeader override(min-h-10 + py-2 = 40,內 24 匹配 button slot)
+  // Popover 等輕量 chrome 走 PopoverHeader override(`[--chrome-slot-h:1.25rem]` = 20 slot,無 min-h / 無 py override)：max(21 title, 20 slot) + py-tight 12×2 = 45（見上方 L57）
   //
   // withTabs=true(無 tabsSlot,backward compat):移除 border-b,consumer 自畫
   return (

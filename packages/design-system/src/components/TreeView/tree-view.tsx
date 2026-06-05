@@ -202,7 +202,7 @@ export interface TreeViewProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   defaultSelectedIds?: string[]
   /**
    * 啟用拖曳排序。預設 false。
-   * 啟用後每個 TreeItem 左側出現 drag handle(GripVertical icon),
+   * 啟用後整列可拖(Figma 風格,無 grip handle;靠 distance:5 區分 click vs drag),
    * 拖曳時顯示 drop indicator(before / after / inside 三種位置)。
    * Consumer 透過 `onDragEnd` callback 接收 reorder 事件,自行更新 data。
    */
@@ -762,8 +762,8 @@ export interface TreeItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>
    */
   actionsReveal?: false | "hover"
   /**
-   * 取代 chevron 的位置。用於 stepper 的 status indicator(●/○/✓)。
-   * 設定後 chevron 不渲染,改渲染 indicator。
+   * 取代 icon 的位置。用於 stepper 的 status indicator(●/○/✓)。
+   * 設定後 icon 不渲染、改渲染 indicator;chevron 永遠保留(expandable=旋轉箭頭 / leaf=placeholder)。
    */
   indicator?: React.ReactNode
   /** 是否停用 */

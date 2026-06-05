@@ -36,10 +36,10 @@ export const Overview: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>狀態</Th><Th>Indicator</Th><Th>Label</Th><Th>Connector(右側)</Th></tr></thead>
             <tbody>
-              <tr><Td>completed</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary" size="sm" /><span>filled primary + white check icon</span></span></Td><Td><TokenCell token="--foreground" display="foreground" /></Td><Td><TokenCell token="--primary" display="bg-primary" /></Td></tr>
+              <tr><Td>completed</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary" size="sm" /><span>filled primary + white check icon</span></span></Td><Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td><Td><TokenCell token="--primary" display="bg-primary" /></Td></tr>
               <tr><Td>current(= value)</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary" size="sm" /><span>filled primary + white number + ring</span></span></Td><Td><TokenCell token="--foreground" display="foreground" /></Td><Td><TokenCell token="--border" display="bg-border" /></Td></tr>
               <tr><Td>upcoming</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--muted" size="sm" /><span>filled muted + fg-disabled number</span></span></Td><Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td><Td><TokenCell token="--border" display="bg-border" /></Td></tr>
-              <tr><Td>error</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--error" size="sm" /><span>bg-error + white icon</span></span></Td><Td><TokenCell token="--error" display="error" /></Td><Td>—</Td></tr>
+              <tr><Td>error</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--error" size="sm" /><span>bg-error + white icon</span></span></Td><Td><TokenCell token="--error-text" display="error-text" /></Td><Td>—</Td></tr>
             </tbody>
           </table>
         </div>
@@ -186,7 +186,7 @@ export const ColorMatrix: Story = {
                 <Td><TokenCell token="--primary" /></Td>
                 <Td>—(同 bg)</Td>
                 <Td><TokenCell token="white" display="白色 Check icon" /></Td>
-                <Td><TokenCell token="--foreground" /></Td>
+                <Td><TokenCell token="--fg-secondary" /></Td>
                 <Td><TokenCell token="--primary" display="bg-primary" /></Td>
               </tr>
               <tr>
@@ -210,7 +210,7 @@ export const ColorMatrix: Story = {
                 <Td><TokenCell token="--error" /></Td>
                 <Td>—(同 bg)</Td>
                 <Td><TokenCell token="white" display="白色 X icon" /></Td>
-                <Td><TokenCell token="--error" /></Td>
+                <Td><TokenCell token="--error-text" /></Td>
                 <Td>—</Td>
               </tr>
             </tbody>

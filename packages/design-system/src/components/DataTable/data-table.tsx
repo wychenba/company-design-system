@@ -175,8 +175,8 @@ export interface DataTableProps<TData>
    *
    * **v2(2026-05-05)修正**:
    * - Virtualizer × transform:被拖 row 略過 `measureElement`(透過 SortableRowCtx 廣播 active id),避免 transform 干擾測量
-   * - 3-panel mirror sync:每 region 都呼叫 `useSortable({id})`(同 SortableContext 共用 state),mirror 自然取得相同 transform
-   * - Cross-parent drop:nested 全 row 進 SortableContext.items,自訂 collisionDetection 過濾出「同 parent siblings」;cross-parent over → 不觸發,handle cursor `not-allowed`
+   * - 3-panel mirror sync:每 region 對同 row id 各呼叫 `useDraggable` + `useDroppable`,mirror 自然取得相同 transform
+   * - Cross-parent drop:nested 全 row 各自 `useDroppable`,自訂 collisionDetection 過濾出「同 parent siblings」;cross-parent over → 不觸發,handle cursor `not-allowed`
    *
    * 詳 `data-table.spec.md`「L4 Row drag」段。
    */

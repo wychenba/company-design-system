@@ -1,6 +1,6 @@
 ---
 component: FileViewer
-family: 3
+family: composite
 variants: {}
 sizes: {}
 traits:
@@ -100,7 +100,7 @@ Family 的 canonical 規定的是「同用途同 layout」;FileViewer 用途(ful
 ```
 
 **分區決策**:
-- **Toolbar 高度 = `--chrome-header-height`**(md=48 / lg=56)——與 InfoPanel header 同高,視覺對齊;**code 實作消費 token**(`file-viewer.tsx:333` + `:459` 已 `h-[var(--chrome-header-height)]`),不硬寫 `h-14`。**跨家族 SSOT pointer**:FileViewer Toolbar + InfoPanel header 屬 **Chrome header(Fixed-h)家族**,border / padding / dismiss size / withTabs 跨家族契約 SSOT 詳 `patterns/header-canonical/header-canonical.spec.md`。Phase 2 ChromeHeader primitive migration 時把這段手刻 className 抽進 primitive(`<ChromeHeader>`),viewer 若需 lock lg density 走 `lockDensity="lg"` prop。
+- **Toolbar 高度 = `--chrome-header-height`**(md=48 / lg=56)——與 InfoPanel header 同高,視覺對齊;**code 已消費 `<ChromeHeader>` primitive**(`file-viewer.tsx:328` Toolbar + `:459` InfoPanel header,皆 `<ChromeHeader lockDensity="lg">`),高度由 primitive 內部套 `h-[var(--chrome-header-height)]`(`chrome-header.tsx`),tsx 不硬寫 height className。**跨家族 SSOT pointer**:FileViewer Toolbar + InfoPanel header 屬 **Chrome header(Fixed-h)家族**,border / padding / dismiss size / withTabs 跨家族契約 SSOT 詳 `patterns/header-canonical/header-canonical.spec.md`。viewer 需 lock lg density 走 `lockDensity="lg"` prop。
 - **Viewport `flex-1`**——填滿剩餘空間;InfoPanel 透過 `w-80 shrink-0` 從右側切出,不吃 viewport 自然寬
 - **Filmstrip 固定 h-24**——預留 thumb 64 + padding;只在 `showFilmstrip && files.length > 1` 時顯示
 - **Prev/Next arrows 絕對定位**——避免 layout shift,只在 `files.length > 1` 渲染

@@ -92,10 +92,10 @@ export const badgeMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'],
   tokens: {
     bg: ['bg-info', 'bg-info-subtle', 'bg-notification', 'bg-secondary'],
-    fg: ['text-fg-muted', 'text-info-text'],
+    fg: ['text-fg-muted', 'text-info-text', 'text-on-emphasis'],
     ring: [],
   },
   defaultVariant: 'low',

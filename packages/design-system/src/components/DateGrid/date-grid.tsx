@@ -32,7 +32,7 @@ import { Button } from '@/design-system/components/Button/button'
  * | outside(非本月) | text-fg-muted(neutral-7) | [&>button]:text-fg-muted |
  * | selected / range 端點 | 藍底白字圓 | [&>button]:bg-primary [&>button]:text-on-emphasis rounded-full |
  * | range middle | 灰底矩形 track(bg-neutral-selected = neutral-2),**高度 = cell 高度**(28×28 @ md) | before pseudo: `inset-y-0 -inset-x-[2px]` |
- * | range start/end 半圓 track | 左/右半圓 + selected 圓疊在上,**圓半徑 = button 半徑** | before pseudo: `rounded-l/r-full` 加 `left-0.5` / `right-0.5` |
+ * | range start/end 半圓 track | 左/右半圓 + selected 圓疊在上,**圓半徑 = button 半徑** | before pseudo: `rounded-l/r-full` + start `left-0 -right-[2px]` / end `-left-[2px] right-0`(向 middle 外擴 2px bridge gap)|
  * | hover(未選中) | 藍圈 outline | hover:ring-[1.5px] hover:ring-primary |
  *
  * ── Range track 高度 canonical(2026-05-03 v6,M8 4 家對照)──
@@ -68,7 +68,7 @@ const DateGrid = React.forwardRef<HTMLDivElement, DateGridProps>(function DateGr
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      // navLayout="around" = 每個 month caption 兩側渲染 prev / next 按鈕(inline row)
+      // navLayout="around" = prev 渲染在首月(displayIndex===0)caption 左、next 渲染在末月(displayIndex===numberOfMonths-1)caption 右;單月時兩鍵同 caption 兩側
       // 取代先前 absolute 定位覆蓋整個 months 容器導致箭頭垂直置中於中段的 bug
       navLayout="around"
       // p-3 = 12px 四邊對稱(canonical 不可動)

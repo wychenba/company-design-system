@@ -1,6 +1,6 @@
 ---
 component: Rating
-family: 4
+family: self-contained
 variants: {}
 sizes: {}
 traits:

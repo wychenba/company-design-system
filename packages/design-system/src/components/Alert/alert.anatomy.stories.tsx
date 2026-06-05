@@ -209,7 +209,7 @@ export const StateBehavior: Story = {
               <tr><Td>default</Td><Td>Button xs iconOnly(24×24),X icon 16,fg-muted</Td><Td mono>text-fg-muted(`dismiss` override)</Td></tr>
               <tr><Td>hover</Td><Td>Button bg 套 neutral-hover,icon 升 foreground</Td><Td mono>bg-neutral-hover / text-foreground</Td></tr>
               <tr><Td>focus</Td><Td>2px ring(鍵盤導航)</Td><Td mono>ring-ring ring-offset-1</Td></tr>
-              <tr><Td>solid appearance</Td><Td>icon 用白字(繼承 data-theme foreground)</Td><Td mono>text-foreground(inverse)</Td></tr>
+              <tr><Td>solid appearance</Td><Td>icon 隨 variant 的 data-theme:info / success / error(dark theme)白字,warning(light theme)深字</Td><Td mono>text-foreground(隨 data-theme 翻轉)</Td></tr>
             </tbody>
           </table>
         </div>

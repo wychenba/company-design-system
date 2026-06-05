@@ -646,7 +646,7 @@ export const SizeMatrix: Story = {
                 <Td>Filmstrip 高</Td>
                 <Td mono>h-24(96px)</Td>
                 <Td>Google Photos 96 / Dropbox 88</Td>
-                <Td>thumb 64 + padding 2×16 = 96</Td>
+                <Td>固定 96(對齊 Google Photos 96 benchmark);thumb 64 + py-2(16px)留白</Td>
               </tr>
               <tr>
                 <Td>Filmstrip thumb</Td>

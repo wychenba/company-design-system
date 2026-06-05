@@ -458,18 +458,19 @@ export const ColorMatrix = {
 
       {/* Button pairing guidance */}
       <div className="flex flex-col gap-3">
-        <span className="text-caption font-medium text-fg-secondary">按鈕搭配規則</span>
-        <Desc>Badge 層級應匹配容器視覺重量。深色按鈕只適合 critical；低層級 badge 放在高視覺重量按鈕上是設計矛盾。</Desc>
+        <span className="text-caption font-medium text-fg-secondary">容器 Contrast floor 對照</span>
+        <Desc>容器 bg 決定 badge 的 contrast floor（可見度下限）——badge 至少要到此層級才看得清。Floor 是下限不是上限：semantic 永遠可往上升（floor 以上的所有層級都合法）。critical 的紅白對比在任何底色都清楚，不受 floor 限制。</Desc>
         <div className="overflow-x-auto">
           <table className="border-collapse text-caption">
-            <thead><tr><Th>按鈕 variant</Th><Th>適合的 Badge 層級</Th></tr></thead>
+            <thead><tr><Th>容器</Th><Th>Contrast floor（最低層級）</Th></tr></thead>
             <tbody>
               {[
-                ['primary / checked / secondary+danger', 'critical'],
-                ['secondary / tertiary', 'critical、high'],
-                ['text', '全部'],
-              ].map(([btn, badge]) => (
-                <tr key={btn}><Td>{btn}</Td><Td>{badge}</Td></tr>
+                ['text / tab item / icon button（透明 / 極淺）', 'low'],
+                ['secondary / tertiary（淺底帶邊框）', 'low'],
+                ['checked（pressed，淺灰 / subtle 底）', 'low / medium'],
+                ['primary / secondary+danger（飽和深底）', 'high'],
+              ].map(([container, floor]) => (
+                <tr key={container}><Td>{container}</Td><Td>{floor}</Td></tr>
               ))}
             </tbody>
           </table>

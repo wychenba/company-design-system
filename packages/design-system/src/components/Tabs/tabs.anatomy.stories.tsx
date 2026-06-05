@@ -123,7 +123,7 @@ export const Inspector: Story = {
     overflow: {
       control: 'radio',
       options: ['none', 'scroll', 'menu'],
-      description: 'none★default / scroll=水平捲動 + fade mask / menu=⋯ dropdown',
+      description: 'none★default / scroll=水平捲動 + fade mask / menu=⌄ navigator dropdown(列全部 tab,全 trigger 仍可見)',
     },
     value: {
       control: 'radio',
@@ -276,10 +276,10 @@ export const ColorMatrix: Story = {
       </div>
 
       <div>
-        <H3>Badge suffix 色彩(跟隨 selected 狀態)</H3>
+        <H3>Badge suffix 色彩(固定 variant 色,不隨 selected 變)</H3>
         <Desc>
-          Badge 作為 suffix 時,未選狀態保持 Badge 原色(low / high variant);selected 時跟著
-          trigger 文字色變化,視覺重量統一。
+          Badge 作為 suffix 時,顏色固定由其 variant token 決定(low / high),selected 與否
+          都維持 Badge 原色——trigger 的 data-[state=active] 文字色只作用在 trigger 本身,不傳遞到 Badge。
         </Desc>
         <div className="border border-border rounded-lg p-4">
           <Tabs defaultValue="members">
@@ -351,8 +351,8 @@ export const OverflowMatrix: Story = {
       </div>
 
       <div>
-        <H3>overflow="menu" — 隱藏溢出 + DropdownMenu trigger</H3>
-        <Desc>Tabs 超出容器時,溢出部分收入 DropdownMenu(由 OverflowMenuTriggerButton 觸發),避免 scroll 互動。適合 tab 數量較多但使用者不常切換到後面的場景。</Desc>
+        <H3>overflow="menu" — 全部 tab 一直可見 + ⌄ navigator dropdown(列全部 tab 快速跳轉)</H3>
+        <Desc>Tabs 超出容器時,右側出現 ⌄ navigator(OverflowMenuTriggerButton),點開 DropdownMenu 列出全部 tab 供快速跳轉;底層仍是真實捲動容器(全 trigger 可見可捲),點選後該 tab scrollIntoView 至視圖中央。適合 tab 數量較多、需快速跳轉到任一 tab 的場景。</Desc>
         {/* 2026-05-18 fix(user 抓 overflow demo 沒秀真實溢出):max-w-md (448px) 太寬
             8 個短 Chinese tab 加總 < 448 不觸發 overflow。改 280px 強制觸發 + 視覺可見。*/}
         <div className="border border-border rounded-lg p-4 max-w-[280px]">

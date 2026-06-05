@@ -241,7 +241,7 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", '顯示模式，disabled/readOnly 原生屬性會自動覆蓋'],
+                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", 'mode 未顯式指定時，由 native readOnly/disabled fallback 推導（最低優先序；顯式 mode prop / fieldCtx.mode 勝出）'],
                 ['variant', "'default' | 'bare'", "'default'", '視覺 chrome（正交於 mode）；bare = 透明、hover/focus 才出現 border，用於 toolbar inline editing'],
                 ['error', 'boolean', 'false', '紅色邊框 + aria-invalid，僅 edit 模式生效'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '高度與字體，與 Button 共用 field-height token'],

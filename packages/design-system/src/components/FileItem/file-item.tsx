@@ -335,9 +335,9 @@ export const fileItemMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'],
   tokens: {
-    bg: ['bg-neutral-hover', 'bg-secondary', 'bg-surface'],
+    bg: ['bg-secondary', 'bg-surface'],
     fg: ['text-fg-muted', 'text-fg-secondary'],
     ring: [],
   },

@@ -104,10 +104,10 @@ export const emptyMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default', 'disabled'],
   tokens: {
     bg: [],
-    fg: ['text-fg-muted', 'text-fg-secondary', 'text-foreground'],
+    fg: ['text-fg-muted', 'text-fg-secondary', 'text-foreground', 'text-fg-disabled'],
     ring: [],
   },
 } as const

@@ -146,7 +146,7 @@ export const progressBarMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'],
   tokens: {
     bg: ['bg-error', 'bg-primary', 'bg-secondary', 'bg-success'],
     fg: ['text-foreground'],

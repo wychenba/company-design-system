@@ -865,7 +865,7 @@ export const StateBehavior = {
         {/* Tag dismiss */}
         <div className="flex flex-col gap-3">
           <span className="text-caption font-medium text-fg-secondary">個別移除（Tag dismiss）</span>
-          <Desc>每個 Tag 自帶 dismiss 按鈕（X），點擊移除該選項。select 下拉只顯示未選中的選項，已選中的不重複出現。</Desc>
+          <Desc>每個 Tag 自帶 dismiss 按鈕（X），點擊移除該選項。手機 / 觸控裝置走原生 select 時下拉只顯示未選中的選項；桌機（預設）走自建浮層選單則已選項仍留在清單中並以打勾標示。</Desc>
           <div className="flex items-center gap-4">
             <Combobox
               options={categoryOptions}
@@ -891,13 +891,14 @@ export const StateBehavior = {
         {/* Select behavior */}
         <div className="flex flex-col gap-3">
           <span className="text-caption font-medium text-fg-secondary">新增選擇</span>
-          <Desc>原生 select 只顯示未選中的選項。有值時 select 以 absolute inset-0 overlay 覆蓋整個 field，opacity:0 不可見。點擊 field 任何位置都會觸發 select showPicker。</Desc>
+          <Desc>新增選擇的機制依裝置分兩條路徑。桌機（預設，非觸控）走自建浮層選單（SelectMenu）：點擊欄位開啟 popover，已選項仍留在清單中並以打勾標示，再點一次即取消。手機 / 觸控裝置改走隱藏的原生 select：只顯示未選中的選項，有值時 select 以 absolute inset-0 overlay 覆蓋整個 field、opacity:0 不可見，點擊欄位任何位置都會觸發原生 picker（showPicker）。</Desc>
           <div className="flex flex-col gap-1 text-[11px] text-fg-muted">
-            <span>select overlay: absolute inset-0 · w-full h-full · opacity-0 · z-0</span>
-            <span>Tags 區域: relative z-10（蓋在 select 上方）</span>
+            <span>桌機（預設）: 點擊欄位 → 開 SelectMenu popover，已選項打勾保留，toggle 取消</span>
+            <span>手機 / 觸控 — select overlay: absolute inset-0 · w-full h-full · opacity-0 · z-0</span>
+            <span>手機 / 觸控 — Tags 區域: relative z-10（蓋在 select 上方）</span>
             <span>chevron / clear: relative z-10 · pointer-events-auto</span>
-            <span>Tag 本體: onClick → selectRef.showPicker()（穿透到 select）</span>
-            <span>全部選完 → selectDropdown = null（沒有未選中的選項）</span>
+            <span>手機 / 觸控 — Tag 本體: onClick → selectRef.showPicker()（穿透到原生 select）</span>
+            <span>手機 / 觸控 — 全部選完 → selectDropdown = null（沒有未選中的選項）</span>
           </div>
         </div>
       </div>

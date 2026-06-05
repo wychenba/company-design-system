@@ -181,7 +181,7 @@ block / inline 是**元件固有性質**(RadioGroup 永遠 block,Input 永遠 in
 ;(RadioGroup as unknown as { fieldLayout: 'block' }).fieldLayout = 'block'
 ```
 
-Field render 時讀第一個 control child 的 `type.fieldLayout`,缺則 `'inline'`。Consumer 完全無感(`<Field><RadioGroup>...</RadioGroup></Field>` 自動切 block)。
+Field render 時迭代**全部** control child 的 `type.fieldLayout`,**任一**宣告為 `'block'` 即整個 area 切 block(first-block-wins);全部缺宣告則 `'inline'`。Consumer 完全無感(`<Field><RadioGroup>...</RadioGroup></Field>` 自動切 block)。
 
 **為什麼這機制**:Consumer 傳 prop 易忘 → 歪;Field 內寫死白名單 → 跟 primitive 名稱耦合。Primitive 自宣告 = Field 0 耦合,新增 block primitive 只在自己檔案加 1 行。
 
@@ -202,7 +202,7 @@ Field 透過 Context 暴露以下狀態給子元件（Primitive 可以透過 `us
 | `id` | FieldLabel 自動 `htmlFor`、Input 自動 `id` |
 | `descriptionId` | FieldDescription 的 id，Input 自動 `aria-describedby` |
 | `errorId` | FieldError 的 id，Input 自動 `aria-errormessage` |
-| `mode` | `edit` / `readonly` / `disabled`，Control 決定自己的視覺形態 |
+| `mode` | `edit` / `display` / `readonly` / `disabled`，Control 決定自己的視覺形態 |
 | `disabled` | Control 顯示 disabled 樣式 |
 | `required` | FieldLabel 自動渲染 `*`；Input 自動 `aria-required` |
 | `invalid` | Control 顯示 error 邊框；Input 自動 `aria-invalid` |
@@ -274,7 +274,7 @@ Field 透過 Context 暴露以下狀態給子元件（Primitive 可以透過 `us
 </FieldGroup>
 ```
 
-gap 三個語意層級(具體 gap token 見 `field.tsx` cva):
+gap 三個語意層級(具體 gap class map 見 `field.tsx` FieldGroup,`compact`→`gap-3` / `normal`→`gap-4` / `loose`→`gap-6`):
 
 | gap | 用途 |
 |---|---|

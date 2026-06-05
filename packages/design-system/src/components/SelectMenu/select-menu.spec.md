@@ -82,10 +82,10 @@ Popover（浮動容器，handle 展開 / 定位）
 
 ## 單選 vs 多選
 
-透過 `value` / `onValueChange` 的類型決定：
+透過 `multiple` prop 決定（`value` 型別只被 normalize 成內部 `selectedValues`，不參與模式判斷）：
 
-- **單選**：`value: string | null`，選中後立即關閉浮層
-- **多選**：`value: string[]`，選中不關閉，可繼續選（footer 可顯示全選 checkbox）
+- **單選**（`multiple={false}`，預設）：`value: string | null`，選中後立即關閉浮層
+- **多選**（`multiple={true}`）：`value: string[]`，選中不關閉，可繼續選（footer 可顯示全選 checkbox）
 
 ---
 
@@ -210,7 +210,7 @@ SelectMenu 是 **composite**(Popover trigger + Command search + 滾動 MenuItem 
 - 字母鍵 — type-ahead 過濾(search 模式)
 - Esc — 關閉
 
-**Focus**:menu 開啟時 active-descendant 虛擬焦點落在第一個 / 已選 option(`aria-activedescendant` 高亮,非 DOM focus;cmdk listbox 模式);searchable 時 DOM focus 給搜尋 input,非 searchable 時落在 content 容器。option 為 `role="option"` 無 tabIndex,DOM focus 不落在 option 上。關閉時 focus 回 trigger。
+**Focus**:menu 開啟時 active-descendant 虛擬焦點落在第一個 / 已選 option(`aria-activedescendant` 高亮,非 DOM focus;cmdk listbox 模式);searchable 時 DOM focus 給搜尋 input,非 searchable 時 DOM focus 移到 cmdk 的 `[cmdk-root]`(`Command` 元素,見 `handleNonSearchableAutoFocus`),讓 cmdk 內建方向鍵 / Enter / Home / End 導覽生效。option 為 `role="option"` 無 tabIndex,DOM focus 不落在 option 上。關閉時 focus 回 trigger。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

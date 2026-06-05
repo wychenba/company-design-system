@@ -68,7 +68,7 @@ export const hoverCardMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'],
   tokens: {
     bg: ['bg-surface-raised'],
     fg: ['--foreground'],

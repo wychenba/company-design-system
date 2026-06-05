@@ -123,7 +123,7 @@ interface TabsListProps
    * Overflow 處理模式。詳見 tabs.spec.md 的 overflow 段。
    *   'none'   ★ 預設，不處理，triggers 溢出父容器（適用 tabs 數量可控的情境）
    *   'scroll' 單行橫向滾動 + 邊緣 fade mask（Material / Polaris / iOS 作法）
-   *   'menu'   塞不下收進 "⋯" dropdown，所有 triggers 仍在 DOM 保留 Radix a11y
+   *   'menu'   show-all navigator——全部 triggers 一直顯示在底層 overflow-x-auto 捲動容器內,
    *            （Ant Design / Atlassian 作法）
    */
   overflow?: TabsOverflow
@@ -234,7 +234,7 @@ ScrollTabsList.displayName = 'ScrollTabsList'
 // Show-all navigator pattern (Chrome tab dropdown / VS Code editor tabs / Discord channel jumper):
 //   - Menu 永遠顯示全部 tabs,active 的用 checked 標記 (單選語意)
 //   - 點 menu item = onValueChange + scrollIntoView(center),把該 tab 捲到視圖中央
-//   - Menu 內容穩定,跟 scroll 位置無關,使用者對「⋯ = navigator」的直覺一致
+//   - Menu 內容穩定,跟 scroll 位置無關,使用者對「⌄ = navigator」的直覺一致
 //
 // 為什麼底層仍是 overflow-x-auto 而非 overflow-hidden:
 //   - scrollIntoView 需要真實 scroll 容器

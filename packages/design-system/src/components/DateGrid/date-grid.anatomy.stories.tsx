@@ -493,7 +493,7 @@ export const StateBehavior = {
               />
             </div>
             <p className="text-[11px] text-fg-muted max-w-[260px] leading-relaxed">
-              點擊設定唯一選擇。再次點已選日 = 保持(預設);點新日取代舊選。DatePicker 使用此 mode。
+              點擊設定唯一選擇。再次點已選日 = 清除選取(react-day-picker v9 single mode 預設 toggle-off,未傳 required);點新日取代舊選。DatePicker 使用此 mode。
             </p>
           </div>
 

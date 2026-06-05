@@ -53,7 +53,7 @@ item-layout 4-slot：
 ```
 
 - Icon: 16px，`h-[1lh]` inline 對齊 first line
-- Dismiss X: `<Button iconOnly dismiss size="xs" />` — chrome corner action group region(Cat 3)。xs 是 **Notification banner family canonical**(Notice / Alert / Toast inherit):ephemeral banner `px-4 py-3` 固定不隨 density,dismiss 邊角小 affordance 輕量不搶眼。詳見 `patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical — 三家族分類」+ `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical — X close only」
+- Dismiss X: `<Button iconOnly dismiss size="xs" />` — chrome corner action group region(Cat 3)。xs 是 **Notification banner family canonical**(Notice / Alert / Toast inherit):ephemeral banner `px-4 py-3` 固定不隨 density,dismiss 邊角小 affordance 輕量不搶眼。詳見 `patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical」(overlay header 走 sm native + 負 margin trick;只有 notification banner family 用 xs)+ `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical — X close only」
 - endContent: 通常放 `<Button variant="tertiary" size="xs">`
 
 ## Variant
@@ -113,7 +113,7 @@ Notice 是 **Toast / Alert 共用的 layout primitive**,刻意不擁有尺寸與
 
 ## 邊界案例
 
-- **Disabled(dismiss button)**:Notice 本身不擁有 disabled state(internal primitive,無互動);內嵌的 `<Button iconOnly dismiss size="xs" />` 自動繼承 Button disabled 視覺(`text-fg-disabled` + `cursor-not-allowed`)。Consumer(Alert / Toast)若需 disable dismiss,應透過 consumer-level prop pass-through。
+- **Disabled(dismiss button)**:Notice 本身不擁有 disabled state(internal primitive,無互動);內嵌的 `<Button iconOnly dismiss size="xs" />` 在 disabled context 內會自動繼承 Button disabled 視覺(`text-fg-disabled` + `cursor-not-allowed`)。Notice **不提供 disable dismiss 的 API**——`...props` 只 spread 到 root `<div>`,dismiss `<Button>` 不接收 / 不 forward 任何 consumer disabled prop,無 consumer-level prop pass-through 可停用 dismiss。對齊消費者 canonical(`../Alert/alert.spec.md`「Disabled(dismiss button)」:banner dismiss 恆可用,對齊 Polaris / Material Banner「通知關閉鈕應永遠可按」);若需防止 close action(API in-flight)被雙擊,consumer 在 `onDismiss` 內自行 debounce / 加上層鎖,不在 UI 層暴露 disabled 透傳。
 - **Loading**:Notice 非 async surface,無 loading state。Body 內若 consumer 注入 CTA Button,該 Button 自行處理 loading。
 - **Empty**:Notice 的 `title` 為必填(消費合約),`description` 選填;layout 至少 1 行 title 內容。`neutral` variant 不渲 status icon 時即為 title-only icon-less 形態(見 `NeutralTitleOnly` story),仍合法 render。
 - **Icon-only / variant=neutral**:`neutral` variant 不渲 status icon,layout 自動收斂為 `[title + description?]  [endContent?]  [dismiss X?]` 三 slot。

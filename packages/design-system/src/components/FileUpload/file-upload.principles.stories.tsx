@@ -90,13 +90,13 @@ export const UsageGuidance: Story = {
 
       <Rule
         title="❌ 不加 scale / shadow 等裝飾性 drag-over 信號"
-        note="drag-over 只用顏色(border-primary + bg-primary-subtle)傳達狀態。加 scale 會讓區塊在拖放瞬間晃動、使用者滑鼠與 drop target 錯位;加 shadow 和元件 elevation 體系衝突。"
+        note="drag-over 只用邊框顏色(border-primary,底維持 surface 不變 bg)傳達狀態。加 scale 會讓區塊在拖放瞬間晃動、使用者滑鼠與 drop target 錯位;加 shadow 和元件 elevation 體系衝突。"
       >
         <div className="flex flex-col gap-2">
-          <div className="border-2 border-dashed border-primary bg-primary-subtle rounded-md px-6 py-10 text-center text-caption text-fg-muted">
-            ✓ 僅改顏色(dashed primary + primary-subtle)
+          <div className="border-2 border-dashed border-primary bg-surface rounded-md px-6 py-10 text-center text-caption text-fg-muted">
+            ✓ 僅改邊框顏色(dashed primary,底維持 surface)
           </div>
-          <div className="border-2 border-dashed border-primary bg-primary-subtle rounded-md px-6 py-10 text-center text-caption text-fg-muted scale-105 shadow-[var(--elevation-200)]">
+          <div className="border-2 border-dashed border-primary bg-surface rounded-md px-6 py-10 text-center text-caption text-fg-muted scale-105 shadow-[var(--elevation-200)]">
             ✗ scale + shadow — 視覺噪音,與 elevation 系統衝突
           </div>
         </div>

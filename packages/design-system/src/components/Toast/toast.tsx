@@ -109,7 +109,7 @@ Toaster.displayName = 'Toaster'
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const toastMeta = {
   component: 'Toast',
-  family: null, // non-family composite / overlay / layout
+  family: 2, // Family 2(List item layout)— 透過 Notice 繼承,對齊 toast.spec.md frontmatter L3 + L39
   variants: {
     neutral: { when: '非狀態通知;一般 announcement / tip' },
     info: { when: '資訊性提示(新版本 / 同步完成)' },

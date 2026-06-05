@@ -225,7 +225,7 @@ export const Overview = {
       {/* Variant catalog */}
       <div className="flex flex-col gap-3">
         <H3>Variant 一覽</H3>
-        <Desc>以色名命名，語義由消費端決定。前五色有對應語義 token，後四色為分類用途。</Desc>
+        <Desc>以色名命名（色名即色相），語義由消費端內容與上下文決定。13 色（neutral + 12 categorical 色相）皆直接消費 primitive token（`--color-{hue}-*`），不對應語義 token。</Desc>
         <div className="flex flex-col gap-2">
           {VARIANTS.map((v) => (
             <div key={v} className="flex items-center gap-4">
@@ -244,7 +244,7 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['color', "'neutral'|'blue'|'red'|'green'|'yellow'|'turquoise'|'purple'|'magenta'|'indigo'", "'neutral'", '色彩 variant，語義由消費端決定'],
+                ['color', "'neutral'|'blue'|'green'|'deep-orange'|'yellow'|'red'|'orange'|'amber'|'lime'|'turquoise'|'indigo'|'purple'|'magenta'", "'neutral'", '色相 variant，語義由消費端內容決定（13 色 = neutral + 12 categorical 色相）'],
                 ['size', "'sm'|'md'|'lg'", "'md'", '尺寸（lg = md alias，子元件補齊原則）'],
                 ['icon', 'LucideIcon', '—', '左側 icon，統一 16px。與 avatar 互斥'],
                 ['avatar', 'ReactNode', '—', '左側 avatar（16px 圓形）。與 icon 互斥'],
@@ -389,7 +389,7 @@ const InspectorInner = () => {
             <PropRow label="高度" dot={Z.dim.text}><TkVal token={size === 'sm' ? 'h-5' : 'h-6'} value={s.height} /></PropRow>
             <PropRow label="Tag 內距" dot={Z.pad.text}><TkVal token={s.tagPx} value={`${s.tagPxVal}px`} /></PropRow>
             <PropRow label="Text 內距" dot={Z.textPx.text}><TkVal token={s.textPx} value={`${s.textPxVal}px`} /></PropRow>
-            <PropRow label="Max Width"><TkVal token="max-w-40" value="160px" /></PropRow>
+            <PropRow label="Max Width"><TkVal token="min(var(--combobox-tag-area-inline-size, 10rem), 10rem)" value="預設 cap 160px（Combobox 窄格可注入更小有效上限）" /></PropRow>
             <PropRow label="Icon 尺寸" dot={Z.icon.text}>16px（統一不分 size）</PropRow>
             {withDismiss && <PropRow label="Dismiss" dot={Z.dismiss.text}>16px icon · 18px hover 背景</PropRow>}
           </div>
@@ -406,7 +406,7 @@ const InspectorInner = () => {
             <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Style</span></div>
             <PropRow label="Radius"><TkVal token="rounded-md" value="4px" /></PropRow>
             <PropRow label="Border"><TkVal token="border-transparent" value="1px solid transparent" /></PropRow>
-            <PropRow label="Truncate"><TkVal token="truncate" value="超過 max-w-40 截斷 + tooltip" /></PropRow>
+            <PropRow label="Truncate"><TkVal token="truncate" value="超過寬度上限（預設 160px）截斷 + tooltip" /></PropRow>
           </div>
         </div>
       </div>

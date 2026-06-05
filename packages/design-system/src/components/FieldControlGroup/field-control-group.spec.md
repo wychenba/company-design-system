@@ -14,7 +14,7 @@ benchmark:
 
 <!-- @benchmark-cited: D5 retrofit 2026-05-18 — Ant Space.Compact + Bootstrap input-group + Chakra Group claims verified via WebFetch + inline URL. -->
 
-# FieldControlGroup spec
+# FieldControlGroup 設計原則
 
 ## 定位
 

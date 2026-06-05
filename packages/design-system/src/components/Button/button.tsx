@@ -30,7 +30,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/compone
  *   僅 secondary / tertiary / text 三個 variant 支援 toggle 視覺：
  *     - secondary + pressed → primary-subtle 底、primary 字、透明邊框
  *     - tertiary  + pressed → primary-subtle 底、primary 字、透明邊框（同 secondary 按下視覺）
- *     - text      + pressed → neutral-selected 底，hover 反向變淺，:active 深一階
+ *     - text      + pressed → primary-subtle 底、primary 字、透明邊框（預設 pressedTone='emphasis'，同 secondary/tertiary 按下視覺）；pressedTone='neutral' 時才走 neutral-selected 灰底
  *   primary / link 傳入 pressed 無視覺效果（語意不符）
  *
  * ── Sizes（預設 md）──

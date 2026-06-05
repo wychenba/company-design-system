@@ -284,7 +284,7 @@ SegmentedControlItem.displayName = 'SegmentedControlItem'
 // SegmentedControl 無語意 variant(選中 vs 未選 是 state 不是 variant)— 與 Button.variant 刻意不同(spec「與 Button 的血緣」段)
 export const segmentedControlMeta = {
   component: 'SegmentedControl',
-  family: null, // non-family composite / overlay / layout
+  family: 3, // Family 3(Pill Layout)— 對齊 spec frontmatter family:3 + body L42
   variants: {},
   sizes: {
     xs: { fieldHeight: 24, typography: 'caption', iconSize: 16, purpose: 'row-embedded inline action / DataTable inline filter' },

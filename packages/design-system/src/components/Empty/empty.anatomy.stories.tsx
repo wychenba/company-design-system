@@ -5,8 +5,10 @@
 //     state 色彩。
 //   SizeMatrix N/A — 不提供 size prop;由 slot 組合決定外觀,SlotCombinations
 //     已涵蓋 4 種強度從 minimal 到 full。
-//   StateBehavior N/A — Empty 是純展示 layout,本身無 hover / focus / disabled。
-//     互動由 action slot 的 Button 提供,屬 Button 元件範疇。
+//   StateBehavior N/A — Empty 是純展示 layout,本身無 hover / focus / active /
+//     selected 互動狀態。互動由 action slot 的 Button 提供,屬 Button 元件範疇。
+//     例外:disabled context state(disabled prop,2026-06-03 加)非互動但元件支援——
+//     title / description / icon glyph 轉 text-fg-disabled(供 FileUpload disabled 消費)。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Inbox, Search, FileText, FolderOpen, Bell, Users } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -83,6 +85,7 @@ export const Overview: Story = {
                 ['title', 'string', '—', '主要標題(16px medium)'],
                 ['description', 'string', '必填(預設唯一 slot)', '說明文字(14px;lg RowSizeContext 子樹內 16px · fg-secondary)'],
                 ['action', 'ReactNode', '—', 'CTA button / 操作區'],
+                ['disabled', 'boolean', 'false', 'disabled context（FileUpload disabled 等情境）— title / description / icon glyph 轉 fg-disabled'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}

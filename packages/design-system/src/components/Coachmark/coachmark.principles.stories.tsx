@@ -249,11 +249,11 @@ export const MultiStepBestPracticesRule: Story = {
       </Rule>
 
       <Rule
-        title="永遠提供 Skip — 尊重退出意願"
-        note="沒 Skip 的 onboarding = 綁架使用者。使用者的本能是「我想自己試試」,強迫看完反而留下負面印象。Skip 是對自主權的尊重,真正有用的 tour 使用者會主動看完"
+        title="永遠提供退出機制 — 尊重退出意願"
+        note="沒退出機制的 onboarding = 綁架使用者。使用者的本能是「我想自己試試」,強迫看完反而留下負面印象。退出機制是對自主權的尊重,真正有用的 tour 使用者會主動看完"
       >
-        <Label warn>❌ 隱藏 Skip、只提供 Next — user 會找關閉方式或直接離開產品</Label>
-        <Label>✅ Skip 放在中間位置(Previous / Skip / Next),tertiary variant 不搶焦點但隨時可用</Label>
+        <Label warn>❌ 完全拿掉退出路徑(連 Esc / header Close 都禁用)— user 會直接離開產品</Label>
+        <Label>✅ 第一步提供 Skip(tertiary 不搶焦點);step 2+ 退出走 Esc / header Close(有 onPrev 時 Skip 自動隱藏,見 CTA 語義表)</Label>
       </Rule>
 
       <Rule
@@ -282,7 +282,7 @@ export const MultiStepBestPracticesRule: Story = {
 
       <Rule
         title="Footer 順序 — Previous / Skip / Next"
-        note="對齊 Ant Tour / Intercom convention:Previous 最左(回退,視覺權重低)、Skip 中間(退出,tertiary)、Next 最右(推進,primary)。語意由左往右「回退 / 退出 / 推進」,符合使用者的閱讀動線"
+        note="對齊 Ant Tour / Intercom convention 的左→右位置順序:Previous 最左(回退,視覺權重低)、Skip 中間(退出,tertiary)、Next 最右(推進,primary)。此為各按鈕『出現時』的排列位置,非三鍵同時 render — Skip 僅第一步顯示、Previous 第 2+ 步顯示,兩者永不共存(見 CTA 語義表)"
       >
         <Label>Previous 第 2+ 步才出現;第 1 步只有 Skip / Next</Label>
       </Rule>

@@ -131,7 +131,7 @@ Form validation 的 ARIA / 鍵盤行為(對齊 WCAG 3.3.1 Error Identification +
 - **Error message ARIA**:Field error 容器 `id="field-{name}-error"`,Input 設 `aria-describedby="field-{name}-error"` + `aria-invalid="true"`;SR 在 focus field 時自動讀「{label}, {error message}」
 - **Submit error scroll**:submit 失敗後,focus 自動 jump 到第一個 invalid field(`field.focus()` + `scrollIntoView({block: 'center'})`);對齊 Material / Atlassian 慣例 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **Error live region**:跨欄位 / async error 用 `aria-live="polite"` 容器宣告 — SR 在空閒時讀出,不中斷使用者打字
-- **Required indicator**:label 的 `*` 必加 `aria-label="required"` 或 hidden span(SR 朗讀「required」),純視覺 `*` SR 讀「asterisk」語義不清
+- **Required indicator**:label 的 `*` 為純視覺、對讀屏隱藏(`aria-hidden="true"`,field.tsx:392);required 語意由內部輸入控件的 `aria-required`(input.tsx:192)承擔,避免讀屏讀出「asterisk」語義不清
 - **Color-only error 警告**:error border 紅色之外必有 icon 或文字(WCAG 1.4.1 不僅靠顏色)— DS error variant 自動 prefix `<AlertCircle/>` icon
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)

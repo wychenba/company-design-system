@@ -130,7 +130,7 @@ export const descriptionListMeta = {
   sizes: {
 
   },
-  states: [], // 純唯讀 dl/dt/dd,無 hover/active/focus/disabled 互動 state(spec L182-189「為何無 Inspector/ColorMatrix」)
+  states: [], // 純唯讀 dl/dt/dd,無 hover/active/focus/disabled 互動 state(spec L181-189「為何無 ColorMatrix / SizeMatrix」)
   tokens: {
     bg: [],
     fg: ['text-fg-secondary', 'text-foreground'],

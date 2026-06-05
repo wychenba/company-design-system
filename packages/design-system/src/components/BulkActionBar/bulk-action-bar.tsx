@@ -7,9 +7,9 @@ import { ButtonDivider } from '@/design-system/components/Button/button-group'
 // ── 消費的 SSOT ───────────────────────────────────────────────────────────────
 // - bulk-action-bar.spec.md(本元件 SSOT)
 // - DataTable/data-table.spec.md「L2 選取」(整合方式)
-// - button.spec.md + button-group.tsx(action variant=tertiary,size=sm,
+// - button.spec.md + button-group.tsx(action variant=tertiary,size=md,
 //   gap-2 + ButtonDivider 自帶 mx-1 = 12px 視覺距離)
-// - inline-action.spec.md「same-row consistency rule」(close X 同尺寸 sm)
+// - inline-action.spec.md「same-row consistency rule」(close X 同尺寸 md)
 // - tokens/layoutSpace/layoutSpace.spec.md(footer 用 px-loose py-tight)
 // - patterns/overlay-surface/overlay-surface.spec.md SurfaceFooter canonical
 // - Alert(banner)用 description ReactNode 帶 inline link CTA
@@ -39,7 +39,7 @@ export interface BulkActionBarProps extends React.HTMLAttributes<HTMLDivElement>
   selection: readonly string[]
   /** Clear 觸發,user 點 X icon 或 Esc(consumer 在 page-level 監聽) */
   onClear?: () => void
-  /** 批次 actions(consumer 提供 sm Button,variant=tertiary 或 tertiary+danger;不用 primary) */
+  /** 批次 actions(consumer 提供 md Button,variant=tertiary 或 tertiary+danger;不用 primary) */
   actions?: React.ReactNode
   /** Filter 模式:hidden 數量,顯示在 count 區 inline「{N} 已選 · {M} 個被 filter 隱藏」 */
   hiddenByFilter?: number
@@ -63,7 +63,7 @@ export interface BulkActionBarProps extends React.HTMLAttributes<HTMLDivElement>
 // 視覺結構(同 SurfaceFooter / DataTable toolbar canonical):
 //   px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]
 //   gap-2 between elements
-//   全 sm Buttons(same-row consistency)
+//   全 md Buttons(same-row consistency)
 //   <ButtonDivider /> 自帶 mx-1 = 12px 視覺距離
 //
 // Hint banner(擴 dataset 提示)完全外包給 Alert 元件 — consumer 視 ref 圖
@@ -131,7 +131,7 @@ const BulkActionBar = React.forwardRef<HTMLDivElement, BulkActionBarProps>(
         {/* divider */}
         {actions && <ButtonDivider />}
 
-        {/* batch actions slot(consumer 提供 sm Buttons) */}
+        {/* batch actions slot(consumer 提供 md Buttons) */}
         {actions && (
           <div className="flex items-center gap-2 flex-1 min-w-0">{actions}</div>
         )}
@@ -149,7 +149,7 @@ export const bulkActionBarMeta = {
   sizes: {},
   states: ['default'],
   tokens: {
-    fg: ['text-fg-secondary', 'text-fg-muted'],
+    fg: ['text-foreground', 'text-fg-muted'],
     border: ['border-divider'],
   },
 } as const

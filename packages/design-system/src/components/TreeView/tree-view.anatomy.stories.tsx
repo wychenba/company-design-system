@@ -244,13 +244,13 @@ export const ColorMatrix: Story = {
                 <tr>
                   <Td mono>default</Td>
                   <Td>—(transparent)</Td>
-                  <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                  <Td><TokenCell token="--foreground" display="foreground(medium)" /></Td>
                   <Td><TokenCell token="--fg-muted" display="fg-muted" /></Td>
                 </tr>
                 <tr>
                   <Td mono>hover</Td>
                   <Td><TokenCell token="--neutral-hover" display="neutral-hover" /></Td>
-                  <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                  <Td><TokenCell token="--foreground" display="foreground(medium)" /></Td>
                   <Td><TokenCell token="--foreground" display="foreground" /></Td>
                 </tr>
                 <tr>

@@ -192,7 +192,7 @@ export const OrientationMatrix: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Vertical(預設)— label 在控件上方</H3>
-        <Desc>主要表單場景。label 與 control 之間 gap = layout-space-tight,垂直堆疊。</Desc>
+        <Desc>主要表單場景。label 與 control 之間 gap = gap-1(4px),垂直堆疊。</Desc>
         <div className="grid grid-cols-2 gap-6 max-w-4xl">
           <div className="border border-dashed border-divider rounded-md p-4">
             <FieldGroup>
@@ -482,7 +482,7 @@ export const FieldGroupBehavior: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>FieldGroup — 管理多 Field 垂直間距</H3>
-        <Desc>FieldGroup 提供 density-aware 的垂直 gap(跟隨 `--layout-space-tight` token),不需 consumer 手算間距。</Desc>
+        <Desc>FieldGroup 提供三個語意層級的垂直 gap(`compact`→gap-3 / `normal`→gap-4 / `loose`→gap-6),不需 consumer 手算間距。</Desc>
         <div className="grid grid-cols-2 gap-6 max-w-4xl">
           <div className="border border-dashed border-divider rounded-md p-4">
             <div className="text-caption text-fg-muted mb-3 font-mono">vertical orientation</div>

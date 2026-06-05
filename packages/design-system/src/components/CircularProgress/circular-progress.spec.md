@@ -225,7 +225,7 @@ CircularProgress 是**最薄的 circular progress primitive**,刻意避免多維
 
 - **無 Inspector**:variant 只有 value 有無(indeterminate / determinate 兩態),互動切換式 Inspector 可展的決策點少。`UsageInButton` / `UsageInline` 已覆蓋真實 consumer context
 - **ColorMatrix N/A(只繼承 Progress color token)**:本元件 color 完全來自 `text-current`(繼承 host)+ Progress token(track / fill),無 own variant × state 色彩組合可 matrix 對照。色彩不隨狀態變色(完成 / 失敗由 consumer swap 整個元件),`UsageInButton` / `UsageInline` 真實 context 已示範,獨立 ColorMatrix story 會是冗餘
-- **SizeMatrix 透過 Inspector 即可展示 — 無 separate SizeMatrix story**:size 是自由 number(非 sm/md/lg tier),Inspector 的 size slider 即可展示 16 / 24 / 32 / 48 等常用值的行為差異,比靜態 matrix 更貼近消費情境
+- **SizeMatrix N/A — 無 separate SizeMatrix story**:size 是自由 number(非 sm/md/lg tier),由 Button / Input 等 consumer 容器內部依規則程式化縮放,`UsageInButton` / `UsageInline` 真實 context 已涵蓋 16 / 24 / 32 / 48 等常用值的行為差異,比靜態 matrix 更貼近消費情境
 - **無 StateBehavior**:無 hover / focus / active,唯一「狀態」是 value 變化(已在 Determinate story 動態演示)
 
 對應 anatomy story:`Overview` + `UsageInButton` + `UsageInline`。缺 canonical 5 多數項的 rationale 即本段。

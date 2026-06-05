@@ -290,7 +290,7 @@ export const AccessibilityRule: Story = {
     <div>
       <Rule
         title="Parent 元件的 aria-label 必須整合 badge 資訊"
-        note="Badge 本身是裝飾層——screen reader 需要從 parent 的 aria-label 取得完整 context。「通知 (3 則未讀)」比「通知」+「3」更清楚"
+        note="Badge 預設 role=\"status\"(live region 可播報計數變化),但仍應由 parent 的 aria-label 整合完整 context——「通知 (3 則未讀)」比「通知」+「3」更清楚"
       >
         <Button
           variant="tertiary"

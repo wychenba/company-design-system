@@ -70,7 +70,7 @@ ScrollArea 用 Radix 自訂 overlay 捲軸 → **跨 OS 一致、不吃寬度、
 
 - **`vertical`**(預設)——垂直捲動(長清單、Sheet body)
 - **`horizontal`**——水平捲動(寬表格、Tag 溢出列)
-- **同時垂直 + 水平**——大型 DataTable 雙向(consumer 同時渲染兩個 `<ScrollBar>` 或依賴 Radix `type="always"`)
+- **同時垂直 + 水平**——大型 DataTable 雙向(wrapper `<ScrollArea>` 已內建一個 vertical `<ScrollBar>`,consumer 只需再渲染一個 `<ScrollBar orientation="horizontal">`)
 
 ## 視覺 token
 

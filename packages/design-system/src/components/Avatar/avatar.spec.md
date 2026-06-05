@@ -244,7 +244,7 @@ Image 模式不顯示背景色（圖片填滿），`solid` prop 無效果。
 
 ## Disabled
 
-Avatar 在 disabled 元件內使用 `opacity-disabled`（由宿主元件控制，非 Avatar 自身 prop）。詳見 `color.spec.md` 的 Disabled 狀態。
+Avatar 包在 disabled Field wrapper context 內時，會經 `fieldCtx`（`mode === 'disabled' && hasFieldWrapper === true`）**自己**套 `opacity-disabled` self-dim（取代既有 wrapper blanket opacity-disabled 逃生艙，2026-05-13 R3.5）；沒包在 Field wrapper 內的 standalone Avatar（ProfileCard / FileItem / HoverCard / Dialog 等 display 場景）維持原樣不變。Avatar 不提供自身 `disabled` prop。詳見 `color.spec.md` 的 Disabled 狀態。
 
 ---
 
@@ -304,15 +304,15 @@ Avatar `badgeCount` 內部消費 DS `<Badge variant="critical" max={99}>`,加上
 
 ---
 
-## 為何無 StateBehavior
+## StateBehavior 範疇
 
-Avatar 是**身份視覺 primitive**(顯示人 / 組織 / 物件的代表視覺),本身**非互動元件**:
+Avatar 是**身份視覺 primitive**(顯示人 / 組織 / 物件的代表視覺),本身無自有的 hover / active / selected 互動 state。但有兩個由 context 委派 / 自管的視覺 state,故 anatomy 仍有 `StateBehavior` story(內容降級 fallback chain + status presence dot 四態):
 
-- 無 hover / focus / active / selected / disabled 這類 state。
-- disabled 由宿主元件透過 `opacity-disabled` 控制(見本 spec「Disabled」段),不是 Avatar 自身的 state。
-- hover 行為(彈 ProfileCard)由 `hoverCard` prop 委託給 HoverCard primitive 處理,屬 HoverCard 的 state 不屬 Avatar。
+- **focus-visible**:Avatar 帶 `hoverCard` prop 時 wrapper 變 focusable,委派 keyboard focus + `focus-visible:ring-2 focus-visible:ring-ring` 給該 wrapper(見「Keyboard 可達 canonical」段);無 `hoverCard` 則純展示不 focusable。
+- **disabled**:Avatar 在 disabled Field wrapper context 內經 `fieldCtx` 自套 `opacity-disabled` self-dim(見「Disabled」段),非互動 state 而是視覺 context state。
+- hover 行為(彈 ProfileCard)由 `hoverCard` prop 委託給 HoverCard primitive,屬 HoverCard 的 state 不屬 Avatar。
 
-對應 anatomy story:保留 `Overview` + `Inspector` + `ColorMatrix` + `SizeMatrix`。
+對應 anatomy story:`Overview` + `Inspector` + `ColorMatrix` + `SizeMatrix` + `StateBehavior` + `Accessibility`。
 
 ---
 

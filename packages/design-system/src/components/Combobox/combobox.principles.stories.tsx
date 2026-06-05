@@ -202,11 +202,11 @@ export const TagOperationRule: Story = {
         </Rule>
 
         <Rule
-          title="dropdown 只列出未選中選項"
-          note="避免使用者選了同一個選項兩次。已選中的就在 field 裡，用 X 移除即可"
+          title="已選中的選項在下拉裡以打勾標示，再點一次即取消"
+          note="桌機（預設）走自建浮層選單：已選項保留在清單中並以打勾呈現，再點一次即移除——避免使用者跨越下拉與 field 才能對照已選狀態。手機 / 觸控裝置改走原生 select，已選項則不重複出現在原生下拉"
         >
           <Combobox options={categoryOptions} value={['electronics']} onChange={() => {}} />
-          <Label>↑ 打開 dropdown，Electronics 不會出現在清單裡</Label>
+          <Label>↑ 打開 dropdown，Electronics 仍在清單裡並打勾，可再點一次取消</Label>
         </Rule>
       </div>
     )

@@ -128,8 +128,8 @@ export interface FieldProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
   /**
    * Control area 佈局模型(逃生艙)。
    *
-   * 預設由 Field 自動偵測——讀第一個 control child 的 `type.fieldLayout` static 屬性,
-   * primitive 沒宣告時視為 `'inline'`。
+   * 預設由 Field 自動偵測——迭代全部 control child 的 `type.fieldLayout` static 屬性,
+   * 任一宣告為 `'block'` 即整個 area 切 block(first-block-wins);全部缺宣告時視為 `'inline'`。
    *
    * 只有兩種情況需要手動指定:
    * 1. consumer 把自己手寫的 JSX(`<div>` / 函式元件)當 control,系統無法偵測——強制 `'block'`

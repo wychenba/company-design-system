@@ -135,7 +135,7 @@ export const UsageGuidance: Story = {
               </div>
             </TooltipContent>
           </Tooltip>
-          <Label warn>↑ tooltip 裡放「查看 profile」按鈕 → 滑鼠離開就消失,點不到 → 改用 HoverCard</Label>
+          <Label warn>↑ tooltip 裡放「查看 profile」按鈕 → 語意是純描述（role=tooltip）不該含可點擊元素 → 改用 HoverCard</Label>
         </Rule>
 
         <Rule

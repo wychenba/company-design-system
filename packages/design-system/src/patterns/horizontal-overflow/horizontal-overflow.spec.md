@@ -66,7 +66,7 @@ scope: utility primitives module (use-overflow-items hooks: useScrollEdges + use
   - 必填 `aria-label`(直接傳給 Button 的 `aria-label`,無 `label` alias;由消費者決定,例如「頁籤選單(共 5 個)」)
   - `forwardRef` + `...props` spread 讓 Radix `DropdownMenuTrigger asChild` 可以接管
 
-> **元件保證行為:auto-Tooltip**——`OverflowScrollArrow` 與 `OverflowMenuTriggerButton` 都是 `iconOnly` + string `aria-label` + 非 `asChild`,因此都會觸發 Button 內建的 auto-Tooltip wrap(button.tsx:490-497)。亦即 hover 時 arrow / trigger 會自動冒出對應 `aria-label` 的 tooltip(「向左捲動」/「向右捲動」/「頁籤選單(共 N 個)」),共享全域 `Tooltip` 的 delay 與 warm-up。`DropdownMenuTrigger asChild` 仍正常運作:Radix 的 `asChild` 由 Trigger 自身消費(套到 `OverflowMenuTriggerButton` 的 forwardRef),不會傳成 Button 的 `asChild` prop,所以 tooltip wrap 與 trigger 接管互不衝突。
+> **元件保證行為:auto-Tooltip**——`OverflowScrollArrow` 與 `OverflowMenuTriggerButton` 都是 `iconOnly` + string `aria-label` + 非 `asChild`,因此都會觸發 Button 內建的 auto-Tooltip wrap(button.tsx:491-498)。亦即 hover 時 arrow / trigger 會自動冒出對應 `aria-label` 的 tooltip(「向左捲動」/「向右捲動」/「頁籤選單(共 N 個)」),共享全域 `Tooltip` 的 delay 與 warm-up。`DropdownMenuTrigger asChild` 仍正常運作:Radix 的 `asChild` 由 Trigger 自身消費(套到 `OverflowMenuTriggerButton` 的 forwardRef),不會傳成 Button 的 `asChild` prop,所以 tooltip wrap 與 trigger 接管互不衝突。
 
 ### Hook re-export
 
@@ -173,8 +173,8 @@ return (
 - `components/Chip/chip.tsx` — `layout="scroll" | "menu"`
 
 **Non-consumers**(2026-05-10 retire from「未來」清單 — prior prediction stale,spec 已明文不消費):
-- ~~`components/Steps/steps.tsx`~~ — `steps.spec.md:326`「水平空間不夠塞 content 區,強塞會破壞 stepper 的掃視節奏」+ L337「步驟 ≤ 5、水平空間充足」→ 設計上不 overflow
-- ~~`components/SegmentedControl/*`~~ — `segmented-control.spec.md:223`「**不支援 overflow / scroll**——若選項可能超出容器寬度,代表選錯元件了」+ L162「最多 5 個 item」→ 設計上拒絕 overflow
+- ~~`components/Steps/steps.tsx`~~ — `steps.spec.md:342`「水平空間不夠塞 content 區,強塞會破壞 stepper 的掃視節奏」+ L353「步驟 ≤ 5、水平空間充足」→ 設計上不 overflow
+- ~~`components/SegmentedControl/*`~~ — `segmented-control.spec.md:240`「**不支援 overflow / scroll**——若選項可能超出容器寬度,代表選錯元件了」+ L239「最多 5 個 item」→ 設計上拒絕 overflow
 
 新消費者必須加到這個清單,並且**只從本 module import** overflow 相關的 primitive,不允許自己複製。
 

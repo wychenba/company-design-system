@@ -52,7 +52,6 @@ export interface CircularProgressProps extends React.HTMLAttributes<HTMLSpanElem
   value?: number
   /** 直徑(px)。預設 24,建議 ≤ 64。 */
   size?: number
-  /** 狀態色(lifecycle,與 ProgressBar 同契約)。 */
   /**
    * 視覺 label(inline 顯示於右側)。
    * - font-size 繼承 parent(不設 text-size class,CSS inherit)

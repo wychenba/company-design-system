@@ -4,7 +4,7 @@
 //     comfortable),語意對應「掃描 vs 閱讀」資料密度而非元件大小。命名沿用
 //     Linear / Notion / Airtable 業界共識(row density,非 component size)。
 //   StateBehavior covered by ColorMatrix「Row 狀態色彩」段(default / hover /
-//     selected / striped / disabled)+ Features「排序」段。Row 互動是 row-level
+//     selected / disabled)+ Features「排序」段。Row 互動是 row-level
 //     而非元件 level,集中於 Row 色彩展示更直觀。
 import type { Meta, StoryObj } from '@storybook/react'
 import { createColumnHelper } from '@tanstack/react-table'
@@ -376,7 +376,7 @@ export const ColorMatrix: Story = {
       <div>
         <H3>Row 狀態色彩</H3>
         <Desc>
-          Row bg 由 default / hover / striped 決定。Hover 用 neutral-hover
+          Row bg 由 default / hover 決定。Hover 用 neutral-hover
           (全系統互動高亮一致,跟 TreeView / MenuItem 同套 token)。
           選取狀態不由 row bg 呈現,而是 __select__ 欄的 selection control(checkbox / radio)
           ——2026-05-31 user 決策:有勾選框就只用勾選框呈現,避免「勾選框 + 底色」雙重指示。
@@ -401,12 +401,6 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td mono>hover</Td>
                 <Td><TokenCell token="--neutral-hover" display="neutral-hover" /></Td>
-                <Td><TokenCell token="--foreground" display="foreground" /></Td>
-                <Td><TokenCell token="--divider" display="divider" /></Td>
-              </tr>
-              <tr>
-                <Td mono>striped(zebra,可選)</Td>
-                <Td><TokenCell token="--muted" display="muted(odd row)" /></Td>
                 <Td><TokenCell token="--foreground" display="foreground" /></Td>
                 <Td><TokenCell token="--divider" display="divider" /></Td>
               </tr>

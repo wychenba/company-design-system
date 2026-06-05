@@ -292,7 +292,7 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td mono>focus-visible</Td>
                 <Td mono><TokenCell token="--surface" /></Td>
-                <Td mono>ring-2 ring-ring ring-offset-2</Td>
+                <Td mono>ring-2 ring-ring ring-offset-1</Td>
                 <Td mono>—</Td>
                 <Td mono>1(強制顯示 / a11y)</Td>
               </tr>

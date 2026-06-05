@@ -165,7 +165,7 @@ export const Overview: Story = {
                   <Td mono>value</Td>
                   <Td mono>string | string[] | null</Td>
                   <Td mono>undefined</Td>
-                  <Td>型別決定單 / 多選</Td>
+                  <Td>當前值（單選 string / 多選 string[]）；單 / 多選由 `multiple` prop 決定，非 value 型別</Td>
                 </tr>
                 <tr>
                   <Td mono>multiple</Td>
@@ -206,7 +206,7 @@ export const Overview: Story = {
                 <tr>
                   <Td mono>minWidth</Td>
                   <Td mono>number</Td>
-                  <Td mono>trigger 寬度</Td>
+                  <Td>跟隨 trigger（下限 240px）</Td>
                   <Td>浮層最小寬度</Td>
                 </tr>
                 <tr>

@@ -1,4 +1,4 @@
-<!-- @benchmark-cited: D5 retrofit 2026-05-18 — verified 0 world-class DS claim in body; blanket retract removed. -->
+<!-- @benchmark-unverified-blanket: body 含 pattern 級 world-class 對照(世界級對照表 L17-24 + Variant narrow-scope 對照 L141-156:Material/VS Code/Figma/Atlassian/Polaris/Linear/GitHub/Gmail/Notion/MUI/Carbon),為 named-reference 級而非 per-source URL/#L/snapshot cite,故 file-level 標 unverified-blanket。 -->
 
 # Action Bar 設計原則
 

@@ -10,7 +10,7 @@ import { useFieldContext } from '@/design-system/components/Field/field-context'
  * 基於 Radix Slider primitive,橋接設計系統 token。詳細設計原則見 `slider.spec.md`。
  *
  * ── 核心設計 ──
- * 1. **視覺單一**:track 厚度、thumb 直徑、ring 尺寸都是固定值,不隨 `size` 變
+ * 1. **視覺單一**:track 厚度、thumb 直徑、thumb 邊框都是固定值,不隨 `size` 變
  * 2. **`size` 只控容器外高**:對齊 Field family 的 `h-field-*` tier,讓 Slider 能跟
  *    Input / NumberInput / Select 在 Field 內並排對齊
  * 3. **Range mode 免費**:Radix 原生支援 `value: number[]`,傳多值自動多 thumb

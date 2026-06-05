@@ -1482,12 +1482,12 @@ export const RowDragInteractive: Story = {
 
 /* ── 列拖曳 × 虛擬捲動（200 列）────────────────────────────────────────────
    v3 fix(2026-05-05)— scroll bug 修法:
-   1. enableRowDrag 時 overscan 自動拉到 ≥ 10(避免 row unmount 時 useSortable subscription 跟著
+   1. enableRowDrag 時 overscan 自動拉到 Math.max(overscan, 5)(避免 row unmount 時 useDraggable/useDroppable subscription 跟著
       消失導致 dnd-kit stale lookup → 拖到該 id 視覺錯位)
    2. drag 進行中(activeDragId != null)整個略過 measureElement(任一 row 重新量測會跟 dnd-kit
       transform 競爭,長 list 累積錯位)
-   3. DndContext modifier 鎖 Y 軸(restrictToVerticalAxis inline 實作)— row drag 是垂直語義,
-      X 抖動會觸發水平 transform → 進而 measureElement loop
+   3. DndContext modifier 用 snapToCursorModifier(ghost top-left 對齊 cursor,不鎖軸)— row drag
+      期間 ghost 跟隨游標
    - 200 列 + 固定高度 → virtualizer 啟用
    - 拖曳長距離 + 持續往下捲 → 視覺位置仍對齊,放下後 onRowReorder 收到正確 sourceId / targetId */
 export const RowDragWithVirtualization: Story = {

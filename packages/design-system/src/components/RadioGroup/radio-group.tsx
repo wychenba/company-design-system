@@ -248,7 +248,7 @@ export const radioGroupMeta = {
   sizes: {
     sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
     md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
-    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },
+    lg: { fieldHeight: 36, iconSize: 20, typography: 'body-lg' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {

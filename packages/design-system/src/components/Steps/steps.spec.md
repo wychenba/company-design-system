@@ -294,7 +294,7 @@ Description 在 error state 下維持 `text-fg-secondary`(跟其他 state 一樣
 
 ## Connector 路徑色
 
-連接 `stepA → stepB` 的 connector:**當且僅當 stepA 是 completed 時,該 connector 為藍色**(`border-primary`),其他一律灰(`border-border`)。
+連接 `stepA → stepB` 的 connector:**當且僅當 stepA 是 completed 時,該 connector 為藍色**(`bg-primary`),其他一律灰(`bg-border`)。connector 是一條 `w-px`(vertical)/ `h-px`(horizontal)的有底色 div line,故用 `bg-*` 而非 `border-*`。
 
 ### 為什麼藍色只跟 completedValues 走,不跟 value 走
 

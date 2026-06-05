@@ -27,7 +27,7 @@ import { ItemContent, ItemPrefix } from '@/design-system/patterns/element-anatom
  * Rationale(Notification banner family canonical):
  * - Notice / Alert / Toast 屬 **notification banner family**(ephemeral、px-4 py-3 固定不隨 density),
  *   dismiss 是邊角小 affordance,xs 視覺不搶眼不跟 content 競爭。見 `overlay-surface.spec.md`
- *   「Chrome dismiss size canonical」三家族分類(Modal sm / Non-modal xs / Notification xs)
+ *   「Chrome dismiss size canonical」(overlay header 走 sm native + 負 margin trick;xs 只用於 notification banner family)
  * - Close 左側可加 refresh / share(action group region),皆統一 xs
  * - `dismiss` prop 自動套 variant="text" + fg-muted override
  * SSOT:patterns/element-anatomy/inline-action.spec.md「Dismiss canonical — X close only」
@@ -179,7 +179,7 @@ export function useInverseTheme(): 'dark' | 'light' {
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const noticeMeta = {
   component: 'Notice',
-  family: null, // non-family composite / overlay / layout
+  family: 2, // Family 2（List item layout）消費者 — 對齊 notice.spec.md frontmatter family: 2 + body「Layout Family」段
   variants: {
 
   },

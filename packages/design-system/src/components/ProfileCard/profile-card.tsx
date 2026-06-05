@@ -113,7 +113,8 @@ export interface ProfileCardProps extends React.HTMLAttributes<HTMLDivElement> {
   actions?: React.ReactNode
   /**
    * Consumer 傳的 field 資料(partial)。預設 keys 走 `NAMECARD_DEFAULT_FIELD_KEYS` —
-   * email / phone / department / location 永遠 render(缺資料顯 `—`)。Consumer 想新增
+   * 只有 id / employeeNumber 兩個 default field 永遠 render(缺資料顯 `—`);email / phone /
+   * department / location 等其他欄位一律 opt-in by consumer 透過本 prop 傳入。Consumer 想新增
    * 自訂 field 直接傳入(在 default 之後 append),想 override default key value 也直接傳。
    */
   fields?: { label: string; value: React.ReactNode }[]

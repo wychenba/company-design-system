@@ -395,7 +395,7 @@ export const ColorMatrix: Story = {
       <div className="flex flex-col gap-2">
         <H3>SidebarMenuButton 狀態</H3>
         <Desc>
-          跟 TreeItem / MenuItem 共用同一組 semantic token。Default → hover → active → selected 的色彩都一致。
+          跟 TreeItem / MenuItem 共用同一組 semantic token。Default → hover → selected 的色彩都一致。
         </Desc>
         <table className="min-w-full text-left border-collapse">
           <thead>
@@ -417,12 +417,6 @@ export const ColorMatrix: Story = {
               <Td>hover</Td>
               <Td><Swatch value="--neutral-hover" />bg-neutral-hover</Td>
               <Td><Swatch value="--foreground" />text-foreground (neutral-9)</Td>
-              <Td mono>500</Td>
-            </tr>
-            <tr>
-              <Td>active (press)</Td>
-              <Td><Swatch value="--neutral-active" />bg-neutral-active</Td>
-              <Td><Swatch value="--foreground" />text-foreground</Td>
               <Td mono>500</Td>
             </tr>
             <tr>
@@ -677,7 +671,7 @@ export const StateBehavior: Story = {
           <li>open state 寫 cookie `sidebar_state`(7 天 max-age),跨 session 還原——使用者上次關 = 下次也關。</li>
           <li>Mobile(&lt;768px)一律走 Sheet overlay,不受 `collapsible` prop 影響——小螢幕 sidebar 永遠不佔固定空間。</li>
           <li>Icon mode 下 active item 的 `bg-neutral-selected` 仍然顯示,但 label 不可見——提供最小視覺指引讓使用者知道「當前在哪」。</li>
-          <li>Cmd+B / Ctrl+B 全域快捷鍵由 SidebarProvider 監聽,任何 focus 位置都可觸發(input 內除外,避免干擾文字輸入)。</li>
+          <li>Cmd+B / Ctrl+B 全域快捷鍵由 SidebarProvider 監聽,任何 focus 位置都可觸發——目前未排除文字輸入框,在 input / textarea 內按下仍會 toggle 並攔掉預設行為(無 disableShortcut opt-out)。</li>
         </ul>
       </div>
     </div>
@@ -763,7 +757,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"-   收合切換鍵：Cmd+B(Mac)/ Ctrl+B(Windows)是業界慣例(VS Code / Linear / shadcn 都用),Sidebar 內建並會攔下這組鍵,避免穿透到瀏覽器書籤列。任何焦點位置都能觸發,文字輸入框內除外。\n\n-   收合按鈕:SidebarTrigger 帶 aria-label「展開或收合」,讓螢幕報讀使用者知道按鈕用途;consumer 可用 toggleAriaLabel 自訂文字。\n\n-   當前項目:選中的 menu item 帶 data-active,呈現選取底色(bg-neutral-selected)作為視覺指引;即使收合成 icon-only 模式,選取底色仍然保留,使用者一眼知道現在在哪一頁。\n\n-   手機尺寸:768px 以下自動切換成從旁滑出的抽屜(Sheet),內建焦點鎖定、Esc 關閉、關閉後焦點回到觸發按鈕。"}</p>
+      <p className="whitespace-pre-line">{"-   收合切換鍵：Cmd+B(Mac)/ Ctrl+B(Windows)是業界慣例(VS Code / Linear / shadcn 都用),Sidebar 內建並會攔下這組鍵,避免穿透到瀏覽器書籤列。任何焦點位置都能觸發;目前未排除文字輸入框——在 input / textarea 內按下仍會 toggle(無 disableShortcut opt-out)。\n\n-   收合按鈕:SidebarTrigger 帶 aria-label「展開或收合」,讓螢幕報讀使用者知道按鈕用途;consumer 可用 toggleAriaLabel 自訂文字。\n\n-   當前項目:選中的 menu item 帶 data-active,呈現選取底色(bg-neutral-selected)作為視覺指引;即使收合成 icon-only 模式,選取底色仍然保留,使用者一眼知道現在在哪一頁。\n\n-   手機尺寸:768px 以下自動切換成從旁滑出的抽屜(Sheet),內建焦點鎖定、Esc 關閉、關閉後焦點回到觸發按鈕。"}</p>
     </div>
   ),
 }

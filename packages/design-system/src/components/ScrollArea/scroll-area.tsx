@@ -99,7 +99,7 @@ export const scrollAreaMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'],
   tokens: {
     bg: [],
     fg: [],

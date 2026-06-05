@@ -279,7 +279,7 @@ export const Overview = {
                 ['checked', "boolean | 'indeterminate'", 'false', 'checkbox 選中狀態'],
                 ['selected', 'boolean', 'false', '單選選中（bg-neutral-selected 背景）'],
                 ['tag', 'ReactNode', '—', '後綴 Tag，靠右對齊'],
-                ['disabled', 'boolean', 'false', '停用，所有子元素統一 fg-disabled'],
+                ['disabled', 'boolean', 'false', '停用：文字 / startIcon 套 fg-disabled，checkbox 用 disabled 樣式，tag / endContent 套 opacity-disabled，avatar 不變'],
                 ['header', 'boolean', 'false', '群組標題，不可選不可 hover'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '尺寸，對齊 field-height token'],
                 ['endContent', 'ReactNode', '—', '後綴自訂內容（DropdownMenu 的 badge/endIcon/shortcut 經由此注入）'],

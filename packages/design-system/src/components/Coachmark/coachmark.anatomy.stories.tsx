@@ -325,7 +325,7 @@ export const StateBehavior: Story = {
                 <tr><Td>無 step、無 callback</Td><Td>Footer 不渲染(僅 media + body)</Td></tr>
                 <tr><Td>只 onNext</Td><Td>Footer 有 Next;左側保留 space(justify-between)</Td></tr>
                 <tr><Td>step + onSkip + onNext</Td><Td>左 step 計數 / 右 Skip + Next</Td></tr>
-                <tr><Td>step + onPrev + onSkip + onNext</Td><Td>左 step 計數 / 右 Previous + Skip + Next</Td></tr>
+                <tr><Td>step + onPrev + onSkip + onNext</Td><Td>左 step 計數 / 右 Previous + Next(有 onPrev 時 Skip 被抑制,見 CTA 語義表)</Td></tr>
                 <tr><Td>isLastStep + onNext</Td><Td>Next 文字 → Done</Td></tr>
               </tbody>
             </table>
@@ -335,7 +335,7 @@ export const StateBehavior: Story = {
         <div>
           <H3>Focus / Esc / Click-outside(繼承 Popover)</H3>
           <Desc>
-            Coachmark 大部分行為繼承 Popover(Radix),但刻意抑制開啟時的自動 focus(onOpenAutoFocus preventDefault)——焦點停在 trigger,避免使用者還在讀 body 時 CTA 被 auto-focus 偷觸發;關閉時 return to trigger;Esc 關閉(= Skip 語意);預設 non-modal,使用者可忽略繼續主流程。
+            Coachmark 大部分行為繼承 Popover(Radix),但刻意抑制開啟時的自動 focus(onOpenAutoFocus preventDefault)——焦點停在 trigger,避免使用者還在讀 body 時 CTA 被 auto-focus 偷觸發;關閉時 return to trigger;Esc 關閉浮層(透過 Radix onOpenChange,效果等同退出,但不觸發 onSkip callback);預設 non-modal,使用者可忽略繼續主流程。
           </Desc>
         </div>
       </div>
@@ -350,7 +350,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `coachmark.spec.md` 「A11y 預設」段。摘要:\n\n-   焦點管理  :刻意抑制開啟時的自動 focus(onOpenAutoFocus preventDefault),焦點停在 trigger——避免 user 還在讀 body 時 CTA 被偷觸發;關閉時 return to trigger\n-   Esc 關閉  :預設啟用(= Skip 行為)——user 按 Esc 等同 skip,尊重退出意願\n-   ARIA  :trigger 自動  aria-expanded  /  aria-controls ,content  role=\"dialog\" (Radix 預設)\n-   Step 計數 tabular-nums  :螢幕閱讀器讀「2 of 3」語意清楚"}</p>
+      <p className="whitespace-pre-line">{"詳 `coachmark.spec.md` 「A11y 預設」段。摘要:\n\n-   焦點管理  :刻意抑制開啟時的自動 focus(onOpenAutoFocus preventDefault),焦點停在 trigger——避免 user 還在讀 body 時 CTA 被偷觸發;關閉時 return to trigger\n-   Esc 關閉  :預設啟用——user 按 Esc 透過 Radix onOpenChange 關閉浮層(效果等同退出),但不觸發 onSkip callback(Esc 是「關閉浮層」非「明確 skip」)\n-   ARIA  :trigger 自動  aria-expanded  /  aria-controls ,content  role=\"dialog\" (Radix 預設)\n-   Step 計數 tabular-nums  :螢幕閱讀器讀「2 of 3」語意清楚"}</p>
     </div>
   ),
 }

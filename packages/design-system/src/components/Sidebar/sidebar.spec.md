@@ -663,7 +663,7 @@ Sidebar 的決策維度是「結構配置」(variant / collapsible / uniformPref
 
 ## StateBehavior(Sidebar 層級特有)
 
-Item-level default / hover / active / selected / disabled **色彩**完全共用 item-anatomy row primitive(`patterns/element-anatomy/item-anatomy.spec.md`),由 `ColorMatrix` 用 5 個 state 的完整 token 對照表承載(state-driven 色彩表)。Sidebar 的 `StateBehavior` story 則展示 **container 層級的結構狀態切換**:三種 `collapsible` 模式(offcanvas / icon / none)、Cmd+B / SidebarTrigger toggle、icon mode 下 label 隱藏 + Tooltip 代償、跨 session cookie 還原——這些是 shell 層級特有的行為,不存在於 row item primitive。
+Item-level default / hover / selected / disabled **色彩**完全共用 item-anatomy row primitive(`patterns/element-anatomy/item-anatomy.spec.md`),由 `ColorMatrix` 用 4 個 state 的完整 token 對照表承載(state-driven 色彩表)。SidebarMenuButton(獨立 cva)無 `:active` press state——對齊 MenuItem / TreeItem 同族 row-button,`--neutral-active` 僅由 inline-action 子按鈕消費(item-anatomy.tsx group-active/action),menu button 本體不套用。Sidebar 的 `StateBehavior` story 則展示 **container 層級的結構狀態切換**:三種 `collapsible` 模式(offcanvas / icon / none)、Cmd+B / SidebarTrigger toggle、icon mode 下 label 隱藏 + Tooltip 代償、跨 session cookie 還原——這些是 shell 層級特有的行為,不存在於 row item primitive。
 
 ---
 

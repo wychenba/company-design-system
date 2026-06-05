@@ -82,7 +82,7 @@ export interface FileUploadProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   loadingTitle?: string
   /** 標題文字(預設「Click or drag file here to upload」) */
   title?: string
-  /** 說明文字(預設「Support for a single or bulk upload」) */
+  /** 說明文字(預設依 multiple:單檔「Support for a single file upload」、multiple 多檔「Support for a single or bulk upload」) */
   description?: string
   /** 若傳入 children,覆寫預設 Empty 結構 */
   children?: React.ReactNode

@@ -248,7 +248,7 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", '顯示模式；display 為純內容輸出（DataTable cell 用），disabled 由原生屬性自動覆蓋'],
+                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", '顯示模式；display 為純內容輸出（DataTable cell 用），傳 disabled prop 時以 React prop 覆蓋 mode（resolvedMode）並套 aria-disabled（trigger 為 div role=combobox，非原生 disabled 屬性）'],
                 ['error', 'boolean', 'false', '紅色邊框 + aria-invalid，僅 edit 模式生效'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '高度與字體，與 Button 共用 field-height token'],
                 ['value', 'string | null', '—', 'ISO date string（YYYY-MM-DD）'],

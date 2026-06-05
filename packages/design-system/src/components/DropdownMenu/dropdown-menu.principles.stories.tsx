@@ -244,7 +244,7 @@ export const ItemTypeRule: Story = {
         </Rule>
 
         <Rule
-          title="RadioItem — 從互斥選項選一（選中後關閉）"
+          title="RadioItem — 從互斥選項選一（選中後選單保持開啟）"
           note="排序方式、檢視模式等只能選一個的設定。選中的那一項以選取底色（neutral-selected 背景）標示，不另畫圓點指示器"
         >
           <DropdownMenu>

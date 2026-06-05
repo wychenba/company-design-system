@@ -4,11 +4,11 @@ family: composite
 variants: {}
 sizes:
   sm:
-    when: "form field-height 28 / compact chrome / dialog / panel context"
+    when: "★ cva default — 所有 header 內 tabs(overlay / chrome header / Dialog / Sidebar / dense toolbar);tab-height 32/40"
   md:
-    when: "default general UI"
+    when: "future tier — 目前無 recommended use case,新 consumer 須先諮詢 DS owner"
   lg:
-    when: "touch / prominent CTA / stakeholder-facing surface"
+    when: "獨立 tabs 直接取代 chrome header — page-level workspace 主導覽(tab-height 48/56 = chrome-header-height)"
 traits:
   - hasSizes
   - hasInteractiveStates
@@ -116,7 +116,7 @@ Tabs trigger = **item-layout 橫向變體 + Button 高度系統**。對標 item-
 
 **Tabs 目前只有一種視覺**：底線標示型（underline indicator）。
 
-選中 trigger 底部有 2px 的 `bg-primary` 底線，未選 trigger 僅文字色變化。未來若需要「填色型」或「pill 型」tabs，應先評估是否真的是 Tabs 的語意（通常是 SegmentedControl 或 Button group 的偽裝）再考慮擴充。
+選中 trigger 底部有 2px 的 `bg-primary-hover` 底線，未選 trigger 僅文字色變化。未來若需要「填色型」或「pill 型」tabs，應先評估是否真的是 Tabs 的語意（通常是 SegmentedControl 或 Button group 的偽裝）再考慮擴充。
 
 ---
 

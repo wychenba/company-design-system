@@ -117,14 +117,13 @@ native `<textarea>` 自帶 `value` / `defaultValue` / `onChange` triplet — Tex
 
 ---
 
-## 為何無 Inspector / StateBehavior
+## 為何無 StateBehavior
 
 Textarea 是 **Field Controls family 的多行變體**,共用規則由 `../Field/field-controls.spec.md` own:
 
-- **無 Inspector**:多行輸入的關鍵決策是「行數(rows)」與「resize 行為」,互動 Inspector 無法呈現「使用者輸入長文」的真實感——已由 `SizeMatrix`(各 size × rows 組合) + `RowsResizeMatrix`(rows 控制預設行數 / resize-y 垂直可調 / min-h-* 覆寫最小高度)完整覆蓋。其他 prop(disabled / readonly / invalid)由 Field family 共用 pattern 管理。
-- **無 StateBehavior**:Textarea 的互動狀態(focus ring / invalid / disabled / readonly)完全繼承 Field Controls SSOT(`field-controls.spec.md`「Mode 狀態」),無 Textarea 特有的 state 行為。重寫 StateBehavior = 與 Field family 漂移風險。
+- **無 StateBehavior**:Textarea 的互動狀態(focus ring / invalid / disabled / readonly)完全繼承 Field Controls SSOT(`field-controls.spec.md`「Mode 狀態」),無 Textarea 特有的 state 行為。重寫 StateBehavior = 與 Field family 漂移風險——改由 `ColorMatrix`(各 mode × state 色彩 token)+ `ModeMatrix`(edit / readonly / disabled / error 視覺對照)涵蓋。
 
-對應 anatomy story:保留 `Overview` + `SizeMatrix` + `ModeMatrix`(edit/readonly/disabled continuation of Field) + `ColorMatrix` + 元件特有 `RowsResizeMatrix`。
+對應 anatomy story:`Overview` + `Inspector` + `SizeMatrix` + `ModeMatrix`(edit/readonly/disabled continuation of Field) + `ColorMatrix` + 元件特有 `RowsResizeMatrix` + `Accessibility`。
 
 ---
 
@@ -145,7 +144,7 @@ Textarea 是 **Field Controls family 的多行變體**,共用規則由 `../Field
 - 字母鍵 — 輸入
 - Enter — 換行（不觸發 form submit，與 Input 不同）
 
-**Focus**:native input focus ring;DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供。
+**Focus**:DS focus-visible 邊框(`focus-visible:!border-primary`)由 `<textarea>` 自身的 cva compoundVariants 直接套用（textarea.tsx default/bare/naked edit 態），無 fieldWrapper composite——Textarea 是裸 native textarea（見「定位」L30），standalone 使用即取得 primary focus 邊框。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
