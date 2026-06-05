@@ -695,7 +695,7 @@ function DraftListPage({
   onAddExcel: () => void
 }) {
   return (
-    <div className="p-6 max-w-screen-xl">
+    <div className="p-6 w-full">
       <h1 className="text-xl font-semibold mb-6">暫存申請單</h1>
 
       <Tabs defaultValue="general">
@@ -706,7 +706,7 @@ function DraftListPage({
         </TabsList>
 
         <TabsContent value="general" className="mt-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-y-2 mb-4">
             <h2 className="font-medium text-fg-primary">一般暫存申請</h2>
             <div className="flex items-center gap-2">
               <DropdownMenu>
@@ -731,8 +731,8 @@ function DraftListPage({
             </div>
           </div>
 
-          <div className="rounded-lg border border-divider overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-lg border border-divider overflow-x-auto">
+            <table className="w-full text-sm min-w-[860px]">
               <thead className="bg-surface-raised border-b border-divider">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">單號</th>
