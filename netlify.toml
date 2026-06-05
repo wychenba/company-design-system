@@ -15,9 +15,11 @@
 # DS Storybook 的 .storybook/main.ts glob `../apps/**/*.stories.@(tsx|mdx)` → 公開暴露 apps/** 內部 product UI;
 # 無此 header 則 preview + production deploy 會被搜尋引擎收錄(內部 UI SEO leak)。
 # 此 header 只防搜尋引擎索引,不擋直接訪問。
-# 真擋陌生人(免費)= HTTP Basic Auth via `_headers`(env var STORYBOOK_BASIC_AUTH,build 後注入;所有方案含 free-tier 支援)。
-#   Netlify Dashboard 的 Password protection 是 Pro 方案專屬($20/mo),free-tier 沒此開關(2026-06-05 官方 docs 證實)。
-#   DS owner 要免費擋人同走 template 的 _headers Basic Auth(見 template/ds-product-template/scripts/inject-basic-auth.mjs);Pro Password / Cloudflare Access 為進階選項。
+# 真擋陌生人(免費)= Netlify Edge Function 自做 HTTP Basic Auth(env var STORYBOOK_BASIC_AUTH,edge 層比對;Edge Functions 免費方案可用)。
+#   Netlify 內建密碼 — Dashboard 的 Password protection 與 `_headers` 的 Basic-Auth header — 兩個都是 Pro 方案專屬
+#   ($20/mo,2026-06-05 官方 docs + support forum 三重證實;且 `_headers` basic-auth 不套用到 edge function),free-tier 都沒有。
+#   DS owner 要免費擋人同走 template 的 Edge Function Basic Auth(見 template/ds-product-template/netlify/edge-functions/basic-auth.ts
+#   + netlify.toml [[edge_functions]] path="/*" function="basic-auth");Pro Password / Cloudflare Access 為進階選項。
 [[headers]]
   for = "/*"
   [headers.values]

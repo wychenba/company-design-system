@@ -77,6 +77,7 @@ const ALLOWLIST = [
   'template/ds-product-template/.npmrc',
   'template/ds-product-template/.env.example',
   'template/ds-product-template/netlify.toml',
+  'template/ds-product-template/netlify/edge-functions',  // FREE 密碼保護 edge function(basic-auth.ts);netlify.toml [[edge_functions]] 引用,必隨 mirror ship 否則 deploy 認證失效
   'template/ds-product-template/README.md',
   'template/ds-product-template/CLAUDE.md',
   'template/ds-product-template/docs',
@@ -107,6 +108,29 @@ if (missingEntries.length > 0) {
   console.error(`\n❌ ${missingEntries.length} allowlist entry(ies) missing — published-template mirror 會不完整。修:更新 ALLOWLIST 或補回缺檔。`)
   console.error(`   缺:${missingEntries.join(', ')}`)
   process.exit(1)
+}
+
+// ━━━ 2026-06-05 fail-closed guard:netlify.toml 引用的 script / edge function 必在 mirror output 存在 ━━━
+// P0 anchor:netlify.toml build command 曾串 `node scripts/inject-basic-auth.mjs` 但該檔沒進 ALLOWLIST →
+// fork user mirror 缺檔 → 每次 deploy build fail。本 guard 解析 mirror netlify.toml 的引用,缺即 exit 1。
+{
+  const mirrorToml = join(OUT_DIR, 'netlify.toml')
+  if (existsSync(mirrorToml)) {
+    const toml = readFileSync(mirrorToml, 'utf8')
+    const refMissing = []
+    for (const m of toml.matchAll(/node\s+([\w./-]+\.mjs)/g)) {
+      if (!existsSync(join(OUT_DIR, m[1]))) refMissing.push(`build script ${m[1]}`)
+    }
+    for (const m of toml.matchAll(/function\s*=\s*["']([\w-]+)["']/g)) {
+      const found = ['ts', 'js', 'mjs', 'mts'].some((ext) => existsSync(join(OUT_DIR, `netlify/edge-functions/${m[1]}.${ext}`)))
+      if (!found) refMissing.push(`edge function ${m[1]} (netlify/edge-functions/${m[1]}.ts)`)
+    }
+    if (refMissing.length) {
+      console.error(`\n❌ netlify.toml 引用但 mirror 缺檔(fork deploy 會掛):${refMissing.join(', ')}。修:加進 ALLOWLIST。`)
+      process.exit(1)
+    }
+    console.log(`  ✓ netlify.toml 引用的 script/edge-function 全在 mirror`)
+  }
 }
 
 // ━━━ Transform root package.json ━━━

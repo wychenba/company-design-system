@@ -24,8 +24,8 @@ cat <<'BANNER'
   ③ Setup Netlify(OAuth)+ 設站台密碼(免費,30 秒)
      $ npm run setup:netlify
      → Netlify 後台 Site configuration → Environment variables
-       加 STORYBOOK_BASIC_AUTH = user:password(免費 _headers 帳密,
-       build 時自動注入;免費方案即可,密碼不進 repo)
+       加 STORYBOOK_BASIC_AUTH = user:password(免費 Edge Function
+       帳密,deploy 後跳瀏覽器原生帳密彈窗;免費方案即可,密碼不進 repo)
      → 進階(非必須):升 Pro 用 dashboard Password Protection 開關
        (美化密碼頁 / 只擋 preview),或 Cloudflare Access 真 SSO
 

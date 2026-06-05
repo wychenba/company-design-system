@@ -23,7 +23,7 @@
 **他拿到**:scaffold + 治理 via plugin install + DS via npm package
 **DS 取得方式**:`@qijenchen/design-system` npm registry(`^X.Y.Z`)
 **Governance 取得**:`/plugin marketplace add github:ajenchen/design-system` + `/plugin install design-system@qijenchen-ds` + restart session
-**E2E 流程**:`fork → npm install → claude → /plugin install(3 step + restart)→ npm run setup:netlify(dashboard 設 Basic Password)→ npm run create-app order-dashboard → npm install → npm run storybook → git push`
+**E2E 流程**:`fork → npm install → claude → /plugin install(3 step + restart)→ npm run setup:netlify(Netlify env var 設 STORYBOOK_BASIC_AUTH = user:password,免費機制走 edge function basic-auth)→ npm run create-app order-dashboard → npm install → npm run storybook → git push`
 **禁**:import `@qijenchen/design-system/src/**` 或 `/dist/**`(`lint:imports` 攔)
 
 ## 2. SSOT Architecture

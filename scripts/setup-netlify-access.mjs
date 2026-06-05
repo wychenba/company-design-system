@@ -1,19 +1,21 @@
 #!/usr/bin/env node
 // scripts/setup-netlify-access.mjs — fork-and-go Netlify setup automation
 //
-// 2026-06-05 修正:免費 access control = _headers Basic Auth(env var 注入),不是 dashboard Password。
+// 2026-06-05 二修:免費 access control = Netlify Edge Function 自做 HTTP Basic Auth,不是 _headers / dashboard Password。
 //
 // Why Identity removed:
 //   - Netlify 2024 公告 Identity service deprecated;新帳號可能看不到 Identity menu
 //   - `netlify api provisionSiteIdentity` 在新 site 已不穩定 / 不可用
 //
-// Free-tier 真實可用 access control(2026-06-05 官方 docs 證實):
-//   - Netlify Dashboard 的「Password protection / Basic protection」是 **Pro 方案專屬**($20/mo),
-//     free-tier 沒這個開關(按下去會被要求升級付費 — 這就是 fork user 卡住的原因)。
-//   - 免費要擋陌生人 → HTTP Basic Auth via `_headers`(所有方案含 free 都支援,edge 層擋,瀏覽器原生帳密彈窗)。
-//   - 本 template 已內建:build 後 `scripts/inject-basic-auth.mjs` 從 Netlify env var `STORYBOOK_BASIC_AUTH`
-//     (格式 "user:pass",多組空格分隔)寫 `storybook-static/_headers` 的 Basic-Auth;未設 env var = no-op 公開。
-//     密碼只存 Netlify 後台 env var(public repo 不能 commit 明文)。
+// Free-tier 真實可用 access control(2026-06-05 官方 docs + support forum 三重證實):
+//   - Netlify Dashboard 的「Password protection」**與** `_headers` 的 Basic-Auth header **都是 Pro 方案專屬**
+//     ($20/mo);free-tier 兩個都沒有(按下去會被要求升級付費 — 這就是 fork user 卡住的原因)。
+//     (官方限制頁也載明 `_headers` 的 basic-auth header 不會套用到 edge function。)
+//   - 免費要擋陌生人 → Netlify Edge Function 自己做 HTTP Basic Auth(讀 Authorization → 比對 → 回 401,
+//     瀏覽器原生帳密彈窗)。Edge Functions 免費方案可用、`.netlify.app` 預設網址直接生效、無需自訂網域。
+//   - 本 template 已內建:`netlify/edge-functions/basic-auth.ts` 從 Netlify env var `STORYBOOK_BASIC_AUTH`
+//     (格式 "user:pass",多組空格分隔)讀帳密比對;netlify.toml 已 wire [[edge_functions]] path="/*"。
+//     未設 env var = no-op 公開放行。密碼只存 Netlify 後台 env var(public repo 不能 commit 明文)。
 //
 // What's automated:
 //   1. Install Netlify CLI(若未裝)
@@ -21,7 +23,7 @@
 //   3. `netlify login`(瀏覽器 OAuth)
 //   4. Auto `netlify sites:create` + `netlify link`(non-interactive)
 //
-// What's NOT automatable(Netlify CLI 不提供 env var protection 的 one-shot setup;走 dashboard 設 env var):
+// What's NOT automatable(Netlify CLI 不提供 edge-function Basic Auth 的 one-shot setup;走 dashboard 設 env var):
 //   5. 設 STORYBOOK_BASIC_AUTH env var — script 印 dashboard URL + step-by-step,user 加一條 env var(30 秒)
 //   6. 分享 帳密 給 stakeholder — team Slack / DM 私訊
 //
@@ -47,7 +49,7 @@ function shOut(cmd) {
 const args = new Set(process.argv.slice(2))
 const skipPrompts = args.has('--skip-prompts')
 
-console.log('🔒 Netlify access control setup(免費方案 = _headers Basic Auth,從 STORYBOOK_BASIC_AUTH env var 注入)')
+console.log('🔒 Netlify access control setup(免費方案 = Edge Function Basic Auth,讀 STORYBOOK_BASIC_AUTH env var)')
 console.log('')
 console.log('━━━ 流程概覽 ━━━')
 console.log('  自動: CLI install + gh check + OAuth login + site 建 + 連 repo')
@@ -118,16 +120,17 @@ const siteSlug = state.siteSlug || siteId
 console.log(`✓ Linked site: ${siteId}`)
 console.log('')
 
-// Step 4: Print dashboard URL + env-var Basic Auth guidance(免費 — build 時 inject-basic-auth.mjs 寫 _headers)
+// Step 4: Print dashboard URL + env-var Basic Auth guidance(免費 — Edge Function netlify/edge-functions/basic-auth.ts)
 const dashboardUrl = `https://app.netlify.com/projects/${siteSlug}/configuration/env`
 const siteUrl = `https://${siteSlug}.netlify.app`
 
 console.log('━━━ 🔒 免費密碼保護設定(30 秒,設一條 env var)━━━')
 console.log('')
-console.log('免費方案的擋人方法 = HTTP Basic Auth via _headers(所有 Netlify 方案含 free 都支援)。')
-console.log('本 template 已內建 build-time 注入(netlify.toml build command 跑 scripts/inject-basic-auth.mjs),')
+console.log('免費方案的擋人方法 = Netlify Edge Function 自做 HTTP Basic Auth(Edge Functions 所有方案含 free 都可用)。')
+console.log('本 template 已內建(netlify/edge-functions/basic-auth.ts,netlify.toml 已 wire [[edge_functions]] path="/*"),')
 console.log('你只需在 Netlify 後台加一條 env var,deploy 後站台自動跳帳密彈窗。')
-console.log('(Dashboard 的「Password protection」開關是 Pro 專屬 $20/mo,免費用不到 — 改用下面這招。)')
+console.log('(Netlify 內建密碼〔Dashboard「Password protection」與 _headers Basic-Auth〕都是 Pro 專屬 $20/mo,')
+console.log(' 免費用不到 — 且 _headers basic-auth 也不套用到 edge function,故改用下面這招。)')
 console.log('')
 console.log(`  Step 1. 開啟 dashboard → Environment variables:`)
 console.log(`          ${dashboardUrl}`)
@@ -167,7 +170,7 @@ console.log('━━━ Defense-in-depth(已 ship in netlify.toml)━━━')
 console.log('  • X-Robots-Tag: noindex — Google 不收錄 URL')
 console.log('  • X-Frame-Options: SAMEORIGIN — 防 iframe 嵌入')
 console.log('  • Referrer-Policy: strict-origin-when-cross-origin')
-console.log('  ⚠️ Header 只防 SEO + iframe 嵌入,**真擋陌生人靠 _headers Basic Auth 那層(env var 注入)**')
+console.log('  ⚠️ Header 只防 SEO + iframe 嵌入,**真擋陌生人靠 Edge Function Basic Auth 那層(讀 env var)**')
 console.log('')
 
 console.log('✅ Setup complete!')

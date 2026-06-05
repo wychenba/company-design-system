@@ -6,7 +6,7 @@
 
 **Repo**:**Private**(team member-only collaborators,non-member 看不到 source)
 **App / Storybook host**:**Netlify**(non-GitHub Pages — public host 不適合 private workspace)
-**權限控管**:**免費 = HTTP Basic Auth via `_headers`**(本 template 內建 `STORYBOOK_BASIC_AUTH` env-var build-time 注入,Netlify 含 free 全方案 edge 層支援,瀏覽器原生帳密彈窗)OR **Pro Password Protection**($20/mo dashboard 開關,美化密碼頁 + 可只擋 preview 放行 production)OR **Cloudflare Access**(免費 50 user 真 SSO,需自架 Cloudflare proxy 在 Netlify 前)。注意:Netlify dashboard 的「Password protection」是 Pro 專屬($20/mo),free-tier 沒此開關(按下去要求升 Pro)→ 免費方法走 `_headers`,非 dashboard password
+**權限控管**:**免費 = HTTP Basic Auth via Netlify Edge Function**(本 template 內建 `netlify/edge-functions/basic-auth.ts` + `netlify.toml` 已 wire `[[edge_functions]]`;fork user 在 Netlify 設 env var `STORYBOOK_BASIC_AUTH`=`user:password` 即生效,瀏覽器原生帳密彈窗,Edge Functions 含 free 全方案可用、`.netlify.app` 預設網址直接生效、無需自訂網域)OR **Pro Password Protection**($20/mo dashboard 開關,美化密碼頁 + 可只擋 preview 放行 production)OR **Cloudflare Access**(免費 50 user 真 SSO,需自架 Cloudflare proxy 在 Netlify 前)。注意:Netlify 內建密碼〔dashboard「Password protection」**與** `_headers` Basic-Auth header〕都是 Pro 專屬($20/mo,官方 docs + support forum 證實),free-tier 沒有(且 `_headers` 不套用到 edge function)→ 免費方法走 Edge Function 自做 Basic Auth,非 dashboard password 也非 `_headers`
 
 不適用 host(本 template 已 ban):
 - ❌ **GitHub Pages**:public host,private workspace 不該 expose
@@ -48,7 +48,10 @@ template/ds-product-template/
 ├── CLAUDE.md                            ← fork-and-go onboarding + consumer canonical
 ├── package.json                          ← workspaces + DS deps + scripts
 ├── tsconfig.json                         ← workspace base tsconfig
-├── netlify.toml                          ← Storybook build + access headers (Netlify Git integration)
+├── netlify.toml                          ← Storybook build + edge-function Basic Auth wire + noindex headers (Netlify Git integration)
+├── netlify/
+│   └── edge-functions/
+│       └── basic-auth.ts                 ← FREE 密碼保護:讀 STORYBOOK_BASIC_AUTH env var 自做 HTTP Basic Auth
 ├── .gitignore
 ├── .npmrc
 ├── .env.example
