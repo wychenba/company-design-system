@@ -60,7 +60,7 @@ export const Default: Story = {
       return (
         <div className="w-[480px] flex flex-col gap-4 p-6 bg-muted rounded-md border border-border">
           <div className="flex items-center gap-3">
-            <span className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+            <span className="h-8 w-8 rounded-full bg-info flex items-center justify-center shrink-0">
               <Check className="text-white" size={20} strokeWidth={2.5} aria-hidden />
             </span>
             <span className="text-body-lg font-medium text-foreground">

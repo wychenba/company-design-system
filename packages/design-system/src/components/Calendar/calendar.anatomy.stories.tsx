@@ -123,8 +123,8 @@ export const ColorMatrix: Story = {
                 </tr>
                 <tr>
                   <Td>Today cell(日期數字)</Td>
-                  <Td mono>bg-primary · text-on-emphasis · rounded-full · min-w-6 h-6 px-2 · text-body font-medium</Td>
-                  <Td>primary-filled pill,固定 h-6 + min-w-6 做圓形 badge(對齊 Google Calendar today pill)</Td>
+                  <Td mono>bg-info · text-on-emphasis · rounded-full · min-w-6 h-6 px-2 · text-body font-medium</Td>
+                  <Td>info-filled pill,固定 h-6 + min-w-6 做圓形 badge(對齊 Google Calendar today pill)</Td>
                 </tr>
                 <tr>
                   <Td>Outside day cell</Td>
@@ -194,7 +194,7 @@ export const StateBehavior: Story = {
   render: () => (
     <div className="h-screen p-4 bg-canvas">
       <div className="mb-2 text-body text-fg-muted space-y-1">
-        <div>• <b>today</b> cell:date 數字加 `bg-primary text-on-emphasis rounded-full` 圓</div>
+        <div>• <b>today</b> cell:date 數字加 `bg-info text-on-emphasis rounded-full` 圓</div>
         <div>• <b>outside month</b>:前後月日期數字走 `text-fg-disabled`,cell 底色 `bg-muted`</div>
         <div>• <b>多事件 cell</b>:超出 3 則的 event 顯示「+N more」</div>
         <div>• <b>event hover</b>:tile 切同色深一階 `hover:bg-{`{color}`}-2`(如 blue → `--color-blue-2`)+ `cursor-pointer`</div>

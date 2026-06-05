@@ -133,6 +133,28 @@ if (missingEntries.length > 0) {
   }
 }
 
+// ━━━ 2026-06-05 fail-closed guard:package.json scripts 引用的 `node scripts/X.mjs` 必在 mirror 存在 ━━━
+// Gap anchor:fork user 拿到的 package.json scripts(setup:netlify / create-app / deploy-url / postinstall…)
+// 都跑 `node scripts/X.mjs`;若某 script 加進 package.json 但忘了進 ALLOWLIST → fork user `npm run X` 炸,
+// 沒人擋(netlify.toml guard 只管 build/edge-function ref,不管 package.json scripts)。本 guard 補洞。
+{
+  const tmplPkgPath = join(REPO_ROOT, 'template/ds-product-template/package.json')
+  if (existsSync(tmplPkgPath)) {
+    const scripts = JSON.parse(readFileSync(tmplPkgPath, 'utf8')).scripts ?? {}
+    const refMissing = []
+    for (const [name, cmd] of Object.entries(scripts)) {
+      for (const m of String(cmd).matchAll(/node\s+(scripts\/[\w./-]+\.mjs)/g)) {
+        if (!existsSync(join(OUT_DIR, m[1]))) refMissing.push(`npm run ${name} → ${m[1]}`)
+      }
+    }
+    if (refMissing.length) {
+      console.error(`\n❌ package.json scripts 引用但 mirror 缺檔(fork user 跑 npm run 會炸):${refMissing.join(', ')}。修:加進 ALLOWLIST。`)
+      process.exit(1)
+    }
+    console.log(`  ✓ package.json scripts 引用的 node scripts/*.mjs 全在 mirror`)
+  }
+}
+
 // ━━━ Transform root package.json ━━━
 
 // dsRootPkg removed 2026-05-29(codex caught dead var)— mirror root uses templatePkg as base

@@ -161,13 +161,13 @@ export interface CircularProgressProps extends React.HTMLAttributes<HTMLSpanElem
 
 世界級對照:Material / Ant / Carbon 的 inline loading 全部 16dp;Material 獨立使用標準 = 40dp(desktop)/ 24dp(compact)。本 DS 收斂成「inline 跟 context 走 16 或 20,獨立走 24」兩檔,不暴露更多 size 階。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
-### 顏色策略:固定 `text-primary` + consumer 覆寫
+### 顏色策略:固定 `text-info` + consumer 覆寫
 
-固定 `text-primary`(品牌語義色「正在處理」)。不隨狀態變色。
+固定 `text-info`(品牌語義色「正在處理」)。不隨狀態變色。
 
 | Consumer | className | 實際色彩 |
 |----------|-----------|---------|
-| 獨立 / 全頁 / Empty overlay / Input loading | 無(走預設) | `text-primary` |
+| 獨立 / 全頁 / Empty overlay / Input loading | 無(走預設) | `text-info` |
 | Button `loading` 各 variant | `className="text-current"` | 繼承 button `text-on-emphasis` / `text-foreground` |
 
 Track 色鎖 `var(--secondary)`(= neutral-3,與 ProgressBar track 一致)。
@@ -236,7 +236,7 @@ CircularProgress 是**最薄的 circular progress primitive**,刻意避免多維
 
 - **Disabled(consumer host)**:CircularProgress 本身**不擁有 disabled state**,也不含任何弱化色邏輯。arc 固定用 `currentColor`,顏色完全跟著 host 的文字色走;若 consumer 傳 `className="text-current"`(如 Button loading),host 把文字色設成什麼,spinner 就是什麼色——由 host CSS 決定,非 CircularProgress 端 prop 或內建保證。
 - **Loading(本即元件本質)**:本元件本質是 loading indicator;無需另外的 loading prop。indeterminate(無 `value`)= 旋轉動畫,determinate(有 `value`)= 弧長對應 0–100%。
-- **Empty / 0 progress**:`value=0` 在 determinate mode 渲空 track(arc 長度 0),符合「尚未開始」語意。本元件沒有 success / error 等狀態色切換——arc 永遠是 `currentColor`(預設 `text-primary`),不會因進度值自動變色。
+- **Empty / 0 progress**:`value=0` 在 determinate mode 渲空 track(arc 長度 0),符合「尚未開始」語意。本元件沒有 success / error 等狀態色切換——arc 永遠是 `currentColor`(預設 `text-info`),不會因進度值自動變色。
 - **Dark mode**:走 Progress token + `text-current` 繼承,自動 adapt。
 - **Size 極端值**:size 為自由 number(非 sm/md/lg tier);size < 12 不建議(stroke width / icon overlap 失調),size > 96 建議改 ProgressBar(linear 在大尺寸更易讀)。
 

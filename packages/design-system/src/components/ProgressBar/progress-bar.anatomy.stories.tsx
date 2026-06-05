@@ -30,7 +30,7 @@ type AffixKey = 'none' | 'value' | 'status-icon'
 const STATUSES: StatusKey[] = ['inProgress', 'success', 'error']
 
 const STATUS_TOKEN: Record<StatusKey, { fill: string; desc: string; affixIcon?: string }> = {
-  inProgress: { fill: '--primary', desc: '進行中 / 未完成 ratio' },
+  inProgress: { fill: '--info', desc: '進行中 / 未完成 ratio' },
   success: { fill: '--success', desc: '完成 / 成功', affixIcon: '--success' },
   error:   { fill: '--error',   desc: '失敗 / 中斷', affixIcon: '--error' },
 }
@@ -58,9 +58,9 @@ export const Overview = {
               <div className="relative">
                 {/* fake track with labels */}
                 <div className="rounded-full bg-secondary overflow-hidden" style={{ height: 6 }}>
-                  <div className="h-full rounded-full bg-primary" style={{ width: '45%' }} />
+                  <div className="h-full rounded-full bg-info" style={{ width: '45%' }} />
                 </div>
-                <span className="absolute -left-1 -top-5 text-[10px] font-mono" style={{ color: 'var(--primary)' }}>fill 45%</span>
+                <span className="absolute -left-1 -top-5 text-[10px] font-mono" style={{ color: 'var(--info)' }}>fill 45%</span>
                 <span className="absolute right-0 -bottom-5 text-[10px] font-mono text-fg-muted">track</span>
               </div>
             </div>
@@ -71,7 +71,7 @@ export const Overview = {
             <div className="inline-flex items-center gap-2 border-2 border-dashed border-primary/30 rounded-md px-3 py-3 w-[360px]">
               <div className="flex-1 min-w-0">
                 <div className="rounded-full bg-secondary overflow-hidden" style={{ height: 6 }}>
-                  <div className="h-full rounded-full bg-primary" style={{ width: '45%' }} />
+                  <div className="h-full rounded-full bg-info" style={{ width: '45%' }} />
                 </div>
               </div>
               <span className="rounded px-2 py-0.5 text-[11px] font-mono border border-dashed"

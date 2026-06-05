@@ -318,7 +318,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
               {/* Date number header */}
               <div className="flex items-start justify-end">
                 {isToday ? (
-                  <span className="inline-flex items-center justify-center min-w-6 h-6 px-2 rounded-full bg-primary text-on-emphasis text-body font-medium">
+                  <span className="inline-flex items-center justify-center min-w-6 h-6 px-2 rounded-full bg-info text-on-emphasis text-body font-medium">
                     {format(date, 'd')}
                   </span>
                 ) : (
@@ -412,7 +412,7 @@ export const calendarMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: ['bg-muted', 'bg-neutral-hover', 'bg-primary', 'bg-surface'],
+    bg: ['bg-muted', 'bg-neutral-hover', 'bg-info', 'bg-surface'],
     fg: ['text-fg-disabled', 'text-fg-muted', 'text-foreground'],
     ring: ['ring-ring'],
   },

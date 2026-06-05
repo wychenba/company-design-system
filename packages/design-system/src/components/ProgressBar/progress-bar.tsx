@@ -43,7 +43,7 @@ import { cn } from '@/lib/utils'
 
 const DEFAULT_TRACK_H = 4 // 預設 4px(見 docblock「單一高度」)
 const STATUS_FILL = {
-  inProgress: 'bg-primary',
+  inProgress: 'bg-info',
   success: 'bg-success',
   error: 'bg-error',
 } as const
@@ -148,7 +148,7 @@ export const progressBarMeta = {
   },
   states: ['default'],
   tokens: {
-    bg: ['bg-error', 'bg-primary', 'bg-secondary', 'bg-success'],
+    bg: ['bg-error', 'bg-info', 'bg-secondary', 'bg-success'],
     fg: ['text-foreground'],
     ring: [],
   },

@@ -47,7 +47,7 @@ function getOuterRingShadow(ringColor: string): string {
 function resolveRingColor(state: StepContentState, linear: boolean): string {
   if (state === 'error') return 'var(--error-hover)'
   if (state === 'current' && !linear) return 'var(--border-hover)'
-  return 'var(--primary-hover)'
+  return 'var(--info-hover)'
 }
 
 // ── Contexts ──────────────────────────────────────────────────────────────
@@ -537,7 +537,7 @@ function VerticalConnectorLine() {
       aria-hidden
       className={cn(
         'absolute w-px',
-        isBlue ? 'bg-primary' : 'bg-border',
+        isBlue ? 'bg-info' : 'bg-border',
       )}
       style={{
         left: INDICATOR_BOX_WIDTH[steps.size] / 2,
@@ -587,7 +587,7 @@ function HorizontalLayout({
         {/* Connector 在 item 內部,flex-1 填滿剩餘寬度 */}
         {!item.isLast && (
           <div className="h-[1lh] flex-1 flex items-center min-w-4" aria-hidden>
-            <div className={cn('h-px w-full', isBlue ? 'bg-primary' : 'bg-border')} />
+            <div className={cn('h-px w-full', isBlue ? 'bg-info' : 'bg-border')} />
           </div>
         )}
       </StepItemHeader>
@@ -635,12 +635,12 @@ function SmIndicator({
       width: INDICATOR_SIZE.sm,
       height: INDICATOR_SIZE.sm,
       background: 'transparent',
-      border: '2px solid var(--primary-hover)',
+      border: '2px solid var(--info-hover)',
       boxShadow: focused ? getOuterRingShadow(resolveRingColor(state, linear)) : undefined,
     }
   } else {
     const dotBg =
-      state === 'completed' ? 'var(--primary)'
+      state === 'completed' ? 'var(--info)'
         : state === 'error' ? 'var(--error)'
           : state === 'current' && !linear ? 'var(--fg-disabled)'
             : 'var(--fg-disabled)' // upcoming + non-linear fallback
@@ -694,12 +694,12 @@ function MdLgIndicator({
       contentColor = 'var(--on-emphasis)'
       break
     case 'completed':
-      fillBg = 'var(--primary)'
+      fillBg = 'var(--info)'
       contentColor = 'var(--on-emphasis)'
       break
     case 'current':
       if (linear) {
-        fillBg = 'var(--primary)'
+        fillBg = 'var(--info)'
         contentColor = 'var(--on-emphasis)'
       } else {
         fillBg = 'var(--secondary)'
@@ -707,7 +707,7 @@ function MdLgIndicator({
       }
       break
     case 'reachable':
-      fillBg = 'var(--primary)'
+      fillBg = 'var(--info)'
       contentColor = 'var(--on-emphasis)'
       break
     default: // upcoming
@@ -858,7 +858,7 @@ export const stepsMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: ['bg-primary'],
+    bg: ['bg-info'],
     fg: ['--fg-disabled', '--foreground', '--on-emphasis', 'text-error-text', 'text-fg-disabled', 'text-fg-muted', 'text-fg-secondary', 'text-foreground'],
     ring: [],
   },

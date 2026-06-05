@@ -126,7 +126,7 @@ interface CalendarEvent {
 
 - **Cell 尺寸**:MVP 月 view cell 高度固定,容納日期 header + 3 個 event tile;寬度 7 欄等分
 - **日期 header**:右上角數字(對齊 Google Calendar 視覺慣例)
-- **Today cell**:日期數字以 primary-filled pill 強調(對齊 Google Calendar today pill)
+- **Today cell**:日期數字以 info-filled pill 強調(對齊 Google Calendar today pill)
 - **Outside day cell**:上/下月溢出日期弱化字色 + 背景略暗區分
 - **Hover cell**:整 cell 帶 neutral-hover 提示可點擊新增入口
 - **Weekend cell**:弱化背景(對齊 Google);MVP 未實作,列後續增量

@@ -36,8 +36,8 @@ export const Overview: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>狀態</Th><Th>Indicator</Th><Th>Label</Th><Th>Connector(右側)</Th></tr></thead>
             <tbody>
-              <tr><Td>completed</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary" size="sm" /><span>filled primary + white check icon</span></span></Td><Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td><Td><TokenCell token="--primary" display="bg-primary" /></Td></tr>
-              <tr><Td>current(= value)</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary" size="sm" /><span>filled primary + white number + ring</span></span></Td><Td><TokenCell token="--foreground" display="foreground" /></Td><Td><TokenCell token="--border" display="bg-border" /></Td></tr>
+              <tr><Td>completed</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--info" size="sm" /><span>filled info + white check icon</span></span></Td><Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td><Td><TokenCell token="--info" display="bg-info" /></Td></tr>
+              <tr><Td>current(= value)</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--info" size="sm" /><span>filled info + white number + ring</span></span></Td><Td><TokenCell token="--foreground" display="foreground" /></Td><Td><TokenCell token="--border" display="bg-border" /></Td></tr>
               <tr><Td>upcoming</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--muted" size="sm" /><span>filled muted + fg-disabled number</span></span></Td><Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td><Td><TokenCell token="--border" display="bg-border" /></Td></tr>
               <tr><Td>error</Td><Td><span className="inline-flex items-center gap-1.5"><Swatch value="--error" size="sm" /><span>bg-error + white icon</span></span></Td><Td><TokenCell token="--error-text" display="error-text" /></Td><Td>—</Td></tr>
             </tbody>
@@ -183,15 +183,15 @@ export const ColorMatrix: Story = {
             <tbody>
               <tr>
                 <Td mono>completed</Td>
-                <Td><TokenCell token="--primary" /></Td>
+                <Td><TokenCell token="--info" /></Td>
                 <Td>—(同 bg)</Td>
                 <Td><TokenCell token="white" display="白色 Check icon" /></Td>
                 <Td><TokenCell token="--fg-secondary" /></Td>
-                <Td><TokenCell token="--primary" display="bg-primary" /></Td>
+                <Td><TokenCell token="--info" display="bg-info" /></Td>
               </tr>
               <tr>
                 <Td mono>current(= value)</Td>
-                <Td><TokenCell token="--primary" /></Td>
+                <Td><TokenCell token="--info" /></Td>
                 <Td>—(同 bg)</Td>
                 <Td><TokenCell token="--on-emphasis" display="白色數字" /></Td>
                 <Td><TokenCell token="--foreground" /></Td>
@@ -217,7 +217,7 @@ export const ColorMatrix: Story = {
           </table>
         </div>
         <p className="text-footnote text-fg-muted mt-3">
-          設計 rationale:completed connector 填 primary、其餘 connector 填 border——
+          設計 rationale:completed connector 填 info、其餘 connector 填 border——
           讓「已走過的路」視覺上連續實在,「未走過的路」保持輕量。current step 的 connector 屬於「未走過」,
           所以也用 border。
         </p>
@@ -371,7 +371,7 @@ export const StateBehavior: Story = {
         <span className="text-caption font-medium text-fg-secondary">行為 1:進度流轉(current → completed 連鎖變化)</span>
         <Desc>
           當 consumer 把 cart 推入 completedValues 並把 shipping 設為 current,observe 三件事同時發生:
-          cart indicator 切 filled check、connector(cart→shipping)切 primary、shipping(md current)切 filled bg-primary + 白數字並疊 focus 外環。
+          cart indicator 切 filled check、connector(cart→shipping)切 info、shipping(md current)切 filled bg-info + 白數字並疊 focus 外環。
           對照 Linear 的 onboarding / Stripe Checkout。
         </Desc>
         <ProgressFlow />
@@ -403,7 +403,7 @@ export const StateBehavior: Story = {
         <ul className="text-caption text-fg-secondary space-y-1.5 ml-4 list-disc">
           <li>`current` 只能有一個——value 是單值,不像 completedValues 是集合。</li>
           <li>`error` 優先於 `completed`——同一 step 若同時在 completedValues + errorValues,一律渲染 error(紅底 X)。</li>
-          <li>Focus ring 顏色自動切換:current 走 `--primary-hover`(linear=false 時走 `--border-hover`)、error 走 `--error-hover`。</li>
+          <li>Focus ring 顏色自動切換:current 走 `--info-hover`(linear=false 時走 `--border-hover`)、error 走 `--error-hover`。</li>
           <li>upcoming step 不可點(linear)或 reachable 判定為 false 時 cursor:not-allowed,鍵盤 Tab 跳過。</li>
           <li>sm size(8px dot)無 indicator icon——太小畫不出 check / X;大 tier(md/lg)才有 icon 反饋。</li>
         </ul>
