@@ -84,7 +84,7 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
       mode: modeProp,
       variant: variantProp,
       error: errorProp = false,
-      size: sizeProp = 'md',
+      size: sizeProp,
       value,
       onChange,
       placeholder = 'https://',
