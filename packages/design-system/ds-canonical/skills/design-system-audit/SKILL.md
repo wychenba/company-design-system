@@ -66,7 +66,7 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 
 | # | Audit | What it catches |
 |---|-------|-----------------|
-| 11 | **Story 三層齊全 + pattern demo coverage**(2026-05-18 升)| (a) Every `Components/` (public) component has all 3 stories layers;(b) Every `patterns/<name>/` 必 ≥ 1 visual demo stories.tsx per `patterns/README.md` charter L5「每 pattern 提供 `.stories.tsx` 展示」(2026-05-23 codex Phase B 抓 Claude 前一輪錯誤 retract,charter cite + package.json `./patterns/*` exports + index.ts barrel exports 證明 patterns 是 public-API,撤回 internal exempt)|
+| 11 | **Story 層 coverage — category-aware**(2026-06-05 RFC P2:改讀 `packages/design-system/src/story-governance/category-matrix.json` 的 `requiredStories`,不再寫死「Components 三層 / patterns 必有 render demo」)| 每 unit 先 `resolveCategory()`,再按 category 要求對應的 story 層:**Component → 三層**(展示/設計規格/設計原則);**Pattern(guidance)→ guidance / composed-example**(blueprint;**不**強迫單一 primitive 的 render demo —— pattern 是「如何組合多元件」的指南、不是元件,修正前一版把 pattern 當可 render 件的錯);**Internal → reference**(≥1 Default/reference story,放寬,不要求三層);**Token → swatch**;**Template → app-scenario**。SSOT = category-matrix.json(改規矩改該檔)。搭配 classification-invariant(放對地方)+ category-templates.md v2(Component 的 trait-based shape)。錨例:2026-06-05 user 抓 dim-11 強迫 pattern 有 render demo = 把指南當元件,與世界級(Polaris/Atlassian/Carbon「pattern=組合指南」)相反|
 | 12 | **Story 人話範例** | Placeholder / abstract codes / extreme scenarios / variant names as labels |
 | 13 | **Anatomy Figma-inspect 完整度** | 5 mandatory sections present / token-first / dev language / no density dual / live swatches |
 
