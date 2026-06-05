@@ -496,10 +496,16 @@ function AddInvoiceModal({
                 </div>
               </div>
 
-              <Notice variant="info" title="注意事項">
-                自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
-                <span className="underline cursor-pointer text-[var(--color-blue-9)]">專區</span>請款。
-              </Notice>
+              <Notice
+                variant="info"
+                title="注意事項"
+                description={
+                  <>
+                    自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
+                    <span className="underline cursor-pointer text-[var(--color-blue-9)]">專區</span>請款。
+                  </>
+                }
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <Field>
