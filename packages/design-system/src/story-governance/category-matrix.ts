@@ -8,7 +8,7 @@
 
 import matrixData from './category-matrix.json'
 
-export type Category = 'token' | 'component' | 'pattern' | 'internal' | 'template'
+export type Category = 'token' | 'component' | 'pattern' | 'internal' | 'template' | 'foundation'
 
 export interface CategoryRule {
   goal: string
@@ -41,6 +41,7 @@ export const CATEGORY_MATRIX = matrixData.categories as Record<Category, Categor
 // 對應 json._decisionTree;token/template 先判(folder 強訊號),再 isInternal,再 patterns/components。
 export function resolveCategory(opts: { path: string; isInternal?: boolean }): Category {
   const p = opts.path.replace(/\\/g, '/')
+  if (p.includes('/foundations/')) return 'foundation'
   if (p.includes('/tokens/')) return 'token'
   if (p.includes('/apps/')) return 'template'
   if (opts.isInternal) return 'internal'
