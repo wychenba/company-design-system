@@ -711,10 +711,7 @@ function DraftListPage({
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button startIcon={Plus}>
-                    新增
-                    <ChevronDown size={14} className="ml-1" />
-                  </Button>
+                  <Button startIcon={Plus} endIcon={ChevronDown}>新增</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={onAddSingle}>
