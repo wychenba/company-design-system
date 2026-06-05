@@ -48,6 +48,7 @@ run('code-quality-audit', 'node scripts/code-quality-audit.mjs --scope=packages/
 run('content-quality', 'node scripts/audit-content-quality.mjs --check')
 run('governance-counters', 'node scripts/sync-governance-counters.mjs --check')
 run('gen-figma-make-artifacts', 'node scripts/gen-figma-make-artifacts.mjs --check')
+run('root barrel internal-exclusion(dim-72)', 'node scripts/gen-design-system-barrel.mjs --check')
 run('plugin-structure-validate', 'node scripts/plugin-structure-validate.mjs')
 run('story-quality', 'npm run --silent story-quality:check')
 run('ds-canonical drift check', 'node scripts/sync-ds-canonical.mjs --check')

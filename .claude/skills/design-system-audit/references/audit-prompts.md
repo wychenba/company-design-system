@@ -1314,4 +1314,11 @@ Your job(NO-SAMPLE 全 component):per-component review 公開 API surface 是否
 size?:number 該否限 token tier、prop 命名違 props-naming canonical、escape-hatch prop 該收)。Enumerate 全 component
 export interface。Report over-broad / mis-named API with file:line + 建議 tighten 方向(propose only,不自動改 = SSOT-UI/UX)。
 End:`N components, M API-surface concerns`。Don't fix。
+
+【internal-vs-public(2026-06-05 dim-72 SSOT,已落地,勿再 flag 為 over-broad）】internal 元件/pattern
+(frontmatter `- isInternal` / `internal: true`,storybook `Design System/Internal[/| ]`)**刻意排除 root barrel
+front-door**,僅留 subpath(per ui-development.md「Root barrel front-door 排除」+ user Q2 原則「internal 包裝後才可用」)。
+判定 PASS 條件:該 internal 不在 `packages/design-system/src/index.ts`(機械 `gen-design-system-barrel.mjs --check`
+已於 release:preflight gate)。**只在**「internal 卻仍出現在 root barrel」或「marking 不一致(frontmatter internal 但
+storybook 非 Internal,反之亦然)」時才 flag。已 subpath-only = 合規,non-finding。
 ```

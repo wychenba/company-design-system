@@ -19,9 +19,7 @@ export * from './components/Chip/index'
 export * from './components/CircularProgress/index'
 export * from './components/Coachmark/index'
 export * from './components/Combobox/index'
-export * from './components/Command/index'
 export * from './components/DataTable/index'
-export * from './components/DateGrid/index'
 export * from './components/DatePicker/index'
 export * from './components/DescriptionList/index'
 export * from './components/Dialog/index'
@@ -32,24 +30,17 @@ export * from './components/FieldControlGroup/index'
 export * from './components/FileItem/index'
 export * from './components/FileUpload/index'
 export * from './components/FileViewer/index'
-export * from './components/HoverCard/index'
 export * from './components/Input/index'
 export * from './components/LinkInput/index'
-export * from './components/Menu/index'
-export * from './components/Notice/index'
 export * from './components/NumberInput/index'
-export * from './components/OverflowIndicator/index'
 export * from './components/PeoplePicker/index'
 export * from './components/Popover/index'
-export * from './components/ProfileCard/index'
 export * from './components/ProgressBar/index'
 export * from './components/RadioGroup/index'
 export * from './components/Rating/index'
 export * from './components/ScrollArea/index'
 export * from './components/SegmentedControl/index'
 export * from './components/Select/index'
-export * from './components/SelectMenu/index'
-export * from './components/SelectionControl/index'
 export * from './components/Separator/index'
 export * from './components/Sheet/index'
 export * from './components/Sidebar/index'
@@ -67,10 +58,24 @@ export * from './components/TreeView/index'
 
 // ─── Patterns ─────────────────────────────────────────────────────────────
 export * from './patterns/element-anatomy/index'
-export * from './patterns/header-canonical/index'
-export * from './patterns/horizontal-overflow/index'
-export * from './patterns/overlay-surface/index'
 export * from './patterns/resize-handle/index'
+
+// ─── Internal(subpath-only,排除 root front-door per dim-72 SSOT)─────────────
+// 下列 internal 元件/pattern 不在 root barrel front-door;只能 subpath import
+// (@qijenchen/design-system/{components,patterns}/<Dir>),「包裝後 + 自行確認」才可用。
+// SSOT = 各自 spec.md frontmatter isInternal。改公開/內部請改 frontmatter 後重跑本 generator。
+//   - components/Command
+//   - components/DateGrid
+//   - components/HoverCard
+//   - components/Menu
+//   - components/Notice
+//   - components/OverflowIndicator
+//   - components/ProfileCard
+//   - components/SelectMenu
+//   - components/SelectionControl
+//   - patterns/header-canonical
+//   - patterns/horizontal-overflow
+//   - patterns/overlay-surface
 
 // ─── Hooks ────────────────────────────────────────────────────────────────
 export * from './hooks/use-controllable'

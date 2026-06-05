@@ -445,6 +445,7 @@ ItemContent.displayName = "ItemContent"
 
 const RowSizeContext = React.createContext<RowSize | null>(null)
 
+/** @internal — L3 row-size primitive;app code 不直接 import,由 MenuItem/Row/Field 等內部消費(inline-action.spec.md)。 */
 export const RowSizeProvider = RowSizeContext.Provider
 
 /**
@@ -601,6 +602,7 @@ export interface ItemInlineActionButtonProps
   overlayTrigger?: boolean
 }
 
+/** @internal — L3 inline-action primitive;app code 禁直接 import,經 MenuItem/Row endActions 消費(inline-action.spec.md)。 */
 export const ItemInlineActionButton = React.forwardRef<
   HTMLButtonElement,
   ItemInlineActionButtonProps
@@ -666,6 +668,7 @@ export interface ItemInlineActionProps {
   size?: RowSize
 }
 
+/** @internal — L3 inline-action primitive;app code 禁直接 import,經 row 元件消費(inline-action.spec.md)。 */
 export const ItemInlineAction = React.forwardRef<
   HTMLButtonElement,
   ItemInlineActionProps
