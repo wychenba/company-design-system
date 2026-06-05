@@ -770,7 +770,7 @@ function CreateFormPage({
         {/* 請款資訊 */}
         <section className="bg-surface border border-divider rounded-lg p-6">
           <h2 className="text-base font-semibold mb-4">請款資訊</h2>
-          <Button variant="outline" startIcon={Plus} onClick={() => setInvoiceModalOpen(true)}>
+          <Button variant="tertiary" startIcon={Plus} onClick={() => setInvoiceModalOpen(true)}>
             新增請款
           </Button>
 
@@ -818,7 +818,7 @@ function CreateFormPage({
         {/* 檢附憑證 / 證明 */}
         <section className="bg-surface border border-divider rounded-lg p-6">
           <h2 className="text-base font-semibold mb-4">檢附憑證 / 證明</h2>
-          <Button variant="outline" startIcon={Plus} onClick={() => setAttachmentModalOpen(true)}>
+          <Button variant="tertiary" startIcon={Plus} onClick={() => setAttachmentModalOpen(true)}>
             新增附件
           </Button>
 
@@ -880,13 +880,19 @@ function CreateFormPage({
           </Field>
 
           <div className="mt-4">
-            <Notice variant="info" title="注意事項">
-              預計付款日為申請單簽核完畢後的下個月一般付款日（每月最後工作日），若有緊急付款需求，請參考下列簽核層級：
-              <ul className="list-disc ml-4 mt-1 space-y-0.5 text-sm">
-                <li>一般付款日：100,000 TWD 以下簽核至處長，以上簽核至副總</li>
-                <li>特殊付款日：一律簽核至副總</li>
-              </ul>
-            </Notice>
+            <Notice
+              variant="info"
+              title="注意事項"
+              description={
+                <>
+                  預計付款日為申請單簽核完畢後的下個月一般付款日（每月最後工作日），若有緊急付款需求，請參考下列簽核層級：
+                  <ul className="list-disc ml-4 mt-1 space-y-0.5">
+                    <li>一般付款日：100,000 TWD 以下簽核至處長，以上簽核至副總</li>
+                    <li>特殊付款日：一律簽核至副總</li>
+                  </ul>
+                </>
+              }
+            />
           </div>
 
           <div className="mt-4 space-y-3">
@@ -915,9 +921,9 @@ function CreateFormPage({
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between mt-6 pt-4 border-t border-divider max-w-[860px]">
-        <Button variant="primary" danger onClick={onBack}>取消申請</Button>
+      <div className="flex items-center justify-end mt-6 pt-4 border-t border-divider max-w-[860px]">
         <div className="flex gap-2">
+          <Button variant="primary" danger onClick={onBack}>取消申請</Button>
           <Button variant="outline">存成草稿</Button>
           <Button onClick={handleSubmit}>下一步</Button>
         </div>
