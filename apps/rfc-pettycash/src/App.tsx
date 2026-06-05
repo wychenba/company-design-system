@@ -714,14 +714,8 @@ function DraftListPage({
                   <Button startIcon={Plus} endIcon={ChevronDown}>新增</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={onAddSingle}>
-                    <FileText size={14} />
-                    單筆申請
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={onAddExcel}>
-                    <Download size={14} />
-                    Excel 申請
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onAddSingle}>單筆申請</DropdownMenuItem>
+                  <DropdownMenuItem onClick={onAddExcel}>Excel 申請</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="outline" startIcon={Download}>下載 Excel 範本</Button>
