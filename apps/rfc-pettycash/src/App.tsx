@@ -67,6 +67,97 @@ const CATEGORIES: Record<string, string[]> = {
 }
 
 const CATEGORY_OPTIONS = Object.keys(CATEGORIES).map(k => ({ value: k, label: k }))
+
+// Category → SubCategory → ACCT code (per Figma node 24:13865)
+const ACCT_MAPPING: Record<string, Record<string, string>> = {
+  '維修及購買零配件': {
+    '純工/連工帶料(檢測、校正、加工...等)': '613009',
+    '純料(螺絲、O-ring等)': '613013',
+    '公共設施/辦公室/其他非Fab區域': '618010',
+    '維修電腦及其週邊': '618010',
+  },
+  '小型工具/物品、電腦/手機週邊、辦公家具': {
+    '小型工具/物品(把手/推車/護具/螺絲起子...等)': '618002',
+    '電腦/手機週邊': '618002',
+    '辦公家俱(台子/桌椅/隔板...等)': '618001',
+  },
+  '文具用品、印刷、書報雜誌/資料庫、軟體、郵快遞費': {
+    '標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法...等)': '618007',
+    '客製化軟體、線上互動軟體(Kahoot/Canva...等)、雲端服務(AI、API...等)': '618008',
+    '公用書籍、報章雜誌、電子報、線上資料庫': '660002',
+    '郵快遞費(如:郵局、ups、快遞等)': '660002',
+    '印刷(海報/獎狀/貼紙...等)': '660001',
+    '複印': '660002',
+    '文具用品(紙/筆/資料夾...等)': '660002',
+  },
+  '外部研討會/跨組織舉辦之研討會、宣導活動': {
+    '跨組織舉辦之研討會、宣導活動-餐飲費用': '655540',
+    '跨組織舉辦之研討會、宣導活動-贈送禮品禮券': '655540',
+    '跨組織舉辦之研討會、宣導活動-聘請外部講師或是機構': '655540',
+    '跨組織舉辦之研討會、宣導活動-用品及其他費用': '655540',
+    '參與台灣境內研討會-旅費': '655530',
+    '參與台灣境內研討會-報名費': '655520',
+    '參與台灣境外研討會-旅費': '655531',
+    '參與台灣境外研討會-報名費': '655521',
+  },
+  '訓練/招募/JDP/國內JOS': {
+    '訓練費-各部門外部訓練費': '655541',
+    '訓練費-人力資訓練費-人力資源舉辦-外部學習平台/工具資源舉辦-台積學習平台': '655505',
+    '訓練費-人力資源舉辦-交通費': '655502',
+    '訓練費-人力資源-餐飲費用': '655509',
+    '訓練費-人力資源-禮品/禮券': '655509',
+    '訓練費-人力資源-道具及其他用品': '655509',
+    '訓練費-人力資源舉辦-報名費/語言及進修補助費': '655501',
+    '國內招募_餐飲費用': '654000',
+    '國內招募_禮品禮券': '654000',
+    '國內招募_用品及其他': '654000',
+    '國外招募_餐飲費用': '654000',
+    '國外招募_禮品禮券': '654010',
+    '國外招募_用品及其他': '654000',
+    'JDP大專院校合作專案': '630120',
+    'JDP-技術研發': '654200',
+    '潛在未來人才培育': '655551',
+    '專案訓練費': '655503',
+    '考取證照費': '654100',
+    'JOS子女就學補助': '654100',
+    'JOS搬遷費': '654100',
+  },
+  '晶片光罩等運費/機儀器搬遷/辦公室搬遷': {
+    '非機儀器之搬遷或重新裝潢': '660000',
+    '運費(如:晶片車、handcarry車資等)': '660000',
+    '機儀器遷移安裝': '660000',
+  },
+  '雜支/拜拜/辦公布置': {
+    '雜支/拜拜(餐飲費用)/辦公布置等其他用品': '664900',
+    '聘請外部個人與機關團體': '664900',
+    '香油錢': '664900',
+    '禮品禮券': '664900',
+  },
+  '廣告費': {
+    '促銷廣告費': '641000',
+    '形象廣告費-國內': '641000',
+    '形象廣告費-國際': '641001',
+  },
+  'Legal專用': {
+    '律師費(216631)-國外事務所且在境外執行業務': '216631',
+    '律師費(216631)-國內事務所及其他': '216631',
+    '專利費用-國外事務所且在境外執行業務': '216635',
+    '專利費用-國內事務所及其他': '216635',
+    'Patent License': '312000',
+  },
+  '健康中心/ERG@tsmc等員工關懷': {
+    '醫療器材、救護車...等非勞務費用': '655900',
+    '餐飲費用': '655900',
+    '禮品禮物': '655900',
+    '非醫療用品與其他': '655900',
+  },
+  '專業費用專區': {
+    '會計師費': '663200',
+    '應計會計師費': '216632',
+    '顧問費-一般': '663001',
+    '顧問費-學術合作': '663001',
+  },
+}
 const TAX_RATES = [{ value: '5', label: '5%' }, { value: '0', label: '0%' }, { value: 'exempt', label: '免稅' }]
 const CURRENCY_OPTIONS = [{ value: 'TWD', label: 'TWD' }, { value: 'USD', label: 'USD' }, { value: 'EUR', label: 'EUR' }, { value: 'JPY', label: 'JPY' }]
 const PAYEE_OPTIONS = [{ value: '員工', label: '員工' }, { value: '廠商', label: '廠商' }]
@@ -343,6 +434,7 @@ function AddInvoiceModal({
   const [s2, setS2] = useState<Step2State>(defaultStep2)
   const [autoFilled, setAutoFilled] = useState(false)
   const [rateUpdateTime, setRateUpdateTime] = useState('')
+  const [contractNums, setContractNums] = useState<string[]>([''])
 
   const today = new Date()
   const mm = String(today.getMonth() + 1).padStart(2, '0')
@@ -398,6 +490,7 @@ function AddInvoiceModal({
     setS2(defaultStep2())
     setAutoFilled(false)
     setRateUpdateTime('')
+    setContractNums([''])
   }
 
   function handleClose() {
@@ -589,11 +682,14 @@ function AddInvoiceModal({
               <div className="grid grid-cols-2 gap-4">
                 <Field>
                   <FieldLabel required>分類</FieldLabel>
-                  <Select placeholder="請選擇" options={CATEGORY_OPTIONS} value={s2.category} onChange={v => setS2(p => ({ ...p, category: v as string, subCategory: '' }))} />
+                  <Select placeholder="請選擇" options={CATEGORY_OPTIONS} value={s2.category} onChange={v => setS2(p => ({ ...p, category: v as string, subCategory: '', accountCode: '' }))} />
                 </Field>
                 <Field>
                   <FieldLabel required>子分類</FieldLabel>
-                  <Select placeholder="請選擇" options={subCategoryOptions} value={s2.subCategory} onChange={v => setS2(p => ({ ...p, subCategory: v as string }))} disabled={!s2.category} />
+                  <Select placeholder="請選擇" options={subCategoryOptions} value={s2.subCategory} onChange={v => {
+                    const acct = ACCT_MAPPING[s2.category]?.[v as string] ?? ''
+                    setS2(p => ({ ...p, subCategory: v as string, accountCode: acct }))
+                  }} disabled={!s2.category} />
                 </Field>
               </div>
 
@@ -602,9 +698,9 @@ function AddInvoiceModal({
                   <FieldLabel required>成本中心&nbsp;<InfoTooltip content="填寫您的成本中心代碼" /></FieldLabel>
                   <Input value={s2.costCenter} onChange={e => setS2(p => ({ ...p, costCenter: e.target.value }))} />
                 </Field>
-                <Field>
-                  <FieldLabel>會計科目&nbsp;<InfoTooltip content="填寫對應的會計科目" /></FieldLabel>
-                  <Input value={s2.accountCode} onChange={e => setS2(p => ({ ...p, accountCode: e.target.value }))} />
+                <Field disabled={!!(s2.category && s2.subCategory && ACCT_MAPPING[s2.category]?.[s2.subCategory])}>
+                  <FieldLabel>會計科目&nbsp;<InfoTooltip content="依分類/子分類自動帶入" /></FieldLabel>
+                  <Input value={s2.accountCode} onChange={e => setS2(p => ({ ...p, accountCode: e.target.value }))} placeholder="依分類自動帶入" />
                 </Field>
               </div>
 
@@ -628,15 +724,66 @@ function AddInvoiceModal({
                 </Field>
               </div>
 
-              <div>
-                <p className="text-sm font-medium mb-2">是否提供合約編號</p>
-                <RadioGroup value={s2.contractProvided} onValueChange={v => setS2(p => ({ ...p, contractProvided: v as Step2State['contractProvided'] }))}>
-                  <div className="flex items-center gap-6">
-                    <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="yes" />是</label>
-                    <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="no" />否</label>
-                    <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="not-required" />無需提供</label>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium mb-2">是否提供合約編號</p>
+                  <RadioGroup value={s2.contractProvided} onValueChange={v => {
+                    setS2(p => ({ ...p, contractProvided: v as Step2State['contractProvided'] }))
+                    if (v !== 'yes') setContractNums([''])
+                  }}>
+                    <div className="flex items-center gap-6">
+                      <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="yes" />是</label>
+                      <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="no" />否</label>
+                      <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="not-required" />無需提供</label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                {s2.contractProvided === 'yes' && (
+                  <div className="space-y-2">
+                    <Field>
+                      <FieldLabel required>合約編號</FieldLabel>
+                      <Input
+                        placeholder="請填寫合約編號"
+                        value={contractNums[0]}
+                        onChange={e => {
+                          const next = [...contractNums]
+                          next[0] = e.target.value
+                          setContractNums(next)
+                        }}
+                      />
+                    </Field>
+                    {contractNums.slice(1).map((num, idx) => (
+                      <div key={idx + 1} className="flex items-center gap-2">
+                        <Input
+                          className="flex-1"
+                          placeholder="填寫合約編號"
+                          value={num}
+                          onChange={e => {
+                            const next = [...contractNums]
+                            next[idx + 1] = e.target.value
+                            setContractNums(next)
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors shrink-0"
+                          aria-label="刪除合約編號"
+                          onClick={() => setContractNums(prev => prev.filter((_, i) => i !== idx + 1))}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    <Button
+                      variant="tertiary"
+                      startIcon={Plus}
+                      onClick={() => setContractNums(prev => [...prev, ''])}
+                    >
+                      新增合約編號
+                    </Button>
                   </div>
-                </RadioGroup>
+                )}
               </div>
             </div>
           )}
