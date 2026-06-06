@@ -126,6 +126,9 @@ interface Step1State {
   subtotal: string
   tax: string
   taxId: string
+  incomeType: string
+  exemptAmount: string
+  withholdingAmount: string
   usePartialAmount: boolean
 }
 
@@ -305,6 +308,9 @@ const defaultStep1 = (): Step1State => ({
   subtotal: '',
   tax: '',
   taxId: '',
+  incomeType: '',
+  exemptAmount: '',
+  withholdingAmount: '',
   usePartialAmount: false,
 })
 
@@ -462,16 +468,41 @@ function AddInvoiceModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel>稅號&nbsp;<InfoTooltip content="統一編號（選填）" /></FieldLabel>
-                  <Input value={s1.taxId} onChange={e => setS1(p => ({ ...p, taxId: e.target.value }))} />
-                </Field>
-                <Field>
-                  <FieldLabel>二代健保</FieldLabel>
-                  <Input disabled value="" />
-                </Field>
-              </div>
+              {parentPayee === '員工' ? (
+                <div className="grid grid-cols-2 gap-4">
+                  <Field>
+                    <FieldLabel>稅號&nbsp;<InfoTooltip content="統一編號（選填）" /></FieldLabel>
+                    <Input value={s1.taxId} onChange={e => setS1(p => ({ ...p, taxId: e.target.value }))} />
+                  </Field>
+                  <Field disabled>
+                    <FieldLabel>二代健保</FieldLabel>
+                    <Input value="" />
+                  </Field>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Field>
+                      <FieldLabel>收入類型&nbsp;<InfoTooltip content="請選擇收入類型" /></FieldLabel>
+                      <Input value={s1.incomeType} onChange={e => setS1(p => ({ ...p, incomeType: e.target.value }))} />
+                    </Field>
+                    <Field>
+                      <FieldLabel>免稅額</FieldLabel>
+                      <Select placeholder="請選擇" options={[{ value: '0', label: '無' }, { value: 'partial', label: '部分免稅' }, { value: 'full', label: '全額免稅' }]} value={s1.exemptAmount} onChange={v => setS1(p => ({ ...p, exemptAmount: v as string }))} />
+                    </Field>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Field>
+                      <FieldLabel>預扣金額&nbsp;<InfoTooltip content="依法規計算之預扣金額" /></FieldLabel>
+                      <Input disabled value={s1.withholdingAmount} />
+                    </Field>
+                    <Field disabled>
+                      <FieldLabel>二代健保</FieldLabel>
+                      <Input value="" />
+                    </Field>
+                  </div>
+                </>
+              )}
 
               <div className="flex items-center gap-2">
                 <Checkbox id="partial" checked={s1.usePartialAmount} onCheckedChange={v => setS1(p => ({ ...p, usePartialAmount: !!v }))} />
