@@ -83,9 +83,9 @@ export const WithTabs = () => (
           </TabsList>
         }
       >
-        <span className="flex-1 truncate text-body-lg font-medium text-foreground">
+        <h2 className="flex-1 truncate text-body-lg font-medium text-foreground">
           Acme 品牌改版專案
-        </span>
+        </h2>
         <Button iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />
       </ChromeHeader>
       <TabsContent value="overview">
@@ -108,9 +108,9 @@ export const WithLeadingRail = () => (
     <ChromeHeader
       leadingRail={<LayoutGrid size={20} className="text-foreground" aria-hidden />}
     >
-      <span className="flex-1 truncate text-body-lg font-medium text-foreground">
+      <h2 className="flex-1 truncate text-body-lg font-medium text-foreground">
         Acme 工作區
-      </span>
+      </h2>
       <Button iconOnly size="sm" startIcon={Search} aria-label="搜尋" />
       <Button iconOnly size="sm" startIcon={Bell} aria-label="通知" />
     </ChromeHeader>

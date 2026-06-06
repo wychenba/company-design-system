@@ -16,6 +16,7 @@
 - [feedback_ds_css_aggregator_full_sweep_2026_05_27.md](feedback_ds_css_aggregator_full_sweep_2026_05_27.md) — DS src/**/*.css 必在 tokens.css aggregator 或被 tsx import — 否則 consumer 拿不到(2026-05-27,hook `check_orphan_ds_css.sh`)
 - [feedback_ssot_mechanical_p0_not_p1_warn_2026_05_27.md](feedback_ssot_mechanical_p0_not_p1_warn_2026_05_27.md) — SSOT canonical = 必 P0 BLOCKER 機械強制 with per-line escape comment;禁 P1 WARN soft signal(2026-05-27)
 - [feedback_ai_ground_truth_unreliable_mechanical_primary.md](feedback_ai_ground_truth_unreliable_mechanical_primary.md) — AI self-audit unreliable;mechanical(pixel/DOM/tsc/playwright)= primary defense / AI judgement = supplementary only / new audit layer ALWAYS expand never replace(2026-05-27 + composition fidelity application,合 2 file)
+- [feedback_consume_existing_classification_ssot.md](feedback_consume_existing_classification_ssot.md) — 分類/治理先消費既有 category-matrix.json 5-category SSOT,禁發明新框架疊上去(朝三暮四根因;對抗 workflow 抓出重造)+ anatomy pattern(item/header)對稱公開(2026-06-06)
 - [feedback_deploy_url_auto_detect_2026_05_27.md](feedback_deploy_url_auto_detect_2026_05_27.md) — Deploy URL auto-detection 3-strategy + per-user override + curl content sniff(2026-05-27 hook v4 ship)
 - [feedback_netlify_basic_password_canonical_2026_05_29.md](feedback_netlify_basic_password_canonical_2026_05_29.md) — Netlify 免費密碼 = Edge Function Basic Auth(STORYBOOK_BASIC_AUTH;Dashboard + _headers 都 Pro $20/mo;Identity 未 deprecated 但不適合 simple gate)+ Claude Code 直連 sandbox 是雲端主路徑 + clone-on-demand(2026-05-29 / 2026-06-05 二修)
 

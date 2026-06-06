@@ -15,9 +15,9 @@ paths:
 
 **唯一判準 = 「DS 是否想讓 consumer 直接 import 來用它」(public-API intent)** —— **不是**「空 `<X/>` 能不能 render 出有意義 UI」。世界級實證:MUI Base 官方「**requiring composition and styling does NOT make something internal — these are explicitly public primitives**」;Atlassian Primitives(Box/Stack/Inline)/ Bootstrap input-group / Ant Space.Compact 皆 public 卻需 compose。
 
-**Public**(consumer-facing):DS 想讓 consumer 直接用的東西,**包含**:(a) 成品元件 `<Button>` / `<Avatar>` / `<Dialog>` / `<DataTable>` / `<Select>`;(b) **組合 primitive —— consumer 把自己內容塞進去 / 自接 callback 才完整**:`<FieldControlGroup>`(塞 field controls = Bootstrap input-group idiom)/ `<ResizeHandle>`(接 drag math = VS Code/Figma resize idiom)。**「需要 children / 接線 / 組合」是正常 public 用法,不是 internal**。判斷訊號:benchmark 對標 consumer-facing primitive / spec「何時用」是 consumer 場景 / 有 standalone 用法 / export 給 consumer。
+**Public**(consumer-facing):DS 想讓 consumer 直接用的東西,**包含**:(a) 成品元件 `<Button>` / `<Avatar>` / `<Dialog>` / `<DataTable>` / `<Select>`;(b) **組合 primitive —— consumer 把自己內容塞進去 / 自接 callback 才完整**:`<FieldControlGroup>`(塞 field controls = Bootstrap input-group idiom)/ `<ResizeHandle>`(接 drag math = VS Code/Figma resize idiom)/ `<ChromeHeader>`(自建 chrome header chrome,follow `header-canonical` anatomy = 對標 item-anatomy 的公開 anatomy primitive)。**「需要 children / 接線 / 組合」是正常 public 用法,不是 internal**。判斷訊號:benchmark 對標 consumer-facing primitive / spec「何時用」是 consumer 場景 / 有 standalone 用法 / export 給 consumer。
 
-**Internal primitive**:**只有 DS 內部其他元件會用、consumer 永遠不碰**(consumer 用 wrapper 而非它)。Examples:`<ChromeHeader>`(只 Sidebar 內部)/ `<SurfaceHeader/Body/Footer>`(只 Dialog 內部)/ `useOverflowItems` hook / `<ItemIcon>` / `<ItemAvatar>`(只 MenuItem 內部 slot,consumer 用 `<MenuItem>` 不用裸 slot)。判斷訊號:無 consumer 場景 / 只被其他 DS 元件 import / 是別元件的 sub-part/slot/chrome。
+**Internal primitive**:**只有 DS 內部其他元件會用、consumer 永遠不碰**(consumer 用 wrapper 而非它)。Examples:`<SurfaceHeader/Body/Footer>`(只 Dialog 內部)/ `useOverflowItems` hook / `<ItemIcon>` / `<ItemAvatar>`(只 MenuItem 內部 slot,consumer 用 `<MenuItem>` 不用裸 slot)。判斷訊號:無 consumer 場景 / 只被其他 DS 元件 import / 是別元件的 sub-part/slot/chrome。
 
 **決策(verifiable)**:
 - 問:DS 想讓 end-user 在自己 app 直接 import 並用它嗎(看 benchmark / 何時用 / 是否 export 給 consumer)?

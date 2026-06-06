@@ -3,7 +3,7 @@
 ## 這裡收:多元件共用的視覺 primitive + 跨元件設計參照(anatomy)+ 組合指南
 
 每個 pattern 是「給多元件 runtime 消費」**或**「給人/AI 設計時參照」的東西,三型:
-- **runtime primitive / hook**(`.tsx` / `.ts` 實作)— eg. `ChromeHeader` / `SurfaceHeader` / `useOverflowItems`(這些多為 internal:`internal: true`)
+- **runtime primitive / hook**(`.tsx` / `.ts` 實作)— eg. `ChromeHeader`(公開組合 primitive,對標 item-anatomy MenuItem/slots)/ `SurfaceHeader` / `useOverflowItems`(後二者 internal:`internal: true`)
 - **跨元件設計參照 / anatomy**(可見消費者文件)— eg. `item-anatomy` 的 4-slot 結構 + 24px 閾值 + scanning/reading 模式 + Inspector;對齊世界級 **Material/Carbon「Anatomy」可見參照**(2026-06-06 研究:4 家 DS 一律把 anatomy 當可見第一線文件,**不藏**)
 - **跨元件組合指南**(spec 為主,**可無 `.tsx`**)— eg. `action-bar` 的 role 系統 / 排列公式;對齊世界級 **Polaris/Atlassian/Carbon「Pattern = 組合多元件解決情境的指南」**
 - 配 `.spec.md` 設計原則 + `.stories.tsx` 展示(**範例 = 人/AI 設計時的必要可見參照,不可藏**)
@@ -18,9 +18,9 @@
 
 詳定義 → `.claude/rules/ui-development.md`「Public component vs Internal primitive canonical」段。
 
-- **Public pattern**:end-user app 可直接 `<X />` render(`action-bar` / `resize-handle` / `element-anatomy` MenuItem)。Storybook title `Design System/Patterns/<Name>`。
-- **Internal pattern**:end-user app 直接 render 無 functioning UI,需 DS 內部其他元件 wrap(`header-canonical/ChromeHeader` / `horizontal-overflow useOverflowItems` / `overlay-surface SurfaceHeader/Body/Footer`)。Storybook title `Design System/Internal Patterns/<Name>`。Frontmatter `internal: true`。Export jsDoc `@internal`。
-- 下方 "當前居民" 表「Consumer」欄 = **DS-internal consumer**(不是 end-user app)— 若 Consumer 全是 other DS components → internal pattern。
+- **Public pattern**:consumer 可直接 import 用,或作為公開設計原則 / anatomy 參照(`action-bar` / `resize-handle` / `element-anatomy`(item-anatomy + slots)/ `header-canonical`(ChromeHeader header anatomy))。Storybook title `Design System/Patterns/<Name>`。
+- **Internal pattern**:只被 DS 內部其他元件 wrap、consumer 不直接碰且**無公開 anatomy 參照**(`horizontal-overflow useOverflowItems` / `overlay-surface SurfaceHeader/Body/Footer`)。Storybook title `Design System/Internal Patterns/<Name>`。Frontmatter `internal: true`。Export jsDoc `@internal`。
+- 下方 "當前居民" 表「Consumer」欄 = **DS-internal consumer**(不是 end-user app)— 若 Consumer 全是 other DS components 且**無公開 anatomy 參照** → internal pattern;但 anatomy 設計原則(item-anatomy / header-canonical)即使 runtime primitive 的 consumer 全是 DS 元件,其 anatomy story 仍是**公開 Patterns**(對齊世界級「anatomy 不藏」)。
 
 ## 當前居民
 
