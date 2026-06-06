@@ -742,7 +742,7 @@ function CreateFormPage({
         <section className="bg-surface border border-divider rounded-lg p-6">
           <h2 className="text-base font-semibold mb-4">基本資訊</h2>
           <div className="space-y-4">
-            <Field>
+            <Field disabled>
               <FieldLabel>
                 公司代號&nbsp;<InfoTooltip content="請選擇您所屬的公司代號" />
               </FieldLabel>
