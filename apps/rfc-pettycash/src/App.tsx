@@ -248,7 +248,7 @@ function AppSidebar({ activeId, onActiveChange }: { activeId: string; onActiveCh
 
 // ─── ModalStepper ────────────────────────────────────────────
 
-const STEP_LABELS = ['填寫請款資訊', '填寫付款細項', '新增憑證/證明'] as const
+const STEP_LABELS = ['填寫請款資訊', '填寫付款細項', '檢附憑證/證明'] as const
 
 function ModalStepper({ current }: { current: 1 | 2 | 3 }) {
   return (
@@ -325,10 +325,12 @@ function AddInvoiceModal({
   open,
   onClose,
   onSubmit,
+  payee: parentPayee = '員工',
 }: {
   open: boolean
   onClose: () => void
   onSubmit: (invoice: Invoice) => void
+  payee?: string
 }) {
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [s1, setS1] = useState<Step1State>(defaultStep1)
@@ -403,7 +405,7 @@ function AddInvoiceModal({
                 </div>
               </div>
 
-              <Field>
+              <Field disabled={parentPayee === '員工'}>
                 <FieldLabel required>收款人/廠商</FieldLabel>
                 <Input value={s1.payee} onChange={e => setS1(p => ({ ...p, payee: e.target.value }))} />
               </Field>
@@ -939,6 +941,7 @@ function CreateFormPage({
         open={invoiceModalOpen}
         onClose={() => setInvoiceModalOpen(false)}
         onSubmit={handleAddInvoice}
+        payee={payee}
       />
       <AddAttachmentModal
         open={attachmentModalOpen}
