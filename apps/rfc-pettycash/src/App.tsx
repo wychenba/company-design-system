@@ -912,13 +912,12 @@ function CreateFormPage({
                 使用緊急/指定付款
               </label>
             </div>
-            <Field>
-              <FieldLabel className={!useUrgentDate ? 'text-fg-disabled' : ''}>緊急/指定付款日</FieldLabel>
+            <Field disabled={!useUrgentDate}>
+              <FieldLabel>緊急/指定付款日</FieldLabel>
               <Input
                 type="date"
                 value={urgentDate}
                 onChange={e => setUrgentDate(e.target.value)}
-                disabled={!useUrgentDate}
                 placeholder="請選擇"
               />
             </Field>
