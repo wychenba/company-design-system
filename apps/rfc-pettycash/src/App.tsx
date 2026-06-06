@@ -1388,9 +1388,7 @@ function DraftListPage({
                       <td className="px-4 py-3 text-fg-secondary">{entry.reason}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-0.5">
-                          <button className="p-1.5 rounded text-fg-disabled cursor-not-allowed" aria-label="查看" disabled>
-                            <Info size={14} />
-                          </button>
+                          <Button variant="ghost" size="sm" iconOnly startIcon={Info} aria-label="查看" disabled />
                           <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
                             <Pencil size={14} />
                           </button>
