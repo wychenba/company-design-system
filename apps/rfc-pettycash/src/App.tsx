@@ -913,7 +913,7 @@ function CreateFormPage({
               </label>
             </div>
             <Field>
-              <FieldLabel>緊急/指定付款日</FieldLabel>
+              <FieldLabel className={!useUrgentDate ? 'text-fg-disabled' : ''}>緊急/指定付款日</FieldLabel>
               <Input
                 type="date"
                 value={urgentDate}
