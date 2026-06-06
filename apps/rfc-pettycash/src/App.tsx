@@ -13,11 +13,12 @@ import {
   Tag, Alert,
   Toaster, toast,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+  Steps, StepItem, StepLabel,
 } from '@qijenchen/design-system'
 import {
   Home, FileText, Upload, ClipboardList, Users, BookOpen,
   MessageSquare, Plus, Pencil, Trash2, Download,
-  Info, ChevronDown, Check, Copy,
+  Info, ChevronDown, Copy,
 } from 'lucide-react'
 
 // ─── Constants ───────────────────────────────────────────────
@@ -340,53 +341,9 @@ function AppSidebar({ activeId, onActiveChange }: { activeId: string; onActiveCh
   )
 }
 
-// ─── ModalStepper ────────────────────────────────────────────
+// ─── Step labels ─────────────────────────────────────────────
 
 const STEP_LABELS = ['填寫請款資訊', '填寫付款細項', '檢附憑證/證明'] as const
-
-function ModalStepper({ current }: { current: 1 | 2 | 3 }) {
-  return (
-    <div className="flex items-center mb-6">
-      {STEP_LABELS.map((label, idx) => {
-        const step = (idx + 1) as 1 | 2 | 3
-        const done = step < current
-        const active = step === current
-        return (
-          <div key={step} className="flex items-center flex-1 last:flex-none min-w-0">
-            <div className="flex items-center gap-2 shrink-0">
-              <div
-                className={[
-                  'size-6 rounded-full flex items-center justify-center text-xs font-semibold',
-                  done || active
-                    ? 'bg-[var(--color-blue-9)] text-white'
-                    : 'bg-[var(--color-neutral-3)] text-fg-tertiary',
-                ].join(' ')}
-              >
-                {done ? <Check size={12} strokeWidth={3} /> : step}
-              </div>
-              <span
-                className={[
-                  'text-sm whitespace-nowrap',
-                  active ? 'text-fg-primary font-medium' : done ? 'text-fg-primary' : 'text-fg-tertiary',
-                ].join(' ')}
-              >
-                {label}
-              </span>
-            </div>
-            {idx < STEP_LABELS.length - 1 && (
-              <div
-                className={[
-                  'flex-1 h-px mx-3',
-                  done ? 'bg-[var(--color-blue-9)]' : 'bg-[var(--color-neutral-3)]',
-                ].join(' ')}
-              />
-            )}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
 
 // ─── Default form state ──────────────────────────────────────
 
@@ -530,7 +487,19 @@ function AddInvoiceModal({
           <DialogTitle>{MODAL_TITLES[step]}</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          <ModalStepper current={step} />
+          <Steps
+            orientation="horizontal"
+            value={String(step)}
+            completedValues={Array.from({ length: step - 1 }, (_, i) => String(i + 1))}
+            linear
+            className="mb-[var(--layout-space-distant)]"
+          >
+            {STEP_LABELS.map((label, idx) => (
+              <StepItem key={idx + 1} value={String(idx + 1)}>
+                <StepLabel>{label}</StepLabel>
+              </StepItem>
+            ))}
+          </Steps>
 
           {/* Step 1 */}
           {step === 1 && (
