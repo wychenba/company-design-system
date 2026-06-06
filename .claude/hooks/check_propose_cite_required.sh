@@ -36,7 +36,30 @@ esac
 TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_path // ""' 2>/dev/null)
 [ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ] && exit 0
 
-LAST_REPLY=$(tail -200 "$TRANSCRIPT" 2>/dev/null | grep -E '"role":"assistant"|"type":"text"' | tail -50 | tr -d '\n' | head -c 8000)
+# Extract only the last assistant message (not tool results / user messages which also have "type":"text")
+LAST_REPLY=$(python3 -c "
+import sys, json
+data = []
+try:
+    for line in open('$TRANSCRIPT'):
+        line = line.strip()
+        if line:
+            try: data.append(json.loads(line))
+            except: pass
+except: pass
+# Find last assistant message
+last = ''
+for item in reversed(data):
+    role = item.get('role','') or (item.get('message') or {}).get('role','')
+    if role == 'assistant':
+        msg = item.get('message', item)
+        for block in (msg.get('content') or []):
+            if isinstance(block, dict) and block.get('type') == 'text':
+                last += block.get('text','')
+        if last:
+            break
+print(last[:8000])
+" 2>/dev/null || echo "")
 
 # Escape clause
 if echo "$LAST_REPLY" | grep -q 'propose-cite-skip'; then
