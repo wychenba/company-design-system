@@ -732,7 +732,7 @@ function CreateFormPage({
           </div>
           <h1 className="text-2xl font-semibold">一般項目申請單 {formNumber}</h1>
         </div>
-        <Button variant="tertiary" startIcon={Upload}>批次匯入申請</Button>
+        <Button variant="tertiary" startIcon={Upload} disabled>批次匯入申請</Button>
       </div>
 
       {/* Form sections */}
