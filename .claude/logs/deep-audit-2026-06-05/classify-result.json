@@ -1,0 +1,361 @@
+{
+  "summary": "Classify all 47 mechanically-flagged story names: real violation (Chinese fix) vs legit-keep (prop/token/ARIA/unit/brand). NO-SAMPLE.",
+  "agentCount": 4,
+  "logs": [
+    "classified 47/47 | VIOLATION 18 | LEGIT 29"
+  ],
+  "result": {
+    "violations": [
+      {
+        "file": "components/DatePicker/date-picker.stories.tsx",
+        "line": 200,
+        "name": "Range:浮層展開狀態",
+        "verdict": "VIOLATION",
+        "reason": "grep date-picker.tsx,DatePicker 的 prop 是 `mode`(L276 mode?: FieldMode),無 `Range` prop;此處 Range 是有中文等價的一般模式詞(範圍),Range→範圍 屬明列違規詞。",
+        "suggestedFix": "範圍:浮層展開狀態"
+      },
+      {
+        "file": "components/Slider/slider.principles.stories.tsx",
+        "line": 128,
+        "name": "位置/長度是 state,不是顏色",
+        "verdict": "VIOLATION",
+        "reason": "grep slider.tsx 無 `state` prop;此處 state 是一般概念詞(狀態),slider.tsx 註解本身也用「semantic state」當概念用,有中文等價,State→狀態 屬明列違規詞。",
+        "suggestedFix": "位置/長度是狀態,不是顏色"
+      },
+      {
+        "file": "components/Dialog/dialog.principles.stories.tsx",
+        "line": 256,
+        "name": "Footer 按鈕配對",
+        "verdict": "VIOLATION",
+        "reason": "雖有 DialogFooter 元件,但 name 中 Footer 作一般區域詞(頁尾)描述按鈕配對,非引用元件識別字字串;Footer→頁尾 屬明列違規詞,中文人話更佳。",
+        "suggestedFix": "頁尾按鈕配對"
+      },
+      {
+        "file": "components/Button/button.principles.stories.tsx",
+        "line": 180,
+        "name": "Primary 限制",
+        "verdict": "VIOLATION",
+        "reason": "雖有 variant=\"primary\",但 name 中 Primary 作一般描述詞(主要)指主要操作數量限制,非字面 prop 值字串;Primary→主要 屬明列違規詞。",
+        "suggestedFix": "主要按鈕限制"
+      },
+      {
+        "file": "components/FileItem/file-item.stories.tsx",
+        "line": 242,
+        "name": "Upload manager · 精簡(無邊框)",
+        "verdict": "VIOLATION",
+        "reason": "真 prop 值是 `surface='upload-manager'`(file-item.tsx L64),但 name 寫成大寫空格分隔的「Upload manager」一般描述語,非字面 prop 值;spec 自身以中文「上傳管理面板」稱之,Upload→上傳 屬明列違規詞。",
+        "suggestedFix": "上傳管理 · 精簡(無邊框)"
+      },
+      {
+        "file": "components/Coachmark/coachmark.principles.stories.tsx",
+        "line": 218,
+        "name": "多步 Tour 最佳實踐",
+        "verdict": "VIOLATION",
+        "reason": "grep coachmark.tsx,tour 僅出現在註解概念描述(onboarding tour),非 prop;一般概念詞有中文等價,Tour→導覽 屬明列違規詞。",
+        "suggestedFix": "多步導覽最佳實踐"
+      },
+      {
+        "file": "components/Badge/badge.stories.tsx",
+        "line": 48,
+        "name": "Dot 模式",
+        "verdict": "VIOLATION",
+        "reason": "雖有 `dot?: boolean` prop(badge.tsx L50),但 name 將其大寫作一般視覺模式描述詞「Dot 模式」,spec 自身描述為「純色圓點」;Dot→圓點 屬明列違規詞,中文人話「圓點模式」更佳。",
+        "suggestedFix": "圓點模式"
+      },
+      {
+        "file": "components/Input/input.principles.stories.tsx",
+        "line": 238,
+        "name": "Error 呈現",
+        "verdict": "VIOLATION",
+        "reason": "雖然 input.tsx L33 有 `error?: boolean` prop,但 name 用 title-case「Error」當一般狀態詞(rubric 明列 Error→錯誤),有乾淨中文等價;非以 prop 字面值呈現。應中文化。",
+        "suggestedFix": "錯誤呈現"
+      },
+      {
+        "file": "components/DropdownMenu/dropdown-menu.principles.stories.tsx",
+        "line": 203,
+        "name": "Item 類型選擇",
+        "verdict": "VIOLATION",
+        "suggestedFix": "項目類型選擇",
+        "reason": "判準明列 Item→項目 為一般詞違規。story 在講「選哪種項目類型」(普通/勾選/單選),語意是一般詞「項目」,有中文等價 → 中文化。"
+      },
+      {
+        "file": "components/DatePicker/date-picker.principles.stories.tsx",
+        "line": 137,
+        "name": "Display 格式化",
+        "verdict": "VIOLATION",
+        "suggestedFix": "顯示格式化",
+        "reason": "無 standalone `display` prop(只有 showDisplayEndIcon)。name 把 Display 當「顯示」一般詞用,判準明列 Display→顯示 為違規 → 中文化。"
+      },
+      {
+        "file": "components/Steps/steps.principles.stories.tsx",
+        "line": 262,
+        "name": "規則:Linear 點回 completed 不改狀態",
+        "verdict": "VIOLATION",
+        "suggestedFix": "規則:Linear 點回 完成項 不改狀態",
+        "reason": "雖 `completed` 是 StepContentState enum 值,但判準明列 completed→完成 為一般狀態詞違規,當 name 用應中文化(Linear 為 Steps mode/品牌名保留)。"
+      },
+      {
+        "file": "components/ProfileCard/profile-card.stories.tsx",
+        "line": 45,
+        "name": "Hover 展開 ProfileCard",
+        "verdict": "VIOLATION",
+        "suggestedFix": "懸停展開 ProfileCard",
+        "reason": "Hover 是一般互動詞,判準明列 Hover→懸停 為違規。ProfileCard 是元件名保留,只中文化 Hover。"
+      },
+      {
+        "file": "components/Sheet/sheet.principles.stories.tsx",
+        "line": 320,
+        "name": "Header / Footer 結構",
+        "verdict": "VIOLATION",
+        "suggestedFix": "頁首 / 頁尾 結構",
+        "reason": "雖 SheetHeader/SheetFooter 是 subcomponent,但 name 描述的是結構概念,判準明列 Header→頁首 / Footer→頁尾 為一般詞違規 → 中文化。"
+      },
+      {
+        "file": "components/Badge/badge.stories.tsx",
+        "line": 62,
+        "name": "Max 上限",
+        "verdict": "VIOLATION",
+        "suggestedFix": "數量上限",
+        "reason": "雖 `max` 是真 prop,但 name `Max 上限` 同義重複(Max=上限),判準明列 Max→上限 為一般詞違規;此處 Max 大寫當一般詞用非 prop 格式引用 → 中文化。"
+      },
+      {
+        "file": "components/DateGrid/date-grid.stories.tsx",
+        "line": 126,
+        "name": "Range — 分析時段 / 訂單範圍",
+        "verdict": "VIOLATION",
+        "reason": "bad word `Range` 是有中文等價的一般選取模式詞(範圍),且 name 內已自帶「範圍」中文。雖然 DS 有 mode='range' / DatePickerRange 概念,但這裡是用作 name 標題的一般詞而非 prop 識別字,屬判準明列的違規例(Range→範圍)。",
+        "suggestedFix": "範圍 — 分析時段 / 訂單範圍"
+      },
+      {
+        "file": "components/Slider/slider.principles.stories.tsx",
+        "line": 128,
+        "name": "位置/長度是 state,不是顏色",
+        "verdict": "VIOLATION",
+        "reason": "bad word `state` 是有中文等價的一般狀態詞(狀態),非 Slider prop 識別字,屬判準明列的違規例(state→狀態)。",
+        "suggestedFix": "位置/長度是狀態,不是顏色"
+      },
+      {
+        "file": "components/Textarea/textarea.principles.stories.tsx",
+        "line": 127,
+        "name": "Readonly 用底色標示閱讀區（不同於 Input）",
+        "verdict": "VIOLATION",
+        "reason": "bad word `Readonly` 是有中文等價的一般狀態詞(唯讀),此處作 name 標題的一般模式詞用(非 prop 識別字寫法),屬判準明列的違規例(Readonly→唯讀)。Input 為品牌/元件名保留。",
+        "suggestedFix": "唯讀模式用底色標示閱讀區（不同於 Input）"
+      },
+      {
+        "file": "components/Steps/steps.principles.stories.tsx",
+        "line": 262,
+        "name": "規則:Linear 點回 completed 不改狀態",
+        "verdict": "VIOLATION",
+        "reason": "bad word `completed` 是有中文等價的一般狀態詞(完成),雖為 StepContentState 值但此處作 name 一般詞用,屬判準明列的違規例(completed→完成)。Linear 為線性模式專名,保留。",
+        "suggestedFix": "規則:Linear 點回已完成不改狀態"
+      }
+    ],
+    "legit": [
+      {
+        "file": "patterns/element-anatomy/item-anatomy.stories.tsx",
+        "line": 926,
+        "name": "對齊容器（24px 閾值）",
+        "verdict": "LEGIT",
+        "reason": "px 是 CSS 長度單位(24px),屬判準 (d) 單位類別,非一般詞,合法保留。"
+      },
+      {
+        "file": "components/TreeView/tree-view.anatomy.stories.tsx",
+        "line": 377,
+        "name": "鍵盤導覽（ARIA tree）",
+        "verdict": "LEGIT",
+        "reason": "tree 是 ARIA role(role=\"tree\"),屬判準 (c) ARIA role 類別;name 已標明「ARIA tree」明確指 role,合法保留。"
+      },
+      {
+        "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+        "line": 225,
+        "name": "children 要填滿容器",
+        "verdict": "LEGIT",
+        "reason": "children 是真 React prop —— AspectRatioProps = React.ComponentPropsWithoutRef<typeof AspectRatioPrimitive.Root>(L28),含標準 children;name 引用字面 prop 識別字,屬判準 (a) 真 prop,合法保留。"
+      },
+      {
+        "file": "components/ProgressBar/progress-bar.anatomy.stories.tsx",
+        "line": 351,
+        "name": "Affix 行為",
+        "verdict": "LEGIT",
+        "reason": "affix 是真 prop —— progress-bar.tsx L61 `affix?: 'value' | 'status-icon' | React.ReactNode`,DS anatomy 識別字;屬判準 (a)/(e),合法保留。"
+      },
+      {
+        "file": "components/Breadcrumb/breadcrumb.stories.tsx",
+        "line": 298,
+        "name": "整合 React Router / Next.js Link",
+        "verdict": "LEGIT",
+        "reason": "js 是品牌名「Next.js」的一部分(專有名詞),Link 是 React Router / Next.js 的元件名(專有名詞);屬判準 (e) 品牌·專有·元件名,合法保留。"
+      },
+      {
+        "file": "components/FileUpload/file-upload.stories.tsx",
+        "line": 84,
+        "name": "內建 files 屬性",
+        "verdict": "LEGIT",
+        "reason": "grep file-upload.tsx L97 `files?: FileUploadStatus[]` — files 是真實 prop 識別字,name 已是「內建 files 屬性」中文人話 + 真 prop 名,合法保留。"
+      },
+      {
+        "file": "components/DatePicker/date-picker.stories.tsx",
+        "line": 302,
+        "name": "showTime Range:活動時段",
+        "verdict": "LEGIT",
+        "reason": "grep date-picker.tsx L657 `DatePickerRange` + L659 對齊 Ant RangePicker canonical;Range 是 DatePicker 真實模式/元件識別字(`showTime Range` = 帶時間的範圍模式),合法保留。"
+      },
+      {
+        "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+        "line": 225,
+        "name": "children 要填滿容器",
+        "verdict": "LEGIT",
+        "reason": "aspect-ratio.tsx `AspectRatioProps = React.ComponentPropsWithoutRef<typeof Root>`,Radix Root 接受 children;children 是真實 prop 識別字(React 標準 prop),story 講 children 內容填滿容器,合法保留。"
+      },
+      {
+        "file": "components/Slider/slider.principles.stories.tsx",
+        "line": 213,
+        "name": "Thumb 白底 + 邊框,不用實心",
+        "verdict": "LEGIT",
+        "reason": "grep slider.tsx L123 `<SliderPrimitive.Thumb>` — Thumb 是 Radix/DS anatomy 子元件名(滑桿把手),非一般詞,合法保留。"
+      },
+      {
+        "file": "components/ProgressBar/progress-bar.anatomy.stories.tsx",
+        "line": 351,
+        "name": "Affix 行為",
+        "verdict": "LEGIT",
+        "reason": "grep progress-bar.tsx L61 `affix?: 'value' | 'status-icon' | React.ReactNode` — Affix 是真實 prop 識別字(右側附加區),合法保留。"
+      },
+      {
+        "file": "components/SelectionControl/selection-item.anatomy.stories.tsx",
+        "line": 386,
+        "name": "Prefix 對齊規則（24px 閾值）",
+        "verdict": "LEGIT",
+        "reason": "grep selection-item.stories.tsx L17 SelectionItem 3-slot:control + optional prefix(icon/avatar)+ content;prefix 是真實 slot/prop 識別字。px 是單位。皆合法保留。"
+      },
+      {
+        "file": "components/Button/button.stories.tsx",
+        "line": 114,
+        "name": "Danger 語意",
+        "verdict": "LEGIT",
+        "reason": "grep button.tsx L128 `danger: {...}` cva variant + L23 `danger prop`;Danger 是真實 prop 識別字(危險色 prop),story 示範 danger prop,合法保留。"
+      },
+      {
+        "file": "components/FileItem/file-item.stories.tsx",
+        "line": 242,
+        "name": "Upload manager · 精簡(無邊框)",
+        "verdict": "LEGIT",
+        "reason": "grep file-item.tsx L64 `surface?: 'form' | 'upload-manager'` — upload-manager 是真實 surface prop 值識別字(對應 Google Drive/Dropbox 上傳管理面板場景),story 示範該 surface 變體,合法保留。"
+      },
+      {
+        "file": "components/Breadcrumb/breadcrumb.anatomy.stories.tsx",
+        "line": 417,
+        "name": "長路徑收合（Ellipsis）",
+        "verdict": "LEGIT",
+        "reason": "grep breadcrumb.tsx L254 `<BreadcrumbEllipsis />` + L251 `role=\"ellipsis\"` — Ellipsis 是 DS anatomy 子元件名(收合節點),name 主體已中文「長路徑收合」+ 括號標 anatomy 名,合法保留。"
+      },
+      {
+        "file": "components/Coachmark/coachmark.principles.stories.tsx",
+        "line": 314,
+        "name": "Media 內容原則",
+        "verdict": "LEGIT",
+        "reason": "grep coachmark.tsx L59 `頂部 media 區` prop + L66 `mediaRatio` — media 是真實 prop/slot 識別字(頂部圖片/illustration 區),合法保留。"
+      },
+      {
+        "file": "components/Badge/badge.stories.tsx",
+        "line": 62,
+        "name": "Max 上限",
+        "verdict": "LEGIT",
+        "reason": "grep badge.tsx L54 `max?: number` — Max 是真實 prop 識別字(數量上限 prop,超過顯示 \"max+\"),story 示範 max prop,合法保留。"
+      },
+      {
+        "file": "components/DateGrid/date-grid.principles.stories.tsx",
+        "line": 302,
+        "name": "Locale 與週首日",
+        "verdict": "LEGIT",
+        "reason": "`locale` 是 DateGrid 真實 prop(grep date-grid.stories.tsx `locale={zhTW}` + anatomy 文件化 `['locale', 'Locale', \"'en-US'\", ...]`)。Locale 是 i18n 國際化技術術語(無單一中文等價),且為真 prop 識別字 → LEGIT (a)。"
+      },
+      {
+        "file": "components/Slider/slider.anatomy.stories.tsx",
+        "line": 173,
+        "name": "範圍 ↔ Thumb 邊框 綁定規則",
+        "verdict": "LEGIT",
+        "reason": "`SliderPrimitive.Thumb` 是真 Radix anatomy part(grep slider.tsx L123 `<SliderPrimitive.Thumb`)。判準 LEGIT (e) 明列 Thumb 為 DS anatomy 名 → 保留。"
+      },
+      {
+        "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+        "line": 322,
+        "name": "Filmstrip 顯示判準",
+        "verdict": "LEGIT",
+        "reason": "Filmstrip 是真 DS feature/anatomy 名(grep file-viewer.tsx multi-region 註解 `Toolbar / Viewport / Filmstrip`)。判準 LEGIT (e) 明列 Filmstrip 為 DS feature 名 → 保留。"
+      },
+      {
+        "file": "components/Field/field.stories.tsx",
+        "line": 143,
+        "name": "混合 控制元件 的 field 高度對齊",
+        "verdict": "LEGIT",
+        "reason": "`field` 指 DS `field-height` token / Field family 概念(grep field.tsx `min-h-field-*` / `--field-height-{size}` 公式)。field-height 是真 DS token 命名空間 + Family 4 名 → LEGIT (DS token/概念名)。"
+      },
+      {
+        "file": "components/Textarea/textarea.anatomy.stories.tsx",
+        "line": 263,
+        "name": "Rows 與 縮放",
+        "verdict": "LEGIT",
+        "reason": "`rows` 是 Textarea 真實 prop(grep textarea.tsx L184 `rows = 3` + 註解 `消費者可透過 rows prop 調整`)。判準 LEGIT (a) 真 prop 識別字 → 保留。"
+      },
+      {
+        "file": "components/DataTable/data-table.anatomy.stories.tsx",
+        "line": 470,
+        "name": "bordered 屬性（預設 true）",
+        "verdict": "LEGIT",
+        "reason": "`bordered` 是 DataTable 真實 prop/cva variant(grep data-table.tsx L48 `bordered: { true:..., false:... }` + L49 `defaultVariants: { bordered: true }`)。name 以 prop 名 + 真實預設值格式呈現,`true` 是該 prop 真實 default → LEGIT (a) 真 prop 識別字。"
+      },
+      {
+        "file": "components/Separator/separator.anatomy.stories.tsx",
+        "line": 80,
+        "name": "設計變數 規則（--divider vs --border）",
+        "verdict": "LEGIT",
+        "reason": "`--divider` 與 `--border` 是 CSS 設計變數(token)名稱,屬判準 (b) CSS token 名白名單,保留原樣。"
+      },
+      {
+        "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+        "line": 194,
+        "name": "如何選 ratio",
+        "verdict": "LEGIT",
+        "reason": "grep aspect-ratio.tsx 確認 `ratio` 是真 prop(consumer 傳 `ratio={n/m}`,如 16/9),屬判準 (a) 真 prop 識別字,保留。"
+      },
+      {
+        "file": "components/ProgressBar/progress-bar.principles.stories.tsx",
+        "line": 265,
+        "name": "Affix 選擇",
+        "verdict": "LEGIT",
+        "reason": "grep progress-bar.tsx/stories 確認 `affix` 是真 prop(affix='value'|'status-icon'),屬判準 (a) 真 prop 識別字,保留。"
+      },
+      {
+        "file": "components/Combobox/combobox.principles.stories.tsx",
+        "line": 134,
+        "name": "Wrap 模式選擇",
+        "verdict": "LEGIT",
+        "reason": "grep combobox.tsx 確認 `wrap: boolean` 是真 prop(OverflowTagList wrap 參數),屬判準 (a) 真 prop 識別字,保留。"
+      },
+      {
+        "file": "components/ProfileCard/profile-card.principles.stories.tsx",
+        "line": 157,
+        "name": "寬度固定 320px",
+        "verdict": "LEGIT",
+        "reason": "`px` 是長度單位(pixel),屬判準 (d) 單位白名單,保留。"
+      },
+      {
+        "file": "components/Sheet/sheet.anatomy.stories.tsx",
+        "line": 138,
+        "name": "Side 方向 × 用途",
+        "verdict": "LEGIT",
+        "reason": "grep sheet.tsx 確認 `side` 是真 prop/variant(side='right' defaultVariants,top/bottom/left 內部基建),屬判準 (a) 真 prop 識別字,保留。"
+      },
+      {
+        "file": "components/Badge/badge.stories.tsx",
+        "line": 62,
+        "name": "Max 上限",
+        "verdict": "LEGIT",
+        "reason": "grep badge.tsx 確認 `max?: number` 是真 prop(超過時顯示 'max+'),此處 `Max` 指真 prop 名,屬判準 (a) 真 prop 識別字,保留(name 已附中文上限)。"
+      }
+    ],
+    "totalClassified": 47
+  }
+}

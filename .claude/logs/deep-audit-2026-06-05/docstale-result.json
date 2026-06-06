@@ -1,0 +1,1269 @@
+{
+  "summary": "Fix DOC_STALE findings: align stale docs to code. Agents edit .spec.md/.md directly + emit .tsx edits for main loop to apply via bypass.",
+  "agentCount": 55,
+  "logs": [
+    "spec/md fixed in-place: 66 | tsx edits emitted: 104 | flagged-not-doc: 39"
+  ],
+  "result": {
+    "specFixedTotal": 66,
+    "tsxEdits": [
+      {
+        "file": "packages/design-system/src/components/Tabs/tabs.tsx",
+        "old": "   *   'menu'   塞不下收進 \"⋯\" dropdown，所有 triggers 仍在 DOM 保留 Radix a11y",
+        "new": "   *   'menu'   show-all navigator——全部 triggers 一直顯示在底層 overflow-x-auto 捲動容器內,",
+        "finding": "tabs.tsx:126 — overflow JSDoc 兩錯:(1) icon 是 ChevronDown ⌄ 非 ⋯(horizontal-overflow.tsx L207 startIcon={ChevronDown});(2)『塞不下收進』暗示 overflow-only collapse,但 code(L304-348)全部 tab 同時在 strip 與 dropdown show-all navigator。對齊 spec L153/L163 + tsx L235。",
+        "unit": "Tabs"
+      },
+      {
+        "file": "packages/design-system/src/components/Tabs/tabs.tsx",
+        "old": "//   - Menu 內容穩定,跟 scroll 位置無關,使用者對「⋯ = navigator」的直覺一致",
+        "new": "//   - Menu 內容穩定,跟 scroll 位置無關,使用者對「⌄ = navigator」的直覺一致",
+        "finding": "tabs.tsx:237 — inline comment 把 navigator icon 標成 ⋯,實際 render 的是 ChevronDown ⌄(horizontal-overflow.tsx L207)。spec L163 正確標 ⌄。",
+        "unit": "Tabs"
+      },
+      {
+        "file": "packages/design-system/src/components/Tabs/tabs.anatomy.stories.tsx",
+        "old": "      description: 'none★default / scroll=水平捲動 + fade mask / menu=⋯ dropdown',",
+        "new": "      description: 'none★default / scroll=水平捲動 + fade mask / menu=⌄ navigator dropdown(列全部 tab,全 trigger 仍可見)',",
+        "finding": "tabs.anatomy.stories.tsx:126 — argType description 稱 menu 用 ⋯ icon,實際 trigger 是 ChevronDown ⌄(horizontal-overflow.tsx L207);且 menu 是 show-all navigator 非隱藏溢出。spec L153/L163 正確標 ⌄。",
+        "unit": "Tabs"
+      },
+      {
+        "file": "packages/design-system/src/components/Tabs/tabs.anatomy.stories.tsx",
+        "old": "        <H3>Badge suffix 色彩(跟隨 selected 狀態)</H3>\n        <Desc>\n          Badge 作為 suffix 時,未選狀態保持 Badge 原色(low / high variant);selected 時跟著\n          trigger 文字色變化,視覺重量統一。\n        </Desc>",
+        "new": "        <H3>Badge suffix 色彩(固定 variant 色,不隨 selected 變)</H3>\n        <Desc>\n          Badge 作為 suffix 時,顏色固定由其 variant token 決定(low / high),selected 與否\n          都維持 Badge 原色——trigger 的 data-[state=active] 文字色只作用在 trigger 本身,不傳遞到 Badge。\n        </Desc>",
+        "finding": "tabs.anatomy.stories.tsx:279-280 — 假行為宣稱:Badge 渲染固定 token 色(badge.tsx L29-33:low='bg-secondary text-fg-muted' / high='bg-info text-on-emphasis'),非 currentColor;tabs.tsx L377 data-[state=active]:text-foreground 只套在 trigger,不傳到 Badge。Badge 色不隨 tab 選中改變。H3 L279『跟隨 selected 狀態』與 Desc 皆 false。",
+        "unit": "Tabs"
+      },
+      {
+        "file": "packages/design-system/src/components/Tabs/tabs.anatomy.stories.tsx",
+        "old": "        <H3>overflow=\"menu\" — 隱藏溢出 + DropdownMenu trigger</H3>",
+        "new": "        <H3>overflow=\"menu\" — 全部 tab 一直可見 + ⌄ navigator dropdown(列全部 tab 快速跳轉)</H3>",
+        "finding": "tabs.anatomy.stories.tsx:354 — H3『隱藏溢出』與 code 語意相反:MenuTabsList(tabs.tsx L304-316)把全部 TabsTrigger 渲在 overflow-x-auto 捲動容器內,不隱藏任何 tab(tsx L235 + spec L163『不套 invisible、不隱藏溢出』)。它是 show-all navigator。",
+        "unit": "Tabs"
+      },
+      {
+        "file": "packages/design-system/src/components/Tabs/tabs.anatomy.stories.tsx",
+        "old": "        <Desc>Tabs 超出容器時,溢出部分收入 DropdownMenu(由 OverflowMenuTriggerButton 觸發),避免 scroll 互動。適合 tab 數量較多但使用者不常切換到後面的場景。</Desc>",
+        "new": "        <Desc>Tabs 超出容器時,右側出現 ⌄ navigator(OverflowMenuTriggerButton),點開 DropdownMenu 列出全部 tab 供快速跳轉;底層仍是真實捲動容器(全 trigger 可見可捲),點選後該 tab scrollIntoView 至視圖中央。適合 tab 數量較多、需快速跳轉到任一 tab 的場景。</Desc>",
+        "finding": "tabs.anatomy.stories.tsx:355 — 兩錯:(1)『溢出部分收入』false,dropdown 經 items.map 列『全部』tab(tabs.tsx L327-348)非只溢出者;(2)『避免 scroll 互動』false,底層是真實 overflow-x-auto 捲動容器(L307)。對齊 spec L163。",
+        "unit": "Tabs"
+      },
+      {
+        "file": "packages/design-system/src/components/Tabs/tabs.stories.tsx",
+        "old": "  name: '溢出處理 — 收進選單',\n  // 2026-05-18 加:narrow 320px container + 8 tabs 強制觸發 → 溢出收進 ⋯ DropdownMenu。",
+        "new": "  name: '溢出處理 — ⌄ navigator 選單',\n  // 2026-05-18 加:narrow 320px container + 8 tabs 強制觸發 → 右側出現 ⌄ navigator(OverflowMenuTriggerButton),DropdownMenu 列全部 tab 快速跳轉;全 trigger 仍在捲動容器內可見。",
+        "finding": "tabs.stories.tsx:120-121 — story name『收進選單』+ comment『溢出收進 ⋯ DropdownMenu』誤述機制:icon 是 ChevronDown ⌄ 非 ⋯(horizontal-overflow.tsx L207);menu 是 show-all navigator(全 trigger 可見,dropdown 列全部 tab),非 overflow-collapse(tabs.tsx L235/L304-348 + spec L163)。",
+        "unit": "Tabs"
+      },
+      {
+        "file": "packages/design-system/src/components/BulkActionBar/bulk-action-bar.tsx",
+        "old": "// - button.spec.md + button-group.tsx(action variant=tertiary,size=sm,",
+        "new": "// - button.spec.md + button-group.tsx(action variant=tertiary,size=md,",
+        "finding": "L10 SSOT 消費 comment 標 size=sm 為 sm→md 漏改殘留。code clear+actions 全 size=\"md\"(L108);spec L75/L137 = md。對齊 code+spec 改 md。",
+        "unit": "BulkActionBar"
+      },
+      {
+        "file": "packages/design-system/src/components/BulkActionBar/bulk-action-bar.tsx",
+        "old": "// - inline-action.spec.md「same-row consistency rule」(close X 同尺寸 sm)",
+        "new": "// - inline-action.spec.md「same-row consistency rule」(close X 同尺寸 md)",
+        "finding": "L12 SSOT 消費 comment 標 close X 同尺寸 sm 為 stale。code clear button = size=\"md\"(L108);spec L92 = dismiss md。對齊 code+spec 改 md。",
+        "unit": "BulkActionBar"
+      },
+      {
+        "file": "packages/design-system/src/components/BulkActionBar/bulk-action-bar.tsx",
+        "old": "  /** 批次 actions(consumer 提供 sm Button,variant=tertiary 或 tertiary+danger;不用 primary) */",
+        "new": "  /** 批次 actions(consumer 提供 md Button,variant=tertiary 或 tertiary+danger;不用 primary) */",
+        "finding": "L42 actions prop 的 public-facing JSDoc 標 sm Button 為 sm→md 漏改殘留(consumer IDE intellisense 直接看到 = 誤導)。spec L137 API 段 = consumer 提供 md Button;全 stories 傳 size=\"md\"。對齊改 md。",
+        "unit": "BulkActionBar"
+      },
+      {
+        "file": "packages/design-system/src/components/BulkActionBar/bulk-action-bar.tsx",
+        "old": "//   全 sm Buttons(same-row consistency)",
+        "new": "//   全 md Buttons(same-row consistency)",
+        "finding": "L66 docblock 視覺結構區標 全 sm Buttons 為 sm→md 漏改殘留。code 渲染 clear X size=\"md\"(L108);spec L67 明文「全 md Buttons」+「2026-05-04 升 md」+ L75「前版 sm 為錯」;全 stories size=\"md\"。對齊 code+spec 改 md。",
+        "unit": "BulkActionBar"
+      },
+      {
+        "file": "packages/design-system/src/components/BulkActionBar/bulk-action-bar.tsx",
+        "old": "        {/* batch actions slot(consumer 提供 sm Buttons) */}",
+        "new": "        {/* batch actions slot(consumer 提供 md Buttons) */}",
+        "finding": "L134 inline 註解標 consumer 提供 sm Buttons 為 sm→md 漏改殘留。spec L137 + 所有 stories consumer 全傳 size=\"md\"。對齊改 md。",
+        "unit": "BulkActionBar"
+      },
+      {
+        "file": "packages/design-system/src/components/BulkActionBar/bulk-action-bar.tsx",
+        "old": "    fg: ['text-fg-secondary', 'text-fg-muted'],",
+        "new": "    fg: ['text-foreground', 'text-fg-muted'],",
+        "finding": "L152 bulkActionBarMeta.tokens.fg drift。元件 render 實際只用 text-foreground(count span L123)+ text-fg-muted(hidden suffix L127);grep 確認 text-fg-secondary 0 命中於 render(只在此 metadata 出現)。metadata 列了 render 不存在的 text-fg-secondary 且漏列實際用的 text-foreground。spec L90 count canonical 亦明文 text-foreground。對齊真實 render className 改為 ['text-foreground','text-fg-muted']。",
+        "unit": "BulkActionBar"
+      },
+      {
+        "file": "packages/design-system/src/components/DataTable/data-table.anatomy.stories.tsx",
+        "old": "//   StateBehavior covered by ColorMatrix「Row 狀態色彩」段(default / hover /\n//     selected / striped / disabled)+ Features「排序」段。Row 互動是 row-level",
+        "new": "//   StateBehavior covered by ColorMatrix「Row 狀態色彩」段(default / hover /\n//     selected / disabled)+ Features「排序」段。Row 互動是 row-level",
+        "finding": "anatomy @anatomy-rationale L7 把不存在且 spec 明文禁止(spec.md L186/L463『不使用斑馬紋』)的 `striped` 列為 row 狀態。code/CSS 零 striped 實作。移除 striped。",
+        "unit": "DataTable"
+      },
+      {
+        "file": "packages/design-system/src/components/DataTable/data-table.anatomy.stories.tsx",
+        "old": "          Row bg 由 default / hover / striped 決定。Hover 用 neutral-hover",
+        "new": "          Row bg 由 default / hover 決定。Hover 用 neutral-hover",
+        "finding": "anatomy L379 正文宣稱『Row bg 由 default / hover / striped 決定』,striped 不存在且被 spec 明文禁止。移除 striped。",
+        "unit": "DataTable"
+      },
+      {
+        "file": "packages/design-system/src/components/DataTable/data-table.anatomy.stories.tsx",
+        "old": "              <tr>\n                <Td mono>striped(zebra,可選)</Td>\n                <Td><TokenCell token=\"--muted\" display=\"muted(odd row)\" /></Td>\n                <Td><TokenCell token=\"--foreground\" display=\"foreground\" /></Td>\n                <Td><TokenCell token=\"--divider\" display=\"divider\" /></Td>\n              </tr>\n",
+        "new": "",
+        "finding": "anatomy L408-412『striped(zebra,可選)』整列 row 狀態憑空捏造一個不存在且 spec.md L186/L463 明文禁止的功能(zebra)。grep striped|zebra|斑馬 在 .tsx/.css/cell-registry 零實作,DataTableProps 無此 prop。移除整列。",
+        "unit": "DataTable"
+      },
+      {
+        "file": "packages/design-system/src/components/DataTable/data-table.tsx",
+        "old": "   * - 3-panel mirror sync:每 region 都呼叫 `useSortable({id})`(同 SortableContext 共用 state),mirror 自然取得相同 transform\n   * - Cross-parent drop:nested 全 row 進 SortableContext.items,自訂 collisionDetection 過濾出「同 parent siblings」;cross-parent over → 不觸發,handle cursor `not-allowed`",
+        "new": "   * - 3-panel mirror sync:每 region 對同 row id 各呼叫 `useDraggable` + `useDroppable`,mirror 自然取得相同 transform\n   * - Cross-parent drop:nested 全 row 各自 `useDroppable`,自訂 collisionDetection 過濾出「同 parent siblings」;cross-parent over → 不觸發,handle cursor `not-allowed`",
+        "finding": "enableRowDrag prop docblock L178-179 仍描述被 v15.0 Path B 移除的 useSortable/SortableContext 舊架構(同檔 L21-22 import 註解 + L2868 已砍,實際 hooks 為 L421 useDraggable + L422 useDroppable)。對齊現行架構。",
+        "unit": "DataTable"
+      },
+      {
+        "file": "packages/design-system/src/components/DataTable/data-table.stories.tsx",
+        "old": "   1. enableRowDrag 時 overscan 自動拉到 ≥ 10(避免 row unmount 時 useSortable subscription 跟著\n      消失導致 dnd-kit stale lookup → 拖到該 id 視覺錯位)",
+        "new": "   1. enableRowDrag 時 overscan 自動拉到 Math.max(overscan, 5)(避免 row unmount 時 useDraggable/useDroppable subscription 跟著\n      消失導致 dnd-kit stale lookup → 拖到該 id 視覺錯位)",
+        "finding": "stories L1485-1486 註解『overscan 自動拉到 ≥ 10』與 code data-table.tsx:1035 `Math.max(overscan, 5)`(floor 5)不符;『useSortable subscription』為已移除架構,改 useDraggable/useDroppable。",
+        "unit": "DataTable"
+      },
+      {
+        "file": "packages/design-system/src/components/DataTable/data-table.stories.tsx",
+        "old": "   3. DndContext modifier 鎖 Y 軸(restrictToVerticalAxis inline 實作)— row drag 是垂直語義,\n      X 抖動會觸發水平 transform → 進而 measureElement loop",
+        "new": "   3. DndContext modifier 用 snapToCursorModifier(ghost top-left 對齊 cursor,不鎖軸)— row drag\n      期間 ghost 跟隨游標",
+        "finding": "stories L1489-1490 註解『DndContext modifier 鎖 Y 軸(restrictToVerticalAxis inline 實作)』與 code 不符:data-table.tsx:2862 實際傳 `modifiers={[snapToCursorModifier]}`,該 modifier(drag-visual.ts:154-155)同時平移 x/y、不鎖任何軸;全 DataTable 無 restrictToVerticalAxis import。",
+        "unit": "DataTable"
+      },
+      {
+        "file": "packages/design-system/src/components/DateGrid/date-grid.anatomy.stories.tsx",
+        "old": "              點擊設定唯一選擇。再次點已選日 = 保持(預設);點新日取代舊選。DatePicker 使用此 mode。",
+        "new": "              點擊設定唯一選擇。再次點已選日 = 清除選取(react-day-picker v9 single mode 預設 toggle-off,未傳 required);點新日取代舊選。DatePicker 使用此 mode。",
+        "finding": "DOC_STALE date-grid.anatomy.stories.tsx:496 — docblock 行為寫反。驗 node_modules/react-day-picker/dist/esm/selection/useSingle.js: `if (!required && selected && isSameDay(triggerDate, selected)) { newDate = undefined; // clear }`。DateGrid tsx 整檔無 required prop、此 story L487-493 mode=single 也未傳 required → 再次點已選日 = 清除(toggle-off),非『保持』。",
+        "unit": "DateGrid"
+      },
+      {
+        "file": "packages/design-system/src/components/DateGrid/date-grid.tsx",
+        "old": " * | range start/end 半圓 track | 左/右半圓 + selected 圓疊在上,**圓半徑 = button 半徑** | before pseudo: `rounded-l/r-full` 加 `left-0.5` / `right-0.5` |",
+        "new": " * | range start/end 半圓 track | 左/右半圓 + selected 圓疊在上,**圓半徑 = button 半徑** | before pseudo: `rounded-l/r-full` + start `left-0 -right-[2px]` / end `-left-[2px] right-0`(向 middle 外擴 2px bridge gap)|",
+        "finding": "DOC_STALE date-grid.tsx:35 — docblock 描述值與同檔 code 不符。code range_start L147 = `before:left-0 before:-right-[2px]`、range_end L153 = `before:-left-[2px] before:right-0`(無 `left-0.5`/`right-0.5`,實際是 left-0/right-0 + 反向外擴 -right-[2px]/-left-[2px])。對齊同檔 L34 既有正確描述風格。",
+        "unit": "DateGrid"
+      },
+      {
+        "file": "packages/design-system/src/components/DateGrid/date-grid.tsx",
+        "old": "      // navLayout=\"around\" = 每個 month caption 兩側渲染 prev / next 按鈕(inline row)",
+        "new": "      // navLayout=\"around\" = prev 渲染在首月(displayIndex===0)caption 左、next 渲染在末月(displayIndex===numberOfMonths-1)caption 右;單月時兩鍵同 caption 兩側",
+        "finding": "DOC_STALE date-grid.tsx:71 — 措辭對 multi-month 不精確。驗 node_modules/react-day-picker/dist/esm/DayPicker.js L255 PreviousMonthButton 僅 displayIndex===0 渲染、L282 NextMonthButton 僅 displayIndex===numberOfMonths-1 渲染。numberOfMonths={2} 時並非『每個 caption 兩側』都有 prev+next;單月情境才兩鍵同月。",
+        "unit": "DateGrid"
+      },
+      {
+        "file": "packages/design-system/src/components/Empty/empty.tsx",
+        "old": "  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],",
+        "new": "  states: ['default', 'disabled'],",
+        "finding": "DOC_STALE empty.tsx:107 — emptyMeta.states 宣告 hover/active/focus-visible 三個 Empty 不存在的互動 state(Empty 是純 layout,code 無任何 hover/active/focus-visible handler 或 :hover/:focus class;spec L180 自述無 hover/focus/active)。此 array load-bearing:compile-stories.mjs L144 把它渲染進 compiled anatomy 文檔『## States』段,對外宣稱不存在的互動態。保留 disabled(code 真實支援的 disabled context state,L55/L69/L79),刪除 hover/active/focus-visible,對齊同類 passive 元件 AspectRatio/BulkActionBar 的 states 寫法。",
+        "unit": "Empty"
+      },
+      {
+        "file": "packages/design-system/src/components/Empty/empty.tsx",
+        "old": "    fg: ['text-fg-muted', 'text-fg-secondary', 'text-foreground'],",
+        "new": "    fg: ['text-fg-muted', 'text-fg-secondary', 'text-foreground', 'text-fg-disabled'],",
+        "finding": "DOC_STALE empty.tsx:110 — emptyMeta.tokens.fg 漏列 2026-06-03 新增的 text-fg-disabled(empty.tsx L55/L69/L79 disabled 分支實際使用)。compile-stories.mjs 輸出『## Tokens consumed』fg 段只印 3 個,對外文檔漏 fg-disabled。append 'text-fg-disabled' 補齊。",
+        "unit": "Empty"
+      },
+      {
+        "file": "packages/design-system/src/components/Empty/empty.anatomy.stories.tsx",
+        "old": "//   StateBehavior N/A — Empty 是純展示 layout,本身無 hover / focus / disabled。\n//     互動由 action slot 的 Button 提供,屬 Button 元件範疇。",
+        "new": "//   StateBehavior N/A — Empty 是純展示 layout,本身無 hover / focus / active /\n//     selected 互動狀態。互動由 action slot 的 Button 提供,屬 Button 元件範疇。\n//     例外:disabled context state(disabled prop,2026-06-03 加)非互動但元件支援——\n//     title / description / icon glyph 轉 text-fg-disabled(供 FileUpload disabled 消費)。",
+        "finding": "DOC_STALE empty.anatomy.stories.tsx:8 — @anatomy-rationale block 稱『本身無 hover / focus / disabled』與 interface(empty.tsx L35 disabled prop)及 FileUpload 消費實況(file-upload.tsx L322 disabled={disabled})矛盾。2026-06-03 prop 新增未傳播至 story 註解。改成:無 hover/focus/active/selected 互動態,但補述 disabled context state 是元件支援的非互動視覺 context。",
+        "unit": "Empty"
+      },
+      {
+        "file": "packages/design-system/src/components/Empty/empty.anatomy.stories.tsx",
+        "old": "                ['action', 'ReactNode', '—', 'CTA button / 操作區'],",
+        "new": "                ['action', 'ReactNode', '—', 'CTA button / 操作區'],\n                ['disabled', 'boolean', 'false', 'disabled context（FileUpload disabled 等情境）— title / description / icon glyph 轉 fg-disabled'],",
+        "finding": "DOC_STALE empty.anatomy.stories.tsx:79 — Props 速查表只列 icon/title/description/action 四個 prop,漏 2026-06-03 新增的 disabled prop(EmptyProps interface empty.tsx L21-36 共 5 個語意 prop)。對 consumer 文檔不完整。在 action row 後補一行 disabled prop。",
+        "unit": "Empty"
+      },
+      {
+        "file": "packages/design-system/src/components/PeoplePicker/people-picker.tsx",
+        "old": "// @placeholder-vocabulary-allow: 1-cycle backward-compat — `placeholder` 已加(trigger empty SSOT),`emptyPlaceholder={emptyText}` forward 仍保留讓既有 consumer 不被 silent break;Combobox line 509 `placeholder ?? emptyPlaceholder` fallback → placeholder 永遠 takes precedence。Future cycle 移除 emptyPlaceholder forward(per field-controls.spec.md 共享 contract b)。",
+        "new": "// @placeholder-vocabulary-allow: 1-cycle backward-compat — `placeholder` 已加(trigger empty SSOT),`emptyPlaceholder={emptyText}` forward 仍保留讓既有 consumer 不被 silent break;Combobox line 760 `placeholder ?? emptyPlaceholder` fallback → placeholder 永遠 takes precedence。Future cycle 移除 emptyPlaceholder forward(per field-controls.spec.md 共享 contract b)。",
+        "finding": "CODE_A11Y #0 (people-picker.tsx:2): docblock cited `Combobox line 509` for the `placeholder ?? emptyPlaceholder` fallback. Verified combobox.tsx L509 = ChevronDown chevron span; the real `placeholder ?? emptyPlaceholder` fallback span is L760. Mechanism real, line-number stale → corrected 509→760.",
+        "unit": "PeoplePicker"
+      },
+      {
+        "file": "packages/design-system/src/components/PeoplePicker/people-picker.tsx",
+        "old": "        // emptyPlaceholder backward-compat forward(Combobox line 509 `placeholder ?? emptyPlaceholder` fallback)",
+        "new": "        // emptyPlaceholder backward-compat forward(Combobox line 760 `placeholder ?? emptyPlaceholder` fallback)",
+        "finding": "Same stale ref as CODE_A11Y #0, second occurrence at people-picker.tsx:247 (M10 改一處看三處). Same correction: Combobox line 509 → 760.",
+        "unit": "PeoplePicker"
+      },
+      {
+        "file": "packages/design-system/src/components/PeoplePicker/people-picker.anatomy.stories.tsx",
+        "old": "                <Td><TokenCell token=\"--ring\" display=\"ring\" /></Td>",
+        "new": "                <Td><TokenCell token=\"--primary\" display=\"primary\" /></Td>",
+        "finding": "DOC_STALE #3 (anatomy.stories.tsx:232/234): ColorMatrix 'edit focus(open)' row claims Field border = --ring. Verified the wrapped Select/Combobox uses field-wrapper.tsx fieldWrapperStyles — focus/open border is `focus-within:!border-primary` (1px var(--primary) border), NOT --ring. There is no --ring / ring- used as the field border anywhere in field-wrapper.tsx. Corrected token --ring/ring → --primary/primary to match code.",
+        "unit": "PeoplePicker"
+      },
+      {
+        "file": "packages/design-system/src/components/PeoplePicker/people-picker.anatomy.stories.tsx",
+        "old": "  Focus  :聚焦框跟整套設計系統一致(2px solid var(--ring));焦點管理由元件自行處理。",
+        "new": "  Focus  :聚焦框跟整套設計系統一致(底層 Select/Combobox Field wrapper 的 1px `focus-within:!border-primary` 邊框 var(--primary));焦點管理由元件自行處理。",
+        "finding": "DOC_STALE #4 (anatomy.stories.tsx:415): Accessibility prose claims focus ring = '2px solid var(--ring)'. Verified field-wrapper.tsx uses 1px border token flow `focus-within:!border-primary` (var(--primary)); no 2px and no --ring. Corrected to describe the real 1px border-primary mechanism.",
+        "unit": "PeoplePicker"
+      },
+      {
+        "file": "packages/design-system/src/components/Steps/steps.anatomy.stories.tsx",
+        "old": "              <tr><Td>error</Td><Td><span className=\"inline-flex items-center gap-1.5\"><Swatch value=\"--error\" size=\"sm\" /><span>bg-error + white icon</span></span></Td><Td><TokenCell token=\"--error\" display=\"error\" /></Td><Td>—</Td></tr>",
+        "new": "              <tr><Td>error</Td><Td><span className=\"inline-flex items-center gap-1.5\"><Swatch value=\"--error\" size=\"sm\" /><span>bg-error + white icon</span></span></Td><Td><TokenCell token=\"--error-text\" display=\"error-text\" /></Td><Td>—</Td></tr>",
+        "finding": "Overview 四種狀態表 error 列 Label token 標 `--error`(deep-orange-6);code steps.tsx:776 StepLabel error state 用 text-error-text(`--error-text` = deep-orange-7),spec.md:276 亦寫 text-error-text。改 Label cell 的 TokenCell 為 --error-text。注意:同列 Indicator 的 `--error` Swatch + `bg-error` 文字維持不變(indicator 確實是 bg-error,正確)。",
+        "unit": "Steps"
+      },
+      {
+        "file": "packages/design-system/src/components/Steps/steps.anatomy.stories.tsx",
+        "old": "              <tr><Td>completed</Td><Td><span className=\"inline-flex items-center gap-1.5\"><Swatch value=\"--primary\" size=\"sm\" /><span>filled primary + white check icon</span></span></Td><Td><TokenCell token=\"--foreground\" display=\"foreground\" /></Td><Td><TokenCell token=\"--primary\" display=\"bg-primary\" /></Td></tr>",
+        "new": "              <tr><Td>completed</Td><Td><span className=\"inline-flex items-center gap-1.5\"><Swatch value=\"--primary\" size=\"sm\" /><span>filled primary + white check icon</span></span></Td><Td><TokenCell token=\"--fg-secondary\" display=\"fg-secondary\" /></Td><Td><TokenCell token=\"--primary\" display=\"bg-primary\" /></Td></tr>",
+        "finding": "Overview 四種狀態表 completed 列 Label 無條件標 `--foreground`;但 code steps.tsx:773-779 label foreground 只在 focused(=current step,L349)時,completed 但非 current 走 text-fg-secondary(L779)。spec.md:269-278 同意 code(只列 focused→foreground / default→fg-secondary,無 completed→foreground)。改 completed Label 為 --fg-secondary(對齊同表 upcoming 列已用的 `<TokenCell token=\"--fg-secondary\" display=\"fg-secondary\" />`)。注意:不可動到 L40 current 列(current=focused,foreground 正確)。",
+        "unit": "Steps"
+      },
+      {
+        "file": "packages/design-system/src/components/Steps/steps.anatomy.stories.tsx",
+        "old": "              <tr>\n                <Td mono>error</Td>\n                <Td><TokenCell token=\"--error\" /></Td>\n                <Td>—(同 bg)</Td>\n                <Td><TokenCell token=\"white\" display=\"白色 X icon\" /></Td>\n                <Td><TokenCell token=\"--error\" /></Td>\n                <Td>—</Td>\n              </tr>",
+        "new": "              <tr>\n                <Td mono>error</Td>\n                <Td><TokenCell token=\"--error\" /></Td>\n                <Td>—(同 bg)</Td>\n                <Td><TokenCell token=\"white\" display=\"白色 X icon\" /></Td>\n                <Td><TokenCell token=\"--error-text\" /></Td>\n                <Td>—</Td>\n              </tr>",
+        "finding": "ColorMatrix error 列 Label(L213)標 `--error`;code steps.tsx:776 用 text-error-text(`--error-text`),spec.md:276 亦寫 error-text。改第 5 欄(Label)的 TokenCell 為 --error-text。第 2 欄 indicator 的 `--error`(L210)維持不變(indicator bg 確實是 --error)。整列 <tr> 作唯一 anchor 以區分 L210 indicator 與 L213 label。",
+        "unit": "Steps"
+      },
+      {
+        "file": "packages/design-system/src/components/Steps/steps.anatomy.stories.tsx",
+        "old": "              <tr>\n                <Td mono>completed</Td>\n                <Td><TokenCell token=\"--primary\" /></Td>\n                <Td>—(同 bg)</Td>\n                <Td><TokenCell token=\"white\" display=\"白色 Check icon\" /></Td>\n                <Td><TokenCell token=\"--foreground\" /></Td>\n                <Td><TokenCell token=\"--primary\" display=\"bg-primary\" /></Td>\n              </tr>",
+        "new": "              <tr>\n                <Td mono>completed</Td>\n                <Td><TokenCell token=\"--primary\" /></Td>\n                <Td>—(同 bg)</Td>\n                <Td><TokenCell token=\"white\" display=\"白色 Check icon\" /></Td>\n                <Td><TokenCell token=\"--fg-secondary\" /></Td>\n                <Td><TokenCell token=\"--primary\" display=\"bg-primary\" /></Td>\n              </tr>",
+        "finding": "ColorMatrix completed 列 Label(L189)標 `--foreground`;但 completed 非 focused 時 code 給 text-fg-secondary(steps.tsx:779),foreground 只在 focused/current(L349)。spec.md:269-278 同意 code。改第 5 欄 Label 的 TokenCell 為 --fg-secondary。整列 <tr> 作唯一 anchor 以區分 L189(completed)與 L197(current,--foreground 正確不動)。",
+        "unit": "Steps"
+      },
+      {
+        "file": "packages/design-system/src/components/Field/field.tsx",
+        "old": "   * 預設由 Field 自動偵測——讀第一個 control child 的 `type.fieldLayout` static 屬性,\n   * primitive 沒宣告時視為 `'inline'`。",
+        "new": "   * 預設由 Field 自動偵測——迭代全部 control child 的 `type.fieldLayout` static 屬性,\n   * 任一宣告為 `'block'` 即整個 area 切 block(first-block-wins);全部缺宣告時視為 `'inline'`。",
+        "finding": "field.tsx:131 controlLayout prop docblock 說『讀第一個 control child』,但 detectControlLayout(L96-103)為 first-block-wins(迭代全部、任一 block 即 block),同檔 L87/92 docblock 已正確寫『任一』。此行 stale 與同檔 docblock 自相矛盾。",
+        "unit": "Field"
+      },
+      {
+        "file": "packages/design-system/src/components/Field/field.anatomy.stories.tsx",
+        "old": "        <Desc>FieldGroup 提供 density-aware 的垂直 gap(跟隨 `--layout-space-tight` token),不需 consumer 手算間距。</Desc>",
+        "new": "        <Desc>FieldGroup 提供三個語意層級的垂直 gap(`compact`→gap-3 / `normal`→gap-4 / `loose`→gap-6),不需 consumer 手算間距。</Desc>",
+        "finding": "field.anatomy.stories.tsx:485 宣稱 FieldGroup gap『density-aware 跟隨 --layout-space-tight token』,但 field.tsx:497 為寫死 ternary class(gap-3/gap-4/gap-6),完全不消費 layout-space / density token。假宣稱,改成描述真實的三層 gap class。",
+        "unit": "Field"
+      },
+      {
+        "file": "packages/design-system/src/components/Field/field.anatomy.stories.tsx",
+        "old": "        <Desc>主要表單場景。label 與 control 之間 gap = layout-space-tight,垂直堆疊。</Desc>",
+        "new": "        <Desc>主要表單場景。label 與 control 之間 gap = gap-1(4px),垂直堆疊。</Desc>",
+        "finding": "field.anatomy.stories.tsx:195 OrientationMatrix Desc 宣稱『gap = layout-space-tight』,但 Field 內部 vertical gap 實際是寫死 gap-1(field.tsx:288 'flex flex-col gap-1'),spec.md:75 也正確列 gap-1(4px)。token 宣稱為假,改成 gap-1(4px)對齊 code + spec 表。",
+        "unit": "Field"
+      },
+      {
+        "file": "packages/design-system/src/components/SelectMenu/select-menu.anatomy.stories.tsx",
+        "old": "                  <Td>型別決定單 / 多選</Td>",
+        "new": "                  <Td>當前值（單選 string / 多選 string[]）；單 / 多選由 `multiple` prop 決定，非 value 型別</Td>",
+        "finding": "DOC_STALE #130 (P1, anatomy:168):Props 速查表 value row 描述『型別決定單 / 多選』為假。code select-menu.tsx L131 multiple=false 為獨立 boolean prop，L171 handleSelect 依 multiple 分支，L159-162 value 一律 normalize 成 selectedValues —— multiple=false 即使傳 array value 仍走單選 close path。模式由 multiple prop 決定，非 value 型別。",
+        "unit": "SelectMenu"
+      },
+      {
+        "file": "packages/design-system/src/components/SelectMenu/select-menu.anatomy.stories.tsx",
+        "old": "                  <Td mono>trigger 寬度</Td>",
+        "new": "                  <Td>跟隨 trigger（下限 240px）</Td>",
+        "finding": "DOC_STALE #131 (P2, anatomy:209):minWidth 預設值 cell『trigger 寬度』不精確。code select-menu.tsx L277 預設 = `max(var(--radix-popover-trigger-width), 15rem)` = max(trigger 寬, 240px)，含 240px 下限，非純 trigger 寬度。一併去掉 mono 樣式（此 cell 為人話描述非 code token）。",
+        "unit": "SelectMenu"
+      },
+      {
+        "file": "packages/design-system/src/components/Notice/notice.tsx",
+        "old": " *   「Chrome dismiss size canonical」三家族分類(Modal sm / Non-modal xs / Notification xs)",
+        "new": " *   「Chrome dismiss size canonical」(overlay header 走 sm native + 負 margin trick;xs 只用於 notification banner family)",
+        "finding": "docblock L30 把 overlay-surface.spec.md L350 明文標 ❌ 的 rejected v2 wording『三家族分類(Modal sm / Non-modal xs / Notification xs)』當成 live canonical 引用。真實 v5 SSOT(L265-323)= overlay header 走 sm native + 負 margin trick,xs 只用於 notification banner(Notice/Alert/Toast)。已驗 grep 該行於 notice.tsx 唯一(count=1),old 為逐字精確含 ` * ` 縮排前綴。對齊我同步修的 notice.spec.md L56。",
+        "unit": "dim15"
+      },
+      {
+        "file": "packages/design-system/src/components/Checkbox/checkbox.tsx",
+        "old": "    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },",
+        "new": "    lg: { fieldHeight: 36, iconSize: 20, typography: 'body' },",
+        "finding": "checkboxMeta.sizes.lg.fieldHeight 宣稱 40,但預設 density(:root)下 uiSize.css:25 `--field-height-lg = 2.25rem = 36px`;40px 是 [data-density=\"lg\"](uiSize.css:88)模式值,非預設。同 meta 的 sm=28(field-height-sm)/ md=32(field-height-md)皆採預設 :root 值,唯 lg=40 混用 lg-density tier 內部不一致;spec L124 自身 canonical 亦明寫 `--field-height-lg = 36px`。改 40→36 對齊 code/token/spec 預設值。",
+        "unit": "Checkbox"
+      },
+      {
+        "file": "packages/design-system/src/components/Checkbox/checkbox.tsx",
+        "old": "  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],",
+        "new": "  states: ['default', 'hover', 'focus-visible', 'disabled'],",
+        "finding": "checkboxMeta.states 含 'active'(pressed)但 cva `grep active:` 0 命中——元件未實作任何 active/pressed 樣式;reader-facing spec(無 active 態)與 anatomy INTERACTION_STATES(L23 = ['default','hover','disabled'])皆未宣稱 active。僅移除不存在的 'active';保留 hover(cva L21)/ focus-visible(cva L22 `focus-visible:ring-2`)/ disabled(cva L27)三個 code 真實存在的 state(Checkbox 是互動元件,與 Badge 非互動全砍成 ['default'] 不同)。",
+        "unit": "Checkbox"
+      },
+      {
+        "file": "packages/design-system/src/components/Coachmark/coachmark.anatomy.stories.tsx",
+        "old": "                <tr><Td>step + onPrev + onSkip + onNext</Td><Td>左 step 計數 / 右 Previous + Skip + Next</Td></tr>",
+        "new": "                <tr><Td>step + onPrev + onSkip + onNext</Td><Td>左 step 計數 / 右 Previous + Next(有 onPrev 時 Skip 被抑制,見 CTA 語義表)</Td></tr>",
+        "finding": "StateBehavior「Footer 按鈕渲染規則」表把『step + onPrev + onSkip + onNext』情境的 render 寫成『Previous + Skip + Next』三鍵同列。code L141 `showSkip = Boolean(onSkip) && !onPrev && !isSingleStep`,傳 onPrev 時 showSkip=false → 實際只渲染 Previous + Next。對齊同檔 Overview L45 + spec L118/L195 canonical。",
+        "unit": "Coachmark"
+      },
+      {
+        "file": "packages/design-system/src/components/Coachmark/coachmark.anatomy.stories.tsx",
+        "old": "            Coachmark 大部分行為繼承 Popover(Radix),但刻意抑制開啟時的自動 focus(onOpenAutoFocus preventDefault)——焦點停在 trigger,避免使用者還在讀 body 時 CTA 被 auto-focus 偷觸發;關閉時 return to trigger;Esc 關閉(= Skip 語意);預設 non-modal,使用者可忽略繼續主流程。",
+        "new": "            Coachmark 大部分行為繼承 Popover(Radix),但刻意抑制開啟時的自動 focus(onOpenAutoFocus preventDefault)——焦點停在 trigger,避免使用者還在讀 body 時 CTA 被 auto-focus 偷觸發;關閉時 return to trigger;Esc 關閉浮層(透過 Radix onOpenChange,效果等同退出,但不觸發 onSkip callback);預設 non-modal,使用者可忽略繼續主流程。",
+        "finding": "StateBehavior Desc 寫『Esc 關閉(= Skip 語意)』,但 spec L204 + code 明文 Esc 僅走 Radix onOpenChange 關閉浮層、永不呼叫 onSkip(Esc 是『關閉浮層』非『明確 skip』)。對齊 spec A11y 段真實語意。",
+        "unit": "Coachmark"
+      },
+      {
+        "file": "packages/design-system/src/components/Coachmark/coachmark.anatomy.stories.tsx",
+        "old": "-   Esc 關閉  :預設啟用(= Skip 行為)——user 按 Esc 等同 skip,尊重退出意願\\n",
+        "new": "-   Esc 關閉  :預設啟用——user 按 Esc 透過 Radix onOpenChange 關閉浮層(效果等同退出),但不觸發 onSkip callback(Esc 是「關閉浮層」非「明確 skip」)\\n",
+        "finding": "Accessibility 故事自稱『摘要 spec A11y 段』,卻寫『Esc 關閉:預設啟用(= Skip 行為)——user 按 Esc 等同 skip』,與其所摘要的 spec L204『不觸發 onSkip callback,Esc 是「關閉浮層」非「明確 skip」』直接矛盾。對齊 spec 真實語意。",
+        "unit": "Coachmark"
+      },
+      {
+        "file": "packages/design-system/src/components/Coachmark/coachmark.principles.stories.tsx",
+        "old": "      <Rule\n        title=\"永遠提供 Skip — 尊重退出意願\"\n        note=\"沒 Skip 的 onboarding = 綁架使用者。使用者的本能是「我想自己試試」,強迫看完反而留下負面印象。Skip 是對自主權的尊重,真正有用的 tour 使用者會主動看完\"\n      >\n        <Label warn>❌ 隱藏 Skip、只提供 Next — user 會找關閉方式或直接離開產品</Label>\n        <Label>✅ Skip 放在中間位置(Previous / Skip / Next),tertiary variant 不搶焦點但隨時可用</Label>\n      </Rule>",
+        "new": "      <Rule\n        title=\"永遠提供退出機制 — 尊重退出意願\"\n        note=\"沒退出機制的 onboarding = 綁架使用者。使用者的本能是「我想自己試試」,強迫看完反而留下負面印象。退出機制是對自主權的尊重,真正有用的 tour 使用者會主動看完\"\n      >\n        <Label warn>❌ 完全拿掉退出路徑(連 Esc / header Close 都禁用)— user 會直接離開產品</Label>\n        <Label>✅ 第一步提供 Skip(tertiary 不搶焦點);step 2+ 退出走 Esc / header Close(有 onPrev 時 Skip 自動隱藏,見 CTA 語義表)</Label>\n      </Rule>",
+        "finding": "principles Rule『永遠提供 Skip / Skip 隨時可用』與元件 canonical 直接衝突:spec L118-119/L123/L165 + code L141 刻意在 step 2+(有 onPrev)隱藏 Skip,Previous 與 Skip 永不共存;退出靠 Esc / header Close(spec L193)。將 Rule 改成『永遠提供退出機制』、勘正『隱藏 Skip = ❌』(隱藏 Skip 正是元件設計行為)與『隨時可用』假宣稱,不改任何設計決策。",
+        "unit": "Coachmark"
+      },
+      {
+        "file": "packages/design-system/src/components/Coachmark/coachmark.principles.stories.tsx",
+        "old": "        title=\"Footer 順序 — Previous / Skip / Next\"\n        note=\"對齊 Ant Tour / Intercom convention:Previous 最左(回退,視覺權重低)、Skip 中間(退出,tertiary)、Next 最右(推進,primary)。語意由左往右「回退 / 退出 / 推進」,符合使用者的閱讀動線\"",
+        "new": "        title=\"Footer 順序 — Previous / Skip / Next\"\n        note=\"對齊 Ant Tour / Intercom convention 的左→右位置順序:Previous 最左(回退,視覺權重低)、Skip 中間(退出,tertiary)、Next 最右(推進,primary)。此為各按鈕『出現時』的排列位置,非三鍵同時 render — Skip 僅第一步顯示、Previous 第 2+ 步顯示,兩者永不共存(見 CTA 語義表)\"",
+        "finding": "L284-285 footer 順序 note 讀起來像三鍵『Previous / Skip / Next』同時 render,但 code L141 + spec L165 規定 Skip 僅第一步、Previous 第 2+ 步,兩者永不共存。澄清此為各按鈕出現時的位置順序而非同列三鍵,對齊 spec『Footer 按鈕順序』L160-168。",
+        "unit": "Coachmark"
+      },
+      {
+        "file": "packages/design-system/src/components/FileItem/file-item.tsx",
+        "old": "  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],",
+        "new": "  states: ['default'],",
+        "finding": "fileItemMeta.states (L338) 宣稱 hover/active/focus-visible/disabled 四個互動態,但 render 是純 <div>(rich L243 / compact L287),無任何 hover/active/focus-visible handler,FileItemProps interface(L47-84)無 disabled prop;spec L144-172『Hover 行為 canonical』明文 FileItem 永不顯示 hover-bg、無 selected、無 disabled。compile-stories.mjs L144 把此 array 寫進生成 doc『## States』section → stale claim 傳播。對齊同類 passive 元件 AspectRatio(L52 states:['default'])+ BulkActionBar(L150 states:['default']) canonical,改為 ['default']。",
+        "unit": "FileItem"
+      },
+      {
+        "file": "packages/design-system/src/components/FileItem/file-item.tsx",
+        "old": "    bg: ['bg-neutral-hover', 'bg-secondary', 'bg-surface'],",
+        "new": "    bg: ['bg-secondary', 'bg-surface'],",
+        "finding": "fileItemMeta.tokens.bg (L340) 列 bg-neutral-hover,但 grep 確認該 token 只出現在 L340 metadata,render code 從未使用——實際 render bg 只有 bg-secondary(L237 compact 靜態)+ bg-surface(L252 rich form card)。更矛盾元件 core canonical:docblock L114-120 + spec L144-172『FileItem 永不顯示 hover-bg』,spec L170-172 記載舊 code hover:bg-neutral-hover 已刻意移除。compile-stories.mjs L146 把此值寫進 stakeholder-visible doc。移除 bg-neutral-hover,保留實際 render 的兩個 token。",
+        "unit": "FileItem"
+      },
+      {
+        "file": "packages/design-system/src/components/FileUpload/file-upload.principles.stories.tsx",
+        "old": "        note=\"drag-over 只用顏色(border-primary + bg-primary-subtle)傳達狀態。加 scale 會讓區塊在拖放瞬間晃動、使用者滑鼠與 drop target 錯位;加 shadow 和元件 elevation 體系衝突。\"",
+        "new": "        note=\"drag-over 只用邊框顏色(border-primary,底維持 surface 不變 bg)傳達狀態。加 scale 會讓區塊在拖放瞬間晃動、使用者滑鼠與 drop target 錯位;加 shadow 和元件 elevation 體系衝突。\"",
+        "finding": "DOC_STALE#57 — note 寫 drag-over 用 bg-primary-subtle,但元件實際純 border-driven(file-upload.tsx L288-291:bg-surface 維持不變,只 border-primary 變色)。spec.md L56 + anatomy ColorMatrix 皆明寫『底維持 surface(不變 bg)』。對齊真實行為。",
+        "unit": "FileUpload"
+      },
+      {
+        "file": "packages/design-system/src/components/FileUpload/file-upload.principles.stories.tsx",
+        "old": "          <div className=\"border-2 border-dashed border-primary bg-primary-subtle rounded-md px-6 py-10 text-center text-caption text-fg-muted\">\n            ✓ 僅改顏色(dashed primary + primary-subtle)",
+        "new": "          <div className=\"border-2 border-dashed border-primary bg-surface rounded-md px-6 py-10 text-center text-caption text-fg-muted\">\n            ✓ 僅改邊框顏色(dashed primary,底維持 surface)",
+        "finding": "DOC_STALE#57 — 配套 ✓ mock div 用 bg-primary-subtle,與元件實際 drag-over(bg-surface 維持,只 border-primary)矛盾。改 bg-surface + label 文字對齊真實 border-driven 行為。",
+        "unit": "FileUpload"
+      },
+      {
+        "file": "packages/design-system/src/components/FileUpload/file-upload.principles.stories.tsx",
+        "old": "          <div className=\"border-2 border-dashed border-primary bg-primary-subtle rounded-md px-6 py-10 text-center text-caption text-fg-muted scale-105 shadow-[var(--elevation-200)]\">",
+        "new": "          <div className=\"border-2 border-dashed border-primary bg-surface rounded-md px-6 py-10 text-center text-caption text-fg-muted scale-105 shadow-[var(--elevation-200)]\">",
+        "finding": "DOC_STALE#57 — ✗ mock div(示範 scale+shadow 錯誤)的 baseline bg 仍用 bg-primary-subtle,應與正確 drag-over baseline 一致為 bg-surface;此 div 要示範的錯誤是 scale-105/shadow,bg 應對齊真實底色 surface。",
+        "unit": "FileUpload"
+      },
+      {
+        "file": "packages/design-system/src/components/FileUpload/file-upload.tsx",
+        "old": "  /** 說明文字(預設「Support for a single or bulk upload」) */",
+        "new": "  /** 說明文字(預設依 multiple:單檔「Support for a single file upload」、multiple 多檔「Support for a single or bulk upload」) */",
+        "finding": "DOC_STALE#58 — docblock 把 multiple=true 分支字串標為「預設」,但 default 為條件式(L121 `multiple ? 'Support for a single or bulk upload' : 'Support for a single file upload'`)+ multiple 預設 false(L115),故真正預設值是『Support for a single file upload』。改為描述條件式真實 default。",
+        "unit": "FileUpload"
+      },
+      {
+        "file": "packages/design-system/src/components/FileViewer/file-viewer.anatomy.stories.tsx",
+        "old": "                <Td>thumb 64 + padding 2×16 = 96</Td>",
+        "new": "                <Td>固定 96(對齊 Google Photos 96 benchmark);thumb 64 + py-2(16px)留白</Td>",
+        "finding": "file-viewer.anatomy.stories.tsx:649 Filmstrip 高 rationale '理由欄『thumb 64 + padding 2×16 = 96』'. Math is wrong: '2×16' implies 2 sides × 16px = 32px padding (64+32=96), but the real inner padding is `py-2` (file-viewer.tsx:569) = 8px each side = 16px total, so 64+16=80, not 96. The 96 is actually the fixed container height `h-24` (file-viewer.tsx:556) chosen to match the Google Photos 96 benchmark (already cited in the benchmark column L648). THUMB_SIZE=64 (tsx:537). Corrected the rationale to describe 96 as the benchmark-fixed value with the actual py-2 (16px) breathing room. Doc-stale only — no code/behavior change; code is correct.",
+        "unit": "FileViewer"
+      },
+      {
+        "file": "packages/design-system/src/components/RadioGroup/radio-group.tsx",
+        "old": "    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },",
+        "new": "    lg: { fieldHeight: 36, iconSize: 20, typography: 'body-lg' },",
+        "finding": "radio-group.tsx:251 (audit 標 :239) radioGroupMeta.sizes.lg 兩欄 stale。(1) fieldHeight:40 是 [data-density=\"lg\"] override 值(uiSize.css:88),預設 density(:root)的 --field-height-lg = 2.25rem = 36px(uiSize.css:25),spec.md:75 亦寫 28/32/36px → 改 36 對齊 token + sm=28/md=32 同 :root tier。(2) typography:'body' 與實作不符:SelectionItem cva lg = text-body-lg(selection-item.tsx:37)+ anatomy SizeMatrix lg = text-body-lg → 改 'body-lg'(DS componentMeta 既有慣例,4 處使用)。iconSize:20 正確不動(radio lg = h-5 w-5 = 20px)。此為 Phase 1 機械遷移 metadata stale,code/token 為真實值。",
+        "unit": "RadioGroup"
+      },
+      {
+        "file": "packages/design-system/src/components/SelectionControl/selection-item.anatomy.stories.tsx",
+        "old": "                <Td>label → text-fg-disabled + cursor-not-allowed</Td>",
+        "new": "                <Td>label / description / icon → text-fg-disabled(M24);label 另加 cursor-not-allowed</Td>",
+        "finding": "L195 Props 速查表 disabled 列只寫『label → text-fg-disabled + cursor-not-allowed』,但 code(selection-item.tsx L145 prefix icon / L175 label / L186 description)三者皆切 text-fg-disabled。且同檔 @anatomy-rationale(L4)自己已正確寫『disabled 統一 fg-disabled』(label+description),L195 props 列只寫 label = spec-internal 不一致。對齊 code + L4:三載體統一 fg-disabled,cursor-not-allowed 僅 label。",
+        "unit": "SelectionControl"
+      },
+      {
+        "file": "packages/design-system/src/components/Slider/slider.tsx",
+        "old": " * 1. **視覺單一**:track 厚度、thumb 直徑、ring 尺寸都是固定值,不隨 `size` 變",
+        "new": " * 1. **視覺單一**:track 厚度、thumb 直徑、thumb 邊框都是固定值,不隨 `size` 變",
+        "finding": "slider.tsx:12 docblock 列舉『ring 尺寸』為固定視覺元素,但 Slider 無 ring——L131-132 focus 實作為 `outline-none focus-visible:border-primary-hover`(border 加深),L131 註解明寫『不加 ring 或 halo』,sliderMeta.tokens.ring=[](L174)。屬殘留自 border-deepening focus 之前舊設計的 stale docblock。改成『thumb 邊框』對齊同檔真實實作(thumb 的 border-2,本就固定不隨 size 變)。",
+        "unit": "Slider"
+      },
+      {
+        "file": "packages/design-system/src/components/Tag/tag.anatomy.stories.tsx",
+        "old": "        <Desc>以色名命名，語義由消費端決定。前五色有對應語義 token，後四色為分類用途。</Desc>",
+        "new": "        <Desc>以色名命名（色名即色相），語義由消費端內容與上下文決定。13 色（neutral + 12 categorical 色相）皆直接消費 primitive token（`--color-{hue}-*`），不對應語義 token。</Desc>",
+        "finding": "L228 Desc 宣稱「前五色有對應語義 token、後四色為分類用途」(暗示 9 色 + 前 5 色映射 semantic token),與 2026-06-04 重構後 canonical 直接矛盾。tag.tsx L203-206 移除 red→--error 等語義映射;tag.spec.md L128『所有有色 variant 直接使用 primitive token,不使用 semantic token』;cva 實際支援 13 色(neutral + 全 12 CATEGORICAL_HUES)。同檔 VARIANT_DESC/tagMeta/Variant 一覽皆已純色相框架,唯此 Desc stale。改成對齊 spec/code 的純色相 13 色無語義映射描述。",
+        "unit": "Tag"
+      },
+      {
+        "file": "packages/design-system/src/components/Tag/tag.anatomy.stories.tsx",
+        "old": "                ['color', \"'neutral'|'blue'|'red'|'green'|'yellow'|'turquoise'|'purple'|'magenta'|'indigo'\", \"'neutral'\", '色彩 variant，語義由消費端決定'],",
+        "new": "                ['color', \"'neutral'|'blue'|'green'|'deep-orange'|'yellow'|'red'|'orange'|'amber'|'lime'|'turquoise'|'indigo'|'purple'|'magenta'\", \"'neutral'\", '色相 variant，語義由消費端內容決定（13 色 = neutral + 12 categorical 色相）'],",
+        "finding": "L247 Props 型別字串只列 9 個值,漏 deep-orange/orange/amber/lime 四色。cva color variant = neutral + CAT_SUBTLE(spread CATEGORICAL_HUES 全 12)= 13 色(tag.tsx L36-39 + categorical-color.ts L28-41)。同檔 VARIANTS 陣列(L35)、Variant 一覽渲染、tag.spec.md L114-126 表皆正確列 13 色,唯此型別字串 stale。改成 spec table 順序的完整 13 值清單。",
+        "unit": "Tag"
+      },
+      {
+        "file": "packages/design-system/src/components/Tag/tag.anatomy.stories.tsx",
+        "old": "            <PropRow label=\"Max Width\"><TkVal token=\"max-w-40\" value=\"160px\" /></PropRow>",
+        "new": "            <PropRow label=\"Max Width\"><TkVal token=\"min(var(--combobox-tag-area-inline-size, 10rem), 10rem)\" value=\"預設 cap 160px（Combobox 窄格可注入更小有效上限）\" /></PropRow>",
+        "finding": "L392 token 標 max-w-40 為不實標籤:tag.tsx L170-174 實際以 inline style `min(var(--combobox-tag-area-inline-size, 10rem), 10rem)`(unbounded=false 預設)套上限,從未使用 Tailwind max-w-40 class。160px(=10rem)值正確、預設截斷行為正確,但呈現為固定 utility class 名而非真實 CSS-var min() inline style(無法表達 narrow-cell 取小語義)。改成真實 CSS-var 表達式 + 說明預設 cap 160px。",
+        "unit": "Tag"
+      },
+      {
+        "file": "packages/design-system/src/components/Tag/tag.anatomy.stories.tsx",
+        "old": "            <PropRow label=\"Truncate\"><TkVal token=\"truncate\" value=\"超過 max-w-40 截斷 + tooltip\" /></PropRow>",
+        "new": "            <PropRow label=\"Truncate\"><TkVal token=\"truncate\" value=\"超過寬度上限（預設 160px）截斷 + tooltip\" /></PropRow>",
+        "finding": "L409(finding #3 同點)沿用 stale 簡寫『超過 max-w-40 截斷』。實作無 max-w-40 class,寬度上限由 inline style min(var(--combobox-tag-area-inline-size, 10rem), 10rem) 控制,預設 160px。改成不引用不實 class 名,描述真實『寬度上限(預設 160px)截斷』。",
+        "unit": "Tag"
+      },
+      {
+        "file": "packages/design-system/src/components/Toast/toast.tsx",
+        "old": "  family: null, // non-family composite / overlay / layout",
+        "new": "  family: 2, // Family 2(List item layout)— 透過 Notice 繼承,對齊 toast.spec.md frontmatter L3 + L39",
+        "finding": "toast.tsx:112 toastMeta.family=null 與 toast.spec.md frontmatter L3 (family: 2) + L39 prose(明示 Family 2 + 世界級理由)矛盾。compile-stories.mjs:127 直接消費 tsxMeta.family 渲染『**Layout Family**: ${tsxMeta.family}』→ auto-compiled anatomy 會輸出『Layout Family: null』與 spec 相反。spec frontmatter 是 canonical SSOT(audit-layout-family-frontmatter.mjs 驗證對象)。真正 Family-2 元件 componentMeta 皆帶數字 family(FileItem family:2 / Steps family:2 / SelectionControl family:2);Toast 是 Phase-1 mechanical stale metadata(tsx L108-109 註明 Phase 2 fill needed)。修向 = stale code null → 2 對齊 spec SSOT,不改 runtime。P2。",
+        "unit": "Toast"
+      },
+      {
+        "file": "packages/design-system/src/components/TreeView/tree-view.tsx",
+        "old": "  /**\n   * 啟用拖曳排序。預設 false。\n   * 啟用後每個 TreeItem 左側出現 drag handle(GripVertical icon),\n   * 拖曳時顯示 drop indicator(before / after / inside 三種位置)。\n   * Consumer 透過 `onDragEnd` callback 接收 reorder 事件,自行更新 data。\n   */\n  draggable?: boolean",
+        "new": "  /**\n   * 啟用拖曳排序。預設 false。\n   * 啟用後整列可拖(Figma 風格,無 grip handle;靠 distance:5 區分 click vs drag),\n   * 拖曳時顯示 drop indicator(before / after / inside 三種位置)。\n   * Consumer 透過 `onDragEnd` callback 接收 reorder 事件,自行更新 data。\n   */\n  draggable?: boolean",
+        "finding": "draggable JSDoc 宣稱『每個 TreeItem 左側出現 drag handle(GripVertical icon)』為假。L16 lucide import 只有 ChevronRight,GripVertical 從未 import / render(grep 全目錄唯一出現處就是此 JSDoc)。dragListeners 直接 spread 在整列 row div(L956),inline comment L811『Figma 風格:整列可拖(不用 grip handle)』+ spec L269/L335 皆與此 JSDoc 矛盾。對齊 code 真實=整列可拖、無 grip handle。",
+        "unit": "TreeView"
+      },
+      {
+        "file": "packages/design-system/src/components/TreeView/tree-view.tsx",
+        "old": "  /**\n   * 取代 chevron 的位置。用於 stepper 的 status indicator(●/○/✓)。\n   * 設定後 chevron 不渲染,改渲染 indicator。\n   */\n  indicator?: React.ReactNode",
+        "new": "  /**\n   * 取代 icon 的位置。用於 stepper 的 status indicator(●/○/✓)。\n   * 設定後 icon 不渲染、改渲染 indicator;chevron 永遠保留(expandable=旋轉箭頭 / leaf=placeholder)。\n   */\n  indicator?: React.ReactNode",
+        "finding": "indicator JSDoc 宣稱『取代 chevron 的位置 / 設定後 chevron 不渲染』為假。L959 無條件先 render {chevronSlot}(chevron 永存);L978-984 indicator 渲染在 ICON 槽、與 Icon 互斥(三元式 indicator ? <ItemPrefix> : Icon ? <ItemIcon> : null)。同檔 inline comment L974『indicator 取代 icon 的位置』+ spec L321『取代 icon 位置(chevron 永存)』皆與 JSDoc 矛盾;expandable node + indicator 消費正依賴 chevron 留存才能展開。對齊 code:取代 icon、chevron 永存。",
+        "unit": "TreeView"
+      },
+      {
+        "file": "packages/design-system/src/components/TreeView/tree-view.anatomy.stories.tsx",
+        "old": "                <tr>\n                  <Td mono>default</Td>\n                  <Td>—(transparent)</Td>\n                  <Td><TokenCell token=\"--foreground\" display=\"foreground\" /></Td>\n                  <Td><TokenCell token=\"--fg-muted\" display=\"fg-muted\" /></Td>\n                </tr>",
+        "new": "                <tr>\n                  <Td mono>default</Td>\n                  <Td>—(transparent)</Td>\n                  <Td><TokenCell token=\"--foreground\" display=\"foreground(medium)\" /></Td>\n                  <Td><TokenCell token=\"--fg-muted\" display=\"fg-muted\" /></Td>\n                </tr>",
+        "finding": "ColorMatrix 表只在 selected row 標 Text=『foreground(medium)』,default/hover 僅標『foreground』,誤導讀者以為 medium 字重是 selected 區別信號。實際 treeItemVariants cva base L686 無條件對所有 row 套 font-medium(註解『Label 字重 500 跟 SidebarMenuButton 一致』),字重不隨 selected 變。對齊 code=default row Text 也加 (medium),讓三 row 一致呈現 medium 字重。",
+        "unit": "TreeView"
+      },
+      {
+        "file": "packages/design-system/src/components/TreeView/tree-view.anatomy.stories.tsx",
+        "old": "                <tr>\n                  <Td mono>hover</Td>\n                  <Td><TokenCell token=\"--neutral-hover\" display=\"neutral-hover\" /></Td>\n                  <Td><TokenCell token=\"--foreground\" display=\"foreground\" /></Td>\n                  <Td><TokenCell token=\"--foreground\" display=\"foreground\" /></Td>\n                </tr>",
+        "new": "                <tr>\n                  <Td mono>hover</Td>\n                  <Td><TokenCell token=\"--neutral-hover\" display=\"neutral-hover\" /></Td>\n                  <Td><TokenCell token=\"--foreground\" display=\"foreground(medium)\" /></Td>\n                  <Td><TokenCell token=\"--foreground\" display=\"foreground\" /></Td>\n                </tr>",
+        "finding": "同上 finding 的第二處對齊:hover row 的 Text cell(第 3 欄,token=--foreground)也加 (medium),使 default/hover/selected 三 row Text 一致呈現 font-medium(code L686 無條件套用)。註:hover row 第 4 欄(Icon/Chevron,亦 --foreground)維持不變,該欄非 Label 字重對象。",
+        "unit": "TreeView"
+      },
+      {
+        "file": "packages/design-system/src/components/Alert/alert.anatomy.stories.tsx",
+        "old": "              <tr><Td>solid appearance</Td><Td>icon 用白字(繼承 data-theme foreground)</Td><Td mono>text-foreground(inverse)</Td></tr>",
+        "new": "              <tr><Td>solid appearance</Td><Td>icon 隨 variant 的 data-theme:info / success / error(dark theme)白字,warning(light theme)深字</Td><Td mono>text-foreground(隨 data-theme 翻轉)</Td></tr>",
+        "finding": "alert.anatomy.stories.tsx:212 — StateBehavior『Close button 互動狀態』表 solid appearance 列 blanket 寫『icon 用白字』+ token『text-foreground(inverse)』,牴觸 (1) code alert.tsx L41-46 SOLID_HUE_THEME.warning='light'(L156 data-theme wrapper)→ warning solid 走 light theme = 深字非白字;(2) spec.md L148 SSOT『info/success/error 走 dark theme 白字,warning 走 light theme 深字以保對比』;(3) 同檔 ColorMatrix L133『solid warning = 黃底深字』。同時消除 finding #1(claim-vs-code)與 finding #2(L212 vs L133 spec-internal 矛盾)—— 兩 finding 同一 root-cause 行。修法:把 blanket『白字 / inverse』改成 per-variant 描述(三色白字 / warning 深字),token 改『text-foreground(隨 data-theme 翻轉)』(warning 是 light theme 非 inverse)。為 .stories.tsx prose,不改 code 行為。",
+        "unit": "Alert"
+      },
+      {
+        "file": "packages/design-system/src/components/Badge/badge.tsx",
+        "old": "  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],",
+        "new": "  states: ['default'],",
+        "finding": "CODE_A11Y badge.tsx:95 — badgeMeta.states 宣稱 5 互動態，但 cva(L25-38)零 hover/active/focus-visible/disabled variant，span role=status 不可聚焦無 handler。spec.md L363-371『為何無 StateBehavior』+ anatomy L3 明文純展示元件無互動。對齊 Tag canonical(tag.tsx:232 states:['default'])。compile-stories.mjs L143-144 會把這 5 個不存在的 state 編進 compiled story。",
+        "unit": "Badge"
+      },
+      {
+        "file": "packages/design-system/src/components/Badge/badge.tsx",
+        "old": "    fg: ['text-fg-muted', 'text-info-text'],",
+        "new": "    fg: ['text-fg-muted', 'text-info-text', 'text-on-emphasis'],",
+        "finding": "DOC_STALE badge.tsx:98 — tokens.fg 漏 text-on-emphasis,但 cva critical(L29)與 high(L30)皆套 text-on-emphasis(白字),佔 4 variant 一半。compile-stories.mjs L145-147 從 tokens 渲染 ## Tokens consumed 會漏這個白字 token。",
+        "unit": "Badge"
+      },
+      {
+        "file": "packages/design-system/src/components/Badge/badge.anatomy.stories.tsx",
+        "old": "        <span className=\"text-caption font-medium text-fg-secondary\">按鈕搭配規則</span>\n        <Desc>Badge 層級應匹配容器視覺重量。深色按鈕只適合 critical；低層級 badge 放在高視覺重量按鈕上是設計矛盾。</Desc>\n        <div className=\"overflow-x-auto\">\n          <table className=\"border-collapse text-caption\">\n            <thead><tr><Th>按鈕 variant</Th><Th>適合的 Badge 層級</Th></tr></thead>\n            <tbody>\n              {[\n                ['primary / checked / secondary+danger', 'critical'],\n                ['secondary / tertiary', 'critical、high'],\n                ['text', '全部'],\n              ].map(([btn, badge]) => (\n                <tr key={btn}><Td>{btn}</Td><Td>{badge}</Td></tr>\n              ))}\n            </tbody>\n          </table>\n        </div>",
+        "new": "        <span className=\"text-caption font-medium text-fg-secondary\">容器 Contrast floor 對照</span>\n        <Desc>容器 bg 決定 badge 的 contrast floor（可見度下限）——badge 至少要到此層級才看得清。Floor 是下限不是上限：semantic 永遠可往上升（floor 以上的所有層級都合法）。critical 的紅白對比在任何底色都清楚，不受 floor 限制。</Desc>\n        <div className=\"overflow-x-auto\">\n          <table className=\"border-collapse text-caption\">\n            <thead><tr><Th>容器</Th><Th>Contrast floor（最低層級）</Th></tr></thead>\n            <tbody>\n              {[\n                ['text / tab item / icon button（透明 / 極淺）', 'low'],\n                ['secondary / tertiary（淺底帶邊框）', 'low'],\n                ['checked（pressed，淺灰 / subtle 底）', 'low / medium'],\n                ['primary / secondary+danger（飽和深底）', 'high'],\n              ].map(([container, floor]) => (\n                <tr key={container}><Td>{container}</Td><Td>{floor}</Td></tr>\n              ))}\n            </tbody>\n          </table>\n        </div>",
+        "finding": "DOC_STALE badge.anatomy.stories.tsx:467-471 — anatomy『按鈕搭配規則』表把 spec contrast-floor『下限/floor』語意誤寫成『適合的上限 suit-list』,與 spec.md L139-146 canonical(floor 是下限不限制 semantic 往上)衝突,且漏 text/icon-button 容器列、把 checked 誤併 primary 群組。改成對齊 spec L141-144 四列 floor 表 + L127/L146 floor-是-下限/critical-always-clear 語意,不改 canonical meaning。",
+        "unit": "Badge"
+      },
+      {
+        "file": "packages/design-system/src/components/Badge/badge.principles.stories.tsx",
+        "old": "        note=\"Badge 本身是裝飾層——screen reader 需要從 parent 的 aria-label 取得完整 context。「通知 (3 則未讀)」比「通知」+「3」更清楚\"",
+        "new": "        note=\"Badge 預設 role=\\\"status\\\"(live region 可播報計數變化),但仍應由 parent 的 aria-label 整合完整 context——「通知 (3 則未讀)」比「通知」+「3」更清楚\"",
+        "finding": "CODE_A11Y(codex-only) badge.principles.stories.tsx:293 — note 稱『Badge 本身是裝飾層』與 code 矛盾:badge.tsx L70 預設 role={role ?? 'status'}(L63-66 註解明示 role=status live region 語意正確且允許 aria-label),非純裝飾層。a11y 整合指引正確保留,僅把 stale 的『裝飾層』描述改成對齊 code 的『預設 role=status live region』。",
+        "unit": "Badge"
+      },
+      {
+        "file": "packages/design-system/src/components/Carousel/carousel.anatomy.stories.tsx",
+        "old": "                <Td mono>ring-2 ring-ring ring-offset-2</Td>",
+        "new": "                <Td mono>ring-2 ring-ring ring-offset-1</Td>",
+        "finding": "ColorMatrix「Arrow(浮層按鈕)」表 L295 focus-visible 列 Stroke 寫 ring-offset-2，但 Arrow 實作為 <Button variant=\"tertiary\" size=\"md\" iconOnly> 唯一 className override 為 rounded-full、無任何 ring override（carousel.tsx L254-267/L287-298），故繼承 Button base focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1（button.tsx L66 確認 ring-offset-1）。ring-offset-2 是 Dots(carousel.tsx L338)的值，被誤標到 Arrow 表。改為 ring-offset-1 對齊 code 真實。注意：同檔 L513 A11y 摘要 prose 內的『dot focus-visible 走 ring token (ring-2 ring-ring ring-offset-2)』是描述 Dots、正確，不動；此 old-string（含 16 空格縮排的 <Td> 整行）在檔內唯一，僅命中 L295。",
+        "unit": "Carousel"
+      },
+      {
+        "file": "packages/design-system/src/components/CircularProgress/circular-progress.tsx",
+        "old": "  /** 狀態色(lifecycle,與 ProgressBar 同契約)。 */\n  /**",
+        "new": "  /**",
+        "finding": "circular-progress.tsx:55 — 孤兒 docblock `/** 狀態色(lifecycle,與 ProgressBar 同契約)。 */` 懸在 label prop 真實 JSDoc 前,描述一個不存在的 status/lifecycle prop。interface CircularProgressProps(L46-69)僅含 value/size/label/affix;元件 header(L28-33『不設 status prop(決策 2026-04-20)』)+ spec(L216 不要加 color/variant、L239 本元件沒有 success/error 狀態色)明文且刻意排除 status prop。此為前版考慮 status prop 的殘留 stale comment(IDE hover label 時會誤帶此 block)。修法=刪除該孤兒行,保留下方 label 的真實 JSDoc。不改任何 code 行為(該 prop 從未存在於 interface)。",
+        "unit": "CircularProgress"
+      },
+      {
+        "file": "packages/design-system/src/components/Combobox/combobox.principles.stories.tsx",
+        "old": "        <Rule\n          title=\"dropdown 只列出未選中選項\"\n          note=\"避免使用者選了同一個選項兩次。已選中的就在 field 裡，用 X 移除即可\"\n        >\n          <Combobox options={categoryOptions} value={['electronics']} onChange={() => {}} />\n          <Label>↑ 打開 dropdown，Electronics 不會出現在清單裡</Label>\n        </Rule>",
+        "new": "        <Rule\n          title=\"已選中的選項在下拉裡以打勾標示，再點一次即取消\"\n          note=\"桌機（預設）走自建浮層選單：已選項保留在清單中並以打勾呈現，再點一次即移除——避免使用者跨越下拉與 field 才能對照已選狀態。手機 / 觸控裝置改走原生 select，已選項則不重複出現在原生下拉\"\n        >\n          <Combobox options={categoryOptions} value={['electronics']} onChange={() => {}} />\n          <Label>↑ 打開 dropdown，Electronics 仍在清單裡並打勾，可再點一次取消</Label>\n        </Rule>",
+        "finding": "combobox.principles.stories.tsx:205-209 — Rule 教「dropdown 只列出未選中選項」+ Label「Electronics 不會出現在清單裡」,但 Storybook 桌機 default 渲染路徑是 CustomCombobox→SelectMenu(combobox.tsx L813-815 device split / useIsTouchDevice 初值 false / select-menu.tsx L227-233 groupedOptions 不剔除已選、L361-372 已選項打勾留在清單)。「只顯示未選中」只存在於手機 NativeCombobox(combobox.tsx L566 unselected)。改成 device-scoped 並對齊 spec.md L21/L97/L155-157 雙路徑 canonical。",
+        "unit": "Combobox"
+      },
+      {
+        "file": "packages/design-system/src/components/Combobox/combobox.anatomy.stories.tsx",
+        "old": "          <Desc>每個 Tag 自帶 dismiss 按鈕（X），點擊移除該選項。select 下拉只顯示未選中的選項，已選中的不重複出現。</Desc>",
+        "new": "          <Desc>每個 Tag 自帶 dismiss 按鈕（X），點擊移除該選項。手機 / 觸控裝置走原生 select 時下拉只顯示未選中的選項；桌機（預設）走自建浮層選單則已選項仍留在清單中並以打勾標示。</Desc>",
+        "finding": "combobox.anatomy.stories.tsx:868 — Desc「select 下拉只顯示未選中的選項，已選中的不重複出現」把手機 NativeCombobox 機制當成唯一行為。桌機 default 路徑(CustomCombobox→SelectMenu)dropdown 保留已選項並打勾(select-menu.tsx L361-372)。加裝置路徑 caveat,對齊 spec.md L21/L97/L155-157。",
+        "unit": "Combobox"
+      },
+      {
+        "file": "packages/design-system/src/components/Combobox/combobox.anatomy.stories.tsx",
+        "old": "          <span className=\"text-caption font-medium text-fg-secondary\">新增選擇</span>\n          <Desc>原生 select 只顯示未選中的選項。有值時 select 以 absolute inset-0 overlay 覆蓋整個 field，opacity:0 不可見。點擊 field 任何位置都會觸發 select showPicker。</Desc>\n          <div className=\"flex flex-col gap-1 text-[11px] text-fg-muted\">\n            <span>select overlay: absolute inset-0 · w-full h-full · opacity-0 · z-0</span>\n            <span>Tags 區域: relative z-10（蓋在 select 上方）</span>\n            <span>chevron / clear: relative z-10 · pointer-events-auto</span>\n            <span>Tag 本體: onClick → selectRef.showPicker()（穿透到 select）</span>\n            <span>全部選完 → selectDropdown = null（沒有未選中的選項）</span>\n          </div>",
+        "new": "          <span className=\"text-caption font-medium text-fg-secondary\">新增選擇</span>\n          <Desc>新增選擇的機制依裝置分兩條路徑。桌機（預設，非觸控）走自建浮層選單（SelectMenu）：點擊欄位開啟 popover，已選項仍留在清單中並以打勾標示，再點一次即取消。手機 / 觸控裝置改走隱藏的原生 select：只顯示未選中的選項，有值時 select 以 absolute inset-0 overlay 覆蓋整個 field、opacity:0 不可見，點擊欄位任何位置都會觸發原生 picker（showPicker）。</Desc>\n          <div className=\"flex flex-col gap-1 text-[11px] text-fg-muted\">\n            <span>桌機（預設）: 點擊欄位 → 開 SelectMenu popover，已選項打勾保留，toggle 取消</span>\n            <span>手機 / 觸控 — select overlay: absolute inset-0 · w-full h-full · opacity-0 · z-0</span>\n            <span>手機 / 觸控 — Tags 區域: relative z-10（蓋在 select 上方）</span>\n            <span>chevron / clear: relative z-10 · pointer-events-auto</span>\n            <span>手機 / 觸控 — Tag 本體: onClick → selectRef.showPicker()（穿透到原生 select）</span>\n            <span>手機 / 觸控 — 全部選完 → selectDropdown = null（沒有未選中的選項）</span>\n          </div>",
+        "finding": "combobox.anatomy.stories.tsx:892-901 — StateBehavior「新增選擇」段把 absolute inset-0 opacity-0 overlay + showPicker + 只顯示未選中(全屬 NativeCombobox 手機路徑,combobox.tsx L566/L571-578/L584)當成唯一行為描述,對桌機 default 路徑誤導。桌機 CustomCombobox 沒有 native select / inset-0 overlay,點擊開的是 SelectMenu popover、保留已選打勾(select-menu.tsx L361-372)。改成標明兩裝置路徑,對齊 spec.md L21/L155-157。",
+        "unit": "Combobox"
+      },
+      {
+        "file": "packages/design-system/src/components/DropdownMenu/dropdown-menu.principles.stories.tsx",
+        "old": "          title=\"RadioItem — 從互斥選項選一（選中後關閉）\"",
+        "new": "          title=\"RadioItem — 從互斥選項選一（選中後選單保持開啟）\"",
+        "finding": "principles.stories.tsx:247 title 括號『選中後關閉』為 stale 錯誤宣稱。RadioDemo(L250-262)實機用 DropdownMenuRadioItem(tsx:411 onSelect preventDefault)渲染,選中後 menu 保持開啟,與 title 直接矛盾。改為『選中後選單保持開啟』對齊 code 真實 + 同檔 L248/L263 note(互斥選一、選取底色標示,未宣稱關閉)。",
+        "unit": "DropdownMenu"
+      },
+      {
+        "file": "packages/design-system/src/components/Input/input.principles.stories.tsx",
+        "old": "        note=\"readonly 仍然有 wrapper 高度和 padding,密集列表會顯得鬆散。Table cell 用 `<Input mode='display'>`(純文字,無 wrapper)\"",
+        "new": "        note=\"readonly 仍然有 padding + 視覺 chrome,密集列表會顯得鬆散。Table cell 用 `<Input mode='display'>`(零視覺 chrome、無左右 padding;wrapper 高度同 readonly)\"",
+        "finding": "DOC_STALE input.principles.stories.tsx:141 — note 宣稱 mode='display' 為『純文字,無 wrapper』,但 input.tsx:123-156 顯示 display mode 仍渲染 <div> wrapper(L126),field-wrapper.tsx:104 的 mode='display'+variant='default' compoundVariant 僅 strip padding/bg/border(`!px-0 !py-0`),不 strip 高度——base size variant(field-wrapper.tsx:61)`h-field-md` 仍套用,與 readonly 同高。故『無 wrapper』為假(確有 wrapper element),『純文字』暗示無 chrome 才是真實差異。改為描述真實:零視覺 chrome + 無左右 padding,且 wrapper 高度與 readonly 相同。",
+        "unit": "Input"
+      },
+      {
+        "file": "packages/design-system/src/components/Input/input.anatomy.stories.tsx",
+        "old": "                ['mode', \"'edit' | 'display' | 'readonly' | 'disabled'\", \"'edit'\", '顯示模式，disabled/readOnly 原生屬性會自動覆蓋'],",
+        "new": "                ['mode', \"'edit' | 'display' | 'readonly' | 'disabled'\", \"'edit'\", 'mode 未顯式指定時，由 native readOnly/disabled fallback 推導（最低優先序；顯式 mode prop / fieldCtx.mode 勝出）'],",
+        "finding": "DOC_STALE input.anatomy.stories.tsx:244 — props 表 mode 說明寫『disabled/readOnly 原生屬性會自動覆蓋』,語意把優先序講反。input.tsx:110-112 `resolvedMode = modeProp ?? fieldCtx?.mode ?? (readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')`——native readOnly/disabled 是 `??` chain 中最低優先的 fallback,只在無顯式 mode prop 且無 fieldCtx.mode 時才生效;<Input mode='edit' readOnly> 解析為 mode='edit'(modeProp 勝)。故是 fallback(最低)非 override(最高)。改為正確描述:未顯式指定時由 native attrs fallback 推導,顯式 mode prop / fieldCtx.mode 勝出。",
+        "unit": "Input"
+      },
+      {
+        "file": "packages/design-system/src/components/Notice/notice.tsx",
+        "old": "  family: null, // non-family composite / overlay / layout",
+        "new": "  family: 2, // Family 2（List item layout）消費者 — 對齊 notice.spec.md frontmatter family: 2 + body「Layout Family」段",
+        "finding": "notice.tsx:182 noticeMeta.family=null 與 notice.spec.md frontmatter L3 `family: 2` + body L26 明文宣告 Family 2 矛盾。compile-stories.mjs L127 直接讀 tsxMeta.family,故 compiled POC 會印『Layout Family: null』與 spec SSOT 衝突。spec frontmatter family=2 為已落實 SSOT,tsx meta 是 Phase 1 mechanical migration 未填的 stale stub(同檔 L178-179 自承 Phase 2 fill needed)→ 對齊 spec 改為 family: 2。",
+        "unit": "Notice"
+      },
+      {
+        "file": "packages/design-system/src/components/Notice/notice.tsx",
+        "old": " *   dismiss 是邊角小 affordance,xs 視覺不搶眼不跟 content 競爭。見 `overlay-surface.spec.md`\n *   「Chrome dismiss size canonical」三家族分類(Modal sm / Non-modal xs / Notification xs)",
+        "new": " *   dismiss 是邊角小 affordance,xs 視覺不搶眼不跟 content 競爭。見 `overlay-surface.spec.md`\n *   「Chrome dismiss size canonical」(overlay header 走 sm native + 負 margin trick;只有 notification banner family 用 xs)",
+        "finding": "notice.tsx:29-30 docblock 把 overlay-surface.spec.md L350 已標 ❌ 拒絕的 v2 anti-pattern『三家族分類(Modal sm / Non-modal xs / Notification xs)』當成 live canonical 重述。現行 v5 SSOT(overlay-surface.spec.md L265-323)是 overlay header 走 sm native + 負 margin trick、只有 notification banner family 用 xs。docblock 錯誤呈現被否決的三家族 split → 對齊 v5 SSOT(亦對齊同元件 notice.spec.md L56 已修正後的引文措辭)。",
+        "unit": "Notice"
+      },
+      {
+        "file": "packages/design-system/src/components/ProfileCard/profile-card.tsx",
+        "old": "   * Consumer 傳的 field 資料(partial)。預設 keys 走 `NAMECARD_DEFAULT_FIELD_KEYS` —\n   * email / phone / department / location 永遠 render(缺資料顯 `—`)。Consumer 想新增\n   * 自訂 field 直接傳入(在 default 之後 append),想 override default key value 也直接傳。",
+        "new": "   * Consumer 傳的 field 資料(partial)。預設 keys 走 `NAMECARD_DEFAULT_FIELD_KEYS` —\n   * 只有 id / employeeNumber 兩個 default field 永遠 render(缺資料顯 `—`);email / phone /\n   * department / location 等其他欄位一律 opt-in by consumer 透過本 prop 傳入。Consumer 想新增\n   * 自訂 field 直接傳入(在 default 之後 append),想 override default key value 也直接傳。",
+        "finding": "tsx L114-116 fields prop docblock 宣稱『email/phone/department/location 永遠 render』,與同檔 SSOT L94-97 直接矛盾:2026-05-07 v15.7 user directive 明定 default render 只 id + employeeNumber,且 NAMECARD_DEFAULT_FIELD_KEYS = ['id','employeeNumber']、DEFAULT_FIELD_LABEL 只 map id + employeeNumber。屬 v10/v11 always-render 殘留 stale 註解,會誤導 consumer 以為預設會出 4 個聯絡欄位。",
+        "unit": "ProfileCard"
+      },
+      {
+        "file": "packages/design-system/src/components/ScrollArea/scroll-area.tsx",
+        "old": "  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],",
+        "new": "  states: ['default'],",
+        "finding": "scroll-area.tsx:102 — scrollAreaMeta.states 是 Phase-1 mechanical migration boilerplate(tsx L91-92 自承 Phase 2 未填),宣告 5 個互動 state。但 spec.md L123-125『為何無 StateBehavior』明文:ScrollArea 是捲動容器 primitive,本身無互動狀態,唯一 state 是 scrollbar visible/hidden 且由 Radix 依 overflow 自動偵測、非 prop 可控;spec L118『Disabled:ScrollArea 無互動狀態』。此 states 值 load-bearing:compile-stories.mjs L144 把 array 逐條編進 compiled anatomy『## States』文檔,對外宣稱 hover/active/focus-visible/disabled 三個不存在的互動態。對齊同類 passive 元件 Chart/Empty 校準(states:['default']),改為 ['default']。",
+        "unit": "ScrollArea"
+      },
+      {
+        "file": "packages/design-system/src/components/ScrollArea/scroll-area.anatomy.stories.tsx",
+        "old": "      <p className=\"whitespace-pre-line\">{\"詳 `scrollarea.spec.md` 「A11y 預設」段。摘要(Radix primitive + 本 DS 橋接):\\n\\n-   鍵盤捲動  :本 DS 在 Viewport 加  tabIndex={0}  使其可被鍵盤聚焦(Radix 不自動標 focusable,Safari 尤其需要),聚焦後支援  ArrowUp/Down/Left/Right  /  PageUp/Down  /  Home/End \\n-   Focus 可見  :聚焦的 Viewport 顯示 DS focus ring(focus-visible:outline-primary,inset 2px)\\n-   Scrollbar 非 tab stop  :scrollbar thumb 不搶焦點,使用鍵盤的使用者透過 viewport 捲動(Radix 內建)\\n-   Pointer 支援  :thumb 可拖曳,track 可 click-to-jump(Radix 內建)\\n\\nConsumer 無需額外處理 a11y——本元件已內建 tabIndex 與 focus ring。\"}</p>",
+        "new": "      <p className=\"whitespace-pre-line\">{\"詳 `scroll-area.spec.md` 「A11y 預設」段。摘要(Radix primitive + 本 DS 橋接):\\n\\n-   鍵盤捲動  :本 DS 在 Viewport 加  tabIndex={0}  使其可被鍵盤聚焦(Radix 不自動標 focusable,Safari 尤其需要),聚焦後支援  ArrowUp/Down/Left/Right  /  PageUp/Down  /  Home/End \\n-   Focus 可見  :聚焦的 Viewport 顯示 DS focus ring(focus-visible:outline-primary,inset 2px)\\n-   Scrollbar 非 tab stop  :scrollbar thumb 不搶焦點,使用鍵盤的使用者透過 viewport 捲動(Radix 內建)\\n-   Pointer 支援  :thumb 可拖曳,track 可 click-to-jump(Radix 內建)\\n\\n本元件已內建 tabIndex 與 focus ring(滿足 axe scrollable-region-focusable);但 Viewport 預設無 role / accessible name——scroll 區域有具體語意(如「留言列表」「程式碼區塊」)時,consumer 應提供 aria-label,否則 SR 只報「可捲動區域」無內容描述;純視覺裝飾容器可省略。\"}</p>",
+        "finding": "scroll-area.anatomy.stories.tsx:428 — Accessibility story 結尾『Consumer 無需額外處理 a11y——本元件已內建 tabIndex 與 focus ring』是被撤回的過度宣稱。spec.md L110(2026-05-31 #31)已明文撤回此 over-claim,corrected SSOT 改為:Viewport 預設無 role / accessible name,有具體語意的 scroll 區域 consumer 應提供 aria-label,否則 SR 只報『可捲動區域』。story 仍保留舊 over-claim = stale doc,與 corrected spec 直接矛盾。同行另把 spec 檔名誤寫 `scrollarea.spec.md`(實際為 `scroll-area.spec.md`,grep 確認此 typo 僅此一處、spec.md 本身無此 typo)。new 同時(1)修檔名 typo(2)把結尾段替換成 spec L110 corrected SSOT 措辭。",
+        "unit": "ScrollArea"
+      },
+      {
+        "file": "packages/design-system/src/components/SegmentedControl/segmented-control.tsx",
+        "old": "  family: null, // non-family composite / overlay / layout",
+        "new": "  family: 3, // Family 3(Pill Layout)— 對齊 spec frontmatter family:3 + body L42",
+        "finding": "DOC_STALE #77: tsx segmentedControlMeta.family:null 與權威 spec SSOT 矛盾。spec frontmatter L3 `family: 3` + body L42/L148 兩度重申 SegmentedControlItem 是 4-Family Model Family 3(Pill Layout)消費者。同庫 Family-3 peer 元件 Chip(chip.tsx:344)/Tag(tag.tsx:202)/Badge(badge.tsx:85)的 meta 全部忠實鏡射 `family: 3`(數字非字串)。compile-stories.mjs:127 直接消費此值渲染 `**Layout Family**: ${tsxMeta.family}`,family:null 會把本元件誤標為「Layout Family: null」。tsx metadata 是 stale 方,改為對齊 spec 的 family:3。",
+        "unit": "SegmentedControl"
+      },
+      {
+        "file": "packages/design-system/src/components/Sidebar/sidebar.anatomy.stories.tsx",
+        "old": "          跟 TreeItem / MenuItem 共用同一組 semantic token。Default → hover → active → selected 的色彩都一致。",
+        "new": "          跟 TreeItem / MenuItem 共用同一組 semantic token。Default → hover → selected 的色彩都一致。",
+        "finding": "ColorMatrix Desc(L398)宣稱 menu button 有 active(press)色彩態且『色彩都一致』,但 sidebarMenuButtonVariants cva(sidebar.tsx:862-905)無任何 :active / bg-neutral-active,同族 Menu/TreeView row-button 亦無。對齊 code 真實:移除『active』。",
+        "unit": "Sidebar"
+      },
+      {
+        "file": "packages/design-system/src/components/Sidebar/sidebar.anatomy.stories.tsx",
+        "old": "            <tr>\n              <Td>active (press)</Td>\n              <Td><Swatch value=\"--neutral-active\" />bg-neutral-active</Td>\n              <Td><Swatch value=\"--foreground\" />text-foreground</Td>\n              <Td mono>500</Td>\n            </tr>\n            <tr>\n              <Td>selected (`data-active`)</Td>",
+        "new": "            <tr>\n              <Td>selected (`data-active`)</Td>",
+        "finding": "ColorMatrix(L422-427)捏造 `active (press)` row 標 Swatch --neutral-active / bg-neutral-active,宣稱 SidebarMenuButton 有視覺 press 態。實際 cva(sidebar.tsx:884/885/891)只有 hover:bg-neutral-hover / focus-visible:bg-neutral-hover / data-[active=true]:bg-neutral-selected,精確 grep neutral-active|:active = NONE。--neutral-active row-family 唯一消費者是 inline-action 子按鈕(item-anatomy.tsx:637 group-active/action),非 menu button。移除此捏造 row,使對照表回到 code 真實的 default/hover/selected/disabled。",
+        "unit": "Sidebar"
+      },
+      {
+        "file": "packages/design-system/src/components/Sidebar/sidebar.anatomy.stories.tsx",
+        "old": "          <li>Cmd+B / Ctrl+B 全域快捷鍵由 SidebarProvider 監聽,任何 focus 位置都可觸發(input 內除外,避免干擾文字輸入)。</li>",
+        "new": "          <li>Cmd+B / Ctrl+B 全域快捷鍵由 SidebarProvider 監聽,任何 focus 位置都可觸發——目前未排除文字輸入框,在 input / textarea 內按下仍會 toggle 並攔掉預設行為(無 disableShortcut opt-out)。</li>",
+        "finding": "行為規則 note(L680)宣稱『input 內除外,避免干擾文字輸入』,但 keydown handler(sidebar.tsx:191-203)只判斷 key==='b' && (metaKey||ctrlKey) → preventDefault + toggle,無任何 input/textarea/contentEditable guard;sidebar.spec.md:674 亦明文『也未排除文字輸入框內』。對齊 code+spec 真實:改成『未排除文字輸入框,input 內仍會 toggle』。",
+        "unit": "Sidebar"
+      },
+      {
+        "file": "packages/design-system/src/components/Sidebar/sidebar.anatomy.stories.tsx",
+        "old": "Sidebar 內建並會攔下這組鍵,避免穿透到瀏覽器書籤列。任何焦點位置都能觸發,文字輸入框內除外。",
+        "new": "Sidebar 內建並會攔下這組鍵,避免穿透到瀏覽器書籤列。任何焦點位置都能觸發;目前未排除文字輸入框——在 input / textarea 內按下仍會 toggle(無 disableShortcut opt-out)。",
+        "finding": "Accessibility story(L766)宣稱『任何焦點位置都能觸發,文字輸入框內除外』,與 code(sidebar.tsx:191-203 無 input guard)及自家 spec.md:674(明文未排除文字輸入框)矛盾。對齊真實:input 內仍會觸發,未排除。",
+        "unit": "Sidebar"
+      },
+      {
+        "file": "packages/design-system/src/patterns/overlay-surface/overlay-surface.tsx",
+        "old": "  // Popover 等輕量 chrome 走 PopoverHeader override(min-h-10 + py-2 = 40,內 24 匹配 button slot)",
+        "new": "  // Popover 等輕量 chrome 走 PopoverHeader override(`[--chrome-slot-h:1.25rem]` = 20 slot,無 min-h / 無 py override)：max(21 title, 20 slot) + py-tight 12×2 = 45（見上方 L57）",
+        "finding": "overlay-surface.tsx:136 stale comment 描述已廢棄舊版實作。實際 PopoverHeader(popover.tsx L94-97)只加 className `[--chrome-slot-h:1.25rem]`(20px slot)且 comment 自註『無 min-h / 無 py override — 修正前一版過度設計』。stale comment 的『min-h-10 + py-2 = 40 / 內 24』機制不存在,且與同檔 L57 canonical(Popover header = max(21,20)+py-tight = 45,slot=20)自相矛盾。全 tree grep `min-h-10` 僅命中此一 stale comment。",
+        "unit": "overlay-surface"
+      },
+      {
+        "file": "packages/design-system/src/components/Button/button.tsx",
+        "old": " *     - text      + pressed → neutral-selected 底，hover 反向變淺，:active 深一階",
+        "new": " *     - text      + pressed → primary-subtle 底、primary 字、透明邊框（預設 pressedTone='emphasis'，同 secondary/tertiary 按下視覺）；pressedTone='neutral' 時才走 neutral-selected 灰底",
+        "finding": "button.tsx:33 docblock 仍描述 pre-v12『text+pressed 預設 neutral-selected 灰底』，與 cva defaultVariants.pressedTone='emphasis'(L216) + emphasis compoundVariant(L185-197 variant array 含 'text' → data-[state=on]:bg-primary-subtle/text-primary) + JSDoc L260-269（明說 emphasis 淡藍底為預設、neutral 為 opt-in）直接矛盾。neutral-selected compoundVariant(L199-211)只在 consumer 明示 pressedTone='neutral' 才生效。改 docblock 對齊 code 真實預設行為，不改任何 code 行為。",
+        "unit": "Button"
+      },
+      {
+        "file": "packages/design-system/src/components/Chart/chart.tsx",
+        "old": "  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],",
+        "new": "  states: ['default'],",
+        "finding": "chart.tsx:364 chartMeta.states 列 5 個互動 state,但 Chart 是 passive 視覺化層(spec L137 明文『無 StateBehavior:chart 是 passive 視覺化層,本身無 hover / focus / active / selected / disabled 互動狀態』;anatomy 檔頭 L7-8 同述）。此值 load-bearing:scripts/compile-stories.mjs:144 把 states 逐條編進 compiled story 文件,對外宣稱本元件有 hover/active/focus-visible/disabled 互動狀態，與 spec/anatomy 相反。tsx L353-354 標 Phase-1 mechanical stub / Phase 2 fill needed。對照同類 passive 元件 AspectRatio(states:['default'])與 BulkActionBar(states:['default'])，正確值為 ['default']。屬 metadata stale，對齊 code 真實(Chart 無互動 state)。",
+        "unit": "Chart"
+      },
+      {
+        "file": "packages/design-system/src/components/DatePicker/date-picker.anatomy.stories.tsx",
+        "old": "                ['mode', \"'edit' | 'display' | 'readonly' | 'disabled'\", \"'edit'\", '顯示模式；display 為純內容輸出（DataTable cell 用），disabled 由原生屬性自動覆蓋'],",
+        "new": "                ['mode', \"'edit' | 'display' | 'readonly' | 'disabled'\", \"'edit'\", '顯示模式；display 為純內容輸出（DataTable cell 用），傳 disabled prop 時以 React prop 覆蓋 mode（resolvedMode）並套 aria-disabled（trigger 為 div role=combobox，非原生 disabled 屬性）'],",
+        "finding": "anatomy Props 表 mode 列說明寫『disabled 由原生屬性自動覆蓋』。實際 trigger 是 <div role=\"combobox\">(date-picker.tsx:510),無 native disabled。真實機制:disabled prop → resolvedMode = disabled ? 'disabled' : mode(L382)+ aria-disabled(L512)。override 行為為真,僅『原生屬性』措辭與 code 機制不符(P2 措辭不準,非行為錯)。已改成描述 React-prop-override + aria-disabled 真實機制。",
+        "unit": "DatePicker"
+      },
+      {
+        "file": "packages/design-system/src/components/DescriptionList/description-list.tsx",
+        "old": "  states: [], // 純唯讀 dl/dt/dd,無 hover/active/focus/disabled 互動 state(spec L182-189「為何無 Inspector/ColorMatrix」)",
+        "new": "  states: [], // 純唯讀 dl/dt/dd,無 hover/active/focus/disabled 互動 state(spec L181-189「為何無 ColorMatrix / SizeMatrix」)",
+        "finding": "L133 inline 註解誤引 spec 段標題為「為何無 Inspector/ColorMatrix」,等於宣稱『無 Inspector』,但 spec L181-189 真實標題是「為何無 ColorMatrix / SizeMatrix」且 L185 明文寫『有 Inspector』(DL 有 Inspector story 暴露 cols/direction/divided)。states:[] 本身正確(DL 唯讀無互動態),僅引用字串 stale/誤引,對齊 spec 真實標題與行範圍。",
+        "unit": "DescriptionList"
+      },
+      {
+        "file": "packages/design-system/src/components/FieldControlGroup/field-control-group.tsx",
+        "old": " * **Size cascade**(對齊 Field family):\n * - `size` prop default = md;cascade 到 children via implicit context inheritance(children 自管 size 或繼承 useFieldContext)\n * - Mode A:整個 FieldControlGroup 包進 Field 當 control slot,size 自動從 Field context 來\n * - Mode B:standalone 用,size 由 prop 控制",
+        "new": " * **Size**(FCG `size` 為 no-op — 不傳遞 size 給 children,無 Context Provider / 無 cloneElement;見 spec「Size」段):\n * - children 尺寸完全由 child 自己決定;FCG 只負責 border-collapse 接合(border / radius / z-index)\n * - Mode A:整個 FieldControlGroup 包進 Field 當 control slot,children 各自讀外層 `<Field>` 的 context size(是 Field 的 context,不是 FCG 的)\n * - Mode B:standalone 用,逐一給每個 child 設 `size`(設 `<FieldControlGroup size>` 無效)",
+        "finding": "field-control-group.tsx:29-32 docblock「Size cascade」段宣稱 FCG size cascade 到 children via implicit context inheritance + Mode A『size 自動從 Field context 來』+ Mode B『size 由 prop 控制』。實際 code:L72 `size: _size = 'md'` underscore-prefix 故意不用,body(L73-110)零消費,render 純 <div> 不 cascade 任何東西;spec.md L55/L90/L92/L103 已 honest(no-op / 不傳遞 / Mode A 讀外層 Field context / Mode B 逐一給 child 設 size)。docblock 為 stale 版,對齊 honest spec。",
+        "unit": "FieldControlGroup"
+      },
+      {
+        "file": "packages/design-system/src/components/FieldControlGroup/field-control-group.tsx",
+        "old": "  /** Children size cascade(Mode B);Mode A 從 Field context 來 */",
+        "new": "  /** no-op — FCG 不傳遞 size 給 children;Mode A 由 children 讀外層 Field context、Mode B 逐一給每個 child 設 size(見 spec「Size」段) */",
+        "finding": "field-control-group.tsx:65 prop JSDoc『Children size cascade(Mode B);Mode A 從 Field context 來』同 stale 框定——把 FCG size 描述成 Mode B 的 cascade source。實際 prop 為 no-op(`_size` 不消費),spec L103 明寫 Mode B 必逐一給 child 設 size、設 `<FieldControlGroup size>` 無效。對齊 spec 真實。",
+        "unit": "FieldControlGroup"
+      },
+      {
+        "file": "packages/design-system/src/components/HoverCard/hover-card.tsx",
+        "old": "  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],",
+        "new": "  states: ['default'],",
+        "finding": "hover-card.tsx:71 hoverCardMeta.states lists 5 interactive states ['default','hover','active','focus-visible','disabled'] but this is Phase-1 mechanical-migration boilerplate (L60-61 self-marks Phase 1 / Phase 2 fill needed). hover-card.spec.md:104 emphatically states HoverCard is a pure behavior primitive with passive open/close only — 無 hover/selected/active/disabled (those belong to consumer components). compile-stories.mjs:143-144 renders tsxMeta.states into a generated '## States' doc section, so the stale array would emit a States list contradicting spec L104. Code behavior is correct (no interactive states implemented); only the meta array is stale. Aligned to ['default'] matching the passive-primitive canonical and the AspectRatio/BulkActionBar precedent (states:['default']) cited in the finding itself.",
+        "unit": "HoverCard"
+      },
+      {
+        "file": "packages/design-system/src/components/ProgressBar/progress-bar.tsx",
+        "old": "  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],",
+        "new": "  states: ['default'],",
+        "finding": "progress-bar.tsx:149 progressBarMeta.states 宣告 ['default','hover','active','focus-visible','disabled'] 五個互動狀態,但 ProgressBar 是 passive Radix Progress wrapper(tsx L107-124 只有 Progress.Root + Indicator + 固定 className,無任何 hover/focus/active/disabled handler 或 :hover/:focus class)。spec.md L182/L201-205 + anatomy stories L6-9 三處明文『本元件非互動,無 hover/focus/active/disabled』。L138-139 註解自承 Phase 1 mechanical migration boilerplate(variants/sizes 皆空 placeholder),states 帶的是泛用 5-state 預設。此值 load-bearing:compile-stories.mjs:144 tsxMeta.states.forEach 把它 emit 進 compiled anatomy 的『## States』段,對外輸出 4 個不存在的互動狀態。對齊 Badge/AspectRatio/BulkActionBar passive 元件 canonical states:['default']。",
+        "unit": "ProgressBar"
+      },
+      {
+        "file": "packages/design-system/src/components/Rating/rating.tsx",
+        "old": "  component: 'Rating',\n  family: 4,",
+        "new": "  component: 'Rating',\n  family: null, // self-contained primitive(對齊 spec frontmatter self-contained + body L24;非 Family 4)",
+        "finding": "rating.spec.md:3 vs:24 (+ rating.tsx:291) — ratingMeta.family 機讀 metadata 繼承同 frontmatter 矛盾值 `4`。spec body 自述 self-contained + DS convention(Switch/Checkbox componentMeta 皆 `family: null, // self-contained primitive(對齊 spec frontmatter self-contained...;非 Family 4)`)。對齊 Switch/Checkbox 精確 canonical pattern:`family: null` + self-contained 註解,與本輪 frontmatter `family: self-contained` 同步。",
+        "unit": "Rating"
+      },
+      {
+        "file": "packages/design-system/src/components/Rating/rating.tsx",
+        "old": "        //   (time-picker.tsx:308 / date-picker.tsx:512:aria-labelledby={fieldCtx?.labelId})。",
+        "new": "        //   (time-picker.tsx:313 / date-picker.tsx:514:aria-labelledby={fieldCtx?.labelId})。",
+        "finding": "rating.tsx:158 — docblock cite 行號 stale。實 grep 確認:time-picker.tsx aria-labelledby 在 L313(cite 寫 308,差 5 行)、date-picker.tsx 在 L514(cite 寫 512,差 2 行)。canonical pattern(兩元件都用 fieldCtx?.labelId 餵 aria-labelledby)正確不變,僅行號漂移需更新。DatePicker L514 真實 code 為 `aria-labelledby={ariaLabelledByProp ?? fieldCtx?.labelId}` 含 consumer override 分支,但 cite 目的是指 fieldCtx?.labelId canonical,故保留 pattern 表述只修行號。",
+        "unit": "Rating"
+      },
+      {
+        "file": "packages/design-system/src/components/Separator/separator.tsx",
+        "old": "  family: null, // non-family composite / overlay / layout",
+        "new": "  family: 'self-contained', // 純視覺 divider,獨立視覺無 slot 結構(對齊 spec frontmatter L3 family: self-contained)",
+        "finding": "separator.tsx:33 separatorMeta.family=null 與 spec frontmatter L3 'family: self-contained' + body L17 'self-contained primitive(獨立視覺,無 slot 結構)' 矛盾。Phase-1 mechanical migration boilerplate 未 curate;compile-stories.mjs 對外渲染 '**Layout Family**: null' 而非 self-contained = 假文件。改 metadata 對齊 spec(code/spec 本身正確,僅此 scaffold 值 stale)。",
+        "unit": "Separator"
+      },
+      {
+        "file": "packages/design-system/src/components/Separator/separator.tsx",
+        "old": "  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],",
+        "new": "  states: ['default'], // 純 Radix Separator.Root,非互動,無 hover/active/focus/disabled(對齊 spec L86/L99 + Tag tag.tsx:232 canonical)",
+        "finding": "separator.tsx:40 separatorMeta.states 宣告 5 個互動態,但 separator.tsx 是純 SeparatorPrimitive.Root,零互動 handler(無 onKeyDown/tabIndex/onClick)。spec.md L86 '無 StateBehavior:非互動元件,無 hover / focus / active / selected / disabled' + L99 '永遠 non-interactive' 明文否定。Tag tag.tsx:232 同類已 curate 成 ['default']。此值 load-bearing:compile-stories.mjs L144 把 states 渲染進 compiled anatomy '## States' 段,對外輸出 3 個不存在的互動態。curate 成 ['default'] 對齊 Tag canonical + spec(不改 code 行為,僅修 stale scaffold metadata)。",
+        "unit": "Separator"
+      },
+      {
+        "file": "packages/design-system/src/components/Tooltip/tooltip.principles.stories.tsx",
+        "old": "          <Label warn>↑ tooltip 裡放「查看 profile」按鈕 → 滑鼠離開就消失,點不到 → 改用 HoverCard</Label>",
+        "new": "          <Label warn>↑ tooltip 裡放「查看 profile」按鈕 → 語意是純描述（role=tooltip）不該含可點擊元素 → 改用 HoverCard</Label>",
+        "finding": "DOC_STALE/claim-vs-code (codex B3-overlay, P2): Label L138 宣稱按鈕「滑鼠離開就消失,點不到」是 factually false。Radix Tooltip 預設 disableHoverableContent=false(node_modules/@radix-ui/react-tooltip/dist/index.js:79),L275 走 TooltipContentHoverable,L283-336 建 pointerGraceArea 讓滑鼠從 trigger 移到 content 時 content 保持開啟 → 按鈕實際可達。DS wrapper(tooltip.tsx)未設 disableHoverableContent = 繼承預設可 hover。且同 Rule 的 note(L125)自己已正確寫『即使 Radix 浮層技術上可 hover』,L138『點不到』與其自身 note + Radix source 雙重矛盾。不該用 Tooltip 放互動內容的『真正理由』是語意(role=tooltip 被 aria-describedby 當純描述讀,非互動 surface),非技術上不可達。改 prose 對齊 code 真實 + sibling note,保留有效的語意規則,不改任何設計決策。",
+        "unit": "Tooltip"
+      },
+      {
+        "file": "packages/design-system/src/components/Menu/menu-item.anatomy.stories.tsx",
+        "old": "                ['disabled', 'boolean', 'false', '停用，所有子元素統一 fg-disabled'],",
+        "new": "                ['disabled', 'boolean', 'false', '停用：文字 / startIcon 套 fg-disabled，checkbox 用 disabled 樣式，tag / endContent 套 opacity-disabled，avatar 不變'],",
+        "finding": "menu-item.anatomy.stories.tsx:282 Props 速查表 disabled 列 codex DOC_STALE(B3-overlay,P2,claim-vs-code):『所有子元素統一 fg-disabled』與 menu-item.tsx 不符。實際 code:text/label/description/startIcon→text-fg-disabled(L198/L221/L246/L248);checkbox→disabled prop(L212,Checkbox 自身 disabled 樣式而非 fg-disabled);tag/endContent→opacity-disabled(L256);avatar→無任何 disabled/fg-disabled 處理(L225-234,Avatar 僅在 disabled Field wrapper context self-dim,MenuItem 非 Field wrapper,avatar.tsx L153 驗證)。code 行為正確且 intentional,故改 story prose 對齊 code。",
+        "unit": "Menu"
+      }
+    ],
+    "flagged": [
+      {
+        "fileLine": "packages/design-system/src/components/SelectMenu/select-menu.anatomy.stories.tsx:808",
+        "why": "False-positive line ref（findings #81 secondary ref + #132 codex）。實讀 anatomy:808 的 Accessibility story Focus 摘要為『searchable 時 DOM focus 給搜尋 input;option 無 tabIndex,DOM focus 不落在 option 上』—— 不含『content 容器』字樣。grep 確認『content 容器』在整個 SelectMenu 僅出現於 spec.md L213（已 Edit 修正）。anatomy 此行無 stale 文字可改，故不 emit tsxEdit。真正 stale 位置=spec.md L213，已在 specFixed 處理。",
+        "unit": "SelectMenu"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/Empty/empty.spec.md:180",
+        "why": "已不存在 / 假陽性(對 current working-tree 而言)。Finding 宣稱 spec L180 仍寫『無 disabled state』與 code 矛盾,但親讀現檔:L180 已正確寫『**唯一例外是 disabled context state**(disabled?: boolean prop)…disabled 時 title/description 轉 text-fg-disabled、icon glyph 轉 fg-disabled(供 FileUpload disabled 等情境消費)』;L178 ColorMatrix 已列 text-fg-disabled;L76 description 段也含『disabled context 時走 fg-disabled』。git status 顯示 empty.tsx + file-upload.tsx 為 M(已 commit 6967c4ed Q1-Q5 視覺/行為修),spec 文字也已同步。此 finding 是對 pre-commit-6967c4ed 舊版跑出的,current state 已對齊,無需再改。(L43『何時不用』表的 disabled row 講的是『何時不該用 Empty』,非 state 宣稱,本就無誤。)",
+        "unit": "dim15"
+      },
+      {
+        "fileLine": "checkbox.tsx:224-226 (CODE_A11Y/SUBSTANTIVE bucket, iconSize mislabel)",
+        "why": "此項在 buckets.json 的 SUBSTANTIVE array(L1677-1685),不在任務指定的 DOC_STALE 或 CODE_A11Y 兩個 array 內,故不在本任務 scope。內容為 checkboxMeta.sizes.iconSize 欄位名語意問題(欄名叫 iconSize 但值 16/16/20 實為控件尺寸 h-4/h-4/h-5,真正 check icon 由 checkIconSize {12,12,16} 決定)。此屬 Phase-1 auto-migration metadata 的欄位語意 mislabel,修法需新增/重命名欄位(controlPx vs iconPx)= 改 metadata schema 結構,非單純『把錯值改成對值』的 doc-stale 對齊,且牽涉 compile-stories.mjs 下游與 dim/SUBSTANTIVE 分流決策,留給 SUBSTANTIVE bucket 處理流程,不在此自行改。",
+        "unit": "Checkbox"
+      },
+      {
+        "fileLine": "CODE_A11Y array (L1324-1666)",
+        "why": "親自 awk 掃描 CODE_A11Y array(L1324-1666)內所有 \"unit\"/\"dim\" 欄位,無任何 unit/dim === \"Checkbox\" 項目。故 Checkbox 在 CODE_A11Y array 為 0 條 finding,本任務的 Checkbox 修正全部來自 DOC_STALE array 的 3 條(checkbox.spec.md:150 / checkbox.tsx:226 / checkbox.tsx:228)。此為說明,非待處理 finding。",
+        "unit": "Checkbox"
+      },
+      {
+        "fileLine": "file-upload.spec.md:102",
+        "why": "Already-fixed / false positive。finding(DOC_STALE#56)的 claim 引述舊文字『完全停用(pointer-events 關)』,但現檔 L102 實際已是修正後版本:『disabled:完全停用(互動由 isBlocked guard 擋 + cursor-not-allowed;Q4 移除 pointer-events-none 後不再靠它擋)』,完全對齊 code(file-upload.tsx L292-297 已移除 pointer-events-none,改 isBlocked guard)+ 同檔 spec L57/L58。spec L102 已無 stale『pointer-events 關』殘留,無需再改。audit 跑在更早 state,此 finding 已被先前 commit 6967c4ed 修掉。",
+        "unit": "FileUpload"
+      },
+      {
+        "fileLine": "radio-group.tsx:30",
+        "why": "非 doc-stale,不可改 doc。此 finding 在 audit snapshot(buckets.json mtime 2026-06-05 11:49)時為 CODE BUG:jsDoc 宣稱 mode='readonly' 行為但 code 只實作 display 分支。已由 commit 409b91da(2026-06-05 12:34,Q1 a11y 批次,user 拍板 verbatim「補 code」)實作 mode='readonly'(radio-group.tsx:80 RadioGroupReadonlyContext.Provider value={mode === 'readonly'} + L193-194 effectiveReadonly 傳給 item data-[readonly])。現 code 已兌現 jsDoc 承諾,L30 jsDoc 'readonly — 同 child item 各自 readOnly:radio 視覺保留 + 鎖互動' 與 code 一致、非 stale。改 doc(刪掉行為描述)會反而 drift。屬 task brief 所述「已由 Q1 a11y 批次處理」類別。",
+        "unit": "RadioGroup"
+      },
+      {
+        "fileLine": "radio-group.tsx:31",
+        "why": "非 doc-stale,不可改 doc。同 #1:audit 時為 code bug(jsDoc 宣稱 mode='disabled' 但 code 未消費),已由 commit 409b91da 實作(radio-group.tsx:86 disabled={mode === 'disabled' || (props as {disabled?:boolean}).disabled})。現 L31 jsDoc 'disabled — 同 RadioGroupPrimitive.Root disabled 屬性' 與 code 一致、非 stale。改 doc 會 drift。屬 Q1 a11y 批次已處理類別。",
+        "unit": "RadioGroup"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/DropdownMenu/dropdown-menu.tsx:127",
+        "why": "Finding 1 不是 doc-stale,是 code-gap 且【已被 Q1 a11y 批次修復】。audit 當時 DropdownMenuContent 缺 data-density=\"md\"(3 SSOT density.spec.md:107 / dropdown-menu.spec.md:218 / uiSize.css:102 皆要求 lock md)。親讀現況:dropdown-menu.tsx:132 現已有 data-density=\"md\",git blame 確認為 2026-06-05 commit 409b91da『fix(a11y/deep-audit): 補 6 元件 a11y/Field-mode 缺口(P0 + Q1 拍板)』加入。code 已對齊 spec,doc 不 stale,無需任何文件改動。",
+        "unit": "dim51"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/Tooltip/tooltip.tsx:29",
+        "why": "Finding 2 同 Finding 1:code-gap 且【已被 Q1 a11y 批次修復】。audit 當時 TooltipContent 缺 data-density=\"md\"(density.spec.md:108 + uiSize.css:102 要求 lock md)。親讀現況:tooltip.tsx:33 現已有 data-density=\"md\",git blame 確認同 commit 409b91da(2026-06-05 Q1 a11y 拍板批次)加入。code 已對齊 spec,doc 不 stale,無需文件改動。注:density.spec.md:108 Tooltip row 寫 data-density=\"md\" 是【正確】的(現在 code 確實設了),不需改。",
+        "unit": "dim51"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/DropdownMenu/dropdown-menu.tsx:127 (dim-51, CODE_A11Y/SUBSTANTIVE_DESIGN)",
+        "why": "假陽性/已解決,非 doc-stale。finding 宣稱 DropdownMenuContent 完全無 data-density attribute,要求 lock md。但親讀 dropdown-menu.tsx:132 確認 DropdownMenuPrimitive.Content 已設 data-density=\"md\"(在 ref/sideOffset 與 onCloseAutoFocus 之間)。code 已與三處 SSOT(density.spec.md:107 / dropdown-menu.spec.md:218 / uiSize.css:102)一致,無 gap 可修。不屬本批 doc-align scope,也非待修 code bug;標記為已對齊。",
+        "unit": "DropdownMenu"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/Notice/notice.spec.md:56",
+        "why": "False positive against current working-tree state — finding 宣稱 L56 cites『三家族分類』subsection(不存在於 overlay-surface.spec.md,且是被 ❌ 拒絕的 v2 wording)。但親讀 notice.spec.md L56 + git blame 確認該行已在本 working tree 被先前 batch 修正(blame 顯示『Not Committed Yet 2026-06-05』),現行 L56 已正確引用 v5 SSOT『「Chrome dismiss size canonical」(overlay header 走 sm native + 負 margin trick;只有 notification banner family 用 xs)』,無『三家族分類』字樣。已對齊,不需再改。注:同 root-cause 的殘留 stale wording 仍存在於 notice.tsx:30 docblock,已 emit 為 tsxEdit 修正。",
+        "unit": "Notice"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/SegmentedControl/segmented-control.spec.md:252",
+        "why": "誤判(假陽性)— 非 doc-stale。L252 屬「禁止事項」段(consumer-facing prohibitions),此 bullet「❌ 未傳 value 時預設『全都未選』——SegmentedControl 必須有 default value，這是 radio 語意」是對 consumer 的設計意圖規則(radio 語意:消費者必須提供 default value),不是宣稱『code 會自動補/強制 default value』。與同段其他 bullet(『❌ 只有 1 個 item』『❌ 超過 5 個 item』『❌ iconOnly 時省略 aria-label』)同性質 — 都是消費者使用規則、code 同樣不機械強制;且與 spec L228『consumer 必須確保 value 永遠落在可選 item 上』一致把責任放在消費者端。code(segmented-control.tsx:97-128)走 Radix uncontrolled 慣例把 undefined 透傳是正確設計,與此 doc 無真矛盾。codex finding 把『消費者禁止事項』誤讀成『code 行為宣稱』。改/弱化此 bullet 等於移除合法的設計規則=發明設計改動,故 flag 不改(per『誤判→flaggedNotDoc』+『不改 code 行為、不發明新設計』)。",
+        "unit": "SegmentedControl"
+      },
+      {
+        "fileLine": "packages/design-system/src/tokens/density/density.spec.md:109",
+        "why": "誤判/已修正(false positive)。finding 宣稱 density.spec.md:109 寫『Sidebar | data-density=\"md\"(lock md)』,但實讀該行現為『| Sidebar | 無(繼承 page) | Sidebar 是 inline chrome(非 Portal 逃逸),跟隨 page density;size=\"md\" 在 density=\"lg\" 下自動變 36px row |』——已與 code(全 Sidebar 目錄 0 個 data-density)及 sidebar.spec.md:126-129 一致。git log 確認此 row 已由 commit 302c0771『4 doc-vs-code drift 對齊』修好。稽核跑在 stale 快照上,當前無需再改。",
+        "unit": "Sidebar"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/DataTable/advanced-filter-operators.draft.md",
+        "why": "非 doc-stale-prose 對齊類:此 finding 不是『文件描述與 code 行為矛盾』,而是『檔案後綴 .draft.md 違反 naming-conventions.md:56 allowlist (.tsx/.spec.md/.stories.tsx/.anatomy.stories.tsx/.principles.stories.tsx)』的結構/治理問題。修法 = 升級成 filter-operators.spec.md OR 移到 .claude/planning/(governance 設計決策,需 user 拍板),且 load-bearing:被 3 個 production 檔以 `*.draft.md` 字面引用 (filter-operators.ts:10 / filter-tree.ts:238 / data-table-filter-panel.tsx:68),重命名須同步改這 3 處 comment(動 .tsx)。原 triage 即標 SUBSTANTIVE_DESIGN、phaseC-report 歸 STOP-propose 類。不在『改文件對齊 code』scope 內,放此給 user 決策。",
+        "unit": "dim14"
+      },
+      {
+        "fileLine": "(scope note) ProfileCard nameCardMeta vs ProfileCardMeta",
+        "why": "phaseC-report.md:37 把此列為第 3 個 dim14 finding,但 buckets.json 的 DOC_STALE+CODE_A11Y 兩 array 中無任何 dim=='dim 14' 且涉及 nameCardMeta 的項目(triage 階段已 dedup 或併入別處,grep buckets.json 確認不存在)。因不在我被指定的兩個 array 的 dim14 篩選結果內,故未處理;若需處理請補進 buckets.json 或另行指派。",
+        "unit": "dim14"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/DescriptionList/description-list.stories.tsx:112",
+        "why": "非 doc-stale-vs-code,而是 story convention-drift(category OTHER)。Finding 要求把 live `export const _RETIRED_HorizontalDivided = { tags:['!autodocs','!dev'], render: ... }` 整個 export body 刪掉,改成 comment-only 退役 stub(對齊 DS-wide 39 檔 @story-trait-rationale 慣例;DS-wide grep 確認全庫僅此檔 + slider 兩處 zombie export,claim 屬實)。但這是「移除一個 live story render 路徑 + 重命名/刪除 identifier」的結構性 code 改動,不是把 stale doc 文字對齊 code 真實——不屬本單元(改文件對齊 code)scope,且刪 export 改變 Storybook render 行為(本任務明令『不改 code 行為』)。應交由 story dead-code/convention cleanup 批次(非 doc-alignment)處理。註:該 export 上方 L108-111 的 @story-trait-rationale 註解本身正確、無需改。",
+        "unit": "dim25"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/Slider/slider.stories.tsx:71",
+        "why": "非 doc-stale-vs-code,而是 story convention-drift(category OTHER)。Finding 要求把 live `export const Disabled_REMOVED: Story = { name:'停用狀態(已移至設計規格頁示範)', tags:['!autodocs','!dev'], render: ... }` 整個 export body 刪掉,改成 comment-only 退役 stub(對齊 DS-wide 39 檔 @story-trait-rationale 慣例;grep 確認全庫僅 description-list + 此檔兩處 zombie export,claim 屬實)。但這是移除 live story export(改 Storybook render)+ 刪 identifier 的結構性 code 改動,違反本任務『不改 code 行為、tsxEdits 僅限 stale 文字描述』約束——不屬 doc-alignment scope,應交由 story dead-code/convention cleanup 批次處理。註:L68-70 的 @story-trait-rationale 註解本身正確、無需改。",
+        "unit": "dim25"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/Sheet/sheet.spec.md:19",
+        "why": "非 doc-stale。spec L19 描述的是刻意的設計契約(『消費者 API = side=right;top/bottom/left 保留 DS 內部基建用,消費者禁止傳,需 user 授權』),且 tsx docblock L25-27 一字不差陳述同一 convention,spec 本身明示 canonical 來源就是 sheet.tsx L23-27。stories 中傳 side=left/bottom 的全是 anatomy/principles 明確標註的『內部能力示範』(principles L256/L280『以下為內部能力示範』)。三方(spec/tsx/stories)對此 convention 完全一致。codex 的 codeReality『SheetContentProps 經 VariantProps 公開四個 side 且 SheetContent 無 runtime guard』是 code 端缺乏機械強制的觀察 —— 屬潛在 CODE 改善(可加 guard 或 type 限制),不是文件寫錯。文件忠實描述了設計意圖,不應為對齊『無 guard 的 code 現況』而把契約文字刪掉/弱化(那會反向丟失設計意圖)。是否替 consumer-facing prop 加 type-level/runtime 限制屬 API contract substantive 決策,需 user 拍板,放此不自改。",
+        "unit": "Sheet"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/Field/field-controls.spec.md:125",
+        "why": "CODE-BUG, not doc-stale. Spec L125「`disabled` 和 `readOnly` 原生 HTML 屬性會自動覆蓋 `mode` prop」是 Family-4 (FieldControls SSOT, 見 field-controls.spec.md L15/L22) 共用 canonical。sibling controls 正確實作:Input (input.tsx:110-112 `resolvedMode = modeProp ?? fieldCtx?.mode ?? (readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')`) 與 Textarea (textarea.tsx:199-202 同 pattern) 都讓 readOnly 覆蓋 mode→'readonly'。唯獨 LinkInput (link-input.tsx:84-107) 不解構也不使用 readOnly,mode resolution 只看 disabled (`resolvedMode = disabled ? 'disabled' : mode`),readOnly 只被 `...props` 漏到 edit input branch。spec 描述的是正確 canonical intent(2 of 3 sibling controls 遵循),LinkInput 才是缺實作的 code bug。改 spec 會弱化 canonical 並把 LinkInput 缺陷誤記為 intended → 不可改 doc。修法應在 LinkInput tsx 補 readOnly→'readonly' mode resolution(對齊 Input/Textarea),屬 code 修不在 doc-align scope。",
+        "unit": "LinkInput"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/FieldControlGroup/field-control-group.spec.md:92",
+        "why": "CODE-BUG, not doc-stale. Spec Mode A L92「children 各自透過 `useFieldContext().size` 讀外層 `<Field>` 的 size」是正確 canonical:所有 sibling Field controls 解構 `size: sizeProp`(無 default)→ Input (input.tsx:81 + L102 `size = sizeProp ?? fieldCtx?.size ?? 'md'`)/ Textarea (textarea.tsx:180 + L198)/ NumberInput (number-input.tsx:79 + L100)/ Select (select.tsx:355,450 `size: sizeProp`),sizeProp 維持 undefined 才能 fall-through 到 fieldCtx?.size。唯獨 LinkInput (link-input.tsx:87) 寫 `size: sizeProp = 'md'`,default 'md' 使 sizeProp 永不 undefined,故 L103 `sizeProp ?? fieldCtx?.size ?? 'md'` 永遠先取 'md',`<Field size=\"lg\">` 對 LinkInput 無效——正是 finding 描述的 bug。spec 描述全部 4 個 sibling 都遵循的正確 canonical,LinkInput 是唯一 divergent 的 code bug。改 spec 會把 LinkInput 缺陷誤記為 intended → 不可改 doc。修法應在 LinkInput tsx 把 `size: sizeProp = 'md'` 改為 `size: sizeProp`(對齊 sibling controls),屬 code 修不在 doc-align scope。",
+        "unit": "LinkInput"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/FieldControlGroup/field-control-group.spec.md:92 (finding unit=LinkInput, DOC_STALE/codex-only B5-field)",
+        "why": "非 doc-stale,是 LinkInput 的 CODE bug。spec L92『Mode A: children 各自透過 useFieldContext().size 讀外層 Field 的 size』描述的是『正確意圖』,且對一般 Field control 為真:Input(input.tsx:81 `size: sizeProp` 無 default)+ Select(select.tsx:355/450 `size: sizeProp` 無 default)都正確 `sizeProp ?? fieldCtx?.size ?? 'md'` 能繼承 Field context。唯獨 LinkInput(link-input.tsx:87 `size: sizeProp = 'md'`)在解構處給了 default,導致 L103 `sizeProp ?? fieldCtx?.size ?? 'md'` 永遠先取 md、永不到 fieldCtx?.size → 無法繼承 Field size。root cause 在 LinkInput 該移除 `= 'md'` default(對齊 Input/Select),不該改 FCG spec(spec 描述的是對的)。此項 unit=LinkInput,亦不符 unit===FieldControlGroup 的 filter。歸屬 Q1 a11y/behavior code 批次或 LinkInput 修復,放此不改。",
+        "unit": "FieldControlGroup"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/FieldControlGroup/field-control-group.spec.md:17 (category=SUBSTANTIVE_DESIGN, dim='dim 14', SUBSTANTIVE bucket)",
+        "why": "超出本任務 DOC_STALE+CODE_A11Y 兩 bucket 範圍(此項在 buckets.json 標 category=SUBSTANTIVE_DESIGN / dim='dim 14',非 unit===FieldControlGroup 也非 dim===FieldControlGroup,不符 filter)。內容:spec H1 = '# FieldControlGroup 設計原則' 經實檔確認其實已是『設計原則』結尾(spec.md L17 真實為 `# FieldControlGroup 設計原則`,非 finding 宣稱的 `# FieldControlGroup spec`)。注:finding 的 claim 與目前檔案內容不符(可能 finding 採樣時點較早或誤判),且歸 SUBSTANTIVE_DESIGN naming-convention 類,非 doc-stale-align-to-code。不在本單元 DOC_STALE 修復範圍,放此標記由 SUBSTANTIVE 流程處理。",
+        "unit": "FieldControlGroup"
+      },
+      {
+        "fileLine": "components/Tag/tag.tsx:70 (DOC_STALE#129, dim 72, SUBSTANTIVE_DESIGN)",
+        "why": "真實跨-SSOT 衝突,非單純 doc-stale。tag.tsx:70 用 onDismiss?,tag.spec.md(L230/249/268/277/287/288)+ ui-development.md codify onDismiss;但 props-naming.md L13(及 ds-canonical mirror L13,兩處字串完全一致——我已 Read 確認)的 onRemove 列明文把『Tag(in list)』歸類在 onRemove(對照 Material Chip.onDelete / React Aria onRemove)。同一 canonical 文件內 Tag 同時被 L12 onDismiss 語意定義與 L13 元件分類(onRemove)指向兩個 prop 名,且 code 選了 onDismiss 與 L13 分類不符。哪邊是 canonical(及是否要改 code 的 prop 名 = breaking API change)屬 SSOT-UI/UX 設計判斷,需 propose 不選邊。對齊 task #34『dim-72 internal-vs-public + SSOT 整理已 user 拍板 Q2』。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "components/Button/button.tsx:247 (SUBSTANTIVE#6, dim 72, SUBSTANTIVE_DESIGN)",
+        "why": "API-surface 過寬議題,非 doc-stale。variant?: ...|(string&{}) loose-autocomplete escape hatch 讓任意字串(含 typo)過 type check;合法語意集合實際封閉 7 值。finding 的建議是 tighten 型別為顯式 union + destructive/ghost @deprecated = code API 改動(SSOT-UI/UX propose),非『補一句 spec 文件』即可解決。button.spec.md 未記載此 escape,但修法是改 code surface 而非對齊 doc。放 flaggedNotDoc 等 propose。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "components/Combobox/combobox.tsx:421 (SUBSTANTIVE#7, dim 72, SUBSTANTIVE_DESIGN)",
+        "why": "API-surface 過寬議題,非 doc-stale。public ComboboxProps 暴露 4 個 internal-mechanism escape hatch(tagWrapperClassName L421 / overflowWrapperClassName L425 / tagAreaGapPx L433 / tagAreaPaddingLeftPx L435),僅服務 PeoplePicker avatar-stack overlap 數學。建議標 @internal 或收進 PeoplePicker 專用 sub-API = code API 改動(propose)。改 doc 無法解決 leak,屬 SSOT-UI/UX 決策。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/Menu/index.ts:5 (SUBSTANTIVE#8, unit 72, codex-only)",
+        "why": "internal-vs-public barrel re-export 議題,非 doc-stale。MenuItem spec 標 isInternal『不直接使用』但 barrel re-export 成 public API。index.ts 是 AUTO-GENERATED(gen-component-indexes.mjs,標『DO NOT EDIT MANUALLY』),修法須改 generator script + spec SSOT 的 internal/public 政策 = 程式/治理改動,非改一句 stale 文件。task #34 已標 dim-72 internal-vs-public 整理由 user 拍板 Q2。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/SelectionControl/index.ts:5 (SUBSTANTIVE#9, unit 72, codex-only)",
+        "why": "同 Menu:SelectionItem spec 標 isInternal 且透過 Checkbox/RadioGroup 消費,但 AUTO-GENERATED barrel re-export 成 public。屬 internal-vs-public API-surface 政策決策(generator + SSOT),非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/OverflowIndicator/index.ts:5 (SUBSTANTIVE#10, unit 72, codex-only)",
+        "why": "同類 internal-vs-public barrel re-export 議題(spec 標 isInternal『不直接使用』vs AUTO-GENERATED 公開 re-export),需 generator/SSOT 政策決策,非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/SelectMenu/index.ts:5 (SUBSTANTIVE#11, unit 72, codex-only)",
+        "why": "同類 internal-vs-public barrel re-export 議題(SelectMenu spec isInternal vs 公開 re-export),需政策決策,非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/DateGrid/index.ts:5 (SUBSTANTIVE#12, unit 72, codex-only)",
+        "why": "同類:DateGrid spec isInternal 且由 DatePicker 包裝,但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/Notice/index.ts:5 (SUBSTANTIVE#13, unit 72, codex-only)",
+        "why": "同類:Notice spec isInternal 且透過 Alert/Toast 消費,但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/Command/index.ts:5 (SUBSTANTIVE#14, unit 72, codex-only)",
+        "why": "同類:Command spec/doc 明確『app 不直接使用』但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/HoverCard/index.ts:5 (SUBSTANTIVE#15, unit 72, codex-only)",
+        "why": "同類:HoverCard spec isInternal 但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/ProfileCard/index.ts:5 (SUBSTANTIVE#16, unit 72, codex-only)",
+        "why": "同類:ProfileCard spec isInternal 但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/patterns/header-canonical/index.ts:5 (SUBSTANTIVE#17, unit 72, codex-only)",
+        "why": "同類(pattern 層):header-canonical frontmatter 標 internal:true/@internal 但 pattern barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/patterns/overlay-surface/index.ts:5 (SUBSTANTIVE#18, unit 72, codex-only)",
+        "why": "同類(pattern 層):overlay-surface frontmatter internal:true 且 DS-internal consumer only,但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/patterns/horizontal-overflow/index.ts:5 (SUBSTANTIVE#19, unit 72, codex-only)",
+        "why": "同類(pattern 層):horizontal-overflow frontmatter internal:true 且 DS-internal consumer only,但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/patterns/element-anatomy/index.ts:5 (SUBSTANTIVE#20, unit 72, codex-only)",
+        "why": "同類(pattern 層):inline-action spec 禁 app-code 直接 import L3 primitive,但 item-anatomy barrel re-export ItemInlineActionButton/ItemInlineAction/RowSizeProvider 成公開。internal-vs-public 政策決策,須改 generator/spec 政策,非 doc-stale。Q2 已決。",
+        "unit": "dim72"
+      },
+      {
+        "fileLine": "packages/design-system/src/components/Tooltip/tooltip.tsx:29 (DOC_STALE idx 127)",
+        "why": "此項 category=SUBSTANTIVE_DESIGN / dim 51,非 doc-stale 文件對齊類。其 codeReality 宣稱 TooltipContent Portal 未設 data-density=\"md\"(理應對齊 density.spec.md:108 + uiSize.css:102 列名要求),但現行 tooltip.tsx L33 已在 TooltipPrimitive.Content 上設 data-density=\"md\"(grep 確認:L33 data-density=\"md\" 在 Content,L44 data-theme=\"dark\" 在 inner div)。即(a)所指的 code gap 已不存在/已修,code 與 density.spec.md + uiSize.css canonical 一致;(b)即使有 gap 也屬 code 修(加 attribute)非改文件對齊 code。density.spec.md:108 與 uiSize.css:102 將 Tooltip 列為 data-density=md 是『正確意圖』且 code 現已符合,故無需改文件。不在本單元 doc-stale 修改範圍。",
+        "unit": "Tooltip"
+      }
+    ],
+    "perUnit": [
+      {
+        "unit": "Tabs",
+        "spec": 4,
+        "tsx": 7,
+        "flagged": 0
+      },
+      {
+        "unit": "BulkActionBar",
+        "spec": 0,
+        "tsx": 6,
+        "flagged": 0
+      },
+      {
+        "unit": "DataTable",
+        "spec": 3,
+        "tsx": 6,
+        "flagged": 0
+      },
+      {
+        "unit": "DateGrid",
+        "spec": 4,
+        "tsx": 3,
+        "flagged": 0
+      },
+      {
+        "unit": "Empty",
+        "spec": 3,
+        "tsx": 4,
+        "flagged": 0
+      },
+      {
+        "unit": "PeoplePicker",
+        "spec": 3,
+        "tsx": 4,
+        "flagged": 0
+      },
+      {
+        "unit": "Steps",
+        "spec": 1,
+        "tsx": 4,
+        "flagged": 0
+      },
+      {
+        "unit": "Field",
+        "spec": 4,
+        "tsx": 3,
+        "flagged": 0
+      },
+      {
+        "unit": "SelectMenu",
+        "spec": 2,
+        "tsx": 2,
+        "flagged": 1
+      },
+      {
+        "unit": "dim15",
+        "spec": 2,
+        "tsx": 1,
+        "flagged": 1
+      },
+      {
+        "unit": "Checkbox",
+        "spec": 1,
+        "tsx": 2,
+        "flagged": 2
+      },
+      {
+        "unit": "Coachmark",
+        "spec": 0,
+        "tsx": 5,
+        "flagged": 0
+      },
+      {
+        "unit": "FileItem",
+        "spec": 1,
+        "tsx": 2,
+        "flagged": 0
+      },
+      {
+        "unit": "FileUpload",
+        "spec": 1,
+        "tsx": 4,
+        "flagged": 1
+      },
+      {
+        "unit": "FileViewer",
+        "spec": 2,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "RadioGroup",
+        "spec": 0,
+        "tsx": 1,
+        "flagged": 2
+      },
+      {
+        "unit": "SelectionControl",
+        "spec": 2,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "Slider",
+        "spec": 2,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "Tag",
+        "spec": 0,
+        "tsx": 4,
+        "flagged": 0
+      },
+      {
+        "unit": "Toast",
+        "spec": 2,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "TreeView",
+        "spec": 3,
+        "tsx": 4,
+        "flagged": 0
+      },
+      {
+        "unit": "horizontal-overflow",
+        "spec": 3,
+        "tsx": 0,
+        "flagged": 0
+      },
+      {
+        "unit": "dim51",
+        "spec": 1,
+        "tsx": 0,
+        "flagged": 2
+      },
+      {
+        "unit": "Alert",
+        "spec": 0,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "Avatar",
+        "spec": 2,
+        "tsx": 0,
+        "flagged": 0
+      },
+      {
+        "unit": "Badge",
+        "spec": 0,
+        "tsx": 4,
+        "flagged": 0
+      },
+      {
+        "unit": "Carousel",
+        "spec": 1,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "CircularProgress",
+        "spec": 1,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "Combobox",
+        "spec": 0,
+        "tsx": 3,
+        "flagged": 0
+      },
+      {
+        "unit": "DropdownMenu",
+        "spec": 1,
+        "tsx": 1,
+        "flagged": 1
+      },
+      {
+        "unit": "Input",
+        "spec": 0,
+        "tsx": 2,
+        "flagged": 0
+      },
+      {
+        "unit": "Notice",
+        "spec": 1,
+        "tsx": 2,
+        "flagged": 1
+      },
+      {
+        "unit": "ProfileCard",
+        "spec": 1,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "ScrollArea",
+        "spec": 1,
+        "tsx": 2,
+        "flagged": 0
+      },
+      {
+        "unit": "SegmentedControl",
+        "spec": 0,
+        "tsx": 1,
+        "flagged": 1
+      },
+      {
+        "unit": "Sidebar",
+        "spec": 1,
+        "tsx": 4,
+        "flagged": 1
+      },
+      {
+        "unit": "Textarea",
+        "spec": 2,
+        "tsx": 0,
+        "flagged": 0
+      },
+      {
+        "unit": "overlay-surface",
+        "spec": 2,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "dim14",
+        "spec": 1,
+        "tsx": 0,
+        "flagged": 2
+      },
+      {
+        "unit": "dim25",
+        "spec": 0,
+        "tsx": 0,
+        "flagged": 2
+      },
+      {
+        "unit": "Sheet",
+        "spec": 1,
+        "tsx": 0,
+        "flagged": 1
+      },
+      {
+        "unit": "LinkInput",
+        "spec": 0,
+        "tsx": 0,
+        "flagged": 2
+      },
+      {
+        "unit": "Button",
+        "spec": 0,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "Chart",
+        "spec": 1,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "DatePicker",
+        "spec": 2,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "DescriptionList",
+        "spec": 0,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "FieldControlGroup",
+        "spec": 0,
+        "tsx": 2,
+        "flagged": 2
+      },
+      {
+        "unit": "HoverCard",
+        "spec": 0,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "ProgressBar",
+        "spec": 0,
+        "tsx": 1,
+        "flagged": 0
+      },
+      {
+        "unit": "Rating",
+        "spec": 1,
+        "tsx": 2,
+        "flagged": 0
+      },
+      {
+        "unit": "Separator",
+        "spec": 0,
+        "tsx": 2,
+        "flagged": 0
+      },
+      {
+        "unit": "action-bar",
+        "spec": 1,
+        "tsx": 0,
+        "flagged": 0
+      },
+      {
+        "unit": "dim72",
+        "spec": 0,
+        "tsx": 0,
+        "flagged": 16
+      },
+      {
+        "unit": "Tooltip",
+        "spec": 0,
+        "tsx": 1,
+        "flagged": 1
+      },
+      {
+        "unit": "Menu",
+        "spec": 2,
+        "tsx": 1,
+        "flagged": 0
+      }
+    ]
+  }
+}

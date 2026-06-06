@@ -1,0 +1,43 @@
+// Deterministic COMPLETE enumeration of every Storybook story display-name across DS.
+// Sample-proof: lists every `export const <Story>` + its `name:` field (or marks derive-from-const).
+// Output drives a partition-review (every name reviewed exactly once, no top-N).
+import { readFileSync, writeFileSync } from 'node:fs'
+import { execSync } from 'node:child_process'
+
+const files = execSync("find packages/design-system/src -name '*.stories.tsx'", { encoding: 'utf8' })
+  .trim().split('\n').filter(Boolean)
+
+const stories = []
+for (const f of files) {
+  const src = readFileSync(f, 'utf8')
+  const lines = src.split('\n')
+  // find `export const X = {` then look ahead for `name:` within the object (before next export)
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^export const ([A-Za-z0-9_]+)\s*[:=]/)
+    if (!m) continue
+    const constName = m[1]
+    // skip non-story exports (meta, helpers) — story consts are CSF objects; meta is `export default`
+    if (/^(meta|default)$/i.test(constName)) continue
+    // look ahead up to 25 lines for name: field (within this story object)
+    let nameField = null
+    for (let j = i; j < Math.min(i + 25, lines.length); j++) {
+      if (j > i && /^export const /.test(lines[j])) break
+      const nm = lines[j].match(/^\s*name:\s*['"`]([^'"`]+)['"`]/)
+      if (nm) { nameField = nm[1]; break }
+    }
+    stories.push({
+      file: f.replace('packages/design-system/src/', ''),
+      line: i + 1,
+      component: f.split('/components/')[1]?.split('/')[0] || f.split('/patterns/')[1]?.split('/')[0] || '?',
+      constName,
+      displayName: nameField, // null = derives from const (Storybook humanizes PascalCase → English label)
+    })
+  }
+}
+writeFileSync('.claude/logs/deep-audit-2026-06-05/story-names-inventory.json', JSON.stringify(stories, null, 1))
+const withName = stories.filter(s => s.displayName)
+const noName = stories.filter(s => !s.displayName)
+console.log(`TOTAL story consts: ${stories.length}`)
+console.log(`  with name: field: ${withName.length}`)
+console.log(`  NO name: (derives English from const): ${noName.length}`)
+console.log(`  files: ${files.length} | components: ${new Set(stories.map(s => s.component)).size}`)

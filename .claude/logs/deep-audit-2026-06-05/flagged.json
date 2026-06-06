@@ -1,0 +1,197 @@
+[
+ {
+  "fileLine": "packages/design-system/src/components/SelectMenu/select-menu.anatomy.stories.tsx:808",
+  "why": "False-positive line ref（findings #81 secondary ref + #132 codex）。實讀 anatomy:808 的 Accessibility story Focus 摘要為『searchable 時 DOM focus 給搜尋 input;option 無 tabIndex,DOM focus 不落在 option 上』—— 不含『content 容器』字樣。grep 確認『content 容器』在整個 SelectMenu 僅出現於 spec.md L213（已 Edit 修正）。anatomy 此行無 stale 文字可改，故不 emit tsxEdit。真正 stale 位置=spec.md L213，已在 specFixed 處理。",
+  "unit": "SelectMenu"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/Empty/empty.spec.md:180",
+  "why": "已不存在 / 假陽性(對 current working-tree 而言)。Finding 宣稱 spec L180 仍寫『無 disabled state』與 code 矛盾,但親讀現檔:L180 已正確寫『**唯一例外是 disabled context state**(disabled?: boolean prop)…disabled 時 title/description 轉 text-fg-disabled、icon glyph 轉 fg-disabled(供 FileUpload disabled 等情境消費)』;L178 ColorMatrix 已列 text-fg-disabled;L76 description 段也含『disabled context 時走 fg-disabled』。git status 顯示 empty.tsx + file-upload.tsx 為 M(已 commit 6967c4ed Q1-Q5 視覺/行為修),spec 文字也已同步。此 finding 是對 pre-commit-6967c4ed 舊版跑出的,current state 已對齊,無需再改。(L43『何時不用』表的 disabled row 講的是『何時不該用 Empty』,非 state 宣稱,本就無誤。)",
+  "unit": "dim15"
+ },
+ {
+  "fileLine": "checkbox.tsx:224-226 (CODE_A11Y/SUBSTANTIVE bucket, iconSize mislabel)",
+  "why": "此項在 buckets.json 的 SUBSTANTIVE array(L1677-1685),不在任務指定的 DOC_STALE 或 CODE_A11Y 兩個 array 內,故不在本任務 scope。內容為 checkboxMeta.sizes.iconSize 欄位名語意問題(欄名叫 iconSize 但值 16/16/20 實為控件尺寸 h-4/h-4/h-5,真正 check icon 由 checkIconSize {12,12,16} 決定)。此屬 Phase-1 auto-migration metadata 的欄位語意 mislabel,修法需新增/重命名欄位(controlPx vs iconPx)= 改 metadata schema 結構,非單純『把錯值改成對值』的 doc-stale 對齊,且牽涉 compile-stories.mjs 下游與 dim/SUBSTANTIVE 分流決策,留給 SUBSTANTIVE bucket 處理流程,不在此自行改。",
+  "unit": "Checkbox"
+ },
+ {
+  "fileLine": "CODE_A11Y array (L1324-1666)",
+  "why": "親自 awk 掃描 CODE_A11Y array(L1324-1666)內所有 \"unit\"/\"dim\" 欄位,無任何 unit/dim === \"Checkbox\" 項目。故 Checkbox 在 CODE_A11Y array 為 0 條 finding,本任務的 Checkbox 修正全部來自 DOC_STALE array 的 3 條(checkbox.spec.md:150 / checkbox.tsx:226 / checkbox.tsx:228)。此為說明,非待處理 finding。",
+  "unit": "Checkbox"
+ },
+ {
+  "fileLine": "file-upload.spec.md:102",
+  "why": "Already-fixed / false positive。finding(DOC_STALE#56)的 claim 引述舊文字『完全停用(pointer-events 關)』,但現檔 L102 實際已是修正後版本:『disabled:完全停用(互動由 isBlocked guard 擋 + cursor-not-allowed;Q4 移除 pointer-events-none 後不再靠它擋)』,完全對齊 code(file-upload.tsx L292-297 已移除 pointer-events-none,改 isBlocked guard)+ 同檔 spec L57/L58。spec L102 已無 stale『pointer-events 關』殘留,無需再改。audit 跑在更早 state,此 finding 已被先前 commit 6967c4ed 修掉。",
+  "unit": "FileUpload"
+ },
+ {
+  "fileLine": "radio-group.tsx:30",
+  "why": "非 doc-stale,不可改 doc。此 finding 在 audit snapshot(buckets.json mtime 2026-06-05 11:49)時為 CODE BUG:jsDoc 宣稱 mode='readonly' 行為但 code 只實作 display 分支。已由 commit 409b91da(2026-06-05 12:34,Q1 a11y 批次,user 拍板 verbatim「補 code」)實作 mode='readonly'(radio-group.tsx:80 RadioGroupReadonlyContext.Provider value={mode === 'readonly'} + L193-194 effectiveReadonly 傳給 item data-[readonly])。現 code 已兌現 jsDoc 承諾,L30 jsDoc 'readonly — 同 child item 各自 readOnly:radio 視覺保留 + 鎖互動' 與 code 一致、非 stale。改 doc(刪掉行為描述)會反而 drift。屬 task brief 所述「已由 Q1 a11y 批次處理」類別。",
+  "unit": "RadioGroup"
+ },
+ {
+  "fileLine": "radio-group.tsx:31",
+  "why": "非 doc-stale,不可改 doc。同 #1:audit 時為 code bug(jsDoc 宣稱 mode='disabled' 但 code 未消費),已由 commit 409b91da 實作(radio-group.tsx:86 disabled={mode === 'disabled' || (props as {disabled?:boolean}).disabled})。現 L31 jsDoc 'disabled — 同 RadioGroupPrimitive.Root disabled 屬性' 與 code 一致、非 stale。改 doc 會 drift。屬 Q1 a11y 批次已處理類別。",
+  "unit": "RadioGroup"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/DropdownMenu/dropdown-menu.tsx:127",
+  "why": "Finding 1 不是 doc-stale,是 code-gap 且【已被 Q1 a11y 批次修復】。audit 當時 DropdownMenuContent 缺 data-density=\"md\"(3 SSOT density.spec.md:107 / dropdown-menu.spec.md:218 / uiSize.css:102 皆要求 lock md)。親讀現況:dropdown-menu.tsx:132 現已有 data-density=\"md\",git blame 確認為 2026-06-05 commit 409b91da『fix(a11y/deep-audit): 補 6 元件 a11y/Field-mode 缺口(P0 + Q1 拍板)』加入。code 已對齊 spec,doc 不 stale,無需任何文件改動。",
+  "unit": "dim51"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/Tooltip/tooltip.tsx:29",
+  "why": "Finding 2 同 Finding 1:code-gap 且【已被 Q1 a11y 批次修復】。audit 當時 TooltipContent 缺 data-density=\"md\"(density.spec.md:108 + uiSize.css:102 要求 lock md)。親讀現況:tooltip.tsx:33 現已有 data-density=\"md\",git blame 確認同 commit 409b91da(2026-06-05 Q1 a11y 拍板批次)加入。code 已對齊 spec,doc 不 stale,無需文件改動。注:density.spec.md:108 Tooltip row 寫 data-density=\"md\" 是【正確】的(現在 code 確實設了),不需改。",
+  "unit": "dim51"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/DropdownMenu/dropdown-menu.tsx:127 (dim-51, CODE_A11Y/SUBSTANTIVE_DESIGN)",
+  "why": "假陽性/已解決,非 doc-stale。finding 宣稱 DropdownMenuContent 完全無 data-density attribute,要求 lock md。但親讀 dropdown-menu.tsx:132 確認 DropdownMenuPrimitive.Content 已設 data-density=\"md\"(在 ref/sideOffset 與 onCloseAutoFocus 之間)。code 已與三處 SSOT(density.spec.md:107 / dropdown-menu.spec.md:218 / uiSize.css:102)一致,無 gap 可修。不屬本批 doc-align scope,也非待修 code bug;標記為已對齊。",
+  "unit": "DropdownMenu"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/Notice/notice.spec.md:56",
+  "why": "False positive against current working-tree state — finding 宣稱 L56 cites『三家族分類』subsection(不存在於 overlay-surface.spec.md,且是被 ❌ 拒絕的 v2 wording)。但親讀 notice.spec.md L56 + git blame 確認該行已在本 working tree 被先前 batch 修正(blame 顯示『Not Committed Yet 2026-06-05』),現行 L56 已正確引用 v5 SSOT『「Chrome dismiss size canonical」(overlay header 走 sm native + 負 margin trick;只有 notification banner family 用 xs)』,無『三家族分類』字樣。已對齊,不需再改。注:同 root-cause 的殘留 stale wording 仍存在於 notice.tsx:30 docblock,已 emit 為 tsxEdit 修正。",
+  "unit": "Notice"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/SegmentedControl/segmented-control.spec.md:252",
+  "why": "誤判(假陽性)— 非 doc-stale。L252 屬「禁止事項」段(consumer-facing prohibitions),此 bullet「❌ 未傳 value 時預設『全都未選』——SegmentedControl 必須有 default value，這是 radio 語意」是對 consumer 的設計意圖規則(radio 語意:消費者必須提供 default value),不是宣稱『code 會自動補/強制 default value』。與同段其他 bullet(『❌ 只有 1 個 item』『❌ 超過 5 個 item』『❌ iconOnly 時省略 aria-label』)同性質 — 都是消費者使用規則、code 同樣不機械強制;且與 spec L228『consumer 必須確保 value 永遠落在可選 item 上』一致把責任放在消費者端。code(segmented-control.tsx:97-128)走 Radix uncontrolled 慣例把 undefined 透傳是正確設計,與此 doc 無真矛盾。codex finding 把『消費者禁止事項』誤讀成『code 行為宣稱』。改/弱化此 bullet 等於移除合法的設計規則=發明設計改動,故 flag 不改(per『誤判→flaggedNotDoc』+『不改 code 行為、不發明新設計』)。",
+  "unit": "SegmentedControl"
+ },
+ {
+  "fileLine": "packages/design-system/src/tokens/density/density.spec.md:109",
+  "why": "誤判/已修正(false positive)。finding 宣稱 density.spec.md:109 寫『Sidebar | data-density=\"md\"(lock md)』,但實讀該行現為『| Sidebar | 無(繼承 page) | Sidebar 是 inline chrome(非 Portal 逃逸),跟隨 page density;size=\"md\" 在 density=\"lg\" 下自動變 36px row |』——已與 code(全 Sidebar 目錄 0 個 data-density)及 sidebar.spec.md:126-129 一致。git log 確認此 row 已由 commit 302c0771『4 doc-vs-code drift 對齊』修好。稽核跑在 stale 快照上,當前無需再改。",
+  "unit": "Sidebar"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/DataTable/advanced-filter-operators.draft.md",
+  "why": "非 doc-stale-prose 對齊類:此 finding 不是『文件描述與 code 行為矛盾』,而是『檔案後綴 .draft.md 違反 naming-conventions.md:56 allowlist (.tsx/.spec.md/.stories.tsx/.anatomy.stories.tsx/.principles.stories.tsx)』的結構/治理問題。修法 = 升級成 filter-operators.spec.md OR 移到 .claude/planning/(governance 設計決策,需 user 拍板),且 load-bearing:被 3 個 production 檔以 `*.draft.md` 字面引用 (filter-operators.ts:10 / filter-tree.ts:238 / data-table-filter-panel.tsx:68),重命名須同步改這 3 處 comment(動 .tsx)。原 triage 即標 SUBSTANTIVE_DESIGN、phaseC-report 歸 STOP-propose 類。不在『改文件對齊 code』scope 內,放此給 user 決策。",
+  "unit": "dim14"
+ },
+ {
+  "fileLine": "(scope note) ProfileCard nameCardMeta vs ProfileCardMeta",
+  "why": "phaseC-report.md:37 把此列為第 3 個 dim14 finding,但 buckets.json 的 DOC_STALE+CODE_A11Y 兩 array 中無任何 dim=='dim 14' 且涉及 nameCardMeta 的項目(triage 階段已 dedup 或併入別處,grep buckets.json 確認不存在)。因不在我被指定的兩個 array 的 dim14 篩選結果內,故未處理;若需處理請補進 buckets.json 或另行指派。",
+  "unit": "dim14"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/DescriptionList/description-list.stories.tsx:112",
+  "why": "非 doc-stale-vs-code,而是 story convention-drift(category OTHER)。Finding 要求把 live `export const _RETIRED_HorizontalDivided = { tags:['!autodocs','!dev'], render: ... }` 整個 export body 刪掉,改成 comment-only 退役 stub(對齊 DS-wide 39 檔 @story-trait-rationale 慣例;DS-wide grep 確認全庫僅此檔 + slider 兩處 zombie export,claim 屬實)。但這是「移除一個 live story render 路徑 + 重命名/刪除 identifier」的結構性 code 改動,不是把 stale doc 文字對齊 code 真實——不屬本單元(改文件對齊 code)scope,且刪 export 改變 Storybook render 行為(本任務明令『不改 code 行為』)。應交由 story dead-code/convention cleanup 批次(非 doc-alignment)處理。註:該 export 上方 L108-111 的 @story-trait-rationale 註解本身正確、無需改。",
+  "unit": "dim25"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/Slider/slider.stories.tsx:71",
+  "why": "非 doc-stale-vs-code,而是 story convention-drift(category OTHER)。Finding 要求把 live `export const Disabled_REMOVED: Story = { name:'停用狀態(已移至設計規格頁示範)', tags:['!autodocs','!dev'], render: ... }` 整個 export body 刪掉,改成 comment-only 退役 stub(對齊 DS-wide 39 檔 @story-trait-rationale 慣例;grep 確認全庫僅 description-list + 此檔兩處 zombie export,claim 屬實)。但這是移除 live story export(改 Storybook render)+ 刪 identifier 的結構性 code 改動,違反本任務『不改 code 行為、tsxEdits 僅限 stale 文字描述』約束——不屬 doc-alignment scope,應交由 story dead-code/convention cleanup 批次處理。註:L68-70 的 @story-trait-rationale 註解本身正確、無需改。",
+  "unit": "dim25"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/Sheet/sheet.spec.md:19",
+  "why": "非 doc-stale。spec L19 描述的是刻意的設計契約(『消費者 API = side=right;top/bottom/left 保留 DS 內部基建用,消費者禁止傳,需 user 授權』),且 tsx docblock L25-27 一字不差陳述同一 convention,spec 本身明示 canonical 來源就是 sheet.tsx L23-27。stories 中傳 side=left/bottom 的全是 anatomy/principles 明確標註的『內部能力示範』(principles L256/L280『以下為內部能力示範』)。三方(spec/tsx/stories)對此 convention 完全一致。codex 的 codeReality『SheetContentProps 經 VariantProps 公開四個 side 且 SheetContent 無 runtime guard』是 code 端缺乏機械強制的觀察 —— 屬潛在 CODE 改善(可加 guard 或 type 限制),不是文件寫錯。文件忠實描述了設計意圖,不應為對齊『無 guard 的 code 現況』而把契約文字刪掉/弱化(那會反向丟失設計意圖)。是否替 consumer-facing prop 加 type-level/runtime 限制屬 API contract substantive 決策,需 user 拍板,放此不自改。",
+  "unit": "Sheet"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/Field/field-controls.spec.md:125",
+  "why": "CODE-BUG, not doc-stale. Spec L125「`disabled` 和 `readOnly` 原生 HTML 屬性會自動覆蓋 `mode` prop」是 Family-4 (FieldControls SSOT, 見 field-controls.spec.md L15/L22) 共用 canonical。sibling controls 正確實作:Input (input.tsx:110-112 `resolvedMode = modeProp ?? fieldCtx?.mode ?? (readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')`) 與 Textarea (textarea.tsx:199-202 同 pattern) 都讓 readOnly 覆蓋 mode→'readonly'。唯獨 LinkInput (link-input.tsx:84-107) 不解構也不使用 readOnly,mode resolution 只看 disabled (`resolvedMode = disabled ? 'disabled' : mode`),readOnly 只被 `...props` 漏到 edit input branch。spec 描述的是正確 canonical intent(2 of 3 sibling controls 遵循),LinkInput 才是缺實作的 code bug。改 spec 會弱化 canonical 並把 LinkInput 缺陷誤記為 intended → 不可改 doc。修法應在 LinkInput tsx 補 readOnly→'readonly' mode resolution(對齊 Input/Textarea),屬 code 修不在 doc-align scope。",
+  "unit": "LinkInput"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/FieldControlGroup/field-control-group.spec.md:92",
+  "why": "CODE-BUG, not doc-stale. Spec Mode A L92「children 各自透過 `useFieldContext().size` 讀外層 `<Field>` 的 size」是正確 canonical:所有 sibling Field controls 解構 `size: sizeProp`(無 default)→ Input (input.tsx:81 + L102 `size = sizeProp ?? fieldCtx?.size ?? 'md'`)/ Textarea (textarea.tsx:180 + L198)/ NumberInput (number-input.tsx:79 + L100)/ Select (select.tsx:355,450 `size: sizeProp`),sizeProp 維持 undefined 才能 fall-through 到 fieldCtx?.size。唯獨 LinkInput (link-input.tsx:87) 寫 `size: sizeProp = 'md'`,default 'md' 使 sizeProp 永不 undefined,故 L103 `sizeProp ?? fieldCtx?.size ?? 'md'` 永遠先取 'md',`<Field size=\"lg\">` 對 LinkInput 無效——正是 finding 描述的 bug。spec 描述全部 4 個 sibling 都遵循的正確 canonical,LinkInput 是唯一 divergent 的 code bug。改 spec 會把 LinkInput 缺陷誤記為 intended → 不可改 doc。修法應在 LinkInput tsx 把 `size: sizeProp = 'md'` 改為 `size: sizeProp`(對齊 sibling controls),屬 code 修不在 doc-align scope。",
+  "unit": "LinkInput"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/FieldControlGroup/field-control-group.spec.md:92 (finding unit=LinkInput, DOC_STALE/codex-only B5-field)",
+  "why": "非 doc-stale,是 LinkInput 的 CODE bug。spec L92『Mode A: children 各自透過 useFieldContext().size 讀外層 Field 的 size』描述的是『正確意圖』,且對一般 Field control 為真:Input(input.tsx:81 `size: sizeProp` 無 default)+ Select(select.tsx:355/450 `size: sizeProp` 無 default)都正確 `sizeProp ?? fieldCtx?.size ?? 'md'` 能繼承 Field context。唯獨 LinkInput(link-input.tsx:87 `size: sizeProp = 'md'`)在解構處給了 default,導致 L103 `sizeProp ?? fieldCtx?.size ?? 'md'` 永遠先取 md、永不到 fieldCtx?.size → 無法繼承 Field size。root cause 在 LinkInput 該移除 `= 'md'` default(對齊 Input/Select),不該改 FCG spec(spec 描述的是對的)。此項 unit=LinkInput,亦不符 unit===FieldControlGroup 的 filter。歸屬 Q1 a11y/behavior code 批次或 LinkInput 修復,放此不改。",
+  "unit": "FieldControlGroup"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/FieldControlGroup/field-control-group.spec.md:17 (category=SUBSTANTIVE_DESIGN, dim='dim 14', SUBSTANTIVE bucket)",
+  "why": "超出本任務 DOC_STALE+CODE_A11Y 兩 bucket 範圍(此項在 buckets.json 標 category=SUBSTANTIVE_DESIGN / dim='dim 14',非 unit===FieldControlGroup 也非 dim===FieldControlGroup,不符 filter)。內容:spec H1 = '# FieldControlGroup 設計原則' 經實檔確認其實已是『設計原則』結尾(spec.md L17 真實為 `# FieldControlGroup 設計原則`,非 finding 宣稱的 `# FieldControlGroup spec`)。注:finding 的 claim 與目前檔案內容不符(可能 finding 採樣時點較早或誤判),且歸 SUBSTANTIVE_DESIGN naming-convention 類,非 doc-stale-align-to-code。不在本單元 DOC_STALE 修復範圍,放此標記由 SUBSTANTIVE 流程處理。",
+  "unit": "FieldControlGroup"
+ },
+ {
+  "fileLine": "components/Tag/tag.tsx:70 (DOC_STALE#129, dim 72, SUBSTANTIVE_DESIGN)",
+  "why": "真實跨-SSOT 衝突,非單純 doc-stale。tag.tsx:70 用 onDismiss?,tag.spec.md(L230/249/268/277/287/288)+ ui-development.md codify onDismiss;但 props-naming.md L13(及 ds-canonical mirror L13,兩處字串完全一致——我已 Read 確認)的 onRemove 列明文把『Tag(in list)』歸類在 onRemove(對照 Material Chip.onDelete / React Aria onRemove)。同一 canonical 文件內 Tag 同時被 L12 onDismiss 語意定義與 L13 元件分類(onRemove)指向兩個 prop 名,且 code 選了 onDismiss 與 L13 分類不符。哪邊是 canonical(及是否要改 code 的 prop 名 = breaking API change)屬 SSOT-UI/UX 設計判斷,需 propose 不選邊。對齊 task #34『dim-72 internal-vs-public + SSOT 整理已 user 拍板 Q2』。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "components/Button/button.tsx:247 (SUBSTANTIVE#6, dim 72, SUBSTANTIVE_DESIGN)",
+  "why": "API-surface 過寬議題,非 doc-stale。variant?: ...|(string&{}) loose-autocomplete escape hatch 讓任意字串(含 typo)過 type check;合法語意集合實際封閉 7 值。finding 的建議是 tighten 型別為顯式 union + destructive/ghost @deprecated = code API 改動(SSOT-UI/UX propose),非『補一句 spec 文件』即可解決。button.spec.md 未記載此 escape,但修法是改 code surface 而非對齊 doc。放 flaggedNotDoc 等 propose。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "components/Combobox/combobox.tsx:421 (SUBSTANTIVE#7, dim 72, SUBSTANTIVE_DESIGN)",
+  "why": "API-surface 過寬議題,非 doc-stale。public ComboboxProps 暴露 4 個 internal-mechanism escape hatch(tagWrapperClassName L421 / overflowWrapperClassName L425 / tagAreaGapPx L433 / tagAreaPaddingLeftPx L435),僅服務 PeoplePicker avatar-stack overlap 數學。建議標 @internal 或收進 PeoplePicker 專用 sub-API = code API 改動(propose)。改 doc 無法解決 leak,屬 SSOT-UI/UX 決策。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/Menu/index.ts:5 (SUBSTANTIVE#8, unit 72, codex-only)",
+  "why": "internal-vs-public barrel re-export 議題,非 doc-stale。MenuItem spec 標 isInternal『不直接使用』但 barrel re-export 成 public API。index.ts 是 AUTO-GENERATED(gen-component-indexes.mjs,標『DO NOT EDIT MANUALLY』),修法須改 generator script + spec SSOT 的 internal/public 政策 = 程式/治理改動,非改一句 stale 文件。task #34 已標 dim-72 internal-vs-public 整理由 user 拍板 Q2。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/SelectionControl/index.ts:5 (SUBSTANTIVE#9, unit 72, codex-only)",
+  "why": "同 Menu:SelectionItem spec 標 isInternal 且透過 Checkbox/RadioGroup 消費,但 AUTO-GENERATED barrel re-export 成 public。屬 internal-vs-public API-surface 政策決策(generator + SSOT),非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/OverflowIndicator/index.ts:5 (SUBSTANTIVE#10, unit 72, codex-only)",
+  "why": "同類 internal-vs-public barrel re-export 議題(spec 標 isInternal『不直接使用』vs AUTO-GENERATED 公開 re-export),需 generator/SSOT 政策決策,非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/SelectMenu/index.ts:5 (SUBSTANTIVE#11, unit 72, codex-only)",
+  "why": "同類 internal-vs-public barrel re-export 議題(SelectMenu spec isInternal vs 公開 re-export),需政策決策,非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/DateGrid/index.ts:5 (SUBSTANTIVE#12, unit 72, codex-only)",
+  "why": "同類:DateGrid spec isInternal 且由 DatePicker 包裝,但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/Notice/index.ts:5 (SUBSTANTIVE#13, unit 72, codex-only)",
+  "why": "同類:Notice spec isInternal 且透過 Alert/Toast 消費,但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/Command/index.ts:5 (SUBSTANTIVE#14, unit 72, codex-only)",
+  "why": "同類:Command spec/doc 明確『app 不直接使用』但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/HoverCard/index.ts:5 (SUBSTANTIVE#15, unit 72, codex-only)",
+  "why": "同類:HoverCard spec isInternal 但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/ProfileCard/index.ts:5 (SUBSTANTIVE#16, unit 72, codex-only)",
+  "why": "同類:ProfileCard spec isInternal 但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/patterns/header-canonical/index.ts:5 (SUBSTANTIVE#17, unit 72, codex-only)",
+  "why": "同類(pattern 層):header-canonical frontmatter 標 internal:true/@internal 但 pattern barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/patterns/overlay-surface/index.ts:5 (SUBSTANTIVE#18, unit 72, codex-only)",
+  "why": "同類(pattern 層):overlay-surface frontmatter internal:true 且 DS-internal consumer only,但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/patterns/horizontal-overflow/index.ts:5 (SUBSTANTIVE#19, unit 72, codex-only)",
+  "why": "同類(pattern 層):horizontal-overflow frontmatter internal:true 且 DS-internal consumer only,但 barrel re-export 公開。internal-vs-public 政策決策,非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/patterns/element-anatomy/index.ts:5 (SUBSTANTIVE#20, unit 72, codex-only)",
+  "why": "同類(pattern 層):inline-action spec 禁 app-code 直接 import L3 primitive,但 item-anatomy barrel re-export ItemInlineActionButton/ItemInlineAction/RowSizeProvider 成公開。internal-vs-public 政策決策,須改 generator/spec 政策,非 doc-stale。Q2 已決。",
+  "unit": "dim72"
+ },
+ {
+  "fileLine": "packages/design-system/src/components/Tooltip/tooltip.tsx:29 (DOC_STALE idx 127)",
+  "why": "此項 category=SUBSTANTIVE_DESIGN / dim 51,非 doc-stale 文件對齊類。其 codeReality 宣稱 TooltipContent Portal 未設 data-density=\"md\"(理應對齊 density.spec.md:108 + uiSize.css:102 列名要求),但現行 tooltip.tsx L33 已在 TooltipPrimitive.Content 上設 data-density=\"md\"(grep 確認:L33 data-density=\"md\" 在 Content,L44 data-theme=\"dark\" 在 inner div)。即(a)所指的 code gap 已不存在/已修,code 與 density.spec.md + uiSize.css canonical 一致;(b)即使有 gap 也屬 code 修(加 attribute)非改文件對齊 code。density.spec.md:108 與 uiSize.css:102 將 Tooltip 列為 data-density=md 是『正確意圖』且 code 現已符合,故無需改文件。不在本單元 doc-stale 修改範圍。",
+  "unit": "Tooltip"
+ }
+]

@@ -1,0 +1,212 @@
+[
+ {
+  "file": "packages/design-system/src/components/Tag/tag.tsx",
+  "old": "  /** 可移除——Tag 自動渲染 dismiss 按鈕並控制尺寸與互動樣式 */\n  onDismiss?: () => void",
+  "new": "  /** 可移除——Tag 自動渲染 remove 按鈕並控制尺寸與互動樣式(從集合移除 item) */\n  onRemove?: () => void"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.tsx",
+  "old": "function TagDismiss({ onDismiss, label, solid, color }: { onDismiss: () => void; label: string; solid?: boolean; color?: string }) {",
+  "new": "function TagDismiss({ onRemove, label, solid, color }: { onRemove: () => void; label: string; solid?: boolean; color?: string }) {"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.tsx",
+  "old": "      onClick={(e) => { e.stopPropagation(); onDismiss() }}",
+  "new": "      onClick={(e) => { e.stopPropagation(); onRemove() }}"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.tsx",
+  "old": "  { className, color, size, icon: Icon, avatar, onDismiss, solid, unbounded = false, children, style, ...props }: TagProps,",
+  "new": "  { className, color, size, icon: Icon, avatar, onRemove, solid, unbounded = false, children, style, ...props }: TagProps,"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.tsx",
+  "old": "      {onDismiss && <TagDismiss onDismiss={onDismiss} label={label} solid={solid} color={color ?? 'neutral'} />}",
+  "new": "      {onRemove && <TagDismiss onRemove={onRemove} label={label} solid={solid} color={color ?? 'neutral'} />}"
+ },
+ {
+  "file": "packages/design-system/src/components/Combobox/combobox.tsx",
+  "old": "              : <Tag key={item.value} size=\"sm\" onDismiss={onRemove ? () => onRemove(item.value) : undefined}>",
+  "new": "              : <Tag key={item.value} size=\"sm\" onRemove={onRemove ? () => onRemove(item.value) : undefined}>"
+ },
+ {
+  "file": "packages/design-system/src/components/Combobox/combobox.tsx",
+  "old": "            <Tag size={size} className=\"shrink-0 relative z-10\" onClick={() => { selectRef.current?.showPicker?.(); selectRef.current?.focus() }}\n              onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>",
+  "new": "            <Tag size={size} className=\"shrink-0 relative z-10\" onClick={() => { selectRef.current?.showPicker?.(); selectRef.current?.focus() }}\n              onRemove={() => handleRemove(item.value)}>{item.label}</Tag>"
+ },
+ {
+  "file": "packages/design-system/src/components/Combobox/combobox.tsx",
+  "old": "                : <Tag size={size} className=\"shrink-0 relative z-10\"\n                    onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>",
+  "new": "                : <Tag size={size} className=\"shrink-0 relative z-10\"\n                    onRemove={() => handleRemove(item.value)}>{item.label}</Tag>"
+ },
+ {
+  "file": "packages/design-system/src/components/Combobox/combobox.tsx",
+  "old": "   * + onRemove,consumer 自己組 onDismiss);沒設 → 走預設 `<Tag>` text-only pill。",
+  "new": "   * + onRemove,consumer 自己組 onRemove);沒設 → 走預設 `<Tag>` text-only pill。"
+ },
+ {
+  "file": "packages/design-system/src/components/PeoplePicker/person-display.tsx",
+  "old": "              onDismiss={onRemove ? () => onRemove(value![resolvedMax + i]) : undefined}",
+  "new": "              onRemove={onRemove ? () => onRemove(value![resolvedMax + i]) : undefined}"
+ },
+ {
+  "file": "packages/design-system/src/components/PeoplePicker/people-picker.tsx",
+  "old": "              onDismiss={onRemove}",
+  "new": "              onRemove={onRemove}"
+ },
+ {
+  "file": "packages/design-system/src/components/PeoplePicker/people-picker.tsx",
+  "old": "            onDismiss={() => {\n              onChange?.(selectedNames.filter(n => n !== item.value).map(n => findPerson(people, n)))\n            }}",
+  "new": "            onRemove={() => {\n              onChange?.(selectedNames.filter(n => n !== item.value).map(n => findPerson(people, n)))\n            }}"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.stories.tsx",
+  "old": "            <Tag key={t} color=\"neutral\" onDismiss={() => setTags(prev => prev.filter(x => x !== t))}>{t}</Tag>",
+  "new": "            <Tag key={t} color=\"neutral\" onRemove={() => setTags(prev => prev.filter(x => x !== t))}>{t}</Tag>"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.principles.stories.tsx",
+  "old": "          title=\"用 onDismiss callback,Tag 自動渲染 X button\"\n          note=\"消費者不需要自己組 dismiss button——傳 onDismiss,Tag 內部處理尺寸、hover、a11y。多選 Combobox 的已選 tag 用這個 pattern\"",
+  "new": "          title=\"用 onRemove callback,Tag 自動渲染 X button\"\n          note=\"消費者不需要自己組 remove button——傳 onRemove,Tag 內部處理尺寸、hover、a11y。多選 Combobox 的已選 tag 用這個 pattern\""
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.principles.stories.tsx",
+  "old": "              <Tag key={t} color=\"blue\" onDismiss={() => setTags(tags.filter(x => x !== t))}>",
+  "new": "              <Tag key={t} color=\"blue\" onRemove={() => setTags(tags.filter(x => x !== t))}>"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.principles.stories.tsx",
+  "old": "            <Tag color=\"blue\" onDismiss={() => {}}>React</Tag>\n            <Tag color=\"green\" onDismiss={() => {}}>TypeScript</Tag>\n            <Tag color=\"red\" onDismiss={() => {}}>Storybook</Tag>\n            <Tag color=\"neutral\" onDismiss={() => {}}>Design System</Tag>",
+  "new": "            <Tag color=\"blue\" onRemove={() => {}}>React</Tag>\n            <Tag color=\"green\" onRemove={() => {}}>TypeScript</Tag>\n            <Tag color=\"red\" onRemove={() => {}}>Storybook</Tag>\n            <Tag color=\"neutral\" onRemove={() => {}}>Design System</Tag>"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.principles.stories.tsx",
+  "old": "          note=\"會失去 Tag 內建的尺寸 / hover / a11y 規則。統一走 onDismiss callback pattern\"",
+  "new": "          note=\"會失去 Tag 內建的尺寸 / hover / a11y 規則。統一走 onRemove callback pattern\""
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.anatomy.stories.tsx",
+  "old": "//     唯一 interactive 部位是 onDismiss button,其狀態色彩集中於 ColorMatrix 比拆 5. 直觀。",
+  "new": "//     唯一 interactive 部位是 onRemove button,其狀態色彩集中於 ColorMatrix 比拆 5. 直觀。"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.anatomy.stories.tsx",
+  "old": "          <Desc>Inline label，用於分類標籤、狀態標記、多選已選值。icon 與 avatar 互斥，onDismiss 自動渲染 dismiss 按鈕。</Desc>",
+  "new": "          <Desc>Inline label，用於分類標籤、狀態標記、多選已選值。icon 與 avatar 互斥，onRemove 自動渲染 remove 按鈕。</Desc>"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.anatomy.stories.tsx",
+  "old": "                ['onDismiss', '() => void', '—', '可移除——Tag 自動渲染 dismiss 按鈕'],",
+  "new": "                ['onRemove', '() => void', '—', '可移除——Tag 自動渲染 remove 按鈕'],"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.anatomy.stories.tsx",
+  "old": "              onDismiss={withDismiss ? () => {} : undefined}",
+  "new": "              onRemove={withDismiss ? () => {} : undefined}"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.anatomy.stories.tsx",
+  "old": "                    <Td key={`dismiss-${sz}`}><Tag color={v} size={sz} onDismiss={() => {}}>Review</Tag></Td>",
+  "new": "                    <Td key={`dismiss-${sz}`}><Tag color={v} size={sz} onRemove={() => {}}>Review</Tag></Td>"
+ },
+ {
+  "file": "packages/design-system/src/components/Combobox/combobox.anatomy.stories.tsx",
+  "old": "            <span>Tag dismiss = Tag 元件的 onDismiss prop，按鈕由 Tag 內部渲染</span>",
+  "new": "            <span>Tag remove = Tag 元件的 onRemove prop，按鈕由 Tag 內部渲染</span>"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.spec.md",
+  "old": "| `onDismiss` | `() => void` | 可移除——Tag 自動渲染 dismiss 按鈕並控制尺寸與互動樣式 |",
+  "new": "| `onRemove` | `() => void` | 可移除——Tag 自動渲染 remove 按鈕並控制尺寸與互動樣式(從集合移除 item) |"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.spec.md",
+  "old": "傳入 `onDismiss` callback 時，Tag 自動渲染 dismiss 按鈕。消費端不需要自行建構 dismiss 按鈕或知道 inline action 的尺寸規格。",
+  "new": "傳入 `onRemove` callback 時，Tag 自動渲染 remove 按鈕。消費端不需要自行建構 remove 按鈕或知道 inline action 的尺寸規格。"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.spec.md",
+  "old": "- ❌ 不用 prefix/suffix 傳入 dismiss 按鈕——用 `onDismiss` callback，Tag 內部控制渲染",
+  "new": "- ❌ 不用 prefix/suffix 傳入 remove 按鈕——用 `onRemove` callback，Tag 內部控制渲染"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.spec.md",
+  "old": "- 僅有的「行為」是 dismiss(`onDismiss` callback 觸發,Tag 本身不管 dismiss 動畫),close icon 的 hover 狀態屬 Inline Action pattern(item-anatomy.spec.md「Inline Action 設計規格」SSOT),非 Tag 自有。",
+  "new": "- 僅有的「行為」是 remove(`onRemove` callback 觸發,Tag 本身不管 remove 動畫),close icon 的 hover 狀態屬 Inline Action pattern(item-anatomy.spec.md「Inline Action 設計規格」SSOT),非 Tag 自有。"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.spec.md",
+  "old": "- **靜態 Tag**(無 `onDismiss`):render 為 `<div data-tag-root>`",
+  "new": "- **靜態 Tag**(無 `onRemove`):render 為 `<div data-tag-root>`"
+ },
+ {
+  "file": "packages/design-system/src/components/Tag/tag.spec.md",
+  "old": "- **Dismissible Tag**(`onDismiss` 存在):inline X close 走",
+  "new": "- **Removable Tag**(`onRemove` 存在):inline X close 走"
+ },
+ {
+  "file": "packages/design-system/src/components/Button/button.tsx",
+  "old": "  variant?: 'primary' | 'secondary' | 'tertiary' | 'text' | 'link' | (string & {})",
+  "new": "  variant?: 'primary' | 'secondary' | 'tertiary' | 'text' | 'link'"
+ },
+ {
+  "file": "packages/design-system/src/components/Combobox/combobox.tsx",
+  "old": "  /**\n   * Optional class merged into each tag's outer measurement wrapper (2026-05-07 v15.13)。\n   * Stack avatar 模式用此 hook point 達成 sibling-level overlap (`-ml-0.5`) + group selector\n   * (`group/avatar`)— 既保留 Combobox 必要 measurement wrapper,又讓 dismiss/overlap 視覺生效。\n   */\n  tagWrapperClassName?: string",
+  "new": "  /**\n   * @internal PeoplePicker stack wrapper 內部協議 — end-user 勿用(measurement-layer hook)。\n   *\n   * Optional class merged into each tag's outer measurement wrapper (2026-05-07 v15.13)。\n   * Stack avatar 模式用此 hook point 達成 sibling-level overlap (`-ml-0.5`) + group selector\n   * (`group/avatar`)— 既保留 Combobox 必要 measurement wrapper,又讓 dismiss/overlap 視覺生效。\n   */\n  tagWrapperClassName?: string"
+ },
+ {
+  "file": "packages/design-system/src/components/Combobox/combobox.tsx",
+  "old": "  /** 2026-05-16:overflow chip wrapper 套此 class(對齊 tagWrapperClassName)。Stack 模式\n   *  pass `-ml-0.5 first:ml-0` 讓 chip 跟 avatar 同 overlap step,物理上 chip = 1 個 slot 不\n   *  外加 24px。Default undefined = chip 不 overlap(text-tag mode 等)。*/\n  overflowWrapperClassName?: string",
+  "new": "  /** @internal PeoplePicker stack wrapper 內部協議 — end-user 勿用(measurement-layer hook)。\n   *  2026-05-16:overflow chip wrapper 套此 class(對齊 tagWrapperClassName)。Stack 模式\n   *  pass `-ml-0.5 first:ml-0` 讓 chip 跟 avatar 同 overlap step,物理上 chip = 1 個 slot 不\n   *  外加 24px。Default undefined = chip 不 overlap(text-tag mode 等)。*/\n  overflowWrapperClassName?: string"
+ },
+ {
+  "file": "packages/design-system/src/components/Combobox/combobox.tsx",
+  "old": "  /**\n   * 2026-05-15 Bug 3 fix:override visible count via formula-based primitive(opt-in;default 走\n   * DOM-based `useOverflowCount`)。PeoplePicker stack mode 用 `avatar-stack-overflow` primitive\n   * deterministic formula 計算 visible count,forward 給 Combobox bypass DOM offsetWidth\n   * measurement,避免 dual-algorithm drift。對齊 user SSOT「同 cell width 同 overflow 判斷」。\n   */\n  visibleCountOverride?: number",
+  "new": "  /**\n   * @internal PeoplePicker stack wrapper 內部協議 — end-user 勿用(measurement-layer override)。\n   *\n   * 2026-05-15 Bug 3 fix:override visible count via formula-based primitive(opt-in;default 走\n   * DOM-based `useOverflowCount`)。PeoplePicker stack mode 用 `avatar-stack-overflow` primitive\n   * deterministic formula 計算 visible count,forward 給 Combobox bypass DOM offsetWidth\n   * measurement,避免 dual-algorithm drift。對齊 user SSOT「同 cell width 同 overflow 判斷」。\n   */\n  visibleCountOverride?: number"
+ },
+ {
+  "file": "packages/design-system/src/components/Combobox/combobox.spec.md",
+  "old": "## 定位",
+  "new": "## 定位\n\n> **Internal-only props(PeoplePicker stack wrapper 協議,end-user 勿用)**:`tagWrapperClassName` / `overflowWrapperClassName` / `tagAreaGapPx` / `tagAreaPaddingLeftPx` / `visibleCountOverride` 是 Combobox overflow 量測層的內部 hook,只供 DS-internal wrapper(PeoplePicker avatar stack)用,已標 `@internal`。`tagAreaPaddingLeftPx` 目前無 active consumer(PeoplePicker 走 `!px-3` 路徑),保留供未來精準 padding 但新 consumer 請先評估。`overflowShape` 是 public typed enum(矩形/圓形 +N),不在此列。"
+ },
+ {
+  "file": "packages/design-system/src/components/Combobox/combobox.tsx",
+  "old": "   * **2026-05-13 v2 deprecate path**:原 PeoplePicker pass `{8}` 假設「Combobox tagPadding=4px,4+8=12」",
+  "new": "   * @internal PeoplePicker stack wrapper 內部協議 — 目前無 active consumer(PeoplePicker 傳 undefined),保留供未來精準 padding;新 consumer 請先評估。\n   *\n   * **2026-05-13 v2 deprecate path**:原 PeoplePicker pass `{8}` 假設「Combobox tagPadding=4px,4+8=12」"
+ },
+ {
+  "file": "packages/design-system/src/components/Combobox/combobox.tsx",
+  "old": "   * **Q2 known tradeoff**:0 後 useOverflowCount 仍按 wrapper.offsetWidth 累加(不含 overlap\n   * 補償)→ +N 偏保守。當前接受;若需精準可 future 加 `overlapPx` 補償邏輯。\n   */\n  tagAreaGapPx?: number",
+  "new": "   * **Q2 known tradeoff**:0 後 useOverflowCount 仍按 wrapper.offsetWidth 累加(不含 overlap\n   * 補償)→ +N 偏保守。當前接受;若需精準可 future 加 `overlapPx` 補償邏輯。\n   *\n   * @internal PeoplePicker stack wrapper 內部協議 — end-user 勿用(measurement-layer hook)。\n   */\n  tagAreaGapPx?: number"
+ },
+ {
+  "file": "packages/design-system/src/components/LinkInput/link-input.tsx",
+  "old": "      label,\n      showDisplayEndIcon = false,\n      id: idProp,",
+  "new": "      label,\n      showDisplayEndIcon = false,\n      readOnly,\n      id: idProp,"
+ },
+ {
+  "file": "packages/design-system/src/components/LinkInput/link-input.tsx",
+  "old": "    // mode resolution:disabled prop 一律覆蓋;否則 prop > context.mode > default 'edit'\n    const mode: FieldMode = modeProp ?? fieldCtx?.mode ?? 'edit'\n    const resolvedMode: FieldMode = disabled ? 'disabled' : mode",
+  "new": "    // mode resolution(對齊 input.tsx L107-112 / textarea.tsx L202 canonical):\n    //   prop > fieldCtx.mode > (readOnly → 'readonly') > (disabled → 'disabled') > 'edit'\n    // spec field-controls.spec.md L125「readOnly 原生屬性自動覆蓋 mode」契約落地。\n    const resolvedMode: FieldMode =\n      modeProp ?? fieldCtx?.mode ?? (readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')"
+ },
+ {
+  "file": "packages/design-system/src/components/LinkInput/link-input.tsx",
+  "old": "          placeholder={placeholder}\n          aria-invalid={(error || fieldCtx?.invalid) || undefined}",
+  "new": "          placeholder={placeholder}\n          readOnly={resolvedMode === 'readonly'}\n          aria-invalid={(error || fieldCtx?.invalid) || undefined}"
+ },
+ {
+  "file": "packages/design-system/src/components/DataTable/filter-operators.ts",
+  "old": " * 詳細 spec:`./advanced-filter-operators.draft.md`",
+  "new": " * 詳細 spec:`./filter-operators.spec.md`"
+ },
+ {
+  "file": "packages/design-system/src/components/DataTable/filter-tree.ts",
+  "old": "    // Per `advanced-filter-operators.draft.md` L116「is 直接接受多值,不另設 is_any_of」+ L103-116",
+  "new": "    // Per `filter-operators.spec.md` L116「is 直接接受多值,不另設 is_any_of」+ L103-116"
+ },
+ {
+  "file": "packages/design-system/src/components/DataTable/data-table-filter-panel.tsx",
+  "old": " * 詳:`./advanced-filter.draft.md` + `./advanced-filter-operators.draft.md`",
+  "new": " * 詳:`./filter-operators.spec.md`"
+ }
+]

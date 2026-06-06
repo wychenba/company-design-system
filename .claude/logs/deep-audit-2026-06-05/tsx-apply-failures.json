@@ -1,0 +1,8 @@
+[
+ {
+  "file": "packages/design-system/src/components/Notice/notice.tsx",
+  "n": 0,
+  "finding": "notice.tsx:29-30 docblock 把 overlay-surface.spec.md L350 已標 ❌ 拒絕的 v2 a",
+  "old": " *   dismiss 是邊角小 affordance,xs 視覺不搶眼不跟 content 競爭。見 `overla"
+ }
+]

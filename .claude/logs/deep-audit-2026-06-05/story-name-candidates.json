@@ -1,0 +1,1444 @@
+[
+ {
+  "file": "patterns/action-bar/action-bar.stories.tsx",
+  "line": 573,
+  "component": "action-bar",
+  "constName": "DismissVsDanger",
+  "displayName": "取消 vs 危險動作 語意區分"
+ },
+ {
+  "file": "patterns/element-anatomy/item-anatomy.stories.tsx",
+  "line": 925,
+  "component": "element-anatomy",
+  "constName": "AlignmentThreshold",
+  "displayName": "對齊容器（24px 閾值）"
+ },
+ {
+  "file": "patterns/element-anatomy/item-anatomy.stories.tsx",
+  "line": 1202,
+  "component": "element-anatomy",
+  "constName": "IconColorsAndPresets",
+  "displayName": "Icon 色彩 + 消費元件預設"
+ },
+ {
+  "file": "components/Tabs/tabs.stories.tsx",
+  "line": 119,
+  "component": "Tabs",
+  "constName": "OverflowMenu",
+  "displayName": "溢出處理 — ⌄ navigator 選單"
+ },
+ {
+  "file": "components/Sidebar/sidebar.anatomy.stories.tsx",
+  "line": 536,
+  "component": "Sidebar",
+  "constName": "VariantMatrix",
+  "displayName": "變體對照（預設 vs 次要）"
+ },
+ {
+  "file": "components/Sidebar/sidebar.principles.stories.tsx",
+  "line": 177,
+  "component": "Sidebar",
+  "constName": "ContentTypeChoice",
+  "displayName": "SidebarMenu vs TreeView 的選擇"
+ },
+ {
+  "file": "components/Sidebar/sidebar.principles.stories.tsx",
+  "line": 422,
+  "component": "Sidebar",
+  "constName": "IconModeRules",
+  "displayName": "Icon 模式的 4 條鐵律"
+ },
+ {
+  "file": "components/FileUpload/file-upload.principles.stories.tsx",
+  "line": 206,
+  "component": "FileUpload",
+  "constName": "DivisionOfLaborRule",
+  "displayName": "與 FileItem 的職責分工"
+ },
+ {
+  "file": "components/FileUpload/file-upload.stories.tsx",
+  "line": 83,
+  "component": "FileUpload",
+  "constName": "WithFileList",
+  "displayName": "內建 files 屬性"
+ },
+ {
+  "file": "components/TimePicker/time-picker.principles.stories.tsx",
+  "line": 101,
+  "component": "TimePicker",
+  "constName": "RuleRangeComposition",
+  "displayName": "時間範圍用兩個 TimePicker 組合,不內建"
+ },
+ {
+  "file": "components/TimePicker/time-picker.principles.stories.tsx",
+  "line": 124,
+  "component": "TimePicker",
+  "constName": "RuleClearNoLabelButton",
+  "displayName": "清除用 X 行內動作,不用文字按鈕"
+ },
+ {
+  "file": "components/Tooltip/tooltip.stories.tsx",
+  "line": 47,
+  "component": "Tooltip",
+  "constName": "NonButtonTrigger",
+  "displayName": "非 Button 元素"
+ },
+ {
+  "file": "components/Rating/rating.stories.tsx",
+  "line": 94,
+  "component": "Rating",
+  "constName": "InField",
+  "displayName": "包在 Field 內"
+ },
+ {
+  "file": "components/Calendar/calendar.principles.stories.tsx",
+  "line": 125,
+  "component": "Calendar",
+  "constName": "MvpScope",
+  "displayName": "MVP 範圍"
+ },
+ {
+  "file": "components/Empty/empty.principles.stories.tsx",
+  "line": 158,
+  "component": "Empty",
+  "constName": "NextActionRule",
+  "displayName": "Empty 必須提示下一步動作"
+ },
+ {
+  "file": "components/DateGrid/date-grid.principles.stories.tsx",
+  "line": 168,
+  "component": "DateGrid",
+  "constName": "ModeRule",
+  "displayName": "Mode 選擇"
+ },
+ {
+  "file": "components/DateGrid/date-grid.principles.stories.tsx",
+  "line": 250,
+  "component": "DateGrid",
+  "constName": "VisualTokenRule",
+  "displayName": "視覺 token 統一"
+ },
+ {
+  "file": "components/DateGrid/date-grid.principles.stories.tsx",
+  "line": 301,
+  "component": "DateGrid",
+  "constName": "LocaleRule",
+  "displayName": "Locale 與週首日"
+ },
+ {
+  "file": "components/DateGrid/date-grid.stories.tsx",
+  "line": 52,
+  "component": "DateGrid",
+  "constName": "Single",
+  "displayName": "Single — 生日 / 到期日"
+ },
+ {
+  "file": "components/DateGrid/date-grid.stories.tsx",
+  "line": 85,
+  "component": "DateGrid",
+  "constName": "Multiple",
+  "displayName": "Multiple — 活動可參加日期"
+ },
+ {
+  "file": "components/DateGrid/date-grid.stories.tsx",
+  "line": 125,
+  "component": "DateGrid",
+  "constName": "Range",
+  "displayName": "Range — 分析時段 / 訂單範圍"
+ },
+ {
+  "file": "components/TreeView/tree-view.anatomy.stories.tsx",
+  "line": 376,
+  "component": "TreeView",
+  "constName": "KeyboardMatrix",
+  "displayName": "鍵盤導覽（ARIA tree）"
+ },
+ {
+  "file": "components/TreeView/tree-view.principles.stories.tsx",
+  "line": 114,
+  "component": "TreeView",
+  "constName": "ExpandSelectSeparationRule",
+  "displayName": "展開 與 Select 語意分離"
+ },
+ {
+  "file": "components/Input/input.stories.tsx",
+  "line": 54,
+  "component": "Input",
+  "constName": "SizeAlignment",
+  "displayName": "尺寸與 Button 對齊"
+ },
+ {
+  "file": "components/Input/input.principles.stories.tsx",
+  "line": 107,
+  "component": "Input",
+  "constName": "ModeRule",
+  "displayName": "Mode 選擇"
+ },
+ {
+  "file": "components/Input/input.principles.stories.tsx",
+  "line": 150,
+  "component": "Input",
+  "constName": "StartIconRule",
+  "displayName": "startIcon 語意"
+ },
+ {
+  "file": "components/Input/input.principles.stories.tsx",
+  "line": 176,
+  "component": "Input",
+  "constName": "EndActionRule",
+  "displayName": "endAction 適用場景"
+ },
+ {
+  "file": "components/Input/input.principles.stories.tsx",
+  "line": 237,
+  "component": "Input",
+  "constName": "ErrorRule",
+  "displayName": "Error 呈現"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.principles.stories.tsx",
+  "line": 202,
+  "component": "DropdownMenu",
+  "constName": "ItemTypeRule",
+  "displayName": "Item 類型選擇"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.principles.stories.tsx",
+  "line": 312,
+  "component": "DropdownMenu",
+  "constName": "SuffixRule",
+  "displayName": "Suffix 使用規則"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.stories.tsx",
+  "line": 251,
+  "component": "DropdownMenu",
+  "constName": "ItemHover",
+  "displayName": "Item Hover 高亮"
+ },
+ {
+  "file": "components/Alert/alert.stories.tsx",
+  "line": 37,
+  "component": "Alert",
+  "constName": "SubtleSingleLine",
+  "displayName": "Subtle 單行"
+ },
+ {
+  "file": "components/Alert/alert.stories.tsx",
+  "line": 46,
+  "component": "Alert",
+  "constName": "SolidSingleLine",
+  "displayName": "Solid 單行"
+ },
+ {
+  "file": "components/Alert/alert.anatomy.stories.tsx",
+  "line": 143,
+  "component": "Alert",
+  "constName": "PlacementMatrix",
+  "displayName": "出現位置（內嵌 vs 固定）"
+ },
+ {
+  "file": "components/Alert/alert.principles.stories.tsx",
+  "line": 143,
+  "component": "Alert",
+  "constName": "PlacementRule",
+  "displayName": "行內 vs 固定放置"
+ },
+ {
+  "file": "components/Alert/alert.principles.stories.tsx",
+  "line": 182,
+  "component": "Alert",
+  "constName": "AppearanceRule",
+  "displayName": "低調 vs 實心 選擇"
+ },
+ {
+  "file": "components/Accordion/accordion.principles.stories.tsx",
+  "line": 151,
+  "component": "Accordion",
+  "constName": "TypeRule",
+  "displayName": "單一展開 vs 多重展開"
+ },
+ {
+  "file": "components/Accordion/accordion.principles.stories.tsx",
+  "line": 266,
+  "component": "Accordion",
+  "constName": "ContentRule",
+  "displayName": "Content 內容限制"
+ },
+ {
+  "file": "components/Accordion/accordion.principles.stories.tsx",
+  "line": 329,
+  "component": "Accordion",
+  "constName": "SingleItemRule",
+  "displayName": "單一 項目 不用 Accordion"
+ },
+ {
+  "file": "components/Accordion/accordion.stories.tsx",
+  "line": 59,
+  "component": "Accordion",
+  "constName": "FAQ",
+  "displayName": "FAQ 常見問題"
+ },
+ {
+  "file": "components/Skeleton/skeleton.stories.tsx",
+  "line": 44,
+  "component": "Skeleton",
+  "constName": "TaskListLoading",
+  "displayName": "Task 列表載入"
+ },
+ {
+  "file": "components/Separator/separator.stories.tsx",
+  "line": 80,
+  "component": "Separator",
+  "constName": "InDropdownMenu",
+  "displayName": "在 DropdownMenu 內"
+ },
+ {
+  "file": "components/Separator/separator.stories.tsx",
+  "line": 100,
+  "component": "Separator",
+  "constName": "BetweenSections",
+  "displayName": "在 DescriptionList 區塊之間"
+ },
+ {
+  "file": "components/Separator/separator.anatomy.stories.tsx",
+  "line": 79,
+  "component": "Separator",
+  "constName": "TokenMatrix",
+  "displayName": "設計變數 規則（--divider vs --border）"
+ },
+ {
+  "file": "components/Separator/separator.principles.stories.tsx",
+  "line": 99,
+  "component": "Separator",
+  "constName": "DecorativeSemanticRule",
+  "displayName": "裝飾性 vs 語意分隔（讀屏的差別）"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 140,
+  "component": "DatePicker",
+  "constName": "RangePicker",
+  "displayName": "Range:訂房 / 訂機票情境"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 180,
+  "component": "DatePicker",
+  "constName": "ShowTime",
+  "displayName": "showTime:會議排程"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 199,
+  "component": "DatePicker",
+  "constName": "RangePopoverOpen",
+  "displayName": "Range:浮層展開狀態"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 219,
+  "component": "DatePicker",
+  "constName": "ShowTimePopoverOpen",
+  "displayName": "showTime:浮層展開狀態"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 238,
+  "component": "DatePicker",
+  "constName": "ShowTimeRangePopoverOpen",
+  "displayName": "showTime Range:浮層展開狀態"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 301,
+  "component": "DatePicker",
+  "constName": "ShowTimeRange",
+  "displayName": "showTime Range:活動時段"
+ },
+ {
+  "file": "components/DatePicker/date-picker.principles.stories.tsx",
+  "line": 109,
+  "component": "DatePicker",
+  "constName": "CalendarRule",
+  "displayName": "自建 Calendar + 視覺一致性"
+ },
+ {
+  "file": "components/DatePicker/date-picker.principles.stories.tsx",
+  "line": 136,
+  "component": "DatePicker",
+  "constName": "FormattingRule",
+  "displayName": "Display 格式化"
+ },
+ {
+  "file": "components/DatePicker/date-picker.anatomy.stories.tsx",
+  "line": 778,
+  "component": "DatePicker",
+  "constName": "CalendarTokens",
+  "displayName": "Calendar 內部 token"
+ },
+ {
+  "file": "components/Toast/toast.stories.tsx",
+  "line": 75,
+  "component": "Toast",
+  "constName": "WithDescription",
+  "displayName": "有 Title + Description"
+ },
+ {
+  "file": "components/Toast/toast.principles.stories.tsx",
+  "line": 110,
+  "component": "Toast",
+  "constName": "ActionRule",
+  "displayName": "動作 使用場景（Undo 模式）"
+ },
+ {
+  "file": "components/Toast/toast.anatomy.stories.tsx",
+  "line": 139,
+  "component": "Toast",
+  "constName": "ContainerArchitecture",
+  "displayName": "Container 三層架構"
+ },
+ {
+  "file": "components/Chart/chart.stories.tsx",
+  "line": 106,
+  "component": "Chart",
+  "constName": "BarChartRevenue",
+  "displayName": "長條 Chart — 月營收"
+ },
+ {
+  "file": "components/Chart/chart.stories.tsx",
+  "line": 141,
+  "component": "Chart",
+  "constName": "LineChartResponseTime",
+  "displayName": "折線 Chart — 伺服器回應時間"
+ },
+ {
+  "file": "components/Chart/chart.stories.tsx",
+  "line": 190,
+  "component": "Chart",
+  "constName": "DonutChartTrafficSource",
+  "displayName": "環圈 Chart — 流量來源分布"
+ },
+ {
+  "file": "components/Chart/chart.principles.stories.tsx",
+  "line": 211,
+  "component": "Chart",
+  "constName": "ChartTypeRule",
+  "displayName": "何時用哪種 Chart"
+ },
+ {
+  "file": "components/Chart/chart.principles.stories.tsx",
+  "line": 289,
+  "component": "Chart",
+  "constName": "CategoryTokenRule",
+  "displayName": "ChartConfig + 類別色 設計變數"
+ },
+ {
+  "file": "components/Chip/chip.stories.tsx",
+  "line": 55,
+  "component": "Chip",
+  "constName": "WithBadge",
+  "displayName": "帶 Badge"
+ },
+ {
+  "file": "components/Chip/chip.anatomy.stories.tsx",
+  "line": 232,
+  "component": "Chip",
+  "constName": "SelectionMatrix",
+  "displayName": "多 vs 單 選擇"
+ },
+ {
+  "file": "components/Chip/chip.anatomy.stories.tsx",
+  "line": 369,
+  "component": "Chip",
+  "constName": "LayoutMatrix",
+  "displayName": "排版（換行 vs 捲動 vs 選單）"
+ },
+ {
+  "file": "components/Chip/chip.principles.stories.tsx",
+  "line": 134,
+  "component": "Chip",
+  "constName": "LayoutRule",
+  "displayName": "超出處理:換行 vs 捲動 vs 選單"
+ },
+ {
+  "file": "components/Chip/chip.principles.stories.tsx",
+  "line": 189,
+  "component": "Chip",
+  "constName": "SelectedStyleRule",
+  "displayName": "選中狀態：text + 邊框 同染，不用 背景 強調"
+ },
+ {
+  "file": "components/DescriptionList/description-list.principles.stories.tsx",
+  "line": 142,
+  "component": "DescriptionList",
+  "constName": "LayoutRule",
+  "displayName": "直式 vs 橫式（欄數對照）"
+ },
+ {
+  "file": "components/DescriptionList/description-list.stories.tsx",
+  "line": 112,
+  "component": "DescriptionList",
+  "constName": "_RETIRED_HorizontalDivided",
+  "displayName": null
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+  "line": 193,
+  "component": "AspectRatio",
+  "constName": "RatioChoice",
+  "displayName": "如何選 ratio"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+  "line": 224,
+  "component": "AspectRatio",
+  "constName": "ChildrenFillRule",
+  "displayName": "children 要填滿容器"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+  "line": 262,
+  "component": "AspectRatio",
+  "constName": "PlaceholderAndSkeleton",
+  "displayName": "背景-muted 占位 與 Skeleton 的分界"
+ },
+ {
+  "file": "components/LinkInput/link-input.stories.tsx",
+  "line": 56,
+  "component": "LinkInput",
+  "constName": "Validation",
+  "displayName": "Blur 驗證"
+ },
+ {
+  "file": "components/LinkInput/link-input.principles.stories.tsx",
+  "line": 102,
+  "component": "LinkInput",
+  "constName": "DisplayStateRule",
+  "displayName": "兩種狀態：連結 顯示 / input 編輯"
+ },
+ {
+  "file": "components/LinkInput/link-input.principles.stories.tsx",
+  "line": 136,
+  "component": "LinkInput",
+  "constName": "ValidationRule",
+  "displayName": "驗證時機：blur，不即時"
+ },
+ {
+  "file": "components/Slider/slider.anatomy.stories.tsx",
+  "line": 172,
+  "component": "Slider",
+  "constName": "ColorBindingRule",
+  "displayName": "範圍 ↔ Thumb 邊框 綁定規則"
+ },
+ {
+  "file": "components/Slider/slider.anatomy.stories.tsx",
+  "line": 201,
+  "component": "Slider",
+  "constName": "KeyboardMatrix",
+  "displayName": "鍵盤操作（Radix 原生）"
+ },
+ {
+  "file": "components/Slider/slider.principles.stories.tsx",
+  "line": 127,
+  "component": "Slider",
+  "constName": "PositionAsStateRule",
+  "displayName": "位置/長度是 state,不是顏色"
+ },
+ {
+  "file": "components/Slider/slider.principles.stories.tsx",
+  "line": 212,
+  "component": "Slider",
+  "constName": "ThumbBindingRule",
+  "displayName": "Thumb 白底 + 邊框,不用實心"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+  "line": 321,
+  "component": "FileViewer",
+  "constName": "FilmstripRule",
+  "displayName": "Filmstrip 顯示判準"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+  "line": 396,
+  "component": "FileViewer",
+  "constName": "ReadOnlyRule",
+  "displayName": "readOnly 由業務權限決定"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.anatomy.stories.tsx",
+  "line": 1008,
+  "component": "FileViewer",
+  "constName": "RendererRegistry",
+  "displayName": "延伸機制（registerFileRenderer）"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 72,
+  "component": "FileViewer",
+  "constName": "JiraAttachments",
+  "displayName": "Jira — 附件多圖檢視"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 152,
+  "component": "FileViewer",
+  "constName": "NotionGallery",
+  "displayName": "Notion — 頁內配圖 相簿"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 216,
+  "component": "FileViewer",
+  "constName": "FigmaDesignReview",
+  "displayName": "Figma — 單檔 縮放 聚焦"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 270,
+  "component": "FileViewer",
+  "constName": "GmailAttachmentPreview",
+  "displayName": "Gmail — 多附件預覽"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 366,
+  "component": "FileViewer",
+  "constName": "FallbackUnknownType",
+  "displayName": "Fallback — 不支援的檔案類型"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.principles.stories.tsx",
+  "line": 210,
+  "component": "ProgressBar",
+  "constName": "StatusRule",
+  "displayName": "Status 語意"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.principles.stories.tsx",
+  "line": 264,
+  "component": "ProgressBar",
+  "constName": "AffixRule",
+  "displayName": "Affix 選擇"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.stories.tsx",
+  "line": 74,
+  "component": "ProgressBar",
+  "constName": "InlineTableCell",
+  "displayName": "DataTable 儲存格 內進度"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.anatomy.stories.tsx",
+  "line": 350,
+  "component": "ProgressBar",
+  "constName": "AffixBehavior",
+  "displayName": "Affix 行為"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 142,
+  "component": "Field",
+  "constName": "MixedControlAlignment",
+  "displayName": "混合 控制元件 的 field 高度對齊"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 212,
+  "component": "Field",
+  "constName": "SegmentedControlInField",
+  "displayName": "SegmentedControl 作為 Field 控制元件"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 302,
+  "component": "Field",
+  "constName": "BlockControlRadioGroup",
+  "displayName": "區塊內控制元件 — RadioGroup"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 374,
+  "component": "Field",
+  "constName": "ButtonAsControl",
+  "displayName": "Button 作為 控制元件"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 416,
+  "component": "Field",
+  "constName": "LabelWidth",
+  "displayName": "Label 寬度"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 443,
+  "component": "Field",
+  "constName": "WithSlider",
+  "displayName": "包 Slider"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 485,
+  "component": "Field",
+  "constName": "SliderAlignsWithOtherFields",
+  "displayName": "Slider 跟 Input / NumberInput 並排"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 519,
+  "component": "Field",
+  "constName": "SliderWithLiveNumberInput",
+  "displayName": "Slider + NumberInput 雙向綁定"
+ },
+ {
+  "file": "components/Field/field.principles.stories.tsx",
+  "line": 144,
+  "component": "Field",
+  "constName": "ResponsibilityRule",
+  "displayName": "Field 只負責佈局,不管資料"
+ },
+ {
+  "file": "components/Field/field.principles.stories.tsx",
+  "line": 235,
+  "component": "Field",
+  "constName": "NotForFormActionsRule",
+  "displayName": "Form 動作 不是 Field 控制元件"
+ },
+ {
+  "file": "components/Field/field.anatomy.stories.tsx",
+  "line": 479,
+  "component": "Field",
+  "constName": "FieldGroupBehavior",
+  "displayName": "FieldGroup — 多 Field 堆疊"
+ },
+ {
+  "file": "components/Carousel/carousel.principles.stories.tsx",
+  "line": 211,
+  "component": "Carousel",
+  "constName": "ArrowHoverOnly",
+  "displayName": "箭頭 滑鼠移過-only 顯示"
+ },
+ {
+  "file": "components/Carousel/carousel.stories.tsx",
+  "line": 44,
+  "component": "Carousel",
+  "constName": "HomepageHeroBanner",
+  "displayName": "首頁 Hero Banner"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.principles.stories.tsx",
+  "line": 230,
+  "component": "ScrollArea",
+  "constName": "SolvesDataTableBug",
+  "displayName": "搭配 DataTable 解跑版"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.principles.stories.tsx",
+  "line": 280,
+  "component": "ScrollArea",
+  "constName": "OutOfScopeRule",
+  "displayName": "不該用 ScrollArea 的場景"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.stories.tsx",
+  "line": 58,
+  "component": "ScrollArea",
+  "constName": "VerticalIssueList",
+  "displayName": "垂直捲動 — Linear issue 清單"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.stories.tsx",
+  "line": 83,
+  "component": "ScrollArea",
+  "constName": "SidebarNav",
+  "displayName": "垂直捲動 — Notion sidebar 導覽"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.stories.tsx",
+  "line": 108,
+  "component": "ScrollArea",
+  "constName": "HorizontalProductTable",
+  "displayName": "水平捲動 — Stripe 寬欄位商品表"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.stories.tsx",
+  "line": 152,
+  "component": "ScrollArea",
+  "constName": "BothDirections",
+  "displayName": "雙向捲動 — GitHub PR 大型檢閱表"
+ },
+ {
+  "file": "components/Combobox/combobox.principles.stories.tsx",
+  "line": 133,
+  "component": "Combobox",
+  "constName": "WrapRule",
+  "displayName": "Wrap 模式選擇"
+ },
+ {
+  "file": "components/Combobox/combobox.principles.stories.tsx",
+  "line": 181,
+  "component": "Combobox",
+  "constName": "TagOperationRule",
+  "displayName": "Tag 操作規則"
+ },
+ {
+  "file": "components/Combobox/combobox.stories.tsx",
+  "line": 63,
+  "component": "Combobox",
+  "constName": "SizeAlignment",
+  "displayName": "尺寸與 Button 對齊"
+ },
+ {
+  "file": "components/Combobox/combobox.stories.tsx",
+  "line": 85,
+  "component": "Combobox",
+  "constName": "WrapModes",
+  "displayName": "單行 vs 換行"
+ },
+ {
+  "file": "components/Combobox/combobox.stories.tsx",
+  "line": 151,
+  "component": "Combobox",
+  "constName": "InDataTable",
+  "displayName": "DataTable 整合"
+ },
+ {
+  "file": "components/Notice/notice.anatomy.stories.tsx",
+  "line": 371,
+  "component": "Notice",
+  "constName": "VariantIconMap",
+  "displayName": "變體 × icon 對照"
+ },
+ {
+  "file": "components/Notice/notice.stories.tsx",
+  "line": 119,
+  "component": "Notice",
+  "constName": "BillingFailed",
+  "displayName": "Workspace 付款失敗"
+ },
+ {
+  "file": "components/Notice/notice.stories.tsx",
+  "line": 198,
+  "component": "Notice",
+  "constName": "ToastLikeSolid",
+  "displayName": "Toast 樣式"
+ },
+ {
+  "file": "components/Notice/notice.stories.tsx",
+  "line": 240,
+  "component": "Notice",
+  "constName": "NeutralTitleOnly",
+  "displayName": "Neutral 純文字"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.principles.stories.tsx",
+  "line": 115,
+  "component": "BulkActionBar",
+  "constName": "VsToastRule",
+  "displayName": "BulkActionBar vs Toast — 角色區分"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.principles.stories.tsx",
+  "line": 188,
+  "component": "BulkActionBar",
+  "constName": "HintBannerRule",
+  "displayName": "提示 橫幅 — 用 Alert 不自刻"
+ },
+ {
+  "file": "components/AppShell/app-shell.stories.tsx",
+  "line": 250,
+  "component": "AppShell",
+  "constName": "PrimarySidebar",
+  "displayName": "主側欄佈局 — Linear 式議題追蹤"
+ },
+ {
+  "file": "components/AppShell/app-shell.stories.tsx",
+  "line": 388,
+  "component": "AppShell",
+  "constName": "PrimaryHeader",
+  "displayName": "主標頭佈局 — 全域+本地兩層(GitHub/Gmail/Slack 派)"
+ },
+ {
+  "file": "components/Dialog/dialog.principles.stories.tsx",
+  "line": 255,
+  "component": "Dialog",
+  "constName": "FooterActionRule",
+  "displayName": "Footer 按鈕配對"
+ },
+ {
+  "file": "components/Dialog/dialog.anatomy.stories.tsx",
+  "line": 148,
+  "component": "Dialog",
+  "constName": "HeightBehavior",
+  "displayName": "高度行為（預設填滿 vs autoHeight）"
+ },
+ {
+  "file": "components/Dialog/dialog.anatomy.stories.tsx",
+  "line": 227,
+  "component": "Dialog",
+  "constName": "DestructiveMatrix",
+  "displayName": "破壞性動作 Dialog"
+ },
+ {
+  "file": "components/Dialog/dialog.stories.tsx",
+  "line": 307,
+  "component": "Dialog",
+  "constName": "ListBody",
+  "displayName": "主體 放 list"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.anatomy.stories.tsx",
+  "line": 385,
+  "component": "SelectionControl",
+  "constName": "PrefixAlignment",
+  "displayName": "Prefix 對齊規則（24px 閾值）"
+ },
+ {
+  "file": "components/Popover/popover.principles.stories.tsx",
+  "line": 248,
+  "component": "Popover",
+  "constName": "VisualAlignmentRule",
+  "displayName": "視覺對齊 Dialog（浮層視覺語言共用）"
+ },
+ {
+  "file": "components/Textarea/textarea.anatomy.stories.tsx",
+  "line": 117,
+  "component": "Textarea",
+  "constName": "ModeMatrix",
+  "displayName": "模式 對照（編輯 / 展示 / readonly / 停用）"
+ },
+ {
+  "file": "components/Textarea/textarea.anatomy.stories.tsx",
+  "line": 262,
+  "component": "Textarea",
+  "constName": "RowsResizeMatrix",
+  "displayName": "Rows 與 縮放"
+ },
+ {
+  "file": "components/Textarea/textarea.stories.tsx",
+  "line": 31,
+  "component": "Textarea",
+  "constName": "InField",
+  "displayName": "在 Field 內"
+ },
+ {
+  "file": "components/Textarea/textarea.principles.stories.tsx",
+  "line": 126,
+  "component": "Textarea",
+  "constName": "ReadonlyRule",
+  "displayName": "Readonly 用底色標示閱讀區（不同於 Input）"
+ },
+ {
+  "file": "components/Textarea/textarea.principles.stories.tsx",
+  "line": 150,
+  "component": "Textarea",
+  "constName": "NoIconRule",
+  "displayName": "禁止:內部不放 圖示 / endAction"
+ },
+ {
+  "file": "components/Button/button.principles.stories.tsx",
+  "line": 179,
+  "component": "Button",
+  "constName": "PrimaryRule",
+  "displayName": "Primary 限制"
+ },
+ {
+  "file": "components/Button/button.principles.stories.tsx",
+  "line": 209,
+  "component": "Button",
+  "constName": "DangerRule",
+  "displayName": "Danger 時機"
+ },
+ {
+  "file": "components/Button/button.principles.stories.tsx",
+  "line": 245,
+  "component": "Button",
+  "constName": "IconRule",
+  "displayName": "Icon 語意"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 113,
+  "component": "Button",
+  "constName": "Danger",
+  "displayName": "Danger 語意"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 138,
+  "component": "Button",
+  "constName": "WithBadge",
+  "displayName": "Badge 槽位"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 344,
+  "component": "Button",
+  "constName": "TooltipVisible",
+  "displayName": "純圖示加 Tooltip"
+ },
+ {
+  "file": "components/Steps/steps.principles.stories.tsx",
+  "line": 112,
+  "component": "Steps",
+  "constName": "ParentControlled",
+  "displayName": "規則:Parent 管理狀態"
+ },
+ {
+  "file": "components/Steps/steps.principles.stories.tsx",
+  "line": 183,
+  "component": "Steps",
+  "constName": "BlueConnectorLogic",
+  "displayName": "規則:藍色 連線 只跟 completed 走"
+ },
+ {
+  "file": "components/Steps/steps.principles.stories.tsx",
+  "line": 261,
+  "component": "Steps",
+  "constName": "LinearBackClickDoesNotMutate",
+  "displayName": "規則:Linear 點回 completed 不改狀態"
+ },
+ {
+  "file": "components/Steps/steps.stories.tsx",
+  "line": 153,
+  "component": "Steps",
+  "constName": "FocusRingCombinations",
+  "displayName": "Ring 正交示範"
+ },
+ {
+  "file": "components/Steps/steps.stories.tsx",
+  "line": 281,
+  "component": "Steps",
+  "constName": "MultipleExpansion",
+  "displayName": "Multiple 展開模式"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.stories.tsx",
+  "line": 55,
+  "component": "OverflowIndicator",
+  "constName": "ComboboxTagOverflow",
+  "displayName": "Combobox 標籤溢出"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.stories.tsx",
+  "line": 93,
+  "component": "OverflowIndicator",
+  "constName": "AvatarStackOverflow",
+  "displayName": "人員頭像 疊合 +N"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.stories.tsx",
+  "line": 168,
+  "component": "OverflowIndicator",
+  "constName": "BreadcrumbCollapse",
+  "displayName": "Breadcrumb 中段收合"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.stories.tsx",
+  "line": 226,
+  "component": "OverflowIndicator",
+  "constName": "TableRowAssignees",
+  "displayName": "DataTable 人員欄位"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.anatomy.stories.tsx",
+  "line": 212,
+  "component": "SegmentedControl",
+  "constName": "FullWidthMatrix",
+  "displayName": "fullWidth 行為"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.principles.stories.tsx",
+  "line": 185,
+  "component": "SegmentedControl",
+  "constName": "IconOnlyRule",
+  "displayName": "iconOnly 是 群組-level 決策"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.principles.stories.tsx",
+  "line": 227,
+  "component": "SegmentedControl",
+  "constName": "FullWidthRule",
+  "displayName": "fullWidth 的適用情境"
+ },
+ {
+  "file": "components/Avatar/avatar.principles.stories.tsx",
+  "line": 119,
+  "component": "Avatar",
+  "constName": "FallbackRule",
+  "displayName": "Fallback 順序"
+ },
+ {
+  "file": "components/Avatar/avatar.principles.stories.tsx",
+  "line": 183,
+  "component": "Avatar",
+  "constName": "HoverCardIntegrationRule",
+  "displayName": "Avatar + ProfileCard 整合"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 75,
+  "component": "FileItem",
+  "constName": "HoverSwap",
+  "displayName": "Hover 替換"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 190,
+  "component": "FileItem",
+  "constName": "CompactMixed",
+  "displayName": "Compact 混合"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 214,
+  "component": "FileItem",
+  "constName": "UploadManagerSurface",
+  "displayName": "Upload manager · 豐富(無邊框)"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 241,
+  "component": "FileItem",
+  "constName": "UploadManagerCompactSurface",
+  "displayName": "Upload manager · 精簡(無邊框)"
+ },
+ {
+  "file": "components/FileItem/file-item.anatomy.stories.tsx",
+  "line": 186,
+  "component": "FileItem",
+  "constName": "ModeMatrix",
+  "displayName": "模式 對照（緊湊 vs 豐富）"
+ },
+ {
+  "file": "components/FileItem/file-item.principles.stories.tsx",
+  "line": 98,
+  "component": "FileItem",
+  "constName": "ModeRule",
+  "displayName": "模式 選擇（緊湊 vs 豐富）"
+ },
+ {
+  "file": "components/HoverCard/hover-card.anatomy.stories.tsx",
+  "line": 78,
+  "component": "HoverCard",
+  "constName": "VisualVariants",
+  "displayName": "Consumer 的兩種常見視覺"
+ },
+ {
+  "file": "components/HoverCard/hover-card.stories.tsx",
+  "line": 36,
+  "component": "HoverCard",
+  "constName": "PersonProfileCard",
+  "displayName": "人員頭像 ProfileCard"
+ },
+ {
+  "file": "components/HoverCard/hover-card.stories.tsx",
+  "line": 179,
+  "component": "HoverCard",
+  "constName": "RepoCard",
+  "displayName": "Repository 資訊卡"
+ },
+ {
+  "file": "components/HoverCard/hover-card.stories.tsx",
+  "line": 238,
+  "component": "HoverCard",
+  "constName": "TriggerShowcase",
+  "displayName": "Trigger 類型與 delay"
+ },
+ {
+  "file": "components/HoverCard/hover-card.principles.stories.tsx",
+  "line": 174,
+  "component": "HoverCard",
+  "constName": "PureBehaviorPrimitiveRule",
+  "displayName": "純行為 primitive——視覺由 consumer 決定"
+ },
+ {
+  "file": "components/NumberInput/number-input.stories.tsx",
+  "line": 51,
+  "component": "NumberInput",
+  "constName": "SizeAlignment",
+  "displayName": "尺寸與 Button 對齊"
+ },
+ {
+  "file": "components/NumberInput/number-input.stories.tsx",
+  "line": 98,
+  "component": "NumberInput",
+  "constName": "InDataTable",
+  "displayName": "DataTable 整合"
+ },
+ {
+  "file": "components/NumberInput/number-input.principles.stories.tsx",
+  "line": 189,
+  "component": "NumberInput",
+  "constName": "DataTypeMatchRule",
+  "displayName": "數字一律用 NumberInput"
+ },
+ {
+  "file": "components/Select/select.stories.tsx",
+  "line": 93,
+  "component": "Select",
+  "constName": "SizeAlignment",
+  "displayName": "尺寸與 Button 對齊"
+ },
+ {
+  "file": "components/Select/select.stories.tsx",
+  "line": 163,
+  "component": "Select",
+  "constName": "InDataTable",
+  "displayName": "DataTable 整合"
+ },
+ {
+  "file": "components/Select/select.principles.stories.tsx",
+  "line": 196,
+  "component": "Select",
+  "constName": "ImmediateVsSubmitRule",
+  "displayName": "即時套用 vs 隨 form 送出"
+ },
+ {
+  "file": "components/Select/select.principles.stories.tsx",
+  "line": 243,
+  "component": "Select",
+  "constName": "SearchableRule",
+  "displayName": "Searchable 開啟判斷"
+ },
+ {
+  "file": "components/Select/select.principles.stories.tsx",
+  "line": 287,
+  "component": "Select",
+  "constName": "NativeSelectRule",
+  "displayName": "桌機自建選單 vs 手機原生 picker"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.anatomy.stories.tsx",
+  "line": 357,
+  "component": "ProfileCard",
+  "constName": "HoverCardIntegration",
+  "displayName": "HoverCard 整合（觸發行為）"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.principles.stories.tsx",
+  "line": 124,
+  "component": "ProfileCard",
+  "constName": "TriggerContextRule",
+  "displayName": "觸發點：avatar hover（不作 standalone）"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.principles.stories.tsx",
+  "line": 156,
+  "component": "ProfileCard",
+  "constName": "FixedWidthRule",
+  "displayName": "寬度固定 320px"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.principles.stories.tsx",
+  "line": 195,
+  "component": "ProfileCard",
+  "constName": "SectionRule",
+  "displayName": "Section 各自獨立（選擇性出現）"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.principles.stories.tsx",
+  "line": 181,
+  "component": "Breadcrumb",
+  "constName": "LastItemRule",
+  "displayName": "最後一項是位置標示，不是 link"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.stories.tsx",
+  "line": 111,
+  "component": "Breadcrumb",
+  "constName": "DeclarativeAutoCollapse",
+  "displayName": "宣告式 API + 自動收合"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.stories.tsx",
+  "line": 209,
+  "component": "Breadcrumb",
+  "constName": "WithHomeIcon",
+  "displayName": "首項配 Home icon"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.stories.tsx",
+  "line": 297,
+  "component": "Breadcrumb",
+  "constName": "IntegrateRouterLink",
+  "displayName": "整合 React Router / Next.js Link"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.anatomy.stories.tsx",
+  "line": 415,
+  "component": "Breadcrumb",
+  "constName": "CollapseMatrix",
+  "displayName": "長路徑收合（Ellipsis）"
+ },
+ {
+  "file": "components/Sheet/sheet.principles.stories.tsx",
+  "line": 229,
+  "component": "Sheet",
+  "constName": "SidePropRule",
+  "displayName": "Side 屬性：消費者用 right（其餘內部基建）"
+ },
+ {
+  "file": "components/Sheet/sheet.principles.stories.tsx",
+  "line": 319,
+  "component": "Sheet",
+  "constName": "HeaderFooterStructureRule",
+  "displayName": "Header / Footer 結構"
+ },
+ {
+  "file": "components/Sheet/sheet.anatomy.stories.tsx",
+  "line": 137,
+  "component": "Sheet",
+  "constName": "SideMatrix",
+  "displayName": "Side 方向 × 用途"
+ },
+ {
+  "file": "components/Coachmark/coachmark.stories.tsx",
+  "line": 69,
+  "component": "Coachmark",
+  "constName": "MultiStepTour",
+  "displayName": "多步 Onboarding Tour"
+ },
+ {
+  "file": "components/Coachmark/coachmark.stories.tsx",
+  "line": 157,
+  "component": "Coachmark",
+  "constName": "TipsMultiStep",
+  "displayName": "多步 Tips"
+ },
+ {
+  "file": "components/Coachmark/coachmark.principles.stories.tsx",
+  "line": 217,
+  "component": "Coachmark",
+  "constName": "MultiStepBestPracticesRule",
+  "displayName": "多步 Tour 最佳實踐"
+ },
+ {
+  "file": "components/Coachmark/coachmark.principles.stories.tsx",
+  "line": 313,
+  "component": "Coachmark",
+  "constName": "MediaContentRule",
+  "displayName": "Media 內容原則"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.principles.stories.tsx",
+  "line": 128,
+  "component": "PeoplePicker",
+  "constName": "SingleVsMultiRule",
+  "displayName": "單選 vs 多選"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.anatomy.stories.tsx",
+  "line": 370,
+  "component": "PeoplePicker",
+  "constName": "PersonValueType",
+  "displayName": "PersonValue 型別"
+ },
+ {
+  "file": "components/Tag/tag.stories.tsx",
+  "line": 60,
+  "component": "Tag",
+  "constName": "Truncation",
+  "displayName": "截斷 + Tooltip"
+ },
+ {
+  "file": "components/Tag/tag.principles.stories.tsx",
+  "line": 144,
+  "component": "Tag",
+  "constName": "SubtleVsSolidRule",
+  "displayName": "低調 vs 實心 選擇"
+ },
+ {
+  "file": "components/Tag/tag.principles.stories.tsx",
+  "line": 234,
+  "component": "Tag",
+  "constName": "IconRule",
+  "displayName": "圖示 與 avatar 的使用"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 167,
+  "component": "DataTable",
+  "constName": "ColumnTypes",
+  "displayName": "欄 Type 自動渲染"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 212,
+  "component": "DataTable",
+  "constName": "RowHeightMatrix",
+  "displayName": "列高階梯（閱讀 vs 掃描模式）"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 469,
+  "component": "DataTable",
+  "constName": "BorderedProp",
+  "displayName": "bordered 屬性（預設 true）"
+ },
+ {
+  "file": "components/DataTable/data-table.principles.stories.tsx",
+  "line": 120,
+  "component": "DataTable",
+  "constName": "ColumnTypeRule",
+  "displayName": "用 欄 type 自動渲染,不手寫 儲存格"
+ },
+ {
+  "file": "components/Badge/badge.stories.tsx",
+  "line": 21,
+  "component": "Badge",
+  "constName": "Shape",
+  "displayName": "正圓 vs 膠囊"
+ },
+ {
+  "file": "components/Badge/badge.stories.tsx",
+  "line": 47,
+  "component": "Badge",
+  "constName": "Dot",
+  "displayName": "Dot 模式"
+ },
+ {
+  "file": "components/Badge/badge.stories.tsx",
+  "line": 61,
+  "component": "Badge",
+  "constName": "MaxCount",
+  "displayName": "Max 上限"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.anatomy.stories.tsx",
+  "line": 91,
+  "component": "CircularProgress",
+  "constName": "UsageInButton",
+  "displayName": "在 Button 載入中 狀態內"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.principles.stories.tsx",
+  "line": 155,
+  "component": "CircularProgress",
+  "constName": "IndeterminateVsDeterminateRule",
+  "displayName": "不確定 vs 確定進度"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.principles.stories.tsx",
+  "line": 229,
+  "component": "CircularProgress",
+  "constName": "SizeMatchContextRule",
+  "displayName": "Size 對應使用情境"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.stories.tsx",
+  "line": 111,
+  "component": "CircularProgress",
+  "constName": "InlineCellLoading",
+  "displayName": "Cell 局部載入"
+ },
+ {
+  "file": "tokens/density/density.stories.tsx",
+  "line": 141,
+  "component": "?",
+  "constName": "UISize",
+  "displayName": "UI 尺寸"
+ }
+]
