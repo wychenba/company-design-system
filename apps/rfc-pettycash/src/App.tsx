@@ -341,17 +341,63 @@ function AddInvoiceModal({
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [s1, setS1] = useState<Step1State>(defaultStep1)
   const [s2, setS2] = useState<Step2State>(defaultStep2)
+  const [autoFilled, setAutoFilled] = useState(false)
+  const [rateUpdateTime, setRateUpdateTime] = useState('')
 
   const today = new Date()
   const mm = String(today.getMonth() + 1).padStart(2, '0')
   const dd = String(today.getDate()).padStart(2, '0')
-  const invoiceSeq = String(Math.floor(Math.random() * 900) + 100)
   const invoiceNumber = `PAGE${today.getFullYear()}${mm}${dd}001-1`
+
+  const EXCHANGE_RATES: Record<string, number> = { TWD: 1, USD: 32.5, EUR: 35.2, JPY: 0.225 }
+  const isEInvoice = s1.voucherType === 'e-invoice-25'
+  // Taiwan e-invoice: 2 uppercase letters + 8 digits
+  const isValidInvoiceNo = /^[A-Z]{2}\d{8}$/.test(s1.invoiceNo.replace(/-/g, '').toUpperCase())
+
+  const taxAfterNum = s1.subtotal !== '' && s1.tax !== ''
+    ? Number(s1.subtotal) + Number(s1.tax)
+    : null
+  const taxAfterDisplay = taxAfterNum !== null ? taxAfterNum.toLocaleString() : '-'
+
+  const rate = EXCHANGE_RATES[s1.currency] ?? 1
+  const localTaxAfterDisplay = taxAfterNum !== null
+    ? (s1.currency === 'TWD' ? taxAfterNum.toLocaleString() : Math.round(taxAfterNum * rate).toLocaleString())
+    : '-'
+  const rateDisplay = s1.currency === 'TWD' ? '-' : rate.toFixed(4)
+
+  function handleVoucherTypeChange(v: string) {
+    setAutoFilled(false)
+    setRateUpdateTime('')
+    setS1(p => ({ ...p, voucherType: v, invoiceNo: '', currency: 'TWD', subtotal: '', tax: '' }))
+  }
+
+  function handleInvoiceNoChange(value: string) {
+    const normalized = value.replace(/-/g, '').toUpperCase()
+    setS1(p => ({ ...p, invoiceNo: value }))
+    if (isEInvoice && /^[A-Z]{2}\d{8}$/.test(normalized)) {
+      // Simulate e-invoice lookup: deterministic mock from last 4 digits
+      const seed = parseInt(normalized.slice(-4), 10)
+      const mockSubtotal = String(Math.round((seed % 9 + 1) * 1000))
+      const mockTax = String(Math.round(Number(mockSubtotal) * 0.05))
+      setS1(p => ({ ...p, invoiceNo: value, currency: 'TWD', subtotal: mockSubtotal, tax: mockTax }))
+      setAutoFilled(true)
+      const now = new Date()
+      setRateUpdateTime(`${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`)
+    } else if (!isEInvoice || !/^[A-Z]{2}\d{8}$/.test(normalized)) {
+      if (autoFilled) {
+        setAutoFilled(false)
+        setRateUpdateTime('')
+        setS1(p => ({ ...p, invoiceNo: value, currency: 'TWD', subtotal: '', tax: '' }))
+      }
+    }
+  }
 
   function reset() {
     setStep(1)
     setS1(defaultStep1())
     setS2(defaultStep2())
+    setAutoFilled(false)
+    setRateUpdateTime('')
   }
 
   function handleClose() {
@@ -377,10 +423,6 @@ function AddInvoiceModal({
   const subCategoryOptions = s2.category
     ? (CATEGORIES[s2.category] ?? []).map(s => ({ value: s, label: s }))
     : []
-
-  const taxAfter = s1.subtotal && s1.tax
-    ? (Number(s1.subtotal) + Number(s1.tax)).toLocaleString()
-    : '-'
 
   const computedTax = s2.total && s2.taxRate && s2.taxRate !== 'exempt'
     ? String(Math.round(Number(s2.total) * Number(s2.taxRate) / 100))
@@ -418,7 +460,7 @@ function AddInvoiceModal({
 
               <Field>
                 <FieldLabel required>憑證類型</FieldLabel>
-                <Select placeholder="請選擇" options={VOUCHER_TYPES} value={s1.voucherType} onChange={v => setS1(p => ({ ...p, voucherType: v as string }))} />
+                <Select placeholder="請選擇" options={VOUCHER_TYPES} value={s1.voucherType} onChange={v => handleVoucherTypeChange(v as string)} />
               </Field>
 
               <div className="grid grid-cols-2 gap-4">
@@ -427,22 +469,26 @@ function AddInvoiceModal({
                   <Input type="date" value={s1.date} onChange={e => setS1(p => ({ ...p, date: e.target.value }))} placeholder="填寫日期" />
                 </Field>
                 <Field>
-                  <FieldLabel>發票號碼</FieldLabel>
-                  <Input value={s1.invoiceNo} onChange={e => setS1(p => ({ ...p, invoiceNo: e.target.value }))} placeholder="填寫發票號碼" />
+                  <FieldLabel required={isEInvoice}>發票號碼</FieldLabel>
+                  <Input
+                    value={s1.invoiceNo}
+                    onChange={e => handleInvoiceNoChange(e.target.value)}
+                    placeholder={isEInvoice ? '例：AB12345678' : '填寫發票號碼'}
+                  />
                 </Field>
               </div>
 
-              <Field>
+              <Field disabled={autoFilled}>
                 <FieldLabel required>幣別</FieldLabel>
                 <Select options={CURRENCY_OPTIONS} value={s1.currency} onChange={v => setS1(p => ({ ...p, currency: v as string }))} />
               </Field>
 
               <div className="grid grid-cols-2 gap-4">
-                <Field>
+                <Field disabled={autoFilled}>
                   <FieldLabel required>合計金額（未稅）</FieldLabel>
                   <Input type="number" value={s1.subtotal} onChange={e => setS1(p => ({ ...p, subtotal: e.target.value }))} />
                 </Field>
-                <Field>
+                <Field disabled={autoFilled}>
                   <FieldLabel>稅額&nbsp;<InfoTooltip content="稅額依憑證類型計算" /></FieldLabel>
                   <Input type="number" value={s1.tax} onChange={e => setS1(p => ({ ...p, tax: e.target.value }))} />
                 </Field>
@@ -451,20 +497,20 @@ function AddInvoiceModal({
               <div className="grid grid-cols-2 gap-4 p-3 rounded-lg bg-surface-raised border border-divider text-sm">
                 <div className="flex items-baseline gap-2">
                   <span className="text-fg-tertiary whitespace-nowrap">稅後金額</span>
-                  <span className="font-medium">{taxAfter}</span>
+                  <span className="font-medium">{taxAfterDisplay}</span>
                 </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-fg-tertiary">匯率</span>
-                  <span className="font-medium">-</span>
+                  <span className="font-medium">{rateDisplay}</span>
                 </div>
                 <div className="flex items-center gap-1 text-fg-tertiary">
                   <span>當地稅後金額</span>
                   <InfoTooltip content="以當前匯率換算後的當地金額" />
-                  <span className="text-fg-primary font-medium ml-1">-</span>
+                  <span className="text-fg-primary font-medium ml-1">{localTaxAfterDisplay}</span>
                 </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-fg-tertiary">更新時間</span>
-                  <span className="font-medium">-</span>
+                  <span className="font-medium">{rateUpdateTime || '-'}</span>
                 </div>
               </div>
 
@@ -718,6 +764,8 @@ function CreateFormPage({
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false)
   const [attachmentModalOpen, setAttachmentModalOpen] = useState(false)
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   const today = new Date()
   const mm = String(today.getMonth() + 1).padStart(2, '0')
@@ -961,9 +1009,9 @@ function CreateFormPage({
       {/* Footer */}
       <div className="flex items-center justify-end mt-6 pt-4 border-t border-divider max-w-[860px]">
         <div className="flex gap-2">
-          <Button variant="primary" danger onClick={onBack}>取消申請</Button>
-          <Button variant="tertiary">存成草稿</Button>
-          <Button onClick={handleSubmit}>下一步</Button>
+          <Button variant="primary" danger onClick={() => setCancelConfirmOpen(true)}>取消申請</Button>
+          <Button variant="tertiary" onClick={() => { onBack(); toast({ variant: 'success', title: '儲存成功' }) }}>存成草稿</Button>
+          <Button onClick={() => setPreviewOpen(true)}>下一步</Button>
         </div>
       </div>
 
@@ -979,6 +1027,173 @@ function CreateFormPage({
         onClose={() => setAttachmentModalOpen(false)}
         onSubmit={handleAddAttachment}
       />
+
+      {/* 取消申請確認 */}
+      <Dialog open={cancelConfirmOpen} onOpenChange={o => !o && setCancelConfirmOpen(false)}>
+        <DialogContent className="max-w-[480px] w-full">
+          <DialogHeader>
+            <DialogTitle>是否取消申請</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <p className="text-sm text-fg-secondary">
+              您尚未儲存目前填寫的內容。若取消申請，已填寫的資料將無法保留，是否仍要取消？
+            </p>
+          </DialogBody>
+          <DialogFooter>
+            <div className="flex justify-end gap-2 w-full">
+              <Button variant="tertiary" onClick={() => setCancelConfirmOpen(false)}>繼續編輯</Button>
+              <Button variant="primary" danger onClick={onBack}>取消申請</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 申請單預覽 */}
+      <Dialog open={previewOpen} onOpenChange={o => !o && setPreviewOpen(false)}>
+        <DialogContent className="max-w-[760px] w-full">
+          <DialogHeader>
+            <DialogTitle>申請單預覽</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <div className="space-y-6">
+              {/* 基本資訊 */}
+              <section>
+                <h3 className="text-sm font-semibold text-fg-secondary mb-3 pb-2 border-b border-divider">基本資訊</h3>
+                <div className="grid grid-cols-3 gap-y-3 text-sm">
+                  <div>
+                    <p className="text-fg-tertiary mb-0.5">公司代號</p>
+                    <p className="text-fg-primary">TA01</p>
+                  </div>
+                  <div>
+                    <p className="text-fg-tertiary mb-0.5">申請人</p>
+                    <p className="text-fg-primary">林間宜 (023156)</p>
+                  </div>
+                  <div>
+                    <p className="text-fg-tertiary mb-0.5">收款對象</p>
+                    <p className="text-fg-primary">{payee}</p>
+                  </div>
+                  <div>
+                    <p className="text-fg-tertiary mb-0.5">申請單號</p>
+                    <p className="text-fg-primary">{formNumber}</p>
+                  </div>
+                  <div>
+                    <p className="text-fg-tertiary mb-0.5">緊急/指定付款日</p>
+                    <p className="text-fg-primary">{useUrgentDate && urgentDate ? urgentDate : '-'}</p>
+                  </div>
+                </div>
+              </section>
+
+              {/* 請款資訊 */}
+              <section>
+                <h3 className="text-sm font-semibold text-fg-secondary mb-3 pb-2 border-b border-divider">請款資訊</h3>
+                {invoices.length === 0 ? (
+                  <p className="text-sm text-fg-tertiary">無請款資訊</p>
+                ) : (
+                  <div className="rounded-lg border border-divider overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-surface-raised border-b border-divider">
+                        <tr>
+                          <th className="text-left px-4 py-2 font-medium text-fg-secondary">請款單號</th>
+                          <th className="text-left px-4 py-2 font-medium text-fg-secondary">收款人</th>
+                          <th className="text-left px-4 py-2 font-medium text-fg-secondary">日期</th>
+                          <th className="text-right px-4 py-2 font-medium text-fg-secondary">金額</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-divider">
+                        {invoices.map(inv => (
+                          <tr key={inv.id}>
+                            <td className="px-4 py-2 text-fg-primary">{inv.number}</td>
+                            <td className="px-4 py-2 text-fg-secondary">{inv.payee}</td>
+                            <td className="px-4 py-2 text-fg-secondary">{inv.date}</td>
+                            <td className="px-4 py-2 text-fg-secondary text-right">{inv.currency} {Number(inv.subtotal).toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
+
+              {/* 憑證附件資訊 */}
+              <section>
+                <h3 className="text-sm font-semibold text-fg-secondary mb-3 pb-2 border-b border-divider">憑證附件資訊</h3>
+                {attachments.length === 0 ? (
+                  <p className="text-sm text-fg-tertiary">無附件資訊</p>
+                ) : (
+                  <div className="rounded-lg border border-divider overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-surface-raised border-b border-divider">
+                        <tr>
+                          <th className="text-left px-4 py-2 font-medium text-fg-secondary">類型</th>
+                          <th className="text-left px-4 py-2 font-medium text-fg-secondary">描述</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-divider">
+                        {attachments.map(att => (
+                          <tr key={att.id}>
+                            <td className="px-4 py-2 text-fg-secondary">{att.type === 'invoice' ? '電腦發票' : '證明文件'}</td>
+                            <td className="px-4 py-2 text-fg-secondary">{att.desc || '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
+
+              {/* 審核流程 */}
+              <section>
+                <h3 className="text-sm font-semibold text-fg-secondary mb-3 pb-2 border-b border-divider">審核流程</h3>
+                <div className="rounded-lg border border-divider overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-surface-raised border-b border-divider">
+                      <tr>
+                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">角色</th>
+                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">審核人</th>
+                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">狀態</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-divider">
+                      <tr>
+                        <td className="px-4 py-2 text-fg-secondary">申請人</td>
+                        <td className="px-4 py-2 text-fg-primary">林間宜 (023156)</td>
+                        <td className="px-4 py-2"><Tag color="blue" size="sm">已申請</Tag></td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-2 text-fg-secondary">主管</td>
+                        <td className="px-4 py-2 text-fg-secondary">-</td>
+                        <td className="px-4 py-2"><Tag color="neutral" size="sm">待審核</Tag></td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-2 text-fg-secondary">會計</td>
+                        <td className="px-4 py-2 text-fg-secondary">財務部</td>
+                        <td className="px-4 py-2"><Tag color="neutral" size="sm">待審核</Tag></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              {/* 簽核補充說明 */}
+              <section>
+                <h3 className="text-sm font-semibold text-fg-secondary mb-3 pb-2 border-b border-divider">簽核補充說明</h3>
+                <Textarea
+                  value={reason}
+                  onChange={e => setReason(e.target.value)}
+                  rows={3}
+                  placeholder="可填寫補充說明（選填）"
+                />
+              </section>
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <div className="flex items-center justify-between w-full">
+              <Button variant="ghost" onClick={() => setPreviewOpen(false)}>上一步</Button>
+              <Button onClick={() => { setPreviewOpen(false); onSubmit(formNumber) }}>送出</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -1115,7 +1330,7 @@ export default function App() {
     }
     setEntries(prev => [newEntry, ...prev])
     setPage('list')
-    toast({ variant: 'success', title: `${newNumber} 存成草稿` })
+    toast({ variant: 'success', title: `${newNumber}送出成功` })
   }
 
   return (
