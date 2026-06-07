@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   AppShell, SidebarProvider, Sidebar, SidebarContent, SidebarFooter,
   SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarHeader,
@@ -21,7 +21,7 @@ import {
 import {
   Home, FileText, Upload, ClipboardList, Users, BookOpen,
   MessageSquare, Plus, Pencil, Trash2, Download,
-  Info, ChevronDown, Copy, Paperclip,
+  Info, ChevronDown, Copy, Paperclip, Loader2,
 } from 'lucide-react'
 
 // ─── Constants ───────────────────────────────────────────────
@@ -1158,7 +1158,276 @@ function PreviewDialog({
   )
 }
 
-// ─── CreateFormPage ───────────────────────────────────────────
+// ─── BatchImportModal ────────────────────────────────────────
+
+function BatchImportModal({
+  open,
+  onClose,
+}: {
+  open: boolean
+  onClose: () => void
+}) {
+  const [fileName, setFileName] = useState<string | null>(null)
+  const [phase, setPhase] = useState<'idle' | 'loading'>('idle')
+
+  function handleClose() {
+    setFileName(null)
+    setPhase('idle')
+    onClose()
+  }
+
+  useEffect(() => {
+    if (phase !== 'loading') return
+    const timer = setTimeout(() => {
+      handleClose()
+      toast({ variant: 'success', title: '匯入成功' })
+    }, 2000)
+    return () => clearTimeout(timer)
+  }, [phase])
+
+  return (
+    <Dialog open={open} onOpenChange={o => !o && handleClose()}>
+      <DialogContent className="max-w-[600px] w-full">
+        <DialogHeader>
+          <DialogTitle>批次匯入 Excel 付款細項</DialogTitle>
+        </DialogHeader>
+        <DialogBody>
+          {phase === 'loading' ? (
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+              <Loader2 size={40} className="text-[var(--color-blue-6)] animate-spin" />
+              <p className="text-base font-semibold text-fg-primary">檔案匯入中</p>
+              <p className="text-sm text-fg-secondary">檔案正在匯入中，請稍候。</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-fg-secondary">
+                請先下載{' '}
+                <span className="text-[var(--color-blue-6)] underline cursor-pointer">Excel 付款細項範本</span>
+                ，填寫完成後到此匯入檔案。
+              </p>
+              {/* Upload zone */}
+              <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-[var(--color-neutral-4)] rounded-lg py-10 cursor-pointer hover:border-[var(--color-blue-5)] transition-colors bg-surface-raised">
+                <Upload size={32} className="text-fg-tertiary" />
+                <div className="text-center">
+                  <p className="text-base font-semibold text-fg-primary">點擊或拖曳到此上傳檔案</p>
+                  <p className="text-sm text-fg-tertiary mt-0.5">Excel 檔案筆數不得超過 5000 筆。</p>
+                </div>
+                <input
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                  className="sr-only"
+                  onChange={e => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      setFileName(file.name)
+                      setPhase('loading')
+                    }
+                    e.target.value = ''
+                  }}
+                />
+              </label>
+              {/* Selected file */}
+              {fileName && (
+                <div className="flex items-center gap-2 px-3 py-2 border-b-2 border-[var(--color-blue-6)]">
+                  <Paperclip size={14} className="text-fg-tertiary shrink-0" />
+                  <span className="text-sm text-[var(--color-blue-6)] flex-1 truncate underline">{fileName}</span>
+                  <button
+                    onClick={() => setFileName(null)}
+                    className="p-1 rounded text-fg-tertiary hover:text-error-default transition-colors"
+                    aria-label="移除"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogBody>
+        {phase === 'loading' && (
+          <DialogFooter>
+            <div className="flex justify-end gap-2 w-full">
+              <Button variant="outline" onClick={handleClose}>取消</Button>
+              <Button disabled>新增</Button>
+            </div>
+          </DialogFooter>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ─── AddItemModal ─────────────────────────────────────────────
+
+function AddItemModal({
+  open,
+  onClose,
+  invoiceNumber,
+  invoiceNo,
+  seqNum,
+}: {
+  open: boolean
+  onClose: () => void
+  invoiceNumber: string
+  invoiceNo: string
+  seqNum: number
+}) {
+  const [category, setCategory] = useState('')
+  const [subCategory, setSubCategory] = useState('')
+  const [costCenter, setCostCenter] = useState('')
+  const [accountCode, setAccountCode] = useState('')
+  const [description, setDescription] = useState('')
+  const [total, setTotal] = useState('')
+  const [taxRate, setTaxRate] = useState('')
+  const [taxAmount, setTaxAmount] = useState('')
+  const [contractProvided, setContractProvided] = useState<'yes' | 'no' | 'not-required'>('not-required')
+
+  const subCategoryOptions = category
+    ? (CATEGORIES[category] ?? []).map(s => ({ value: s, label: s }))
+    : []
+
+  function handleClose() {
+    setCategory('')
+    setSubCategory('')
+    setCostCenter('')
+    setAccountCode('')
+    setDescription('')
+    setTotal('')
+    setTaxRate('')
+    setTaxAmount('')
+    setContractProvided('not-required')
+    onClose()
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={o => !o && handleClose()}>
+      <DialogContent className="max-w-[600px] w-full">
+        <DialogHeader>
+          <DialogTitle>新增付款細項</DialogTitle>
+        </DialogHeader>
+        <DialogBody>
+          <div className="space-y-4">
+            {/* Info bar */}
+            <div className="grid grid-cols-3 gap-4 bg-surface-raised border border-divider rounded-lg px-4 py-3 text-sm">
+              <div>
+                <p className="text-fg-tertiary text-xs mb-0.5">請款單號</p>
+                <p className="text-fg-primary font-medium">{invoiceNumber}</p>
+              </div>
+              <div>
+                <p className="text-fg-tertiary text-xs mb-0.5">發票號碼</p>
+                <p className="text-fg-primary font-medium">{invoiceNo || '-'}</p>
+              </div>
+              <div>
+                <p className="text-fg-tertiary text-xs mb-0.5">序號</p>
+                <p className="text-fg-primary font-medium">{seqNum}</p>
+              </div>
+            </div>
+            {/* 注意事項 */}
+            <Alert
+              variant="info"
+              title="注意事項"
+              description={
+                <>
+                  自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
+                  <span className="text-[var(--color-blue-6)] underline cursor-pointer">專區</span>
+                  請款。
+                </>
+              }
+            />
+            {/* 分類 / 子分類 */}
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel required>分類</FieldLabel>
+                <Select
+                  placeholder="請選擇"
+                  options={CATEGORY_OPTIONS}
+                  value={category}
+                  onChange={v => { setCategory(v as string); setSubCategory(''); setAccountCode('') }}
+                />
+              </Field>
+              <Field>
+                <FieldLabel required>子分類</FieldLabel>
+                <Select
+                  placeholder="請選擇"
+                  options={subCategoryOptions}
+                  value={subCategory}
+                  disabled={!category}
+                  onChange={v => {
+                    setSubCategory(v as string)
+                    setAccountCode(ACCT_MAPPING[category]?.[v as string] ?? '')
+                  }}
+                />
+              </Field>
+            </div>
+            {/* 成本中心 / 會計科目 */}
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel required>
+                  成本中心 <InfoTooltip content="請填寫您的成本中心編號" />
+                </FieldLabel>
+                <Input value={costCenter} onChange={e => setCostCenter(e.target.value)} placeholder="填寫成本中心" />
+              </Field>
+              <Field disabled={!!(category && subCategory && ACCT_MAPPING[category]?.[subCategory])}>
+                <FieldLabel>
+                  會計科目 <InfoTooltip content="依子分類自動帶入" />
+                </FieldLabel>
+                <Input value={accountCode} onChange={e => setAccountCode(e.target.value)} placeholder="填寫會計科目" />
+              </Field>
+            </div>
+            {/* 描述 */}
+            <Field>
+              <FieldLabel>描述</FieldLabel>
+              <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="填寫描述" />
+            </Field>
+            {/* 總額 / 稅率 / 稅額 */}
+            <div className="grid grid-cols-3 gap-4">
+              <Field>
+                <FieldLabel required>總額</FieldLabel>
+                <Input type="number" value={total} onChange={e => setTotal(e.target.value)} placeholder="填寫總額" />
+              </Field>
+              <Field>
+                <FieldLabel>
+                  稅率 <InfoTooltip content="依憑證類型選擇稅率" />
+                </FieldLabel>
+                <Select placeholder="請選擇" options={TAX_RATES} value={taxRate} onChange={v => setTaxRate(v as string)} />
+              </Field>
+              <Field>
+                <FieldLabel>稅額</FieldLabel>
+                <Input type="number" value={taxAmount} onChange={e => setTaxAmount(e.target.value)} placeholder="" />
+              </Field>
+            </div>
+            {/* 合約編號 */}
+            <div>
+              <p className="text-sm text-fg-secondary mb-2">是否提供合約編號</p>
+              <RadioGroup
+                value={contractProvided}
+                onValueChange={v => setContractProvided(v as 'yes' | 'no' | 'not-required')}
+                className="flex items-center gap-4"
+              >
+                <label className="flex items-center gap-1.5 cursor-pointer text-sm">
+                  <RadioGroupItem value="yes" />是
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-sm">
+                  <RadioGroupItem value="no" />否
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-sm">
+                  <RadioGroupItem value="not-required" />無需提供
+                </label>
+              </RadioGroup>
+            </div>
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <div className="flex justify-end gap-2 w-full">
+            <Button variant="outline" onClick={handleClose}>取消</Button>
+            <Button onClick={handleClose}>新增</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ─── CreateFormPage ─────────────────────────────────────────────
 
 function CreateFormPage({
   onBack,
@@ -1177,6 +1446,8 @@ function CreateFormPage({
   const [attachmentModalOpen, setAttachmentModalOpen] = useState(false)
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [batchImportInvoiceId, setBatchImportInvoiceId] = useState<string | null>(null)
+  const [addItemInvoiceId, setAddItemInvoiceId] = useState<string | null>(null)
   const [expandedInvoiceIds, setExpandedInvoiceIds] = useState<Set<string>>(new Set())
 
   function toggleInvoiceExpand(id: string) {
@@ -1364,8 +1635,8 @@ function CreateFormPage({
                               付款細項：3 項
                             </div>
                             <div className="flex items-center gap-2">
-                              <Button variant="tertiary" size="sm" startIcon={Download} disabled>批次匯入</Button>
-                              <Button variant="tertiary" size="sm" startIcon={Plus} disabled>新增細項</Button>
+                              <Button variant="tertiary" size="sm" startIcon={Download} onClick={() => setBatchImportInvoiceId(inv.id)}>批次匯入</Button>
+                              <Button variant="tertiary" size="sm" startIcon={Plus} onClick={() => setAddItemInvoiceId(inv.id)}>新增細項</Button>
                             </div>
                           </div>
                           <div className="rounded-lg border border-divider overflow-hidden">
@@ -1554,6 +1825,22 @@ function CreateFormPage({
       />
 
       {/* 取消申請確認 */}
+      <BatchImportModal
+        open={batchImportInvoiceId !== null}
+        onClose={() => setBatchImportInvoiceId(null)}
+      />
+      {(() => {
+        const inv = invoices.find(i => i.id === addItemInvoiceId)
+        return (
+          <AddItemModal
+            open={addItemInvoiceId !== null}
+            onClose={() => setAddItemInvoiceId(null)}
+            invoiceNumber={inv?.number ?? ''}
+            invoiceNo={inv?.invoiceNo ?? ''}
+            seqNum={4}
+          />
+        )
+      })()}
       <Dialog open={cancelConfirmOpen} onOpenChange={o => !o && setCancelConfirmOpen(false)}>
         <DialogContent className="max-w-[480px] w-full">
           <DialogHeader>
