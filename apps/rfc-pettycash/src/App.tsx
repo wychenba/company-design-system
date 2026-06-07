@@ -1445,6 +1445,7 @@ function AddItemModal({
   const [taxRate, setTaxRate] = useState('')
   const [taxAmount, setTaxAmount] = useState('')
   const [contractProvided, setContractProvided] = useState<'yes' | 'no' | 'not-required'>('not-required')
+  const [submitted, setSubmitted] = useState(false)
 
   const subCategoryOptions = category
     ? (CATEGORIES[category] ?? []).map(s => ({ value: s, label: s }))
@@ -1460,7 +1461,14 @@ function AddItemModal({
     setTaxRate('')
     setTaxAmount('')
     setContractProvided('not-required')
+    setSubmitted(false)
     onClose()
+  }
+
+  function handleSubmit() {
+    setSubmitted(true)
+    if (!category || !subCategory || !costCenter || !total) return
+    handleClose()
   }
 
   return (
@@ -1500,7 +1508,7 @@ function AddItemModal({
             />
             {/* 分類 / 子分類 */}
             <div className="grid grid-cols-2 gap-4">
-              <Field>
+              <Field invalid={submitted && !category}>
                 <FieldLabel required>分類</FieldLabel>
                 <Select
                   placeholder="請選擇"
@@ -1508,8 +1516,9 @@ function AddItemModal({
                   value={category}
                   onChange={v => { setCategory(v as string); setSubCategory(''); setAccountCode('') }}
                 />
+                {submitted && !category && <FieldError>請選擇分類</FieldError>}
               </Field>
-              <Field>
+              <Field invalid={submitted && !!category && !subCategory}>
                 <FieldLabel required>子分類</FieldLabel>
                 <Select
                   placeholder="請選擇"
@@ -1521,15 +1530,17 @@ function AddItemModal({
                     setAccountCode(ACCT_MAPPING[category]?.[v as string] ?? '')
                   }}
                 />
+                {submitted && !!category && !subCategory && <FieldError>請選擇子分類</FieldError>}
               </Field>
             </div>
             {/* 成本中心 / 會計科目 */}
             <div className="grid grid-cols-2 gap-4">
-              <Field>
+              <Field invalid={submitted && !costCenter}>
                 <FieldLabel required>
                   成本中心 <InfoTooltip content="請填寫您的成本中心編號" />
                 </FieldLabel>
                 <Input value={costCenter} onChange={e => setCostCenter(e.target.value)} placeholder="填寫成本中心" />
+                {submitted && !costCenter && <FieldError>請填寫成本中心</FieldError>}
               </Field>
               <Field disabled={!!(category && subCategory && ACCT_MAPPING[category]?.[subCategory])}>
                 <FieldLabel>
@@ -1545,9 +1556,10 @@ function AddItemModal({
             </Field>
             {/* 總額 / 稅率 / 稅額 */}
             <div className="grid grid-cols-3 gap-4">
-              <Field>
+              <Field invalid={submitted && !total}>
                 <FieldLabel required>總額</FieldLabel>
                 <Input type="number" value={total} onChange={e => setTotal(e.target.value)} placeholder="填寫總額" />
+                {submitted && !total && <FieldError>請填寫總額</FieldError>}
               </Field>
               <Field>
                 <FieldLabel>
@@ -1584,7 +1596,7 @@ function AddItemModal({
         <DialogFooter>
           <div className="flex justify-end gap-2 w-full">
             <Button variant="outline" onClick={handleClose}>取消</Button>
-            <Button onClick={handleClose}>新增</Button>
+            <Button onClick={handleSubmit}>新增</Button>
           </div>
         </DialogFooter>
       </DialogContent>
@@ -1817,14 +1829,18 @@ function AddItemBModal({
   const [taxRate, setTaxRate] = useState('')
   const [contractProvided, setContractProvided] = useState<'yes' | 'no' | 'not-required'>('not-required')
   const subCategoryOptions = category ? (CATEGORIES[category] ?? []).map(s => ({ value: s, label: s })) : []
+  const [submitted, setSubmitted] = useState(false)
 
   function handleClose() {
     setCategory(''); setSubCategory(''); setCostCenter(''); setAccountCode('')
     setDescription(''); setTotal(''); setTaxRate(''); setContractProvided('not-required')
+    setSubmitted(false)
     onClose()
   }
 
   function handleSave() {
+    setSubmitted(true)
+    if (!category || !subCategory || !costCenter || !total) return
     onSubmit({ id: String(Date.now()), seq: seqNum, category, subCategory, costCenter, accountCode, description })
     handleClose()
     toast({ variant: 'success', title: '新增成功' })
@@ -1843,19 +1859,22 @@ function AddItemBModal({
             </div>
             <Alert variant="info" title="注意事項" description={<>自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往<span className="text-[var(--color-blue-6)] underline cursor-pointer">專區</span>請款。</>} />
             <div className="grid grid-cols-2 gap-4">
-              <Field>
+              <Field invalid={submitted && !category}>
                 <FieldLabel required>分類</FieldLabel>
                 <Select placeholder="請選擇" options={CATEGORY_OPTIONS} value={category} onChange={v => { setCategory(v as string); setSubCategory(''); setAccountCode('') }} />
+                {submitted && !category && <FieldError>請選擇分類</FieldError>}
               </Field>
-              <Field>
+              <Field invalid={submitted && !!category && !subCategory}>
                 <FieldLabel required>子分類</FieldLabel>
                 <Select placeholder="請選擇" options={subCategoryOptions} value={subCategory} disabled={!category} onChange={v => { setSubCategory(v as string); setAccountCode(ACCT_MAPPING[category]?.[v as string] ?? '') }} />
+                {submitted && !!category && !subCategory && <FieldError>請選擇子分類</FieldError>}
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <Field>
+              <Field invalid={submitted && !costCenter}>
                 <FieldLabel required>成本中心 <InfoTooltip content="請填寫您的成本中心編號" /></FieldLabel>
                 <Input value={costCenter} onChange={e => setCostCenter(e.target.value)} placeholder="填寫成本中心" />
+                {submitted && !costCenter && <FieldError>請填寫成本中心</FieldError>}
               </Field>
               <Field disabled={!!(category && subCategory && ACCT_MAPPING[category]?.[subCategory])}>
                 <FieldLabel>會計科目 <InfoTooltip content="依子分類自動帶入" /></FieldLabel>
@@ -1864,7 +1883,7 @@ function AddItemBModal({
             </div>
             <Field><FieldLabel>描述</FieldLabel><Input value={description} onChange={e => setDescription(e.target.value)} placeholder="填寫描述" /></Field>
             <div className="grid grid-cols-3 gap-4">
-              <Field><FieldLabel required>總額</FieldLabel><Input type="number" value={total} onChange={e => setTotal(e.target.value)} placeholder="填寫總額" /></Field>
+              <Field invalid={submitted && !total}><FieldLabel required>總額</FieldLabel><Input type="number" value={total} onChange={e => setTotal(e.target.value)} placeholder="填寫總額" />{submitted && !total && <FieldError>請填寫總額</FieldError>}</Field>
               <Field>
                 <FieldLabel>稅率 <InfoTooltip content="依憑證類型選擇稅率" /></FieldLabel>
                 <Select placeholder="請選擇" options={TAX_RATES} value={taxRate} onChange={v => setTaxRate(v as string)} />
