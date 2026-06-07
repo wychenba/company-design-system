@@ -1429,19 +1429,21 @@ function AddItemModal({
   invoiceNumber,
   invoiceNo,
   seqNum,
+  initialTotal = '',
 }: {
   open: boolean
   onClose: () => void
   invoiceNumber: string
   invoiceNo: string
   seqNum: number
+  initialTotal?: string
 }) {
   const [category, setCategory] = useState('')
   const [subCategory, setSubCategory] = useState('')
   const [costCenter, setCostCenter] = useState('')
   const [accountCode, setAccountCode] = useState('')
   const [description, setDescription] = useState('')
-  const [total, setTotal] = useState('')
+  const [total, setTotal] = useState(initialTotal)
   const [taxRate, setTaxRate] = useState('')
   const [taxAmount, setTaxAmount] = useState('')
   const [contractProvided, setContractProvided] = useState<'yes' | 'no' | 'not-required'>('not-required')
@@ -1457,7 +1459,7 @@ function AddItemModal({
     setCostCenter('')
     setAccountCode('')
     setDescription('')
-    setTotal('')
+    setTotal(initialTotal)
     setTaxRate('')
     setTaxAmount('')
     setContractProvided('not-required')
@@ -2662,6 +2664,7 @@ function CreateFormPage({
             invoiceNumber={inv?.number ?? ''}
             invoiceNo={inv?.invoiceNo ?? ''}
             seqNum={4}
+            initialTotal={inv?.subtotal ?? ''}
           />
         )
       })()}
