@@ -936,11 +936,11 @@ function PreviewCard({
   return (
     <div className="bg-surface border border-[var(--color-neutral-4)] rounded-lg overflow-hidden">
       <button
-        className="w-full flex items-center justify-between px-4 py-4 hover:bg-surface-raised transition-colors"
+        className="w-full flex items-center justify-between px-4 min-h-[52px] hover:bg-surface-raised transition-colors"
         onClick={() => setOpen(o => !o)}
       >
-        <span className="text-base font-semibold text-fg-primary">{title}</span>
-        <span className="flex items-center gap-1 text-sm text-fg-secondary font-medium">
+        <span className="text-xl font-semibold text-fg-primary">{title}</span>
+        <span className="flex items-center gap-1 text-base text-fg-primary font-medium">
           {open ? '收合資訊' : '更多資訊'}
           <ChevronDown size={16} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
         </span>
@@ -1130,8 +1130,9 @@ function PreviewDialog({
               </div>
             </PreviewCard>
 
-            <PreviewCard title="簽核補充說明" defaultOpen>
-              <div className="space-y-2 pt-1">
+            <div className="bg-surface border border-[var(--color-neutral-4)] rounded-lg p-4 space-y-4">
+              <h3 className="text-xl font-semibold text-fg-primary">簽核補充說明</h3>
+              <div className="space-y-2">
                 <p className="text-sm text-fg-secondary">您可以填寫簽核補充說明，協助下一階段簽核人員快速完成審核</p>
                 <Textarea
                   value={reason}
@@ -1140,7 +1141,7 @@ function PreviewDialog({
                   placeholder="請填寫補充說明"
                 />
               </div>
-            </PreviewCard>
+            </div>
 
           </div>
         </DialogBody>
