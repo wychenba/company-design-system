@@ -1427,7 +1427,190 @@ function AddItemModal({
   )
 }
 
+// ─── EditItemModal ────────────────────────────────────────────
+
+function EditItemModal({
+  open,
+  onClose,
+  invoiceNumber,
+  invoiceNo,
+  seqNum,
+}: {
+  open: boolean
+  onClose: () => void
+  invoiceNumber: string
+  invoiceNo: string
+  seqNum: number
+}) {
+  const MOCK_CATEGORY = '小型工具/物品、電腦/手機週邊、辦公家具'
+  const MOCK_SUB = '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)'
+  const [category, setCategory] = useState(MOCK_CATEGORY)
+  const [subCategory, setSubCategory] = useState(MOCK_SUB)
+  const [costCenter, setCostCenter] = useState('00690')
+  const [accountCode, setAccountCode] = useState('613000')
+  const [description, setDescription] = useState('')
+  const [total, setTotal] = useState('100')
+  const [taxRate, setTaxRate] = useState('0')
+  const [taxAmount, setTaxAmount] = useState('0')
+  const [contractProvided, setContractProvided] = useState<'yes' | 'no' | 'not-required'>('not-required')
+
+  const subCategoryOptions = category
+    ? (CATEGORIES[category] ?? []).map(s => ({ value: s, label: s }))
+    : []
+
+  function handleClose() { onClose() }
+
+  return (
+    <Dialog open={open} onOpenChange={o => !o && handleClose()}>
+      <DialogContent className="max-w-[600px] w-full">
+        <DialogHeader>
+          <DialogTitle>編輯付款細項</DialogTitle>
+        </DialogHeader>
+        <DialogBody>
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4 bg-surface-raised border border-divider rounded-lg px-4 py-3 text-sm">
+              <div>
+                <p className="text-fg-tertiary text-xs mb-0.5">請款單號</p>
+                <p className="text-fg-primary font-medium">{invoiceNumber}</p>
+              </div>
+              <div>
+                <p className="text-fg-tertiary text-xs mb-0.5">發票號碼</p>
+                <p className="text-fg-primary font-medium">{invoiceNo || '-'}</p>
+              </div>
+              <div>
+                <p className="text-fg-tertiary text-xs mb-0.5">序號</p>
+                <p className="text-fg-primary font-medium">{seqNum}</p>
+              </div>
+            </div>
+            <Alert
+              variant="info"
+              title="注意事項"
+              description={
+                <>
+                  自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
+                  <span className="text-[var(--color-blue-6)] underline cursor-pointer">專區</span>
+                  請款。
+                </>
+              }
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel required>分類</FieldLabel>
+                <Select
+                  placeholder="請選擇"
+                  options={CATEGORY_OPTIONS}
+                  value={category}
+                  onChange={v => { setCategory(v as string); setSubCategory(''); setAccountCode('') }}
+                />
+              </Field>
+              <Field>
+                <FieldLabel required>子分類</FieldLabel>
+                <Select
+                  placeholder="請選擇"
+                  options={subCategoryOptions}
+                  value={subCategory}
+                  disabled={!category}
+                  onChange={v => {
+                    setSubCategory(v as string)
+                    setAccountCode(ACCT_MAPPING[category]?.[v as string] ?? '')
+                  }}
+                />
+              </Field>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel required>
+                  成本中心 <InfoTooltip content="請填寫您的成本中心編號" />
+                </FieldLabel>
+                <Input value={costCenter} onChange={e => setCostCenter(e.target.value)} />
+              </Field>
+              <Field disabled={!!(category && subCategory && ACCT_MAPPING[category]?.[subCategory])}>
+                <FieldLabel>
+                  會計科目 <InfoTooltip content="依子分類自動帶入" />
+                </FieldLabel>
+                <Input value={accountCode} onChange={e => setAccountCode(e.target.value)} />
+              </Field>
+            </div>
+            <Field>
+              <FieldLabel>描述</FieldLabel>
+              <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="填寫描述" />
+            </Field>
+            <div className="grid grid-cols-3 gap-4">
+              <Field>
+                <FieldLabel required>總額</FieldLabel>
+                <Input type="number" value={total} onChange={e => setTotal(e.target.value)} />
+              </Field>
+              <Field>
+                <FieldLabel>
+                  稅率 <InfoTooltip content="依憑證類型選擇稅率" />
+                </FieldLabel>
+                <Select placeholder="請選擇" options={TAX_RATES} value={taxRate} onChange={v => setTaxRate(v as string)} />
+              </Field>
+              <Field>
+                <FieldLabel>稅額</FieldLabel>
+                <Input type="number" value={taxAmount} onChange={e => setTaxAmount(e.target.value)} />
+              </Field>
+            </div>
+            <div>
+              <p className="text-sm text-fg-secondary mb-2">是否提供合約編號</p>
+              <RadioGroup
+                value={contractProvided}
+                onValueChange={v => setContractProvided(v as 'yes' | 'no' | 'not-required')}
+                className="flex items-center gap-4"
+              >
+                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="yes" />是</label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="no" />否</label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="not-required" />無需提供</label>
+              </RadioGroup>
+            </div>
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <div className="flex justify-end gap-2 w-full">
+            <Button variant="outline" onClick={handleClose}>取消</Button>
+            <Button onClick={handleClose}>更新</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ─── DeleteItemModal ──────────────────────────────────────────
+
+function DeleteItemModal({
+  open,
+  onClose,
+  onConfirm,
+}: {
+  open: boolean
+  onClose: () => void
+  onConfirm: () => void
+}) {
+  return (
+    <Dialog open={open} onOpenChange={o => !o && onClose()}>
+      <DialogContent className="max-w-[480px] w-full">
+        <DialogHeader>
+          <DialogTitle>是否刪除付款細項</DialogTitle>
+        </DialogHeader>
+        <DialogBody>
+          <p className="text-sm text-fg-secondary">
+            刪除後此筆付款細項資料將無法保留，是否仍要刪除？
+          </p>
+        </DialogBody>
+        <DialogFooter>
+          <div className="flex justify-end gap-2 w-full">
+            <Button variant="outline" onClick={onClose}>取消</Button>
+            <Button variant="primary" danger onClick={onConfirm}>刪除細項</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ─── CreateFormPage ─────────────────────────────────────────────
+
 
 function CreateFormPage({
   onBack,
@@ -1448,6 +1631,8 @@ function CreateFormPage({
   const [previewOpen, setPreviewOpen] = useState(false)
   const [batchImportInvoiceId, setBatchImportInvoiceId] = useState<string | null>(null)
   const [addItemInvoiceId, setAddItemInvoiceId] = useState<string | null>(null)
+  const [editItemTarget, setEditItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
+  const [deleteItemTarget, setDeleteItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
   const [expandedInvoiceIds, setExpandedInvoiceIds] = useState<Set<string>>(new Set())
 
   function toggleInvoiceExpand(id: string) {
@@ -1663,10 +1848,10 @@ function CreateFormPage({
                                     <td className="px-3 py-2 text-fg-tertiary">-</td>
                                     <td className="px-3 py-2">
                                       <div className="flex items-center gap-0.5">
-                                        <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
+                                        <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditItemTarget({ invoiceId: inv.id, seq })}>
                                           <Pencil size={13} />
                                         </button>
-                                        <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除">
+                                        <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq })}>
                                           <Trash2 size={13} />
                                         </button>
                                       </div>
@@ -1841,6 +2026,26 @@ function CreateFormPage({
           />
         )
       })()}
+      {(() => {
+        const inv2 = invoices.find(i => i.id === editItemTarget?.invoiceId)
+        return (
+          <EditItemModal
+            open={editItemTarget !== null}
+            onClose={() => setEditItemTarget(null)}
+            invoiceNumber={inv2?.number ?? ''}
+            invoiceNo={inv2?.invoiceNo ?? ''}
+            seqNum={editItemTarget?.seq ?? 1}
+          />
+        )
+      })()}
+      <DeleteItemModal
+        open={deleteItemTarget !== null}
+        onClose={() => setDeleteItemTarget(null)}
+        onConfirm={() => {
+          setDeleteItemTarget(null)
+          toast({ variant: 'success', title: '付款細項已刪除' })
+        }}
+      />
       <Dialog open={cancelConfirmOpen} onOpenChange={o => !o && setCancelConfirmOpen(false)}>
         <DialogContent className="max-w-[480px] w-full">
           <DialogHeader>
