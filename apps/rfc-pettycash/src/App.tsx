@@ -206,6 +206,7 @@ interface Invoice {
   currency: string
   subtotal: string
   tax: string
+  voucherType: string
 }
 
 interface Attachment {
@@ -480,6 +481,7 @@ function AddInvoiceModal({
       currency: s1.currency,
       subtotal: s1.subtotal || '0',
       tax: s1.tax || '0',
+      voucherType: s1.voucherType,
     })
     reset()
     onClose()
@@ -1175,6 +1177,16 @@ function CreateFormPage({
   const [attachmentModalOpen, setAttachmentModalOpen] = useState(false)
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [expandedInvoiceIds, setExpandedInvoiceIds] = useState<Set<string>>(new Set())
+
+  function toggleInvoiceExpand(id: string) {
+    setExpandedInvoiceIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
   const today = new Date()
   const mm = String(today.getMonth() + 1).padStart(2, '0')
@@ -1278,37 +1290,127 @@ function CreateFormPage({
             </div>
           ) : (
             <div className="mt-4 space-y-2">
-              {invoices.map(invoice => (
-                <div key={invoice.id} className="border border-divider rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-medium text-fg-primary shrink-0">{invoice.number}</span>
-                      <Tag color="neutral" size="sm">Draft</Tag>
-                      <span className="text-fg-secondary shrink-0">
-                        {invoice.currency} {Number(invoice.subtotal).toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-0.5 shrink-0 ml-2">
-                      <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
-                        <Pencil size={14} />
-                      </button>
-                      <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="複製">
-                        <Copy size={14} />
-                      </button>
+              {invoices.map(inv => {
+                const isExpanded = expandedInvoiceIds.has(inv.id)
+                const VOUCHER_LABEL: Record<string, string> = {
+                  'e-invoice-25': '電子統一發票 (25)',
+                  'paper-invoice': '紙本統一發票',
+                }
+                const voucherLabel = VOUCHER_LABEL[inv.voucherType] ?? inv.voucherType
+                return (
+                  <div key={inv.id} className="border border-divider rounded-lg overflow-hidden">
+                    {/* Header row */}
+                    <div className="flex items-center gap-2 px-4 py-3">
                       <button
-                        className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors"
-                        aria-label="刪除"
-                        onClick={() => handleRemoveInvoice(invoice.id)}
+                        onClick={() => toggleInvoiceExpand(inv.id)}
+                        className="p-0.5 rounded text-fg-tertiary hover:text-fg-secondary transition-colors shrink-0"
+                        aria-label={isExpanded ? '收合' : '展開'}
                       >
-                        <Trash2 size={14} />
+                        <ChevronDown size={16} className={`transition-transform ${isExpanded ? '' : '-rotate-90'}`} />
                       </button>
+                      <span className="font-medium text-fg-primary shrink-0">{inv.number}</span>
+                      <Tag color="neutral" size="sm">Draft</Tag>
+                      <div className="flex-1" />
+                      <span className="text-fg-secondary text-sm shrink-0">
+                        {inv.currency} {Number(inv.subtotal).toLocaleString()}
+                      </span>
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
+                          <Pencil size={14} />
+                        </button>
+                        <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="複製">
+                          <Copy size={14} />
+                        </button>
+                        <button
+                          className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors"
+                          aria-label="刪除"
+                          onClick={() => handleRemoveInvoice(inv.id)}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
+                    {/* Subtitle - always visible */}
+                    <p className="text-sm text-fg-tertiary px-4 pb-3">
+                      收款人：{inv.payee}&nbsp;|&nbsp;日期：{inv.date}
+                    </p>
+                    {/* Expanded content */}
+                    {isExpanded && (
+                      <div className="border-t border-divider">
+                        {/* Invoice detail row */}
+                        <div className="grid grid-cols-4 gap-4 px-4 py-4 bg-surface-raised">
+                          <div>
+                            <p className="text-xs text-fg-tertiary mb-1">憑證類型</p>
+                            <p className="text-sm text-fg-primary">{voucherLabel}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-fg-tertiary mb-1">發票號碼</p>
+                            <p className="text-sm text-fg-primary">{inv.invoiceNo || '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-fg-tertiary mb-1">合計金額（未稅）</p>
+                            <p className="text-sm text-fg-primary">{inv.currency} {Number(inv.subtotal).toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-fg-tertiary mb-1">稅額</p>
+                            <p className="text-sm text-fg-primary">{inv.tax || '0'}</p>
+                          </div>
+                        </div>
+                        {/* 付款細項 */}
+                        <div className="px-4 py-3">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-1.5 text-sm font-medium text-fg-primary">
+                              <ClipboardList size={16} className="text-fg-secondary" />
+                              付款細項：3 項
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button variant="tertiary" size="sm" startIcon={Download} disabled>批次匯入</Button>
+                              <Button variant="tertiary" size="sm" startIcon={Plus} disabled>新增細項</Button>
+                            </div>
+                          </div>
+                          <div className="rounded-lg border border-divider overflow-hidden">
+                            <table className="w-full text-sm">
+                              <thead className="bg-surface-raised border-b border-divider">
+                                <tr>
+                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary w-10">序號</th>
+                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary">分類</th>
+                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary">子分類</th>
+                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">成本中心</th>
+                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">會計科目</th>
+                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary">描述</th>
+                                  <th className="px-3 py-2 w-16"></th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-divider">
+                                {[1, 2, 3].map(seq => (
+                                  <tr key={seq} className="hover:bg-surface-raised transition-colors">
+                                    <td className="px-3 py-2 text-fg-secondary">{seq}</td>
+                                    <td className="px-3 py-2 text-fg-secondary">小型工具/物品、電腦/手機週邊、辦公家具</td>
+                                    <td className="px-3 py-2 text-fg-secondary">電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)</td>
+                                    <td className="px-3 py-2 text-fg-secondary">00690</td>
+                                    <td className="px-3 py-2 text-fg-secondary">613000</td>
+                                    <td className="px-3 py-2 text-fg-tertiary">-</td>
+                                    <td className="px-3 py-2">
+                                      <div className="flex items-center gap-0.5">
+                                        <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
+                                          <Pencil size={13} />
+                                        </button>
+                                        <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除">
+                                          <Trash2 size={13} />
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-sm text-fg-tertiary mt-1">
-                    收款人：{invoice.payee}&nbsp;|&nbsp;日期：{invoice.date}
-                  </p>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </section>
@@ -1434,7 +1536,7 @@ function CreateFormPage({
         <div className="flex gap-2">
           <Button variant="primary" danger onClick={() => setCancelConfirmOpen(true)}>取消申請</Button>
           <Button variant="tertiary" onClick={() => { onBack(); toast({ variant: 'success', title: '儲存成功' }) }}>存成草稿</Button>
-          <Button onClick={() => setPreviewOpen(true)}>下一步</Button>
+          <Button onClick={() => setPreviewOpen(true)}>送出預覽</Button>
         </div>
       </div>
 
