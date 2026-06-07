@@ -758,12 +758,11 @@ function AddInvoiceModal({
 
                 {s2.contractProvided === 'no' && (
                   <Field>
-                    <FieldLabel required>無合約原因</FieldLabel>
-                    <Textarea
-                      placeholder="請填寫無合約原因"
+                    <FieldLabel required>填寫無合約原因</FieldLabel>
+                    <Input
+                      placeholder="填寫無合約原因"
                       value={s2.noContractReason}
                       onChange={e => setS2(p => ({ ...p, noContractReason: e.target.value }))}
-                      rows={3}
                     />
                   </Field>
                 )}
