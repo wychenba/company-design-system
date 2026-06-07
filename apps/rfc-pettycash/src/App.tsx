@@ -1871,8 +1871,8 @@ function CreateFormPage({
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel required>
+              <Field mode="readonly">
+                <FieldLabel>
                   申請人 <InfoTooltip content="自動帶入登入者" />
                 </FieldLabel>
                 <Input value="林間宜 (023156)" readOnly />
