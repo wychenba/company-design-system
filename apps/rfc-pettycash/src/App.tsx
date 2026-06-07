@@ -988,9 +988,12 @@ function CreateFormPage({
               />
             </Field>
             <div className="grid grid-cols-2 gap-4">
-              <DescriptionList direction="vertical">
-                <DescriptionItem label="申請人">林間宜 (023156)</DescriptionItem>
-              </DescriptionList>
+              <Field>
+                <FieldLabel required>
+                  申請人 <InfoTooltip content="自動帶入登入者" />
+                </FieldLabel>
+                <Input value="林間宜 (023156)" readOnly />
+              </Field>
               <Field>
                 <FieldLabel required>
                   收款對象&nbsp;<InfoTooltip content="請選擇本次請款的收款對象" />
