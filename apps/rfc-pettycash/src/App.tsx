@@ -966,6 +966,88 @@ function AddAttachmentModal({
   )
 }
 
+
+// ─── EditAttachmentModal ──────────────────────────────────────
+
+function EditAttachmentModal({
+  open,
+  onClose,
+  attachment,
+  onUpdate,
+}: {
+  open: boolean
+  onClose: () => void
+  attachment: Attachment | null
+  onUpdate: (updated: Omit<Attachment, 'id'>) => void
+}) {
+  const [attType, setAttType] = useState<'invoice' | 'auxiliary'>(attachment?.type ?? 'invoice')
+  const [desc, setDesc] = useState(attachment?.desc ?? '')
+  const [attFiles, setAttFiles] = useState<FileUploadStatus[]>(
+    (attachment?.files ?? []).map(f => ({ id: f.id, name: f.name, size: 0, status: 'completed' as const }))
+  )
+
+  function handleClose() { onClose() }
+
+  function handleSave() {
+    onUpdate({ type: attType, desc, files: attFiles.map(f => ({ id: f.id, name: f.name })) })
+    handleClose()
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={o => !o && handleClose()}>
+      <DialogContent maxWidth={480} autoHeight>
+        <DialogHeader>
+          <DialogTitle>編輯附件</DialogTitle>
+        </DialogHeader>
+        <DialogBody>
+          <div className="space-y-4">
+            <Field>
+              <FieldLabel required>附件類型</FieldLabel>
+              <RadioGroup value={attType} onValueChange={v => setAttType(v as 'invoice' | 'auxiliary')}>
+                <div className="flex items-center gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="invoice" />發票</label>
+                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="auxiliary" />輔助文件</label>
+                </div>
+              </RadioGroup>
+            </Field>
+            <Field>
+              <FieldLabel>附件說明</FieldLabel>
+              <Input placeholder="填寫附件說明" value={desc} onChange={e => setDesc(e.target.value)} />
+            </Field>
+            <FileUpload
+              multiple
+              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+              title="編輯附件"
+              description="支援圖片、PDF、Word、Excel 等格式，單檔最大 20 MB"
+              maxSize={20_000_000}
+              files={attFiles}
+              fileListMode="compact"
+              onRemove={id => setAttFiles(prev => prev.filter(f => f.id !== id))}
+              onUpload={accepted =>
+                setAttFiles(prev => [
+                  ...prev,
+                  ...accepted.map((f, i) => ({
+                    id: `att-${Date.now()}-${i}`,
+                    name: f.name,
+                    size: f.size,
+                    status: 'completed' as const,
+                  })),
+                ])
+              }
+            />
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <div className="flex justify-end gap-2 w-full">
+            <Button variant="outline" onClick={handleClose}>取消</Button>
+            <Button onClick={handleSave}>儲存</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ─── PreviewDialog ───────────────────────────────────────────
 
 function PreviewCard({
@@ -1683,6 +1765,8 @@ function CreateFormPage({
   const [attachments, setAttachments] = useState<Attachment[]>(isEdit ? MOCK_EDIT_ATTACHMENTS : [])
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false)
   const [attachmentModalOpen, setAttachmentModalOpen] = useState(false)
+  const [editAttachmentTarget, setEditAttachmentTarget] = useState<Attachment | null>(null)
+  const [deleteAttachmentTarget, setDeleteAttachmentTarget] = useState<string | null>(null)
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [batchImportInvoiceId, setBatchImportInvoiceId] = useState<string | null>(null)
@@ -1733,6 +1817,10 @@ function CreateFormPage({
 
   function handleRemoveAttachment(id: string) {
     setAttachments(prev => prev.filter(a => a.id !== id))
+  }
+
+  function handleUpdateAttachment(id: string, updated: Omit<Attachment, 'id'>) {
+    setAttachments(prev => prev.map(a => a.id === id ? { ...updated, id } : a))
   }
 
   function handleSubmit() {
@@ -1984,13 +2072,13 @@ function CreateFormPage({
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-0.5">
-                          <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
+                          <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditAttachmentTarget(att)}>
                             <Pencil size={14} />
                           </button>
                           <button
                             className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors"
                             aria-label="刪除"
-                            onClick={() => handleRemoveAttachment(att.id)}
+                            onClick={() => setDeleteAttachmentTarget(att.id)}
                           >
                             <Trash2 size={14} />
                           </button>
@@ -2087,6 +2175,40 @@ function CreateFormPage({
         onClose={() => setAttachmentModalOpen(false)}
         onSubmit={handleAddAttachment}
       />
+      <EditAttachmentModal
+        key={editAttachmentTarget?.id ?? 'none'}
+        open={editAttachmentTarget !== null}
+        onClose={() => setEditAttachmentTarget(null)}
+        attachment={editAttachmentTarget}
+        onUpdate={(updated) => {
+          handleUpdateAttachment(editAttachmentTarget!.id, updated)
+          setEditAttachmentTarget(null)
+          toast({ variant: 'success', title: '附件更新成功' })
+        }}
+      />
+      {/* 刪除附件確認 */}
+      <Dialog open={deleteAttachmentTarget !== null} onOpenChange={o => !o && setDeleteAttachmentTarget(null)}>
+        <DialogContent maxWidth={480} autoHeight>
+          <DialogHeader>
+            <DialogTitle>是否刪除附件</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <p className="text-sm text-fg-secondary">
+              刪除後此筆附件資料將無法保留，是否仍要刪除？
+            </p>
+          </DialogBody>
+          <DialogFooter>
+            <div className="flex justify-end gap-2 w-full">
+              <Button variant="outline" onClick={() => setDeleteAttachmentTarget(null)}>取消</Button>
+              <Button variant="primary" danger onClick={() => {
+                if (deleteAttachmentTarget) handleRemoveAttachment(deleteAttachmentTarget)
+                setDeleteAttachmentTarget(null)
+                toast({ variant: 'success', title: '附件已刪除' })
+              }}>刪除附件</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* 取消申請確認 */}
       <BatchImportModal
