@@ -1889,7 +1889,7 @@ function CreateFormPage({
             <div className="grid grid-cols-2 gap-4">
               <Field mode="readonly">
                 <FieldLabel>
-                  公司代號&nbsp;<InfoTooltip content="請選擇您所屬的公司代號" />
+                  公司代號&nbsp;<InfoTooltip content="Company Code" />
                 </FieldLabel>
                 <Select
                   value="TA01"
