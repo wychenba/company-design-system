@@ -997,16 +997,18 @@ function CreateFormPage({
         <section className="bg-surface border border-divider rounded-lg p-6">
           <h2 className="text-base font-semibold mb-4">付款資訊</h2>
           <div className="space-y-4">
-            <Field disabled>
-              <FieldLabel>
-                公司代號&nbsp;<InfoTooltip content="請選擇您所屬的公司代號" />
-              </FieldLabel>
-              <Select
-                value="TA01"
-                options={[{ value: 'TA01', label: 'TA01' }]}
-                onChange={() => {}}
-              />
-            </Field>
+            <div className="grid grid-cols-2 gap-4">
+              <Field disabled>
+                <FieldLabel>
+                  公司代號&nbsp;<InfoTooltip content="請選擇您所屬的公司代號" />
+                </FieldLabel>
+                <Select
+                  value="TA01"
+                  options={[{ value: 'TA01', label: 'TA01' }]}
+                  onChange={() => {}}
+                />
+              </Field>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <Field>
                 <FieldLabel required>
