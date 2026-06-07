@@ -527,7 +527,7 @@ function AddInvoiceModal({
 
   return (
     <Dialog open={open} onOpenChange={o => !o && handleClose()}>
-      <DialogContent className="max-w-[754px] w-full">
+      <DialogContent maxWidth={754}>
         <DialogHeader>
           <DialogTitle>{MODAL_TITLES[step]}</DialogTitle>
         </DialogHeader>
@@ -913,7 +913,7 @@ function AddAttachmentModal({
 
   return (
     <Dialog open={open} onOpenChange={o => !o && handleClose()}>
-      <DialogContent className="max-w-[480px] w-full">
+      <DialogContent maxWidth={480} autoHeight>
         <DialogHeader>
           <DialogTitle>新增附件</DialogTitle>
         </DialogHeader>
@@ -1027,7 +1027,7 @@ function PreviewDialog({
 
   return (
     <Dialog open={open} onOpenChange={o => !o && onClose()}>
-      <DialogContent className="max-w-[760px] w-full">
+      <DialogContent maxWidth={760}>
         <DialogHeader>
           <DialogTitle>申請單預覽</DialogTitle>
         </DialogHeader>
@@ -1230,7 +1230,7 @@ function BatchImportModal({
 
   return (
     <Dialog open={open} onOpenChange={o => !o && handleClose()}>
-      <DialogContent className="max-w-[600px] w-full">
+      <DialogContent maxWidth={600} autoHeight>
         <DialogHeader>
           <DialogTitle>批次匯入 Excel 付款細項</DialogTitle>
         </DialogHeader>
@@ -1343,7 +1343,7 @@ function AddItemModal({
 
   return (
     <Dialog open={open} onOpenChange={o => !o && handleClose()}>
-      <DialogContent className="max-w-[600px] w-full">
+      <DialogContent maxWidth={600} autoHeight>
         <DialogHeader>
           <DialogTitle>新增付款細項</DialogTitle>
         </DialogHeader>
@@ -1505,7 +1505,7 @@ function EditItemModal({
 
   return (
     <Dialog open={open} onOpenChange={o => !o && handleClose()}>
-      <DialogContent className="max-w-[600px] w-full">
+      <DialogContent maxWidth={600} autoHeight>
         <DialogHeader>
           <DialogTitle>編輯付款細項</DialogTitle>
         </DialogHeader>
@@ -1632,7 +1632,7 @@ function DeleteItemModal({
 }) {
   return (
     <Dialog open={open} onOpenChange={o => !o && onClose()}>
-      <DialogContent className="max-w-[480px] w-full">
+      <DialogContent maxWidth={480} autoHeight>
         <DialogHeader>
           <DialogTitle>是否刪除付款細項</DialogTitle>
         </DialogHeader>
@@ -2151,7 +2151,7 @@ function CreateFormPage({
         const invDel = invoices.find(i => i.id === deleteInvoiceTarget)
         return (
           <Dialog open={deleteInvoiceTarget !== null} onOpenChange={o => !o && setDeleteInvoiceTarget(null)}>
-            <DialogContent className="max-w-[480px] w-full">
+            <DialogContent maxWidth={480} autoHeight>
               <DialogHeader>
                 <DialogTitle>是否刪除 {invDel?.number ?? ''}</DialogTitle>
               </DialogHeader>
@@ -2175,7 +2175,7 @@ function CreateFormPage({
         )
       })()}
       <Dialog open={cancelConfirmOpen} onOpenChange={o => !o && setCancelConfirmOpen(false)}>
-        <DialogContent className="max-w-[480px] w-full">
+        <DialogContent maxWidth={480} autoHeight>
           <DialogHeader>
             <DialogTitle>是否取消申請</DialogTitle>
           </DialogHeader>
@@ -2318,7 +2318,7 @@ function DraftListPage({
       </Tabs>
       {/* 刪除確認 */}
       <Dialog open={deleteTargetId !== null} onOpenChange={o => !o && setDeleteTargetId(null)}>
-        <DialogContent className="max-w-[480px] w-full">
+        <DialogContent maxWidth={480} autoHeight>
           <DialogHeader>
             <DialogTitle>是否刪除申請單</DialogTitle>
           </DialogHeader>
