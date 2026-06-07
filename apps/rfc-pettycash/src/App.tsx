@@ -1665,7 +1665,11 @@ export default function App() {
               onAddSingle={() => setPage('createform')}
               onAddExcel={() => toast({ variant: 'info', title: 'Excel 申請', description: '請下載範本填寫後上傳' })}
               onEdit={() => setPage('createform')}
-              onDelete={id => setEntries(prev => prev.filter(e => e.id !== id))}
+              onDelete={id => {
+                const entry = entries.find(e => e.id === id)
+                setEntries(prev => prev.filter(e => e.id !== id))
+                if (entry) toast({ variant: 'success', title: `${entry.number}申請單已刪除` })
+              }}
             />
           ) : (
             <CreateFormPage
