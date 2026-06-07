@@ -847,10 +847,12 @@ function AddAttachmentModal({
 }) {
   const [attType, setAttType] = useState<'invoice' | 'auxiliary'>('invoice')
   const [desc, setDesc] = useState('')
+  const [attFiles, setAttFiles] = useState<FileUploadStatus[]>([])
 
   function handleClose() {
     setAttType('invoice')
     setDesc('')
+    setAttFiles([])
     onClose()
   }
 
@@ -880,15 +882,27 @@ function AddAttachmentModal({
               <FieldLabel>附件說明</FieldLabel>
               <Input placeholder="填寫附件說明" value={desc} onChange={e => setDesc(e.target.value)} />
             </Field>
-            <div className="border-2 border-dashed border-divider rounded-lg p-10 flex flex-col items-center gap-3 cursor-pointer hover:border-[var(--color-neutral-6)] hover:bg-surface-raised transition-colors">
-              <div className="size-10 rounded-lg bg-surface-raised flex items-center justify-center text-fg-tertiary">
-                <Upload size={24} />
-              </div>
-              <div className="text-center">
-                <p className="font-semibold text-fg-primary">點擊或拖曳到此上傳檔案</p>
-                <p className="text-sm text-fg-tertiary mt-0.5">每個檔案大小不得超過 20 MB</p>
-              </div>
-            </div>
+            <FileUpload
+              multiple
+              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+              title="新增附件"
+              description="支援圖片、PDF、Word、Excel 等格式，單檔最大 20 MB"
+              maxSize={20_000_000}
+              files={attFiles}
+              fileListMode="compact"
+              onRemove={id => setAttFiles(prev => prev.filter(f => f.id !== id))}
+              onUpload={accepted =>
+                setAttFiles(prev => [
+                  ...prev,
+                  ...accepted.map((f, i) => ({
+                    id: `att-${Date.now()}-${i}`,
+                    name: f.name,
+                    size: f.size,
+                    status: 'completed' as const,
+                  })),
+                ])
+              }
+            />
           </div>
         </DialogBody>
         <DialogFooter>
