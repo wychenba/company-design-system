@@ -502,7 +502,7 @@ function AddInvoiceModal({
             value={String(step)}
             completedValues={Array.from({ length: step - 1 }, (_, i) => String(i + 1))}
             linear
-            className="mb-[var(--layout-space-distant)]"
+            className="mb-[var(--layout-space-loose)]"
           >
             {STEP_LABELS.map((label, idx) => (
               <StepItem key={idx + 1} value={String(idx + 1)}>
