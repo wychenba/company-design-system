@@ -921,6 +921,240 @@ function AddAttachmentModal({
   )
 }
 
+// ─── PreviewDialog ───────────────────────────────────────────
+
+function PreviewCard({
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  title: string
+  defaultOpen?: boolean
+  children: React.ReactNode
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <div className="bg-surface border border-[var(--color-neutral-4)] rounded-lg overflow-hidden">
+      <button
+        className="w-full flex items-center justify-between px-4 py-4 hover:bg-surface-raised transition-colors"
+        onClick={() => setOpen(o => !o)}
+      >
+        <span className="text-base font-semibold text-fg-primary">{title}</span>
+        <span className="flex items-center gap-1 text-sm text-fg-secondary font-medium">
+          {open ? '收合資訊' : '更多資訊'}
+          <ChevronDown size={16} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+        </span>
+      </button>
+      {open && <div className="px-4 pb-4">{children}</div>}
+    </div>
+  )
+}
+
+function PreviewDialog({
+  open,
+  onClose,
+  onSubmit,
+  formNumber,
+  payee,
+  invoices,
+  attachments,
+  useUrgentDate,
+  urgentDate,
+  reason,
+  onReasonChange,
+}: {
+  open: boolean
+  onClose: () => void
+  onSubmit: () => void
+  formNumber: string
+  payee: string
+  invoices: Invoice[]
+  attachments: Attachment[]
+  useUrgentDate: boolean
+  urgentDate: string
+  reason: string
+  onReasonChange: (v: string) => void
+}) {
+  const ATT_TYPE_LABEL: Record<Attachment['type'], string> = {
+    invoice: '電腦發票',
+    auxiliary: '證明文件',
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={o => !o && onClose()}>
+      <DialogContent className="max-w-[760px] w-full">
+        <DialogHeader>
+          <DialogTitle>申請單預覽</DialogTitle>
+        </DialogHeader>
+        <DialogBody className="bg-surface-raised">
+          <div className="space-y-3 p-1">
+
+            <PreviewCard title="基本資訊">
+              <div className="grid grid-cols-3 gap-y-3 text-sm pt-1">
+                <div>
+                  <p className="text-fg-tertiary mb-0.5">公司代號</p>
+                  <p className="text-fg-primary">TA01</p>
+                </div>
+                <div>
+                  <p className="text-fg-tertiary mb-0.5">申請人</p>
+                  <p className="text-fg-primary">林間宜 (023156)</p>
+                </div>
+                <div>
+                  <p className="text-fg-tertiary mb-0.5">收款對象</p>
+                  <p className="text-fg-primary">{payee}</p>
+                </div>
+                <div>
+                  <p className="text-fg-tertiary mb-0.5">申請單號</p>
+                  <p className="text-fg-primary">{formNumber}</p>
+                </div>
+                <div>
+                  <p className="text-fg-tertiary mb-0.5">緊急/指定付款日</p>
+                  <p className="text-fg-primary">{useUrgentDate && urgentDate ? urgentDate : '-'}</p>
+                </div>
+              </div>
+            </PreviewCard>
+
+            <PreviewCard title="請款資訊">
+              {invoices.length === 0 ? (
+                <p className="text-sm text-fg-tertiary pt-1">無請款資訊</p>
+              ) : (
+                <div className="rounded-lg border border-divider overflow-hidden mt-1">
+                  <table className="w-full text-sm">
+                    <thead className="bg-surface-raised border-b border-divider">
+                      <tr>
+                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">請款單號</th>
+                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">收款人</th>
+                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">日期</th>
+                        <th className="text-right px-4 py-2 font-medium text-fg-secondary">金額</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-divider">
+                      {invoices.map(inv => (
+                        <tr key={inv.id}>
+                          <td className="px-4 py-2 text-fg-primary">{inv.number}</td>
+                          <td className="px-4 py-2 text-fg-secondary">{inv.payee}</td>
+                          <td className="px-4 py-2 text-fg-secondary">{inv.date}</td>
+                          <td className="px-4 py-2 text-fg-secondary text-right">{inv.currency} {Number(inv.subtotal).toLocaleString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </PreviewCard>
+
+            <PreviewCard title="憑證附件資訊">
+              {attachments.length === 0 ? (
+                <p className="text-sm text-fg-tertiary pt-1">無附件資訊</p>
+              ) : (
+                <div className="rounded-lg border border-divider overflow-hidden mt-1">
+                  <table className="w-full text-sm">
+                    <thead className="bg-surface-raised border-b border-divider">
+                      <tr>
+                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">類型</th>
+                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">描述</th>
+                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">附件</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-divider">
+                      {attachments.map(att => (
+                        <tr key={att.id}>
+                          <td className="px-4 py-2 text-fg-secondary">{ATT_TYPE_LABEL[att.type]}</td>
+                          <td className="px-4 py-2 text-fg-secondary">{att.desc || '-'}</td>
+                          <td className="px-4 py-2">
+                            {att.files.length === 0 ? (
+                              <span className="text-fg-tertiary">-</span>
+                            ) : (
+                              <div className="flex flex-col gap-1">
+                                {att.files.map(f => (
+                                  <div key={f.id} className="flex items-center gap-1.5">
+                                    <Paperclip size={13} className="text-fg-tertiary shrink-0" />
+                                    <span className="text-[var(--color-blue-6)] text-sm truncate">{f.name}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </PreviewCard>
+
+            <PreviewCard title="審核流程" defaultOpen>
+              <div className="space-y-3 pt-1">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-fg-secondary">您可以依照需求新增審核人員。</p>
+                  <Button variant="outline" size="sm" startIcon={Plus}>新增審核人員</Button>
+                </div>
+                <div className="rounded-lg border border-divider overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-surface-raised border-b border-divider">
+                      <tr>
+                        <th className="text-left px-3 py-2 font-medium text-fg-secondary">流程角色</th>
+                        <th className="text-left px-3 py-2 font-medium text-fg-secondary">任務擁有者</th>
+                        <th className="text-left px-3 py-2 font-medium text-fg-secondary">指派</th>
+                        <th className="text-left px-3 py-2 font-medium text-fg-secondary">執行人員</th>
+                        <th className="text-left px-3 py-2 font-medium text-fg-secondary">動作</th>
+                        <th className="text-left px-3 py-2 font-medium text-fg-secondary">評論</th>
+                        <th className="text-left px-3 py-2 font-medium text-fg-secondary">更新日期</th>
+                        <th className="px-3 py-2"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-divider">
+                      {[
+                        { role: '申請人', owner: '林間宜 (023156)', canDelete: false },
+                        { role: '主管', owner: '109964 洪挺鈞', canDelete: true },
+                        { role: '會計', owner: '060069 黃蓉芬', canDelete: false },
+                      ].map((row, i) => (
+                        <tr key={i} className="hover:bg-surface-raised transition-colors">
+                          <td className="px-3 py-2 text-fg-secondary">{row.role}</td>
+                          <td className="px-3 py-2 text-fg-primary">{row.owner}</td>
+                          <td className="px-3 py-2 text-fg-tertiary">-</td>
+                          <td className="px-3 py-2 text-fg-tertiary">-</td>
+                          <td className="px-3 py-2 text-fg-tertiary">-</td>
+                          <td className="px-3 py-2 text-fg-tertiary">-</td>
+                          <td className="px-3 py-2 text-fg-tertiary">-</td>
+                          <td className="px-3 py-2">
+                            {row.canDelete && (
+                              <Button variant="ghost" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" />
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </PreviewCard>
+
+            <PreviewCard title="簽核補充說明" defaultOpen>
+              <div className="space-y-2 pt-1">
+                <p className="text-sm text-fg-secondary">您可以填寫簽核補充說明，協助下一階段簽核人員快速完成審核</p>
+                <Textarea
+                  value={reason}
+                  onChange={e => onReasonChange(e.target.value)}
+                  rows={3}
+                  placeholder="請填寫補充說明"
+                />
+              </div>
+            </PreviewCard>
+
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <div className="flex justify-end gap-2 w-full">
+            <Button variant="outline" onClick={onClose}>上一步</Button>
+            <Button onClick={onSubmit}>送出</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ─── CreateFormPage ───────────────────────────────────────────
 
 function CreateFormPage({
@@ -1237,151 +1471,19 @@ function CreateFormPage({
       </Dialog>
 
       {/* 申請單預覽 */}
-      <Dialog open={previewOpen} onOpenChange={o => !o && setPreviewOpen(false)}>
-        <DialogContent className="max-w-[760px] w-full">
-          <DialogHeader>
-            <DialogTitle>申請單預覽</DialogTitle>
-          </DialogHeader>
-          <DialogBody>
-            <div className="space-y-6">
-              {/* 基本資訊 */}
-              <section>
-                <h3 className="text-sm font-semibold text-fg-secondary mb-3 pb-2 border-b border-divider">基本資訊</h3>
-                <div className="grid grid-cols-3 gap-y-3 text-sm">
-                  <div>
-                    <p className="text-fg-tertiary mb-0.5">公司代號</p>
-                    <p className="text-fg-primary">TA01</p>
-                  </div>
-                  <div>
-                    <p className="text-fg-tertiary mb-0.5">申請人</p>
-                    <p className="text-fg-primary">林間宜 (023156)</p>
-                  </div>
-                  <div>
-                    <p className="text-fg-tertiary mb-0.5">收款對象</p>
-                    <p className="text-fg-primary">{payee}</p>
-                  </div>
-                  <div>
-                    <p className="text-fg-tertiary mb-0.5">申請單號</p>
-                    <p className="text-fg-primary">{formNumber}</p>
-                  </div>
-                  <div>
-                    <p className="text-fg-tertiary mb-0.5">緊急/指定付款日</p>
-                    <p className="text-fg-primary">{useUrgentDate && urgentDate ? urgentDate : '-'}</p>
-                  </div>
-                </div>
-              </section>
-
-              {/* 請款資訊 */}
-              <section>
-                <h3 className="text-sm font-semibold text-fg-secondary mb-3 pb-2 border-b border-divider">請款資訊</h3>
-                {invoices.length === 0 ? (
-                  <p className="text-sm text-fg-tertiary">無請款資訊</p>
-                ) : (
-                  <div className="rounded-lg border border-divider overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead className="bg-surface-raised border-b border-divider">
-                        <tr>
-                          <th className="text-left px-4 py-2 font-medium text-fg-secondary">請款單號</th>
-                          <th className="text-left px-4 py-2 font-medium text-fg-secondary">收款人</th>
-                          <th className="text-left px-4 py-2 font-medium text-fg-secondary">日期</th>
-                          <th className="text-right px-4 py-2 font-medium text-fg-secondary">金額</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-divider">
-                        {invoices.map(inv => (
-                          <tr key={inv.id}>
-                            <td className="px-4 py-2 text-fg-primary">{inv.number}</td>
-                            <td className="px-4 py-2 text-fg-secondary">{inv.payee}</td>
-                            <td className="px-4 py-2 text-fg-secondary">{inv.date}</td>
-                            <td className="px-4 py-2 text-fg-secondary text-right">{inv.currency} {Number(inv.subtotal).toLocaleString()}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </section>
-
-              {/* 憑證附件資訊 */}
-              <section>
-                <h3 className="text-sm font-semibold text-fg-secondary mb-3 pb-2 border-b border-divider">憑證附件資訊</h3>
-                {attachments.length === 0 ? (
-                  <p className="text-sm text-fg-tertiary">無附件資訊</p>
-                ) : (
-                  <div className="rounded-lg border border-divider overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead className="bg-surface-raised border-b border-divider">
-                        <tr>
-                          <th className="text-left px-4 py-2 font-medium text-fg-secondary">類型</th>
-                          <th className="text-left px-4 py-2 font-medium text-fg-secondary">描述</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-divider">
-                        {attachments.map(att => (
-                          <tr key={att.id}>
-                            <td className="px-4 py-2 text-fg-secondary">{att.type === 'invoice' ? '電腦發票' : '證明文件'}</td>
-                            <td className="px-4 py-2 text-fg-secondary">{att.desc || '-'}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </section>
-
-              {/* 審核流程 */}
-              <section>
-                <h3 className="text-sm font-semibold text-fg-secondary mb-3 pb-2 border-b border-divider">審核流程</h3>
-                <div className="rounded-lg border border-divider overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead className="bg-surface-raised border-b border-divider">
-                      <tr>
-                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">角色</th>
-                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">審核人</th>
-                        <th className="text-left px-4 py-2 font-medium text-fg-secondary">狀態</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-divider">
-                      <tr>
-                        <td className="px-4 py-2 text-fg-secondary">申請人</td>
-                        <td className="px-4 py-2 text-fg-primary">林間宜 (023156)</td>
-                        <td className="px-4 py-2"><Tag color="blue" size="sm">已申請</Tag></td>
-                      </tr>
-                      <tr>
-                        <td className="px-4 py-2 text-fg-secondary">主管</td>
-                        <td className="px-4 py-2 text-fg-secondary">-</td>
-                        <td className="px-4 py-2"><Tag color="neutral" size="sm">待審核</Tag></td>
-                      </tr>
-                      <tr>
-                        <td className="px-4 py-2 text-fg-secondary">會計</td>
-                        <td className="px-4 py-2 text-fg-secondary">財務部</td>
-                        <td className="px-4 py-2"><Tag color="neutral" size="sm">待審核</Tag></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-              {/* 簽核補充說明 */}
-              <section>
-                <h3 className="text-sm font-semibold text-fg-secondary mb-3 pb-2 border-b border-divider">簽核補充說明</h3>
-                <Textarea
-                  value={reason}
-                  onChange={e => setReason(e.target.value)}
-                  rows={3}
-                  placeholder="可填寫補充說明（選填）"
-                />
-              </section>
-            </div>
-          </DialogBody>
-          <DialogFooter>
-            <div className="flex items-center justify-between w-full">
-              <Button variant="ghost" onClick={() => setPreviewOpen(false)}>上一步</Button>
-              <Button onClick={() => { setPreviewOpen(false); onSubmit(formNumber) }}>送出</Button>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PreviewDialog
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        onSubmit={() => { setPreviewOpen(false); onSubmit(formNumber) }}
+        formNumber={formNumber}
+        payee={payee}
+        invoices={invoices}
+        attachments={attachments}
+        useUrgentDate={useUrgentDate}
+        urgentDate={urgentDate}
+        reason={reason}
+        onReasonChange={setReason}
+      />
     </div>
   )
 }
@@ -1392,11 +1494,17 @@ function DraftListPage({
   entries,
   onAddSingle,
   onAddExcel,
+  onEdit,
+  onDelete,
 }: {
   entries: DraftEntry[]
   onAddSingle: () => void
   onAddExcel: () => void
+  onEdit: () => void
+  onDelete: (id: string) => void
 }) {
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
+
   return (
     <div className="p-6 w-full">
       <h1 className="text-xl font-semibold mb-6">暫存申請單</h1>
@@ -1461,12 +1569,8 @@ function DraftListPage({
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-0.5">
                           <Button variant="ghost" size="sm" iconOnly startIcon={Info} aria-label="查看" disabled />
-                          <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
-                            <Pencil size={14} />
-                          </button>
-                          <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除">
-                            <Trash2 size={14} />
-                          </button>
+                          <Button variant="ghost" size="sm" iconOnly startIcon={Pencil} aria-label="編輯" onClick={() => onEdit()} />
+                          <Button variant="ghost" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={() => setDeleteTargetId(entry.id)} />
                         </div>
                       </td>
                     </tr>
@@ -1489,6 +1593,34 @@ function DraftListPage({
           </div>
         </TabsContent>
       </Tabs>
+      {/* 刪除確認 */}
+      <Dialog open={deleteTargetId !== null} onOpenChange={o => !o && setDeleteTargetId(null)}>
+        <DialogContent className="max-w-[480px] w-full">
+          <DialogHeader>
+            <DialogTitle>是否刪除申請單</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <p className="text-sm text-fg-secondary">
+              您尚未儲存目前填寫的內容。若刪除申請，已填寫的資料將無法保留，是否仍要刪除？
+            </p>
+          </DialogBody>
+          <DialogFooter>
+            <div className="flex justify-end gap-2 w-full">
+              <Button variant="outline" onClick={() => setDeleteTargetId(null)}>繼續編輯</Button>
+              <Button
+                variant="primary"
+                danger
+                onClick={() => {
+                  if (deleteTargetId) onDelete(deleteTargetId)
+                  setDeleteTargetId(null)
+                }}
+              >
+                刪除申請單
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -1531,6 +1663,8 @@ export default function App() {
               entries={entries}
               onAddSingle={() => setPage('createform')}
               onAddExcel={() => toast({ variant: 'info', title: 'Excel 申請', description: '請下載範本填寫後上傳' })}
+              onEdit={() => setPage('createform')}
+              onDelete={id => setEntries(prev => prev.filter(e => e.id !== id))}
             />
           ) : (
             <CreateFormPage
