@@ -162,19 +162,23 @@ for (const f of storyFiles) {
   }
 }
 
-const LOG_DIR = path.join(ROOT, '.claude/logs')
-if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true })
-const auditOutPath = path.join(LOG_DIR, 'story-quality-audit.json')
-// 2026-06-06 idempotent write:findings(排除 ts)無變則沿用既有 ts,避免每次掃描 churn git tree
-// (cosmetic;no consumer 讀 ts 判 staleness — 已 grep 確認)。ts 改 = 真有 story-quality 變化。
-const serializeAudit = (r) => JSON.stringify({ ...r, ts: undefined }, null, 2)
-if (fs.existsSync(auditOutPath)) {
-  try {
-    const existing = JSON.parse(fs.readFileSync(auditOutPath, 'utf8'))
-    if (serializeAudit(existing) === serializeAudit(report) && existing.ts) report.ts = existing.ts
-  } catch { /* corrupt existing → 正常重寫 */ }
+// 2026-06-07 fix:--check 模式純讀(CI gate / codex read-only env)→ 不寫 git-tracked log,完全不碰 tree。
+// 對齊 dispatch-audit-dims.mjs 的 `if (!CHECK)` write-gate(原本無條件寫,--check 也動檔)。
+if (!CHECK) {
+  const LOG_DIR = path.join(ROOT, '.claude/logs')
+  if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true })
+  const auditOutPath = path.join(LOG_DIR, 'story-quality-audit.json')
+  // 2026-06-06 idempotent write:findings(排除 ts)無變則沿用既有 ts,避免每次掃描 churn git tree
+  // (cosmetic;no consumer 讀 ts 判 staleness — 已 grep 確認)。ts 改 = 真有 story-quality 變化。
+  const serializeAudit = (r) => JSON.stringify({ ...r, ts: undefined }, null, 2)
+  if (fs.existsSync(auditOutPath)) {
+    try {
+      const existing = JSON.parse(fs.readFileSync(auditOutPath, 'utf8'))
+      if (serializeAudit(existing) === serializeAudit(report) && existing.ts) report.ts = existing.ts
+    } catch { /* corrupt existing → 正常重寫 */ }
+  }
+  fs.writeFileSync(auditOutPath, JSON.stringify(report, null, 2))
 }
-fs.writeFileSync(auditOutPath, JSON.stringify(report, null, 2))
 
 const totalViolations =
   report.violations.title_canonical.length +

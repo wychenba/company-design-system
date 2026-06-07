@@ -94,12 +94,19 @@ jobs:
           # 2026-06-07 fail-closed guard:rsync 後 published package.json 的 DS dep 必 == build 寫出的版本,
           # 否則代表 overlay 又靜默失敗 → 直接 fail,絕不再靜默推 stale package.json(C1 不可回歸)。
           BUILT_VER=$(node -p "require('$GITHUB_WORKSPACE/packages/design-system/package.json').version")
-          GOT_DEP=$(node -p "(require('/tmp/published/package.json').dependencies||{})['@qijenchen/design-system']||''")
-          if [ "$GOT_DEP" != "^$BUILT_VER" ]; then
-            echo "❌ rsync overlay 驗證失敗:published package.json DS dep = '$GOT_DEP',預期 '^$BUILT_VER'。中止,不推 stale。"
-            exit 1
-          fi
-          echo "✓ overlay 驗證通過:published package.json DS dep = $GOT_DEP"
+          # 2026-06-07 fix:fail-closed 斷言覆蓋 root + apps/template 兩個 package.json 的 DS dep
+          # (rsync size+mtime quick-check 對「任一」等長同秒檔都可能靜默 skip → 任一 stale 都 fail,不只 root)。
+          check_ds_dep() {
+            local got
+            got=$(node -p "(require('$1').dependencies||{})['@qijenchen/design-system']||''" 2>/dev/null)
+            if [ "$got" != "^$BUILT_VER" ]; then
+              echo "❌ rsync overlay 驗證失敗:$1 DS dep = '$got',預期 '^$BUILT_VER'。中止,不推 stale。"
+              exit 1
+            fi
+            echo "✓ overlay 驗證通過:$1 DS dep = $got"
+          }
+          check_ds_dep /tmp/published/package.json
+          check_ds_dep /tmp/published/apps/template/package.json
           # Regenerate package-lock.json matching the FULL published structure(scaffold + apps/template workspace).
           # Why:published Audit CI 用 setup-node cache:npm + npm ci → 需 valid committed lock 含 @product/template
           # workspace。Template source(template/ds-product-template/)無 apps/ → 只有此 mirror 結構能生正確 lock。
@@ -128,6 +135,15 @@ jobs:
             exit 0
           fi
           git commit -m "sync: scaffold mirror from DS repo ${GITHUB_SHA::8}(.github/workflows preserved)"
-          git push "$REPO_URL" main
-          echo "✅ Scaffold mirrored → ajenchen/ds-product-template main"
+          # 2026-06-07 fix:mirror 與 receiver(sync-design-system.yml)同一 release 都推 published main → 競態。
+          # fetch-rebase-retry 迴圈(非裸 push):被對方搶先也乾淨疊上去;真衝突 abort 後重試;5 次仍失敗才 fail
+          # (不再 non-fast-forward 直接掛 / 丟更新)。
+          for i in 1 2 3 4 5; do
+            if git fetch "$REPO_URL" main -q && git rebase FETCH_HEAD -q && git push "$REPO_URL" main; then
+              echo "✅ Scaffold mirrored → ajenchen/ds-product-template main"; break
+            fi
+            git rebase --abort 2>/dev/null || true
+            if [ "$i" -eq 5 ]; then echo "❌ push 競態重試 5 次仍失敗(mirror vs receiver)"; exit 1; fi
+            echo "⏳ push 競態,重試 $i…"; sleep $((i * 3))
+          done
           echo "ℹ️ .github/workflows 已保留未動(需 PAT 加 workflow scope 才同步 workflow 檔)"

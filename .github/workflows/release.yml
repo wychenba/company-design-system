@@ -106,6 +106,10 @@ jobs:
           npm run --silent typecheck:stories
           node scripts/audit-orphan-tokens.mjs --check
           node scripts/categorical-color-invariants.mjs
+          node scripts/status-color-invariant.mjs
+          node scripts/layout-space-utility-invariant.mjs
+          node scripts/category-classification-invariant.mjs
+          node scripts/gen-design-system-barrel.mjs --check
           node scripts/code-quality-audit.mjs --scope=packages/design-system/src/components --check
           node scripts/audit-content-quality.mjs --check
           node scripts/sync-governance-counters.mjs --check
