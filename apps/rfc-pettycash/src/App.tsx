@@ -790,8 +790,9 @@ function AddInvoiceModal({
           {step === 3 && (
             <FileUpload
               multiple
-              title="點擊或拖曳到此上傳檔案"
-              description="每個檔案大小不得超過 20 MB"
+              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+              title="新增附件"
+              description="支援圖片、PDF、Word、Excel 等格式，單檔最大 20 MB"
               maxSize={20_000_000}
               files={uploadFiles}
               fileListMode="compact"
