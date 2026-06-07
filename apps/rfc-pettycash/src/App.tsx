@@ -233,6 +233,7 @@ interface Step2State {
   total: string
   taxRate: string
   contractProvided: 'yes' | 'no' | 'not-required'
+  noContractReason: string
 }
 
 interface Step3State {
@@ -371,6 +372,7 @@ const defaultStep2 = (): Step2State => ({
   total: '',
   taxRate: '',
   contractProvided: 'not-required',
+  noContractReason: '',
 })
 
 // ─── AddInvoiceModal (3-step) ─────────────────────────────────
@@ -697,7 +699,7 @@ function AddInvoiceModal({
                 <div>
                   <p className="text-sm font-medium mb-2">是否提供合約編號</p>
                   <RadioGroup value={s2.contractProvided} onValueChange={v => {
-                    setS2(p => ({ ...p, contractProvided: v as Step2State['contractProvided'] }))
+                    setS2(p => ({ ...p, contractProvided: v as Step2State['contractProvided'], noContractReason: '' }))
                     if (v !== 'yes') setContractNums([''])
                   }}>
                     <div className="flex items-center gap-6">
@@ -752,6 +754,18 @@ function AddInvoiceModal({
                       新增合約編號
                     </Button>
                   </div>
+                )}
+
+                {s2.contractProvided === 'no' && (
+                  <Field>
+                    <FieldLabel required>無合約原因</FieldLabel>
+                    <Textarea
+                      placeholder="請填寫無合約原因"
+                      value={s2.noContractReason}
+                      onChange={e => setS2(p => ({ ...p, noContractReason: e.target.value }))}
+                      rows={3}
+                    />
+                  </Field>
                 )}
               </div>
             </div>
