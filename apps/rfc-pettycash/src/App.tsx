@@ -9,7 +9,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle,
   Input, Select, Textarea, Checkbox, DatePicker,
   RadioGroup, RadioGroupItem,
-  Field, FieldLabel,
+  Field, FieldLabel, FieldError,
   Tag, Alert,
   Toaster, toast,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
@@ -447,6 +447,7 @@ function AddInvoiceModal({
   const [rateUpdateTime, setRateUpdateTime] = useState('')
   const [contractNums, setContractNums] = useState<string[]>([''])
   const [uploadFiles, setUploadFiles] = useState<FileUploadStatus[]>([])
+  const [step1Submitted, setStep1Submitted] = useState(false)
 
   const today = new Date()
   const mm = String(today.getMonth() + 1).padStart(2, '0')
@@ -509,6 +510,7 @@ function AddInvoiceModal({
     setAutoFilled(false)
     setRateUpdateTime('')
     setContractNums([''])
+    setStep1Submitted(false)
   }
 
   function handleClose() {
@@ -593,15 +595,17 @@ function AddInvoiceModal({
                 />
               </Field>
 
-              <Field>
+              <Field invalid={step1Submitted && !s1.voucherType}>
                 <FieldLabel required>憑證類型&nbsp;<InfoTooltip content="Invoice Type" /></FieldLabel>
                 <Select placeholder="請選擇" options={VOUCHER_TYPES} value={s1.voucherType} onChange={v => handleVoucherTypeChange(v as string)} />
+                {step1Submitted && !s1.voucherType && <FieldError>請選擇憑證類型</FieldError>}
               </Field>
 
               <div className="grid grid-cols-2 gap-4">
-                <Field>
+                <Field invalid={step1Submitted && !s1.date}>
                   <FieldLabel required>日期&nbsp;<InfoTooltip content="Invoice Date" /></FieldLabel>
                   <Input type="date" value={s1.date} onChange={e => setS1(p => ({ ...p, date: e.target.value }))} placeholder="填寫日期" />
+                  {step1Submitted && !s1.date && <FieldError>請填寫日期</FieldError>}
                 </Field>
                 <Field>
                   <FieldLabel required={isEInvoice}>發票號碼&nbsp;<InfoTooltip content="Invoice No." /></FieldLabel>
@@ -623,9 +627,10 @@ function AddInvoiceModal({
               </Field>
 
               <div className="grid grid-cols-2 gap-4">
-                <Field disabled={autoFilled}>
+                <Field disabled={autoFilled} invalid={step1Submitted && !autoFilled && !s1.subtotal}>
                   <FieldLabel required>合計金額（未稅）</FieldLabel>
                   <Input type="number" value={s1.subtotal} onChange={e => setS1(p => ({ ...p, subtotal: e.target.value }))} />
+                  {step1Submitted && !autoFilled && !s1.subtotal && <FieldError>請填寫金額</FieldError>}
                 </Field>
                 <Field disabled={autoFilled}>
                   <FieldLabel>稅額&nbsp;<InfoTooltip content="稅額依憑證類型計算" /></FieldLabel>
@@ -896,7 +901,14 @@ function AddInvoiceModal({
                   handleClose()
                 }}>更新</Button>
               ) : step < 3 ? (
-                <Button onClick={() => setStep(s => (s + 1) as 1 | 2 | 3)}>下一步</Button>
+                <Button onClick={() => {
+                  if (step === 1) {
+                    setStep1Submitted(true)
+                    const needVendor = parentPayee === '廠商' && !s1.payee
+                    if (!s1.voucherType || !s1.date || !s1.subtotal || needVendor) return
+                  }
+                  setStep(s => (s + 1) as 1 | 2 | 3)
+                }}>下一步</Button>
               ) : (
                 <Button onClick={handleSubmit}>新增</Button>
               )}
@@ -1606,6 +1618,7 @@ function AddInvoiceBModal({
   const [usePartialAmount, setUsePartialAmount] = useState(false)
   const [autoFilled, setAutoFilled] = useState(false)
   const [rateUpdateTime, setRateUpdateTime] = useState('')
+  const [submitted, setSubmitted] = useState(false)
 
   const today = new Date()
   const mm = String(today.getMonth() + 1).padStart(2, '0')
@@ -1645,10 +1658,13 @@ function AddInvoiceBModal({
     setVendorValue(''); setVoucherType(''); setDate('')
     setInvoiceNo(''); setCurrency('TWD'); setSubtotal(''); setTax('')
     setTaxId(''); setIncomeType(''); setExemptAmount(''); setUsePartialAmount(false)
-    setAutoFilled(false); setRateUpdateTime(''); onClose()
+    setAutoFilled(false); setRateUpdateTime(''); setSubmitted(false); onClose()
   }
 
   function handleNext() {
+    setSubmitted(true)
+    const needVendor = parentPayee === '廠商' && !vendorValue
+    if (!voucherType || !date || !subtotal || needVendor) return
     const payeeName = parentPayee === '員工' ? '林間宜 (023156)' : vendorValue
     onSubmit({
       id: String(Date.now()), number: invoiceNumber, payee: payeeName,
@@ -1676,27 +1692,30 @@ function AddInvoiceBModal({
               </div>
             </div>
 
-            <Field mode="readonly">
-              <FieldLabel>收款人/廠商</FieldLabel>
+            <Field mode={parentPayee === '廠商' ? undefined : 'readonly'} invalid={submitted && parentPayee === '廠商' && !vendorValue}>
+              <FieldLabel required={parentPayee === '廠商'}>收款人/廠商</FieldLabel>
               {parentPayee === '廠商' ? (
                 <Select searchable placeholder="搜尋廠商名稱" options={VENDOR_OPTIONS} value={vendorValue} onChange={v => setVendorValue(v as string)} />
               ) : (
                 <Input value="林間宜 (023156)" readOnly />
               )}
+              {submitted && parentPayee === '廠商' && !vendorValue && <FieldError>請選擇收款廠商</FieldError>}
             </Field>
 
-            <Field>
+            <Field invalid={submitted && !voucherType}>
               <FieldLabel required>憑證類型</FieldLabel>
               <Select placeholder="請選擇" options={VOUCHER_TYPES} value={voucherType} onChange={v => {
                 setAutoFilled(false); setRateUpdateTime('')
                 setVoucherType(v as string); setInvoiceNo(''); setCurrency('TWD'); setSubtotal(''); setTax('')
               }} />
+              {submitted && !voucherType && <FieldError>請選擇憑證類型</FieldError>}
             </Field>
 
             <div className="grid grid-cols-2 gap-4">
-              <Field>
+              <Field invalid={submitted && !date}>
                 <FieldLabel required>日期</FieldLabel>
                 <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
+                {submitted && !date && <FieldError>請填寫日期</FieldError>}
               </Field>
               <Field>
                 <FieldLabel required={isEInvoice}>發票號碼</FieldLabel>
@@ -1713,9 +1732,10 @@ function AddInvoiceBModal({
             </Field>
 
             <div className="grid grid-cols-2 gap-4">
-              <Field disabled={autoFilled}>
+              <Field disabled={autoFilled} invalid={submitted && !autoFilled && !subtotal}>
                 <FieldLabel required>合計金額（未稅）</FieldLabel>
                 <Input type="number" value={subtotal} onChange={e => setSubtotal(e.target.value)} />
+                {submitted && !autoFilled && !subtotal && <FieldError>請填寫金額</FieldError>}
               </Field>
               <Field disabled={autoFilled}>
                 <FieldLabel>稅額</FieldLabel>
