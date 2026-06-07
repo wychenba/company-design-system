@@ -740,8 +740,8 @@ function AddInvoiceModal({
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <Field disabled>
-                  <FieldLabel required>成本中心&nbsp;<InfoTooltip content="填寫您的成本中心代碼" /></FieldLabel>
+                <Field>
+                  <FieldLabel required>成本中心&nbsp;<InfoTooltip content="Cost Center" /></FieldLabel>
                   <Input value={s2.costCenter} onChange={e => setS2(p => ({ ...p, costCenter: e.target.value }))} />
                 </Field>
                 <Field disabled={!!(s2.category && s2.subCategory && ACCT_MAPPING[s2.category]?.[s2.subCategory])}>
