@@ -168,6 +168,28 @@ const CURRENCY_OPTIONS = [
 ].map(c => ({ value: c, label: c }))
 const PAYEE_OPTIONS = [{ value: '員工', label: '員工' }, { value: '廠商', label: '廠商' }]
 
+const VENDOR_OPTIONS = [
+  { value: '富邦媒體科技股份有限公司', label: '富邦媒體科技股份有限公司' },
+  { value: '中華軟協資訊服務股份有限公司', label: '中華軟協資訊服務股份有限公司' },
+  { value: '精誠資訊股份有限公司', label: '精誠資訊股份有限公司' },
+  { value: '宏碁股份有限公司', label: '宏碁股份有限公司' },
+  { value: '聯詠科技股份有限公司', label: '聯詠科技股份有限公司' },
+  { value: '瑞昱半導體股份有限公司', label: '瑞昱半導體股份有限公司' },
+  { value: '廣達電腦股份有限公司', label: '廣達電腦股份有限公司' },
+  { value: '仁寶電腦工業股份有限公司', label: '仁寶電腦工業股份有限公司' },
+]
+
+const EMPLOYEE_OPTIONS = [
+  { value: '林間宜 (023156)', label: '林間宜 (023156)' },
+  { value: '陳建宏 (031042)', label: '陳建宏 (031042)' },
+  { value: '王雅婷 (028745)', label: '王雅婷 (028745)' },
+  { value: '張志明 (019823)', label: '張志明 (019823)' },
+  { value: '李美慧 (045678)', label: '李美慧 (045678)' },
+  { value: '劉俊傑 (052341)', label: '劉俊傑 (052341)' },
+  { value: '吳怡君 (038901)', label: '吳怡君 (038901)' },
+  { value: '蔡明哲 (067234)', label: '蔡明哲 (067234)' },
+]
+
 type StatusKey = 'draft' | 'reviewing' | 'manager-rejected' | 'acct-rejected' | 'approved' | 'finance-cleared' | 'acct-posted' | 'modifying' | 'abandoned' | 'advance-cleared'
 const STATUS_META: Record<StatusKey, { label: string; color: 'neutral' | 'blue' | 'red' | 'green' | 'yellow' | 'turquoise' }> = {
   draft: { label: '草稿', color: 'neutral' },
@@ -419,7 +441,7 @@ function AddInvoiceModal({
     currency: editInvoice.currency,
     subtotal: editInvoice.subtotal,
     tax: editInvoice.tax,
-  } : defaultStep1())
+  } : parentPayee === '廠商' ? { ...defaultStep1(), payee: '' } : defaultStep1())
   const [s2, setS2] = useState<Step2State>(defaultStep2)
   const [autoFilled, setAutoFilled] = useState(false)
   const [rateUpdateTime, setRateUpdateTime] = useState('')
@@ -560,9 +582,15 @@ function AddInvoiceModal({
                 </div>
               </div>
 
-              <Field disabled={parentPayee === '員工'}>
+              <Field>
                 <FieldLabel required>收款人/廠商&nbsp;<InfoTooltip content="Vendor/Payee" /></FieldLabel>
-                <Input value={s1.payee} onChange={e => setS1(p => ({ ...p, payee: e.target.value }))} />
+                <Select
+                  searchable
+                  placeholder={parentPayee === '廠商' ? '搜尋廠商名稱' : '搜尋員工姓名'}
+                  options={parentPayee === '廠商' ? VENDOR_OPTIONS : EMPLOYEE_OPTIONS}
+                  value={s1.payee}
+                  onChange={v => setS1(p => ({ ...p, payee: v as string }))}
+                />
               </Field>
 
               <Field>
