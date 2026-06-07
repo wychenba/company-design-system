@@ -160,7 +160,9 @@ const ACCT_MAPPING: Record<string, Record<string, string>> = {
   },
 }
 const TAX_RATES = [{ value: '5', label: '5%' }, { value: '0', label: '0%' }, { value: 'exempt', label: '免稅' }]
-const CURRENCY_OPTIONS = [{ value: 'TWD', label: 'TWD' }, { value: 'USD', label: 'USD' }, { value: 'EUR', label: 'EUR' }, { value: 'JPY', label: 'JPY' }]
+const CURRENCY_OPTIONS = [
+  'TWD', 'USD', 'JPY', 'EUR', 'HKD', 'SGD', 'GBP', 'CHF', 'MYR', 'AUD', 'SEK', 'CAD', 'KRW', 'NOK', 'RMB',
+].map(c => ({ value: c, label: c }))
 const PAYEE_OPTIONS = [{ value: '員工', label: '員工' }, { value: '廠商', label: '廠商' }]
 
 type StatusKey = 'draft' | 'reviewing' | 'manager-rejected' | 'acct-rejected' | 'approved' | 'finance-cleared' | 'acct-posted' | 'modifying' | 'abandoned' | 'advance-cleared'
@@ -400,7 +402,13 @@ function AddInvoiceModal({
   const dd = String(today.getDate()).padStart(2, '0')
   const invoiceNumber = `PAGE${today.getFullYear()}${mm}${dd}001-1`
 
-  const EXCHANGE_RATES: Record<string, number> = { TWD: 1, USD: 32.5, EUR: 35.2, JPY: 0.225 }
+  const today2 = new Date()
+  const RATE_UPDATE_DATE = `${today2.getFullYear()}/${String(today2.getMonth()+1).padStart(2,'0')}/${String(today2.getDate()).padStart(2,'0')}`
+  const EXCHANGE_RATES: Record<string, number> = {
+    TWD: 1, USD: 32.51, JPY: 0.2198, EUR: 35.47, HKD: 4.17, SGD: 24.23,
+    GBP: 41.38, CHF: 36.82, MYR: 7.31, AUD: 20.48, SEK: 3.12,
+    CAD: 23.76, KRW: 0.0234, NOK: 2.98, RMB: 4.49,
+  }
   const isEInvoice = s1.voucherType === 'e-invoice-25'
   // Taiwan e-invoice: 2 uppercase letters + 8 digits
   const isValidInvoiceNo = /^[A-Z]{2}\d{8}$/.test(s1.invoiceNo.replace(/-/g, '').toUpperCase())
@@ -544,7 +552,11 @@ function AddInvoiceModal({
 
               <Field disabled={autoFilled}>
                 <FieldLabel required>幣別</FieldLabel>
-                <Select options={CURRENCY_OPTIONS} value={s1.currency} onChange={v => setS1(p => ({ ...p, currency: v as string }))} />
+                <Select options={CURRENCY_OPTIONS} value={s1.currency} onChange={v => {
+                    const cur = v as string
+                    setS1(p => ({ ...p, currency: cur }))
+                    setRateUpdateTime(cur === 'TWD' ? '' : RATE_UPDATE_DATE)
+                  }} />
               </Field>
 
               <div className="grid grid-cols-2 gap-4">
