@@ -90,7 +90,7 @@ User 說以下 → 繼續 edit 不 push main:
 
 **Why(root cause,非各自獨立 symptom)**:beta.43(3 blocker)+ beta.45(發 3 次才成)連續失敗,**共同 root cause = 發版前靠「手動記得逐道跑 sync/check」→ 一定會漏**:beta.43 漏 `sync-version-to-all-manifests`(5 manifest)+ 漏 `sync-ds-canonical`;beta.45 編 SKILL 後又漏 `sync-ds-canonical` re-sync → dogfood Step0 drift。release CI gate 是對的,是**本地 preflight 不完整 + 沒有單一強制指令**。
 
-**Fix(2026-06-02,真 root-cause 修)**:`npm run release:preflight`(`scripts/release-preflight.mjs`)= **單一指令**,fail-fast,1:1 對齊 release.yml:① 先 SYNCS(`sync-version-to-all-manifests` + `sync-ds-canonical` → 修 drift)② 全 deterministic gate(tsc / typecheck:stories / orphan-tokens / code-quality / content-quality / governance-counters / figma-make / plugin-structure / story-quality / ds-canonical drift)③ build:lib + build-storybook + dogfood ④ 5-manifest version 一致性 ⑤ 全過寫 `.claude/logs/release-preflight-pass.json`(綁 HEAD sha)。
+**Fix(2026-06-02,真 root-cause 修)**:`npm run release:preflight`(`scripts/release-preflight.mjs`)= **單一指令**,fail-fast,1:1 對齊 release.yml:① 先 SYNCS(`sync-version-to-all-manifests` + `sync-ds-canonical` → 修 drift)② 全 deterministic gate(**完整清單 SSOT = `scripts/release-preflight.mjs`,禁手抄避免漂移**;含 tsc / typecheck:stories / 全 invariant / sync-*-drift / template-canonical 等;release.yml「Audit gates」須與其 1:1 同步)③ build:lib + build-storybook + dogfood ④ 5-manifest version 一致性 ⑤ 全過寫 `.claude/logs/release-preflight-pass.json`(綁 HEAD sha)。
 
 **Release flow(canonical,取代舊 checklist)**:bump `packages/design-system/package.json` 版本 → **`npm run release:preflight`(全過才寫 marker)** → tag → push tag。tag 前若再 commit 須重跑(marker 綁 HEAD)。**Tag-push 機械強制(2026-06-02 ship,原 defer 已解)**:`check_solo_workflow.sh` R4 — push tag(v*)前 pass-marker 必存在且 `.head`==HEAD 否則 BLOCK(detect_push_tag shlex,對齊 R1-R3)。
 
