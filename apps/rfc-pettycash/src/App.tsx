@@ -600,9 +600,9 @@ function AddInvoiceModal({
                     <FieldLabel>稅號&nbsp;<InfoTooltip content="統一編號（選填）" /></FieldLabel>
                     <Input value={s1.taxId} onChange={e => setS1(p => ({ ...p, taxId: e.target.value }))} />
                   </Field>
-                  <Field disabled>
+                  <Field>
                     <FieldLabel>二代健保</FieldLabel>
-                    <Input value="" />
+                    <Input value="-" readOnly />
                   </Field>
                 </div>
               ) : (
@@ -622,9 +622,9 @@ function AddInvoiceModal({
                       <FieldLabel>預扣金額&nbsp;<InfoTooltip content="依法規計算之預扣金額" /></FieldLabel>
                       <Input disabled value={s1.withholdingAmount} />
                     </Field>
-                    <Field disabled>
+                    <Field>
                       <FieldLabel>二代健保</FieldLabel>
-                      <Input value="" />
+                      <Input value="-" readOnly />
                     </Field>
                   </div>
                 </>
