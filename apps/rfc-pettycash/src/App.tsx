@@ -398,15 +398,28 @@ function AddInvoiceModal({
   open,
   onClose,
   onSubmit,
+  onUpdate,
   payee: parentPayee = '員工',
+  editInvoice,
 }: {
   open: boolean
   onClose: () => void
   onSubmit: (invoice: Invoice) => void
+  onUpdate?: (invoice: Invoice) => void
   payee?: string
+  editInvoice?: Invoice
 }) {
   const [step, setStep] = useState<1 | 2 | 3>(1)
-  const [s1, setS1] = useState<Step1State>(defaultStep1)
+  const [s1, setS1] = useState<Step1State>(() => editInvoice ? {
+    ...defaultStep1(),
+    payee: editInvoice.payee,
+    voucherType: editInvoice.voucherType,
+    date: editInvoice.date,
+    invoiceNo: editInvoice.invoiceNo,
+    currency: editInvoice.currency,
+    subtotal: editInvoice.subtotal,
+    tax: editInvoice.tax,
+  } : defaultStep1())
   const [s2, setS2] = useState<Step2State>(defaultStep2)
   const [autoFilled, setAutoFilled] = useState(false)
   const [rateUpdateTime, setRateUpdateTime] = useState('')
@@ -505,7 +518,12 @@ function AddInvoiceModal({
     ? String(Math.round(Number(s2.total) * Number(s2.taxRate) / 100))
     : ''
 
-  const MODAL_TITLES = { 1: '新增請款', 2: '新增付款細項', 3: '新增憑證/證明' } as const
+  const isEditing = !!editInvoice
+  const MODAL_TITLES = {
+    1: isEditing ? '編輯請款' : '新增請款',
+    2: '新增付款細項',
+    3: '新增憑證/證明',
+  } as const
 
   return (
     <Dialog open={open} onOpenChange={o => !o && handleClose()}>
@@ -834,7 +852,22 @@ function AddInvoiceModal({
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={handleClose}>取消</Button>
-              {step < 3 ? (
+              {isEditing && step === 1 ? (
+                <Button onClick={() => {
+                  onUpdate?.({
+                    id: editInvoice!.id,
+                    number: editInvoice!.number,
+                    payee: s1.payee,
+                    date: s1.date || editInvoice!.date,
+                    invoiceNo: s1.invoiceNo,
+                    currency: s1.currency,
+                    subtotal: s1.subtotal || '0',
+                    tax: s1.tax || '0',
+                    voucherType: s1.voucherType,
+                  })
+                  handleClose()
+                }}>更新</Button>
+              ) : step < 3 ? (
                 <Button onClick={() => setStep(s => (s + 1) as 1 | 2 | 3)}>下一步</Button>
               ) : (
                 <Button onClick={handleSubmit}>新增</Button>
@@ -1656,6 +1689,8 @@ function CreateFormPage({
   const [addItemInvoiceId, setAddItemInvoiceId] = useState<string | null>(null)
   const [editItemTarget, setEditItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
   const [deleteItemTarget, setDeleteItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
+  const [editInvoiceTarget, setEditInvoiceTarget] = useState<Invoice | null>(null)
+  const [deleteInvoiceTarget, setDeleteInvoiceTarget] = useState<string | null>(null)
   const MOCK_PAYMENT_ITEMS: PaymentItem[] = [
     { id: 'pi1', seq: 1, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-' },
     { id: 'pi2', seq: 2, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-' },
@@ -1686,6 +1721,10 @@ function CreateFormPage({
 
   function handleRemoveInvoice(id: string) {
     setInvoices(prev => prev.filter(i => i.id !== id))
+  }
+
+  function handleUpdateInvoice(id: string, updated: Invoice) {
+    setInvoices(prev => prev.map(i => i.id === id ? { ...updated, id } : i))
   }
 
   function handleAddAttachment(att: Omit<Attachment, 'id'>) {
@@ -1802,16 +1841,16 @@ function CreateFormPage({
                         {inv.currency} {Number(inv.subtotal).toLocaleString()}
                       </span>
                       <div className="flex items-center gap-0.5 shrink-0">
-                        <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
+                        <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditInvoiceTarget(inv)}>
                           <Pencil size={14} />
                         </button>
-                        <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="複製">
+                        <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="複製" onClick={() => setInvoiceModalOpen(true)}>
                           <Copy size={14} />
                         </button>
                         <button
                           className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors"
                           aria-label="刪除"
-                          onClick={() => handleRemoveInvoice(inv.id)}
+                          onClick={() => setDeleteInvoiceTarget(inv.id)}
                         >
                           <Trash2 size={14} />
                         </button>
@@ -2094,6 +2133,47 @@ function CreateFormPage({
           toast({ variant: 'success', title: '付款細項已刪除' })
         }}
       />
+      {/* 編輯發票 */}
+      <AddInvoiceModal
+        open={editInvoiceTarget !== null}
+        onClose={() => setEditInvoiceTarget(null)}
+        onSubmit={handleAddInvoice}
+        payee={payee}
+        editInvoice={editInvoiceTarget ?? undefined}
+        onUpdate={(updated) => {
+          handleUpdateInvoice(editInvoiceTarget!.id, updated)
+          setEditInvoiceTarget(null)
+          toast({ variant: 'success', title: '發票已更新' })
+        }}
+      />
+      {/* 刪除發票確認 */}
+      {(() => {
+        const invDel = invoices.find(i => i.id === deleteInvoiceTarget)
+        return (
+          <Dialog open={deleteInvoiceTarget !== null} onOpenChange={o => !o && setDeleteInvoiceTarget(null)}>
+            <DialogContent className="max-w-[480px] w-full">
+              <DialogHeader>
+                <DialogTitle>是否刪除 {invDel?.number ?? ''}</DialogTitle>
+              </DialogHeader>
+              <DialogBody>
+                <p className="text-sm text-fg-secondary">
+                  刪除後將無法復原。若此發票已綁定請款單，相關請款資料可能受到影響，確定要刪除嗎？
+                </p>
+              </DialogBody>
+              <DialogFooter>
+                <div className="flex justify-end gap-2 w-full">
+                  <Button variant="outline" onClick={() => setDeleteInvoiceTarget(null)}>保留資料</Button>
+                  <Button variant="primary" danger onClick={() => {
+                    if (deleteInvoiceTarget) handleRemoveInvoice(deleteInvoiceTarget)
+                    setDeleteInvoiceTarget(null)
+                    toast({ variant: 'success', title: '發票已刪除' })
+                  }}>刪除發票</Button>
+                </div>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )
+      })()}
       <Dialog open={cancelConfirmOpen} onOpenChange={o => !o && setCancelConfirmOpen(false)}>
         <DialogContent className="max-w-[480px] w-full">
           <DialogHeader>
