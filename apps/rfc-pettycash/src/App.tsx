@@ -368,7 +368,7 @@ const defaultStep1 = (): Step1State => ({
 const defaultStep2 = (): Step2State => ({
   category: '',
   subCategory: '',
-  costCenter: '',
+  costCenter: '25B00',
   accountCode: '',
   description: '',
   total: '',
@@ -677,7 +677,7 @@ function AddInvoiceModal({
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <Field>
+                <Field disabled>
                   <FieldLabel required>成本中心&nbsp;<InfoTooltip content="填寫您的成本中心代碼" /></FieldLabel>
                   <Input value={s2.costCenter} onChange={e => setS2(p => ({ ...p, costCenter: e.target.value }))} />
                 </Field>
