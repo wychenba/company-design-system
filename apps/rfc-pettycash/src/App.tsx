@@ -1586,12 +1586,13 @@ function AddInvoiceBModal({
   open,
   onClose,
   onSubmit,
+  payee: parentPayee = '員工',
 }: {
   open: boolean
   onClose: () => void
   onSubmit: (invoice: Invoice) => void
+  payee?: string
 }) {
-  const [payeeType, setPayeeType] = useState<'員工' | '廠商'>('員工')
   const [vendorValue, setVendorValue] = useState('')
   const [voucherType, setVoucherType] = useState('')
   const [date, setDate] = useState('')
@@ -1641,14 +1642,14 @@ function AddInvoiceBModal({
   }
 
   function handleClose() {
-    setPayeeType('員工'); setVendorValue(''); setVoucherType(''); setDate('')
+    setVendorValue(''); setVoucherType(''); setDate('')
     setInvoiceNo(''); setCurrency('TWD'); setSubtotal(''); setTax('')
     setTaxId(''); setIncomeType(''); setExemptAmount(''); setUsePartialAmount(false)
     setAutoFilled(false); setRateUpdateTime(''); onClose()
   }
 
   function handleNext() {
-    const payeeName = payeeType === '員工' ? '林間宜 (023156)' : vendorValue
+    const payeeName = parentPayee === '員工' ? '林間宜 (023156)' : vendorValue
     onSubmit({
       id: String(Date.now()), number: invoiceNumber, payee: payeeName,
       date: date || `${today.getFullYear()}/${mm}/${dd}`,
@@ -1675,19 +1676,9 @@ function AddInvoiceBModal({
               </div>
             </div>
 
-            <Field>
-              <FieldLabel required>收款對象</FieldLabel>
-              <RadioGroup value={payeeType} onValueChange={v => { setPayeeType(v as '員工' | '廠商'); setVendorValue('') }}>
-                <div className="flex items-center gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="員工" />員工</label>
-                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="廠商" />廠商</label>
-                </div>
-              </RadioGroup>
-            </Field>
-
             <Field mode="readonly">
               <FieldLabel>收款人/廠商</FieldLabel>
-              {payeeType === '廠商' ? (
+              {parentPayee === '廠商' ? (
                 <Select searchable placeholder="搜尋廠商名稱" options={VENDOR_OPTIONS} value={vendorValue} onChange={v => setVendorValue(v as string)} />
               ) : (
                 <Input value="林間宜 (023156)" readOnly />
@@ -1751,7 +1742,7 @@ function AddInvoiceBModal({
               </div>
             </div>
 
-            {payeeType === '員工' ? (
+            {parentPayee === '員工' ? (
               <div className="grid grid-cols-2 gap-4">
                 <Field><FieldLabel>稅號</FieldLabel><Input value={taxId} onChange={e => setTaxId(e.target.value)} /></Field>
                 <Field><FieldLabel>二代健保</FieldLabel><Input value="-" readOnly /></Field>
@@ -2728,6 +2719,7 @@ function CreateFormPage({
         open={addInvoiceBOpen}
         onClose={() => setAddInvoiceBOpen(false)}
         onSubmit={inv => setBInvoices(prev => [...prev, inv])}
+        payee={payee}
       />
       {(() => {
         const bInv = bInvoices.find(i => i.id === addItemBInvoiceId)
