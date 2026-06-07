@@ -561,22 +561,22 @@ function AddInvoiceModal({
               </div>
 
               <Field disabled={parentPayee === '員工'}>
-                <FieldLabel required>收款人/廠商</FieldLabel>
+                <FieldLabel required>收款人/廠商&nbsp;<InfoTooltip content="Vendor/Payee" /></FieldLabel>
                 <Input value={s1.payee} onChange={e => setS1(p => ({ ...p, payee: e.target.value }))} />
               </Field>
 
               <Field>
-                <FieldLabel required>憑證類型</FieldLabel>
+                <FieldLabel required>憑證類型&nbsp;<InfoTooltip content="Invoice Type" /></FieldLabel>
                 <Select placeholder="請選擇" options={VOUCHER_TYPES} value={s1.voucherType} onChange={v => handleVoucherTypeChange(v as string)} />
               </Field>
 
               <div className="grid grid-cols-2 gap-4">
                 <Field>
-                  <FieldLabel required>日期</FieldLabel>
+                  <FieldLabel required>日期&nbsp;<InfoTooltip content="Invoice Date" /></FieldLabel>
                   <Input type="date" value={s1.date} onChange={e => setS1(p => ({ ...p, date: e.target.value }))} placeholder="填寫日期" />
                 </Field>
                 <Field>
-                  <FieldLabel required={isEInvoice}>發票號碼</FieldLabel>
+                  <FieldLabel required={isEInvoice}>發票號碼&nbsp;<InfoTooltip content="Invoice No." /></FieldLabel>
                   <Input
                     value={s1.invoiceNo}
                     onChange={e => handleInvoiceNoChange(e.target.value)}
@@ -586,7 +586,7 @@ function AddInvoiceModal({
               </div>
 
               <Field disabled={autoFilled}>
-                <FieldLabel required>幣別</FieldLabel>
+                <FieldLabel required>幣別&nbsp;<InfoTooltip content="Currency" /></FieldLabel>
                 <Select options={CURRENCY_OPTIONS} value={s1.currency} onChange={v => {
                     const cur = v as string
                     setS1(p => ({ ...p, currency: cur }))
@@ -616,7 +616,7 @@ function AddInvoiceModal({
                 </div>
                 <div className="flex items-center gap-1 text-fg-tertiary">
                   <span>當地稅後金額</span>
-                  <InfoTooltip content="以當前匯率換算後的當地金額" />
+                  <InfoTooltip content="實際支付金額，已包含當地稅費" />
                   <span className="text-fg-primary font-medium ml-1">{localTaxAfterDisplay}</span>
                 </div>
                 <div className="flex items-baseline gap-2">
@@ -628,7 +628,7 @@ function AddInvoiceModal({
               {parentPayee === '員工' ? (
                 <div className="grid grid-cols-2 gap-4">
                   <Field>
-                    <FieldLabel>稅號&nbsp;<InfoTooltip content="統一編號（選填）" /></FieldLabel>
+                    <FieldLabel>稅號&nbsp;<InfoTooltip content="Tax ID" /></FieldLabel>
                     <Input value={s1.taxId} onChange={e => setS1(p => ({ ...p, taxId: e.target.value }))} />
                   </Field>
                   <Field>
@@ -640,17 +640,17 @@ function AddInvoiceModal({
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <Field>
-                      <FieldLabel>收入類型&nbsp;<InfoTooltip content="請選擇收入類型" /></FieldLabel>
+                      <FieldLabel>收入類型&nbsp;<InfoTooltip content="Income type" /></FieldLabel>
                       <Input value={s1.incomeType} onChange={e => setS1(p => ({ ...p, incomeType: e.target.value }))} />
                     </Field>
                     <Field>
-                      <FieldLabel>免稅額</FieldLabel>
+                      <FieldLabel>免稅額&nbsp;<InfoTooltip content="Tax Exempt" /></FieldLabel>
                       <Select placeholder="請選擇" options={[{ value: '0', label: '無' }, { value: 'partial', label: '部分免稅' }, { value: 'full', label: '全額免稅' }]} value={s1.exemptAmount} onChange={v => setS1(p => ({ ...p, exemptAmount: v as string }))} />
                     </Field>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <Field>
-                      <FieldLabel>預扣金額&nbsp;<InfoTooltip content="依法規計算之預扣金額" /></FieldLabel>
+                      <FieldLabel>預扣金額&nbsp;<InfoTooltip content="Withholding Amount" /></FieldLabel>
                       <Input disabled value={s1.withholdingAmount} />
                     </Field>
                     <Field>
