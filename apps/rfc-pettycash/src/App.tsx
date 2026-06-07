@@ -1859,7 +1859,7 @@ function CreateFormPage({
           <h2 className="text-base font-semibold mb-4">付款資訊</h2>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <Field disabled>
+              <Field mode="readonly">
                 <FieldLabel>
                   公司代號&nbsp;<InfoTooltip content="請選擇您所屬的公司代號" />
                 </FieldLabel>
