@@ -15,6 +15,8 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
   Steps, StepItem, StepLabel,
   DescriptionList, DescriptionItem,
+  FileUpload,
+  type FileUploadStatus,
 } from '@qijenchen/design-system'
 import {
   Home, FileText, Upload, ClipboardList, Users, BookOpen,
@@ -397,6 +399,7 @@ function AddInvoiceModal({
   const [autoFilled, setAutoFilled] = useState(false)
   const [rateUpdateTime, setRateUpdateTime] = useState('')
   const [contractNums, setContractNums] = useState<string[]>([''])
+  const [uploadFiles, setUploadFiles] = useState<FileUploadStatus[]>([])
 
   const today = new Date()
   const mm = String(today.getMonth() + 1).padStart(2, '0')
@@ -785,17 +788,26 @@ function AddInvoiceModal({
 
           {/* Step 3 */}
           {step === 3 && (
-            <div className="space-y-4">
-              <div className="border-2 border-dashed border-divider rounded-lg p-12 flex flex-col items-center gap-3 cursor-pointer hover:border-[var(--color-neutral-6)] hover:bg-surface-raised transition-colors">
-                <div className="size-10 rounded-lg bg-surface-raised flex items-center justify-center text-fg-tertiary">
-                  <Upload size={24} />
-                </div>
-                <div className="text-center">
-                  <p className="font-semibold text-fg-primary">點擊或拖曳到此上傳檔案</p>
-                  <p className="text-sm text-fg-tertiary mt-0.5">每個檔案大小不得超過 20 MB</p>
-                </div>
-              </div>
-            </div>
+            <FileUpload
+              multiple
+              title="點擊或拖曳到此上傳檔案"
+              description="每個檔案大小不得超過 20 MB"
+              maxSize={20_000_000}
+              files={uploadFiles}
+              fileListMode="compact"
+              onRemove={id => setUploadFiles(prev => prev.filter(f => f.id !== id))}
+              onUpload={accepted =>
+                setUploadFiles(prev => [
+                  ...prev,
+                  ...accepted.map((f, i) => ({
+                    id: `upload-${Date.now()}-${i}`,
+                    name: f.name,
+                    size: f.size,
+                    status: 'completed' as const,
+                  })),
+                ])
+              }
+            />
           )}
         </DialogBody>
 
