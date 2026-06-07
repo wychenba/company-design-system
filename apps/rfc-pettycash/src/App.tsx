@@ -1580,6 +1580,310 @@ function AddItemModal({
   )
 }
 
+// ─── AddInvoiceBModal (Scenario B) ───────────────────────────
+
+function AddInvoiceBModal({
+  open,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean
+  onClose: () => void
+  onSubmit: (invoice: Invoice) => void
+}) {
+  const [payeeType, setPayeeType] = useState<'員工' | '廠商'>('員工')
+  const [vendorValue, setVendorValue] = useState('')
+  const [voucherType, setVoucherType] = useState('')
+  const [date, setDate] = useState('')
+  const [invoiceNo, setInvoiceNo] = useState('')
+  const [currency, setCurrency] = useState('TWD')
+  const [subtotal, setSubtotal] = useState('')
+  const [tax, setTax] = useState('')
+  const [taxId, setTaxId] = useState('')
+  const [incomeType, setIncomeType] = useState('')
+  const [exemptAmount, setExemptAmount] = useState('')
+  const [usePartialAmount, setUsePartialAmount] = useState(false)
+  const [autoFilled, setAutoFilled] = useState(false)
+  const [rateUpdateTime, setRateUpdateTime] = useState('')
+
+  const today = new Date()
+  const mm = String(today.getMonth() + 1).padStart(2, '0')
+  const dd = String(today.getDate()).padStart(2, '0')
+  const invoiceNumber = `PAGE${today.getFullYear()}${mm}${dd}001-1`
+  const RATE_UPDATE_DATE = `${today.getFullYear()}/${String(today.getMonth()+1).padStart(2,'0')}/${String(today.getDate()).padStart(2,'0')}`
+  const EXCHANGE_RATES: Record<string, number> = {
+    TWD: 1, USD: 32.51, JPY: 0.2198, EUR: 35.47, HKD: 4.17, SGD: 24.23,
+    GBP: 41.38, CHF: 36.82, MYR: 7.31, AUD: 20.48, SEK: 3.12,
+    CAD: 23.76, KRW: 0.0234, NOK: 2.98, RMB: 4.49,
+  }
+  const isEInvoice = voucherType === 'e-invoice-25'
+  const taxAfterNum = subtotal !== '' && tax !== '' ? Number(subtotal) + Number(tax) : null
+  const taxAfterDisplay = taxAfterNum !== null ? taxAfterNum.toLocaleString() : '-'
+  const rate = EXCHANGE_RATES[currency] ?? 1
+  const localTaxAfterDisplay = taxAfterNum !== null
+    ? (currency === 'TWD' ? taxAfterNum.toLocaleString() : Math.round(taxAfterNum * rate).toLocaleString())
+    : '-'
+  const rateDisplay = currency === 'TWD' ? '-' : rate.toFixed(4)
+
+  function handleInvoiceNoChange(value: string) {
+    const normalized = value.replace(/-/g, '').toUpperCase()
+    setInvoiceNo(value)
+    if (isEInvoice && /^[A-Z]{2}\d{8}$/.test(normalized)) {
+      const seed = parseInt(normalized.slice(-4), 10)
+      const mockSubtotal = String(Math.round((seed % 9 + 1) * 1000))
+      const mockTax = String(Math.round(Number(mockSubtotal) * 0.05))
+      setSubtotal(mockSubtotal); setTax(mockTax); setAutoFilled(true)
+      const now = new Date()
+      setRateUpdateTime(`${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`)
+    } else if (autoFilled) {
+      setAutoFilled(false); setRateUpdateTime(''); setSubtotal(''); setTax('')
+    }
+  }
+
+  function handleClose() {
+    setPayeeType('員工'); setVendorValue(''); setVoucherType(''); setDate('')
+    setInvoiceNo(''); setCurrency('TWD'); setSubtotal(''); setTax('')
+    setTaxId(''); setIncomeType(''); setExemptAmount(''); setUsePartialAmount(false)
+    setAutoFilled(false); setRateUpdateTime(''); onClose()
+  }
+
+  function handleNext() {
+    const payeeName = payeeType === '員工' ? '林間宜 (023156)' : vendorValue
+    onSubmit({
+      id: String(Date.now()), number: invoiceNumber, payee: payeeName,
+      date: date || `${today.getFullYear()}/${mm}/${dd}`,
+      invoiceNo, currency, subtotal: subtotal || '0', tax: tax || '0', voucherType,
+    })
+    handleClose()
+    toast({ variant: 'success', title: '新增成功' })
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={o => !o && handleClose()}>
+      <DialogContent maxWidth={754}>
+        <DialogHeader><DialogTitle>新增發票</DialogTitle></DialogHeader>
+        <DialogBody>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-6 p-3 rounded-lg bg-surface-raised border border-divider">
+              <div>
+                <p className="text-caption text-fg-tertiary mb-0.5">請款單號</p>
+                <p className="text-sm font-medium">{invoiceNumber}</p>
+              </div>
+              <div>
+                <p className="text-caption text-fg-tertiary mb-0.5">狀態</p>
+                <Tag color="neutral" size="sm">Draft</Tag>
+              </div>
+            </div>
+
+            <Field>
+              <FieldLabel required>收款對象</FieldLabel>
+              <RadioGroup value={payeeType} onValueChange={v => { setPayeeType(v as '員工' | '廠商'); setVendorValue('') }}>
+                <div className="flex items-center gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="員工" />員工</label>
+                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="廠商" />廠商</label>
+                </div>
+              </RadioGroup>
+            </Field>
+
+            <Field mode="readonly">
+              <FieldLabel>收款人/廠商</FieldLabel>
+              {payeeType === '廠商' ? (
+                <Select searchable placeholder="搜尋廠商名稱" options={VENDOR_OPTIONS} value={vendorValue} onChange={v => setVendorValue(v as string)} />
+              ) : (
+                <Input value="林間宜 (023156)" readOnly />
+              )}
+            </Field>
+
+            <Field>
+              <FieldLabel required>憑證類型</FieldLabel>
+              <Select placeholder="請選擇" options={VOUCHER_TYPES} value={voucherType} onChange={v => {
+                setAutoFilled(false); setRateUpdateTime('')
+                setVoucherType(v as string); setInvoiceNo(''); setCurrency('TWD'); setSubtotal(''); setTax('')
+              }} />
+            </Field>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel required>日期</FieldLabel>
+                <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
+              </Field>
+              <Field>
+                <FieldLabel required={isEInvoice}>發票號碼</FieldLabel>
+                <Input value={invoiceNo} onChange={e => handleInvoiceNoChange(e.target.value)} placeholder={isEInvoice ? '例：AB12345678' : '填寫發票號碼'} />
+              </Field>
+            </div>
+
+            <Field disabled={autoFilled}>
+              <FieldLabel required>幣別</FieldLabel>
+              <Select options={CURRENCY_OPTIONS} value={currency} onChange={v => {
+                const cur = v as string; setCurrency(cur)
+                setRateUpdateTime(cur === 'TWD' ? '' : RATE_UPDATE_DATE)
+              }} />
+            </Field>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Field disabled={autoFilled}>
+                <FieldLabel required>合計金額（未稅）</FieldLabel>
+                <Input type="number" value={subtotal} onChange={e => setSubtotal(e.target.value)} />
+              </Field>
+              <Field disabled={autoFilled}>
+                <FieldLabel>稅額</FieldLabel>
+                <Input type="number" value={tax} onChange={e => setTax(e.target.value)} />
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 p-3 rounded-lg bg-surface-raised border border-divider text-sm">
+              <div className="flex items-baseline gap-2">
+                <span className="text-fg-tertiary whitespace-nowrap">稅後金額</span>
+                <span className="font-medium">{taxAfterDisplay}</span>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-fg-tertiary">匯率</span>
+                <span className="font-medium">{rateDisplay}</span>
+              </div>
+              <div className="flex items-center gap-1 text-fg-tertiary">
+                <span>當地稅後金額</span>
+                <span className="text-fg-primary font-medium ml-1">{localTaxAfterDisplay}</span>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-fg-tertiary">更新時間</span>
+                <span className="font-medium">{rateUpdateTime || '-'}</span>
+              </div>
+            </div>
+
+            {payeeType === '員工' ? (
+              <div className="grid grid-cols-2 gap-4">
+                <Field><FieldLabel>稅號</FieldLabel><Input value={taxId} onChange={e => setTaxId(e.target.value)} /></Field>
+                <Field><FieldLabel>二代健保</FieldLabel><Input value="-" readOnly /></Field>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field><FieldLabel>收入類型</FieldLabel><Input value={incomeType} onChange={e => setIncomeType(e.target.value)} /></Field>
+                  <Field>
+                    <FieldLabel>免稅額</FieldLabel>
+                    <Select placeholder="請選擇" options={[{ value: '0', label: '無' }, { value: 'partial', label: '部分免稅' }, { value: 'full', label: '全額免稅' }]} value={exemptAmount} onChange={v => setExemptAmount(v as string)} />
+                  </Field>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field><FieldLabel>預扣金額</FieldLabel><Input disabled value="" /></Field>
+                  <Field><FieldLabel>二代健保</FieldLabel><Input value="-" readOnly /></Field>
+                </div>
+              </>
+            )}
+
+            <div className="flex items-center gap-2">
+              <Checkbox id="partial-b" checked={usePartialAmount} onCheckedChange={v => setUsePartialAmount(!!v)} />
+              <label htmlFor="partial-b" className="text-sm cursor-pointer select-none">使用不足額請款</label>
+            </div>
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <div className="flex justify-end gap-2 w-full">
+            <Button variant="outline" onClick={handleClose}>取消</Button>
+            <Button onClick={handleNext}>下一步</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ─── AddItemBModal (Scenario B) ───────────────────────────────
+
+function AddItemBModal({
+  open, onClose, onSubmit, invoiceNumber, invoiceNo, seqNum,
+}: {
+  open: boolean; onClose: () => void; onSubmit: (item: PaymentItem) => void
+  invoiceNumber: string; invoiceNo: string; seqNum: number
+}) {
+  const [category, setCategory] = useState('')
+  const [subCategory, setSubCategory] = useState('')
+  const [costCenter, setCostCenter] = useState('')
+  const [accountCode, setAccountCode] = useState('')
+  const [description, setDescription] = useState('')
+  const [total, setTotal] = useState('')
+  const [taxRate, setTaxRate] = useState('')
+  const [contractProvided, setContractProvided] = useState<'yes' | 'no' | 'not-required'>('not-required')
+  const subCategoryOptions = category ? (CATEGORIES[category] ?? []).map(s => ({ value: s, label: s })) : []
+
+  function handleClose() {
+    setCategory(''); setSubCategory(''); setCostCenter(''); setAccountCode('')
+    setDescription(''); setTotal(''); setTaxRate(''); setContractProvided('not-required')
+    onClose()
+  }
+
+  function handleSave() {
+    onSubmit({ id: String(Date.now()), seq: seqNum, category, subCategory, costCenter, accountCode, description })
+    handleClose()
+    toast({ variant: 'success', title: '新增成功' })
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={o => !o && handleClose()}>
+      <DialogContent maxWidth={600} autoHeight>
+        <DialogHeader><DialogTitle>新增細項</DialogTitle></DialogHeader>
+        <DialogBody>
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4 bg-surface-raised border border-divider rounded-lg px-4 py-3 text-sm">
+              <div><p className="text-fg-tertiary text-xs mb-0.5">請款單號</p><p className="text-fg-primary font-medium">{invoiceNumber}</p></div>
+              <div><p className="text-fg-tertiary text-xs mb-0.5">發票號碼</p><p className="text-fg-primary font-medium">{invoiceNo || '-'}</p></div>
+              <div><p className="text-fg-tertiary text-xs mb-0.5">序號</p><p className="text-fg-primary font-medium">{seqNum}</p></div>
+            </div>
+            <Alert variant="info" title="注意事項" description={<>自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往<span className="text-[var(--color-blue-6)] underline cursor-pointer">專區</span>請款。</>} />
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel required>分類</FieldLabel>
+                <Select placeholder="請選擇" options={CATEGORY_OPTIONS} value={category} onChange={v => { setCategory(v as string); setSubCategory(''); setAccountCode('') }} />
+              </Field>
+              <Field>
+                <FieldLabel required>子分類</FieldLabel>
+                <Select placeholder="請選擇" options={subCategoryOptions} value={subCategory} disabled={!category} onChange={v => { setSubCategory(v as string); setAccountCode(ACCT_MAPPING[category]?.[v as string] ?? '') }} />
+              </Field>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel required>成本中心 <InfoTooltip content="請填寫您的成本中心編號" /></FieldLabel>
+                <Input value={costCenter} onChange={e => setCostCenter(e.target.value)} placeholder="填寫成本中心" />
+              </Field>
+              <Field disabled={!!(category && subCategory && ACCT_MAPPING[category]?.[subCategory])}>
+                <FieldLabel>會計科目 <InfoTooltip content="依子分類自動帶入" /></FieldLabel>
+                <Input value={accountCode} onChange={e => setAccountCode(e.target.value)} placeholder="填寫會計科目" />
+              </Field>
+            </div>
+            <Field><FieldLabel>描述</FieldLabel><Input value={description} onChange={e => setDescription(e.target.value)} placeholder="填寫描述" /></Field>
+            <div className="grid grid-cols-3 gap-4">
+              <Field><FieldLabel required>總額</FieldLabel><Input type="number" value={total} onChange={e => setTotal(e.target.value)} placeholder="填寫總額" /></Field>
+              <Field>
+                <FieldLabel>稅率 <InfoTooltip content="依憑證類型選擇稅率" /></FieldLabel>
+                <Select placeholder="請選擇" options={TAX_RATES} value={taxRate} onChange={v => setTaxRate(v as string)} />
+              </Field>
+              <Field>
+                <FieldLabel>稅額</FieldLabel>
+                <Input disabled value={taxRate && total && taxRate !== 'exempt' ? String(Math.round(Number(total) * Number(taxRate) / 100)) : ''} placeholder="" />
+              </Field>
+            </div>
+            <div>
+              <p className="text-sm text-fg-secondary mb-2">是否提供合約編號</p>
+              <RadioGroup value={contractProvided} onValueChange={v => setContractProvided(v as 'yes' | 'no' | 'not-required')} className="flex items-center gap-4">
+                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="yes" />是</label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="no" />否</label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="not-required" />無需提供</label>
+              </RadioGroup>
+            </div>
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <div className="flex justify-end gap-2 w-full">
+            <Button variant="outline" onClick={handleClose}>取消</Button>
+            <Button onClick={handleSave}>儲存並關閉</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ─── EditItemModal ────────────────────────────────────────────
 
 function EditItemModal({
@@ -1803,6 +2107,11 @@ function CreateFormPage({
   const [deleteItemTarget, setDeleteItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
   const [editInvoiceTarget, setEditInvoiceTarget] = useState<Invoice | null>(null)
   const [deleteInvoiceTarget, setDeleteInvoiceTarget] = useState<string | null>(null)
+  const [scenarioBMode, setScenarioBMode] = useState(false)
+  const [bInvoices, setBInvoices] = useState<Invoice[]>([])
+  const [bItemsMap, setBItemsMap] = useState<Record<string, PaymentItem[]>>({})
+  const [addInvoiceBOpen, setAddInvoiceBOpen] = useState(false)
+  const [addItemBInvoiceId, setAddItemBInvoiceId] = useState<string | null>(null)
   const MOCK_PAYMENT_ITEMS: PaymentItem[] = [
     { id: 'pi1', seq: 1, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-' },
     { id: 'pi2', seq: 2, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-' },
@@ -1876,7 +2185,23 @@ function CreateFormPage({
           </div>
           <h1 className="text-2xl font-semibold">一般項目申請單 {formNumber}</h1>
         </div>
-        <Button variant="tertiary" startIcon={Upload} disabled>批次匯入申請</Button>
+        <div className="flex items-center gap-3">
+          <div className="flex rounded-md border border-divider overflow-hidden text-sm font-medium">
+            <button
+              onClick={() => setScenarioBMode(false)}
+              className={`px-3 py-1.5 transition-colors ${!scenarioBMode ? 'bg-[var(--color-blue-6)] text-white' : 'text-fg-secondary hover:bg-surface-raised'}`}
+            >
+              流程 A
+            </button>
+            <button
+              onClick={() => setScenarioBMode(true)}
+              className={`px-3 py-1.5 transition-colors ${scenarioBMode ? 'bg-[var(--color-blue-6)] text-white' : 'text-fg-secondary hover:bg-surface-raised'}`}
+            >
+              流程 B
+            </button>
+          </div>
+          <Button variant="tertiary" startIcon={Upload} disabled>批次匯入申請</Button>
+        </div>
       </div>
 
       {/* Form sections */}
@@ -1923,138 +2248,192 @@ function CreateFormPage({
         {/* 請款資訊 */}
         <section className="bg-surface border border-divider rounded-lg p-6">
           <h2 className="text-base font-semibold mb-4">請款資訊</h2>
-          <Button variant="tertiary" startIcon={Plus} onClick={() => setInvoiceModalOpen(true)}>
-            新增請款
-          </Button>
-
-          {invoices.length === 0 ? (
-            <div className="mt-4 rounded-lg border border-divider py-12 text-center text-sm text-fg-tertiary">
-              沒有任何資料
-            </div>
-          ) : (
-            <div className="mt-4 space-y-2">
-              {invoices.map(inv => {
-                const isExpanded = expandedInvoiceIds.has(inv.id)
-                const VOUCHER_LABEL: Record<string, string> = {
-                  'e-invoice-25': '電子統一發票 (25)',
-                  'paper-invoice': '紙本統一發票',
-                }
-                const voucherLabel = VOUCHER_LABEL[inv.voucherType] ?? inv.voucherType
-                return (
-                  <div key={inv.id} className="border border-divider rounded-lg overflow-hidden">
-                    {/* Header row */}
-                    <div className="flex items-center gap-2 px-4 py-3">
-                      <button
-                        onClick={() => toggleInvoiceExpand(inv.id)}
-                        className="p-0.5 rounded text-fg-tertiary hover:text-fg-secondary transition-colors shrink-0"
-                        aria-label={isExpanded ? '收合' : '展開'}
-                      >
-                        <ChevronDown size={16} className={`transition-transform ${isExpanded ? '' : '-rotate-90'}`} />
-                      </button>
-                      <span className="font-medium text-fg-primary shrink-0">{inv.number}</span>
-                      <Tag color="neutral" size="sm">Draft</Tag>
-                      <div className="flex-1" />
-                      <span className="text-fg-secondary text-sm shrink-0">
-                        {inv.currency} {Number(inv.subtotal).toLocaleString()}
-                      </span>
-                      <div className="flex items-center gap-0.5 shrink-0">
-                        <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditInvoiceTarget(inv)}>
-                          <Pencil size={14} />
-                        </button>
-                        <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="複製" onClick={() => setInvoiceModalOpen(true)}>
-                          <Copy size={14} />
-                        </button>
-                        <button
-                          className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors"
-                          aria-label="刪除"
-                          onClick={() => setDeleteInvoiceTarget(inv.id)}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
-                    {/* Subtitle - always visible */}
-                    <p className="text-sm text-fg-tertiary px-4 pb-3">
-                      收款人：{inv.payee}&nbsp;|&nbsp;日期：{inv.date}
-                    </p>
-                    {/* Expanded content */}
-                    {isExpanded && (
-                      <div className="border-t border-divider">
-                        {/* Invoice detail row */}
-                        <div className="grid grid-cols-4 gap-4 px-4 py-4 bg-surface-raised">
-                          <div>
-                            <p className="text-xs text-fg-tertiary mb-1">憑證類型</p>
-                            <p className="text-sm text-fg-primary">{voucherLabel}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-fg-tertiary mb-1">發票號碼</p>
-                            <p className="text-sm text-fg-primary">{inv.invoiceNo || '-'}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-fg-tertiary mb-1">合計金額（未稅）</p>
-                            <p className="text-sm text-fg-primary">{inv.currency} {Number(inv.subtotal).toLocaleString()}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-fg-tertiary mb-1">稅額</p>
-                            <p className="text-sm text-fg-primary">{inv.tax || '0'}</p>
+          {!scenarioBMode ? (
+            <>
+              <Button variant="tertiary" startIcon={Plus} onClick={() => setInvoiceModalOpen(true)}>
+                新增請款
+              </Button>
+              {invoices.length === 0 ? (
+                <div className="mt-4 rounded-lg border border-divider py-12 text-center text-sm text-fg-tertiary">
+                  沒有任何資料
+                </div>
+              ) : (
+                <div className="mt-4 space-y-2">
+                  {invoices.map(inv => {
+                    const isExpanded = expandedInvoiceIds.has(inv.id)
+                    const VOUCHER_LABEL: Record<string, string> = {
+                      'e-invoice-25': '電子統一發票 (25)',
+                      'paper-invoice': '紙本統一發票',
+                    }
+                    const voucherLabel = VOUCHER_LABEL[inv.voucherType] ?? inv.voucherType
+                    return (
+                      <div key={inv.id} className="border border-divider rounded-lg overflow-hidden">
+                        <div className="flex items-center gap-2 px-4 py-3">
+                          <button onClick={() => toggleInvoiceExpand(inv.id)} className="p-0.5 rounded text-fg-tertiary hover:text-fg-secondary transition-colors shrink-0" aria-label={isExpanded ? '收合' : '展開'}>
+                            <ChevronDown size={16} className={`transition-transform ${isExpanded ? '' : '-rotate-90'}`} />
+                          </button>
+                          <span className="font-medium text-fg-primary shrink-0">{inv.number}</span>
+                          <Tag color="neutral" size="sm">Draft</Tag>
+                          <div className="flex-1" />
+                          <span className="text-fg-secondary text-sm shrink-0">{inv.currency} {Number(inv.subtotal).toLocaleString()}</span>
+                          <div className="flex items-center gap-0.5 shrink-0">
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditInvoiceTarget(inv)}><Pencil size={14} /></button>
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="複製" onClick={() => setInvoiceModalOpen(true)}><Copy size={14} /></button>
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setDeleteInvoiceTarget(inv.id)}><Trash2 size={14} /></button>
                           </div>
                         </div>
-                        {/* 付款細項 */}
-                        <div className="px-4 py-3">
+                        <p className="text-sm text-fg-tertiary px-4 pb-3">收款人：{inv.payee}&nbsp;|&nbsp;日期：{inv.date}</p>
+                        {isExpanded && (
+                          <div className="border-t border-divider">
+                            <div className="grid grid-cols-4 gap-4 px-4 py-4 bg-surface-raised">
+                              <div><p className="text-xs text-fg-tertiary mb-1">憑證類型</p><p className="text-sm text-fg-primary">{voucherLabel}</p></div>
+                              <div><p className="text-xs text-fg-tertiary mb-1">發票號碼</p><p className="text-sm text-fg-primary">{inv.invoiceNo || '-'}</p></div>
+                              <div><p className="text-xs text-fg-tertiary mb-1">合計金額（未稅）</p><p className="text-sm text-fg-primary">{inv.currency} {Number(inv.subtotal).toLocaleString()}</p></div>
+                              <div><p className="text-xs text-fg-tertiary mb-1">稅額</p><p className="text-sm text-fg-primary">{inv.tax || '0'}</p></div>
+                            </div>
+                            <div className="px-4 py-3">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-1.5 text-sm font-medium text-fg-primary">
+                                  <ClipboardList size={16} className="text-fg-secondary" />
+                                  付款細項：{(paymentItemsMap[inv.id] ?? []).length} 項
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Button variant="tertiary" size="sm" startIcon={Download} onClick={() => setBatchImportInvoiceId(inv.id)}>批次匯入</Button>
+                                  <Button variant="tertiary" size="sm" startIcon={Plus} onClick={() => setAddItemInvoiceId(inv.id)}>新增細項</Button>
+                                </div>
+                              </div>
+                              <div className="rounded-lg border border-divider overflow-hidden">
+                                <table className="w-full text-sm">
+                                  <thead className="bg-surface-raised border-b border-divider">
+                                    <tr>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary w-10">序號</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary">分類</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary">子分類</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">成本中心</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">會計科目</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary">描述</th>
+                                      <th className="px-3 py-2 w-16"></th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-divider">
+                                    {(paymentItemsMap[inv.id] ?? []).map(item => (
+                                      <tr key={item.id} className="hover:bg-surface-raised transition-colors">
+                                        <td className="px-3 py-2 text-fg-secondary">{item.seq}</td>
+                                        <td className="px-3 py-2 text-fg-secondary">{item.category}</td>
+                                        <td className="px-3 py-2 text-fg-secondary">{item.subCategory}</td>
+                                        <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
+                                        <td className="px-3 py-2 text-fg-secondary">{item.accountCode}</td>
+                                        <td className="px-3 py-2 text-fg-tertiary">{item.description}</td>
+                                        <td className="px-3 py-2">
+                                          <div className="flex items-center gap-0.5">
+                                            <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditItemTarget({ invoiceId: inv.id, seq: item.seq })}><Pencil size={13} /></button>
+                                            <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq: item.seq })}><Trash2 size={13} /></button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </>
+          ) : (
+            /* Scenario B */
+            <>
+              <Button variant="tertiary" startIcon={Plus} onClick={() => setAddInvoiceBOpen(true)}>
+                新增發票
+              </Button>
+              {bInvoices.length === 0 ? (
+                <div className="mt-4 rounded-lg border border-divider py-12 text-center text-sm text-fg-tertiary">
+                  沒有任何資料
+                </div>
+              ) : (
+                <div className="mt-4 space-y-3">
+                  {bInvoices.map(inv => {
+                    const bItems = bItemsMap[inv.id] ?? []
+                    const VOUCHER_LABEL: Record<string, string> = {
+                      'e-invoice-25': '電子統一發票 (25)',
+                      'paper-invoice': '紙本統一發票',
+                    }
+                    const voucherLabel = VOUCHER_LABEL[inv.voucherType] ?? inv.voucherType
+                    return (
+                      <div key={inv.id} className="border border-divider rounded-lg overflow-hidden">
+                        <div className="flex items-center gap-2 px-4 py-3">
+                          <span className="font-medium text-fg-primary shrink-0">{inv.number}</span>
+                          <Tag color="neutral" size="sm">Draft</Tag>
+                          <div className="flex-1" />
+                          <span className="text-fg-secondary text-sm shrink-0">{inv.currency} {Number(inv.subtotal).toLocaleString()}</span>
+                          <div className="flex items-center gap-0.5 shrink-0">
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯"><Pencil size={14} /></button>
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setBInvoices(prev => prev.filter(i => i.id !== inv.id))}><Trash2 size={14} /></button>
+                          </div>
+                        </div>
+                        <p className="text-sm text-fg-tertiary px-4 pb-3">收款人：{inv.payee}&nbsp;|&nbsp;日期：{inv.date}</p>
+                        <div className="border-t border-divider grid grid-cols-4 gap-4 px-4 py-4 bg-surface-raised">
+                          <div><p className="text-xs text-fg-tertiary mb-1">憑證類型</p><p className="text-sm text-fg-primary">{voucherLabel}</p></div>
+                          <div><p className="text-xs text-fg-tertiary mb-1">發票號碼</p><p className="text-sm text-fg-primary">{inv.invoiceNo || '-'}</p></div>
+                          <div><p className="text-xs text-fg-tertiary mb-1">合計金額（未稅）</p><p className="text-sm text-fg-primary">{inv.currency} {Number(inv.subtotal).toLocaleString()}</p></div>
+                          <div><p className="text-xs text-fg-tertiary mb-1">稅額</p><p className="text-sm text-fg-primary">{inv.tax || '0'}</p></div>
+                        </div>
+                        <div className="border-t border-divider px-4 py-3">
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-1.5 text-sm font-medium text-fg-primary">
                               <ClipboardList size={16} className="text-fg-secondary" />
-                              付款細項：{(paymentItemsMap[inv.id] ?? []).length} 項
+                              付款細項：{bItems.length} 項
                             </div>
                             <div className="flex items-center gap-2">
                               <Button variant="tertiary" size="sm" startIcon={Download} onClick={() => setBatchImportInvoiceId(inv.id)}>批次匯入</Button>
-                              <Button variant="tertiary" size="sm" startIcon={Plus} onClick={() => setAddItemInvoiceId(inv.id)}>新增細項</Button>
+                              <Button variant="tertiary" size="sm" startIcon={Plus} onClick={() => setAddItemBInvoiceId(inv.id)}>新增細項</Button>
                             </div>
                           </div>
-                          <div className="rounded-lg border border-divider overflow-hidden">
-                            <table className="w-full text-sm">
-                              <thead className="bg-surface-raised border-b border-divider">
-                                <tr>
-                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary w-10">序號</th>
-                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary">分類</th>
-                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary">子分類</th>
-                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">成本中心</th>
-                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">會計科目</th>
-                                  <th className="text-left px-3 py-2 font-medium text-fg-secondary">描述</th>
-                                  <th className="px-3 py-2 w-16"></th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-divider">
-                                {(paymentItemsMap[inv.id] ?? []).map(item => (
-                                  <tr key={item.id} className="hover:bg-surface-raised transition-colors">
-                                    <td className="px-3 py-2 text-fg-secondary">{item.seq}</td>
-                                    <td className="px-3 py-2 text-fg-secondary">{item.category}</td>
-                                    <td className="px-3 py-2 text-fg-secondary">{item.subCategory}</td>
-                                    <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
-                                    <td className="px-3 py-2 text-fg-secondary">{item.accountCode}</td>
-                                    <td className="px-3 py-2 text-fg-tertiary">{item.description}</td>
-                                    <td className="px-3 py-2">
-                                      <div className="flex items-center gap-0.5">
-                                        <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditItemTarget({ invoiceId: inv.id, seq: item.seq })}>
-                                          <Pencil size={13} />
-                                        </button>
-                                        <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq: item.seq })}>
-                                          <Trash2 size={13} />
-                                        </button>
-                                      </div>
-                                    </td>
+                          {bItems.length === 0 ? (
+                            <div className="rounded-lg border border-divider py-8 text-center text-sm text-fg-tertiary">沒有任何資料</div>
+                          ) : (
+                            <div className="rounded-lg border border-divider overflow-hidden">
+                              <table className="w-full text-sm">
+                                <thead className="bg-surface-raised border-b border-divider">
+                                  <tr>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary w-10">序號</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary">分類</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary">子分類</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">成本中心</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">會計科目</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary">描述</th>
+                                    <th className="px-3 py-2 w-12"></th>
                                   </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
+                                </thead>
+                                <tbody className="divide-y divide-divider">
+                                  {bItems.map(item => (
+                                    <tr key={item.id} className="hover:bg-surface-raised transition-colors">
+                                      <td className="px-3 py-2 text-fg-secondary">{item.seq}</td>
+                                      <td className="px-3 py-2 text-fg-secondary">{item.category}</td>
+                                      <td className="px-3 py-2 text-fg-secondary">{item.subCategory}</td>
+                                      <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
+                                      <td className="px-3 py-2 text-fg-secondary">{item.accountCode}</td>
+                                      <td className="px-3 py-2 text-fg-tertiary">{item.description}</td>
+                                      <td className="px-3 py-2">
+                                        <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setBItemsMap(prev => ({ ...prev, [inv.id]: (prev[inv.id] ?? []).filter(i => i.id !== item.id).map((i, idx) => ({ ...i, seq: idx + 1 })) }))}><Trash2 size={13} /></button>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+                    )
+                  })}
+                </div>
+              )}
+            </>
           )}
         </section>
 
@@ -2344,7 +2723,34 @@ function CreateFormPage({
         </DialogContent>
       </Dialog>
 
-      {/* 申請單預覽 */}
+      {/* Scenario B modals */}
+      <AddInvoiceBModal
+        open={addInvoiceBOpen}
+        onClose={() => setAddInvoiceBOpen(false)}
+        onSubmit={inv => setBInvoices(prev => [...prev, inv])}
+      />
+      {(() => {
+        const bInv = bInvoices.find(i => i.id === addItemBInvoiceId)
+        return (
+          <AddItemBModal
+            open={addItemBInvoiceId !== null}
+            onClose={() => setAddItemBInvoiceId(null)}
+            onSubmit={item => {
+              if (addItemBInvoiceId) {
+                setBItemsMap(prev => ({
+                  ...prev,
+                  [addItemBInvoiceId]: [...(prev[addItemBInvoiceId] ?? []), { ...item, seq: (prev[addItemBInvoiceId] ?? []).length + 1 }],
+                }))
+              }
+              setAddItemBInvoiceId(null)
+            }}
+            invoiceNumber={bInv?.number ?? ''}
+            invoiceNo={bInv?.invoiceNo ?? ''}
+            seqNum={(bItemsMap[addItemBInvoiceId ?? ''] ?? []).length + 1}
+          />
+        )
+      })()}
+            {/* 申請單預覽 */}
       <PreviewDialog
         open={previewOpen}
         onClose={() => setPreviewOpen(false)}
