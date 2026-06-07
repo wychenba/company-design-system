@@ -14,6 +14,7 @@ import {
   Toaster, toast,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
   Steps, StepItem, StepLabel,
+  DescriptionList, DescriptionItem,
 } from '@qijenchen/design-system'
 import {
   Home, FileText, Upload, ClipboardList, Users, BookOpen,
@@ -975,12 +976,9 @@ function CreateFormPage({
               />
             </Field>
             <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel required>
-                  申請人&nbsp;<InfoTooltip content="自動帶入登入者" />
-                </FieldLabel>
-                <Input value="林間宜 (023156)" disabled />
-              </Field>
+              <DescriptionList direction="vertical">
+                <DescriptionItem label="申請人">林間宜 (023156)</DescriptionItem>
+              </DescriptionList>
               <Field>
                 <FieldLabel required>
                   收款對象&nbsp;<InfoTooltip content="請選擇本次請款的收款對象" />
