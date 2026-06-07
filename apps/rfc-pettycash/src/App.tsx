@@ -7,7 +7,7 @@ import {
   Avatar, ItemAvatar, Button,
   Tabs, TabsList, TabsTrigger, TabsContent,
   Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle,
-  Input, Select, Textarea, Checkbox,
+  Input, Select, Textarea, Checkbox, DatePicker,
   RadioGroup, RadioGroupItem,
   Field, FieldLabel,
   Tag, Alert,
@@ -1111,11 +1111,10 @@ function CreateFormPage({
             </div>
             <Field disabled={!useUrgentDate}>
               <FieldLabel>緊急/指定付款日</FieldLabel>
-              <Input
-                type="date"
-                value={urgentDate}
-                onChange={e => setUrgentDate(e.target.value)}
-                placeholder="請選擇"
+              <DatePicker
+                value={urgentDate || null}
+                onChange={v => setUrgentDate(v)}
+                placeholder="請選擇日期"
               />
             </Field>
           </div>
