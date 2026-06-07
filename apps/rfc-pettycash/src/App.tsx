@@ -21,7 +21,7 @@ import {
 import {
   Home, FileText, Upload, ClipboardList, Users, BookOpen,
   MessageSquare, Plus, Pencil, Trash2, Download,
-  Info, ChevronDown, Copy,
+  Info, ChevronDown, Copy, Paperclip,
 } from 'lucide-react'
 
 // ─── Constants ───────────────────────────────────────────────
@@ -212,6 +212,7 @@ interface Attachment {
   id: string
   type: 'invoice' | 'auxiliary'
   desc: string
+  files: Array<{ id: string; name: string }>
 }
 
 interface Step1State {
@@ -857,7 +858,11 @@ function AddAttachmentModal({
   }
 
   function handleSubmit() {
-    onSubmit({ type: attType, desc })
+    onSubmit({
+      type: attType,
+      desc,
+      files: attFiles.map(f => ({ id: f.id, name: f.name })),
+    })
     handleClose()
   }
 
@@ -990,7 +995,7 @@ function CreateFormPage({
 
         {/* 基本資訊 */}
         <section className="bg-surface border border-divider rounded-lg p-6">
-          <h2 className="text-base font-semibold mb-4">基本資訊</h2>
+          <h2 className="text-base font-semibold mb-4">付款資訊</h2>
           <div className="space-y-4">
             <Field disabled>
               <FieldLabel>
@@ -1098,7 +1103,20 @@ function CreateFormPage({
                     <tr key={att.id} className="hover:bg-surface-raised transition-colors">
                       <td className="px-4 py-3 text-fg-secondary">{ATT_TYPE_LABEL[att.type]}</td>
                       <td className="px-4 py-3 text-fg-secondary">{att.desc || '-'}</td>
-                      <td className="px-4 py-3 text-fg-tertiary">-</td>
+                      <td className="px-4 py-3">
+                        {att.files.length === 0 ? (
+                          <span className="text-fg-tertiary">-</span>
+                        ) : (
+                          <div className="flex flex-col gap-1">
+                            {att.files.map(f => (
+                              <div key={f.id} className="flex items-center gap-1.5">
+                                <Paperclip size={14} className="text-fg-tertiary shrink-0" />
+                                <span className="text-[var(--color-blue-6)] text-sm truncate">{f.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-0.5">
                           <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯">
