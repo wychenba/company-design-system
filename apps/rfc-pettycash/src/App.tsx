@@ -1892,6 +1892,7 @@ function CreateFormPage({
                   公司代號&nbsp;<InfoTooltip content="Company Code" />
                 </FieldLabel>
                 <Select
+                  mode="readonly"
                   value="TA01"
                   options={[{ value: 'TA01', label: 'TA01' }]}
                   onChange={() => {}}
