@@ -1615,16 +1615,29 @@ function DeleteItemModal({
 function CreateFormPage({
   onBack,
   onSubmit,
+  mode = 'create',
+  editEntry,
 }: {
   onBack: () => void
   onSubmit: (newNumber: string) => void
+  mode?: 'create' | 'edit'
+  editEntry?: DraftEntry
 }) {
-  const [payee, setPayee] = useState('員工')
-  const [reason, setReason] = useState('')
-  const [useUrgentDate, setUseUrgentDate] = useState(false)
-  const [urgentDate, setUrgentDate] = useState('')
-  const [invoices, setInvoices] = useState<Invoice[]>([])
-  const [attachments, setAttachments] = useState<Attachment[]>([])
+  const MOCK_EDIT_INVOICES: Invoice[] = [
+    { id: 'e1', number: `${editEntry?.number ?? 'PAE20260525001'}-1`, payee: editEntry?.applicant ?? '林間宜 (023156)', date: '2026/05/25', invoiceNo: 'BD28114045', currency: 'TWD', subtotal: '600', tax: '0', voucherType: 'e-invoice-25' },
+    { id: 'e2', number: `${editEntry?.number ?? 'PAE20260525001'}-2`, payee: editEntry?.applicant ?? '林間宜 (023156)', date: '2026/05/25', invoiceNo: 'BD28114045', currency: 'TWD', subtotal: '4000', tax: '0', voucherType: 'e-invoice-25' },
+  ]
+  const MOCK_EDIT_ATTACHMENTS: Attachment[] = [
+    { id: 'ea1', type: 'invoice', desc: '-', files: [{ id: 'f1', name: 'Computer-invoice.Png' }] },
+    { id: 'ea2', type: 'auxiliary', desc: '-', files: [{ id: 'f2', name: 'Supportdoc.Png' }] },
+  ]
+  const isEdit = mode === 'edit'
+  const [payee, setPayee] = useState(editEntry?.payee ?? '員工')
+  const [reason, setReason] = useState(editEntry?.reason !== '-' ? (editEntry?.reason ?? '') : '')
+  const [useUrgentDate, setUseUrgentDate] = useState(editEntry?.urgentDate !== '-' && !!editEntry?.urgentDate)
+  const [urgentDate, setUrgentDate] = useState(editEntry?.urgentDate !== '-' ? (editEntry?.urgentDate ?? '') : '')
+  const [invoices, setInvoices] = useState<Invoice[]>(isEdit ? MOCK_EDIT_INVOICES : [])
+  const [attachments, setAttachments] = useState<Attachment[]>(isEdit ? MOCK_EDIT_ATTACHMENTS : [])
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false)
   const [attachmentModalOpen, setAttachmentModalOpen] = useState(false)
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false)
@@ -1633,7 +1646,7 @@ function CreateFormPage({
   const [addItemInvoiceId, setAddItemInvoiceId] = useState<string | null>(null)
   const [editItemTarget, setEditItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
   const [deleteItemTarget, setDeleteItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
-  const [expandedInvoiceIds, setExpandedInvoiceIds] = useState<Set<string>>(new Set())
+  const [expandedInvoiceIds, setExpandedInvoiceIds] = useState<Set<string>>(isEdit ? new Set(['e2']) : new Set())
 
   function toggleInvoiceExpand(id: string) {
     setExpandedInvoiceIds(prev => {
@@ -1990,9 +2003,18 @@ function CreateFormPage({
       {/* Footer */}
       <div className="flex items-center justify-end mt-6 pt-4 border-t border-divider max-w-[860px]">
         <div className="flex gap-2">
-          <Button variant="primary" danger onClick={() => setCancelConfirmOpen(true)}>取消申請</Button>
-          <Button variant="tertiary" onClick={() => { onBack(); toast({ variant: 'success', title: '儲存成功' }) }}>存成草稿</Button>
-          <Button onClick={() => setPreviewOpen(true)}>送出預覽</Button>
+          {isEdit ? (
+            <>
+              <Button variant="outline" onClick={onBack}>取消</Button>
+              <Button onClick={() => { onBack(); toast({ variant: 'success', title: '申請單已更新' }) }}>更新</Button>
+            </>
+          ) : (
+            <>
+              <Button variant="primary" danger onClick={() => setCancelConfirmOpen(true)}>取消申請</Button>
+              <Button variant="tertiary" onClick={() => { onBack(); toast({ variant: 'success', title: '儲存成功' }) }}>存成草稿</Button>
+              <Button onClick={() => setPreviewOpen(true)}>送出預覽</Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -2095,7 +2117,7 @@ function DraftListPage({
   entries: DraftEntry[]
   onAddSingle: () => void
   onAddExcel: () => void
-  onEdit: () => void
+  onEdit: (entry: DraftEntry) => void
   onDelete: (id: string) => void
 }) {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
@@ -2164,7 +2186,7 @@ function DraftListPage({
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-0.5">
                           <Button variant="ghost" size="sm" iconOnly startIcon={Info} aria-label="查看" disabled />
-                          <Button variant="ghost" size="sm" iconOnly startIcon={Pencil} aria-label="編輯" onClick={() => onEdit()} />
+                          <Button variant="ghost" size="sm" iconOnly startIcon={Pencil} aria-label="編輯" onClick={() => onEdit(entry)} />
                           <Button variant="ghost" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={() => setDeleteTargetId(entry.id)} />
                         </div>
                       </td>
@@ -2225,6 +2247,7 @@ function DraftListPage({
 export default function App() {
   const [activeNav, setActiveNav] = useState('drafts')
   const [entries, setEntries] = useState<DraftEntry[]>(INITIAL_ENTRIES)
+  const [editEntry, setEditEntry] = useState<DraftEntry | null>(null)
   const [page, setPage] = useState<'list' | 'createform'>('list')
 
   function handleSubmit(newNumber: string) {
@@ -2258,7 +2281,7 @@ export default function App() {
               entries={entries}
               onAddSingle={() => setPage('createform')}
               onAddExcel={() => toast({ variant: 'info', title: 'Excel 申請', description: '請下載範本填寫後上傳' })}
-              onEdit={() => setPage('createform')}
+              onEdit={entry => { setEditEntry(entry); setPage('createform') }}
               onDelete={id => {
                 const entry = entries.find(e => e.id === id)
                 setEntries(prev => prev.filter(e => e.id !== id))
@@ -2267,8 +2290,11 @@ export default function App() {
             />
           ) : (
             <CreateFormPage
-              onBack={() => setPage('list')}
+              key={editEntry?.id ?? 'new'}
+              onBack={() => { setEditEntry(null); setPage('list') }}
               onSubmit={handleSubmit}
+              mode={editEntry ? 'edit' : 'create'}
+              editEntry={editEntry ?? undefined}
             />
           )}
         </AppShell>
