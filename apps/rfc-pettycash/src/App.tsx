@@ -216,6 +216,16 @@ interface Attachment {
   files: Array<{ id: string; name: string }>
 }
 
+interface PaymentItem {
+  id: string
+  seq: number
+  category: string
+  subCategory: string
+  costCenter: string
+  accountCode: string
+  description: string
+}
+
 interface Step1State {
   payee: string
   voucherType: string
@@ -1646,6 +1656,14 @@ function CreateFormPage({
   const [addItemInvoiceId, setAddItemInvoiceId] = useState<string | null>(null)
   const [editItemTarget, setEditItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
   const [deleteItemTarget, setDeleteItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
+  const MOCK_PAYMENT_ITEMS: PaymentItem[] = [
+    { id: 'pi1', seq: 1, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-' },
+    { id: 'pi2', seq: 2, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-' },
+    { id: 'pi3', seq: 3, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-' },
+  ]
+  const [paymentItemsMap, setPaymentItemsMap] = useState<Record<string, PaymentItem[]>>(
+    isEdit ? { e1: MOCK_PAYMENT_ITEMS.map(i => ({ ...i })), e2: MOCK_PAYMENT_ITEMS.map(i => ({ ...i })) } : {}
+  )
   const [expandedInvoiceIds, setExpandedInvoiceIds] = useState<Set<string>>(isEdit ? new Set(['e2']) : new Set())
 
   function toggleInvoiceExpand(id: string) {
@@ -1830,7 +1848,7 @@ function CreateFormPage({
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-1.5 text-sm font-medium text-fg-primary">
                               <ClipboardList size={16} className="text-fg-secondary" />
-                              付款細項：3 項
+                              付款細項：{(paymentItemsMap[inv.id] ?? []).length} 項
                             </div>
                             <div className="flex items-center gap-2">
                               <Button variant="tertiary" size="sm" startIcon={Download} onClick={() => setBatchImportInvoiceId(inv.id)}>批次匯入</Button>
@@ -1851,20 +1869,20 @@ function CreateFormPage({
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-divider">
-                                {[1, 2, 3].map(seq => (
-                                  <tr key={seq} className="hover:bg-surface-raised transition-colors">
-                                    <td className="px-3 py-2 text-fg-secondary">{seq}</td>
-                                    <td className="px-3 py-2 text-fg-secondary">小型工具/物品、電腦/手機週邊、辦公家具</td>
-                                    <td className="px-3 py-2 text-fg-secondary">電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)</td>
-                                    <td className="px-3 py-2 text-fg-secondary">00690</td>
-                                    <td className="px-3 py-2 text-fg-secondary">613000</td>
-                                    <td className="px-3 py-2 text-fg-tertiary">-</td>
+                                {(paymentItemsMap[inv.id] ?? []).map(item => (
+                                  <tr key={item.id} className="hover:bg-surface-raised transition-colors">
+                                    <td className="px-3 py-2 text-fg-secondary">{item.seq}</td>
+                                    <td className="px-3 py-2 text-fg-secondary">{item.category}</td>
+                                    <td className="px-3 py-2 text-fg-secondary">{item.subCategory}</td>
+                                    <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
+                                    <td className="px-3 py-2 text-fg-secondary">{item.accountCode}</td>
+                                    <td className="px-3 py-2 text-fg-tertiary">{item.description}</td>
                                     <td className="px-3 py-2">
                                       <div className="flex items-center gap-0.5">
-                                        <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditItemTarget({ invoiceId: inv.id, seq })}>
+                                        <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditItemTarget({ invoiceId: inv.id, seq: item.seq })}>
                                           <Pencil size={13} />
                                         </button>
-                                        <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq })}>
+                                        <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq: item.seq })}>
                                           <Trash2 size={13} />
                                         </button>
                                       </div>
@@ -2064,6 +2082,14 @@ function CreateFormPage({
         open={deleteItemTarget !== null}
         onClose={() => setDeleteItemTarget(null)}
         onConfirm={() => {
+          if (deleteItemTarget) {
+            setPaymentItemsMap(prev => {
+              const items = (prev[deleteItemTarget.invoiceId] ?? [])
+                .filter(item => item.seq !== deleteItemTarget.seq)
+                .map((item, i) => ({ ...item, seq: i + 1 }))
+              return { ...prev, [deleteItemTarget.invoiceId]: items }
+            })
+          }
           setDeleteItemTarget(null)
           toast({ variant: 'success', title: '付款細項已刪除' })
         }}
