@@ -39,7 +39,7 @@ function serve(dir, port) {
 // ── story id 動態抓(不寫死 CJK tier 名)──
 const idx = JSON.parse(readFileSync(join(AFTER, 'index.json'), 'utf8'))
 const entries = Object.values(idx.entries || idx.stories || {})
-const CONTROLS = ['input','numberinput','textarea','select','combobox','datepicker','timepicker','peoplepicker','linkinput']
+const CONTROLS = ['input','numberinput','textarea','select','combobox','datepicker','timepicker','peoplepicker','linkinput','segmentedcontrol','rating','button']
 const TYPES = ['overview','size-matrix','state-behavior','mode-matrix','inspector','column-types']
 const STORY_IDS = entries
   .filter(e => e.type === 'story' && (

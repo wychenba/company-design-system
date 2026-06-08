@@ -34,23 +34,38 @@ const FIELD_STYLE_IMPORT = /(fieldWrapperStyles|bareInputStyles)/
 const violations = []
 let checked = 0
 
+const scattered = []  // Check 2:散落直讀 fieldCtx.size(該走 SSOT)
+
 for (const f of walk(COMPONENTS)) {
-  if (f.includes('/Field/')) continue  // field-wrapper.tsx / field-context 等基建本身豁免
+  if (f.includes('/Field/')) continue  // field-wrapper.tsx / field-context 等基建本身豁免(useResolvedFieldSize 內部本就讀 fieldCtx.size)
   const s = readFileSync(f, 'utf8')
-  // 只查「Field 控件」:有 import field-wrapper 的 size→font/height 視覺契約者
-  if (!/from '@\/design-system\/components\/Field\/field-wrapper'/.test(s)) continue
-  if (!FIELD_STYLE_IMPORT.test(s)) continue
-  checked++
-  if (!/useResolvedFieldSize/.test(s)) {
-    violations.push(f.replace(/.*packages\/design-system\/src\//, 'src/'))
+  const rel = f.replace(/.*packages\/design-system\/src\//, 'src/')
+
+  // ── Check 1:Field 控件(import field-wrapper size→font/height 契約者)必用 useResolvedFieldSize ──
+  if (/from '@\/design-system\/components\/Field\/field-wrapper'/.test(s) && FIELD_STYLE_IMPORT.test(s)) {
+    checked++
+    if (!/useResolvedFieldSize/.test(s)) violations.push(rel)
+  }
+
+  // ── Check 2:任何控件「散落直讀 fieldCtx.size」(SegmentedControl/Rating/Button class)= 該走 useResolvedFieldSize SSOT ──
+  // 逐行掃,剝掉行內 // 註解後仍含 fieldCtx(?.| .)size → 散落讀取(M17 違反)。
+  for (const rawLine of s.split('\n')) {
+    const codeOnly = rawLine.replace(/\/\/.*$/, '')  // 去行尾註解
+    if (/fieldCtx\??\.size/.test(codeOnly)) { scattered.push(`${rel}: ${rawLine.trim().slice(0, 80)}`); break }
   }
 }
 
-if (violations.length) {
-  console.error(`❌ Field 控件未用 useResolvedFieldSize 解析 size(size 不會隨 <Field size>/cell surface 流動):`)
-  violations.forEach((v) => console.error(`   - ${v}`))
-  console.error(`\n   修:該控件改 \`const size = useResolvedFieldSize(sizeProp)\`(取代 size 預設 'md' / 散落 fieldCtx?.size resolve)。`)
-  console.error(`   SSOT:components/Field/field-context.ts useResolvedFieldSize(prop > fieldCtx.size > surface-size > md)。`)
+if (violations.length || scattered.length) {
+  if (violations.length) {
+    console.error(`❌ Field 控件未用 useResolvedFieldSize 解析 size(size 不會隨 <Field size>/cell surface 流動):`)
+    violations.forEach((v) => console.error(`   - ${v}`))
+  }
+  if (scattered.length) {
+    console.error(`❌ 散落直讀 fieldCtx.size(應走 useResolvedFieldSize SSOT,prop > fieldCtx.size > surface-size > fallback):`)
+    scattered.forEach((v) => console.error(`   - ${v}`))
+  }
+  console.error(`\n   修:改 \`const size = useResolvedFieldSize(sizeProp[, fallback])\`(取代 size 預設 / 散落 fieldCtx?.size)。`)
+  console.error(`   SSOT:components/Field/field-context.ts useResolvedFieldSize<T>(generic + 自訂 fallback,Rating 'xs' / SegmentedControl 'md')。`)
   process.exit(1)
 }
-console.log(`✓ Field size-resolve gate:${checked} 個 Field 控件全經 useResolvedFieldSize(無漏讀 size context)`)
+console.log(`✓ Field size-resolve gate:${checked} 個 Field 控件全經 useResolvedFieldSize + 0 散落 fieldCtx.size(SSOT 統一)`)

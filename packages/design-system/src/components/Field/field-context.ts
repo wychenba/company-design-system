@@ -152,10 +152,13 @@ const FieldSurfaceSizeContext = React.createContext<FieldSize | null>(null)
  * 真 <Field> 永遠勝 host surface(安全序);cell 無 Field wrapper(fieldCtx=null)→ 自動接 surface-size,
  * 漏傳 size 的新 cell 也字級一致。
  */
-export function useResolvedFieldSize(sizeProp?: FieldSize | null): FieldSize {
+export function useResolvedFieldSize<T extends string = FieldSize>(sizeProp?: T | null, fallback?: T): T {
   const fieldCtx = React.useContext(FieldContext)
   const surfaceSize = React.useContext(FieldSurfaceSizeContext)
-  return sizeProp ?? fieldCtx?.size ?? surfaceSize ?? 'md'
+  // generic T(預設 FieldSize)讓非-input 控件(SegmentedControl/Rating 的 'xs'|'sm'|'md'|'lg' 超集、各自 fallback)
+  // 也走同一 SSOT resolution。fieldCtx.size/surfaceSize 為 FieldSize(T 的子集)→ widen cast 安全。
+  // fallback 未傳預設 'md'(input-class 控件向後相容);Rating 傳 'xs'、SegmentedControl 傳 'md'。
+  return (sizeProp ?? (fieldCtx?.size as T | undefined) ?? (surfaceSize as T | undefined) ?? fallback ?? ('md' as T))
 }
 
 /**

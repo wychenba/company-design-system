@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { CircularProgress } from '@/design-system/components/CircularProgress/circular-progress'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useResolvedFieldSize } from '@/design-system/components/Field/field-context'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 
 /**
@@ -359,9 +359,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    // ── FieldContext：在 Field 內時自動讀 size，讓 Button 跟 Input 同高 ──
-    const fieldCtx = useFieldContext?.()
-    const resolvedSize = size ?? (fieldCtx?.size as typeof size) ?? 'md'
+    // ── FieldContext：在 Field 內自動讀 size，讓 Button 跟 Input 同高(SSOT:useResolvedFieldSize)──
+    const resolvedSize = useResolvedFieldSize(size, 'md')
 
     // ── Dismiss 視覺類 override(2026-04-22 cross-implementation dimming canonical) ──
     // dismiss=true 強制:variant="text" + iconOnly=true + icon 色弱化(fg-muted → hover foreground)

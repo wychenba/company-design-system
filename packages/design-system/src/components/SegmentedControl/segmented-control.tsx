@@ -4,7 +4,7 @@ import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group'
 import { cva } from 'class-variance-authority'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 import { ICON_SIZE } from '@/design-system/tokens/uiSize/icon-size'
 
@@ -103,8 +103,7 @@ const SegmentedControl = React.forwardRef<
   ) => {
     // Field 內自動讀 size，跟 Button 同機制
     const fieldCtx = useFieldContext?.()
-    const resolvedSize: SegmentedControlSize =
-      sizeProp ?? (fieldCtx?.size as SegmentedControlSize) ?? 'md'
+    const resolvedSize = useResolvedFieldSize<SegmentedControlSize>(sizeProp, 'md')  // SSOT:統一 size resolution(原散落 ?? fieldCtx?.size ?? 'md')
     const resolvedDisabled = disabled || !!fieldCtx?.disabled
 
     // Memoize provider value(2026-04-22 D3 perf audit):避免每次父 render 重建 4-field object
