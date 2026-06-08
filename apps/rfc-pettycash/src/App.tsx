@@ -797,7 +797,7 @@ function AddInvoiceModal({
                 </Field>
                 <Field mode="readonly">
                   <FieldLabel>會計科目&nbsp;<InfoTooltip content="依分類/子分類自動帶入" /></FieldLabel>
-                  <Input value={s2.accountCode ? `${s2.accountCode}（${ACCT_NAME_MAPPING[s2.accountCode] ?? ''}）` : ''} readOnly placeholder="依分類自動帶入" />
+                  <Input value={s2.accountCode ? `${s2.accountCode}（${ACCT_NAME_MAPPING[s2.accountCode] ?? ''}）` : ''} placeholder="依分類自動帶入" />
                 </Field>
               </div>
 
