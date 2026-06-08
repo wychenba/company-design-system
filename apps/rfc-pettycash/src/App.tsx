@@ -2437,7 +2437,7 @@ function CreateFormPage({
       </div>
 
       {/* Form sections */}
-      <div className="space-y-4 max-w-[860px]">
+      <div className="space-y-4 max-w-[860px] mx-auto">
 
         {/* 基本資訊 */}
         <section className="bg-surface border border-divider rounded-lg p-6">
@@ -2819,7 +2819,7 @@ function CreateFormPage({
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-end mt-6 pt-4 border-t border-divider max-w-[860px]">
+      <div className="flex items-center justify-end mt-6 pt-4 border-t border-divider max-w-[860px] mx-auto">
         <div className="flex gap-2">
           {isEdit && !isModifying ? (
             <>
