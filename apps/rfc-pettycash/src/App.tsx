@@ -795,9 +795,9 @@ function AddInvoiceModal({
                   <FieldLabel required>成本中心&nbsp;<InfoTooltip content="Cost Center" /></FieldLabel>
                   <Input value={s2.costCenter} onChange={e => setS2(p => ({ ...p, costCenter: e.target.value }))} />
                 </Field>
-                <Field mode="readonly">
+                <Field>
                   <FieldLabel>會計科目&nbsp;<InfoTooltip content="依分類/子分類自動帶入" /></FieldLabel>
-                  <Input value={s2.accountCode ? `${s2.accountCode}（${ACCT_NAME_MAPPING[s2.accountCode] ?? ''}）` : ''} placeholder="依分類自動帶入" />
+                  <Input value={s2.accountCode ? `${s2.accountCode}（${ACCT_NAME_MAPPING[s2.accountCode] ?? ''}）` : ''} placeholder="依分類自動帶入" onChange={e => setS2(p => ({ ...p, accountCode: e.target.value }))} />
                 </Field>
               </div>
 
