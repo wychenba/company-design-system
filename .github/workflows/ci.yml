@@ -222,6 +222,11 @@ jobs:
       - name: Figma Make artifacts(SSOT propagation check)
         run: node scripts/gen-figma-make-artifacts.mjs --check
 
+      # 2026-06-08:llms.txt/llms-full.txt 從 spec frontmatter build-time derive,禁手維護。
+      # deterministic(不讀 storybook)→ 此 gate 順序無關;source 改了沒重生 → drift fail。
+      - name: llms.txt drift check(build-time derive,禁手維護)
+        run: node scripts/gen-llms-txt.mjs --check 2>&1 | tail -20
+
       # 2026-06-08:DS src 改了但版本沒 bump → 此 main push 不會 republish npm → consumer 拿 stale。
       # 補「republish 靠 AI 記得 bump」的非機械斷點(release.yml tag-only 觸發,plain main push 不發版)。
       # 只在 main push 跑(PR 還沒決定發版,不擋);排除 stories/spec.md(不 ship);網路失敗降級 warn。

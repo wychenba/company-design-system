@@ -51,6 +51,7 @@
     "postinstall": "node scripts/ensure-playwright-browsers.mjs",
     "prepare": "husky",
     "gen-ds-story-manifest": "node scripts/gen-ds-story-manifest.mjs",
+    "gen-llms-txt": "node scripts/gen-llms-txt.mjs",
     "postbuild-storybook": "node scripts/gen-ds-story-manifest.mjs"
   },
   "dependencies": {

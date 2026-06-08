@@ -15,7 +15,9 @@
     "CLAUDE.md",
     "ds-canonical",
     "cli-init.mjs",
-    "ds-story-manifest.json"
+    "ds-story-manifest.json",
+    "llms.txt",
+    "llms-full.txt"
   ],
   "exports": {
     ".": {
@@ -39,6 +41,8 @@
     "./styles/tokens": "./src/styles/tokens.css",
     "./package.json": "./package.json",
     "./ds-story-manifest.json": "./ds-story-manifest.json",
+    "./llms.txt": "./llms.txt",
+    "./llms-full.txt": "./llms-full.txt",
     "./styles/base": "./src/styles/base.css"
   },
   "bin": {

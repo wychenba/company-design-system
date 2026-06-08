@@ -38,6 +38,9 @@ console.log('═══ Release Preflight — 1:1 release.yml gates,fail-fast ═
 // ① SYNCS first(修 drift,讓 CI 抓不到)
 run('sync version → 5 manifests', 'node scripts/sync-version-to-all-manifests.mjs')
 run('sync ds-canonical mirror', 'node scripts/sync-ds-canonical.mjs')
+// llms.txt/llms-full.txt 從 spec frontmatter build-time 重生(deterministic,禁手維護;對齊 Mantine
+// 「每 release 從 source 重生」)。SYNCS 段重生 → 下方 drift gate 驗 + commit 進 tag。
+run('sync llms.txt + llms-full.txt(從 spec frontmatter)', 'node scripts/gen-llms-txt.mjs')
 run('sync template canonical App(dashboard-app.tsx ← apps/template App.tsx)', 'node scripts/sync-template-canonical-app.mjs')
 
 // ② Deterministic audit gates(== release.yml「Audit gates」step + story type-check)
@@ -60,6 +63,7 @@ run('template canonical App drift check(防 receiver 覆寫 scaffold App.tsx)', 
 // 2026-06-08:DS src 改了必 bump 才 republish(補「republish 靠 AI 記得 bump」非機械斷點)。
 // preflight 此時 version 已 bump → gate 見「bumped → OK」綠;若忘 bump 直 push 則 ci.yml 同道 gate 擋。
 run('DS src republish gate(src 改了必 bump,防 ship stale)', 'node scripts/check-src-republish.mjs --check')
+run('llms.txt drift check(build-time derive,禁手維護)', 'node scripts/gen-llms-txt.mjs --check')
 
 // ③ Build + smoke + dogfood(== release.yml publish job + smoke-shard job)
 run('build:lib', 'npm run --silent build:lib')

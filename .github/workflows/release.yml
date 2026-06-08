@@ -119,6 +119,7 @@ jobs:
           node scripts/sync-ds-canonical.mjs --check
           node scripts/check-src-republish.mjs --check
           node scripts/sync-template-canonical-app.mjs --check
+          node scripts/gen-llms-txt.mjs --check
 
       - name: Build Storybook
         run: npm run build-storybook
