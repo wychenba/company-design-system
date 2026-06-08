@@ -2197,6 +2197,7 @@ function CreateFormPage({
   const [scenarioBMode, setScenarioBMode] = useState(false)
   const [bInvoices, setBInvoices] = useState<Invoice[]>([])
   const [bItemsMap, setBItemsMap] = useState<Record<string, PaymentItem[]>>({})
+  const [bEditItemTarget, setBEditItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
   const [addInvoiceBOpen, setAddInvoiceBOpen] = useState(false)
   const [addItemBInvoiceId, setAddItemBInvoiceId] = useState<string | null>(null)
   const MOCK_PAYMENT_ITEMS: PaymentItem[] = [
@@ -2535,6 +2536,7 @@ function CreateFormPage({
                                       <td className="px-3 py-2 text-fg-secondary">{item.contractInfo}</td>
                                       <td className="sticky right-0 bg-surface border-l border-divider px-3 py-2">
                                         <div className="flex items-center gap-0.5">
+                                          <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setBEditItemTarget({ invoiceId: inv.id, seq: item.seq })}><Pencil size={13} /></button>
                                           <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setBItemsMap(prev => ({ ...prev, [inv.id]: (prev[inv.id] ?? []).filter(i => i.id !== item.id).map((i, idx) => ({ ...i, seq: idx + 1 })) }))}><Trash2 size={13} /></button>
                                         </div>
                                       </td>
@@ -2875,6 +2877,18 @@ function CreateFormPage({
             invoiceNumber={bInv?.number ?? ''}
             invoiceNo={bInv?.invoiceNo ?? ''}
             seqNum={(bItemsMap[addItemBInvoiceId ?? ''] ?? []).length + 1}
+          />
+        )
+      })()}
+      {(() => {
+        const bInv2 = bInvoices.find(i => i.id === bEditItemTarget?.invoiceId)
+        return (
+          <EditItemModal
+            open={bEditItemTarget !== null}
+            onClose={() => setBEditItemTarget(null)}
+            invoiceNumber={bInv2?.number ?? ''}
+            invoiceNo={bInv2?.invoiceNo ?? ''}
+            seqNum={bEditItemTarget?.seq ?? 1}
           />
         )
       })()}
