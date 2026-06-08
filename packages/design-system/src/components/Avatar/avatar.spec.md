@@ -244,7 +244,7 @@ Image 模式不顯示背景色（圖片填滿），`solid` prop 無效果。
 
 ## Disabled
 
-Avatar 包在 disabled Field wrapper context 內時，會經 `fieldCtx`（`mode === 'disabled' && hasFieldWrapper === true`）**自己**套 `opacity-disabled` self-dim（取代既有 wrapper blanket opacity-disabled 逃生艙，2026-05-13 R3.5）；沒包在 Field wrapper 內的 standalone Avatar（ProfileCard / FileItem / HoverCard / Dialog 等 display 場景）維持原樣不變。Avatar 不提供自身 `disabled` prop。詳見 `color.spec.md` 的 Disabled 狀態。
+Avatar 包在 disabled Field wrapper context 內時，會經 `useResolvedFieldDisabled()`（讀 `fieldCtx.disabled`，**涵蓋 `<Field disabled>` 與 `<Field mode="disabled">` 兩者**）**自己**套 `opacity-disabled`（= `var(--opacity-disabled)`，0.45）self-dim（取代既有 wrapper blanket opacity-disabled 逃生艙，2026-05-13 R3.5；**2026-06-08 trigger 由「只認 `mode==='disabled'`」改為 `fieldCtx.disabled`，與其他 field 控件的 disabled cascade 統一**——`<Field disabled>` 內 PeoplePicker 人名變灰時 avatar 同步變淡，視覺一致）；沒包在 Field wrapper 內的 standalone Avatar（ProfileCard / FileItem / HoverCard / Dialog 等 display 場景）維持原樣不變（`fieldCtx=null` → 不觸發）。Avatar 不提供自身 `disabled` prop。詳見 `color.spec.md` 的 Disabled 狀態。
 
 ---
 
