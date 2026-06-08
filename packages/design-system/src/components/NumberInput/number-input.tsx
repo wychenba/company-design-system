@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import type { InlineActionConfig } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 // ── Format ──────────────────────────────────────────────────────────────────
@@ -97,7 +97,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
   ) => {
     const fieldCtx = useFieldContext()
     const error = errorProp || (fieldCtx?.invalid ?? false)
-    const size = sizeProp ?? fieldCtx?.size ?? 'md'
+    const size = useResolvedFieldSize(sizeProp)
     const disabled = disabledProp ?? fieldCtx?.disabled
     // chrome 透傳:per-prop override context;context 沒值則 'default'
     const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'

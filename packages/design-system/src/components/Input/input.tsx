@@ -5,7 +5,7 @@ import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
 import { ItemInlineAction, ItemPrefix, type InlineActionConfig } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { CircularProgress } from '@/design-system/components/CircularProgress/circular-progress'
 import { ICON_SIZE } from '@/design-system/tokens/uiSize/icon-size'
@@ -99,7 +99,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const fieldCtx = useFieldContext()
     // 2026-05-31 #11/#12:size + disabled 從 Field context cascade(對齊 NumberInput number-input.tsx:100-101
     // + MUI FormControl)。原 Input 不讀 fieldCtx.size/disabled → <Field size="lg"> / <Field disabled> 對 Input 無效。
-    const size = sizeProp ?? fieldCtx?.size ?? 'md'
+    const size = useResolvedFieldSize(sizeProp)
     const disabled = disabledProp ?? fieldCtx?.disabled
     // chrome 透傳:per-prop override context;context 沒值則 'default'
     const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'

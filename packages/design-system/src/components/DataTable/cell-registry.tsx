@@ -33,7 +33,7 @@ import { LinkInput } from '@/design-system/components/LinkInput/link-input'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Button } from '@/design-system/components/Button/button'
 import type { PersonValue } from '@/design-system/components/PeoplePicker/person-display'
-import { FieldSurfaceProvider } from '@/design-system/components/Field/field-context'
+import { FieldSurfaceProvider, FieldSurfaceSizeProvider } from '@/design-system/components/Field/field-context'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -506,7 +506,11 @@ function buildCellWithSurface(Inner: ComponentType<CellComponentProps>, key: str
   const CellWithSurface = React.memo(function CellWithSurface(props: CellComponentProps) {
     return (
       <FieldSurfaceProvider surface="table-cell">
-        <Inner {...props} />
+        {/* 2026-06-08:把 table-density size 經獨立 surface-size context 注給 child Field controls,
+            漏傳 size 的 cell 也自動繼承(根治「新 cell 漏傳 size」class);size primitive 不破壞 memo identity。*/}
+        <FieldSurfaceSizeProvider size={props.size}>
+          <Inner {...props} />
+        </FieldSurfaceSizeProvider>
       </FieldSurfaceProvider>
     )
   })

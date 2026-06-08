@@ -134,3 +134,40 @@ export function TableScrollProvider({
 }): React.ReactElement {
   return React.createElement(TableScrollContext.Provider, { value: isScrolling }, children)
 }
+
+/**
+ * Surface size signal — 獨立於 FieldContext + FieldSurfaceContext 的純視覺 size context(2026-06-08)。
+ * 讓 host(DataTable cell substrate)把「這片 surface 的 density size」propagate 給 child Field controls,
+ * 未來新 cell 漏傳 size prop 也自動繼承 → 字級一致(根治 StringCell/NumberCell 漏傳 size class)。
+ *
+ * 不放進 FieldSurfaceContext value(避免 string→object identity drift on scroll → 全 cell 重渲,
+ * 同 TableScrollContext L119-121 canonical)— 獨立 Context,value = FieldSize primitive(stable when unchanged)。
+ * 絕不污染 FieldContext:不碰 hasFieldWrapper/mode/invalid/disabled,useFieldContext() 在 cell 內仍 null。
+ */
+const FieldSurfaceSizeContext = React.createContext<FieldSize | null>(null)
+
+/**
+ * Resolve Field control size — 控件用此 helper 取代散落的 `sizeProp ?? fieldCtx?.size ?? 'md'`。
+ * 優先序:prop(caller 顯式)> FieldContext.size(真 <Field> wrapper)> surface-size(host 如 cell)> 'md'。
+ * 真 <Field> 永遠勝 host surface(安全序);cell 無 Field wrapper(fieldCtx=null)→ 自動接 surface-size,
+ * 漏傳 size 的新 cell 也字級一致。
+ */
+export function useResolvedFieldSize(sizeProp?: FieldSize | null): FieldSize {
+  const fieldCtx = React.useContext(FieldContext)
+  const surfaceSize = React.useContext(FieldSurfaceSizeContext)
+  return sizeProp ?? fieldCtx?.size ?? surfaceSize ?? 'md'
+}
+
+/**
+ * Host(non-Field-wrapper,如 DataTable cell)注 surface density size 給 child Field controls。
+ * 僅注 size 視覺訊號,不污染 FieldContext。Usage:cell-registry buildCellWithSurface。
+ */
+export function FieldSurfaceSizeProvider({
+  size,
+  children,
+}: {
+  size: FieldSize
+  children: React.ReactNode
+}): React.ReactElement {
+  return React.createElement(FieldSurfaceSizeContext.Provider, { value: size }, children)
+}

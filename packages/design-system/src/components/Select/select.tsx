@@ -9,7 +9,7 @@ import type { FieldMode, FieldVariant } from '@/design-system/components/Field/f
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, nakedCellRowModeAlign, fieldDisplayTextClass } from '@/design-system/components/Field/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { ItemInlineAction, ItemPrefix, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
 import { useIsTouchDevice } from '@/design-system/hooks/use-is-touch-device'
 import { useControllable } from '@/design-system/hooks/use-controllable'
@@ -357,7 +357,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
     // 2026-05-31 #11:size 從 Field context cascade(對齊 Input/NumberInput + MUI FormControl)
-    const size = sizeProp ?? fieldCtx?.size ?? 'md'
+    const size = useResolvedFieldSize(sizeProp)
     const resolvedMode = disabled ? 'disabled' : mode
     const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const iconSize = getIconSize(size)
@@ -452,7 +452,7 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
     const error = errorProp || (fieldCtx?.invalid ?? false)
     const disabled = disabledProp ?? fieldCtx?.disabled
     // 2026-05-31 #11:size 從 Field context cascade(對齊 Input/NumberInput + MUI FormControl)
-    const size = sizeProp ?? fieldCtx?.size ?? 'md'
+    const size = useResolvedFieldSize(sizeProp)
     const resolvedMode = disabled ? 'disabled' : mode
     const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const iconSize = getIconSize(size)

@@ -3,7 +3,7 @@ import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
 import { EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 
 /**
@@ -195,7 +195,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     // chrome 透傳:per-prop override context
     const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
     const error = errorProp || (fieldCtx?.invalid ?? false)
-    const size = sizeProp ?? fieldCtx?.size ?? 'md'
+    const size = useResolvedFieldSize(sizeProp)
     // mode resolve order(Phase B1 2026-05-05):prop > fieldCtx > readOnly/disabled fallback > 'edit'
     const resolvedMode: FieldMode = modeProp
       ?? fieldCtx?.mode
