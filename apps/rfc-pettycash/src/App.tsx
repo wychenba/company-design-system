@@ -440,7 +440,7 @@ const defaultStep1 = (): Step1State => ({
   invoiceNo: '',
   currency: 'TWD',
   subtotal: '',
-  tax: '',
+  tax: '0',
   taxId: '',
   incomeType: '',
   exemptAmount: '',
@@ -525,7 +525,7 @@ function AddInvoiceModal({
   function handleVoucherTypeChange(v: string) {
     setAutoFilled(false)
     setRateUpdateTime('')
-    setS1(p => ({ ...p, voucherType: v, invoiceNo: '', currency: 'TWD', subtotal: '', tax: '' }))
+    setS1(p => ({ ...p, voucherType: v, invoiceNo: '', currency: 'TWD', subtotal: '', tax: '0' }))
   }
 
   function handleInvoiceNoChange(value: string) {
@@ -544,7 +544,7 @@ function AddInvoiceModal({
       if (autoFilled) {
         setAutoFilled(false)
         setRateUpdateTime('')
-        setS1(p => ({ ...p, invoiceNo: value, currency: 'TWD', subtotal: '', tax: '' }))
+        setS1(p => ({ ...p, invoiceNo: value, currency: 'TWD', subtotal: '', tax: '0' }))
       }
     }
   }
@@ -1676,7 +1676,7 @@ function AddInvoiceBModal({
   const [invoiceNo, setInvoiceNo] = useState('')
   const [currency, setCurrency] = useState('TWD')
   const [subtotal, setSubtotal] = useState('')
-  const [tax, setTax] = useState('')
+  const [tax, setTax] = useState('0')
   const [taxId, setTaxId] = useState('')
   const [incomeType, setIncomeType] = useState('')
   const [exemptAmount, setExemptAmount] = useState('')
