@@ -797,14 +797,9 @@ function AddInvoiceModal({
                 </Field>
                 <Field mode="readonly">
                   <FieldLabel>會計科目&nbsp;<InfoTooltip content="依分類/子分類自動帶入" /></FieldLabel>
-                  <Input value={s2.accountCode} onChange={e => setS2(p => ({ ...p, accountCode: e.target.value }))} placeholder="依分類自動帶入" />
+                  <Input value={s2.accountCode ? `${s2.accountCode}（${ACCT_NAME_MAPPING[s2.accountCode] ?? ''}）` : ''} readOnly placeholder="依分類自動帶入" />
                 </Field>
               </div>
-
-              <Field>
-                <FieldLabel>描述</FieldLabel>
-                <Textarea value={s2.description} onChange={e => setS2(p => ({ ...p, description: e.target.value }))} rows={2} />
-              </Field>
 
               <div className="grid grid-cols-3 gap-4">
                 <Field>
