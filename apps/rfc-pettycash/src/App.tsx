@@ -246,6 +246,11 @@ interface PaymentItem {
   costCenter: string
   accountCode: string
   description: string
+  total: string
+  taxRate: string
+  taxAmount: string
+  contractProvided: string
+  contractInfo: string
 }
 
 interface Step1State {
@@ -1426,6 +1431,7 @@ function BatchImportModal({
 function AddItemModal({
   open,
   onClose,
+  onSubmit,
   invoiceNumber,
   invoiceNo,
   seqNum,
@@ -1433,6 +1439,7 @@ function AddItemModal({
 }: {
   open: boolean
   onClose: () => void
+  onSubmit: (item: PaymentItem) => void
   invoiceNumber: string
   invoiceNo: string
   seqNum: number
@@ -1470,6 +1477,13 @@ function AddItemModal({
   function handleSubmit() {
     setSubmitted(true)
     if (!category || !subCategory || !costCenter || !total) return
+    const contractLabel = contractProvided === 'yes' ? '是' : contractProvided === 'no' ? '否' : '無須提供'
+    onSubmit({
+      id: String(Date.now()), seq: seqNum, category, subCategory, costCenter, accountCode,
+      description, total, taxRate, taxAmount,
+      contractProvided: contractLabel,
+      contractInfo: contractProvided === 'not-required' ? '-' : '',
+    })
     handleClose()
   }
 
@@ -1843,7 +1857,16 @@ function AddItemBModal({
   function handleSave() {
     setSubmitted(true)
     if (!category || !subCategory || !costCenter || !total) return
-    onSubmit({ id: String(Date.now()), seq: seqNum, category, subCategory, costCenter, accountCode, description })
+    const contractLabel = contractProvided === 'yes' ? '是' : contractProvided === 'no' ? '否' : '無須提供'
+    const computedTaxAmount = taxRate && total && taxRate !== 'exempt'
+      ? String(Math.round(Number(total) * Number(taxRate) / 100))
+      : '0'
+    onSubmit({
+      id: String(Date.now()), seq: seqNum, category, subCategory, costCenter, accountCode,
+      description, total, taxRate: taxRate || '0', taxAmount: computedTaxAmount,
+      contractProvided: contractLabel,
+      contractInfo: contractProvided === 'not-required' ? '-' : '',
+    })
     handleClose()
     toast({ variant: 'success', title: '新增成功' })
   }
@@ -2145,9 +2168,9 @@ function CreateFormPage({
   const [addInvoiceBOpen, setAddInvoiceBOpen] = useState(false)
   const [addItemBInvoiceId, setAddItemBInvoiceId] = useState<string | null>(null)
   const MOCK_PAYMENT_ITEMS: PaymentItem[] = [
-    { id: 'pi1', seq: 1, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-' },
-    { id: 'pi2', seq: 2, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-' },
-    { id: 'pi3', seq: 3, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-' },
+    { id: 'pi1', seq: 1, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-', total: '100', taxRate: '0', taxAmount: '0', contractProvided: '無須提供', contractInfo: '-' },
+    { id: 'pi2', seq: 2, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-', total: '100', taxRate: '0', taxAmount: '0', contractProvided: '無須提供', contractInfo: '-' },
+    { id: 'pi3', seq: 3, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-', total: '200', taxRate: '0', taxAmount: '0', contractProvided: '無須提供', contractInfo: '-' },
   ]
   const [paymentItemsMap, setPaymentItemsMap] = useState<Record<string, PaymentItem[]>>(
     isEdit ? { e1: MOCK_PAYMENT_ITEMS.map(i => ({ ...i })), e2: MOCK_PAYMENT_ITEMS.map(i => ({ ...i })) } : {}
@@ -2334,17 +2357,22 @@ function CreateFormPage({
                                   <Button variant="tertiary" size="sm" startIcon={Plus} onClick={() => setAddItemInvoiceId(inv.id)}>新增細項</Button>
                                 </div>
                               </div>
-                              <div className="rounded-lg border border-divider overflow-hidden">
-                                <table className="w-full text-sm">
+                              <div className="rounded-lg border border-divider overflow-x-auto">
+                                <table className="text-sm" style={{ minWidth: '1200px' }}>
                                   <thead className="bg-surface-raised border-b border-divider">
                                     <tr>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary w-10">序號</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary">分類</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary">子分類</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">成本中心</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">會計科目</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary">描述</th>
-                                      <th className="px-3 py-2 w-16"></th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 44 }}>序號</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 160 }}>分類</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 280 }}>子分類</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>成本中心</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>會計科目</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 140 }}>描述</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 120 }}>總額</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅率</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅額</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 144 }}>是否提供合約編號</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 160 }}>合約編號/無合約原因</th>
+                                      <th className="sticky right-0 bg-surface-raised border-l border-divider px-3 py-2" style={{ width: 88 }}></th>
                                     </tr>
                                   </thead>
                                   <tbody className="divide-y divide-divider">
@@ -2355,8 +2383,13 @@ function CreateFormPage({
                                         <td className="px-3 py-2 text-fg-secondary">{item.subCategory}</td>
                                         <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
                                         <td className="px-3 py-2 text-fg-secondary">{item.accountCode}</td>
-                                        <td className="px-3 py-2 text-fg-tertiary">{item.description}</td>
-                                        <td className="px-3 py-2">
+                                        <td className="px-3 py-2 text-fg-tertiary">{item.description || '-'}</td>
+                                        <td className="px-3 py-2 text-fg-secondary">{item.total}</td>
+                                        <td className="px-3 py-2 text-fg-secondary">{item.taxRate}</td>
+                                        <td className="px-3 py-2 text-fg-secondary">{item.taxAmount}</td>
+                                        <td className="px-3 py-2 text-fg-secondary">{item.contractProvided}</td>
+                                        <td className="px-3 py-2 text-fg-secondary">{item.contractInfo}</td>
+                                        <td className="sticky right-0 bg-surface border-l border-divider px-3 py-2">
                                           <div className="flex items-center gap-0.5">
                                             <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditItemTarget({ invoiceId: inv.id, seq: item.seq })}><Pencil size={13} /></button>
                                             <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq: item.seq })}><Trash2 size={13} /></button>
@@ -2428,17 +2461,22 @@ function CreateFormPage({
                           {bItems.length === 0 ? (
                             <div className="rounded-lg border border-divider py-8 text-center text-sm text-fg-tertiary">沒有任何資料</div>
                           ) : (
-                            <div className="rounded-lg border border-divider overflow-hidden">
-                              <table className="w-full text-sm">
+                            <div className="rounded-lg border border-divider overflow-x-auto">
+                              <table className="text-sm" style={{ minWidth: '1200px' }}>
                                 <thead className="bg-surface-raised border-b border-divider">
                                   <tr>
-                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary w-10">序號</th>
-                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary">分類</th>
-                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary">子分類</th>
-                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">成本中心</th>
-                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary w-20">會計科目</th>
-                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary">描述</th>
-                                    <th className="px-3 py-2 w-12"></th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 44 }}>序號</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 160 }}>分類</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 280 }}>子分類</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>成本中心</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>會計科目</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 140 }}>描述</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 120 }}>總額</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅率</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅額</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 144 }}>是否提供合約編號</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 160 }}>合約編號/無合約原因</th>
+                                    <th className="sticky right-0 bg-surface-raised border-l border-divider px-3 py-2" style={{ width: 88 }}></th>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-divider">
@@ -2449,9 +2487,16 @@ function CreateFormPage({
                                       <td className="px-3 py-2 text-fg-secondary">{item.subCategory}</td>
                                       <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
                                       <td className="px-3 py-2 text-fg-secondary">{item.accountCode}</td>
-                                      <td className="px-3 py-2 text-fg-tertiary">{item.description}</td>
-                                      <td className="px-3 py-2">
-                                        <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setBItemsMap(prev => ({ ...prev, [inv.id]: (prev[inv.id] ?? []).filter(i => i.id !== item.id).map((i, idx) => ({ ...i, seq: idx + 1 })) }))}><Trash2 size={13} /></button>
+                                      <td className="px-3 py-2 text-fg-tertiary">{item.description || '-'}</td>
+                                      <td className="px-3 py-2 text-fg-secondary">{item.total}</td>
+                                      <td className="px-3 py-2 text-fg-secondary">{item.taxRate}</td>
+                                      <td className="px-3 py-2 text-fg-secondary">{item.taxAmount}</td>
+                                      <td className="px-3 py-2 text-fg-secondary">{item.contractProvided}</td>
+                                      <td className="px-3 py-2 text-fg-secondary">{item.contractInfo}</td>
+                                      <td className="sticky right-0 bg-surface border-l border-divider px-3 py-2">
+                                        <div className="flex items-center gap-0.5">
+                                          <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setBItemsMap(prev => ({ ...prev, [inv.id]: (prev[inv.id] ?? []).filter(i => i.id !== item.id).map((i, idx) => ({ ...i, seq: idx + 1 })) }))}><Trash2 size={13} /></button>
+                                        </div>
                                       </td>
                                     </tr>
                                   ))}
@@ -2661,9 +2706,18 @@ function CreateFormPage({
           <AddItemModal
             open={addItemInvoiceId !== null}
             onClose={() => setAddItemInvoiceId(null)}
+            onSubmit={item => {
+              if (!addItemInvoiceId) return
+              setPaymentItemsMap(prev => {
+                const existing = prev[addItemInvoiceId] ?? []
+                return { ...prev, [addItemInvoiceId]: [...existing, { ...item, seq: existing.length + 1 }] }
+              })
+              setAddItemInvoiceId(null)
+              toast({ variant: 'success', title: '新增成功' })
+            }}
             invoiceNumber={inv?.number ?? ''}
             invoiceNo={inv?.invoiceNo ?? ''}
-            seqNum={4}
+            seqNum={(paymentItemsMap[addItemInvoiceId ?? ''] ?? []).length + 1}
             initialTotal={inv?.subtotal ?? ''}
           />
         )
