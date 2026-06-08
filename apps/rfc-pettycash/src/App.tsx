@@ -2155,6 +2155,147 @@ function DeleteItemModal({
   )
 }
 
+
+// ─── EditInvoiceModal ────────────────────────────────────────
+
+function EditInvoiceModal({
+  open,
+  onClose,
+  invoice,
+  onUpdate,
+  isModifying = false,
+}: {
+  open: boolean
+  onClose: () => void
+  invoice: Invoice
+  onUpdate: (inv: Invoice) => void
+  isModifying?: boolean
+}) {
+  const [voucherType, setVoucherType] = useState(invoice.voucherType)
+  const [date, setDate] = useState(invoice.date)
+  const [invoiceNo, setInvoiceNo] = useState(invoice.invoiceNo)
+  const [subtotal, setSubtotal] = useState(invoice.subtotal)
+  const [tax, setTax] = useState(invoice.tax || '0')
+
+  const taxAfterNum = subtotal && tax ? Number(subtotal) + Number(tax) : null
+  const rate = invoice.currency === 'TWD' ? 1 : 32.51
+
+  return (
+    <Dialog open={open} onOpenChange={o => !o && onClose()}>
+      <DialogContent className="max-w-[720px]">
+        <DialogHeader>
+          <DialogTitle>編輯發票</DialogTitle>
+        </DialogHeader>
+        <DialogBody className="space-y-4">
+          {/* Info row: 請款單號 + 狀態 */}
+          <div className="flex gap-2 bg-surface-raised border border-divider rounded-md px-4 py-2 text-sm">
+            <div className="flex-1 space-y-0.5">
+              <p className="text-fg-tertiary">請款單號</p>
+              <p className="text-fg-primary font-medium">{invoice.number}</p>
+            </div>
+            <div className="w-px bg-divider shrink-0" />
+            <div className="flex-1 space-y-0.5">
+              <p className="text-fg-tertiary">狀態</p>
+              {isModifying ? (
+                <Tag color="yellow" size="sm">修改中</Tag>
+              ) : (
+                <Tag color="neutral" size="sm">Draft</Tag>
+              )}
+            </div>
+          </div>
+
+          {/* 收款人/廠商 readonly */}
+          <div className="grid grid-cols-2 gap-3">
+            <Field mode="readonly">
+              <FieldLabel required>收款人/廠商</FieldLabel>
+              <Input value={invoice.payee} readOnly />
+            </Field>
+          </div>
+
+          {/* 憑證類型 */}
+          <div className="grid grid-cols-2 gap-3">
+            <Field>
+              <FieldLabel required>憑證類型</FieldLabel>
+              <Select options={VOUCHER_TYPES} value={voucherType} onChange={v => setVoucherType(v as string)} />
+            </Field>
+          </div>
+
+          {/* 日期 + 發票號碼 */}
+          <div className="grid grid-cols-2 gap-3">
+            <Field>
+              <FieldLabel required>日期</FieldLabel>
+              <DatePicker value={date || null} onChange={v => setDate(v)} placeholder="請選擇日期" />
+            </Field>
+            <Field>
+              <FieldLabel>發票號碼</FieldLabel>
+              <Input value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} placeholder="填寫發票號碼" />
+            </Field>
+          </div>
+
+          {/* 幣別 readonly */}
+          <div className="grid grid-cols-2 gap-3">
+            <Field mode="readonly">
+              <FieldLabel required>幣別</FieldLabel>
+              <Select mode="readonly" options={CURRENCY_OPTIONS} value={invoice.currency} onChange={() => {}} />
+            </Field>
+          </div>
+
+          {/* 合計金額 + 稅額 */}
+          <div className="grid grid-cols-2 gap-3">
+            <Field>
+              <FieldLabel required>合計金額（未稅）</FieldLabel>
+              <Input type="number" value={subtotal} onChange={e => setSubtotal(e.target.value)} placeholder="0" />
+            </Field>
+            <Field>
+              <FieldLabel>稅額&nbsp;<InfoTooltip content="稅額依憑證類型計算" /></FieldLabel>
+              <Input type="number" value={tax} onChange={e => setTax(e.target.value)} placeholder="0" />
+            </Field>
+          </div>
+
+          {/* 稅後金額 summary */}
+          <div className="flex gap-2 bg-surface-raised border border-divider rounded-md px-4 py-2 text-sm">
+            <div className="flex-1 space-y-0.5">
+              <p className="text-fg-secondary">稅後金額</p>
+              <p className="text-fg-primary font-medium">{invoice.currency} {taxAfterNum !== null ? taxAfterNum.toLocaleString() : '-'}</p>
+              <p className="text-fg-tertiary text-xs">實發金額&nbsp;<InfoTooltip content="實發金額 = 稅後金額 × 匯率" />&nbsp;{invoice.currency} {taxAfterNum !== null ? taxAfterNum.toLocaleString() : '-'}</p>
+            </div>
+            <div className="w-px bg-divider shrink-0" />
+            <div className="flex-1 space-y-0.5">
+              <p className="text-fg-secondary">匯率</p>
+              <p className="text-fg-primary font-medium">{rate}</p>
+              <p className="text-fg-tertiary text-xs">更新時間 {new Date().getFullYear()}/5/26 9:00</p>
+            </div>
+          </div>
+
+          {/* 稅號 + 二代健保 */}
+          <div className="grid grid-cols-2 gap-3">
+            <Field>
+              <FieldLabel>稅號&nbsp;<InfoTooltip content="統一編號" /></FieldLabel>
+              <Input placeholder="" />
+            </Field>
+            <Field mode="readonly">
+              <FieldLabel>二代健保</FieldLabel>
+              <Input value="0" readOnly />
+            </Field>
+          </div>
+
+          {/* 使用不足額請款 */}
+          <div className="flex items-center gap-2">
+            <Checkbox id="edit-insufficient" />
+            <label htmlFor="edit-insufficient" className="text-sm cursor-pointer select-none">使用不足額請款</label>
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>關閉</Button>
+          <Button onClick={() => {
+            onUpdate({ ...invoice, voucherType, date, invoiceNo, subtotal, tax })
+          }}>更新</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ─── CreateFormPage ─────────────────────────────────────────────
 
 
@@ -2798,18 +2939,19 @@ function CreateFormPage({
         }}
       />
       {/* 編輯發票 */}
-      <AddInvoiceModal
-        open={editInvoiceTarget !== null}
-        onClose={() => setEditInvoiceTarget(null)}
-        onSubmit={handleAddInvoice}
-        payee={payee}
-        editInvoice={editInvoiceTarget ?? undefined}
-        onUpdate={(updated) => {
-          handleUpdateInvoice(editInvoiceTarget!.id, updated)
-          setEditInvoiceTarget(null)
-          toast({ variant: 'success', title: '發票已更新' })
-        }}
-      />
+      {editInvoiceTarget && (
+        <EditInvoiceModal
+          open={editInvoiceTarget !== null}
+          onClose={() => setEditInvoiceTarget(null)}
+          invoice={editInvoiceTarget}
+          isModifying={isModifying}
+          onUpdate={(updated) => {
+            handleUpdateInvoice(editInvoiceTarget.id, updated)
+            setEditInvoiceTarget(null)
+            toast({ variant: 'success', title: '發票已更新' })
+          }}
+        />
+      )}
       {/* 刪除發票確認 */}
       {(() => {
         const invDel = invoices.find(i => i.id === deleteInvoiceTarget)
