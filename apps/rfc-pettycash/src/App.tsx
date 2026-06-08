@@ -2718,7 +2718,7 @@ function CreateFormPage({
             invoiceNumber={inv?.number ?? ''}
             invoiceNo={inv?.invoiceNo ?? ''}
             seqNum={(paymentItemsMap[addItemInvoiceId ?? ''] ?? []).length + 1}
-            initialTotal={inv?.subtotal ?? ''}
+            initialTotal={inv ? String(Number(inv.subtotal || 0) + Number(inv.tax || 0)) : ''}
           />
         )
       })()}
