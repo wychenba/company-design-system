@@ -2966,12 +2966,18 @@ export default function App() {
     toast({ variant: 'success', title: `${newNumber}送出成功` })
   }
 
+  function handleNavChange(id: string) {
+    setActiveNav(id)
+    setPage('list')
+    setEditEntry(null)
+  }
+
   return (
     <TooltipProvider delayDuration={300} skipDelayDuration={100}>
-      <SidebarProvider activeId={activeNav} onActiveChange={setActiveNav}>
+      <SidebarProvider activeId={activeNav} onActiveChange={handleNavChange}>
         <AppShell
           layout="primary-sidebar"
-          sidebar={<AppSidebar activeId={activeNav} onActiveChange={setActiveNav} />}
+          sidebar={<AppSidebar activeId={activeNav} onActiveChange={handleNavChange} />}
         >
           {page === 'list' ? (
             <DraftListPage
