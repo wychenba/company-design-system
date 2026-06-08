@@ -3073,6 +3073,20 @@ function DraftListPage({
   onDelete: (id: string) => void
 }) {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
+  const [infoTarget, setInfoTarget] = useState<DraftEntry | null>(null)
+
+  const MOCK_DRAFT_INVOICES: Record<string, { number: string; invoiceNo: string; voucherType: string; subtotal: string; tax: string; payee: string; date: string }[]> = {
+    '1': [
+      { number: 'PAE20260525001-1', payee: '林間宜 (023156)', date: '2026/05/25', invoiceNo: 'BD28114045', voucherType: '電子統一發票 (25)', subtotal: '1,000', tax: '0' },
+      { number: 'PAE20260525001-2', payee: '林間宜 (023156)', date: '2026/05/25', invoiceNo: 'BD28114046', voucherType: '電子統一發票 (25)', subtotal: '600', tax: '0' },
+    ],
+    '4': [
+      { number: 'PAE20260525004-1', payee: 'ACME Corp', date: '2026/05/26', invoiceNo: 'ZZ99887766', voucherType: '紙本統一發票', subtotal: '5,000', tax: '200' },
+    ],
+    '5': [
+      { number: 'PAE20260525005-1', payee: '林間宜 (023156)', date: '2026/05/25', invoiceNo: 'AB12345678', voucherType: '電子統一發票 (25)', subtotal: '1,800', tax: '0' },
+    ],
+  }
 
   return (
     <div className="p-6 w-full">
@@ -3102,8 +3116,9 @@ function DraftListPage({
             </div>
           </div>
 
-          <div className="rounded-lg border border-divider overflow-x-auto">
-            <table className="w-full text-sm min-w-[860px]">
+          <div className="flex gap-0 transition-all">
+          <div className={`flex-1 min-w-0 rounded-lg border border-divider overflow-x-auto transition-all ${infoTarget ? 'mr-4' : ''}`}>
+            <table className="w-full text-sm min-w-[720px]">
               <thead className="bg-surface-raised border-b border-divider">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">單號</th>
@@ -3137,7 +3152,7 @@ function DraftListPage({
                       <td className="px-4 py-3 text-fg-secondary">{entry.reason}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-0.5">
-                          <Button variant="ghost" size="sm" iconOnly startIcon={Info} aria-label="查看" disabled />
+                          <Button variant="ghost" size="sm" iconOnly startIcon={Info} aria-label="查看" onClick={() => setInfoTarget(infoTarget?.id === entry.id ? null : entry)} />
                           <Button variant="ghost" size="sm" iconOnly startIcon={Pencil} aria-label="編輯" onClick={() => onEdit(entry)} disabled={entry.status === 'reviewing'} />
                           <Button variant="ghost" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={() => setDeleteTargetId(entry.id)} disabled={entry.status === 'reviewing'} />
                         </div>
@@ -3147,6 +3162,117 @@ function DraftListPage({
                 })}
               </tbody>
             </table>
+          </div>
+          {/* Right info panel */}
+          {infoTarget && (() => {
+            const meta = STATUS_META[infoTarget.status]
+            const invList = MOCK_DRAFT_INVOICES[infoTarget.id] ?? []
+            return (
+              <div className="w-[320px] flex-shrink-0 rounded-lg border border-divider bg-surface flex flex-col overflow-hidden">
+                {/* Panel header */}
+                <div className="px-4 py-3 border-b border-divider flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-xs text-fg-tertiary mb-1">一般申請單</p>
+                    <p className="text-sm font-medium text-fg-primary leading-snug">{infoTarget.number}</p>
+                    <div className="mt-1"><Tag color={meta.color} size="sm">{meta.label}</Tag></div>
+                  </div>
+                  <button
+                    className="text-fg-tertiary hover:text-fg-secondary transition-colors mt-0.5 flex-shrink-0"
+                    onClick={() => setInfoTarget(null)}
+                    aria-label="關閉"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                  </button>
+                </div>
+                {/* Scrollable body */}
+                <div className="overflow-y-auto flex-1 divide-y divide-divider">
+                  {/* 基本資訊 */}
+                  <div className="px-4 py-3">
+                    <p className="text-xs font-medium text-fg-secondary uppercase tracking-wide mb-3">基本資訊</p>
+                    <dl className="space-y-2 text-sm">
+                      <div className="flex justify-between gap-2">
+                        <dt className="text-fg-tertiary flex-shrink-0">收款人</dt>
+                        <dd className="text-fg-primary text-right">{infoTarget.applicant}</dd>
+                      </div>
+                      <div className="flex justify-between gap-2">
+                        <dt className="text-fg-tertiary flex-shrink-0">公司代號</dt>
+                        <dd className="text-fg-primary text-right">{infoTarget.company}</dd>
+                      </div>
+                      <div className="flex justify-between gap-2">
+                        <dt className="text-fg-tertiary flex-shrink-0">收款對象</dt>
+                        <dd className="text-fg-primary text-right">{infoTarget.payee}</dd>
+                      </div>
+                      <div className="flex justify-between gap-2">
+                        <dt className="text-fg-tertiary flex-shrink-0">緊急/指定付款日期</dt>
+                        <dd className="text-fg-primary text-right">{infoTarget.urgentDate}</dd>
+                      </div>
+                      <div className="flex justify-between gap-2">
+                        <dt className="text-fg-tertiary flex-shrink-0">申請原因</dt>
+                        <dd className="text-fg-primary text-right">{infoTarget.reason}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                  {/* 請款資訊 */}
+                  <div className="px-4 py-3">
+                    <p className="text-xs font-medium text-fg-secondary uppercase tracking-wide mb-3">請款資訊</p>
+                    {invList.length === 0 ? (
+                      <p className="text-sm text-fg-tertiary">無請款資訊</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {invList.map((inv, idx) => (
+                          <div key={idx} className="space-y-2 text-sm">
+                            <p className="text-xs font-medium text-fg-secondary">{inv.number}</p>
+                            <dl className="space-y-1.5">
+                              <div className="flex justify-between gap-2">
+                                <dt className="text-fg-tertiary flex-shrink-0">收款人</dt>
+                                <dd className="text-fg-primary text-right">{inv.payee}</dd>
+                              </div>
+                              <div className="flex justify-between gap-2">
+                                <dt className="text-fg-tertiary flex-shrink-0">申請日期</dt>
+                                <dd className="text-fg-primary text-right">{inv.date}</dd>
+                              </div>
+                              <div className="flex justify-between gap-2">
+                                <dt className="text-fg-tertiary flex-shrink-0">憑證類型</dt>
+                                <dd className="text-fg-primary text-right">{inv.voucherType}</dd>
+                              </div>
+                              <div className="flex justify-between gap-2">
+                                <dt className="text-fg-tertiary flex-shrink-0">發票號碼</dt>
+                                <dd className="text-fg-primary text-right">{inv.invoiceNo}</dd>
+                              </div>
+                              <div className="flex justify-between gap-2">
+                                <dt className="text-fg-tertiary flex-shrink-0">合計金額(未稅)</dt>
+                                <dd className="text-fg-primary text-right">{inv.subtotal}</dd>
+                              </div>
+                              <div className="flex justify-between gap-2">
+                                <dt className="text-fg-tertiary flex-shrink-0">稅額</dt>
+                                <dd className="text-fg-primary text-right">{inv.tax}</dd>
+                              </div>
+                            </dl>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {/* 檢附憑證/證明 */}
+                  <div className="px-4 py-3">
+                    <p className="text-xs font-medium text-fg-secondary uppercase tracking-wide mb-3">檢附憑證/證明</p>
+                    {invList.length === 0 ? (
+                      <p className="text-sm text-fg-tertiary">無附件</p>
+                    ) : (
+                      <ul className="space-y-2">
+                        {invList.map((inv, idx) => (
+                          <li key={idx} className="flex items-center gap-2 text-sm text-fg-secondary">
+                            <Paperclip size={13} className="text-fg-tertiary flex-shrink-0" />
+                            <span className="truncate">{inv.invoiceNo}_receipt.pdf</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
           </div>
         </TabsContent>
 
