@@ -32,6 +32,11 @@ jobs:
     name: Verify(tsc + tests + compile + build)
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # 2026-06-08 fix(Pages 永遠不更新根治):輸出「Pages artifact 是否已成功 build+upload」。讓 deploy job
+    # 只依賴「build 成功」而非「整個 Verify 綠」—— 否則一個「非關鍵 doc-check(死連結 / spec-deadlink 等)」
+    # 失敗就永久擋住整個 storybook 部署(發生 N 次的根因:doc-check drift → Verify fail → deploy skip)。
+    outputs:
+      pages_ready: ${{ steps.pages_mark.outputs.ready }}
 
     steps:
       - uses: actions/checkout@v4
@@ -170,6 +175,12 @@ jobs:
         with:
           path: storybook-static
 
+      # 2026-06-08:標記「Pages artifact 已成功 build+upload」→ deploy job 據此判斷可部署(decouple from doc-checks)。
+      - name: Mark Pages artifact ready
+        id: pages_mark
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: echo "ready=true" >> "$GITHUB_OUTPUT"
+
       - name: Vite build
         run: npm run build 2>&1 | tail -10
 
@@ -238,7 +249,10 @@ jobs:
     # Storybook → GitHub Pages(`https://ajenchen.github.io/design-system/`)
     # 只 push main 才 deploy(PR 不動 production Pages)
     name: Deploy Storybook to GitHub Pages
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # 2026-06-08 fix:依賴「Pages artifact 已 build」(needs.verify.outputs.pages_ready)而非「整個 Verify 綠」。
+    # always() → Verify 因「非關鍵 doc-check」失敗時 deploy 仍跑;但 build 早期失敗(無 artifact)時
+    # pages_ready 為空 → deploy 乾淨 skip(絕不部署 build 壞掉的)。根治「死連結卡住 storybook 永不更新」。
+    if: ${{ always() && needs.verify.outputs.pages_ready == 'true' }}
     needs: verify
     runs-on: ubuntu-latest
     environment:

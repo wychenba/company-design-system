@@ -50,7 +50,7 @@ export const UsageGuidance: Story = {
             <li><LinkTo kind="Design System/Components/DatePicker/展示" name="四模式"><span className="text-primary hover:underline font-medium cursor-pointer">四模式</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/DatePicker/展示" name="可清除"><span className="text-primary hover:underline font-medium cursor-pointer">可清除</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/DatePicker/展示" name="尺寸"><span className="text-primary hover:underline font-medium cursor-pointer">尺寸</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="Range:訂房 / 訂機票情境"><span className="text-primary hover:underline font-medium cursor-pointer">Range:訂房 / 訂機票情境</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="範圍模式:訂房 / 訂機票情境"><span className="text-primary hover:underline font-medium cursor-pointer">Range:訂房 / 訂機票情境</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/DatePicker/展示" name="Display"><span className="text-primary hover:underline font-medium cursor-pointer">Display</span></LinkTo></li>
           </ul>
           <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方 vs 近親 段)。</p>

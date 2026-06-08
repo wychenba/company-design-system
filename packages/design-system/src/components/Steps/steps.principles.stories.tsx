@@ -76,7 +76,7 @@ export const UsageGuidance: Story = {
       <p>適合 Steps 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/Steps/展示" name="Ring 正交示範"><span className="text-primary hover:underline font-medium cursor-pointer">Ring 正交示範</span></LinkTo>
+          <LinkTo kind="Design System/Components/Steps/展示" name="聚焦環正交示範"><span className="text-primary hover:underline font-medium cursor-pointer">Ring 正交示範</span></LinkTo>
         </li>
         <li>
           <LinkTo kind="Design System/Components/Steps/展示" name="非線性"><span className="text-primary hover:underline font-medium cursor-pointer">非線性</span></LinkTo>
@@ -85,7 +85,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/Steps/展示" name="水平"><span className="text-primary hover:underline font-medium cursor-pointer">水平</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Steps/展示" name="Multiple 展開模式"><span className="text-primary hover:underline font-medium cursor-pointer">Multiple 展開模式</span></LinkTo>
+          <LinkTo kind="Design System/Components/Steps/展示" name="多重展開模式"><span className="text-primary hover:underline font-medium cursor-pointer">Multiple 展開模式</span></LinkTo>
         </li>
         <li>
           <LinkTo kind="Design System/Components/Steps/展示" name="欄 節奏 驗證"><span className="text-primary hover:underline font-medium cursor-pointer">欄 節奏 驗證</span></LinkTo>

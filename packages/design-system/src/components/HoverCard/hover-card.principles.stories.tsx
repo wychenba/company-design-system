@@ -59,10 +59,10 @@ export const UsageGuidance: Story = {
               <LinkTo kind="Design System/Internal/HoverCard/展示" name="溢出清單"><span className="text-primary hover:underline font-medium cursor-pointer">溢出清單</span></LinkTo>
             </li>
             <li>
-              <LinkTo kind="Design System/Internal/HoverCard/展示" name="Repository 資訊卡"><span className="text-primary hover:underline font-medium cursor-pointer">Repository 資訊卡</span></LinkTo>
+              <LinkTo kind="Design System/Internal/HoverCard/展示" name="儲存庫資訊卡"><span className="text-primary hover:underline font-medium cursor-pointer">Repository 資訊卡</span></LinkTo>
             </li>
             <li>
-              <LinkTo kind="Design System/Internal/HoverCard/展示" name="Trigger 類型與 delay"><span className="text-primary hover:underline font-medium cursor-pointer">Trigger 類型與 delay</span></LinkTo>
+              <LinkTo kind="Design System/Internal/HoverCard/展示" name="觸發點類型與延遲"><span className="text-primary hover:underline font-medium cursor-pointer">Trigger 類型與 delay</span></LinkTo>
             </li>
           </ul>
           <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方「vs 近親」)。</p>

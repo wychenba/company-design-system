@@ -48,10 +48,10 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/Badge/展示" name="正圓 vs 膠囊"><span className="text-primary hover:underline font-medium cursor-pointer">正圓 vs 膠囊</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Badge/展示" name="Dot 模式"><span className="text-primary hover:underline font-medium cursor-pointer">Dot 模式</span></LinkTo>
+          <LinkTo kind="Design System/Components/Badge/展示" name="圓點模式"><span className="text-primary hover:underline font-medium cursor-pointer">Dot 模式</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Badge/展示" name="Max 上限"><span className="text-primary hover:underline font-medium cursor-pointer">Max 上限</span></LinkTo>
+          <LinkTo kind="Design System/Components/Badge/展示" name="數量上限"><span className="text-primary hover:underline font-medium cursor-pointer">Max 上限</span></LinkTo>
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:先確認使用者真正需要的是「有沒有新東西」(用 Dot)還是「有多少」(用數字)。若兩者都不貼切,代表這裡可能不該放 Badge——改用文字標籤或其他狀態指示。</p>

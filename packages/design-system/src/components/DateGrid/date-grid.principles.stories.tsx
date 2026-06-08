@@ -71,13 +71,13 @@ export const UsageGuidance: Story = {
             <p>適合 DateGrid 的真實業務場景(點擊跳轉「展示」頁範例):</p>
             <ul className="space-y-1">
               <li>
-                <LinkTo kind="Design System/Internal/DateGrid/展示" name="Single — 生日 / 到期日"><span className="text-primary hover:underline font-medium cursor-pointer">Single — 生日 / 到期日</span></LinkTo>
+                <LinkTo kind="Design System/Internal/DateGrid/展示" name="單日 — 生日 / 到期日"><span className="text-primary hover:underline font-medium cursor-pointer">Single — 生日 / 到期日</span></LinkTo>
               </li>
               <li>
-                <LinkTo kind="Design System/Internal/DateGrid/展示" name="Multiple — 活動可參加日期"><span className="text-primary hover:underline font-medium cursor-pointer">Multiple — 活動可參加日期</span></LinkTo>
+                <LinkTo kind="Design System/Internal/DateGrid/展示" name="多日 — 活動可參加日期"><span className="text-primary hover:underline font-medium cursor-pointer">Multiple — 活動可參加日期</span></LinkTo>
               </li>
               <li>
-                <LinkTo kind="Design System/Internal/DateGrid/展示" name="Range — 分析時段 / 訂單範圍"><span className="text-primary hover:underline font-medium cursor-pointer">Range — 分析時段 / 訂單範圍</span></LinkTo>
+                <LinkTo kind="Design System/Internal/DateGrid/展示" name="範圍 — 分析時段 / 訂單範圍"><span className="text-primary hover:underline font-medium cursor-pointer">Range — 分析時段 / 訂單範圍</span></LinkTo>
               </li>
               <li>
                 <LinkTo kind="Design System/Internal/DateGrid/展示" name="行內 — 儀表板小卡"><span className="text-primary hover:underline font-medium cursor-pointer">行內 — 儀表板小卡</span></LinkTo>

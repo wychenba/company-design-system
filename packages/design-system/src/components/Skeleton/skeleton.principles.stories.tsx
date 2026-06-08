@@ -48,7 +48,7 @@ export const UsageGuidance: Story = {
           <p>適合 Skeleton 的真實業務場景(點擊跳轉「展示」頁範例):</p>
           <ul className="space-y-1">
             <li><LinkTo kind="Design System/Components/Skeleton/展示" name="個人資料卡載入"><span className="text-primary hover:underline font-medium cursor-pointer">個人資料卡載入</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Components/Skeleton/展示" name="Task 列表載入"><span className="text-primary hover:underline font-medium cursor-pointer">Task 列表載入</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Components/Skeleton/展示" name="任務列表載入"><span className="text-primary hover:underline font-medium cursor-pointer">Task 列表載入</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/Skeleton/展示" name="表格列載入"><span className="text-primary hover:underline font-medium cursor-pointer">表格列載入</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/Skeleton/展示" name="文件載入"><span className="text-primary hover:underline font-medium cursor-pointer">文件載入</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/Skeleton/展示" name="卡片網格載入"><span className="text-primary hover:underline font-medium cursor-pointer">卡片網格載入</span></LinkTo></li>

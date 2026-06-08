@@ -71,10 +71,10 @@ export const UsageGuidance: Story = {
       <p>適合 ScrollArea 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/ScrollArea/展示" name="垂直捲動 — Linear issue 清單"><span className="text-primary hover:underline font-medium cursor-pointer">垂直捲動 — Linear issue 清單</span></LinkTo>
+          <LinkTo kind="Design System/Components/ScrollArea/展示" name="垂直捲動 — Linear 議題清單"><span className="text-primary hover:underline font-medium cursor-pointer">垂直捲動 — Linear issue 清單</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/ScrollArea/展示" name="垂直捲動 — Notion sidebar 導覽"><span className="text-primary hover:underline font-medium cursor-pointer">垂直捲動 — Notion sidebar 導覽</span></LinkTo>
+          <LinkTo kind="Design System/Components/ScrollArea/展示" name="垂直捲動 — Notion 側欄 導覽"><span className="text-primary hover:underline font-medium cursor-pointer">垂直捲動 — Notion sidebar 導覽</span></LinkTo>
         </li>
         <li>
           <LinkTo kind="Design System/Components/ScrollArea/展示" name="水平捲動 — Stripe 寬欄位商品表"><span className="text-primary hover:underline font-medium cursor-pointer">水平捲動 — Stripe 寬欄位商品表</span></LinkTo>

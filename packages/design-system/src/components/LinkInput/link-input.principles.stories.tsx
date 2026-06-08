@@ -50,7 +50,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/LinkInput/展示" name="空值"><span className="text-primary hover:underline font-medium cursor-pointer">空值</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/LinkInput/展示" name="Blur 驗證"><span className="text-primary hover:underline font-medium cursor-pointer">Blur 驗證</span></LinkTo>
+          <LinkTo kind="Design System/Components/LinkInput/展示" name="失焦驗證"><span className="text-primary hover:underline font-medium cursor-pointer">Blur 驗證</span></LinkTo>
         </li>
         <li>
           <LinkTo kind="Design System/Components/LinkInput/展示" name="尺寸"><span className="text-primary hover:underline font-medium cursor-pointer">尺寸</span></LinkTo>

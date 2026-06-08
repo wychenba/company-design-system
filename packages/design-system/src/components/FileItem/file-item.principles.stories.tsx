@@ -49,13 +49,13 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/FileItem/展示" name="Compact"><span className="text-primary hover:underline font-medium cursor-pointer">Compact</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/FileItem/展示" name="Hover 替換"><span className="text-primary hover:underline font-medium cursor-pointer">Hover 替換</span></LinkTo>
+          <LinkTo kind="Design System/Components/FileItem/展示" name="懸停替換"><span className="text-primary hover:underline font-medium cursor-pointer">Hover 替換</span></LinkTo>
         </li>
         <li>
           <LinkTo kind="Design System/Components/FileItem/展示" name="已上傳"><span className="text-primary hover:underline font-medium cursor-pointer">已上傳</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/FileItem/展示" name="Compact 混合"><span className="text-primary hover:underline font-medium cursor-pointer">Compact 混合</span></LinkTo>
+          <LinkTo kind="Design System/Components/FileItem/展示" name="緊湊 混合"><span className="text-primary hover:underline font-medium cursor-pointer">Compact 混合</span></LinkTo>
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>

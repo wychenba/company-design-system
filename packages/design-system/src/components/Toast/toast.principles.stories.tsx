@@ -42,7 +42,7 @@ export const UsageGuidance: Story = {
       <p>適合 Toast 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/Toast/展示" name="有 Title + Description"><span className="text-primary hover:underline font-medium cursor-pointer">有 Title + Description</span></LinkTo>
+          <LinkTo kind="Design System/Components/Toast/展示" name="有標題與描述"><span className="text-primary hover:underline font-medium cursor-pointer">有 Title + Description</span></LinkTo>
         </li>
         <li>
           <LinkTo kind="Design System/Components/Toast/展示" name="互動測試"><span className="text-primary hover:underline font-medium cursor-pointer">互動測試</span></LinkTo>
