@@ -162,6 +162,46 @@ const ACCT_MAPPING: Record<string, Record<string, string>> = {
     '顧問費-學術合作': '663001',
   },
 }
+const ACCT_NAME_MAPPING: Record<string, string> = {
+  '613009': '外包勞務費',
+  '613013': '零件材料費',
+  '618010': '修繕費',
+  '618002': '什項購置費',
+  '618001': '辦公家俱費',
+  '618007': '電腦軟體費',
+  '618008': '雲端服務費',
+  '660002': '書報雜誌費',
+  '660001': '印刷費',
+  '660000': '運費',
+  '655540': '活動費用',
+  '655530': '國內差旅費',
+  '655520': '國內報名費',
+  '655531': '海外差旅費',
+  '655521': '海外報名費',
+  '655541': '各部門訓練費',
+  '655505': '學習平台費',
+  '655502': '訓練交通費',
+  '655509': '訓練活動費',
+  '655501': '進修補助費',
+  '654000': '招募費用',
+  '654010': '海外招募費',
+  '630120': '產學合作費',
+  '654200': '技術研發費',
+  '655551': '人才培育費',
+  '655503': '專案訓練費',
+  '654100': '員工福利費',
+  '664900': '雜費',
+  '641000': '廣告費',
+  '641001': '國際廣告費',
+  '216631': '律師費',
+  '216635': '專利費',
+  '312000': 'Patent License',
+  '655900': '員工關懷費',
+  '663200': '會計師費',
+  '216632': '應計會計師費',
+  '663001': '顧問費',
+  '613000': '會議相關費用',
+}
 const TAX_RATES = [{ value: '5', label: '5%' }, { value: '0', label: '0%' }, { value: 'exempt', label: '免稅' }]
 const CURRENCY_OPTIONS = [
   'TWD', 'USD', 'JPY', 'EUR', 'HKD', 'SGD', 'GBP', 'CHF', 'MYR', 'AUD', 'SEK', 'CAD', 'KRW', 'NOK', 'RMB',
@@ -245,6 +285,7 @@ interface PaymentItem {
   subCategory: string
   costCenter: string
   accountCode: string
+  accountName: string
   description: string
   total: string
   taxRate: string
@@ -1480,6 +1521,7 @@ function AddItemModal({
     const contractLabel = contractProvided === 'yes' ? '是' : contractProvided === 'no' ? '否' : '無須提供'
     onSubmit({
       id: String(Date.now()), seq: seqNum, category, subCategory, costCenter, accountCode,
+      accountName: ACCT_NAME_MAPPING[accountCode] ?? '',
       description, total, taxRate, taxAmount,
       contractProvided: contractLabel,
       contractInfo: contractProvided === 'not-required' ? '-' : '',
@@ -1863,6 +1905,7 @@ function AddItemBModal({
       : '0'
     onSubmit({
       id: String(Date.now()), seq: seqNum, category, subCategory, costCenter, accountCode,
+      accountName: ACCT_NAME_MAPPING[accountCode] ?? '',
       description, total, taxRate: taxRate || '0', taxAmount: computedTaxAmount,
       contractProvided: contractLabel,
       contractInfo: contractProvided === 'not-required' ? '-' : '',
@@ -2168,9 +2211,9 @@ function CreateFormPage({
   const [addInvoiceBOpen, setAddInvoiceBOpen] = useState(false)
   const [addItemBInvoiceId, setAddItemBInvoiceId] = useState<string | null>(null)
   const MOCK_PAYMENT_ITEMS: PaymentItem[] = [
-    { id: 'pi1', seq: 1, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-', total: '100', taxRate: '0', taxAmount: '0', contractProvided: '無須提供', contractInfo: '-' },
-    { id: 'pi2', seq: 2, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-', total: '100', taxRate: '0', taxAmount: '0', contractProvided: '無須提供', contractInfo: '-' },
-    { id: 'pi3', seq: 3, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', description: '-', total: '200', taxRate: '0', taxAmount: '0', contractProvided: '無須提供', contractInfo: '-' },
+    { id: 'pi1', seq: 1, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', accountName: '會議相關費用', description: '-', total: '100', taxRate: '0', taxAmount: '0', contractProvided: '無須提供', contractInfo: '-' },
+    { id: 'pi2', seq: 2, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', accountName: '會議相關費用', description: '-', total: '100', taxRate: '0', taxAmount: '0', contractProvided: '無須提供', contractInfo: '-' },
+    { id: 'pi3', seq: 3, category: '小型工具/物品、電腦/手機週邊、辦公家具', subCategory: '電子標準化軟體(非雲端服務/無雙方互動，如：adobe、字體、輸入法..等)', costCenter: '00690', accountCode: '613000', accountName: '會議相關費用', description: '-', total: '200', taxRate: '0', taxAmount: '0', contractProvided: '無須提供', contractInfo: '-' },
   ]
   const [paymentItemsMap, setPaymentItemsMap] = useState<Record<string, PaymentItem[]>>(
     isEdit ? { e1: MOCK_PAYMENT_ITEMS.map(i => ({ ...i })), e2: MOCK_PAYMENT_ITEMS.map(i => ({ ...i })) } : {}
@@ -2358,16 +2401,14 @@ function CreateFormPage({
                                 </div>
                               </div>
                               <div className="rounded-lg border border-divider overflow-x-auto">
-                                <table className="text-sm" style={{ minWidth: '1200px' }}>
+                                <table className="text-sm" style={{ minWidth: '1100px' }}>
                                   <thead className="bg-surface-raised border-b border-divider">
                                     <tr>
                                       <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 44 }}>序號</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 160 }}>分類</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 280 }}>子分類</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 240 }}>分類/子分類</th>
                                       <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>成本中心</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>會計科目</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 140 }}>描述</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 120 }}>總額</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 144 }}>會計科目</th>
+                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>總額</th>
                                       <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅率</th>
                                       <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅額</th>
                                       <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 144 }}>是否提供合約編號</th>
@@ -2379,11 +2420,15 @@ function CreateFormPage({
                                     {(paymentItemsMap[inv.id] ?? []).map(item => (
                                       <tr key={item.id} className="hover:bg-surface-raised transition-colors">
                                         <td className="px-3 py-2 text-fg-secondary">{item.seq}</td>
-                                        <td className="px-3 py-2 text-fg-secondary">{item.category}</td>
-                                        <td className="px-3 py-2 text-fg-secondary">{item.subCategory}</td>
+                                        <td className="px-3 py-2">
+                                          <p className="text-fg-primary text-sm truncate">{item.category}</p>
+                                          <p className="text-fg-tertiary text-xs truncate mt-0.5">{item.subCategory}</p>
+                                        </td>
                                         <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
-                                        <td className="px-3 py-2 text-fg-secondary">{item.accountCode}</td>
-                                        <td className="px-3 py-2 text-fg-tertiary">{item.description || '-'}</td>
+                                        <td className="px-3 py-2">
+                                          <p className="text-fg-primary text-sm">{item.accountCode}</p>
+                                          <p className="text-fg-tertiary text-xs mt-0.5">{item.accountName || '-'}</p>
+                                        </td>
                                         <td className="px-3 py-2 text-fg-secondary">{item.total}</td>
                                         <td className="px-3 py-2 text-fg-secondary">{item.taxRate}</td>
                                         <td className="px-3 py-2 text-fg-secondary">{item.taxAmount}</td>
@@ -2462,16 +2507,14 @@ function CreateFormPage({
                             <div className="rounded-lg border border-divider py-8 text-center text-sm text-fg-tertiary">沒有任何資料</div>
                           ) : (
                             <div className="rounded-lg border border-divider overflow-x-auto">
-                              <table className="text-sm" style={{ minWidth: '1200px' }}>
+                              <table className="text-sm" style={{ minWidth: '1100px' }}>
                                 <thead className="bg-surface-raised border-b border-divider">
                                   <tr>
                                     <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 44 }}>序號</th>
-                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 160 }}>分類</th>
-                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 280 }}>子分類</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 240 }}>分類/子分類</th>
                                     <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>成本中心</th>
-                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>會計科目</th>
-                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 140 }}>描述</th>
-                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 120 }}>總額</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 144 }}>會計科目</th>
+                                    <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>總額</th>
                                     <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅率</th>
                                     <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅額</th>
                                     <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 144 }}>是否提供合約編號</th>
@@ -2483,11 +2526,15 @@ function CreateFormPage({
                                   {bItems.map(item => (
                                     <tr key={item.id} className="hover:bg-surface-raised transition-colors">
                                       <td className="px-3 py-2 text-fg-secondary">{item.seq}</td>
-                                      <td className="px-3 py-2 text-fg-secondary">{item.category}</td>
-                                      <td className="px-3 py-2 text-fg-secondary">{item.subCategory}</td>
+                                      <td className="px-3 py-2">
+                                        <p className="text-fg-primary text-sm truncate">{item.category}</p>
+                                        <p className="text-fg-tertiary text-xs truncate mt-0.5">{item.subCategory}</p>
+                                      </td>
                                       <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
-                                      <td className="px-3 py-2 text-fg-secondary">{item.accountCode}</td>
-                                      <td className="px-3 py-2 text-fg-tertiary">{item.description || '-'}</td>
+                                      <td className="px-3 py-2">
+                                        <p className="text-fg-primary text-sm">{item.accountCode}</p>
+                                        <p className="text-fg-tertiary text-xs mt-0.5">{item.accountName || '-'}</p>
+                                      </td>
                                       <td className="px-3 py-2 text-fg-secondary">{item.total}</td>
                                       <td className="px-3 py-2 text-fg-secondary">{item.taxRate}</td>
                                       <td className="px-3 py-2 text-fg-secondary">{item.taxAmount}</td>
