@@ -609,7 +609,7 @@ function AddInvoiceModal({
               <div className="grid grid-cols-2 gap-4">
                 <Field invalid={step1Submitted && !s1.date}>
                   <FieldLabel required>日期&nbsp;<InfoTooltip content="Invoice Date" /></FieldLabel>
-                  <Input type="date" value={s1.date} onChange={e => setS1(p => ({ ...p, date: e.target.value }))} placeholder="填寫日期" />
+                  <DatePicker value={s1.date || null} onChange={v => setS1(p => ({ ...p, date: v }))} clearable placeholder="YYYY/MM/DD" />
                   {step1Submitted && !s1.date && <FieldError>請填寫日期</FieldError>}
                 </Field>
                 <Field>
@@ -1742,7 +1742,7 @@ function AddInvoiceBModal({
             <div className="grid grid-cols-2 gap-4">
               <Field invalid={submitted && !date}>
                 <FieldLabel required>日期</FieldLabel>
-                <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
+                <DatePicker value={date || null} onChange={v => setDate(v)} clearable placeholder="YYYY/MM/DD" />
                 {submitted && !date && <FieldError>請填寫日期</FieldError>}
               </Field>
               <Field>
