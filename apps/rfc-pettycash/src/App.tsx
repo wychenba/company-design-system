@@ -2400,51 +2400,55 @@ function CreateFormPage({
                                   <Button variant="tertiary" size="sm" startIcon={Plus} onClick={() => setAddItemInvoiceId(inv.id)}>新增細項</Button>
                                 </div>
                               </div>
-                              <div className="rounded-lg border border-divider overflow-x-auto">
-                                <table className="text-sm" style={{ minWidth: '1100px' }}>
-                                  <thead className="bg-surface-raised border-b border-divider">
-                                    <tr>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 44 }}>序號</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 240 }}>分類/子分類</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>成本中心</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 144 }}>會計科目</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>總額</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅率</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅額</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 144 }}>是否提供合約編號</th>
-                                      <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 160 }}>合約編號/無合約原因</th>
-                                      <th className="sticky right-0 bg-surface-raised border-l border-divider px-3 py-2" style={{ width: 88 }}></th>
-                                    </tr>
-                                  </thead>
-                                  <tbody className="divide-y divide-divider">
-                                    {(paymentItemsMap[inv.id] ?? []).map(item => (
-                                      <tr key={item.id} className="hover:bg-surface-raised transition-colors">
-                                        <td className="px-3 py-2 text-fg-secondary">{item.seq}</td>
-                                        <td className="px-3 py-2">
-                                          <p className="text-fg-primary text-sm truncate">{item.category}</p>
-                                          <p className="text-fg-tertiary text-xs truncate mt-0.5">{item.subCategory}</p>
-                                        </td>
-                                        <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
-                                        <td className="px-3 py-2">
-                                          <p className="text-fg-primary text-sm">{item.accountCode}</p>
-                                          <p className="text-fg-tertiary text-xs mt-0.5">{item.accountName || '-'}</p>
-                                        </td>
-                                        <td className="px-3 py-2 text-fg-secondary">{item.total}</td>
-                                        <td className="px-3 py-2 text-fg-secondary">{item.taxRate}</td>
-                                        <td className="px-3 py-2 text-fg-secondary">{item.taxAmount}</td>
-                                        <td className="px-3 py-2 text-fg-secondary">{item.contractProvided}</td>
-                                        <td className="px-3 py-2 text-fg-secondary">{item.contractInfo}</td>
-                                        <td className="sticky right-0 bg-surface border-l border-divider px-3 py-2">
-                                          <div className="flex items-center gap-0.5">
-                                            <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditItemTarget({ invoiceId: inv.id, seq: item.seq })}><Pencil size={13} /></button>
-                                            <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq: item.seq })}><Trash2 size={13} /></button>
-                                          </div>
-                                        </td>
+                              {(paymentItemsMap[inv.id] ?? []).length === 0 ? (
+                                <div className="rounded-lg border border-divider py-8 text-center text-sm text-fg-tertiary">沒有任何資料</div>
+                              ) : (
+                                <div className="rounded-lg border border-divider overflow-x-auto">
+                                  <table className="text-sm" style={{ minWidth: '1100px' }}>
+                                    <thead className="bg-surface-raised border-b border-divider">
+                                      <tr>
+                                        <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 44 }}>序號</th>
+                                        <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 240 }}>分類/子分類</th>
+                                        <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>成本中心</th>
+                                        <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 144 }}>會計科目</th>
+                                        <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>總額</th>
+                                        <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅率</th>
+                                        <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 96 }}>稅額</th>
+                                        <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 144 }}>是否提供合約編號</th>
+                                        <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 160 }}>合約編號/無合約原因</th>
+                                        <th className="sticky right-0 bg-surface-raised border-l border-divider px-3 py-2" style={{ width: 88 }}></th>
                                       </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              </div>
+                                    </thead>
+                                    <tbody className="divide-y divide-divider">
+                                      {(paymentItemsMap[inv.id] ?? []).map(item => (
+                                        <tr key={item.id} className="hover:bg-surface-raised transition-colors">
+                                          <td className="px-3 py-2 text-fg-secondary">{item.seq}</td>
+                                          <td className="px-3 py-2">
+                                            <p className="text-fg-primary text-sm truncate">{item.category}</p>
+                                            <p className="text-fg-tertiary text-xs truncate mt-0.5">{item.subCategory}</p>
+                                          </td>
+                                          <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
+                                          <td className="px-3 py-2">
+                                            <p className="text-fg-primary text-sm">{item.accountCode}</p>
+                                            <p className="text-fg-tertiary text-xs mt-0.5">{item.accountName || '-'}</p>
+                                          </td>
+                                          <td className="px-3 py-2 text-fg-secondary">{item.total}</td>
+                                          <td className="px-3 py-2 text-fg-secondary">{item.taxRate}</td>
+                                          <td className="px-3 py-2 text-fg-secondary">{item.taxAmount}</td>
+                                          <td className="px-3 py-2 text-fg-secondary">{item.contractProvided}</td>
+                                          <td className="px-3 py-2 text-fg-secondary">{item.contractInfo}</td>
+                                          <td className="sticky right-0 bg-surface border-l border-divider px-3 py-2">
+                                            <div className="flex items-center gap-0.5">
+                                              <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditItemTarget({ invoiceId: inv.id, seq: item.seq })}><Pencil size={13} /></button>
+                                              <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq: item.seq })}><Trash2 size={13} /></button>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
