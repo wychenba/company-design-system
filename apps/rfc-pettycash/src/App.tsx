@@ -1493,7 +1493,7 @@ function AddItemModal({
   const [description, setDescription] = useState('')
   const [total, setTotal] = useState(initialTotal)
   const [taxRate, setTaxRate] = useState('')
-  const [taxAmount, setTaxAmount] = useState('')
+  const [taxAmount, setTaxAmount] = useState('0')
   const [contractProvided, setContractProvided] = useState<'yes' | 'no' | 'not-required'>('not-required')
   const [submitted, setSubmitted] = useState(false)
 
@@ -1509,7 +1509,7 @@ function AddItemModal({
     setDescription('')
     setTotal(initialTotal)
     setTaxRate('')
-    setTaxAmount('')
+    setTaxAmount('0')
     setContractProvided('not-required')
     setSubmitted(false)
     onClose()
