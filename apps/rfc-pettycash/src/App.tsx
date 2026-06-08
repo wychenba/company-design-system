@@ -586,7 +586,7 @@ function AddInvoiceModal({
 
   const computedTax = s2.total && s2.taxRate && s2.taxRate !== 'exempt'
     ? String(Math.round(Number(s2.total) * Number(s2.taxRate) / 100))
-    : ''
+    : '0'
 
   const isEditing = !!editInvoice
   const MODAL_TITLES = {
@@ -1947,7 +1947,7 @@ function AddItemBModal({
               </Field>
               <Field>
                 <FieldLabel>稅額</FieldLabel>
-                <Input disabled value={taxRate && total && taxRate !== 'exempt' ? String(Math.round(Number(total) * Number(taxRate) / 100)) : ''} placeholder="" />
+                <Input disabled value={taxRate && total && taxRate !== 'exempt' ? String(Math.round(Number(total) * Number(taxRate) / 100)) : '0'} placeholder="" />
               </Field>
             </div>
             <div>
