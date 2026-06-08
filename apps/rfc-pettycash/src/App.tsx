@@ -332,6 +332,8 @@ const INITIAL_ENTRIES: DraftEntry[] = [
   { id: '1', number: 'PAE20260525001', date: '2026/5/29', company: 'TA01', applicant: '林間宜 (023156)', payee: '員工', total: 1600, urgentDate: '-', reason: '-', status: 'reviewing' },
   { id: '2', number: 'PAE20260525002', date: '2026/5/28', company: 'TA01', applicant: '林間宜 (023156)', payee: '員工', total: 2400, urgentDate: '-', reason: '-', status: 'draft' },
   { id: '3', number: 'PAE20260525003', date: '2026/5/27', company: 'TA01', applicant: '林間宜 (023156)', payee: '員工', total: 3800, urgentDate: '-', reason: '-', status: 'draft' },
+  { id: '4', number: 'PAE20260525004', date: '2026/5/26', company: 'TA01', applicant: '林間宜 (023156)', payee: '廠商', total: 5200, urgentDate: '-', reason: '-', status: 'reviewing' },
+  { id: '5', number: 'PAE20260525005', date: '2026/5/25', company: 'TA01', applicant: '林間宜 (023156)', payee: '員工', total: 1800, urgentDate: '-', reason: '-', status: 'modifying' },
 ]
 
 // ─── InfoTooltip ─────────────────────────────────────────────
@@ -2991,8 +2993,8 @@ function DraftListPage({
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-0.5">
                           <Button variant="ghost" size="sm" iconOnly startIcon={Info} aria-label="查看" disabled />
-                          <Button variant="ghost" size="sm" iconOnly startIcon={Pencil} aria-label="編輯" onClick={() => onEdit(entry)} />
-                          <Button variant="ghost" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={() => setDeleteTargetId(entry.id)} />
+                          <Button variant="ghost" size="sm" iconOnly startIcon={Pencil} aria-label="編輯" onClick={() => onEdit(entry)} disabled={entry.status === 'reviewing'} />
+                          <Button variant="ghost" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={() => setDeleteTargetId(entry.id)} disabled={entry.status === 'reviewing'} />
                         </div>
                       </td>
                     </tr>
