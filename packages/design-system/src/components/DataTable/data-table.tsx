@@ -24,7 +24,7 @@ import { DndContext, DragOverlay, useDraggable, useDroppable, useDndContext, poi
 import { cn } from '@/lib/utils'
 import { ICON_SIZE } from '@/design-system/tokens/uiSize/icon-size'
 import { dragSourceStyle, dropIndicatorRow, dropIndicatorColumn, dragActiveCursor, isReorderNoop, reconstructFullRowGhost, snapToCursorModifier } from '@/design-system/lib/drag-visual'
-import { nakedCellEditableDisplayHover } from '@/design-system/components/Field/field-wrapper'
+import { nakedCellEditableDisplayHover, fieldDisplayTextClass } from '@/design-system/components/Field/field-wrapper'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/design-system/components/DropdownMenu/dropdown-menu'
 import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
@@ -1529,7 +1529,11 @@ function DataTableInner<TData>(
           //     「框框跟 cell 一樣大並取代 cell 的框且與 table 隔線無縫接軌」(2026-05-05)。
           //   - **沒有** cell 自己 box-shadow ring — focus / hover / open ring 由 Field naked 自帶
           //     state machine 提供(對齊 user「狀態樣式取決於原輸入框」reminder)
-          'group/cell flex text-foreground text-body font-normal shrink-0 relative self-stretch',
+          // 字級隨 size:sm/md text-body / lg text-body-lg(fieldDisplayTextClass),對齊 Field family
+          // size→font SSOT。此為非-Field content(consumer 自訂 cell / TruncateCell 純文字)的 fallback 字級;
+          // typed cell 各自的 Field 控件已自帶 size→font(cell-registry 傳 size)。
+          'group/cell flex text-foreground font-normal shrink-0 relative self-stretch',
+          fieldDisplayTextClass(size),
           // Issue 9(2026-05-10):有 cell error → unset overflow-hidden 讓 error message
           // wrap 撐 row 高。**H1(2026-05-10)升級**:overflow-visible 條件改 `rowHasAnyError` —
           // row 內任一 cell 有 error 整 row 全 cells 都 overflow-visible(error 訊息可能多行
@@ -1875,7 +1879,10 @@ function DataTableInner<TData>(
           // absolute → hover 顯時佔位 → label 自動讓出空間給 sort + more,**不再重疊**(對齊
           // user 圖示質疑 + Notion / Airtable header layout 共識)。
           // cell padding 12px 由外層 cellPadding style 提供 → more 距 cell 右邊 = 12px。
-          'group relative flex items-center gap-2 text-fg-secondary text-body font-normal shrink-0 overflow-hidden select-none',
+          // header 字級也隨 size(原寫死 text-body → lg 表格 header 字偏小,跟 body 不一致)。
+          // 對齊 cell wrapper + Field family size→font SSOT。色弱化由 text-fg-secondary 維持。
+          'group relative flex items-center gap-2 text-fg-secondary font-normal shrink-0 overflow-hidden select-none',
+          fieldDisplayTextClass(size),
           align === 'right' && 'justify-end',
           align === 'center' && 'justify-center',
         )}

@@ -119,9 +119,12 @@ function StringCell({ value, meta, mode, size, isDisabled, autoRowHeight, onComm
   //   - 互動(Input):Esc cancel / Enter commit / blur commit
   const v = value != null ? String(value) : ''
   if (mode === 'display') {
+    // size 必傳:DataTable cell 字級隨 size 變(sm/md text-body / lg text-body-lg),
+    // 對齊 Field family size→font SSOT(field-wrapper.tsx:60-64)。漏傳 → fallback md → lg 表格
+    // 字卡 14px 跟 Select/Date 等有傳 size 的 cell 不一致(2026-06-08 user 抓 frozen string 欄字偏小)。
     return autoRowHeight
-      ? <Textarea variant="naked" mode={displayOrDisabled(isDisabled)} value={v} className={clampClass} />
-      : <Input variant="naked" mode={displayOrDisabled(isDisabled)} value={v} />
+      ? <Textarea variant="naked" mode={displayOrDisabled(isDisabled)} value={v} size={size} className={clampClass} />
+      : <Input variant="naked" mode={displayOrDisabled(isDisabled)} value={v} size={size} />
   }
   if (autoRowHeight) {
     // 2026-05-14 I8 fix(per codex verdict + user 抓「edit cell shrink」):
@@ -177,6 +180,8 @@ function NumberCell({ value, meta, mode, size, isDisabled, onCommit, onCancel, o
         variant="naked"
         mode={displayOrDisabled(isDisabled)}
         value={value as number | null}
+        // size 必傳(同 StringCell)— currency/number cell 字級隨 DataTable size 變,對齊 Field SSOT。
+        size={size}
         prefix={prefix}
         suffix={meta?.suffix}
         precision={meta?.precision}
