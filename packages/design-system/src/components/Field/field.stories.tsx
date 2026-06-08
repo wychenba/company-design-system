@@ -69,7 +69,7 @@ const CASCADE_PRIORITY = [
 ]
 
 export const StateCascade: Story = {
-  name: 'Field 狀態 cascade（停用 / 純展示 流給所有控件）',
+  name: '欄位狀態連動 — 停用態 / 純展示態 流給所有控件',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
