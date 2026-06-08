@@ -2178,6 +2178,7 @@ function CreateFormPage({
     { id: 'ea2', type: 'auxiliary', desc: '-', files: [{ id: 'f2', name: 'Supportdoc.Png' }] },
   ]
   const isEdit = mode === 'edit'
+  const isModifying = editEntry?.status === 'modifying'
   const [payee, setPayee] = useState(editEntry?.payee ?? '員工')
   const [reason, setReason] = useState(editEntry?.reason !== '-' ? (editEntry?.reason ?? '') : '')
   const [useUrgentDate, setUseUrgentDate] = useState(editEntry?.urgentDate !== '-' && !!editEntry?.urgentDate)
@@ -2321,11 +2322,12 @@ function CreateFormPage({
                 </FieldLabel>
                 <Input value="林間宜 (023156)" readOnly />
               </Field>
-              <Field>
+              <Field mode={isModifying ? 'readonly' : undefined}>
                 <FieldLabel required>
                   收款對象&nbsp;<InfoTooltip content="請選擇本次請款的收款對象" />
                 </FieldLabel>
                 <Select
+                  mode={isModifying ? 'readonly' : undefined}
                   options={PAYEE_OPTIONS}
                   value={payee}
                   onChange={v => setPayee(v as string)}
@@ -2368,8 +2370,8 @@ function CreateFormPage({
                           <span className="text-fg-secondary text-sm shrink-0">{inv.currency} {Number(inv.subtotal).toLocaleString()}</span>
                           <div className="flex items-center gap-0.5 shrink-0">
                             <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditInvoiceTarget(inv)}><Pencil size={14} /></button>
-                            <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="複製" onClick={() => setInvoiceModalOpen(true)}><Copy size={14} /></button>
-                            <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setDeleteInvoiceTarget(inv.id)}><Trash2 size={14} /></button>
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors disabled:opacity-40 disabled:pointer-events-none" aria-label="複製" onClick={() => setInvoiceModalOpen(true)} disabled={isModifying}><Copy size={14} /></button>
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors disabled:opacity-40 disabled:pointer-events-none" aria-label="刪除" onClick={() => setDeleteInvoiceTarget(inv.id)} disabled={isModifying}><Trash2 size={14} /></button>
                           </div>
                         </div>
                         <p className="text-sm text-fg-tertiary px-4 pb-3">收款人：{inv.payee}&nbsp;|&nbsp;日期：{inv.date}</p>
@@ -2388,8 +2390,8 @@ function CreateFormPage({
                                   付款細項：{(paymentItemsMap[inv.id] ?? []).length} 項
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <Button variant="tertiary" size="sm" startIcon={Download} onClick={() => setBatchImportInvoiceId(inv.id)}>批次匯入</Button>
-                                  <Button variant="tertiary" size="sm" startIcon={Plus} onClick={() => setAddItemInvoiceId(inv.id)}>新增細項</Button>
+                                  <Button variant="tertiary" size="sm" startIcon={Download} onClick={() => setBatchImportInvoiceId(inv.id)} disabled={isModifying}>批次匯入</Button>
+                                  <Button variant="tertiary" size="sm" startIcon={Plus} onClick={() => setAddItemInvoiceId(inv.id)} disabled={isModifying}>新增細項</Button>
                                 </div>
                               </div>
                               {(paymentItemsMap[inv.id] ?? []).length === 0 ? (
@@ -2432,7 +2434,7 @@ function CreateFormPage({
                                           <td className="sticky right-0 bg-surface border-l border-divider px-3 py-2">
                                             <div className="flex items-center gap-0.5">
                                               <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditItemTarget({ invoiceId: inv.id, seq: item.seq })}><Pencil size={13} /></button>
-                                              <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq: item.seq })}><Trash2 size={13} /></button>
+                                              <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors disabled:opacity-40 disabled:pointer-events-none" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq: item.seq })} disabled={isModifying}><Trash2 size={13} /></button>
                                             </div>
                                           </td>
                                         </tr>
@@ -2657,6 +2659,7 @@ function CreateFormPage({
                 id="urgent"
                 checked={useUrgentDate}
                 onCheckedChange={v => setUseUrgentDate(!!v)}
+                disabled={isModifying}
               />
               <label htmlFor="urgent" className="text-sm cursor-pointer select-none">
                 使用緊急/指定付款
@@ -2677,7 +2680,7 @@ function CreateFormPage({
       {/* Footer */}
       <div className="flex items-center justify-end mt-6 pt-4 border-t border-divider max-w-[860px]">
         <div className="flex gap-2">
-          {isEdit ? (
+          {isEdit && !isModifying ? (
             <>
               <Button variant="outline" onClick={onBack}>取消</Button>
               <Button onClick={() => { onBack(); toast({ variant: 'success', title: '申請單已更新' }) }}>更新</Button>
