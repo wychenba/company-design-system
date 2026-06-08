@@ -1604,14 +1604,9 @@ function AddItemModal({
                 <FieldLabel>
                   會計科目 <InfoTooltip content="依子分類自動帶入" />
                 </FieldLabel>
-                <Input value={accountCode} onChange={e => setAccountCode(e.target.value)} placeholder="填寫會計科目" />
+                <Input value={accountCode ? `${accountCode}（${ACCT_NAME_MAPPING[accountCode] ?? ''}）` : ''} readOnly placeholder="依子分類自動帶入" />
               </Field>
             </div>
-            {/* 描述 */}
-            <Field>
-              <FieldLabel>描述</FieldLabel>
-              <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="填寫描述" />
-            </Field>
             {/* 總額 / 稅率 / 稅額 */}
             <div className="grid grid-cols-3 gap-4">
               <Field invalid={submitted && !total}>
@@ -1946,10 +1941,9 @@ function AddItemBModal({
               </Field>
               <Field disabled={!!(category && subCategory && ACCT_MAPPING[category]?.[subCategory])}>
                 <FieldLabel>會計科目 <InfoTooltip content="依子分類自動帶入" /></FieldLabel>
-                <Input value={accountCode} onChange={e => setAccountCode(e.target.value)} placeholder="填寫會計科目" />
+                <Input value={accountCode ? `${accountCode}（${ACCT_NAME_MAPPING[accountCode] ?? ''}）` : ''} readOnly placeholder="依子分類自動帶入" />
               </Field>
             </div>
-            <Field><FieldLabel>描述</FieldLabel><Input value={description} onChange={e => setDescription(e.target.value)} placeholder="填寫描述" /></Field>
             <div className="grid grid-cols-3 gap-4">
               <Field invalid={submitted && !total}><FieldLabel required>總額</FieldLabel><Input type="number" value={total} onChange={e => setTotal(e.target.value)} placeholder="填寫總額" />{submitted && !total && <FieldError>請填寫總額</FieldError>}</Field>
               <Field>
