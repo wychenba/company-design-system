@@ -56,6 +56,8 @@ benchmark:
 
 ## 視覺 canonical(對齊 DataTable v11)
 
+取值依據:7px 命中區 / 1px line 非自創——來自下方「世界級對照細節」5 家共識(hit zone 7-8px fingertip-friendly / 1px line non-intrusive)+ DataTable v11 已 ship 的既有 canonical(本 primitive 抽取自它,M17)。
+
 - **命中區**:7px 寬(horizontal)/ 高(vertical),`-3px` outward offset 跨 boundary 抓得到
 - **Visual line**:1px,positioned `right-[3px]` / `bottom-[3px]`,default full-extent
   - **idle**:`bg-divider`
@@ -79,6 +81,13 @@ benchmark:
 - Modal / Dialog 大小(那是 `<Sheet>` 自帶 handle,不該重發明)
 - Image crop 邊界(專用 `<ImageCropTool>` 領域)
 - Splitter pane (`resizable-panes` style)— 雙端 drag with linked state(future 評估抽 `<SplitPane>` 上層 primitive 消費本 handle)
+
+## 邊界案例
+
+- **Disabled**:仍渲染 1px line(`bg-divider`,無 hover affordance),但無 cursor、無 `select-none`、不掛 role / orientation / label(見 a11y 段)。disabled 切換不改 DOM 結構,只增減 attribute。
+- **拖到 min / max 卡住**:primitive 不持 width state(不耦合 drag math),邊界 clamp 與卡住回饋由 consumer 的 resize handler 管;`isResizing` 期間 line 維持 `bg-primary` 不另示警。
+- **同列多 handle 並存**(多欄 column resize):各 handle 為獨立 `<span>`,無互相協調;`-3px` outward offset 使相鄰欄命中區可能相接,先命中者(DOM 順序 / pointer target)收事件,衝突仲裁屬 consumer drag math。
+- **RTL**:未特化——命中區與 line 用 physical `left/right` 定位(`resize-handle.tsx`),RTL 鏡像需另案。
 
 ## Roadmap(用 user 既有的 v2 framing)
 

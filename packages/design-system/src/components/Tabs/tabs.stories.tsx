@@ -137,9 +137,9 @@ export const OverflowMenu: Story = {
   ),
 }
 
-// @story-trait-rationale: OverflowScroll / OverflowMenu + MANY_TABS array retired 2026-05-17 per audit Dim 24 —
-//   anatomy.stories.tsx OverflowMatrix(3 overflow values side-by-side)已 cover overflow 機制比較。
-//   展示層保留 typical 情境(Default / WithSuffix / Disabled);overflow 真實情境靠 anatomy。
+// @story-trait-rationale: overflow 機制對照(none / scroll / menu side-by-side)由 anatomy
+//   OverflowMatrix own;上方兩則「溢出處理」是 320px 窄容器的真實情境示範
+//   (2026-05-18 加,user 要求展示層要真的看得到溢出),兩層分工不重複。
 
 export const Disabled: Story = {
   name: '停用',

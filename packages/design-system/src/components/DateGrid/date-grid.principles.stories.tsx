@@ -80,7 +80,7 @@ export const UsageGuidance: Story = {
                 <LinkTo kind="Design System/Internal/DateGrid/展示" name="範圍 — 分析時段 / 訂單範圍"><span className="text-primary hover:underline font-medium cursor-pointer">Range — 分析時段 / 訂單範圍</span></LinkTo>
               </li>
               <li>
-                <LinkTo kind="Design System/Internal/DateGrid/展示" name="行內 — 儀表板小卡"><span className="text-primary hover:underline font-medium cursor-pointer">行內 — 儀表板小卡</span></LinkTo>
+                <LinkTo kind="Design System/Internal/DateGrid/展示" name="行內 — 儀表板小卡"><span className="text-primary hover:underline font-medium cursor-pointer">行內 — Linear 專案截止日小卡</span></LinkTo>
               </li>
             </ul>
             <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方「vs 近親」)。</p>
@@ -304,9 +304,9 @@ export const LocaleRule: Story = {
     <div>
       <Rule
         title="locale prop 控制週首日與星期標頭語言"
-        note="react-day-picker 接受 date-fns locale 物件。週首日由 locale 物件決定,不以語言籠統判斷:zhTW 週日起、en-US 週日起,但 en-GB / de / fr 週一起(同樣是英文,en-US 與 en-GB 週首日就不同)。Consumer 決定傳哪個 locale,DateGrid 不內建語言。"
+        note="react-day-picker 接受 date-fns locale 物件。週首日由 locale 物件決定,不以語言籠統判斷:en-US 週日起、en-GB 週一起——同樣是英文,週首日就不同;zhTW / de / fr(date-fns 內建值)都是週一起。下方對照:zhTW 首欄是週一,en-US 首欄是週日。Consumer 決定傳哪個 locale,DateGrid 不內建語言。"
       >
-        <Demo title="zhTW(繁體中文 · 週日起)">
+        <Demo title="zhTW(繁體中文 · 週一起)">
           <DateGrid mode="single" defaultMonth={new Date(2026, 3, 1)} locale={zhTW} />
         </Demo>
         <Demo title="預設(en-US · 週日起)">

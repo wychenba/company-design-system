@@ -618,6 +618,14 @@ Sheet 開啟狀態**不持久化**。
 
 ---
 
+## 常見誤解
+
+- 「SidebarMenuSub 可做第 2 層選單」——本 DS 不 export;深度 > 1 一律 TreeView(見「內容形態選擇」)
+- 「Settings 子頁要佔 sidebar 位置」——走 in-page secondary nav / user menu modal(見「Settings 這類有子頁的頁面」)
+- 「點 icon 可順便展開 sidebar」——行為不可預測;重新看階層資料的唯一路徑 = 展開 sidebar(見「Icon 模式的行為規則」)
+
+---
+
 ## 禁止事項
 
 - ❌ **使用 SidebarMenuSub / 讓 SidebarMenu 超過 1 層**——用 TreeView 或 in-page secondary nav
@@ -644,7 +652,7 @@ Sheet 開啟狀態**不持久化**。
 ## 判斷決策樹
 
 ```
-Variant：傳統工具型 → sidebar；現代 SaaS 卡片化 → inset；浮動面板 → floating
+Variant：目前僅 sidebar（floating 刻意不做 / inset 規劃中未實作，見「Variant」段）
 
 Collapsible：內容優先低頻導覽 → offcanvas；扁平高頻切換 → icon；超簡單 → none
 
@@ -685,7 +693,7 @@ Item-level default / hover / selected / disabled **色彩**完全共用 item-ana
 - **Loading(nav data-fetch)**:async nav tree fetch 時 consumer 應在對應 group 內渲 `<Skeleton>` line-stack(常見 3-5 條 sidebar nav skeleton 行)而非 Empty + spinner — Sidebar 是 chrome 不是 panel,loading 用 skeleton 更符合 chrome 持續存在的 affordance。對齊 Atlassian Sidebar / VS Code activity-bar idiom。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **Empty(no nav items)**:罕見場景(用戶無權限 / 全空 workspace)。若整個 group 無 item,consumer 應 conditional 不渲該 group(不渲空 group label);若整個 sidebar 無 item,可能該 hide sidebar(走 layout context 不渲)。不渲空白 sidebar。
 - **Dark mode / density**:Sidebar 為 chrome surface,走 chrome-header token 自動 adapt;density 預設 lock 跟隨 app density chrome token,不獨立 own。
-- **Collapsed mode(icon-only)**:已 codify(見 Sidebar collapsed mode 段);此時 label / endAction 隱藏,只留 icon + tooltip。
+- **Collapsed mode(icon-only)**:label / inline actions suffix 隱藏,只留 icon + tooltip;TreeView 整區隱藏,重新看階層資料的唯一路徑 = 展開 sidebar(完整規則見「Icon 模式的行為規則」段)。
 
 ---
 
@@ -703,9 +711,6 @@ Item-level default / hover / selected / disabled **色彩**完全共用 item-ana
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `app-shell.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
 - `scroll-area.spec.md`
+- `sheet.spec.md`
+- `tree-view.spec.md`

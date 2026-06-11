@@ -528,12 +528,19 @@ function ReadonlyMultiSelect({
         // readonly/disabled path 對齊 L293 display wrapper 已 ship 的 overflow-hidden fix。
         // M10 propagation:原 overflow-visible 讓 readonly tag 越界蓋 indicator,跟 display 不對稱。
         wrap ? 'flex-wrap py-1' : 'overflow-hidden', className)}
-      style={{ gap: GAP, ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode={resolvedMode}>
+      style={{ gap: GAP, ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode={resolvedMode}
+      aria-disabled={resolvedMode === 'disabled' ? true : undefined}>
       {hasTags ? (
         <ComboboxTagStack value={value} options={options} tagSize={sz} wrap={wrap}
           containerRef={containerRef} disabled={resolvedMode === 'disabled'} />
       ) : (
         <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+      )}
+      {/* 2026-06-10 類型身份 indicator 規則:readonly/disabled 保留 chevron(naked cell 依 showDisplayEndIcon);disabled → fg-disabled */}
+      {(variant === 'naked' ? !!showDisplayEndIcon : true) && (
+        <ItemSuffix className="pointer-events-none">
+          <ChevronDown size={iconSize} className={cn('shrink-0', resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted')} aria-hidden />
+        </ItemSuffix>
       )}
     </div>
   )

@@ -89,7 +89,7 @@ Button 是最基礎的互動元件，用於觸發操作或導覽。
 **結構**：
 
 ```
-[startIcon? 16/20px] [<span px-1>label</span>] [<span gap-1>badge? + endIcon?</span>]
+[startIcon? 16/20px] [label(兩側隱性 4px 呼吸)] [badge? + endIcon?(內部 4px)]
 ```
 
 - 單行不 wrap
@@ -300,10 +300,12 @@ const ICON_ONLY_BASE = 'aspect-square p-0 min-w-0 gap-0'
 - `disabled` 本身**不代表**正在載入；若需傳達載入中，應同時設定 `loading`
 - disabled 時品牌 / 狀態色完全移除，統一回到 neutral——避免「可用但弱化」的視覺誤導
 - danger 在 disabled 時同樣消失，呈現與非 danger 版本相同的外觀
+- `pressed` + disabled 並存:**disabled 視覺優先**——pressed 底色被 disabled token 取代(state > emphasis,同 M24 precedence;`aria-pressed` 語意仍保留)
+- 常見誤解:「disabled 時 badge 還能傳達待辦數」——badge 不應與 disabled / loading 並存(使用者無法互動,計數成誤導;規則同 loading 段)
 
 ### loading
 
-顯示 `CircularProgress`(indeterminate),自動 disabled,設定 `aria-busy`。
+顯示 `CircularProgress`(indeterminate),自動 disabled(`disabled={disabled || loading}`),設定 `aria-busy`。disabled + loading 並存時視覺以 disabled neutral token 為底,spinner 照常渲染(`text-current` 繼承 disabled 文字色)。
 
 **CircularProgress 永遠在左側(`startIcon` 位置)**,方向與行動發起一致:
 - 有 `startIcon` → icon 換成 CircularProgress(同位置替換)
@@ -443,19 +445,20 @@ N/A(action trigger,無資料層)。
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
-- `header-canonical.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
+- `action-bar.spec.md`
 - `alert.spec.md`
+- `badge.spec.md`
 - `bulk-action-bar.spec.md`
 - `chip.spec.md`
 - `data-table.spec.md`
 - `dropdown-menu.spec.md`
 - `element-anatomy.spec.md`
 - `file-upload.spec.md`
+- `header-canonical.spec.md`
+- `item-anatomy.spec.md`
+- `overlay-surface.spec.md`
+- `segmented-control.spec.md`
 - `switch.spec.md`
+- `tabs.spec.md`
 - `tag.spec.md`
 - `tooltip.spec.md`

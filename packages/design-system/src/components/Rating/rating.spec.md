@@ -89,12 +89,7 @@ Rating 的 **container 高度消費 `--field-height-*` token**(sm=28 / md=32 / l
 | md | **24px** ← Avatar | 24px | 16px | Avatar |
 | lg | **24px** ← Avatar | 24px | 20px | Avatar |
 
-**為什麼對齊 Avatar 不對齊 icon tier**:
-
-1. **視覺份量**:Rating 的「一顆星」是 **filled shape**(整個 icon 面積都是重量),不像純 outline icon 靠 stroke。跟 filled identity 元件(Avatar)同尺寸才能在 row 裡 visual weight 對齊。
-2. **語意**:Rating 是「主要資料視覺」(一顆星 = 一個資料點),不是次要 affordance。次要 affordance(如 Input 的 startIcon、Button iconOnly)才走 icon tier(16/16/20)。
-3. **世界級對照**:Ant Rate in Form = 20px(對齊 Form avatar-like components);Material MUI Rating default 24px;Airbnb 商品卡星星 24px。皆走 identity 重量,不走 icon tier。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
-4. **歷史錯誤**:早期設 16/16/20 跟 icon tier 齊,但視覺上跟 inline avatar / tag 並排時星星顯得比 avatar「小一號」,失去「這一顆星是資料點」的語感——AR48 修正。
+**為什麼對齊 Avatar 不對齊 icon tier**:星星是 filled shape 的「主要資料視覺」(一顆星 = 一個資料點),與同為 filled 的 identity 元件(Avatar)同尺寸才能在 row 裡 visual weight 對齊;次要 affordance(Input startIcon / Button iconOnly)才走 icon tier(16/16/20)。世界級對照:Ant Rate in Form 20px / Material MUI Rating 24px / Airbnb 商品卡 24px,皆走 identity 重量。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->(歷史:早期 16/16/20 對齊 icon tier,星星比並排 avatar「小一號」——AR48 修正。)
 
 ### 放入 Field 的可組合性
 
@@ -190,6 +185,16 @@ Star icon 渲染時明確設 `stroke="none"`(Lucide Star 預設 `stroke="current
 - ❌ **interactive 狀態下不與 `Field` 的 `Label` 分離超過一個 section**——使用者要清楚「這個評分屬於誰 / 哪個面向」
 - ❌ **`max` 不設超過 7**——超過使用者無法快速掃視，若需更細分度改用 Slider（連續 0–100）
 - ❌ **send-form 用 `precision="half"`**——送出評分選半星會讓使用者猶豫（`4` 跟 `4.5` 差在哪？）；半星只用於展示平均值
+
+---
+
+## 邊界案例
+
+- **value = 0 / 未評分**:全空星照常渲染(`--divider` fill),不做特殊 empty state。
+- **超界 value**:渲染端每顆星 fill ratio 自動 clamp 0–1(`> max` 全滿、`< 0` 全空),鍵盤增減恆 clamp 0–max(tsx)。
+- **max 上限**:預設 5(世界級慣例,見 Props 表);**不設超過 7**,原因見「禁止事項」。
+- **Disabled / Loading**:整塊 dim(`opacity-disabled`),兩者視覺同、語義與 ARIA 不同 — 見「Interactive vs ReadOnly」表 +「Loading canonical」段。
+- **Dark mode**:`--warning` / `--divider` semantic token 自動 adapt,Rating 不 own dark token。
 
 ---
 

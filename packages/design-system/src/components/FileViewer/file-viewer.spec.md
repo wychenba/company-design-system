@@ -318,10 +318,10 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 
 | 狀態 | 處理方式 |
 |------|---------|
-| **Loading**(圖片載入中) | 由 renderer 自己處理(例:`<img>` 的自然 loading,未來 PDFRenderer 可在內部秀 skeleton)。shell 不提供全頁 loading state |
+| **Loading**(圖片載入中) | 由 renderer 自己處理(例:`<img>` 的自然 loading,未來 PDFRenderer 可在內部秀 skeleton)。shell 不提供全頁 loading state(shell / renderer 分工見「Renderer Registry」+「ImageRenderer 規則」) |
 | **Empty**(`files.length === 0`) | 不渲染整個 viewer(return null);consumer 透過 `open=false` 控制 |
 | **Error**(圖片載入失敗 / renderer crash) | MVP 不處理——renderer 自己處理;未來可加 error boundary 幫 Fallback 兜底 |
-| **Unknown file type** | FallbackRenderer 自動兜底,顯示 Empty + 下載提示 |
+| **Unknown file type** | FallbackRenderer 自動兜底,顯示 Empty + 下載提示(resolution 順序見「Renderer Registry」) |
 
 **Dark mode**:整個 viewer chrome 鎖 dark,不隨頁面 theme 切。
 
@@ -366,15 +366,3 @@ Radix DialogPrimitive 自動處理:
 - `../../patterns/horizontal-overflow/horizontal-overflow.spec.md` — Filmstrip 水平捲動 + fade mask
 - `../../patterns/action-bar/action-bar.spec.md` — Toolbar 按鈕順序 canonical
 - `../FileItem/file-item.spec.md` — 上傳清單列元件(與 FileViewer 不同用途,FileItem 是 list item,FileViewer 是 fullscreen preview)
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
-- `layoutSpace.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
-- `popover.spec.md`

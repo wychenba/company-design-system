@@ -4,11 +4,11 @@ family: composite
 variants: {}
 sizes:
   sm:
-    when: "★ cva default — 所有 header 內 tabs(overlay / chrome header / Dialog / Sidebar / dense toolbar);tab-height 32/40"
+    when: "★ cva default — 所有 header 內 tabs(overlay / chrome header / Dialog / Sidebar / dense toolbar)"
   md:
     when: "future tier — 目前無 recommended use case,新 consumer 須先諮詢 DS owner"
   lg:
-    when: "獨立 tabs 直接取代 chrome header — page-level workspace 主導覽(tab-height 48/56 = chrome-header-height)"
+    when: "獨立 tabs 直接取代 chrome header — page-level workspace 主導覽(tab 高度 = chrome-header-height)"
 traits:
   - hasSizes
   - hasInteractiveStates
@@ -254,6 +254,8 @@ Size 建議:overlay / chrome header 內用 `sm`(32/40)— 對應 close X 也是 
 - **Empty(no tabs)**:單 tab 已禁用(見「禁止事項」),0 tab 同理 — consumer 應條件性不渲 `<Tabs>`,不渲空 TabsList。
 - **Empty content panel**:tab 切到沒內容的 view 時,content panel 應渲 `<Empty>` 引導 user(對齊 empty 元件的 page-empty pattern)— 由 consumer 決定,Tabs primitive 不獨立處理。
 - **Disabled tab 鍵盤行為**:Radix Tabs 自動 skip disabled tab(`←/→` 不停留),focus 跳到下一個可用 tab。
+- **極長 label**:trigger `whitespace-nowrap` 不換行、不 truncate(hug content);整列放不下屬 TabsList 溢出問題,走「Overflow 模式」(scroll / menu),非單 trigger 截斷。
+- **RTL**:未實作方向鏡像(scroll edge / arrow 以 LTR `scrollLeft` 計算,與 Chip 共用 `useScrollEdges`);RTL 屬 DS-wide 決策,未定(與 Chip / Breadcrumb 同口徑)。
 - **Dark mode / density**:走 chrome-header / Field 對應 token 自動 adapt;`size` × `variant` matrix 已在 anatomy 完整呈現,density 由 size prop 表達不獨立 own 維度。
 
 ---
@@ -311,6 +313,11 @@ Tabs anatomy 採 DS 標準結構 + 元件特有矩陣:
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `accordion.spec.md`
+- `button.spec.md`
 - `carousel.spec.md`
+- `header-canonical.spec.md`
+- `horizontal-overflow.spec.md`
+- `segmented-control.spec.md`
 - `sidebar.spec.md`
 - `steps.spec.md`

@@ -94,10 +94,20 @@ Consumer 無需額外處理 a11y,保留 cmdk 原結構 + 使用 `<CommandInput>`
 
 ## 邊界案例
 
-- **Disabled item**:`<CommandItem disabled>` 透過 cmdk 內建支援,視覺繼承 MenuItem SSOT(`text-fg-disabled` + `aria-disabled=true` + 鍵盤導覽自動 skip + Enter 不觸發 onSelect)。
+- **Disabled item**:`<CommandItem disabled>` 透過 cmdk 內建支援,視覺繼承 MenuItem SSOT(`text-fg-disabled` + `aria-disabled=true` + 鍵盤導覽自動 skip + Enter 不觸發 onSelect)。skip 是「不進導覽清單」(cmdk `:not([aria-disabled="true"])` selector)— ↑/↓ 直接跳到下一個可選項,無中途 highlight。
+- **Group heading 不可選中**:heading 是 `aria-hidden` 裝飾 div(group container `role="presentation"`),不參與導覽與選取;SR 經 items wrapper `role="group"` + `aria-labelledby` 取得群組語意。
+- **Empty 後持續打字**:cmdk 每個 keystroke 重新過濾(`filtered.count` 驅動),`<CommandEmpty>` 持續顯示直到有 match;input 不鎖、不清空。
 - **Loading**:Command 本身非 async surface。async option fetch 應由 consumer(SelectMenu / Cmd+K palette)在外層處理 — 將 `<CommandList>` body 切換為 `<Empty icon={<CircularProgress size={48}/>}/>`(對齊 `empty.spec.md:163` SelectMenu loading row SSOT,禁止事項見 `empty.spec.md:168`)。Command primitive 不獨立 own loading prop。
 - **Empty(no results)**:`<CommandEmpty>` 自動偵測 search filter result = 0 時渲;consumer 必傳 fallback 文案(預設 cmdk 不渲)。
 - **Dark mode / density**:Command 的 inline Tailwind class 直接消費 semantic token（`bg-neutral-hover` / `text-fg-muted` / `text-fg-disabled` 等），token 在 dark mode 自動切值——非透過 MenuItem / Input / Empty primitive 連動。density 不獨立 own（由 consumer SelectMenu 控）。
+
+---
+
+## 常見誤解
+
+- 「選單一律用 Command」— < 6 項、選完即觸發動作的操作選單是 `DropdownMenu`(見「與 DropdownMenu 的分界」)。
+- 「Command 搜尋框是 Field control」— 不對齊 `--field-height-*`(見「禁止事項」)。
+- 「cmdk `data-selected` = 持續選中態」— 它是鍵盤 / 指標的臨時 roving highlight,故用 `bg-neutral-hover` 而非 `bg-neutral-selected`(見「為何無 StateBehavior」)。
 
 ---
 

@@ -321,7 +321,7 @@ function OverflowInspector() {
               </tr>
               <tr>
                 <Td mono>openDelay</Td>
-                <Td mono>700ms（HOVER_DELAY_RICH_MS）</Td>
+                <Td mono>500ms（HOVER_DELAY_PLAIN_MS）</Td>
               </tr>
               <tr>
                 <Td mono>closeDelay</Td>

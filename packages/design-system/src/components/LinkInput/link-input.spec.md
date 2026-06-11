@@ -78,6 +78,14 @@ URL 格式要求：必須包含 `http://` 或 `https://` protocol。
 
 ---
 
+## 極長 URL（邊界）
+
+- **顯示文字 = hostname**:link 狀態預設只顯示 hostname（去 `www.`,如 `https://github.com/org/repo` → `github.com`）,非完整 URL;`label` prop 可覆寫顯示文字。完整 URL 載於 `href`
+- **單行 truncate**:link / readonly / display 狀態超寬時 ellipsis 截斷,不換行
+- **編輯態**:原生 input 水平捲動,無長度上限
+
+---
+
 ## readonly / disabled
 
 與其他 Field 一致：
@@ -128,4 +136,5 @@ LinkInput 是 **Field Controls family 成員**——互動狀態(focus / invalid
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `file-item.spec.md`
+- `input.spec.md`
 - `textarea.spec.md`

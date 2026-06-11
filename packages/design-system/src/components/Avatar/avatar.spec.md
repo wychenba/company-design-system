@@ -200,43 +200,13 @@ Icon 和 Text 模式使用 primitive step-1 subtle 背景 + 對應 step-7 前景
 
 ### Subtle（預設，`solid=false`）
 
-| Color | 背景 | 前景 |
-|---|---|---|
-| neutral（預設） | `--muted` | **`--foreground`** |
-| blue | `--color-blue-1` | `--color-blue-7` |
-| green | `--color-green-1` | `--color-green-7` |
-| deep-orange | `--color-deep-orange-1` | `--color-deep-orange-7` |
-| yellow | `--color-yellow-1` | `--color-yellow-7` |
-| red | `--color-red-1` | `--color-red-7` |
-| orange | `--color-orange-1` | `--color-orange-7` |
-| amber | `--color-amber-1` | `--color-amber-7` |
-| lime | `--color-lime-1` | `--color-lime-7` |
-| turquoise | `--color-turquoise-1` | `--color-turquoise-7` |
-| indigo | `--color-indigo-1` | `--color-indigo-7` |
-| purple | `--color-purple-1` | `--color-purple-7` |
-| magenta | `--color-magenta-1` | `--color-magenta-7` |
+**通則**:12 色相一律 `--color-{hue}-1` subtle 背景 + `--color-{hue}-7` 前景（1:1 零 offset,無 per-hue 特例）。**neutral 例外**（非色相）:`--muted` 背景 + `--foreground` 前景。逐色 mapping 的 implementation SSOT = `tokens/categorical-color.ts`。
 
 ### Solid（`solid=true`）
 
-step-6 全色背景 + 對比前景（白 / 深依底色明暗分桶,見下「Solid 文字色規則」）。
+**通則**:12 色相一律 `--color-{hue}-6` 全色背景;**neutral 例外**:`--color-neutral-9` 背景 + `--inverse-fg` 前景。前景依底色明暗分桶（見下）。
 
-| Color | 背景 | 前景 |
-|---|---|---|
-| neutral | `--color-neutral-9` | `--inverse-fg` |
-| blue | `--color-blue-6` | `--on-emphasis`（白） |
-| green | `--color-green-6` | `--on-emphasis`（白）★ |
-| deep-orange | `--color-deep-orange-6` | `--on-emphasis`（白） |
-| yellow | `--color-yellow-6` | **`--on-emphasis-dark`（深）** |
-| red | `--color-red-6` | `--on-emphasis`（白） |
-| orange | `--color-orange-6` | **`--on-emphasis-dark`（深）** |
-| amber | `--color-amber-6` | **`--on-emphasis-dark`（深）** |
-| lime | `--color-lime-6` | **`--on-emphasis-dark`（深）** |
-| turquoise | `--color-turquoise-6` | `--on-emphasis`（白） |
-| indigo | `--color-indigo-6` | `--on-emphasis`（白） |
-| purple | `--color-purple-6` | `--on-emphasis`（白） |
-| magenta | `--color-magenta-6` | `--on-emphasis`（白） |
-
-**Solid 文字色規則（on-emphasis 配對,2026-06-04,與 Tag 共用 SSOT）**：依 step-6 底色明暗分桶,合規門檻 = WCAG **large/bold 3:1**（user 拍板「以最低為原則」）。底夠深 → `--on-emphasis`（白）；底太亮 → `--on-emphasis-dark`（深,= `black-a85`,原 `warning-foreground` 改名）:**yellow / amber / orange / lime**。**★ green 例外**:white 實測 2.47 連 3:1 都不過,但維持白字（慣見「綠底白字」觀感）= documented exception。對比由 `categorical-color-invariants.mjs` I4 機械驗(green exempt)。
+**Solid 文字色規則（on-emphasis 配對,2026-06-04,與 Tag 共用 SSOT）**：依 step-6 底色明暗分桶,合規門檻 = WCAG **large/bold 3:1**（user 拍板「以最低為原則」）。底夠深 → `--on-emphasis`（白）；底太亮 → `--on-emphasis-dark`（深,= `black-a85`,原 `warning-foreground` 改名）:**yellow / amber / orange / lime** 四色用深字,其餘用白。**★ green 例外**:white 實測 2.47 連 3:1 都不過,但維持白字（慣見「綠底白字」觀感）= documented exception。對比由 `categorical-color-invariants.mjs` I4 機械驗(green exempt);逐色 mapping SSOT = `tokens/categorical-color.ts`。
 
 Image 模式不顯示背景色（圖片填滿），`solid` prop 無效果。
 
@@ -316,24 +286,25 @@ Avatar 是**身份視覺 primitive**(顯示人 / 組織 / 物件的代表視覺)
 
 ---
 
-## 空值 / 驗證
+## 空值 / 驗證 / 邊界
 
-N/A(非互動 primitive,consumer 決定何時渲染;`src` 為 null / 載入失敗時 fallback 到 initials)。
+非互動 primitive,無 loading / error state;各邊界已散見對應段,此處收斂索引:
 
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
-- `motion.spec.md`
-- `opacity.spec.md`
-- `uiSize.spec.md`
+- **`src` null / 圖片載入失敗**:自動降級 Icon / Text fallback chain(見「三種內容模式」)。
+- **`alt` 缺失**:fallback 與 SR 行為見「A11y 預設」(alt 必傳 canonical)。
+- **`size="fill"` 無確定尺寸的父容器**:fill 以父容器尺寸為準,僅用於「父已決定尺寸」的 slot(見「兩種模式」表);父無確定尺寸時改用顯式 `size={px}`。
+- **Disabled context**:見「Disabled」段(fieldCtx self-dim)。
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `badge.spec.md`
 - `file-item.spec.md`
 - `hover-card.spec.md`
 - `menu-item.spec.md`
+- `motion.spec.md`
 - `overflow-indicator.spec.md`
 - `people-picker.spec.md`
+- `profile-card.spec.md`
+- `uiSize.spec.md`

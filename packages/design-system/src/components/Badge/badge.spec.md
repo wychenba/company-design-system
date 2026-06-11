@@ -384,6 +384,14 @@ Badge 是**計數 / 狀態視覺指示器**,本身**非互動元件**:
 ## 相關
 
 - `../Tag/tag.spec.md` — 分類標籤、狀態標記（Badge vs Tag 的詳細對照在本 spec 定位段落）
+- `../Avatar/avatar.spec.md` — `badgeCount` 內部消費 `<Badge variant="critical">`（遵循本 spec）;`status` 是 Avatar 自有 presence SVG（非 Badge 系統）,兩者可並存,詳該 spec
 - `../Button/button.spec.md` — iconOnly Button + Badge overlay 通知 icon 的組合模式
 - `../Chip/chip.spec.md` — 可互動 filter（不是 Badge 的用途）
 - `../CircularProgress/circular-progress.spec.md` — Loading 狀態指示(取代 Spinner)
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `button.spec.md`
+- `tag.spec.md`

@@ -34,7 +34,7 @@ const COLOR_MAP: Record<ModeKey, Partial<Record<StateKey, ColorSpec>>> = {
     default:  { bg: 'transparent',    text: '--foreground',  border: 'transparent',     placeholder: '--fg-muted' },
   },
   readonly: {
-    default:  { bg: '--bg-disabled',  text: '--foreground',  border: 'transparent',     placeholder: '--fg-muted' },
+    default:  { bg: '--bg-readonly',  text: '--foreground',  border: 'transparent',     placeholder: '--fg-muted' },
   },
   disabled: {
     default:  { bg: '--bg-disabled',  text: '--fg-disabled', border: 'transparent',     placeholder: '--fg-disabled' },
@@ -59,7 +59,7 @@ const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
 const MODE_DESC: Record<ModeKey, string> = {
   edit:     '表單可編輯欄位 — bg-surface + border + hover/focus 回饋',
   display:  '純展示資料 — 無 chrome（transparent）+ 文字正常色，空值顯示 —（em dash）',
-  readonly: '不可編輯但可見 — bg-disabled(neutral-2) + 無邊框 + 文字正常色',
+  readonly: '不可編輯但可見 — bg-readonly(neutral-2) + 無邊框 + 文字正常色',
   disabled: '被停用的欄位 — bg-disabled(neutral-2) + 無邊框 + 文字灰化',
 }
 

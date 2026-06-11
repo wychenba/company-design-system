@@ -51,10 +51,16 @@ export const UsageGuidance: Story = {
       <p>適合 Chip 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/Chip/展示" name="單選"><span className="text-primary hover:underline font-medium cursor-pointer">單選</span></LinkTo>
+          <LinkTo kind="Design System/Components/Chip/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">技術文章列表的語言標籤濾鏡(多選)</span></LinkTo>
+        </li>
+        <li>
+          <LinkTo kind="Design System/Components/Chip/展示" name="帶 Badge"><span className="text-primary hover:underline font-medium cursor-pointer">任務列表的狀態篩選 — Badge 顯示各狀態筆數</span></LinkTo>
+        </li>
+        <li>
+          <LinkTo kind="Design System/Components/Chip/展示" name="單選"><span className="text-primary hover:underline font-medium cursor-pointer">程式語言擇一的單選濾鏡(type="single")</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方「vs 近親元件」段)。</p>
     </div>
 
       {/* vs 近親元件 — 原 VsSegmentedRule */}

@@ -76,6 +76,12 @@ Consumer 在 JSX 裡明確放置分隔線的場景：
 - ❌ 用 `--border` token 做分隔線（應該用 `--divider`）
 - ❌ 用 `bg-border` 做 ButtonDivider 等 consumer 放置的分隔線
 
+## 邊界案例
+
+- **Vertical 方向**：`h-full` 取父容器高度——父容器無確定高度（auto）時 separator 高度為 0、不可見；需父容器有確定高度或 flex row 的 stretch 對齊
+- **空容器 / 0 寬**：horizontal `w-full` 隨父寬，父寬為 0 時無可見線；Separator 不自帶 min-width / min-height
+- **厚度固定 1px**（`h-px` / `w-px`）、非互動無 hover / focus——無 size / state 變體（見下「為何無 …」段）
+
 ## 為何無 Inspector / ColorMatrix / SizeMatrix / StateBehavior
 
 Separator 是**視覺分隔 primitive**(一條 1px 線),結構極薄:

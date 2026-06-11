@@ -319,19 +319,9 @@ upload-manager 的 completed(100% bar + ✓)屬「剛完成的 upload session」
   {files.map(f => <FileItem key={f.id} mode="rich" {...f} />)}
 </div>
 
-// ✅ Compact 無 status(form attachment,靜態灰底)
+// ✅ Compact 一律 gap-1(無 status / 有 status / mixed 上傳中+已存附件 都同此 wrapper,見上表)
 <div className="flex flex-col gap-1">
-  {files.map(f => <FileItem key={f.id} mode="compact" {...f} />)}
-</div>
-
-// ✅ Compact 有 status only(全有 status,uploading/error/completed)
-<div className="flex flex-col gap-1">
-  {files.map(f => <FileItem key={f.id} mode="compact" status={f.status} progress={f.progress} {...f} />)}
-</div>
-
-// ✅ Compact mixed 上傳中 + 已存附件(email 草稿、舊附件 + 新上傳)
-<div className="flex flex-col gap-1">
-  {allFiles.map(f => <FileItem key={f.id} mode="compact" status={f.isUploading ? 'uploading' : undefined} {...f} />)}
+  {files.map(f => <FileItem key={f.id} mode="compact" status={f.isUploading ? 'uploading' : undefined} {...f} />)}
 </div>
 
 // ❌ 反例:list 加外框 + overflow-hidden(雙重 card / 強制邊框相黏)
@@ -412,16 +402,7 @@ Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿
   mode="rich"
   name="report.pdf"
   status="completed"
-  onDownload={() => downloadFile(id)}   // hover ✓ → ↓
-  actions={<Button size="xs" iconOnly variant="text" startIcon={Trash2} onClick={del} aria-label="刪除" />}
-/>
-
-<FileItem
-  mode="compact"
-  name="backup.json"
-  status="error"
-  description="There's something wrong."
-  onRetry={() => retryUpload(id)}        // hover ✗ → ⟲
+  onDownload={() => downloadFile(id)}   // hover ✓ → ↓;error 場景同理:onRetry → hover ✗ → ⟲
   actions={<Button size="xs" iconOnly variant="text" startIcon={Trash2} onClick={del} aria-label="刪除" />}
 />
 ```
@@ -451,6 +432,7 @@ Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿
 |------|------|------|
 | **FileItem** | 單一檔案 row primitive — 顯示一個檔案的 name / status / progress / actions | List 內的單筆 / detail / preview / message attachment |
 | **FileUpload** | Dropzone + file list orchestrator — 拖放區 + 多 FileItem 排列 + 上傳狀態管理 | 完整上傳流程入口 |
+| **FileViewer** | 檔案內容預覽 overlay — FileItem `onClick` 的預設開啟目標 | 點 row 後的檔案全幅預覽 |
 
 **判斷**:
 
@@ -469,6 +451,18 @@ Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿
 - ❌ **不在 FileItem 內塞自組 ProgressBar**(`<div className="bg-primary h-1" style={{width: `${progress}%`}} />`)→ 必消費內建 `<ProgressBar>` SSOT。自組會視覺漂移(高度 / 動畫 / status 色不一致)+ 失去 a11y attributes。
 - ❌ **不混用 rich + compact 在同一 list**(詳「Invariant 1」)— 高度差破壞 row rhythm,prefix 視覺語言衝突。
 - ❌ **不用 FileItem 做下載進度**(瀏覽器原生下載 UX 已足夠)— FileItem 為 upload narrative 設計,download progress 走自訂元件。
+
+**常見誤解**:FileItem 該有 hover-bg → 永不(三型態 permanent-anchored,見「Hover 行為 canonical」);status 會染整 row 底色 → 只升階 progress bar / status icon / description(見「Inspector 與矩陣的教學分工」);`surface` 影響進度條 → 進度條只看 `status`(見「可下載狀態 canonical」)。
+
+---
+
+## 邊界案例
+
+- **超長檔名**:label 經 `ItemContent` 預設 `truncate` 單行截斷(ellipsis),不換行。
+- **過長 description**:自由換行不截斷(FileItem 未傳 `descriptionClamp`);rich 多行 desc 時 progress bar 隨內容下移並保 8px min gap(見 Rich layout invariant)。
+- **progress 精度**:傳入值直接顯示(rich 的 `%` 文字與 bar 同源),元件不四捨五入;`completed` 強制 100。
+- **RTL**:未特化——compact progress bar offset 用 physical `left/right`(見 `file-item.tsx`),RTL 支援需另案。
+- **Dark mode**:走 semantic token 自動 adapt。無 `disabled` prop(展示型 row,非 form control)。
 
 ---
 
@@ -489,3 +483,9 @@ ColorMatrix 已建:展示 status × 元素(filename / description / progress bar
 - `../TreeView/tree-view.spec.md` — 階層 file structure 場景
 - `../ProgressBar/progress-bar.spec.md` — ProgressBar SSOT(FileItem consumes ProgressBar for upload bar)
 - `../../tokens/color/color.spec.md` — Track 底色（`bg-secondary` 使用原則）
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `file-upload.spec.md`

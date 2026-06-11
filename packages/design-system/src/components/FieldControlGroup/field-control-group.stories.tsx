@@ -42,7 +42,7 @@ const CURRENCIES = [
 ]
 
 /* ── 電話輸入(國碼 + 號碼)── */
-export const Phone_NumberInput: Story = {
+export const PhoneNumber: Story = {
   name: '電話',
   render: () => {
     const [code, setCode] = React.useState('+886')
@@ -75,7 +75,7 @@ export const Phone_NumberInput: Story = {
 }
 
 /* ── 金額輸入(幣別 + 數字)── */
-export const Currency_Amount: Story = {
+export const CurrencyAmount: Story = {
   name: '金額',
   render: () => {
     const [currency, setCurrency] = React.useState('TWD')
@@ -105,7 +105,7 @@ export const Currency_Amount: Story = {
 }
 
 /* ── 搜尋 + 提交按鈕 ── */
-export const Search_Submit: Story = {
+export const SearchSubmit: Story = {
   name: '搜尋與提交',
   render: () => {
     const [q, setQ] = React.useState('')
@@ -139,7 +139,7 @@ const STRING_OPS = [
   { value: 'starts_with', label: '開頭為' },
 ]
 
-export const FilterRow_RealUsage: Story = {
+export const FilterRow: Story = {
   name: '篩選列（資料表進階篩選實例）',
   render: () => {
     const [field, setField] = React.useState('name')

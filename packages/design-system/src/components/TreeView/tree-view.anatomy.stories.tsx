@@ -295,7 +295,7 @@ export const ColorMatrix: Story = {
 }
 
 export const IndentMatrix: Story = {
-  name: '縮排 與 樹狀導引',
+  name: '縮排與樹狀導引',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

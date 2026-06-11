@@ -2,10 +2,8 @@
 
 # Form Validation 設計原則
 
-> **本 spec = 跨表單的 validation 方法論 rules,非 UI 元件 spec,不適用 Layout Family 分類**(Dim 16 豁免)。
+> **本 spec = 跨表單的 validation 方法論 rules**(表單層級行為規範,適用於所有含 Field 元件的表單)。非 UI 元件 spec,不適用 Layout Family 分類(Dim 16 豁免)。
 > 元件級 validation 視覺規格住在 `Field/field.spec.md`(Field wrapper chrome)+ 各 form control spec。
-
-表單層級的驗證行為規範。適用於所有包含 Field 元件的表單。
 
 ---
 
@@ -43,7 +41,7 @@
 ### Submit 驗證
 
 7. **Submit 驗證全部**——點擊 submit 時對所有欄位執行驗證(不依賴個別 field 的 blur 狀態)
-8. **Anchor 到第一個錯誤**——若有任何欄位出錯,scroll 並 focus 到第一個錯誤欄位
+8. **Anchor 到第一個錯誤**——若有任何欄位出錯,scroll 並 focus 到第一個錯誤欄位。多次 submit 重試時,每次都重新驗證全部欄位並重新計算「第一個錯誤」(rule 7 的自然結果),不保持上次 anchor 位置
 9. **Async / cross-field 驗證 defer 到 submit**——某些驗證無法在 blur 當下完成(如「名稱是否重複」需要 API 查詢、跨欄位邏輯如「結束日不得早於開始日」),這些在 submit 時統一判斷。若有錯誤,同樣 anchor 到第一個出錯欄位。
 
 ### 驗證分層
@@ -134,17 +132,20 @@ Form validation 的 ARIA / 鍵盤行為(對齊 WCAG 3.3.1 Error Identification +
 - **Required indicator**:label 的 `*` 為純視覺、對讀屏隱藏(`aria-hidden="true"`,field.tsx:392);required 語意由內部輸入控件的 `aria-required`(input.tsx:192)承擔,避免讀屏讀出「asterisk」語義不清
 - **Color-only error 警告**:error border 紅色之外必有 icon 或文字(WCAG 1.4.1 不僅靠顏色)— DS error variant 自動 prefix `<AlertCircle/>` icon
 
+## 相關
+
+- `field.spec.md` — Field wrapper 的 error 視覺 chrome(紅框 + error message slot)
+- `field-controls.spec.md` — form control 共用 state(disabled / readonly / invalid)
+- `../Input/input.spec.md` — `aria-required` / `aria-invalid` 實作端(input.tsx)
+
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `combobox.spec.md`
 - `date-picker.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
+- `field-controls.spec.md`
+- `field.spec.md`
 - `link-input.spec.md`
 - `textarea.spec.md`
 - `time-picker.spec.md`

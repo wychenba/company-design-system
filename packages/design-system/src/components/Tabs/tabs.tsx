@@ -204,7 +204,7 @@ const ScrollTabsList = React.forwardRef<
     //   overflow-x:auto + overflow-y:visible 必 compute auto)。
     //   不加 `pb-px`(outer border 撤後 list border 已接 -1px 部分,加 pb 多 1px 多餘空白)。
     //   對齊 Primer UnderlineNav `overflow-x:auto; overflow-y:hidden` canonical 同步動
-    //   horizontal-overflow.spec.md L75/L101/L129 owner 升 list 內部。
+    //   horizontal-overflow.spec.md(「Hook re-export」+「典型 scroll / menu 模式組裝」段)owner 升 list 內部。
     <div className="relative">
       <div
         ref={scrollRef}

@@ -25,6 +25,8 @@ DropdownMenu 是按鈕觸發的**動作選單**——使用者從中選擇一個
 
 SelectMenu 是**選值**(選完後值留在 field 裡),DropdownMenu 是**執行**(選完後觸發動作,選單關閉)。判斷標準:「選完之後,畫面上是否需要保留選中狀態?」需要 → SelectMenu;不需要 → DropdownMenu。
 
+心智模型:SelectMenu 的選單是 **field 的延伸**(使用者在「編輯欄位裡的值」,trigger 持續顯示當前值);DropdownMenu 的選單是**動作清單**(執行一次性動作後選單消失,畫面不留痕)。CheckboxItem / RadioItem 雖涉「選擇」,屬即時生效設定非選值(見「Item 類型」)。
+
 ---
 
 ## 何時用
@@ -247,19 +249,12 @@ Item-level default / hover / focused / selected / disabled **色彩**由 MenuIte
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
-- `density.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
+- `action-bar.spec.md`
 - `command.spec.md`
+- `file-viewer.spec.md`
+- `menu-item.spec.md`
+- `popover.spec.md`
+- `select-menu.spec.md`
 - `sheet.spec.md`
 - `sidebar.spec.md`
 - `tree-view.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
-- `file-viewer.spec.md`

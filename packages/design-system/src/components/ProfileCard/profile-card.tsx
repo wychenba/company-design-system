@@ -146,9 +146,9 @@ const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
     },
     ref,
   ) => {
-    // v11 always-render canonical:default fields 永遠 render(缺資料顯 placeholder),
-    // consumer 自訂 fields 在 default 之後 append。Status section 也永遠 render(無 status
-    // 顯「Status not set」placeholder),統一視覺結構。
+    // v12 canonical:default fields 永遠 render(缺資料顯 placeholder),consumer 自訂
+    // fields 在 default 之後 append。Status section 為條件 render(status undefined →
+    // 整 block 隱藏,見下方 render 處)— v11「永遠 render + placeholder」已退役。
     //
     // **Dedup canonical(2026-05-07 v15.8 fix Bug E)**:consumer 的 `fields` array 若含
     // label 撞 default(eg. 「ID」「Employee number」),consumer 值 win — defaults 那一行

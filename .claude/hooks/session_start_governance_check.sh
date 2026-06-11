@@ -294,7 +294,7 @@ if [ -n "$BLOCKERS" ]; then
   [ -n "$PRUNE_TRIGGERS" ] && MSG="${MSG}\n\n附 soft prune triggers:${PRUNE_TRIGGERS}"
   [ -n "$QUARTERLY_DUE" ] && MSG="${MSG}\n${QUARTERLY_DUE}"
 elif [ -n "$PRUNE_TRIGGERS" ]; then
-  MSG="⚙️ Auto-prune triggers fired (SessionStart):${PRUNE_TRIGGERS}\n建議 invoke /knowledge-prune scope=full 評估 retire / consolidate.${QUARTERLY_DUE}"
+  MSG="⚙️ Auto-prune triggers fired (SessionStart):${PRUNE_TRIGGERS}\nAI 必 AUTO-RUN /knowledge-prune(禁問 user 要不要跑;P0+P1 自動執行,P2 retire 候選列拍板清單 — per deep-audit-cross-codex SKILL C.0a,2026-06-11 user 糾正 codify).${QUARTERLY_DUE}"
 else
   MSG="🧭 Governance hygiene reminder (SessionStart):${QUARTERLY_DUE}\nNot blocking — address inline when convenient."
 fi

@@ -246,7 +246,7 @@ export const LabelAlignmentRule: Story = {
 }
 
 export const NoInteractionRule: Story = {
-  name: '唯讀 — 不放互動元件 / 不做表格',
+  name: '唯讀:不放互動元件',
   render: () => (
     <div>
       <Rule
@@ -303,21 +303,7 @@ export const NoInteractionRule: Story = {
           ↑ dd 內放 Button 破壞「唯讀屬性」語義 → 改用 Field(read-only mode + inline edit)
         </Label>
       </Rule>
-
-      <Rule
-        title="❌ 把 DescriptionList 當表格(多 row 同結構)"
-        note="重複的 label 是反模式 — 視覺上也會讀起來像清單而不是屬性。多筆同結構資料 → DataTable"
-      >
-        <Frame className="max-w-md">
-          <DescriptionList cols={2}>
-            <DescriptionItem label="姓名">Ada Chen</DescriptionItem>
-            <DescriptionItem label="Email">ada.chen@example.com</DescriptionItem>
-            <DescriptionItem label="姓名">王小明</DescriptionItem>
-            <DescriptionItem label="Email">ming@example.com</DescriptionItem>
-          </DescriptionList>
-        </Frame>
-        <Label warn>↑ 「姓名 / Email」重複 → 多筆同結構應用 DataTable</Label>
-      </Rule>
+      {/* 「多筆同結構 → DataTable」的 ❌ 對照由「使用指引」story(vs DataTable 段)擁有,不在此重複 */}
     </div>
   ),
 }

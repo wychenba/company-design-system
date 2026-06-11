@@ -75,10 +75,10 @@ export const UsageGuidance: Story = {
       <p>適合 Sheet 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/Sheet/展示" name="右側建立 專案"><span className="text-primary hover:underline font-medium cursor-pointer">右側建立 專案</span></LinkTo>
+          <LinkTo kind="Design System/Components/Sheet/展示" name="建立新專案（右側滑入）"><span className="text-primary hover:underline font-medium cursor-pointer">建立新專案（右側滑入）</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Sheet/展示" name="右側編輯 使用者 詳情"><span className="text-primary hover:underline font-medium cursor-pointer">右側編輯 使用者 詳情</span></LinkTo>
+          <LinkTo kind="Design System/Components/Sheet/展示" name="編輯成員詳情（右側滑入）"><span className="text-primary hover:underline font-medium cursor-pointer">編輯成員詳情（右側滑入）</span></LinkTo>
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
@@ -163,28 +163,12 @@ export const UsageGuidance: Story = {
         <Label>Dialog:刪除確認、放棄變更、登入、付款確認</Label>
       </Rule>
 
-      {/* 何時不用 / 替代元件 — 原 WhenNotSheetRule */}
+      {/* 何時不用 / 替代元件 — 原 WhenNotSheetRule。
+          短確認 → Dialog 的完整 live 對照已在上方「Dialog — 居中 modal」段示範,此處不重複(2026-06-11 精簡)。 */}
       <Rule
         title="何時不用 / 替代元件 — 短確認 / 不可逆動作 → Dialog"
-        note="「刪除 / 登出 / 放棄變更」這類要使用者完全停下做決定的場景,用 Dialog 的居中 modal 強制聚焦。Sheet 側滑視覺不夠強,使用者可能點旁邊就跳過"
+        note="「刪除 / 登出 / 放棄變更」這類要使用者完全停下做決定的場景,用 Dialog 的居中 modal 強制聚焦。Sheet 側滑視覺不夠強,使用者可能點旁邊就跳過(live 對照見上方「Dialog — 居中 modal」段)"
       >
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="primary" danger startIcon={Trash2}>刪除帳號</Button>
-          </DialogTrigger>
-          <DialogContent autoHeight maxWidth="420px">
-            <DialogHeader>
-              <DialogTitle>確定要刪除帳號?</DialogTitle>
-            </DialogHeader>
-            <DialogBody>
-              <p className="text-body">所有資料將於 30 天後永久移除,此動作無法復原。</p>
-            </DialogBody>
-            <DialogFooter>
-              <Button variant="tertiary">取消</Button>
-              <Button variant="primary" danger>確認刪除</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
         <Label>↑ 短決策應該用 Dialog(Sheet 太長太輕)</Label>
       </Rule>
 

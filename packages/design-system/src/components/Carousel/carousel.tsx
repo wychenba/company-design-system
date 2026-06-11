@@ -219,7 +219,7 @@ const CarouselItem = React.forwardRef<
 CarouselItem.displayName = 'CarouselItem'
 
 // ── Arrow buttons(hover 才顯示)────────────────────────────────────────────
-// 使用 DS Button (secondary + iconOnly size md);hover-only 顯示由 wrapper 的
+// 使用 DS Button (tertiary + iconOnly size md);hover-only 顯示由 wrapper 的
 // opacity transition 控制(Button 本身不負責)。此 wrapper 存在僅為絕對定位 +
 // hover/focus 可見性,不再覆寫 Button 的視覺 token。
 

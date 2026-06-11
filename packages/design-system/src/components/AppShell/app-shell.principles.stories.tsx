@@ -1,5 +1,6 @@
 // @benchmark-cited: Polaris / Material / Ant 共識 principles canonical(UsageGuidance integrated)
 import type { Meta, StoryObj } from '@storybook/react'
+import LinkTo from '@storybook/addon-links/react'
 
 const meta: Meta = {
   title: 'Design System/Components/AppShell/設計原則',
@@ -14,19 +15,28 @@ export const UsageGuidance: Story = {
     <div className="prose max-w-2xl space-y-6 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
       <section>
         <h2 className="text-h4 mb-2">何時用 AppShell</h2>
-        <ul className="text-body space-y-1">
-          <li>• 多頁 web service 主結構(Linear / Notion / Slack / GitHub / Asana 類)</li>
-          <li>• 需要 sidebar + main 持續共存,跨頁切換時 sidebar 不重渲染</li>
-          <li>• 需要 right panel(info / inspector / detail pane)跟 main 並存</li>
+        <ul className="text-body space-y-2">
+          <li>
+            • 多頁 web service 的主結構——Linear / Notion / Slack / GitHub / Asana 這類「左側導覽 + 中央工作區」產品。完整組合見{' '}
+            <LinkTo kind="Design System/Components/AppShell/展示" name="主側欄佈局 — Linear 式議題追蹤"><span className="text-primary hover:underline font-medium cursor-pointer">展示 → 主側欄佈局 — Linear 式議題追蹤</span></LinkTo>
+          </li>
+          <li>
+            • 需要 sidebar + main 持續共存——在議題列表、看板、報表等頁面間切換時,左側導覽不重渲染、捲動位置不丟失。見{' '}
+            <LinkTo kind="Design System/Components/AppShell/展示" name="主側欄佈局 + 頁面分頁"><span className="text-primary hover:underline font-medium cursor-pointer">展示 → 主側欄佈局 + 頁面分頁</span></LinkTo>
+          </li>
+          <li>
+            • 需要右側詳情面板(議題詳情 / inspector / 成員資料)跟 main 並存——如 Linear 點選議題後右側展開詳情。開合行為見{' '}
+            <LinkTo kind="Design System/Components/AppShell/設計規格" name="右側面板開合行為(兩種模式)"><span className="text-primary hover:underline font-medium cursor-pointer">設計規格 → 右側面板開合行為</span></LinkTo>
+          </li>
         </ul>
       </section>
 
       <section>
         <h2 className="text-h4 mb-2">何時不用</h2>
         <ul className="text-body space-y-1">
-          <li>• 單頁 landing / marketing site → `&lt;main&gt;` 直接展開</li>
-          <li>• Auth 頁(login / signup)→ 自寫 centered layout,不被 sidebar 佔位</li>
-          <li>• Embedded widget / iframe → 已被 host shell 包住</li>
+          <li>• 單頁 landing / marketing site(產品官網、定價頁)→ `&lt;main&gt;` 直接展開,沒導覽不需要 shell</li>
+          <li>• Auth 頁(login / signup)→ 自寫置中 layout,不被 sidebar 佔位</li>
+          <li>• Embedded widget / iframe(嵌進別人頁面的客服小視窗類)→ 已被 host shell 包住</li>
           <li>• 文件 reader(全螢幕閱讀)→ shell chrome 干擾閱讀</li>
         </ul>
       </section>
@@ -48,12 +58,13 @@ export const UsageGuidance: Story = {
             <strong>primary-header</strong>:多一條 <strong>global bar</strong> 橫跨頂部 —
             服務整個 app(account / workspace switcher / 跨頁 search / notifications);local toolbar
             <em>仍在</em> main col 頂,只是上面多了 global header。WorkspaceBrand 改放 globalHeader 左側。
-            參考 GitHub / Slack / Gmail。
+            參考 GitHub / Slack / Gmail。完整組合見{' '}
+            <LinkTo kind="Design System/Components/AppShell/展示" name="主標頭佈局 — 全域+本地兩層(GitHub/Gmail/Slack 派)"><span className="text-primary hover:underline font-medium cursor-pointer">展示 → 主標頭佈局 — 全域+本地兩層</span></LinkTo>
           </li>
         </ul>
-        <p className="text-caption text-fg-muted mt-2">
-          兩 mode 是 product 角色表態 — 啟動時固定,不該在 runtime 切換。
-          視覺對照圖見「設計規格 → 兩種布局模式對照圖」。
+        <p className="text-caption text-fg-secondary mt-2">
+          兩 mode 是 product 角色表態——啟動時固定,不該在 runtime 切換。視覺對照圖見{' '}
+          <LinkTo kind="Design System/Components/AppShell/設計規格" name="兩種布局模式對照圖"><span className="text-primary hover:underline font-medium cursor-pointer">設計規格 → 兩種布局模式對照圖</span></LinkTo>
         </p>
       </section>
 

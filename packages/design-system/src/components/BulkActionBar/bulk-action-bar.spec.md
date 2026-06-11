@@ -53,6 +53,14 @@ benchmark:
 
 判斷:**「沒選取就消失嗎?」** 是 → BulkActionBar;否 → Action Bar / Toolbar / Notice。
 
+## 常見誤解
+
+| 誤解 | 正解 |
+|------|------|
+| 「BulkActionBar 可替代 toolbar」 | 否——additive 派,toolbar 永遠保留(selection 期間 filter / sort / search 仍可用,見「Placement」) |
+| 「批次主操作用 primary」 | 否——一律 tertiary(primary 留給 dialog 確認最終 action,見「禁止事項」) |
+| 「selection 為 0 顯示空 bar 佔位」 | 否——回 null 完全不佔 layout(見「結構」) |
+
 ---
 
 ## 結構
@@ -64,15 +72,16 @@ benchmark:
 └──────────────────────────────────────────────────────────────┘
 ```
 
-- 全 md Buttons(`same-row consistency`,close X 同 size;2026-05-04 升 md,見下方 Size canonical)
+- 全 md Buttons(`same-row consistency`,close X 同 size;rationale 見下方「Size canonical」)
 - `gap-2`(8px)+ `<ButtonDivider />`(自帶 mx-1 = 12px 視覺距離)
 - `px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]`
 - 自然高度 56md / 68lg(md Button `--field-height-md` 32/36 + `py-[var(--layout-space-tight)]` 12/16 ×2;對齊 SurfaceFooter / DataTable toolbar canonical)
 - `selection.length === 0` → 回 null 不佔 layout
+- **寬度邊界**:actions 為單行 flex 排列(`gap-2`),無折行、無內建 overflow 收納;寬度受限場景由 consumer 控制 action 數量
 
 ### Slot
 
-- **`actions`**:consumer 提供 **md** Buttons(2026-05-04 spec update,前版 sm 為錯);`variant=tertiary`(主)/ `tertiary danger`(destructive)— **不用 primary**(留 dialog 確認最終 action)
+- **`actions`**:consumer 提供 **md** Buttons(size rationale 見「Size canonical」);`variant=tertiary`(主)/ `tertiary danger`(destructive)— **不用 primary**(留 dialog 確認最終 action)
 - **count 區**:`{N} 已選`(內建)+ inline filter hidden status `· {M} 個被 filter 隱藏`(`hiddenByFilter` prop 傳入時)
 - **clear**:`<Button iconOnly size=md variant=text dismiss />`(內建,觸發 `onClear`)
 
@@ -138,6 +147,8 @@ interface BulkActionBarProps {
   actions?: React.ReactNode
   /** Filter 模式:hidden 數量,顯示在 count 區 inline 「{N} 已選 · {M} 個被 filter 隱藏」 */
   hiddenByFilter?: number
+  /** 擴選整個 dataset 後的真總數;number 時 count 顯示此值,否則 fallback selection.length(見「Extend dataset pattern」) */
+  totalSelected?: number | null
   /** i18n labels(Partial,merge with default;對齊 Material localeText / Polaris i18n 慣例) */
   labels?: Partial<BulkActionBarLabels>
   className?: string
@@ -154,6 +165,10 @@ interface BulkActionBarLabels {
 完整 default labels 由 component 內 export `BULK_ACTION_BAR_DEFAULT_LABELS`,consumer 可 spread 後 override(對齊 Material `defaultLocale` 模式)。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 **Hint banner(擴 dataset 提示)不在本 API**:由 consumer 用 `<Alert variant="info" placement="fixed">` 配 ReactNode title 帶 inline link 自組,黏在 BulkActionBar 上方。Alert / Notice 的 `title` + `description` 已支援 ReactNode(2026-04-28)。
+
+### Extend dataset pattern(totalSelected)
+
+「本頁全選 → hint 點擊 → 擴選整個 dataset」2-step 後,consumer 把 `totalSelected` 設為 dataset 真總數,count 區改顯示該值(否則 fallback `selection.length`)——避免 Alert 顯「已選 5370」但 bar 仍顯「已選 50」的不同步(2026-05-13 ship)。對齊 Gmail / Linear / Notion 全選 dataset hint pattern。
 
 ---
 

@@ -225,7 +225,7 @@ export const OrientationMatrix: Story = {
         <H3>Horizontal — label 在控件左方</H3>
         <Desc>Settings / 詳情頁場景。label 寬度(labelWidth,預設 auto 由內容撐開)對齊縱向軸,節省垂直空間。</Desc>
         <div className="border border-dashed border-divider rounded-md p-4 max-w-2xl">
-          <FieldGroup>
+          <FieldGroup horizontalLabelWidth="120px">
             <Field orientation="horizontal" required>
               <FieldLabel>電子郵件</FieldLabel>
               <Input type="email" defaultValue="user@example.com" />
@@ -347,7 +347,7 @@ export const StateBehavior: Story = {
       <div>
         <H3>組合:Required + Horizontal + Size=md(settings 典型場景)</H3>
         <div className="border border-dashed border-divider rounded-md p-4 max-w-2xl">
-          <FieldGroup>
+          <FieldGroup horizontalLabelWidth="120px">
             <Field orientation="horizontal" required size="md">
               <FieldLabel>姓名</FieldLabel>
               <Input defaultValue="Ada Chen" />

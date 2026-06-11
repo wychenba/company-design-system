@@ -538,7 +538,7 @@ export const buttonMeta = {
     fg: ['--on-emphasis', '--fg-disabled'],
     ring: ['--ring'],
   },
-  defaultVariant: 'primary',
+  defaultVariant: 'tertiary',  // 2026-06-10 修 stale:對齊 cva defaultVariants(2026-06-06 labeled 預設改 tertiary,meta 漏同步)
   defaultSize: 'md',
 } as const
 

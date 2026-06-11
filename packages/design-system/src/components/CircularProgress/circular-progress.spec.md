@@ -65,7 +65,7 @@ benchmark:
 | 場景 | 改用 | 原因 |
 |------|------|------|
 | 頁面級 / 表單級大區塊進度 | `ProgressBar`(linear) | CircularProgress 在大尺寸視覺比例不如 linear bar |
-| 骨架載入(list / card 初次 render) | `Skeleton` | Skeleton 保留內容形狀 |
+| 骨架載入(list / card 初次 render) | `Skeleton` | Skeleton 保留內容形狀;完整分界 SSOT 見 `skeleton.spec.md`「Skeleton vs CircularProgress」 |
 | 全頁 loading 版面 | `<Empty icon={<CircularProgress/>}/>` | 版面繼承 Empty 垂直堆疊 canonical |
 | 通知計數 / 狀態紅點 | `Badge`(dot 模式) | 語義完全不同 |
 
@@ -174,7 +174,7 @@ Track 色鎖 `var(--secondary)`(= neutral-3,與 ProgressBar track 一致)。
 
 ### Label 策略:font-size 繼承 + 色鎖 neutral-7
 
-- `label` 有值 → render `<span className="text-fg-muted">`,font-size **繼承 parent**(不設 text-size class,CSS inherit 天然處理)
+- `label` 有值 → render `<span className="text-fg-muted">`,font-size **繼承 parent**(不設 text-size class,CSS inherit 天然處理);label 渲染於 circle **右側**(inline sibling),不在圈內——小 size(16)也不會文字疊圈
 - 塞在元件內(Button / Field)時不用 label(元件本身已有文字);全頁 / Empty overlay 場景可開
 
 ### A11y 策略
@@ -191,11 +191,7 @@ Track 色鎖 `var(--secondary)`(= neutral-3,與 ProgressBar track 一致)。
 
 - **正方形不可妥協**:`style={{ width: size, height: size }}` 強制。本體絕不加 margin / padding
 - **SVG 雙 circle**:track(`var(--secondary)`) + arc(`currentColor`),stroke-linecap round,rotate -90deg 從 12 點起始
-- **strokeWidth 動態 scale**:`Math.max(2, Math.round(size / 10))` 維持跨尺寸視覺比例
-  - size 24 → stroke 2
-  - size 32 → stroke 3
-  - size 48 → stroke 5
-  - size 64 → stroke 6
+- **strokeWidth 動態 scale**:`Math.max(2, Math.round(size / 10))` 維持跨尺寸視覺比例(逐值結果由公式推導,不另列舉)
 - **Indeterminate arc**:固定 25%(`INDETERMINATE_ARC_RATIO=0.25`),外層 `animate-spin` 旋轉整個 span(Material 流派)
 - **旋轉規則單純**:indeterminate → 轉;determinate → 不轉;沒有 status 條件分支,因為沒有 status。完成時 consumer 把整個 CircularProgress swap 成其他內容(Check icon / 結果 / Empty),不靠元件本身做 spin-stop 動畫
 - **`align-middle` 鎖死**(SVG 對齊 adjacent text x-height 中線):外層 span 本體帶 `align-middle`,避免在 inline-flex 容器內出現基線錯位。consumer 若在文字旁放 CircularProgress,**不需**自己加 `align-middle` 或 `leading-none`
@@ -238,7 +234,8 @@ CircularProgress 是**最薄的 circular progress primitive**,刻意避免多維
 - **Loading(本即元件本質)**:本元件本質是 loading indicator;無需另外的 loading prop。indeterminate(無 `value`)= 旋轉動畫,determinate(有 `value`)= 弧長對應 0–100%。
 - **Empty / 0 progress**:`value=0` 在 determinate mode 渲空 track(arc 長度 0),符合「尚未開始」語意。本元件沒有 success / error 等狀態色切換——arc 永遠是 `currentColor`(預設 `text-info`),不會因進度值自動變色。
 - **Dark mode**:走 Progress token + `text-current` 繼承,自動 adapt。
-- **Size 極端值**:size 為自由 number(非 sm/md/lg tier);size < 12 不建議(stroke width / icon overlap 失調),size > 96 建議改 ProgressBar(linear 在大尺寸更易讀)。
+- **Size 極端值**:size 為自由 number(非 sm/md/lg tier);size < 12 不建議(stroke width / icon overlap 失調),size > 96 建議改 ProgressBar(linear 在大尺寸更易讀)。建議值非強制——元件不 clamp size,照傳入值渲染。
+- **Value 越界 / 快速更新**:`value` 超出 0–100 自動 clamp(`Math.max(0, Math.min(100, value))`);快速連續更新由 CSS transition(300ms)自動朝最新值收斂,不堆疊不排隊。
 
 ---
 
@@ -265,4 +262,6 @@ CircularProgress 是**最薄的 circular progress primitive**,刻意避免多維
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `badge.spec.md`
+- `empty.spec.md`
+- `progress-bar.spec.md`
 - `skeleton.spec.md`

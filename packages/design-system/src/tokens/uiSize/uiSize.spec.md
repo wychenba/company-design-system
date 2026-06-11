@@ -3,7 +3,7 @@
 # UiSize 設計原則
 
 > **Foundational SSOT rationale**(cap 800,2026-04-25 approved):
-> 尺寸 token SSOT。定義 field-height family `md` default / chrome-header 選型 decision tree(fixed-h vs padding-based + 8 家對照)/ icon-only `calc` 公式。Button / Input / Select / Checkbox / Slider / Tabs 等皆消費,scope 本質 > 單一 token 檔。
+> 尺寸 token SSOT。定義 field-height family `md` default / chrome-header 選型 decision tree(fixed-h vs padding-based + 8 家對照)/ icon-only padding-free canonical。Button / Input / Select / Checkbox / Slider / Tabs 等皆消費,scope 本質 > 單一 token 檔。
 
 元件高度的語義 token，rem 單位。透過 `data-density`（或 `data-ui-size`）切換。
 
@@ -353,6 +353,8 @@ className={cn(
 
 `aspect-square` 鎖 width=height(從 `h-field-X` 來)。`p-0` override base 的 `px-3`。SVG flex-center 自動視覺置中。**0 magic number / 0 公式 / 0 border-deduction** — 任何 size / icon 都自然正方形。
 
+**邊界(非 1:1 viewBox icon / RTL)**:容器寬恆等高、`p-0` 四邊對稱,flex 置中對任意 icon viewBox 比例與 RTL 方向皆不變形,無需特例。
+
 ### 為什麼選 padding-free 派(2026-04-25 從 padding-formula 派切換)
 
 **舊 padding-formula 派的問題**:
@@ -396,6 +398,20 @@ const ICON_ONLY_BASE = 'aspect-square p-0 min-w-0 gap-0'
 
 ---
 
+## 何時不用(反 pattern 總覽)
+
+散在各節的 ❌ 規則總索引(細節以 owner 段落為準):
+
+| ❌ 場景 | 正解 | Owner 段落 |
+|---|---|---|
+| 互動元件高度 < 24px | 重新檢視容器佈局,不縮元件 | 「元件高度地板」 |
+| chrome 區域硬寫高度(`h-16` 等) | `h-[var(--chrome-header-height)]` | 「Canonical 意圖(AR47)」 |
+| iconOnly 用 padding 公式 | `ICON_ONLY_BASE` padding-free | 「Icon-only 元件的 padding canonical」 |
+| Tabs 高度借用 field-height / table-row | `--tab-height-*`(概念獨立) | 「Tab Height」 |
+| 新 field-height 消費者 default ≠ md | default `md`;偏離必寫 rationale | 「硬規則」+「偏離 rationale 格式」 |
+
+---
+
 ## Tailwind Bridge
 
 透過 `@theme inline` 橋接到 Tailwind spacing：
@@ -425,14 +441,12 @@ document.documentElement.setAttribute('data-density', 'lg')
 
 - `app-shell.spec.md`
 - `breadcrumb.spec.md`
-- `popover.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
 - `button.spec.md`
 - `dialog.spec.md`
+- `header-canonical.spec.md`
+- `overlay-surface.spec.md`
+- `popover.spec.md`
+- `segmented-control.spec.md`
 - `selection-item.spec.md`
 - `slider.spec.md`
 - `token-system.spec.md`

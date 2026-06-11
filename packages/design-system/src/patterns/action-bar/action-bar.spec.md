@@ -89,7 +89,7 @@ Search 的角色**不由「產品核心是不是搜尋」決定**，而由——
 ┌──────────────────────────┐ ┆ ┌──────────────────────┐
 │       業務操作群組        │ ┆ │  工具操作    溢出      │
 └──────────────────────────┘ ┆ └──────────────────────┘
-       Operations tier               Utilities tier
+    業務層(Operations)          工具層(Utilities)
 ```
 
 兩種對齊的差異只在業務層內部排序方向，工具層位置不變：
@@ -331,6 +331,7 @@ Icon 的目的是幫助辨識，不是視覺對稱。
 ### 共通規則
 
 - 溢出按鈕不構成工具層。工具層需要有固定工具按鈕（⚙ 設定、↺ 刷新、⤢ 全螢幕等）才存在，只有 ··· 不算
+- 溢出選單本體的浮層行為（超出 viewport 的 collision 翻轉 / 內容過長捲動 / Esc 關閉 / 鍵盤導覽）由 `DropdownMenu` own（Radix 預設），本 pattern 不重定義
 - **如果操作列出現大量溢出按鈕，這是資訊架構的問題，應回到功能規劃層重新設計**
 
 ---
@@ -443,15 +444,21 @@ Icon 的目的是幫助辨識，不是視覺對稱。
 
 ---
 
+## 邊界與分權
+
+本 pattern 是組合指南（無 runtime 元件）——元件級邊界（無可見 action 時不渲染空操作列 / loading / disabled 狀態）與 a11y 細節由消費端元件 own：icon-only 必設 `aria-label` + tooltip（見第四節，Button own）；溢出選單的鍵盤 / focus 行為由 `DropdownMenu` own（見第六節）。
+
 ## 關聯文件
 
 - `button.spec.md`：Button 元件層的設計原則
+- `../../components/DropdownMenu/dropdown-menu.spec.md`：溢出選單浮層行為 SSOT（collision / 捲動 / Esc / 鍵盤）
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `bulk-action-bar.spec.md`
+- `button.spec.md`
 - `calendar.spec.md`
 - `data-table.spec.md`
 - `file-viewer.spec.md`

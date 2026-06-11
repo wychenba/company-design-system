@@ -45,7 +45,7 @@ const TOKEN_MAP: Record<ModeKey, Record<StateKey, ColorSpec>> = {
     disabled: { bg: 'transparent',    text: '--fg-disabled',  border: 'transparent' },
   },
   readonly: {
-    default:  { bg: '--bg-disabled',  text: '--foreground',   border: 'transparent' },
+    default:  { bg: '--bg-readonly',  text: '--foreground',   border: 'transparent' },
     hover:    { bg: '--bg-disabled',  text: '--foreground',   border: 'transparent' },
     focus:    { bg: '--bg-disabled',  text: '--foreground',   border: 'transparent' },
     error:    { bg: '--bg-disabled',  text: '--foreground',   border: 'transparent' },

@@ -330,41 +330,6 @@ export const MultipleExpansion: Story = {
   ),
 }
 
-// ── Without description ─────────────────────────────────────────────────
-// 驗證 column rhythm:混用有/無 description 的 step,indicator y 位置不變
-
-export const MixedDescription: Story = {
-  name: '欄 節奏 驗證',
-  render: () => (
-    <div className="flex gap-12">
-      {(['md', 'lg'] as const).map(size => (
-        <div key={size} className="w-[280px]">
-          <div className="text-caption text-fg-muted mb-4">size = {size}</div>
-          <Steps
-            defaultValue="step-3"
-            completedValues={['step-1', 'step-2']}
-            size={size}
-          >
-            <StepItem value="step-1">
-              <StepLabel>建立帳號</StepLabel>
-            </StepItem>
-            <StepItem value="step-2">
-              <StepLabel>驗證 Email</StepLabel>
-              <StepDescription>發送確認信至你的信箱</StepDescription>
-            </StepItem>
-            <StepItem value="step-3">
-              <StepLabel>設定團隊</StepLabel>
-              <StepDescription>
-                命名你的工作區、選擇方案、匯入現有專案;這個步驟結束後可隨時在設定頁
-                調整
-              </StepDescription>
-            </StepItem>
-            <StepItem value="step-4">
-              <StepLabel>邀請成員</StepLabel>
-            </StepItem>
-          </Steps>
-        </div>
-      ))}
-    </div>
-  ),
-}
+// @story-trait-rationale: MixedDescription(欄節奏驗證 grid)retired 2026-06-11 per audit
+//   EXAMPLE_REDUNDANT — indicator 對齊 label 第一行的 column rhythm 已由 anatomy「欄位節奏」+
+//   principles「規則:指示欄節奏一致」雙層 own;展示層不重複 trait 驗證 grid。

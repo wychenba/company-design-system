@@ -150,16 +150,6 @@ export const ColorMatrix: Story = {
       </div>
 
       <div>
-        <H3>視覺對照(rich mode)</H3>
-        <div className="flex flex-col gap-2 max-w-lg">
-          <FileItem name="Q1-marketing-report.pdf" description="2.4 MB · 已上傳" mode="rich" />
-          <FileItem name="brand-guidelines.pdf" description="1.2 MB · 上傳中 45%" status="uploading" progress={45} mode="rich" />
-          <FileItem name="Q2-forecast.xlsx" description="上傳成功 · 3.8 MB" status="completed" progress={100} mode="rich" />
-          <FileItem name="legacy-data.csv" description="上傳失敗 · 網路中斷" status="error" mode="rich" />
-        </div>
-      </div>
-
-      <div>
         <H3>Container background(per mode,**無 hover-bg**)</H3>
         <Desc>
           FileItem 設計準則(2026-04-23):**永不顯示 hover-bg**。三種型態皆已 permanent-anchored(rich = border card / compact 無 status = bg-secondary / compact 有 status = 底部 progress bar),再加 hover-bg 是 double-emphasis 視覺雜。affordance 只靠 `cursor-pointer`(onClick 時)+ hover-swap icon fade。詳 spec「Hover 行為 canonical」。
@@ -199,7 +189,7 @@ export const ModeMatrix: Story = {
 
       <div>
         <H3>compact（預設）— Paperclip 16px icon 在左</H3>
-        <Desc>掃描模式(text-caption),資訊密度高。適合批次上傳的 logs / CSV / JSON。Description 只在 error 才顯示。</Desc>
+        <Desc>掃描模式(text-body + leading-compact;desc 為 text-caption,兩 mode 統一),資訊密度高。適合批次上傳的 logs / CSV / JSON。Description 只在 error 才顯示。</Desc>
         <div className="flex flex-col gap-1 max-w-lg">
           <FileItem name="users.csv" mode="compact" status="completed" progress={100} />
           <FileItem name="orders.json" mode="compact" status="uploading" progress={42} />
@@ -214,7 +204,7 @@ export const ModeMatrix: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>Mode</Th><Th>Prefix</Th><Th>Typography</Th><Th>Description</Th><Th>使用場景</Th></tr></thead>
             <tbody>
-              <tr><Td mono>compact（預設）</Td><Td>Paperclip 16px</Td><Td>掃描模式(text-caption)</Td><Td>只有 error 才顯示</Td><Td>批次上傳、一般檔案</Td></tr>
+              <tr><Td mono>compact（預設）</Td><Td>Paperclip 16px</Td><Td>掃描模式(text-body;兩 mode 統一 scanning)</Td><Td>只有 error 才顯示</Td><Td>批次上傳、一般檔案</Td></tr>
               <tr><Td mono>rich</Td><Td>Avatar 48px square</Td><Td>掃描模式(text-body;兩 mode 統一 scanning)</Td><Td>任何場景</Td><Td>圖片、文件、需要預覽</Td></tr>
             </tbody>
           </table>
@@ -245,7 +235,7 @@ export const SizeMatrix: Story = {
               </tr>
             </thead>
             <tbody>
-              <tr><Td>Prefix</Td><Td mono>Paperclip 16px(foreground)</Td><Td mono>Avatar 48px square(縮圖或 fallback)</Td></tr>
+              <tr><Td>Prefix</Td><Td mono>Paperclip 16px(fg-muted)</Td><Td mono>Avatar 48px square(縮圖或 fallback)</Td></tr>
               <tr><Td>Row 高度(無 bar)</Td><Td mono>px-3 py-2(content 1lh)</Td><Td mono>content col minHeight 48(avatar)+ py-3</Td></tr>
               <tr><Td>Typography</Td><Td mono>text-body leading-compact(掃描模式)</Td><Td mono>text-body leading-compact(掃描模式;兩 mode 統一 scanning)</Td></tr>
               <tr><Td>Description</Td><Td>僅 error 才顯示</Td><Td>任何場景都可顯示</Td></tr>

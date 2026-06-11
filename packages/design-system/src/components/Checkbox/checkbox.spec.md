@@ -90,6 +90,12 @@ Checkbox 和 Radio 是**表單內的選擇控件**，視覺語言完全一致，
 
 - 在 form 裡、旁邊有 submit button / cancel button → **Checkbox**
 - 獨立的 inline control、旁邊沒有 submit 流程 → **Switch**
+- **常見誤解**:「無 submit button 就一定用 Switch」→ 錯。判準是上方三角度(套用時機優先);值仍屬 form 欄位語意(暫存後一併儲存)就用 Checkbox,本 heuristic 只是輔助
+
+### 常見誤解(其餘)
+
+- 只傳 `checked` 不傳 `onCheckedChange` ≠ readonly——那只是值鎖死,仍可 focus / click;readonly 必用 `readOnly` prop(見「Controlled / Uncontrolled API」)
+- `<Field disabled>` cascade 與自身 `disabled` prop 同效(SSOT resolver),不需兩處都傳
 
 ### 情境對照表
 
@@ -199,14 +205,16 @@ Checkbox / Radio 在 form 內承載的常常是:
 | 狀態 | 邊框 | 底色 | 指示器 |
 |------|------|------|--------|
 | unchecked | border | surface | 無 |
-| checked | primary | primary | white check |
-| indeterminate | primary | primary | white minus |
-| hover unchecked | neutral-6 | surface | 無 |
-| hover checked | primary-hover | primary-hover | white check |
-| hover indeterminate | primary-hover | primary-hover | white minus |
-| disabled unchecked | 無 | neutral-2 | 無 |
-| disabled checked | 無 | neutral-2 | fg-disabled check |
-| disabled indeterminate | 無 | neutral-2 | fg-disabled minus |
+| checked | primary | primary | on-emphasis check |
+| indeterminate | primary | primary | on-emphasis minus |
+| hover unchecked | border-hover | surface | 無 |
+| hover checked | primary-hover | primary-hover | on-emphasis check |
+| hover indeterminate | primary-hover | primary-hover | on-emphasis minus |
+| disabled unchecked | transparent | bg-disabled | 無 |
+| disabled checked | transparent | bg-disabled | fg-disabled check |
+| disabled indeterminate | transparent | bg-disabled | fg-disabled minus |
+
+(token 名對齊 `checkbox.tsx` cva 真值;表內一律 semantic token,不寫視覺色名)
 
 ### Indeterminate（半選）
 
@@ -214,7 +222,9 @@ Checkbox / Radio 在 form 內承載的常常是:
 
 典型場景：SelectMenu 的「全選」checkbox——當部分選項被勾選時顯示 indeterminate。
 
-Indeterminate 是由父層邏輯控制的狀態，Checkbox 本身不會自動進入 indeterminate——必須明確傳入 `checked="indeterminate"`。
+Indeterminate 是由父層邏輯控制的狀態，Checkbox 本身不會自動進入 indeterminate——必須明確傳入 `checked="indeterminate"`。**常見誤解**:「部分子項已選」不可用 disabled + checked 混搭表達——半選是可互動狀態,disabled 是鎖互動,語意不同。
+
+**狀態切換視覺**(code 真值):unchecked ↔ checked / indeterminate 之間色彩走 `transition-colors` 150ms;Check ↔ Minus 圖示為條件渲染即時 swap,無過渡動畫。
 
 ### Radio
 
@@ -222,10 +232,10 @@ Indeterminate 是由父層邏輯控制的狀態，Checkbox 本身不會自動進
 |------|------|------|--------|
 | unchecked | border | surface | 無 |
 | checked | primary | surface | primary dot |
-| hover unchecked | neutral-6 | surface | 無 |
+| hover unchecked | border-hover | surface | 無 |
 | hover checked | primary-hover | surface | primary-hover dot |
-| disabled unchecked | 無 | neutral-2 | 無 |
-| disabled checked | 無 | neutral-2 | fg-disabled dot |
+| disabled unchecked | transparent | bg-disabled | 無 |
+| disabled checked | transparent | bg-disabled | fg-disabled dot |
 
 ---
 
@@ -332,7 +342,7 @@ Horizontal 需 `gap-4` 因 row 的 py 不擴散到左右。
 
 **ARIA / Pattern**:繼承 Radix `checkbox` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/checkbox#accessibility)。
 
-**Focus**:單一 toggle 控件,無 focus trap / restoration(那是 Dialog / Sheet 等浮層容器的行為)。鍵盤聚焦時顯示 visible ring(`focus-visible:ring-2 ring-ring ring-offset-1` per design-system focus-visible canonical)。
+**Focus**:單一 toggle 控件,無 focus trap / restoration(那是 Dialog / Sheet 等浮層容器的行為);聚焦中被切 disabled 時由瀏覽器原生 drop focus(native disabled button 行為),不另行管理。鍵盤聚焦時顯示 visible ring(`focus-visible:ring-2 ring-ring ring-offset-1` per design-system focus-visible canonical)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
@@ -340,5 +350,11 @@ Horizontal 需 `gap-4` 因 row 的 py 不擴散到左右。
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `combobox.spec.md`
+- `field-control-group.spec.md`
 - `menu-item.spec.md`
+- `radio-group.spec.md`
 - `segmented-control.spec.md`
+- `select.spec.md`
+- `selection-item.spec.md`
+- `switch.spec.md`

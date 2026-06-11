@@ -131,7 +131,7 @@ export const WithCheckbox: Story = {
 // ── Long label (wrap test) ──────────────────────────────────────────────
 
 export const LongLabel: Story = {
-  name: '長 標籤',
+  name: '長標籤',
   render: () => (
     <div className="flex gap-8 items-start">
       <div className="flex flex-col gap-2">
@@ -265,7 +265,7 @@ export const DragAndDrop: Story = {
 // ── Indent 結構對齊驗證 ─────────────────────────────────────────────────
 
 export const IndentAlignment: Story = {
-  name: '縮排 結構對齊驗證',
+  name: '縮排結構對齊驗證',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">

@@ -58,19 +58,19 @@ export const UsageGuidance: Story = {
       <p>適合 DropdownMenu 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="群組"><span className="text-primary hover:underline font-medium cursor-pointer">群組</span></LinkTo>
+          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="群組"><span className="text-primary hover:underline font-medium cursor-pointer">群組 — 帳號選單(個人資料 / 設定 / 登出分組)</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="後綴"><span className="text-primary hover:underline font-medium cursor-pointer">後綴</span></LinkTo>
+          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="後綴"><span className="text-primary hover:underline font-medium cursor-pointer">後綴 — 收件匣未讀數 badge、外開連結提示</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="子選單"><span className="text-primary hover:underline font-medium cursor-pointer">子選單</span></LinkTo>
+          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="子選單"><span className="text-primary hover:underline font-medium cursor-pointer">子選單 — 主題切換(淺色 / 深色 / 跟隨系統)</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="勾選項"><span className="text-primary hover:underline font-medium cursor-pointer">勾選項</span></LinkTo>
+          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="勾選項"><span className="text-primary hover:underline font-medium cursor-pointer">勾選項 — 表格顯示欄位切換</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="單選"><span className="text-primary hover:underline font-medium cursor-pointer">單選</span></LinkTo>
+          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="單選"><span className="text-primary hover:underline font-medium cursor-pointer">單選 — 檔案清單排序方式</span></LinkTo>
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:先看「選完之後畫面是否需要保留選中狀態」——需要就改用 Select / SelectMenu。下方的「DropdownMenu vs 選值元件」與「群組 vs 分隔線」範例提供更完整的對照。</p>

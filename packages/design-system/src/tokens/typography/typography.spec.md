@@ -40,8 +40,7 @@ Typography 由三個獨立維度組成，分開疊加：
 | `text-caption` | 12px      | 1.3         | 圖表附註、標籤文字、元件內次要說明 |
 | `text-footnote`| 10px      | 1.3         | 法律文字、來源標注（極少用）|
 
-**h5（16px）vs body-lg（16px）**：同尺寸，line-height 不同，靠這個區分標題與段落角色。
-**h6（14px）vs body（14px）**：同尺寸，靠 font-weight 和 color 區分，使用端需有意識地處理。
+**h5（16px）vs body-lg（16px）/ h6（14px）vs body（14px）**：同尺寸配對的統一判別法——line-height 區分角色（標題 1.3 / 段落 1.5），使用端再疊 font-weight / color 強化標題層級，需有意識地選擇（詳「同尺寸但不同角色的選法」）。
 
 
 ## line-height 覆蓋（僅 14/16px body 可覆蓋）
@@ -60,6 +59,8 @@ Typography 由三個獨立維度組成，分開疊加：
 {/* ✅ Notice banner 單行 alert text */}
 <span className="text-body leading-compact">已儲存</span>
 ```
+
+單行保證由容器自身承擔（Button / SegmentedControl item 等套 `whitespace-nowrap`）——`leading-compact` 不處理 2 行以上的 label；多行截斷是 `line-clamp-*` + 預設行高的職責（見下方反 pattern）。
 
 可用的 override utility：
 - `leading-compact`：1.3（自訂，只給 `text-body` / `text-body-lg`）
@@ -200,9 +201,4 @@ Tailwind / Apple SF 的 9 階 weight scale 涵蓋 marketing / 印刷需求,但 p
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `empty.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
 - `token-system.spec.md`

@@ -265,6 +265,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
         <div
           className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
+          aria-disabled={resolvedMode === 'disabled' ? true : undefined}
           {...(props as React.HTMLAttributes<HTMLDivElement>)}
         >
           <span
@@ -278,7 +279,8 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
               : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
             }
           </span>
-          {EndIconCmp && (
+          {/* 2026-06-10 類型身份 indicator gate:naked cell 依 showDisplayEndIcon=isEditable(修 disabled cell 漏顯 bug)*/}
+          {EndIconCmp && (variant === 'naked' ? showDisplayEndIcon : true) && (
             <ItemSuffix className="pointer-events-none">
               <EndIconCmp
                 size={iconSize}

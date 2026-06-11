@@ -327,13 +327,22 @@ function ReadonlyDisplay({
     )
   }
 
+  // 2026-06-10 user 拍板「類型身份 indicator」規則:readonly/disabled 保留 ChevronDown(表單情境恆顯;
+  // naked cell 情境依 showDisplayEndIcon = isEditable,維持 2026-05-10 cell canonical「非可編欄不顯」)。
+  // disabled → fg-disabled(對齊 spec L213 + Accordion M24 precedent + 原生 select/MUI/Carbon 慣例)。
+  // aria-disabled:styled-disabled(非 native disabled 元素)需明告 AT「inactive」,同時讓 axe 正確
+  // 豁免 disabled 文字的 color-contrast(WCAG 1.4.3 inactive UI 例外)。
+  const showIndicator = variant === 'naked' ? !!showDisplayEndIcon : true
+  const ariaDisabled = resolvedMode === 'disabled' ? true : undefined
+
   if (isTextDisplay) {
     return (
-      <div className={cn(fieldWrapperStyles({ mode: resolvedMode, variant, size: sz }), className)} data-field-mode={resolvedMode}>
+      <div className={cn(fieldWrapperStyles({ mode: resolvedMode, variant, size: sz }), className)} data-field-mode={resolvedMode} aria-disabled={ariaDisabled}>
         {StartIcon && <ItemPrefix><StartIcon size={iconSize} className={cn('pointer-events-none', iconColor)} aria-hidden /></ItemPrefix>}
         <span className={cn('flex-1 min-w-0 truncate', resolvedMode === 'disabled' && 'text-fg-disabled')}>
           {value ? label : <span className={emptyColorCls}>{emptyText}</span>}
         </span>
+        {showIndicator && <ItemSuffix className="pointer-events-none"><ChevronDown size={iconSize} className={cn('shrink-0', iconColor)} aria-hidden /></ItemSuffix>}
       </div>
     )
   }
@@ -342,8 +351,9 @@ function ReadonlyDisplay({
   const tagVariant = selectedOpt?.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral' | undefined
 
   return (
-    <div className={cn(fieldWrapperStyles({ mode: resolvedMode, variant, size: sz }), value && tagPadding[sz], className)} data-field-mode={resolvedMode}>
+    <div className={cn(fieldWrapperStyles({ mode: resolvedMode, variant, size: sz }), value && tagPadding[sz], className)} data-field-mode={resolvedMode} aria-disabled={ariaDisabled}>
       {value ? <Tag size={sz} color={tagVariant}>{label}</Tag> : <span className={emptyColorCls}>{emptyText}</span>}
+      {showIndicator && <ItemSuffix className="pointer-events-none"><ChevronDown size={iconSize} className={cn('shrink-0', iconColor)} aria-hidden /></ItemSuffix>}
     </div>
   )
 }

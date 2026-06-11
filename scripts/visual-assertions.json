@@ -149,10 +149,6 @@
       "file": "button-icon-only.png"
     },
     {
-      "id": "design-system-components-button-設計規格--size-matrix",
-      "file": "button-sizes.png"
-    },
-    {
       "id": "design-system-components-button-設計規格--color-matrix",
       "file": "button-color-matrix.png"
     },
@@ -353,8 +349,8 @@
       "file": "linkinput-basic.png"
     },
     {
-      "id": "design-system-internal-namecard-設計規格--overview",
-      "file": "namecard-basic.png"
+      "id": "design-system-internal-profilecard-設計規格--overview",
+      "file": "profilecard-basic.png"
     },
     {
       "id": "design-system-components-numberinput-展示--modes",

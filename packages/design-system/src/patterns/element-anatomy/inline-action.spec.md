@@ -188,6 +188,11 @@ Row action 的 affordance 是「次要功能」,不是 primary CTA。Button chro
 - 尺寸:`patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical」(overlay sm + v5 trick / banner xs explicit)
 - variant / divider:`patterns/action-bar/action-bar.spec.md`(corner action group)
 
+### 邊界案例
+
+- **帶可見文字 label 的觸發**:不是 Inline Action — Inline Action 必 icon-only(label 走 tooltip + `aria-label`,見「實作要求」);需要可見文字 → `Button`(text / tertiary)。
+- **Dark mode**:hover / active / fg 全走 semantic token(`--neutral-hover` 等)自動 adapt,Inline Action 不 own dark token;colored host 的繼承色由 host token 處理(見 `tag.spec.md`)。
+
 ### Inline action 共用元件(`ItemInlineAction` / `ItemSuffix`)
 
 Canonical 實作於 `item-anatomy.tsx`,匯出 `ItemInlineAction` / `ItemSuffix`(從 `RowSizeContext` 自動查 icon size / hover bg / tooltip / aria-label / fg-muted → foreground 全內建)。
@@ -301,20 +306,12 @@ hook `check_story_anatomy.sh` 規則 B 已在 stories 層攔 label Button 作 di
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
-- `sheet.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
 - `alert.spec.md`
 - `breadcrumb.spec.md`
 - `data-table.spec.md`
 - `field-controls.spec.md`
+- `item-anatomy.spec.md`
+- `overlay-surface.spec.md`
 - `popover.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
+- `sheet.spec.md`
 - `tag.spec.md`

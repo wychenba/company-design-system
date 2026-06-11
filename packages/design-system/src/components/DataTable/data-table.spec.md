@@ -29,9 +29,9 @@ TanStack Table 負責邏輯，DataTable 負責視覺與互動。
 
 **Layout Family**：非上述 family — composite / multi-section（多區塊組合，自 own layout）。
 
-### 檔案結構(2026-05-03 split matrix)
+### 檔案結構
 
-12 file,每個過 M21 / M17 / Rule-of-3 三 test:`data-table.tsx`(主,foundational)/ `data-table-filter-panel.tsx` + `data-table-sort-manager.tsx`(panel state 隔離)/ `column-types.ts` + `filter-operators.ts`(✓ Rule-of-3 SSOT,3+ consumer)/ `filter-tree.ts`(pure data + eval,test isolation)/ `lib/column-meta.ts`(Internal SSOT,消 5 處 `(col as any)`)+ stories/spec/css。**M21 retract**:`filter-value-picker.tsx` 1 consumer → 已 inline 回 panel。
+檔案拆分架構(12 file split matrix)與工程決策史屬 code home — 詳 `data-table.tsx` 檔頭 docblock(2026-06-11 遷移,Level 4;spec 只管設計語言)。
 
 ---
 
@@ -109,13 +109,13 @@ Table 分三層:
 
 **三個 region 共享垂直捲動。** body-viewport 是唯一的垂直 scroll container，三個 body region 是它的 flex children。垂直捲動天然同步，不需 JS。
 
-**只有 center 水平捲動。** center-body `overflow-x: auto`。center-header `overflow: hidden`，用 JS sync：`centerBody.scrollLeft → centerHeader.scrollLeft`。
+**只有 center 水平捲動。** center-body 是唯一的水平 scroll container,center-header 跟隨其捲動位置同步（同步機制見「捲軸」段 + `data-table.tsx`）。
 
-**Left / right 不水平捲動。** `overflow: hidden`。Frozen 邊界用 `border-divider`（全高度）。
+**Left / right 不水平捲動。** Frozen 邊界用 `border-divider`（全高度）。
 
 **固定行高確保跨 region 對齊。** 所有 row 用 `h-table-row-{size}`，三個 region 的 row 精確同高。
 
-**Header/body region 寬度同步。** Header region 寬度由內容決定（columns + actions），body region 用 ResizeObserver 量測 header 寬度並同步。
+**Header/body region 寬度同步。** Header region 寬度由內容決定（columns + actions），body region 量測 header 寬度同步（機制見 `data-table.tsx`）。
 
 ### 四、行高模式
 
@@ -517,12 +517,13 @@ DataTable 是 composite multi-section 元件,**不套 canonical 5**(Inspector / 
 
 **Why not radio-group**:之前 boilerplate 從 RadioGroup spec 誤抄。DataTable 是 multi-row / multi-column composite,not single-choice selection group;a11y semantics 完全不同(grid vs radio-group)。 <!-- @benchmark-verified: 2026-05-18 D1 rewrite -->
 
-
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `bulk-action-bar.spec.md`
 - `carousel.spec.md`
 - `circular-progress.spec.md`
+- `description-list.spec.md`
 - `scroll-area.spec.md`
-- `item-anatomy.spec.md`
+- `tree-view.spec.md`

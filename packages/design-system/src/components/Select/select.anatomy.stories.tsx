@@ -46,7 +46,7 @@ const TOKEN_MAP: Record<ModeKey, Record<StateKey, ColorSpec>> = {
     disabled: { bg: '--bg-disabled', text: '--fg-disabled', border: 'transparent',    icon: '--fg-disabled' },
   },
   readonly: {
-    default:  { bg: '--bg-disabled', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
+    default:  { bg: '--bg-readonly', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
     hover:    { bg: '--bg-disabled', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
     focus:    { bg: '--bg-disabled', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
     error:    { bg: '--bg-disabled', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
@@ -657,7 +657,7 @@ export const ColorMatrix = {
                   </Td>
                   <Td>
                     {m === 'edit' && 'Wrapper 相同。Tag 用 Tag 元件色彩（bg-muted + text-foreground）'}
-                    {m === 'readonly' && 'Wrapper 相同（bg-disabled）。Tag 用 tagPadding 置中'}
+                    {m === 'readonly' && 'Wrapper 相同（bg-readonly）。Tag 用 tagPadding 置中'}
                     {m === 'disabled' && 'Wrapper 相同。Tag 文字色 fg-disabled + 背景 bg-disabled'}
                   </Td>
                 </tr>

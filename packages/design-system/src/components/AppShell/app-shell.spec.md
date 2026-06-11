@@ -94,14 +94,14 @@ function CustomAside() {
 
 **Header 永遠是 horizontal strip,不延伸 vertical**(per 2026-05-19 user clarification)。
 
-### primary-header = primary-sidebar + 一條 global header(2026-05-21 v2 user clarification)
+### primary-header = primary-sidebar + 一條 global header
 
-過去版本誤把 primary-header 描述成「header 取代 local toolbar」**錯了** — 世界級 100% 反證:
-- **GitHub**:global top nav(logo / search / account)+ **repo header**(breadcrumb / branch selector,**local**)+ sidebar + content ← **2 層 header**
-- **Slack**:global header(workspace switcher)+ **channel header**(channel name / settings,**local**)+ sidebar + main ← **2 層**
-- **Gmail**:global logo bar + **email list toolbar**(sort / filter,**local**)+ sidebar + list ← **2 層**
+`primary-header` mode = `primary-sidebar` mode 的所有東西 + **額外一條 global header 在頂**。`header` slot(local toolbar)**仍然存在**,只是上面多了 `globalHeader` slot(跨頁 chrome)。世界級對照(皆為 2 層 header):
+- **GitHub**:global top nav(logo / search / account)+ **repo header**(breadcrumb / branch selector,**local**)+ sidebar + content
+- **Slack**:global header(workspace switcher)+ **channel header**(channel name / settings,**local**)+ sidebar + main
+- **Gmail**:global logo bar + **email list toolbar**(sort / filter,**local**)+ sidebar + list
 
-**結論**:`primary-header` mode = `primary-sidebar` mode 的所有東西 + **額外一條 global header 在頂**。`header` slot(local toolbar)**仍然存在**,只是上面多了 `globalHeader` slot(跨頁 chrome)。
+**常見誤解:「primary-header = header 取代 local toolbar」** — 錯;global header 是**加在 local toolbar 之上**,不是取代(上列三家全部同時保有兩層)。
 
 **API**:
 - `header` prop:**永遠** local page header(per page actions / breadcrumb / filter),兩 mode 都 render
@@ -133,18 +133,11 @@ function CustomAside() {
   header={<PageHeader title="..." />}>...
 ```
 
-**真正的 distinguishing factor = Header scope(local toolbar vs global bar)**(2026-05-20 user clarification 撤回 single/multi-workspace mis-claim):
-
-過去版本誤把「workspace 數量」綁定到 layout mode(寫 primary-sidebar = single-workspace、primary-header = multi-workspace)。**反證(grep world-class verified)**:
-- Linear / Notion / Figma(primary-sidebar)= 全部都**支援 multi workspace / multi team**
-- GitHub / Gmail / Slack(primary-header)= 同樣是 multi workspace
-- **Workspace 多寡跟 layout 派别無相關性** — Notion 多 workspace 卻用 primary-sidebar、Gmail 多 account 用 primary-header
-
-決定派别的是「Header scope」:
+**真正的 distinguishing factor = Header scope(local toolbar vs global bar)**:
 - **Local toolbar 派**(當前頁 anchor / breadcrumb / page-level actions / filter / 該頁 specific 操作)→ `primary-sidebar`
 - **Global bar 派**(account avatar / workspace switcher / notifications / 跨頁 search / 跨頁導覽)→ `primary-header`
 
-選 mode = 表態「Header 是 local 還是 global」,**不是**「workspace 是 single 還是 multi」。
+**常見誤解:「multi-workspace 就必須 primary-header 派」** — workspace 多寡跟 layout 派别無相關性(world-class 反證:Linear / Notion / Figma 皆 multi-workspace 卻用 primary-sidebar;Gmail 多 account 用 primary-header)。選 mode = 表態「Header 是 local 還是 global」,**不是**「workspace 是 single 還是 multi」。
 
 **Sidebar toggle 按鈕位置**(消費既有 `sidebar.spec.md:308-360` SidebarTrigger 兩 pattern,**不發明新 toggle**):
 
@@ -300,8 +293,8 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 ## Consumer 紀律
 
 - ❌ 禁:`<AppShell>` 內 wrap 第二個 `<AppShell>`(nested shell 違反「整頁框架」單例性)
-- ❌ 禁:`sidebar={<div>...</div>}`(必傳 `<Sidebar>` primitive,確保視覺 SSOT)
-- ❌ 禁:`header={<header>...</header>}`(必傳 `<ChromeHeader>` 或消費 `header-canonical` 派生 header)
+- ❌ 禁:`sidebar={<div>...</div>}`(應傳 `<Sidebar>` primitive,確保視覺 SSOT。型別上收 ReactNode、不做機械強制 — React 型別強制易被 wrapper 包一層繞過,世界級 shell 元件皆收 ReactNode;本約定靠 story 示範 + audit 把關。2026-06-10 user 拍板 2a:措辭「必」→「應」對齊 code 真實)
+- ❌ 禁:`header={<header>...</header>}`(應傳 `<ChromeHeader>` 或消費 `header-canonical` 派生 header;同上,型別不機械強制)
 - ❌ 禁:AppShell.Main 自加 padding(違反 layoutSpace 規則 1B)
 - ✅ 必:`layout` mode 在 product 啟動時固定,**不在 runtime 切換**(切換 = product 角色變動 = 應該重 mount app)
 
@@ -327,4 +320,3 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 - `components/Sheet/sheet.spec.md` — modal fallback SSOT(`aria-labelledby` 強制 + `z-50`)
 - `tokens/layoutSpace/layoutSpace.spec.md` — Main 內 layout 6 條規則 SSOT
 - `tokens/uiSize/uiSize.spec.md` — `--chrome-header-height` / `--sidebar-mobile-breakpoint` 等 size token
-

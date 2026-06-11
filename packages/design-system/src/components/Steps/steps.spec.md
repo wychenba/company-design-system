@@ -428,10 +428,10 @@ Item-level **內容狀態色彩**(completed / current / upcoming / error indicat
 ## 邊界案例
 
 - **Disabled step**:`disabled` step 視覺繼承 SelectionItem disabled token(`text-fg-disabled`,M24),click 不觸發 navigate;`linear` mode 下 upcoming steps 預設 disabled 直到前面 completed。
-- **Loading(async step state fetch)**:Steps primitive 為 sync render,async data fetch 應由 consumer 在外層 Skeleton 取代整個 Steps;Steps 內部不獨立 own loading prop。
+- **Loading(async step state fetch)**:Steps primitive 為 sync render,async data fetch 應由 consumer 在外層 Skeleton 取代整個 Steps;Steps 內部不獨立 own loading prop,**也無 per-step loading state**(content state 集合不含 loading)— 單一步驟 async 進行中即 current,進度細節由 consumer 在 `StepContent` 內呈現。
 - **Empty(0 steps)**:`items=[]` 無意義(無進度可呈現);consumer 應條件性不渲 Steps 或渲 `<Empty>` 替代,不渲空 Steps container。
 - **Single step / current=0**:合法初始狀態,渲第一個 step 為 current,後續為 upcoming。
-- **Error state(`errorValues`)**:由元件層級 own — 對應 step indicator 切 error token,connector 切 error muted,後續 step 仍 upcoming 但 user 預期 navigation 暫停。
+- **Error state(`errorValues`)**:由元件層級 own — 對應 step indicator 切 error token、label 切 `text-error-text`(見「Label 色彩」);connector **不**變色,仍按「Connector 路徑色」規則(前一步 completed 才藍,否則灰);後續 step 仍 upcoming。
 - **Dark mode**:走 semantic token + Primary token 自動 adapt。
 - **Density**:Step indicator 32px 對齊 `AVATAR_SIZE.block.sm/md`,connector 細線跨 density 不變(進度視覺對 density 不敏感)。
 
@@ -470,4 +470,5 @@ Item-level **內容狀態色彩**(completed / current / upcoming / error indicat
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `horizontal-overflow.spec.md`
+- `item-anatomy.spec.md`
 - `progress-bar.spec.md`

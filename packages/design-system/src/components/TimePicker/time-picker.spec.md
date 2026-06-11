@@ -241,6 +241,13 @@ trigger 的互動狀態(focus / invalid / disabled / readonly)完全繼承 `../F
 
 ---
 
+## 常見誤解
+
+- 「OK(確定)鈕才 commit value」→ 錯;每次欄位選取**當下即 commit**(eager commit),OK 只關 Panel(見「驗證時機」)
+- 「時間範圍要等內建 Range」→ 用兩個 `<TimePicker>` 並列組合即可(見「為何無 Range(MVP)」)
+- 「value 可傳 Date object」→ 不可;家族統一 ISO time string(見「Value 格式」)
+- 「selected 該用藍底」→ panel 是「列表選中」語意走 `bg-neutral-selected`,藍底是 DatePicker date cell 的「最終選定」語意(見「欄內 item 狀態」)
+
 ## 禁止事項
 
 - ❌ 不要在 TimePicker 內部直接顯示日期——那是 DatePicker 的語義
@@ -257,6 +264,7 @@ trigger 的互動狀態(focus / invalid / disabled / readonly)完全繼承 `../F
 - **Loading**:TimePicker 為 sync UI(time math 在 client),無 loading state。極端 case(後端 disabled-times list)應由 consumer 先 disable trigger 直到 fetch 完成。
 - **Empty(no value)**:`value=null` 為合法 initial state,trigger 顯 placeholder;**未傳 `placeholder` 時 default = 格式遮罩**(`HH:MM`,showSeconds=true 時 `HH:MM:SS`),非固定文案。`null` + Display mode 顯 `—`(em dash + `text-fg-muted`)對齊 Input display empty 慣例。
 - **Empty(disabled all times)**:極端場景(`disabledHours` / `disabledMinutes` 覆蓋全範圍),panel column 全 disabled,鍵盤焦點停留無導覽目標。
+- **Panel 開啟中外部 value 變更**:controlled 單向資料流——欄位選中即時反映新 value,並 scroll-into-view(`behavior:'smooth'`,mount 後的變更;見「Spacing + 結構」的 Scroll-into-view 條)。
 - **Dark mode / density**:走 Field + Popover SSOT 自動 adapt;panel column item 由 MenuItem SSOT 控 density。
 
 ---

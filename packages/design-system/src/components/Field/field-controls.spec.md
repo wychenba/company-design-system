@@ -62,8 +62,8 @@ Field/
 | Mode | 底色 | 邊框 | 文字色 | 用途 |
 |------|------|------|--------|------|
 | `edit` | surface | border（hover 深一階、focus primary） | foreground | 表單可編輯欄位 |
-| `readonly` | neutral-2 | 無 | foreground | 表單中不可編輯但可見的欄位 |
-| `disabled` | neutral-2 | 無 | fg-disabled | 表單中被停用的欄位 |
+| `readonly` | neutral-2(`--bg-readonly`)| 無 | foreground | 表單中不可編輯但可見的欄位 |
+| `disabled` | neutral-2(`--bg-disabled`)| 無 | fg-disabled | 表單中被停用的欄位 |
 
 三種模式共用同一個 wrapper 結構（`fieldWrapperStyles`），只有底色、邊框、文字色不同。
 
@@ -221,12 +221,14 @@ Field 內的具體套用：
 - `aria-hidden`——純裝飾
 - 命名與 Button 的 `startIcon` 一致
 
-## 下拉箭頭（Select / Combobox）
+## 下拉箭頭（Select / Combobox）與類型身份 indicator
 
-Select 和 Combobox 的最右側固定顯示 ChevronDown icon，指示可下拉選擇。
+Select / Combobox 的 ChevronDown、DatePicker 的 Calendar、TimePicker 的 Clock = **類型身份 indicator**(「這是什麼欄位」),**「是欄位」的所有狀態都顯示**(2026-06-10 user 拍板;對齊原生 select / MUI #19833 / Carbon read-only「keep icon signifiers de-emphasized」/ Accordion M24 precedent):
 
-- 顏色 `fg-muted`——指示意圖，不是 value
-- 不可互動（`pointer-events-none`）——下拉由 select 元素本身觸發
+- edit / readonly:`fg-muted`;**disabled:`fg-disabled`**(對齊上方 Icon 色彩原則)
+- 不可互動(`pointer-events-none`)——下拉由 select 元素本身觸發
+- **Cell(naked variant)例外**:indicator 依 `showDisplayEndIcon`(= cell 的 isEditable)——非可編欄不顯(2026-05-10 cell canonical「indicator = editable affordance」);**可編欄的 disabled cell 顯示 + fg-disabled**(同表單邏輯)
+- locked(readonly/disabled)wrapper 並設 `aria-disabled`(disabled 時)——styled-disabled 非原生元素需明告 AT inactive,亦使 axe 正確套用 WCAG 1.4.3 inactive-UI 豁免
 - clearable 有值時：clear X 在左，ChevronDown 在右
 - 右側元素(clear + chevron)水平間距對齊 Field container padding token(具體值見 `field-wrapper.tsx`),跟 Input 一致
 
@@ -330,6 +332,11 @@ col.accessor('status', {
 
 ---
 
+## 邊界案例(家族共用 pointer)
+
+- **極長輸入溢出**:由各元件 spec own — Input 超寬走原生水平捲動(`input.spec.md`「邊界(內容超寬)」)、Textarea 內容超出時 native 內部捲動 / display 態隨內容增高(`textarea.spec.md`「極長文字」)。
+- **常見誤解 — disabled 時 label 該隱藏?**:不隱藏 — label 保留但變灰(`FieldLabel` disabled 灰化、required 星號同步 `text-fg-disabled`,SSOT `Field/field.spec.md`);停用原因由外部 Tooltip / help text 承擔(見「disabled 的停用原因」)。
+
 ## 表單驗證原則
 
 詳見 `Field/form-validation.spec.md`。
@@ -350,10 +357,13 @@ col.accessor('status', {
 - `checkbox.spec.md`
 - `circular-progress.spec.md`
 - `combobox.spec.md`
-- `data-table.spec.md`
 - `date-picker.spec.md`
 - `element-anatomy.spec.md`
+- `field-control-group.spec.md`
+- `field.spec.md`
+- `form-validation.spec.md`
 - `input.spec.md`
+- `item-anatomy.spec.md`
 - `link-input.spec.md`
 - `number-input.spec.md`
 - `people-picker.spec.md`

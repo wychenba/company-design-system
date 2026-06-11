@@ -328,6 +328,7 @@
   --neutral-hover:        var(--color-neutral-1);
   --neutral-active:       var(--color-neutral-2);
   --bg-disabled:          var(--color-neutral-2);
+  --bg-readonly:          var(--color-neutral-2);  /* readonly 鎖定欄位 chrome — 同值但獨立 owner(≠ disabled:可聚焦/選取/提交,僅不可改值);詳 color.spec.md Static Subtle 邊界 */
 
   /* Neutral Interactive — Selected state family
      ─────────────────────────────────────────────────────────────
@@ -515,6 +516,7 @@
   --color-neutral-hover:             var(--neutral-hover);
   --color-neutral-active:            var(--neutral-active);
   --color-disabled:                  var(--bg-disabled);
+  --color-readonly:                  var(--bg-readonly);
 
   /* Neutral Interaction — Selected state family */
   --color-neutral-selected:          var(--neutral-selected);

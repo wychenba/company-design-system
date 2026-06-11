@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as SliderPrimitive from '@radix-ui/react-slider'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import { useResolvedFieldDisabled } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldDisabled } from '@/design-system/components/Field/field-context'
 
 /**
  * Slider — 數值範圍選取器
@@ -62,6 +62,9 @@ const Slider = React.forwardRef<
   // 家族整合時繼承其 canonical」)。Slider 已有完整 data-[disabled] 視覺,故只需把 fieldCtx disabled 接上。
   // 2026-06-08 SSOT:讀 useResolvedFieldDisabled()(fieldCtx.disabled)→ <Field disabled> 與 <Field mode="disabled"> 都生效
   const fieldDisabled = useResolvedFieldDisabled()
+  // 2026-06-10 a11y:Field 內 Slider thumb(role=slider)無 accessible name(deep-audit axe 抓 aria-input-field-name)
+  // → 預設接 FieldLabel(aria-labelledby),consumer ariaLabel 優先。對齊 rating/time-picker labelId 接線。
+  const fieldLabelId = useFieldContext()?.labelId
   // 推導要渲染幾個 thumb:controlled 用 value,uncontrolled 用 defaultValue,
   // 都沒有時 fallback 單 thumb(Radix 預設行為)
   const thumbCount =
@@ -147,6 +150,7 @@ const Slider = React.forwardRef<
                 : ariaLabel
               : undefined
           }
+          aria-labelledby={!ariaLabel && fieldLabelId ? fieldLabelId : undefined}
         />
       ))}
     </SliderPrimitive.Root>

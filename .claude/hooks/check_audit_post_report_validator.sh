@@ -116,6 +116,13 @@ if [ "${CRITICAL_FAIL:-0}" -eq 1 ]; then
 fi
 
 # ─ Validator E: prune-chain-trigger emit ──────────────────────────────────
+# 2026-06-11 擴充(user 糾正「為何每次都要問我是否要跑 knowledge prune」機械兜底,SSOT = deep-audit SKILL C.0a):
+# deep-audit 規模 report(DIM_COUNT≥10)→ 無條件 fire prune-chain trigger,非僅 coverage 不足時。
+# 分權不變:AI 收到 trigger 必 AUTO-RUN(品質優先前提),P2 retire 仍 user 拍板。
+if [ "${DIM_COUNT:-0}" -ge 10 ] && [ "$TRIGGER_PRUNE" -eq 0 ]; then
+  TRIGGER_PRUNE=1
+  WARNINGS="${WARNINGS}\n  • C.0a unconditional chain:deep-audit 收尾必 AUTO-RUN /knowledge-prune(禁問 user 要不要跑;headroom trigger 命中時 scope 聚焦,否則 quarterly)。"
+fi
 if [ "$TRIGGER_PRUNE" -eq 1 ] || [ -n "$WARNINGS" ]; then
   mkdir -p "$PROJECT_DIR/.claude/logs" 2>/dev/null
   printf '{"ts":"%s","file":"%s","trigger_prune":%d,"warnings":%s}\n' \
@@ -126,7 +133,7 @@ if [ "$TRIGGER_PRUNE" -eq 1 ] || [ -n "$WARNINGS" ]; then
     >> "$PROJECT_DIR/.claude/logs/audit-post-report-validator.jsonl" 2>/dev/null || true
 
   if [ "$TRIGGER_PRUNE" -eq 1 ]; then
-    CTX=$(printf '🚨 audit post-report validator: prune-chain-trigger fire。下輪 invoke /knowledge-prune scope=full(triggers: audit-prompts coverage < 100%% / @benchmark-unverified-blanket count > 0)。\n%b' "$WARNINGS")
+    CTX=$(printf '🚨 audit post-report validator: prune-chain-trigger fire。AI 必 AUTO-RUN /knowledge-prune(禁問 user;品質優先前提 per deep-audit SKILL C.0a;P2 retire 候選列拍板清單)。\n%b' "$WARNINGS")
     jq -n --arg ctx "$CTX" '{
       hookSpecificOutput: { hookEventName: "PostToolUse", additionalContext: $ctx }
     }'

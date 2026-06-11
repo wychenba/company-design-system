@@ -162,6 +162,15 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 - Loading:子 control 各自處理(Input loading state / Select loading)
 - Empty:N/A(layout primitive,無資料概念)
 - 驗證:子 control 自管(form library 透過 Field 處理)
+- 「子必 direct child」規則**無 runtime 偵測**——違反(多包 wrapper div)時的症狀是圓角破圖(CSS `[&>*]` 命中 wrapper),見禁止事項 2026-05-04 #2;靠 review + Storybook 目視抓
+- a11y 驗證:Storybook a11y addon panel 0 critical violation;Tab 順序 = children DOM 順序
+
+## 邊界案例
+
+- **子高度不一**:容器 `items-stretch`,但 field controls 自帶固定 `h-field-*`,不會被拉齊——混 size 即視覺高低差(故禁止,見禁止事項)
+- **某子 disabled、某子 edit**:機制上可行(disabled 子降 z-0 + K12 border 維持 divider),但語意一體應一致(見禁止事項);**全組 disabled** 走 K12 canonical(見 States)
+- **極窄容器**:無特化處理——固定寬 children(`w-[Xpx]`)溢出容器、`flex-1` children 壓縮;子自管 width 的對價,consumer 自行配置
+- **單一 child**:radius 選擇器 `:first-child:not(:last-child)` 不命中,圓角完整保留(等同未包 group,但此時應直接用 Field)
 
 ## 世界級對照
 
@@ -173,6 +182,13 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 | **Mantine** | 無此 idiom | — | — | — |
 
 3/4 共識 → 我們的實作對齊 Ant + Bootstrap 主軸。
+
+## 相關
+
+- `../Field/field.spec.md` — FieldGroup(多 Field 垂直堆疊近親,gap 分離)的 home
+- `../Button/button-group.tsx` — 同 border-collapse mechanism 的 Button 版(無獨立 spec,機制同源)
+- `../Field/field-controls.spec.md` — children(Input / Select / DatePicker 等)共用 Field control 規則
+- `../Checkbox/checkbox.spec.md` / `../RadioGroup/radio-group.spec.md` — semantic group 近親(1 question 多 options,非本元件 scope)
 
 ## 變更紀錄
 

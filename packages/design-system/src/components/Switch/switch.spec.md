@@ -150,6 +150,8 @@ Switch 可透過 `label` / `description` props 內部直接渲染緊鄰文字：
 
 在 `<Field orientation="horizontal">` 內 Switch 自動 `ml-auto`(control area 是 `flex items-center`,Switch 被推到最右邊),**不需要 consumer 傳 className**。這對齊 iOS Settings / macOS System Settings / GitHub Settings / Figma preferences 的 canonical:**toggle 永遠齊右,label 左對齊、固定寬度**——視覺掃描快、列與列對齊一致。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
+**⚠️ 自動齊右只適用「純 settings list」情境**(整排獨立 toggle)— 適用判準見下方「兩種對齊慣例」表。**混合表單**(同表單有 Input / SegmentedControl 等其他控件)= Form-edit 情境 → Switch 應與其他控件**左對齊**:consumer 傳 `className="ml-0"` 覆寫(cn 合併時 consumer className 在後,tailwind-merge 以 `ml-0` 蓋掉內部 `ml-auto`)。錨例:`field.stories.tsx`「SegmentedControl 作為 Field 控制元件」混合表單段(2026-06-10 user 拍板修正)。
+
 視覺上等同於 horizontal `<DescriptionItem>`(label 左 / value 右 `justify-between`)——同一個心智模型:**label 描述、trailing slot 呈現狀態**(value 或 toggle)。
 
 **同一畫面多個 horizontal Switch Field → 必搭配 `FieldGroup horizontalLabelWidth={...}`**:否則每個 label 會被內容撐到不同寬度,Switch 左邊緣不對齊,整排參差不齊(世界級 UI 通病,Settings 類型畫面特別明顯)。見 `../Field/field.spec.md`「FieldGroup horizontalLabelWidth cascade」。
@@ -170,6 +172,16 @@ Switch 可透過 `label` / `description` props 內部直接渲染緊鄰文字：
 本 DS 的 `auto ml-auto` 邏輯是**為 settings list 最佳化**。若 consumer 把 Switch 放 submit form 並想「緊跟 label」,需自行在 `<Switch className="ml-0">` 覆寫——但更推薦重新考慮是不是該用 Checkbox。
 
 > **記住**:在 form 內 + Switch 緊跟 label 的覆寫寫法是 **`<Switch className="ml-0" />`**。這是**目前唯一**需要 consumer 明示 override 的 Switch 行為(其他 layout 都 auto)。但 99% 情境使用者應該先問「是不是該用 Checkbox」——Switch 即時生效的心智模型跟 submit form 本來就衝突。
+
+---
+
+## 邊界案例
+
+- **Readonly 的滑鼠 / 鍵盤**：`pointer-events-none` 使點擊無反應；`tabIndex=-1` 不入 tab order，故無鍵盤互動（視覺正常、僅鎖互動）
+- **Disabled 的鍵盤**：native `disabled`——不可聚焦、無鍵盤行為
+- **Label 過長**：自動換行（label 容器 `flex-1 min-w-0`），Switch 錨定第一行行高置中（`h-[1lh]`）且不被擠壓（`shrink-0`）
+- **無 loading state**：Switch 無 loading prop——async 進度不屬 Switch（見「何時不用」，用 Button loading）
+- **無 indeterminate 三態**：Switch 只有 on/off；三態用 RadioGroup / SegmentedControl（見「何時不用」）
 
 ---
 
@@ -216,6 +228,7 @@ Switch 可透過 `label` / `description` props 內部直接渲染緊鄰文字：
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `checkbox.spec.md`
 - `combobox.spec.md`
 - `radio-group.spec.md`
 - `select.spec.md`

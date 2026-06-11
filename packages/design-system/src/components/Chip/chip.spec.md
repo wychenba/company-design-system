@@ -184,6 +184,8 @@ Chip 的 overflow 處理有三種模式：
 
 **menu 模式需要 controlled ChipGroup**：菜單 items 透過 `onValueChange` 觸發選擇變化，因此 ChipGroup 必須傳 `value` + `onValueChange`（controlled）。uncontrolled mode（`defaultValue`）的 menu 模式無法讓 menu items 與 chips 同步狀態。
 
+**RTL**：三模式皆未實作方向鏡像（scroll edge 偵測以 LTR `scrollLeft` 計算，fade mask / arrow 為實體 left/right）；RTL 屬 DS-wide 決策，未定。
+
 ---
 
 ## 禁止事項
@@ -229,10 +231,5 @@ ColorMatrix 已建:展示 default / hover / selected / disabled 四狀態的 bg 
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
-- `opacity.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
+- `badge.spec.md`
 - `tag.spec.md`

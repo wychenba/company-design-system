@@ -41,7 +41,7 @@ User 2026-05-15 + 2026-05-27 系列 directives codified per Rule-of-3 absorb pri
 
 **Anchor**:2026-05-15 user verbatim「要 user 決策必中文具體人話講(發生什麼/影響/選項 outcome)」。
 
-**Mechanical enforcement**:`.claude/hooks/check_propose_plain_chinese.sh` PreToolUse Edit/Write 偵測 propose pattern + jargon keyword → BLOCKER。
+**Mechanical enforcement**:`.claude/hooks/check_propose_discipline.sh(r1,2026-06-11 merge)` PreToolUse Edit/Write 偵測 propose pattern + jargon keyword → BLOCKER。
 
 ## Sub-rule 2 — file:line cite(原 propose_without_cite_fabrication)
 
@@ -59,7 +59,7 @@ User 2026-05-15 + 2026-05-27 系列 directives codified per Rule-of-3 absorb pri
 
 **Anchor**:2026-05-27 user verbatim「誰跟你說的?」— 我曾 cite「caption + muted SSOT 規定」但 grep `semantic.css:49` 是 use-case 描述非 rule。建議 propose 全 retract。
 
-**Mechanical enforcement**:`.claude/hooks/check_propose_cite_required.sh` PreToolUse Edit/Write 偵測 propose pattern + canonical claim 但無 file:line cite → BLOCKER。
+**Mechanical enforcement**:`.claude/hooks/check_propose_discipline.sh(r2,2026-06-11 merge)` PreToolUse Edit/Write 偵測 propose pattern + canonical claim 但無 file:line cite → BLOCKER。
 
 ## How to apply
 

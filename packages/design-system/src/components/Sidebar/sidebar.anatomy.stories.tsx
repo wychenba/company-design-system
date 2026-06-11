@@ -1,7 +1,7 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { LayoutDashboard, Inbox, Users, Settings, Bell } from 'lucide-react'
+import { LayoutDashboard, Inbox, Users, Settings, Bell, Folder, Plus } from 'lucide-react'
 import {
   SidebarProvider,
   SidebarHeader,
@@ -535,44 +535,53 @@ const CollapsedFrame = ({
 // SidebarMenuButton cva 有 variant: { default, meta } 兩個值,本 story 展示 default vs meta 區別
 export const VariantMatrix: Story = {
   name: '變體對照（預設 vs 次要）',
+  // 2026-06-11:改用真 SidebarMenuButton 渲染(原為手繪灰塊 mock row,違 production-grade composition fidelity)
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div className="flex flex-col gap-2">
         <H3>variant=&quot;default&quot;(導覽 item)</H3>
-        <Desc>正常導覽目的地。文字 `text-fg-secondary` + `font-medium`,參與 single-selection,可 active。</Desc>
-        <div className="border border-border rounded-md p-3 bg-surface flex flex-col gap-1">
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
-            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">Mobile App</span>
-          </div>
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
-            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">Design System</span>
-          </div>
+        <Desc>正常導覽目的地。文字 <code>text-fg-secondary</code> + <code>font-medium</code>,參與 single-selection,可 active。</Desc>
+        <div className="border border-border rounded-md p-3 bg-surface">
+          <SidebarProvider defaultActiveId="dashboard" style={{ minHeight: 'auto' }}>
+            <div className="flex flex-col w-full">
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton id="dashboard" startIcon={LayoutDashboard}>Dashboard</SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton id="inbox" startIcon={Inbox}>Inbox</SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </div>
+          </SidebarProvider>
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
         <H3>variant=&quot;meta&quot;(命令 row,非導覽目的地)</H3>
         <Desc>
-          section 底部的命令(「查看更多 / 載入更多 / + 新增專案」)。文字退到 `text-fg-muted` + `font-normal`,
-          視覺重量下沉。**不參與 single-selection**(誤傳 isActive 也不啟動)。對齊 Linear「Show N more」/ Notion「Show more」/ Slack「Show more」/ Gmail Labels「More」共識。
+          section 底部的命令(「查看更多 / 載入更多 / + 新增專案」)。文字退到 <code>text-fg-muted</code> + <code>font-normal</code>,
+          視覺重量下沉。<strong>不參與 single-selection</strong>(誤傳 isActive 也不啟動)。對齊 Linear「Show N more」/ Notion「Show more」/ Slack「Show more」/ Gmail Labels「More」共識。
         </Desc>
-        <div className="border border-border rounded-md p-3 bg-surface flex flex-col gap-1">
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
-            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">Checkout Revamp</span>
-          </div>
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
-            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">Billing Migration</span>
-          </div>
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-muted)' }}>
-            <span className="text-caption font-normal">+ 新增專案</span>
-          </div>
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-muted)' }}>
-            <span className="text-caption font-normal">查看更多</span>
-          </div>
+        <div className="border border-border rounded-md p-3 bg-surface">
+          <SidebarProvider style={{ minHeight: 'auto' }}>
+            <div className="flex flex-col w-full">
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton id="checkout" startIcon={Folder}>Checkout Revamp</SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton id="billing" startIcon={Folder}>Billing Migration</SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton variant="meta" startIcon={Plus}>新增專案</SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton variant="meta">查看更多</SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </div>
+          </SidebarProvider>
         </div>
       </div>
     </div>

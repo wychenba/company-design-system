@@ -383,6 +383,9 @@ const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
         style={{ ...horizontalBlockStyle, ...style }}
         data-field-slot="label"
         data-field-disabled={disabled ? '' : undefined}
+        // 2026-06-10 a11y:styled-disabled label 必明告 inactive(WCAG 1.4.3 inactive-UI 豁免需可機判;
+        // axe 對無 aria-disabled 的 fg-disabled 文字誤報 color-contrast — deep-audit 抓 8 筆)
+        aria-disabled={disabled || undefined}
         {...props}
       >
         <span className="inline-flex items-center gap-1">

@@ -38,18 +38,27 @@ benchmark:
 | 單純顯示一個名字 | `Avatar` + `Text` | ProfileCard 是完整資訊卡，單名字用更輕量元件 |
 | 複雜人員表單（編輯角色 / 權限）| `Dialog` 或專用頁面 | ProfileCard 是快速預覽，不承載複雜互動 |
 
+## 近親職責分界
+
+| 元件 | 職責 | 不管 |
+|---|---|---|
+| ProfileCard(本元件) | 人員資訊**內容模板**(header / status / info / view more) | 觸發、定位、浮層外殼(radius / border / shadow) |
+| HoverCard | 浮層**容器**(觸發 / 定位 / 外殼),詳 `hover-card.spec.md` | 內容結構 |
+| Avatar | 身份視覺;`hoverCard` prop 一鍵整合 ProfileCard | card 內容本身 |
+| Tooltip | 純文字 hover 提示(不可互動) | 結構化人員資訊 |
+
 ## 結構
 
 ProfileCard 是**三層 chrome 結構**(2026-04-23 canonical):
 
 ```
 ┌─────────────────────────────┐
-│ HEADER(固定,shrink-0)       │  ← Profile(Avatar + Name + Subtitle)+ Actions(選用)
+│ HEADER(固定不捲)            │  ← Profile(Avatar + Name + Subtitle)+ Actions(選用)
 ├─────────────────────────────┤
-│ BODY(flex-1,可垂直捲動)      │  ← Status section(v12 conditional)+ Info fields(always-render)
-│ ↕ 空間不足時此區 ScrollArea   │    Status undefined → 整 status block skip
+│ BODY(可垂直捲動)            │  ← Status section(v12 conditional)+ Info fields(always-render)
+│ ↕ 空間不足時此區捲動         │    Status undefined → 整 status block skip
 ├─────────────────────────────┤
-│ FOOTER(固定,shrink-0)       │  ← View more(hover context 必含,詳「View more canonical」)
+│ FOOTER(固定不捲)            │  ← View more(hover context 必含,詳「View More」)
 └─────────────────────────────┘
 ```
 
@@ -122,6 +131,15 @@ ProfileCard 的 default actions **是 `Chat + Audio call`**(chat app 標配,cano
 
 ---
 
+## 邊界案例
+
+- **Name / Subtitle 超長**:自然換行撐高 header,不截斷(text column 最小高度對齊 avatar,見「Profile Header」)
+- **Status / statusMessage 缺值**:status undefined = loading transient → 整 status block 隱藏(v12 rule,見「結構」);ProfileCard **無整卡 loading prop**,資料未到的整卡呈現由 consumer 決定
+- **Info fields 缺值**:default fields 永遠 render,缺資料顯 `—` placeholder(section 結構不收合);consumer `fields` label 撞 default 時 consumer 值 win(dedup canonical,詳 `profile-card.tsx`)
+- **內容過長**:Body 在固定高度內以 ScrollArea 捲動,不 clamp 行數(見「Status 區」)
+
+---
+
 ## 禁止事項
 
 - ❌ 不要在 HoverCard 外直接用 ProfileCard 當 standalone card——它不是獨立 Card primitive,是 HoverCard content 模板,缺少浮層外殼(radius / border / shadow)與定位邏輯。需要 card 佈局時用專屬元件或自組 Surface
@@ -167,5 +185,7 @@ ProfileCard 的 default actions **是 `Chat + Audio call`**(chat app 標配,cano
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `description-list.spec.md`
+- `hover-card.spec.md`
 - `people-picker.spec.md`
 - `tag.spec.md`

@@ -163,7 +163,7 @@ export const ColumnResize: Story = {
           />
         </div>
         <div>
-          <h3 className="text-body font-bold text-foreground mb-2">Pinned + Resize 並存(USER #43 sanity)</h3>
+          <h3 className="text-body font-bold text-foreground mb-2">欄位釘選與欄寬調整並存</h3>
           <p className="text-caption text-fg-muted mb-3">
             把 SKU 跟產品名稱固定在左側,依然可以拖動分隔線調整這兩欄的寬度。
             <br />目前各欄寬度:{JSON.stringify(pinnedWidths)}
@@ -1390,11 +1390,11 @@ export const FilterPanelModified: Story = {
   },
 }
 
-/* ── 進階篩選 — 長 tag 溢出測試(A5 reproduce)── */
+/* ── 進階篩選 — 長標籤溢出 ── */
 export const FilterPanelLongTagOverflow: Story = {
   name: '進階篩選 — 長標籤溢出',
   render: () => {
-    // 故意用 select_multi op + 多個長 label values,測試 Combobox tag overflow + +N indicator
+    // 製造業 ERP 的產品分類名稱普遍很長 — 示範多選後 Combobox tag 溢出時的 +N 摘要收斂
     const longLabelColumns = [
       col.accessor('category', {
         header: '類別',
@@ -1418,7 +1418,7 @@ export const FilterPanelLongTagOverflow: Story = {
     }))
     return (
       <div className="w-full max-w-[680px]">
-        <p className="text-caption text-fg-muted mb-3">A5 reproduce — 多個超長 label values 是否觸發 Combobox `+N` overflow indicator?</p>
+        <p className="text-caption text-fg-muted mb-3">產品分類名稱很長(製造業 ERP 常見)時,已選的多個標籤超出單行寬度,Combobox 自動收斂為 +N 摘要。</p>
         <DataTableFilterPanel
           mode="flat"
           columns={[...longLabelColumns]}

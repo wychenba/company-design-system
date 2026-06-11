@@ -112,12 +112,21 @@ HoverCard 是**純行為 primitive**(只提供 hover 觸發邏輯 + 定位 + 動
 - ❌ 把關鍵資訊放在 HoverCard — 觸控裝置無 hover 能力,user 永遠看不到;關鍵 info 直接顯示或 Popover(click 觸發)
 - ❌ HoverCard 內塞表單 / 多步流程 — hover 離開可能誤關閉,複雜互動用 Dialog / Sheet
 - ❌ HoverCard 自帶 bg / border / shadow / padding 套在 HoverCardContent 上 — HoverCard 是純行為 primitive,視覺由 consumer ProfileCard / OverflowIndicator 各自決定(見「純行為 primitive」段)
-- ❌ HoverCard delay 設 0(立即彈出)— 滑鼠掃過所有 trigger 都彈,視覺雜訊;遵循 Radix delay 預設 700ms open / 300ms close
+- ❌ HoverCard delay 設 0(立即彈出)— 滑鼠掃過所有 trigger 都彈,視覺雜訊;delay tier SSOT 見 `tokens/motion/motion.spec.md`(rich 700ms open / close 200ms;2026-06-11 起 HoverCard Root 內建預設,裸用即得 canonical,consumer 可 per-instance override — 如 OverflowIndicator 傳 plain)
 - ❌ 拿 HoverCard 當 Tooltip(純文字提示)— 用 Tooltip(統一深色背景 + ARIA `role="tooltip"`),HoverCard 是 interactive surface 角色不同
 
-## 空值 / 驗證 / loading / a11y
+## 常見誤解
 
-純行為 primitive,無獨立 empty / validation / loading;a11y 由 Radix HoverCard 提供(open on hover / focus,Escape 關)。
+- 「HoverCard 內的按鈕鍵盤可達」——錯。Radix 把 content 內 tabbable node 設 `tabindex="-1"`,鍵盤使用者進不了卡片(見 A11y 預設);需鍵盤可達的互動浮層用 Popover
+- 「HoverCard = 大一點的 Tooltip」——錯。Tooltip 純文字不可互動;HoverCard 是 interactive surface(分界 SSOT 見上方)
+- 「觸控裝置也會開卡」——觸控無 hover;關鍵資訊不可只放 HoverCard(見禁止事項)
+
+## 邊界案例 / 空值
+
+- **重複快速 hover**:open / close delay 自然 debounce——滑過不停留不開卡(open delay),短暫滑出再滑回不閃爍(close delay 緩衝)
+- **Content 為空**:純行為 primitive 不驗證 content,傳空仍渲染空浮層;consumer(如 Avatar `hoverCard`)應在無資料時不掛 hoverCard prop
+- **浮層超出 viewport**:Radix collision 自動 flip / shift(`collisionPadding=12` 保證視覺 ≥ 8px 邊距);高度以 `--radix-hover-card-content-available-height` 為 max-h + flex chain 壓縮 scroll(M25)
+- **Disabled / loading**:純行為 primitive 無此 state;fetch 中的內容(如 ProfileCard loading)由 consumer 自行渲 skeleton
 
 ---
 
@@ -146,12 +155,10 @@ HoverCard 是**純行為 primitive**(只提供 hover 觸發邏輯 + 定位 + 動
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
-- `motion.spec.md`
-
-## 被引用(auto-maintained,Dim 3 reciprocal audit)
-
-> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
-
 - `carousel.spec.md`
 - `coachmark.spec.md`
+- `motion.spec.md`
 - `overflow-indicator.spec.md`
+- `popover.spec.md`
+- `profile-card.spec.md`
+- `tooltip.spec.md`

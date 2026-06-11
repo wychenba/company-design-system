@@ -33,7 +33,7 @@ const COLOR_MAP: Record<ModeKey, Partial<Record<StateKey, ColorSpec>>> = {
     disabled: { bg: '--bg-disabled', text: '--fg-disabled', border: 'transparent',     icon: '--fg-disabled' },
   },
   readonly: {
-    default:  { bg: '--bg-disabled', text: '--foreground',  border: 'transparent',     icon: '--fg-muted' },
+    default:  { bg: '--bg-readonly', text: '--foreground',  border: 'transparent',     icon: '--fg-muted' },
   },
   disabled: {
     default:  { bg: '--bg-disabled', text: '--fg-disabled', border: 'transparent',     icon: '--fg-disabled' },
@@ -57,7 +57,7 @@ const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
 
 const MODE_DESC: Record<ModeKey, string> = {
   edit:     'button trigger + Calendar icon — bg-surface + border + hover/focus 回饋,點擊開啟 Calendar Popover',
-  readonly: '格式化日期文字 — bg-disabled(neutral-2) + 無邊框 + 文字正常色',
+  readonly: '格式化日期文字 — bg-readonly(neutral-2) + 無邊框 + 文字正常色',
   disabled: '格式化日期文字 — bg-disabled(neutral-2) + 無邊框 + 文字灰化',
 }
 
