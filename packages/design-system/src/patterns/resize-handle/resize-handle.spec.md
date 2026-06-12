@@ -105,7 +105,7 @@ Phase 2-4 需獨立 RFC + 各別 user approval,本 spec 只 ship Phase 1 + 鎖�
 | DS / Library | 命中區 | Line | Cursor | a11y |
 |---|---|---|---|---|
 | **AG Grid** | 7-8px | 1px primary on drag | col-resize | role="separator" |
-| **Material X-DataGrid** | column-separator(resize 命中區)~8px | 1px hairline(`MuiDataGrid-iconSeparator` 是純裝飾分隔 icon,非命中區也非 a11y 來源)| col-resize | aria-label "Resize column" |
+| **Material X-DataGrid** | column-separator(resize 命中區)~8px | 1px hairline(`MuiDataGrid-iconSeparator` 是純裝飾分隔 icon,非命中區也非 a11y 來源)| col-resize | aria-label "Resize column" | <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 | **Notion(column / sidebar)** | ~6-8px | 1px line | col-resize | (DOM-only,無 role)|
 | **VS Code** | 8px(activity bar)| bg highlight on drag | col-resize | aria-label "Resize" |
 | **Figma** | 8px | 1px line | col-resize | role separator |

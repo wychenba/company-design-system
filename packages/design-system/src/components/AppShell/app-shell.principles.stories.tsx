@@ -43,6 +43,44 @@ export const UsageGuidance: Story = {
 
       <section>
         <h2 className="text-h4 mb-2">Layout mode 怎麼選</h2>
+        <p className="text-body">
+          兩種佈局模式(primary-sidebar / primary-header)的選型決策樹獨立成「佈局模式怎麼選」story(含
+          WorkspaceBrand 放置規則),見本頁側欄或{' '}
+          <LinkTo kind="Design System/Components/AppShell/設計原則" name="佈局模式怎麼選"><span className="text-primary hover:underline font-medium cursor-pointer">設計原則 → 佈局模式怎麼選</span></LinkTo>
+        </p>
+      </section>
+
+      <section>
+        <h2 className="text-h4 mb-2">vs Sidebar 規則</h2>
+        <p className="text-body">
+          AppShell 只負責整體組合、版面模式、以及右側面板的響應式開合。Sidebar 的外觀、行為、行動裝置上的
+          抽屜形式都由 Sidebar 元件自己定義,<strong>AppShell 不會去改 Sidebar 的樣式</strong>。
+          多個 sidebar 的情境要等 Sidebar 元件本身支援後才提供。
+        </p>
+      </section>
+
+      <section>
+        <h2 className="text-h4 mb-2">Consumer 紀律</h2>
+        <ul className="text-body space-y-1">
+          <li>❌ 禁:`&lt;AppShell&gt;` 內塞另一個 `&lt;AppShell&gt;`(整頁框架單例)</li>
+          <li>❌ 禁:`sidebar={'{'}&lt;div&gt;...&lt;/div&gt;{'}'}` → 應傳 `&lt;Sidebar&gt;` primitive(型別收 ReactNode 不機械強制,2026-06-10 拍板)</li>
+          <li>❌ 禁:`header={'{'}&lt;header&gt;raw&lt;/header&gt;{'}'}` → 應傳 `&lt;ChromeHeader&gt;` 或 header-canonical 派生(同上,不機械強制)</li>
+          <li>❌ 禁:`&lt;AppShell.Main&gt;` 強制 padding(違 layoutSpace 規則 1B)</li>
+          <li>✅ 必:Main 內容遵循既有 `layoutSpace.spec.md` 6 條規則(Page header / Card / DataTable / naked list 各按規則)</li>
+        </ul>
+      </section>
+    </div>
+  ),
+}
+
+// 佈局模式選型 deep-dive — 內容錨定 app-shell.spec.md「兩 mode 差異」(L93-94 / L105 常見誤解)
+// +「WorkspaceBrand 放置 SSOT」(L112-119);category-templates.md component-specific `{Topic}Rule` idiom
+export const LayoutModeRule: Story = {
+  name: '佈局模式怎麼選',
+  render: () => (
+    <div className="prose max-w-2xl space-y-6 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
+      <section>
+        <h2 className="text-h4 mb-2">唯一判準:Header scope</h2>
         <p className="text-body mb-2">
           唯一 distinguisher = <strong>Header scope 是 local 還是 global</strong>,
           <em>不是</em> workspace 多寡(Notion / Gmail 都支援 multi-workspace,卻分屬不同派)。
@@ -69,22 +107,20 @@ export const UsageGuidance: Story = {
       </section>
 
       <section>
-        <h2 className="text-h4 mb-2">vs Sidebar 規則</h2>
+        <h2 className="text-h4 mb-2">常見誤解:global header 取代 local toolbar</h2>
         <p className="text-body">
-          AppShell 只負責整體組合、版面模式、以及右側面板的響應式開合。Sidebar 的外觀、行為、行動裝置上的
-          抽屜形式都由 Sidebar 元件自己定義,<strong>AppShell 不會去改 Sidebar 的樣式</strong>。
-          多個 sidebar 的情境要等 Sidebar 元件本身支援後才提供。
+          錯。primary-header = primary-sidebar 的所有東西 + <strong>額外一條</strong> global header 在頂;
+          `header` slot(local toolbar)<strong>仍然存在</strong>。GitHub / Slack / Gmail 全部同時保有兩層,
+          不是二選一。
         </p>
       </section>
 
       <section>
-        <h2 className="text-h4 mb-2">Consumer 紀律</h2>
+        <h2 className="text-h4 mb-2">WorkspaceBrand 跟著 mode 走(只能出現一次)</h2>
         <ul className="text-body space-y-1">
-          <li>❌ 禁:`&lt;AppShell&gt;` 內塞另一個 `&lt;AppShell&gt;`(整頁框架單例)</li>
-          <li>❌ 禁:`sidebar={'{'}&lt;div&gt;...&lt;/div&gt;{'}'}` → 必傳真 `&lt;Sidebar&gt;` primitive</li>
-          <li>❌ 禁:`header={'{'}&lt;header&gt;raw&lt;/header&gt;{'}'}` → 必傳 `&lt;ChromeHeader&gt;` 或 header-canonical 派生</li>
-          <li>❌ 禁:`&lt;AppShell.Main&gt;` 強制 padding(違 layoutSpace 規則 1B)</li>
-          <li>✅ 必:Main 內容遵循既有 `layoutSpace.spec.md` 6 條規則(Page header / Card / DataTable / naked list 各按規則)</li>
+          <li>• <strong>primary-sidebar</strong>:WorkspaceBrand 放 Sidebar 頂部(`&lt;SidebarHeader&gt;` 內)— Linear / Notion / Figma file panel</li>
+          <li>• <strong>primary-header</strong>:WorkspaceBrand 改放 globalHeader 左側(搭配 SidebarTrigger),SidebarHeader 留空 — GitHub / Gmail / Figma file editor</li>
+          <li>❌ 禁:`primary-header` mode 同時在 globalHeader + SidebarHeader 各放一份 = 視覺冗餘 + 跨產品識別混淆(WorkspaceBrand 視覺 SSOT,只能出現一次)</li>
         </ul>
       </section>
     </div>

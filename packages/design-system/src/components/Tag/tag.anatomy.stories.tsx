@@ -249,7 +249,7 @@ export const Overview = {
                 ['icon', 'LucideIcon', '—', '左側 icon，統一 16px。與 avatar 互斥'],
                 ['avatar', 'ReactNode', '—', '左側 avatar（16px 圓形）。與 icon 互斥'],
                 ['onRemove', '() => void', '—', '可移除——Tag 自動渲染 remove 按鈕'],
-                ['solid', 'boolean', 'false', '深底白字模式（step-6 背景 + 白色前景，yellow 例外）'],
+                ['solid', 'boolean', 'false', '深底配對前景模式（step-6 背景；yellow/amber/orange/lime 用深字，其餘白字）'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -658,7 +658,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"本元件為純視覺呈現,無 keyboard / ARIA role / focus state 需求。Consumer 包 Tag 進互動容器(Button / Card / Link)時 a11y 由容器決定。"}</p>
+      <p className="whitespace-pre-line">{"靜態 Tag(無 onRemove)為純視覺呈現,無 keyboard / ARIA role / focus state;包進互動容器(Button / Card / Link)時 a11y 由容器決定。傳 onRemove 時 Tag 渲染原生 remove button(aria-label「移除 {label}」):Tab 可聚焦、Enter/Space 觸發移除、focus-visible 帶 outline ring(詳 spec「A11y 預設」)。"}</p>
     </div>
   ),
 }

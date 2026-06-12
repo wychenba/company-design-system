@@ -69,7 +69,7 @@ export const UsageGuidance: Story = {
         <div className="prose prose-sm max-w-prose mb-8">
           <p>適合 Coachmark 的真實業務場景(點擊跳轉「展示」頁範例):</p>
           <ul className="space-y-1">
-            <li><LinkTo kind="Design System/Components/Coachmark/展示" name="單步驟新功能介紹"><span className="text-primary hover:underline font-medium cursor-pointer">改版後向老用戶指出搬家的匯出按鈕(單步驟)</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Components/Coachmark/展示" name="單步驟新功能介紹"><span className="text-primary hover:underline font-medium cursor-pointer">首次推出 AI 助理時 anchor 到入口按鈕介紹(單步驟)</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/Coachmark/展示" name="多步 新手導覽"><span className="text-primary hover:underline font-medium cursor-pointer">新用戶首登的三步功能導覽(多步 Onboarding)</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/Coachmark/展示" name="多步提示"><span className="text-primary hover:underline font-medium cursor-pointer">進階快捷鍵的漸進式提示(多步 Tips)</span></LinkTo></li>
           </ul>
@@ -97,10 +97,10 @@ export const UsageGuidance: Story = {
         </Rule>
 
         <Rule
-          title="❌ 不強迫完成 tour(無 Skip 選項)"
-          note="使用者的本能是「我想自己試試」。沒 Skip = 綁架,使用者找關閉方式或直接關閉整個頁面。永遠提供 Skip 反而提升完成率 — 信任使用者會選擇"
+          title="❌ 不強迫完成 tour(拿掉退出機制)"
+          note="使用者的本能是「我想自己試試」。沒退出 = 綁架,使用者找關閉方式或直接關閉整個頁面。永遠提供退出機制(第一步 Skip;step 2+ 走 Esc / header Close,有 Prev 時 Skip 自動隱藏,見 CTA 語義表)反而提升完成率 — 信任使用者會選擇"
         >
-          <Label warn>❌ 只提供 Next 沒有 Skip — 使用者 frustration 增加,產品印象變差</Label>
+          <Label warn>❌ 拿掉所有退出路徑(無 Skip / Esc / header Close)— 使用者 frustration 增加,產品印象變差</Label>
         </Rule>
 
         <Rule
@@ -189,7 +189,7 @@ export const UsageGuidance: Story = {
 
         <Rule
           title="判準 — 問「不看這個資訊會怎樣?」"
-          note="不看也能用 → Coachmark(介紹 / 提示 / onboarding)。不看就做不下去(破壞性動作、必要資訊輸入、多步表單)→ Dialog。視覺上 Coachmark 共用 overlay-surface(bg / border / shadow / radius 完全繼承 Popover),差別僅:觸發模型(主動 vs 被動)+ 結構(Coachmark 無 Header / 有 Media / Footer 是 justify-between)"
+          note="不看也能用 → Coachmark(介紹 / 提示 / onboarding)。不看就做不下去(破壞性動作、必要資訊輸入、多步表單)→ Dialog。視覺上 Coachmark 共用 overlay-surface(bg / border / shadow / radius 完全繼承 Popover),差別僅:觸發模型(主動 vs 被動)+ 結構(Coachmark Header 可選 kind / 有 Media / Footer 是 justify-between)"
         >
           <Label>Coachmark:新功能介紹、onboarding tour、版本更新提示</Label>
           <Label>Dialog:刪除確認、建立 project 表單、付款資訊輸入、多步 wizard</Label>

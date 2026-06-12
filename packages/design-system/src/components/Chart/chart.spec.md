@@ -118,7 +118,7 @@ const config = {
 | Tooltip border | `border-border` |
 | Tooltip shadow | `shadow-[var(--elevation-200)]` |
 | Tooltip label（上方） | `font-medium` |
-| Tooltip 值文字 | `text-foreground font-mono font-medium tabular-nums` |
+| Tooltip 值文字 | `text-foreground`（數字以 mono + tabular-nums 等寬對齊，utility 細節見 `chart.tsx` tooltip） |
 | Tooltip 類別文字 | `text-fg-secondary` |
 | Legend 文字 | `text-fg-secondary` |
 | Cartesian grid line | `stroke-divider` |
@@ -130,6 +130,7 @@ const config = {
 ## 邊界案例
 
 - **空資料 / 空 series**:`ChartContainer` 照常渲染(`aspect-video` 高度保留,不坍塌);無內建 empty state——「無資料」提示由 consumer 外層處理(見 `Empty` 元件)
+- **Loading(資料抓取中)**:本 wrapper 無內建 loading state——與空資料同模式,由 consumer 外層處理
 - **Tooltip / Legend 無 payload**:不渲染(return null),不留空殼
 - **ChartConfig 項目缺 `color` / `theme`**:不注入該 key 的 `--color-{key}` variable(`ChartStyle` 過濾)
 - **單一資料點 / 大資料量 / RTL**:由 Recharts engine 處理,本 wrapper 無額外行為;大資料量的取樣 / 聚合屬 consumer 職責

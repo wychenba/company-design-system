@@ -154,7 +154,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 **Trigger phrase auto-pipeline**(M19 升級):「依原則自主」/「不需問」/「馬不停蹄」/「全部做完」/「自動」→ 進 autonomous mode,僅 SSOT-affecting UI/UX 停下 ASK。
 
 **2026-05-23 永久 reinforcement(user verbatim,hook 機械強制)**:
-- **Triple-verify before propose**(M18 Q0 universal gate):propose / 列 option / 發現「問題」(含 codex / deep audit findings)前必 inline 跑 (1) grep DS-wide (2) Read spec.md / tsx (3) 對照 canonical exception。三題全過才 propose;任一 NO → 自動撤回不煩 user。Hook `check_propose_pre_grep_verify.sh`。Anchor:2026-05-18 Sheet/inline-action/SurfaceBody false positive、2026-05-23 Badge `text-[10px]` 誤判為 drift(spec L161-167 documented exception)
+- **Triple-verify before propose**(M18 Q0 universal gate):propose / 列 option / 發現「問題」(含 codex / deep audit findings)前必 inline 跑 (1) grep DS-wide (2) Read spec.md / tsx (3) 對照 canonical exception。三題全過才 propose;任一 NO → 自動撤回不煩 user。Hook `check_propose_pre_grep_verify.sh`。Anchor:2026-05-18 Sheet/inline-action/SurfaceBody false positive、2026-05-23 Badge `text-[10px]` 誤判為 drift(badge.spec.md「字體例外」段 documented exception)
 - **SSOT auto-sync invariant**:M-rule count / hook count / dim count / npm scope / version / plugin name 等跨 file 數字禁 hardcode 多處;SSOT in `session_start_governance_check.sh` Check 7 / `meta-patterns.md` / `design-system-audit/SKILL.md` / `package.json` / `.claude-plugin/plugin.json`;其他 file reference 或 `scripts/sync-governance-counters.mjs` 機械對齊,drift 偵測 auto fix
 
 # 遇不確定時的協議
@@ -184,8 +184,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 
 # 專案 Stack
 
-Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design Token。必要檔案:`index.html` / `src/main.tsx` / `src/globals.css` / `vite.config.ts` / `package.json` / `tsconfig.json`。
-完整路徑 + Token 系統 → `packages/design-system/src/tokens/README.md`(charter)— Phase 1 後 DS 內化在 npm workspace。
+Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design Token(必要檔案:`index.html` / `src/main.tsx` / `src/globals.css` / `vite.config.ts` / `package.json` / `tsconfig.json`);完整路徑 + Token 系統 → `packages/design-system/src/tokens/README.md`(charter)— Phase 1 後 DS 內化在 npm workspace。
 
 # Path-scoped rules(2026 Anthropic 推薦)
 

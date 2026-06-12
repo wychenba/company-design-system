@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils"
 import type { FieldMode, FieldVariant } from "@/design-system/components/Field/field-types"
 import { useFieldContext, useResolvedFieldDisabled, useResolvedFieldMode } from "@/design-system/components/Field/field-context"
 import { SelectionItem } from "@/design-system/components/SelectionControl/selection-item"
+import type { LucideIcon } from "lucide-react"
+import type { AvatarData } from "@/design-system/components/Avatar/avatar"
 import { CheckboxGroupContext } from "./checkbox-group"
 
 // ── Variants ────────────────────────────────────────────────────────────────
@@ -87,6 +89,10 @@ export interface CheckboxProps
    * 在 <Field> context 內時此 prop 會被忽略（由 FieldDescription 接管）。
    */
   description?: React.ReactNode
+  /** 可選左側 icon(label 前)— 2026-06-12 M30 修:轉發 SelectionItem 既有 canonical 槽(selection-item.tsx jsDoc 為 SSOT;與 avatar 互斥)*/
+  icon?: LucideIcon
+  /** 可選左側 avatar(label 前)— 同上,SelectionItem 槽轉發 */
+  avatar?: AvatarData
   /**
    * readonly 模式：鎖定互動但維持 checked/unchecked 視覺正確。
    * 與 disabled 的差異：readonly 不降色（可讀），disabled 降色（弱化）。
@@ -120,6 +126,8 @@ const Checkbox = React.forwardRef<
       className,
       size,
       label,
+      icon,
+      avatar,
       description,
       readOnly = false,
       disabled,
@@ -208,6 +216,8 @@ const Checkbox = React.forwardRef<
         control={rootEl}
         label={effectiveLabel}
         description={effectiveDescription}
+        icon={icon}
+        avatar={avatar}
         htmlFor={inputId}
         disabled={resolvedDisabled}
         size={sizeKey}

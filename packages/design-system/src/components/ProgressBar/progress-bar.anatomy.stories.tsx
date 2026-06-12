@@ -432,7 +432,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"本元件為純視覺呈現,無 keyboard / ARIA role / focus state 需求。Consumer 包 ProgressBar 進互動容器(Button / Card / Link)時 a11y 由容器決定。"}</p>
+      <p className="whitespace-pre-line">{"詳 `progress-bar.spec.md`「A11y 預設」段。摘要:\n\nRadix Progress.Root 自動提供:\n- role=\"progressbar\"\n- aria-valuenow={value} / aria-valuemin={0} / aria-valuemax={100}\n- 客製 announce(如「上傳中 45%」)→ parent 傳 aria-valuetext override\n\nConsumer 需補:代表特定語境任務時在 parent 加 aria-label(如「檔案上傳進度」)讓螢幕閱讀器辨認。\n\n無 keyboard / focus state(非互動元件,進度語意由 progressbar role 承載)。"}</p>
     </div>
   ),
 }

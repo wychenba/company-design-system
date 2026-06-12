@@ -107,7 +107,7 @@ Notice 是 **Toast / Alert 共用的 layout primitive**,刻意不擁有尺寸與
 - **無 SizeMatrix**:Notice / Alert / Toast **單一固定 size**(見本 spec「尺寸偏離」段),不實作 Family 2 baseline 的 sm/md/lg——通知的使命是「搶注意」而非「在密度選擇裡協調」。padding 固定 `px-4 py-3`,typography 固定 md tier(14px),不隨 density 變。
 - **無 ColorMatrix**:Notice 本身**不設 bg / text color**(見本 spec「Theme 策略」段),色彩完全由 consumer(Alert / Toast)透過 `data-theme` + `text-foreground` 控制。Notice 層級的色彩矩陣沒有意義——視覺對照屬於 consumer 的職責,應查 `alert.anatomy.stories.tsx` 與 `toast.anatomy.stories.tsx` 的 ColorMatrix。
 
-對應 anatomy story:保留 `Overview` / `Inspector` / `StateBehavior`,額外追加元件特有的 `VariantIconMap`(展示 5 種 variant 對應的 status icon + 語意)。
+對應 anatomy story:保留 `Overview` / `Inspector` / `StateBehavior` / `Accessibility`,額外追加元件特有的 `VariantIconMap`(展示 5 種 variant 對應的 status icon + 語意)。
 
 ---
 
@@ -139,7 +139,7 @@ Notice 是 **Toast / Alert 共用的 layout primitive**,刻意不擁有尺寸與
 
 Notice **不**自帶 Esc-to-dismiss 行為(`notice.tsx` 無 keydown handler);dismiss 純粹由 dismiss button 的 `onClick={onDismiss}` 觸發。若 consumer(Alert / Toast)需要 Esc 關閉,於 consumer 層自行掛 keydown。Dismiss 後的焦點處置 Notice 同樣不管理(無 focus restoration 邏輯)——節點移除後焦點落點由 consumer(Alert / Toast host)決定。
 
-**Focus**:focus-visible ring 對齊 DS canonical(`outline: 2px solid var(--ring)`);focus management 由元件 own。
+**Focus**:唯一 focusable 元素是 dismiss `<Button>`,focus indicator 走 Button canonical(`focus-visible:ring-2 ring-ring`,box-shadow ring 非 CSS `outline`);Notice 本身無 focus management(dismiss 後焦點處置見上段,由 consumer 決定)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

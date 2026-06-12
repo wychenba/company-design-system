@@ -162,7 +162,7 @@ Slider.displayName = 'Slider'
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const sliderMeta = {
   component: 'Slider',
-  family: 4,
+  family: null, // self-contained(對齊 spec;同 rating.tsx 慣例),
   variants: {},
   // size 只控容器外高,對齊 Field family h-field-*(md density:28/32/36px,uiSize.css)。
   // track 厚度 / thumb 直徑固定不隨 size 變,故無 iconSize / typography。

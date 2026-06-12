@@ -142,7 +142,7 @@ Search 的角色**不由「產品核心是不是搜尋」決定**，而由——
 
 | Context | Variant | Cite |
 |---|---|---|
-| **DataTable / Kanban / list 等 dense always-visible data toolbar** filter / sort / column controls | **`text` + pressed** + iconOnly + Popover wrap real panel(DataTableFilterPanel / DataTableSortManager) | `data-table.stories.tsx#WithBulkActions L998` SSOT |
+| **DataTable / Kanban / list 等 dense always-visible data toolbar** filter / sort / column controls | **`text` + pressed** + iconOnly + Popover wrap real panel(DataTableFilterPanel / DataTableSortManager) | `data-table.stories.tsx#WithBulkActions` SSOT |
 | **Standalone / labeled** sole state carrier(toolbar 外 / 單獨 filter UI 非 DataTable context) | `tertiary` + pressed | 視 case |
 | 純動作工具(無 state)/ 低重量輔助 | `text` | 既有 default |
 
@@ -283,7 +283,7 @@ Icon 的目的是幫助辨識，不是視覺對稱。
 
 **分隔線語意判斷**：遵守以上規則後孤立自然不出現。若出現孤立，先問「這條分隔線有語意理由嗎？」而非接受孤立。
 
-**切換按鈕**：`text ↔ checked` 依預設（text）狀態決定位置與分隔線；切換為 checked 時不移動、不調整分隔線。
+**切換按鈕**：`text` + `pressed` toggle——依預設（未啟用）狀態決定位置與分隔線；切為啟用（`pressed=true`）時不移動、不調整分隔線（啟用態不是 variant，見三節）。
 
 ---
 
@@ -426,7 +426,7 @@ Icon 的目的是幫助辨識，不是視覺對稱。
 ├── 移除它，使用者無法完成任務  →  業務操作
 │     ├── 一般操作                →  label 或 icon + label
 │     ├── 含多個子選項            →  + endIcon={ChevronDown}
-│     └── 可配置資料操作          →  text（未配置）/ checked（已配置）
+│     └── 可配置資料操作          →  text + pressed（未配置 pressed=false / 已配置 pressed=true）
 │           └── 需要更強可操作性提示  →  tertiary（未配置）
 └── 跟任務無關，服務環境          →  工具操作  →  icon-only + tooltip
 

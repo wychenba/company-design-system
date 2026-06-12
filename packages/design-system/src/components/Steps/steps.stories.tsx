@@ -185,7 +185,7 @@ export const FocusRingCombinations: Story = {
           </StepItem>
           <StepItem value="step-2">
             <StepLabel>Current</StepLabel>
-            <StepDescription>藍底數字 + ring(若 focused)</StepDescription>
+            <StepDescription>中性底(bg-secondary)數字 + ring(若 focused)</StepDescription>
           </StepItem>
           <StepItem value="step-3">
             <StepLabel>Completed</StepLabel>
@@ -283,7 +283,7 @@ export const MultipleExpansion: Story = {
   render: () => (
     <div className="w-[480px]">
       <p className="text-caption text-fg-secondary mb-4">
-        點 step header 切換展開。預設 `all` = 全部展開起手。
+        點 step header 切換展開(並更新 value)。本例顯式傳 `defaultExpanded="all"` 全部展開起手(預設 `"none"`)。
       </p>
       <Steps
         defaultValue="b"

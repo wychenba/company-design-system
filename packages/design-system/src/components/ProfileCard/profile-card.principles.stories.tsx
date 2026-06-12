@@ -6,8 +6,6 @@ import { MessageCircle, Phone, ChevronDown } from 'lucide-react'
 import { ProfileCard } from './profile-card'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
-import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/design-system/components/HoverCard/hover-card'
-import { HOVER_DELAY_RICH_MS, HOVER_DELAY_CLOSE_MS } from '@/design-system/tokens/motion/motion'
 
 const meta: Meta = {
   title: 'Design System/Internal/ProfileCard/設計原則',
@@ -43,30 +41,31 @@ const sampleActions = (
   </>
 )
 
+// Canonical path(avatar.spec.md DS-wide rule;抄 profile-card.stories.tsx ProfileCardHover baseline):
+// 透過 <Avatar hoverCard={...}> — Avatar 內部處理 HoverCardTrigger / Content / keyboard focus /
+// 浮層 chrome,不在 story 層手刻 HoverCard 三件套(避免 raw button UA chrome 污染視覺)。
 function InlineHoverExample() {
   return (
-    <HoverCard openDelay={HOVER_DELAY_RICH_MS} closeDelay={HOVER_DELAY_CLOSE_MS}>
-      <span className="inline-flex items-center gap-2">
-        <HoverCardTrigger asChild>
-          <button type="button" className="cursor-pointer">
-            <Avatar src={AVATAR_URL} alt="Alice" size={32} />
-          </button>
-        </HoverCardTrigger>
-        <span className="text-body">@Alice Chen</span>
-        <span className="text-body text-fg-muted">留言：「這版 spacing 看起來好多了！」</span>
-      </span>
-      <HoverCardContent align="start" className="bg-surface-raised rounded-lg border border-border" style={{ boxShadow: 'var(--elevation-200)' }}>
-        <ProfileCard
-          name="Alice Chen"
-          avatar={{ src: AVATAR_URL, alt: 'Alice' }}
-          subtitle="Product Designer｜D-0042"
-          status="online"
-          actions={sampleActions}
-          defaultFieldValues={{ id: 'YHANAX', employeeNumber: '1234567' }}
-          onViewMore={() => {}}
-        />
-      </HoverCardContent>
-    </HoverCard>
+    <span className="inline-flex items-center gap-2">
+      <Avatar
+        src={AVATAR_URL}
+        alt="Alice"
+        size={32}
+        hoverCard={
+          <ProfileCard
+            name="Alice Chen"
+            avatar={{ src: AVATAR_URL, alt: 'Alice' }}
+            subtitle="Product Designer｜D-0042"
+            status="online"
+            actions={sampleActions}
+            defaultFieldValues={{ id: 'YHANAX', employeeNumber: '1234567' }}
+            onViewMore={() => {}}
+          />
+        }
+      />
+      <span className="text-body">@Alice Chen</span>
+      <span className="text-body text-fg-muted">留言：「這版 spacing 看起來好多了！」</span>
+    </span>
   )
 }
 

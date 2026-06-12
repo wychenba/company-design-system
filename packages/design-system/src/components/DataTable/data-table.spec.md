@@ -64,7 +64,7 @@ TanStack Table 負責邏輯，DataTable 負責視覺與互動。
 |------|------|------|
 | **L1 基礎結構** | 骨架、尺寸、border、色彩、高度模式、行高模式 | ✅ 完成(本文件 L1 段)|
 | **L2 選取** | row selection、checkbox、單/多選、bulk action 整合 | ✅ 完成(本文件 L2 段)|
-| **L3 欄位互動** | 排序(本文件 L3)、resize、reorder、pin、顯示隱藏 | ✅ 完成(sort + resize + reorder + pin + visibility 全 props 支援:`enableColumnResize` / `enableColumnReorder` / `columnVisibility` / `pinnedLeftColumns` / `pinnedRightColumns`,見 data-table.tsx L87-88,143,201,217)|
+| **L3 欄位互動** | 排序(本文件 L3)、resize、reorder、pin、顯示隱藏 | ✅ 完成(sort + resize + reorder + pin + visibility 全 props 支援:`enableColumnResize` / `enableColumnReorder` / `columnVisibility` / `pinnedLeftColumns` / `pinnedRightColumns`,見 `data-table.tsx` `DataTableProps` 宣告)|
 | **L4 資料操作 + Cell 能力** | 進階篩選(本文件 L4 Filter)、inline edit、nested rows、row drag(本文件 L4 段)| ✅ Filter / Inline edit / Nested rows / Row drag v3 完成(Jira canonical + virtualization fix) |
 | **L5 進階** | 分組、搜尋、tree data v2 enhancements、export CSV/Excel | 待 v2 |
 
@@ -105,7 +105,7 @@ Table 分三層:
 
 完整 class / overflow 規則見 `data-table.tsx`。
 
-**Header 在 scroll 容器外面。** 不用 CSS sticky——header 結構性地在 body 上方，永遠固定在頂部。Header bg 用 `neutral-2-opaque`（不透明），不受底層色影響。
+**Header 在 scroll 容器外面。** 不用 CSS sticky——header 結構性地在 body 上方，永遠固定在頂部。Header bg 用 `--muted`（code `HEADER_BG = 'bg-muted'`,比 surface 深一階,同 anatomy ColorMatrix）。
 
 **三個 region 共享垂直捲動。** body-viewport 是唯一的垂直 scroll container，三個 body region 是它的 flex children。垂直捲動天然同步，不需 JS。
 
@@ -173,9 +173,11 @@ Row actions 欄本質上是 frozen right column，左邊界也使用 full-height
 | Case | Story | Avg / p95 / long-task | Gate |
 |---|---|---|---|
 | A Plain virt | `VirtualScroll` | ≤16.67/≤33/0 | hard |
-| B Rich budget | `RoadmapPerfBudget`(500×13 rich+inline-edit,fixed 600px) | ≤50/≤80/≤1 | hard |
+| B Rich budget | `RoadmapPerfBudget`(500×13 rich+inline-edit,fixed 600px;2026-05-17 整併誤 retire → 2026-06-12 R2 重建,gate 恢復可跑) | ≤50/≤80/≤1 | hard |
 | C Row drag | `RowDragWithVirtualization` | ≤33/≤50/longest<100 | soft(DnD thermal) |
 | D Edit isolation | `<Profiler>` TBD | skip ≥ visible−active | hard |
+
+**2026-06-12 重建後實測**(static build,3 runs/case):1x CPU — A 16.56/16.8/0、B 24.0/33.4/0、C 16.67/16.8/0 全過 gate;script 預設 4x throttle 在有背景負載機器上全 case 一致 ~2.3x 超標(含未動過的對照組 A)→ 本表門檻實證對應 1x/閒置條件,4x 門檻是否重校 = user 決策(本表數字不動)。
 
 **Anti-pattern**:`RoadmapAllInOne`(全 features stack)≈117ms 不達 B,因 SortableRowProvider/column reorder/resize/selection/overlay 同時開。Consumer:13+ cols rich-cell → 拆 detail drawer / column visibility 預設 hide,不該期 60fps + 全 feature stack。Cite + Phase 1/2 history → `cell-registry.tsx:480-499` JSDoc + commits log。
 
@@ -446,7 +448,7 @@ Row drag + column reorder + TreeView 共用 `lib/drag-visual.ts`:source `opacity
 
 `enableRowDrag?: boolean` + `onRowReorder?: (sourceId, targetId, 'before' | 'after')`。Library:@dnd-kit/core(v15.0 Path B 用 `useDraggable` + `useDroppable`,不用 `@dnd-kit/sortable`)。**必填 `getRowId`**(否則 dnd 用 row.index reorder 後錯位)。
 
-- **Handle**:`<Button variant="tertiary" iconOnly size="xs" startIcon={GripVertical} />` 24px chip,所有 state(idle / hover / aria-disabled)統一 `bg-surface-raised`(border / shadow 已 retire,2026-05-12 per user「我有叫你加 elevation 嗎」),`absolute left-1 top-1/2 -translate-y-1/2` 4px inset 不佔 column 空間;**hover-reveal** `opacity-0 group-hover/row:opacity-100`。對齊 Jira backlog(@benchmark-unverified,M22)。Tertiary chip 非 ItemInlineAction 因透明背景撞 table border。
+- **Handle**:Button tertiary iconOnly xs(GripVertical)24px chip,所有 state(idle / hover / aria-disabled)統一 `bg-surface-raised`(border / shadow 已 retire,2026-05-12 per user「我有叫你加 elevation 嗎」),fixed-position 浮層貼 row 左緣、不佔 column 空間(位置 JS 計算,實作見 `data-table.tsx`);**hover-reveal** 由 JS 控 visibility / opacity(row 或 handle hover 顯示;drag 中 source 強制顯示、其他列隱藏)。對齊 Jira backlog(@benchmark-unverified,M22)。Tertiary chip 非 ItemInlineAction 因透明背景撞 table border。
 - **Sort × Drag 互斥**:sort.length>0 → handle disabled+Tooltip。**Top-level only**(`row.depth>0` 不顯 handle)。**Position**:active vs over 視覺位置 → `'after'`/`'before'` 對齊 `arrayMove`。**Consumer-managed mutation**:`onRowReorder(sourceId, targetId, position)`,DS 不持 row order(Notion/Airtable/Linear)。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **Virtualization 整合**(v3 2026-05-05):enableRowDrag 自動把 overscan 拉到 `Math.max(overscan, 5)` + drag 期 freeze `measureElement` + `modifiers={[snapToCursorModifier]}`(ghost top-left 對齊 cursor,不鎖軸)。**3-panel mirror sync**:各 region 對同 row id 各呼叫 `useDraggable` + `useDroppable`,mirror 自然取得相同 transform;handle 只 render primary region(left 優先 → center)避雙觸發。**Cross-parent drop 禁止**(已知 limit):nested 只同 top-level 重排,collisionDetection 過濾,顯 invalid signal。
 
@@ -525,5 +527,6 @@ DataTable 是 composite multi-section 元件,**不套 canonical 5**(Inspector / 
 - `carousel.spec.md`
 - `circular-progress.spec.md`
 - `description-list.spec.md`
+- `opacity.spec.md`
 - `scroll-area.spec.md`
 - `tree-view.spec.md`

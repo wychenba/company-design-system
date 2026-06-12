@@ -152,8 +152,8 @@ export const MustBeInGroupRule: Story = {
         </Rule>
 
         <Rule
-          title="RadioGroup 必須有 default value"
-          note="Radio 的語意不允許「都沒選」——沒有預設值使用者看到一組全空的 radio 會困惑「我要選什麼」。必須指定 defaultValue 或 value"
+          title="RadioGroup 預設建議給 default value"
+          note="一組全空的 radio 會讓使用者困惑「我要選什麼」——通常應指定 defaultValue 或 value。例外:表單要求使用者主動表態時,value=null 為合法 initial state(見 spec「邊界案例」),由 Field required 驗證引導選擇"
         >
           <Label>若真的「可以不選」(選填)→ 用 Select + clearable 或 Checkbox stack</Label>
         </Rule>

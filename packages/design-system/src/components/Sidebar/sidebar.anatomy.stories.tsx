@@ -155,7 +155,7 @@ export const Overview: Story = {
           <pre className="text-caption font-mono text-fg-secondary bg-canvas p-4 rounded-md border border-divider leading-relaxed">{`SidebarProvider
   Sidebar
     SidebarHeader          ← h-[var(--chrome-header-height)]
-    SidebarContent         ← flex-1 overflow-auto
+    SidebarContent         ← flex-1 + ScrollArea 捲動
       SidebarGroup         ← py-2 + ::before divider
         SidebarGroupLabel  ← item-layout row (header mode)
         SidebarGroupContent
@@ -595,7 +595,7 @@ export const StateBehavior: Story = {
       <div className="flex flex-col gap-1">
         <H3>狀態行為</H3>
         <Desc>
-          Sidebar 層級特有的狀態:collapse / expand 三種模式、mobile offcanvas、active item 跨 session 還原。
+          Sidebar 層級特有的狀態:collapse / expand 三種模式、mobile offcanvas、active item single-selection、open state cookie 持久化。
           Item-level default / hover / active / selected / disabled **色彩**由 `ColorMatrix` 作為 state-driven 矩陣完整呈現(共用 item-anatomy row primitive 主檔);本 story 展示 container 層的結構狀態切換。
         </Desc>
       </div>
@@ -617,7 +617,7 @@ export const StateBehavior: Story = {
       <div className="flex flex-col gap-3">
         <span className="text-caption font-medium text-fg-secondary">行為 2:Cmd+B / SidebarTrigger 切換 open state</span>
         <Desc>
-          SidebarProvider 內建 Cmd+B (Mac) / Ctrl+B (Win) 全域快捷鍵,同時 SidebarTrigger iconOnly Button 作為視覺 toggle。open state 寫入 cookie(7 天),跨 session 還原。
+          SidebarProvider 內建 Cmd+B (Mac) / Ctrl+B (Win) 全域快捷鍵,同時 SidebarTrigger iconOnly Button 作為視覺 toggle。open state 寫入 cookie(7 天);跨 session 還原需 consumer 讀 cookie 後傳 defaultOpen(詳 spec「持久化與快捷鍵」)。
         </Desc>
         <div className="border border-divider rounded-lg overflow-hidden bg-surface" style={{ width: 480, height: 280 }}>
           <SidebarProvider style={{ minHeight: 'auto', height: '100%' }}>
@@ -677,7 +677,7 @@ export const StateBehavior: Story = {
         <span className="text-caption font-medium text-fg-secondary">行為規則</span>
         <ul className="text-caption text-fg-secondary space-y-1.5 ml-4 list-disc">
           <li>`collapsible="offcanvas"` 用於主內容為主的 app(sidebar 是啟動器,使用者常關);`collapsible="icon"` 用於深度導覽 app(sidebar 是常駐工作區)。</li>
-          <li>open state 寫 cookie `sidebar_state`(7 天 max-age),跨 session 還原——使用者上次關 = 下次也關。</li>
+          <li>open state 寫 cookie `sidebar_state`(7 天 max-age);Provider 只寫不讀,還原由 consumer 讀 cookie 傳 `defaultOpen`(避免 SSR hydration flash)。</li>
           <li>Mobile(&lt;768px)一律走 Sheet overlay,不受 `collapsible` prop 影響——小螢幕 sidebar 永遠不佔固定空間。</li>
           <li>Icon mode 下 active item 的 `bg-neutral-selected` 仍然顯示,但 label 不可見——提供最小視覺指引讓使用者知道「當前在哪」。</li>
           <li>Cmd+B / Ctrl+B 全域快捷鍵由 SidebarProvider 監聽,任何 focus 位置都可觸發——目前未排除文字輸入框,在 input / textarea 內按下仍會 toggle 並攔掉預設行為(無 disableShortcut opt-out)。</li>
@@ -766,7 +766,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"-   收合切換鍵：Cmd+B(Mac)/ Ctrl+B(Windows)是業界慣例(VS Code / Linear / shadcn 都用),Sidebar 內建並會攔下這組鍵,避免穿透到瀏覽器書籤列。任何焦點位置都能觸發;目前未排除文字輸入框——在 input / textarea 內按下仍會 toggle(無 disableShortcut opt-out)。\n\n-   收合按鈕:SidebarTrigger 帶 aria-label「展開或收合」,讓螢幕報讀使用者知道按鈕用途;consumer 可用 toggleAriaLabel 自訂文字。\n\n-   當前項目:選中的 menu item 帶 data-active,呈現選取底色(bg-neutral-selected)作為視覺指引;即使收合成 icon-only 模式,選取底色仍然保留,使用者一眼知道現在在哪一頁。\n\n-   手機尺寸:768px 以下自動切換成從旁滑出的抽屜(Sheet),內建焦點鎖定、Esc 關閉、關閉後焦點回到觸發按鈕。"}</p>
+      <p className="whitespace-pre-line">{"-   收合切換鍵：Cmd+B(Mac)/ Ctrl+B(Windows)是業界慣例(VS Code / Linear / shadcn 都用),Sidebar 內建並會攔下這組鍵,避免穿透到瀏覽器書籤列。任何焦點位置都能觸發;目前未排除文字輸入框——在 input / textarea 內按下仍會 toggle(無 disableShortcut opt-out)。\n\n-   收合按鈕:SidebarTrigger 內建 aria-label「Toggle Sidebar」,讓螢幕報讀使用者知道按鈕用途;consumer 可傳 aria-label 覆寫(i18n)。SidebarGroupLabel 的收合 chevron 另有 toggleAriaLabel prop(預設「展開或收合」)。\n\n-   當前項目:選中的 menu item 帶 data-active,呈現選取底色(bg-neutral-selected)作為視覺指引;即使收合成 icon-only 模式,選取底色仍然保留,使用者一眼知道現在在哪一頁。\n\n-   手機尺寸:768px 以下自動切換成從旁滑出的抽屜(Sheet),內建焦點鎖定、Esc 關閉、關閉後焦點回到觸發按鈕。"}</p>
     </div>
   ),
 }

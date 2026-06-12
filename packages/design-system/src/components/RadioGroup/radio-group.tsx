@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils"
 import type { FieldMode, FieldVariant } from "@/design-system/components/Field/field-types"
 import { useResolvedFieldMode, useResolvedFieldDisabled } from "@/design-system/components/Field/field-context"
 import { SelectionItem } from "@/design-system/components/SelectionControl/selection-item"
+import type { LucideIcon } from "lucide-react"
+import type { AvatarData } from "@/design-system/components/Avatar/avatar"
 import { EMPTY_DISPLAY } from "@/design-system/components/Field/field-wrapper"
 
 // ── RadioGroup display mode ─────────────────────────────────────────────────
@@ -151,6 +153,10 @@ export interface RadioGroupItemProps
    * 套用 text-body / text-fg-secondary 樣式。
    */
   description?: React.ReactNode
+  /** 可選左側 icon(label 前)— 2026-06-12 M30 修:轉發 SelectionItem 既有 canonical 槽(selection-item.tsx jsDoc SSOT;與 avatar 互斥)*/
+  icon?: LucideIcon
+  /** 可選左側 avatar(label 前)— 同上 */
+  avatar?: AvatarData
   /**
    * readonly 模式：鎖定互動但維持 checked/unchecked 視覺正確。
    * 通常整個 RadioGroup 一起設 readonly（由 parent RadioGroup 的 disabled
@@ -170,6 +176,8 @@ const RadioGroupItem = React.forwardRef<
       className,
       size,
       label,
+      icon,
+      avatar,
       description,
       readOnly = false,
       disabled,
@@ -227,6 +235,8 @@ const RadioGroupItem = React.forwardRef<
         control={rootEl}
         label={label}
         description={description}
+        icon={icon}
+        avatar={avatar}
         htmlFor={inputId}
         disabled={resolvedDisabled}
         size={sizeKey}

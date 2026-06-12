@@ -103,7 +103,7 @@ native `<textarea>` 自帶 `value` / `defaultValue` / `onChange` triplet — Tex
 
 ### Readonly 特例
 
-不同於 Input 的 readonly（同高度、緊湊底色），Textarea readonly **保留 padding，並填上 `bg-readonly` 底色標示閱讀區**——多行內容需要明確的閱讀區域邊界訊號,沒有這塊填色區會無法與周圍純文字內容區分。
+不同於 Input 的 readonly（同高度、緊湊底色），`variant="default"` 的 Textarea readonly **保留 padding，並填上 `bg-readonly` 底色標示閱讀區**——多行內容需要明確的閱讀區域邊界訊號,沒有這塊填色區會無法與周圍純文字內容區分。`variant="bare"` readonly 維持透明無填色;`variant="naked"`(cell-as-input substrate)readonly 透明且 `!px-0 !py-0`——兩者的邊界訊號由 host context(toolbar / table cell)提供(`textarea.tsx` compoundVariants,intentional divergence)。
 
 ### 邊界案例
 
@@ -119,7 +119,7 @@ native `<textarea>` 自帶 `value` / `defaultValue` / `onChange` triplet — Tex
 - ❌ Textarea 裡放 startIcon / endAction——textarea 慣例無 icon 框內
 - ❌ Textarea 啟用水平 resize（`resize-x` / `resize: both`）——破壞 form 佈局
 - ❌ 把 Textarea 當 code editor 用（無 syntax highlight / auto-complete）
-- ❌ Readonly 時移除底色填充 + padding——多行內容需要閱讀區域邊界訊號
+- ❌ `variant="default"` readonly 移除底色填充 + padding——多行內容需要閱讀區域邊界訊號(bare / naked 變體本就透明、邊界由 host context 提供,不在此限)
 
 ---
 

@@ -30,7 +30,7 @@ scope: utility primitives module (use-overflow-items hooks: useScrollEdges + use
 
 - 左右 scroll arrow → text button,ChevronLeft / ChevronRight
 - Menu trigger → text button,ChevronDown
-- **禁止**用 item 自身的視覺語言(chip 形狀、tab 底線等)來渲染 overflow trigger——overflow affordance 是「工具層」,不是「業務層」,不該跟內容爭視覺重量(對齊 `CLAUDE.md` 的「工具層必須是視覺重量最低的一層」原則)。
+- **禁止**用 item 自身的視覺語言(chip 形狀、tab 底線等)來渲染 overflow trigger——overflow affordance 是「工具層」,不是「業務層」,不該跟內容爭視覺重量(「工具層必須是視覺重量最低的一層」— 本 spec codify 此原則,owner SSOT 在此)。
 
 這條規則讓使用者看到向下 chevron 或向右 arrow 時,心智是一致的:「這是 overflow 的工具,不是可選內容」,不論這排 items 是什麼類型。
 
@@ -58,7 +58,7 @@ scope: utility primitives module (use-overflow-items hooks: useScrollEdges + use
 ### Helpers
 
 - `buildFadeMask({ canScroll, atStart, atEnd, reserveArrowWidth })`
-  回傳 `linear-gradient` 字串。`reserveArrowWidth` > 0 時 fade 會延伸到 arrow button 底下(Material 3 scrim 原理);= 0 時直接從邊緣 fade。
+  回傳 `linear-gradient` 字串。`reserveArrowWidth` > 0 時 fade 會延伸到 arrow button 底下(Material 3 scrim 原理);= 0 時直接從邊緣 fade。 <!-- @benchmark-unverified -->
 - `useScrollByPage(scrollRef)` → `(direction: 'left' | 'right') => void`
   點一次滑動 `clientWidth × SCROLL_PAGE_RATIO`,含 `behavior: 'smooth'`。
 
@@ -75,7 +75,7 @@ scope: utility primitives module (use-overflow-items hooks: useScrollEdges + use
   - 必填 `aria-label`(直接傳給 Button 的 `aria-label`,無 `label` alias;由消費者決定,例如「頁籤選單(共 5 個)」)
   - `forwardRef` + `...props` spread 讓 Radix `DropdownMenuTrigger asChild` 可以接管
 
-> **元件保證行為:auto-Tooltip**——`OverflowScrollArrow` 與 `OverflowMenuTriggerButton` 都是 `iconOnly` + string `aria-label` + 非 `asChild`,因此都會觸發 Button 內建的 auto-Tooltip wrap(button.tsx:491-498)。亦即 hover 時 arrow / trigger 會自動冒出對應 `aria-label` 的 tooltip(「向左捲動」/「向右捲動」/「頁籤選單(共 N 個)」),共享全域 `Tooltip` 的 delay 與 warm-up。`DropdownMenuTrigger asChild` 仍正常運作:Radix 的 `asChild` 由 Trigger 自身消費(套到 `OverflowMenuTriggerButton` 的 forwardRef),不會傳成 Button 的 `asChild` prop,所以 tooltip wrap 與 trigger 接管互不衝突。
+> **元件保證行為:auto-Tooltip**——`OverflowScrollArrow` 與 `OverflowMenuTriggerButton` 都是 `iconOnly` + string `aria-label` + 非 `asChild`,因此都會觸發 Button 內建的 auto-Tooltip wrap(`button.tsx` iconOnly auto-Tooltip wrap)。亦即 hover 時 arrow / trigger 會自動冒出對應 `aria-label` 的 tooltip(「向左捲動」/「向右捲動」/「頁籤選單(共 N 個)」),共享全域 `Tooltip` 的 delay 與 warm-up。`DropdownMenuTrigger asChild` 仍正常運作:Radix 的 `asChild` 由 Trigger 自身消費(套到 `OverflowMenuTriggerButton` 的 forwardRef),不會傳成 Button 的 `asChild` prop,所以 tooltip wrap 與 trigger 接管互不衝突。
 
 ### Hook re-export
 
@@ -199,7 +199,6 @@ return (
 ## 反向引用
 
 - `hooks/use-overflow-items.ts` — 底層 scroll / overflow 計算 hooks(本 module re-export)
-- `CLAUDE.md`「選擇 / 狀態視覺」規則 — 為什麼 overflow trigger 不該用 selection-like 視覺
 - `components/Button/button.tsx` — text variant 的 canonical 樣式
 - `components/DropdownMenu/dropdown-menu.spec.md` — menu item 的 selection 指示器規則
 

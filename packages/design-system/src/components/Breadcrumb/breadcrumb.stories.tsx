@@ -59,8 +59,9 @@ export const InteractiveEllipsis: Story = {
       <div className="text-caption text-fg-muted max-w-xl">
         BreadcrumbEllipsis 永遠是 <code>&lt;button&gt;</code>,搭配
         <code> DropdownMenuTrigger asChild </code>把 dropdown 行為注入。
-        點擊 <code>⋯</code> 開選單顯示折疊路徑,hover 時字色變 primary-hover,
-        跟 BreadcrumbLink 同語言。對齊 Material / Atlassian / Ant Design 作法。
+        點擊 <code>⋯</code> 開選單顯示折疊路徑;hover 走 neutral(fg-muted → foreground
+        + neutral hover bg,消費 ItemInlineActionButton),與 BreadcrumbLink 的
+        primary-hover 區隔。對齊 Material / Atlassian / Ant Design 作法。
       </div>
       <Breadcrumb>
         <BreadcrumbList>

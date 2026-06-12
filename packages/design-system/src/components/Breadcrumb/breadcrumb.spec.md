@@ -214,16 +214,16 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 - ❌ **不用 `/` 字元作分隔**——用 `ChevronRight` icon。`/` 是文字字元，跟文字對齊不穩、顏色綁 text、screen reader 會讀出「斜線」
 - ❌ **最後一項不可是 `BreadcrumbLink`**——最後一項代表當前頁，無處可點。必須用 `BreadcrumbPage`
 - ❌ **Breadcrumb 不做頁面切換動作的「back 按鈕」**——back 的語意是「上一步瀏覽歷史」不是「上一層階層」，兩者目的地可能不同（從搜尋結果直接進深層頁時，back 回搜尋結果＝歷史，breadcrumb 上一層回 parent＝階層）。Back 用 Button 或瀏覽器原生
-- ❌ **不得在 Breadcrumb 裡嵌入複雜互動元素**（dropdown、search、avatar picker）——使用者對 breadcrumb 的心智模型是「每個節點都是回上層的連結」，混入查詢 / 選擇功能會打斷路徑掃讀，breadcrumb 就變成 nav bar
+- ❌ **不得在 Breadcrumb 裡嵌入複雜互動元素**（dropdown、search、avatar picker）——使用者對 breadcrumb 的心智模型是「每個節點都是回上層的連結」，混入查詢 / 選擇功能會打斷路徑掃讀，breadcrumb 就變成 nav bar（`BreadcrumbEllipsis` 展開折疊路徑的選單屬路徑導覽本身、是本 spec 既定 canonical，非此禁令範圍——禁令指 consumer 自嵌的業務 dropdown / search）
 - ❌ **不得覆寫 `BreadcrumbLink` 的 hover 色彩**——`primary-hover` 是全系統的「互動高亮」canonical，覆寫破壞語言一致性
 - ❌ **不得把 Breadcrumb 拿來當 sidebar 或 top nav 替代**——breadcrumb 只顯示當前路徑，不展示 sibling 選項
 - ❌ **單一層級頁面不要放 Breadcrumb**——「首頁」一個 item 沒導覽價值，造成視覺噪音
 
 ---
 
-## 為何無 Inspector
+## anatomy story 結構
 
-Breadcrumb 決策維度是 collapse 策略 × size × 當前頁狀態,已在 `CollapseMatrix` / `SizeMatrix` / `ColorMatrix` / `StateBehavior` / 元件特有 `UsageExamples` 五張結構矩陣 + 真實場景完整覆蓋。互動 Inspector(切換 size / truncate)無法呈現「路徑深度 + 斷點」這類真實場景決策——`UsageExamples` 展示實際業務路徑更直接。
+互動 `Inspector`(切 `size` / `showHomeIcon` / `pathLength` / `maxItems` / collapse 設定,即時看路徑深度 × 折疊行為)搭配 `CollapseMatrix` / `SizeMatrix` / `ColorMatrix` / `StateBehavior` / 元件特有 `UsageExamples` 結構矩陣 + 真實場景,完整覆蓋 collapse 策略 × size × 當前頁狀態的決策維度。
 
 ColorMatrix 已建:展示 BreadcrumbLink / Page / Separator / Ellipsis 四種節點的 default / hover / focus 色彩矩陣,採 fg-muted → fg-secondary → foreground 的階層策略(對齊 GitHub / Notion / Linear)。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
@@ -246,7 +246,7 @@ ColorMatrix 已建:展示 BreadcrumbLink / Page / Separator / Ellipsis 四種節
 - Tab — 逐個 link 導覽
 - Enter — navigate
 
-**Focus**:聚焦時顯示 visible ring;`BreadcrumbLink` 用 `focus-visible:ring-2 ring-ring ring-offset-1`（box-shadow ring，對齊全系統 focus-visible canonical，見上方互動狀態段 L118），`BreadcrumbEllipsis` 按鈕（消費 `ItemInlineActionButton`）用 `focus-visible:outline-2 outline-ring`。連結逐個依序成為 tab stop,不攔截焦點(無 focus trap — breadcrumb 是序列式導覽,trap 反而是無障礙 bug)。
+**Focus**:聚焦時顯示 visible ring;`BreadcrumbLink` 用 `focus-visible:ring-2 ring-ring ring-offset-1`（box-shadow ring，對齊全系統 focus-visible canonical，見上方「互動狀態」段），`BreadcrumbEllipsis` 按鈕（消費 `ItemInlineActionButton`）用 `focus-visible:outline-2 outline-ring`。連結逐個依序成為 tab stop,不攔截焦點(無 focus trap — breadcrumb 是序列式導覽,trap 反而是無障礙 bug)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

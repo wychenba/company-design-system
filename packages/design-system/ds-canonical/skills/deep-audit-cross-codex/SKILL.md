@@ -210,6 +210,8 @@ Deep-audit 收尾**必自動跑** `/knowledge-prune` deep — **前提鐵律:確
 ### 待你拍板(中文人話)
 <決策 1-N(per A.2 format)>
 
+**每題必附「SSOT 理由:」一句**(= 為何這是「會影響 SSOT 的 UI/UX 增刪改」:新 API contract / 改 canonical 語意 / 新視覺 design language,三類之一,具體指出)。**寫不出 SSOT 理由 = 該題不是拍板題,移回 AUTO 自己做**(2026-06-11 user 第 3 次糾正 codify:bug fix / a11y 對齊 W3C / 對齊 spec 既有意圖 / story 內容 / 治理 / 補 rationale 文件 / dead code 清除,全部 AUTO 不問)。Hook \`check_audit_post_report_validator.sh\` Validator H 機械強制。
+
 ### Verify artifact
 - tsc PASS / invariant PASS / content-quality PASS / visual probe PASS
 - file:line + before / after diff link

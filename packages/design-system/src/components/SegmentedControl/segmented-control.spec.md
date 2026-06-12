@@ -207,11 +207,9 @@ SegmentedControl 必須能塞進 `Field` 容器（就像 `Input` / `Button` / `S
 
 ### 選中 / 未選
 
-- **選中**：`bg-surface text-primary-hover border-primary-hover z-10`
-  - 文字與邊框都用 `--primary-hover`（底色維持 `bg-surface` 不變），這是 pill 風格元件（Chip / SegmentedControl）共用的選中規則
-  - `z-10` 讓 selected item 的邊框浮在相鄰 item 之上，避免被重疊的 border 切掉
-- **未選**：`bg-surface text-fg-secondary border-border`
-  - hover：`text-foreground`（不改 bg，避免 hover 狀態與 selected 搶戲）
+- **選中**：文字與邊框都用 `--primary-hover`（底色維持 surface 不變）——pill 風格元件（Chip / SegmentedControl）共用的選中規則；selected item 提升 z-index 讓邊框浮在相鄰 item 之上，避免被重疊的 border 切掉（class 實作見 `segmented-control.tsx` `data-[state=on]` cva）
+- **未選**：surface 底 + `--fg-secondary` 文字 + `--border` 邊框
+  - hover：文字轉 `--foreground` + 邊框加深一階（`--border-hover`）+ 微提升 z-index；不改 bg，避免 hover 狀態與 selected 搶戲
 
 ### Item 連體手法
 

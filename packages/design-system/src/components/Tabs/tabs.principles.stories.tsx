@@ -82,7 +82,7 @@ export const UsageGuidance: Story = {
           note="Tabs label 長度天然不均(「總覽」2 字 vs「成員管理與權限設定」8 字),強制等分會視覺失衡。需要等分選項改用 SegmentedControl"
         >
           <div className="w-full">
-            <SegmentedControl defaultValue="a" fullWidth>
+            <SegmentedControl defaultValue="day" fullWidth>
               <SegmentedControlItem value="day">日</SegmentedControlItem>
               <SegmentedControlItem value="week">週</SegmentedControlItem>
               <SegmentedControlItem value="month">月</SegmentedControlItem>

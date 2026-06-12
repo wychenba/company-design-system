@@ -19,6 +19,8 @@ Hover 觸發的**可互動浮層**，基於 Radix HoverCard。
 
 **實作基礎**：基於 Radix HoverCard——純行為 primitive，只提供觸發邏輯、定位、動畫，不含視覺樣式。
 
+**分類**：Internal primitive——consumer 不直接 import;由 Avatar(`hoverCard`)/ OverflowIndicator / ProfileCard 場景組合消費(frontmatter `isInternal`:root barrel 排除,storybook `Design System/Internal/HoverCard`)。
+
 - **是**：hover 顯示可互動內容（按鈕、連結、可選取文字）的浮層容器
 - **不是**：Tooltip（純文字提示、不可互動、hover 離開即消失）
 
@@ -135,7 +137,7 @@ HoverCard 是**純行為 primitive**(只提供 hover 觸發邏輯 + 定位 + 動
 - `../Tooltip/tooltip.spec.md` — 純文字 hover 提示（HoverCard vs Tooltip 的分界 SSOT 在本 spec）
 - `../ProfileCard/profile-card.spec.md` — 人員資訊卡（HoverCard 最常見 content）
 - `../Avatar/avatar.spec.md` — 人員 Avatar 自動 hoverCard 整合
-- Popover（`components/Popover/`，shadcn passthrough 無 spec）— 點擊觸發的浮層
+- `../Popover/popover.spec.md` — 點擊觸發的浮層(align canonical SSOT,本 spec「align」段引用)
 
 ## A11y 預設
 
@@ -155,6 +157,7 @@ HoverCard 是**純行為 primitive**(只提供 hover 觸發邏輯 + 定位 + 動
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `avatar.spec.md`
 - `carousel.spec.md`
 - `coachmark.spec.md`
 - `motion.spec.md`

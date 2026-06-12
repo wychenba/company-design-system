@@ -477,7 +477,7 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
           aria-disabled={resolvedMode === 'disabled' ? true : undefined}
           {...(props as React.HTMLAttributes<HTMLDivElement>)}
         >
-          <span className={cn('flex-1 min-w-0', resolvedMode === 'disabled' && 'text-fg-disabled')}>
+          <span className={cn('flex-1 min-w-0 truncate', resolvedMode === 'disabled' && 'text-fg-disabled')}>
             {value
               ? displayCommitted
               : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>

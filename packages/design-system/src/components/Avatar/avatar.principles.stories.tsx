@@ -130,7 +130,7 @@ export const FallbackRule: Story = {
           <Avatar alt="Alice Wang" size={40} />
           <Avatar alt="ABC Corp" size={40} color="blue" />
         </div>
-        <Label>↑ 依序:有圖 / 圖片失敗取首字母 / 英文取首字母 / 組織首字 + 色彩</Label>
+        <Label>↑ 依序:有圖 / 無 src 取首字母 / 英文取首字母 / 組織首字 + 色彩</Label>
       </Rule>
     </div>
   ),

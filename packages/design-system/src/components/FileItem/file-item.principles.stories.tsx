@@ -161,7 +161,7 @@ export const StatusProgressRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="uploading — progress bar primary 色 + 百分比 description"
+        title="uploading — progress bar info 色 + 百分比 description"
         note="上傳中清楚展示進度,讓使用者知道「多久能好」而不是只看到一個等待狀態"
       >
         <FileItem

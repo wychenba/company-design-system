@@ -118,7 +118,7 @@ export const UsageGuidance: Story = {
         title="使用場景對照"
         note="Readonly:表單 readonly 呈現、DataTable cell 非編輯態——值重要、視覺不能弱化。Disabled:外部條件造成暫時不可用(方案限制、權限不足)——傳達「現在用不到」"
       >
-        <Label>兩者都 `pointer-events-none` + 不在 tab order 內,互動鎖定一致,差別在視覺訊號</Label>
+        <Label>兩者都不可切換、不在 tab order 內,但機制不同:readonly 用 `pointer-events-none`(視覺正常);disabled 走 native `disabled` + `cursor-not-allowed`(降透明度)</Label>
       </Rule>
     </div>
     </div>

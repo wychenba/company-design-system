@@ -235,7 +235,7 @@ export const ArrowHoverOnly: Story = {
 
       <Rule
         title="✅ 鍵盤 focus 時強制顯示(a11y 例外)"
-        note="鍵盤使用者不 hover。若 focus-visible 時仍 opacity-0,將無法得知元素位置——違反焦點可見原則。arrow 在 :focus-visible 強制 opacity-100。"
+        note="鍵盤使用者不 hover。若 focus-visible 時仍 opacity-0,將無法得知元素位置——違反焦點可見原則。arrow wrapper 用 focus-within:opacity-100——後代 arrow 取得 focus 即強制顯示(機制掛在 wrapper,非 button 的 :focus-visible)。"
       >
         <div className="w-[480px]">
           <Carousel>

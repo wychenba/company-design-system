@@ -120,10 +120,10 @@ export const UsageGuidance: Story = {
           </Rule>
         </Section>
 
-        <Section title="vs 近親 — Calendar(inline) vs DatePicker(field trigger)">
+        <Section title="vs 近親 — DateGrid(inline)vs DatePicker(field trigger)">
           <Rule
-            title="Calendar — inline 月曆,頁面上常駐可見"
-            note="dashboard 小卡、側欄 widget、日期 filter bar。使用者一眼就看到整月,不需點開。Calendar 是純 primitive,不自包 Popover。"
+            title="DateGrid — inline 月曆,頁面上常駐可見"
+            note="dashboard 小卡、側欄 widget、日期 filter bar。使用者一眼就看到整月,不需點開。DateGrid 是純 primitive,不自包 Popover。"
           >
             <Demo title="Linear 專案截止日 widget">
               <div className="flex flex-col gap-2 w-fit">
@@ -152,7 +152,7 @@ export const UsageGuidance: Story = {
 
           <Rule
             title="判斷法 — 看「頁面是否常駐顯示整月」"
-            note="常駐(月曆是主要內容)→ Calendar;輔助(主要是一個欄位,偶爾改)→ DatePicker。空間有限的表單永遠用 DatePicker,不要塞整個月曆進表單。"
+            note="常駐(月曆是主要內容)→ DateGrid;輔助(主要是一個欄位,偶爾改)→ DatePicker。空間有限的表單永遠用 DatePicker,不要塞整個月曆進表單。"
           >
             <Label>
               常駐月曆 = 使用者「在選日的脈絡中」(排班、活動、分析時段篩選);

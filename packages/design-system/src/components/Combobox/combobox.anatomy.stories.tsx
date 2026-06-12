@@ -270,7 +270,7 @@ export const Overview = {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <H3>結構（Anatomy）— readonly / disabled</H3>
-          <Desc>Tag 沒有 dismiss 按鈕，沒有 ChevronDown，沒有 clear。溢出行為與 edit 相同（+N 指示器）。</Desc>
+          <Desc>Tag 沒有 dismiss 按鈕、沒有 clear;ChevronDown 保留為類型身份 indicator(pointer-events-none,readonly fg-muted / disabled fg-disabled)。溢出行為與 edit 相同(+N 指示器)。</Desc>
         </div>
         <div className="flex gap-8">
           <div className="flex flex-col gap-2 items-start">
@@ -285,7 +285,7 @@ export const Overview = {
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
             </div>
-            <span className="text-[10px] text-fg-muted font-mono">無 dismiss · 無 chevron · 無 clear · tagPadding</span>
+            <span className="text-[10px] text-fg-muted font-mono">無 dismiss · 無 clear · chevron=類型 indicator · tagPadding</span>
           </div>
           <div className="flex flex-col gap-2 items-start">
             <span className="text-[11px] text-fg-secondary font-medium">空值</span>

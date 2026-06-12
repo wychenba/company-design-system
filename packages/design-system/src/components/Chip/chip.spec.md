@@ -129,10 +129,12 @@ Chip **不可單獨使用**，必須放在 `<ChipGroup>` 裡。跟 SegmentedCont
 
 ### Type
 
-| Type | 語意 | 預設 |
+| Type | 語意 | 備註 |
 |---|---|---|
-| `multiple` | 可勾選任意數量（checkbox 語意）| ★ **預設**（filter 最常見） |
+| `multiple` | 可勾選任意數量（checkbox 語意）| filter 最常見 |
 | `single` | 互斥單選（radio 語意）| 從 tag 群裡選唯一主要 tag |
+
+`type` 必填——Radix ToggleGroup discriminated union,無 API default(anatomy「Props 速查」同)。
 
 ### Layout
 
@@ -142,7 +144,7 @@ Chip 的 overflow 處理有三種模式：
 |---|---|---|
 | `wrap` ★default | 塞不下時換到下一排 | 大多數情況（filter panel / tag cloud） |
 | `scroll` | 單行、水平滾動，邊緣 fade mask 指示還有內容 | Toolbar / header filter 必須單行 |
-| `menu` | 塞不下的 chips 收進 `⋯` dropdown menu | 單行且需要完整選項可見（ListView toolbar）|
+| `menu` | 單行水平捲動;dropdown(`ChevronDown` trigger)永遠列出全部 chip(show-all navigator)| 單行且需要完整選項可見（ListView toolbar）|
 
 **詳見 overflow 段落。**
 

@@ -60,7 +60,7 @@
 - 以上都沒命中 → 才可自建,但 **建完要立刻回來加行**(防下一個人又重造輪子)
 - **本規則同樣適用 story / consumer / exploration code**:不 hand-craft 已有 prop 能做的事(如 Input loading 走 `loading` prop 不自刻 `<div className="relative"><input/><div className="absolute">` / 全頁 loading 走 `<Empty icon={<CircularProgress/>}/>` 不自刻 `absolute inset-0`)。遇缺口**回元件 spec 擴 API**,不自刻繞過 — hand-craft 視覺對齊 bug 上游
 
-具體 anti-pattern signals → `/design-system-audit` Dim 21;pixel-level 視覺 regression(API 用對但視覺仍跑掉)tech debt → memory `project_pending_tasks`。
+具體 anti-pattern signals → `/design-system-audit` Dim 21;pixel-level 視覺 regression(API 用對但視覺仍跑掉)→ `/visual-audit`(D5)抓(原 memory `project_pending_tasks` 已 retire)。
 
 ---
 

@@ -10,6 +10,8 @@ sizes:
   lg:
     when: "touch / prominent CTA / stakeholder-facing surface"
 traits:
+  - hasSizes
+  - hasInteractiveStates
   - isSelectionMulti
 benchmark:
   - Radix Checkbox primitive: github.com/radix-ui/primitives/tree/main/packages/react/checkbox
@@ -135,7 +137,9 @@ Checkbox 和 Radio 是**表單內的選擇控件**，視覺語言完全一致，
 
 ## Label 對齊
 
-Checkbox/Radio 不內建 label。Label 組合使用 `SelectionItem` 元件。
+Checkbox/Radio 控件本體不畫 label——label 由 `SelectionItem` 承載:提供一級 `label` / `description` props 時元件內部自動包 `SelectionItem`(checkbox.tsx,consumer 不手刻);需自訂佈局時才手動組合 `SelectionItem`。
+
+**icon / avatar prefix(2026-06-12 M30 轉發)**:一級 `icon`(LucideIcon)/ `avatar`(AvatarData)props 直接轉發 `SelectionItem` 既有三槽 canonical 的 prefix 槽(互斥;尺寸與 inline/block 對齊規則 SSOT = `selection-item.spec.md`「3-slot 結構」+ selection-item.tsx jsDoc)。RadioGroupItem 同。
 
 對齊機制：
 1. 外層 `<div>` 設 `text-body` / `text-body-lg`（建立 line-height context）
@@ -321,7 +325,7 @@ Horizontal 需 `gap-4` 因 row 的 py 不擴散到左右。
 ## 禁止事項
 
 - ❌ Radio 不可單獨使用——必須在 RadioGroup 內
-- ❌ Checkbox 不內建 label——label 組合用 SelectionItem
+- ❌ 不手刻外部 `<label>` 排版——用 `label` prop(內部自動包 SelectionItem)或手動組合 `SelectionItem`
 - ❌ 垂直 CheckboxGroup 加 `gap-y-*` / `space-y-*`——違反 zero-gap canonical
 - ❌ 多選一不用 Checkbox——用 Radio 或 Select
 - ❌ 即時套用的布林開關用 Checkbox——用 Switch（見「與 Switch 的分界」）

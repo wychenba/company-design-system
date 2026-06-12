@@ -272,7 +272,9 @@ export const IndentAlignment: Story = {
         <h3 className="text-h6 font-semibold">indentStep = chevronSize + gap-2</h3>
         <p className="text-caption text-fg-muted max-w-xl">
           子 chevron 應對齊父 icon 的起始位置,子 icon 應對齊父 label 的起始位置。
-          這裡用有 icon / 無 icon 混合的 tree 來驗證 placeholder 佔位是否正確。
+          這裡混合有 / 無 children 的 node 驗證 chevron placeholder 佔位(leaf 無條件留等寬空白);
+          icon 無自動佔位——無 icon 的 node(README.md / public)label 起點前移,屬「Icon 使用策略」
+          的混用反例,此處僅作 indent 結構驗證。
         </p>
       </div>
       <div className="w-[300px] border border-divider rounded-lg bg-surface overflow-hidden py-2">

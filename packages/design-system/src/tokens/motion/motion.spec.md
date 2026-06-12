@@ -14,7 +14,7 @@ benchmark:
 
 <!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
-# Motion tokens — hover delay 設計原則
+# Motion 設計原則
 
 > **Foundational SSOT rationale**(2026-05-18 ship per user 拍板 #3A):跨 5+ overlay 消費者
 > (Tooltip / HoverCard / ProfileCard / Avatar / OverflowIndicator)的 hover 開啟 / 關閉延遲統一。
@@ -29,14 +29,14 @@ Hover delay token 是「hover 觸發 → 延遲 N ms → overlay 顯示」的延
 
 | Token | 值 | 用於 | 為何 |
 |---|---|---|---|
-| `--hover-delay-plain` | `500ms` | Tooltip 純文字提示 | 被動 hint,需 user「真停留」才觸發,避免滑過列表時 N 次視覺擾動。對齊 Material 3 plain tooltip 500ms / Apple HIG ~500ms / shadcn-Radix default 500ms 主流共識 |
+| `--hover-delay-plain` | `500ms` | Tooltip 純文字提示 | 被動 hint,需 user「真停留」才觸發,避免滑過列表時 N 次視覺擾動。對齊 Material 3 plain tooltip 500ms / Apple HIG ~500ms / shadcn-Radix default 500ms 主流共識 | <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 | `--hover-delay-rich` | `700ms` | HoverCard / ProfileCard 內容預覽 | 含 avatar / fields / actions 的 rich content(可能含 fetch)。User 必須「真的想看」才停留 700ms,避免列表掃視時誤觸發 N 個 fetch waterfall |
 | `--hover-delay-close` | `200ms` | 所有 overlay 關閉 | Mouse leave 後給 200ms 緩衝(user 可能誤滑出再回來)。對齊 UX 共識「close delay ≤ open delay」+ 既有 Avatar `closeDelay={200}` 值 |
 
 ## 為何不用單一值 / 為何不沿用過去 200ms
 
 - **過去 200/300ms 偏快**(2026-05-18 ship,2026-05-20 user 抓「太快很容易干擾人」撤回):200ms plain 滑過列表 N 次觸發 Tooltip 視覺擾動;300ms rich 在含 fetch 的 HoverCard 場景列表掃視會打 N 次 server request waterfall。
-- **MUI/Ant 100ms 是 fast-tier 例外**:適合 form input help text 等「我就是要快」的 dense 場景,不適合通用 chrome tooltip。
+- **MUI/Ant 100ms 是 fast-tier 例外**:適合 form input help text 等「我就是要快」的 dense 場景,不適合通用 chrome tooltip。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **單一值** 失去 plain / rich 語意區分:ProfileCard 含 fetch + image + actions 應比 Tooltip(純文字)delay 長,單一值會讓 ProfileCard 滑過列表時整列誤觸發 fetch waterfall。
 - **過短**(< 100ms):每滑必觸發 → 視覺擾動 + 不必要 server request。
 - **過長**(> 1s):user 已不期待 overlay,等出來變干擾。
@@ -68,7 +68,7 @@ Hover delay token 是「hover 觸發 → 延遲 N ms → overlay 顯示」的延
 
 ## 消費者
 
-- `components/Avatar/avatar.tsx:299` — HoverCard openDelay / closeDelay(原硬寫 300/200,migrate 到 token)
+- `components/Avatar/avatar.tsx` — HoverCard openDelay / closeDelay 消費 `HOVER_DELAY_RICH_MS` / `HOVER_DELAY_CLOSE_MS`(原硬寫 300/200,migrate 到 token)
 - `components/HoverCard/hover-card.tsx` — Root 預設 `openDelay`=`--hover-delay-rich` / `closeDelay`=`--hover-delay-close`(Radix HoverCard 無 Provider;2026-06-11 落地,原宣稱與 code 脫鉤)
 - `components/Tooltip/tooltip.tsx` — Radix Provider 預設 delayDuration override 為 `--hover-delay-plain`
 - `components/ProfileCard/profile-card.tsx`(consumer of HoverCard)— 繼承 `--hover-delay-rich`
@@ -88,7 +88,7 @@ Hover delay token 是「hover 觸發 → 延遲 N ms → overlay 顯示」的延
 | MUI / Ant Tooltip | 100ms(dense form input fast-tier) | — |
 | **DS canonical(本 spec)** | **500ms** | **700ms** |
 
-500ms 對齊 Material 3 / Apple HIG / shadcn 主流共識(三家集中在 500ms),避 MUI/Ant 100ms(form input fast-tier 不適通用 chrome)+ Radix 700(過保守)兩極端。Rich 700ms 比 plain 多 200ms 反映 fetch / multi-section content「真的想看」門檻。
+500ms 對齊 Material 3 / Apple HIG / shadcn 主流共識(三家集中在 500ms),避 MUI/Ant 100ms(form input fast-tier 不適通用 chrome)+ Radix 700(過保守)兩極端。Rich 700ms 比 plain 多 200ms 反映 fetch / multi-section content「真的想看」門檻。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ## 相關
 

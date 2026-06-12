@@ -1,6 +1,6 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // @renderer-symmetry-allow: ComboboxTagStack(display path)接 consumer tagRenderer 是 Stream C 下 cycle 工作 — 2026-05-12 先 ship Issues 2/3/4 surgical fixes(placeholder vocabulary + cell surface metrics + placeholder truncate),tagRenderer display-path unify deferred per field-controls.spec.md 共享 contract a。當前 multi=1 顯示已透過 PeoplePicker tagRenderer 線 314 PersonDisplay SSOT 對齊;其他 Combobox consumer 走 default `<Tag>` 純文字 backward-compat。
-// code-quality-allow: file-size — Combobox 含 NativeCombobox/CustomCombobox/useOverflowCount/OverflowTagList/ComboboxTagStack 5 子元件 + 共用 helpers,split-into-files 會破壞 measurement closures + 重複 type definitions。當前 751 lines 在 800 hard cap 內。
+// code-quality-allow: file-size — Combobox 含 NativeCombobox/CustomCombobox/useOverflowCount/OverflowTagList/ComboboxTagStack 5 子元件 + 共用 helpers,split-into-files 會破壞 measurement closures + 重複 type definitions。
 import * as React from 'react'
 import { X, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -735,7 +735,9 @@ function CustomCombobox({
       // 純 additive:此 trigger 原無 onKeyDown,不覆寫既有 handler;open 邏輯仍走 setOpen SSOT。
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          if (!searchable) { e.preventDefault(); setOpen(true) }
+          // 2026-06-11 P0 a11y(R2,同 select.tsx 修):Combobox 恆 searchable → 原 `!searchable`
+          // guard 使 Enter/Space 永遠開不了(僅 ArrowDown 可)。正確 guard = !open。
+          if (!open) { e.preventDefault(); setOpen(true) }
         }
         if (e.key === 'ArrowDown' && !open) { e.preventDefault(); setOpen(true) }
         if (e.key === 'Escape') setOpen(false)

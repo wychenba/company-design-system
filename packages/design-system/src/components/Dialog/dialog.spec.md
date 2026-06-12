@@ -109,7 +109,7 @@ Modal 與 viewport 四邊保持 `--layout-space-bottom`（48px）最小間距。
 
 `text-body-lg font-medium truncate`——單行截斷，不換行。
 
-**Header 可成長**:Dialog 提供 `<DialogDescription>` primitive 作副標/補充說明(`mt-[var(--item-gap-label-desc-reading-lg)] text-body text-fg-secondary` — title body-lg 16 + desc body 14 → reading-lg token)。Consumer 傳 title + description 時 header 自然長高(這也是為何 Dialog / Sheet / Popover 的 SurfaceHeader 刻意 **padding-based 而非 fixed-h** — 宣告 chrome 可成長)。詳見 `patterns/overlay-surface/overlay-surface.spec.md`「為什麼 SurfaceHeader 是 padding-based」+ `tokens/uiSize/uiSize.spec.md`「消費 --chrome-header-height 的 2 種實作 pattern」。
+**Header 可成長**:Dialog 提供 `<DialogDescription>` primitive 作副標/補充說明(`mt-[var(--item-gap-label-desc-reading-lg)] text-body text-fg-secondary` — title body-lg 16 + desc body 14 → reading-lg token)。Consumer 傳 title + description 時 header 自然長高(這也是為何 Dialog / Sheet / Popover 的 SurfaceHeader 刻意 **padding-based 而非 fixed-h** — 宣告 chrome 可成長)。詳見 `patterns/overlay-surface/overlay-surface.spec.md`「為什麼 SurfaceHeader 是 padding-based」+ `tokens/uiSize/uiSize.spec.md`「Chrome header 選型 canonical」節(含「2 種 pattern 對照」)。
 
 ## Footer 按鈕
 
@@ -206,6 +206,7 @@ Dialog 是 modal 浮層元件,關鍵決策維度是 `maxWidth`(400/480/512/560/7
 - `accordion.spec.md`
 - `alert.spec.md`
 - `coachmark.spec.md`
+- `command.spec.md`
 - `dropdown-menu.spec.md`
 - `file-viewer.spec.md`
 - `overlay-surface.spec.md`

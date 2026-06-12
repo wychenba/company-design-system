@@ -27,7 +27,7 @@ esac
 
 FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null)
 # Only check consumer storybook files
-if ! echo "$FILE" | grep -qE '/(apps|consumer)/.*\.stories\.tsx$'; then exit 0; fi
+if ! echo "$FILE" | grep -qE '(^|/)(apps|consumer)/.*\.stories\.tsx$'; then exit 0; fi
 # Skip DS source
 if echo "$FILE" | grep -qE 'packages/design-system/src/'; then exit 0; fi
 
@@ -108,7 +108,7 @@ esac
 
 FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null)
 # Only check consumer storybook files
-if ! echo "$FILE" | grep -qE '/(apps|consumer)/.*\.stories\.tsx$'; then exit 0; fi
+if ! echo "$FILE" | grep -qE '(^|/)(apps|consumer)/.*\.stories\.tsx$'; then exit 0; fi
 if echo "$FILE" | grep -qE 'packages/design-system/src/'; then exit 0; fi
 
 CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // .tool_input.content // ""' 2>/dev/null)
@@ -165,7 +165,7 @@ esac
 
 FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null)
 # Cover BOTH stories AND production .tsx in consumer apps
-if ! echo "$FILE" | grep -qE '/(apps|consumer)/.*\.(tsx|ts)$'; then exit 0; fi
+if ! echo "$FILE" | grep -qE '(^|/)(apps|consumer)/.*\.(tsx|ts)$'; then exit 0; fi
 if echo "$FILE" | grep -qE 'packages/design-system/src/|node_modules/'; then exit 0; fi
 
 CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // .tool_input.content // ""' 2>/dev/null)
@@ -265,7 +265,7 @@ esac
 
 FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null)
 # Scope:apps/<name>/**/*.stories.(tsx|ts|mdx)
-if ! echo "$FILE" | grep -qE '/apps/[^/]+/.+\.stories\.(tsx|ts|mdx)$'; then exit 0; fi
+if ! echo "$FILE" | grep -qE '(^|/)apps/[^/]+/.+\.stories\.(tsx|ts|mdx)$'; then exit 0; fi
 
 CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // .tool_input.content // ""' 2>/dev/null)
 [ -z "$CONTENT" ] && exit 0

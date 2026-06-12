@@ -109,7 +109,7 @@ Tabs.displayName = 'Tabs'
 // - 跟 Dialog / Sheet / Popover / Sidebar header `border-b border-divider`(neutral-4)同色
 // - withTabs scenario 下 tabs underline = chrome separator,跟 dialog 其他 separator 視覺一致
 // - Selected trigger 2px primary 仍 overlay underlying divider(對比 primary >> divider 不弱)
-// - 對齊 `color.spec.md:706-708` outer-vs-divider 判準(Dialog 結構,T-junction 思路適用)
+// - 對齊 `color.spec.md`「T-junction connectivity 原則」段 outer-vs-divider 判準(Dialog 結構,T-junction 思路適用)
 const TABS_LIST_BASE = [
   'inline-flex items-stretch',
   'gap-[var(--layout-space-loose)]',

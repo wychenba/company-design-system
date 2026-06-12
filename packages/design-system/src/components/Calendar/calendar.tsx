@@ -22,7 +22,7 @@ import { SegmentedControl, SegmentedControlItem } from '@/design-system/componen
  * Calendar — 事件檢視 canvas(月 view MVP)
  *
  * 定位:看事件的 page-level canvas,對齊 Notion Calendar / Google Calendar。
- * 完整 spec 見 `event-calendar.spec.md`。
+ * 完整 spec 見 `calendar.spec.md`。
  *
  * ── Layout Family ──
  * 非 4-Family,屬 page-composite(多區塊 Toolbar + Grid + EventTile)。

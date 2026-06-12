@@ -25,6 +25,7 @@ benchmark:
 
 **SSOT 邊界**:
 - AppShell own:slot composition / layout mode / Aside inline-vs-modal mode / mobile breakpoint propagate
+- **邊界狀態**:layout 殼,無自身互動狀態(disabled / loading / empty 不適用,slot 內容各自管;dark / density 隨 theme subtree);overlay open state 自管(見「Dialog / Sheet / Popover 互動」段)
 - **不 own**:Sidebar 視覺(SSOT 在 `sidebar.spec.md`)/ Header 視覺(SSOT 在 `header-canonical.spec.md`)/ Sheet 視覺(SSOT 在 `sheet.spec.md`)/ Main 內 layout(SSOT 在 `layoutSpace.spec.md` 6 條規則)
 
 **不是**:`Sidebar`(本 shell consumer 之一)/ `Sheet`(臨時浮層)/ `ChromeHeader`(local header)/ `Page`(語意 wrapper,不存在於本 DS)。
@@ -166,7 +167,7 @@ function CustomAside() {
 
 | Mode | Trigger | Mask 蓋背景? | Background operable? | 佔 layout 寬度? |
 |---|---|---|---|---|
-| **Standard inline**(對齊 Material 3 standard drawer) | viewport ≥ `--sidebar-mobile-breakpoint`(768px) | ❌ 不蓋 | ✅ 可操作 | ✅ 佔 layout |
+| **Standard inline**(對齊 Material 3 standard drawer) | viewport ≥ 768px(`useIsNarrowViewport()`,同 Sidebar mobile 切換) | ❌ 不蓋 | ✅ 可操作 | ✅ 佔 layout |
 | **Modal overlay**(對齊 Material 3 modal drawer = Sheet pattern) | viewport < breakpoint | ✅ 蓋 | ❌ 不可操作 | ❌ 不佔(蓋上去) |
 
 **Standard inline** 行為(layout-mode aware):
@@ -181,13 +182,13 @@ function CustomAside() {
 - **title prop required**(per `sheet.spec.md:98` 禁無 title — `aria-labelledby` 強制)
 - 跟 Sidebar mobile fallback 同 SSOT
 
-**Breakpoint**:消費既有 `--sidebar-mobile-breakpoint`(`sidebar.spec.md:594` SSOT,768px),**不發明新 breakpoint**。Sidebar + Aside 同步切 Sheet。
+**Breakpoint**:消費既有 `useIsNarrowViewport()` hook(`hooks/use-is-narrow-viewport.ts`,`MOBILE_BREAKPOINT = 768`;與 `sidebar.spec.md`「Mobile 行為」段 768px 同值),**不發明新 breakpoint**(非 CSS token — repo 無 `--sidebar-mobile-breakpoint`)。Sidebar + Aside 同步切 Sheet。
 
 ---
 
 ## Mobile(viewport < breakpoint)
 
-- **Sidebar**:消費既有 `sidebar.spec.md:594` canonical(自動切 Sheet,從左滑出,寬度 `--sidebar-width-mobile`)
+- **Sidebar**:消費既有 `sidebar.spec.md`「Mobile 行為」canonical(自動切 Sheet,從左滑出,寬度 `--sidebar-width-mobile`)
 - **Aside**:同邏輯,切右 Sheet(複用 Sheet primitive,只方向相反)
 - **Header**:始終可見(both mode);`primary-sidebar` 仍是 local toolbar / `primary-header` 仍是 global bar
 - **AppShell 不重新發明 mobile**,沿用 Sidebar / Sheet 既有 canonical
@@ -251,7 +252,7 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 
 **W3C ARIA in HTML banner rule(精準 quote)**:`<header>` element 在 `<body>` direct context = `role="banner"` implicit;若 `<header>` 是 `<main>` / `<nav>` / `<article>` / `<section>` / `<aside>` descendant,則 **NOT** banner role(W3C HTML AAM spec)。
 
-**本 AppShell 對應落實**(ChromeHeader render `<header>`,per `chrome-header.tsx:96/129/157`):
+**本 AppShell 對應落實**(ChromeHeader 三個分支皆 render `<header>`,per `chrome-header.tsx` 2026-05-20「`<div>` → `<header>`」註解):
 - `primary-header` mode:`<header>` 被 `flex-shrink-0 <div>` 包覆(AppShell root flex-col 第一個 child,body-scoped)→ implicit banner role ✓
 - `primary-sidebar` mode:`<header>` 被 `flex-shrink-0 <div>` 包覆、與 `<main>` 是 sibling(非 main descendant,body-scoped)→ **同樣得到 implicit banner role**。`<div>` wrapper 依 W3C HTML-AAM **不** scope out banner(只有 `main/article/aside/nav/section` 能)。
 
@@ -277,7 +278,7 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 
 | 用途 | Consume token / SSOT |
 |---|---|
-| Mobile breakpoint | `--sidebar-mobile-breakpoint`(`sidebar.spec.md:594`)|
+| Mobile breakpoint | `useIsNarrowViewport()` JS hook,768px(非 CSS token;`sidebar.spec.md`「Mobile 行為」段同值)|
 | Sidebar width | `--sidebar-width`(`sidebar.spec.md`)|
 | Header height | `--chrome-header-height`(`tokens/uiSize/uiSize.spec.md`)|
 | Aside width | consumer 自傳 prop(無 token)|
@@ -319,4 +320,4 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 - `patterns/overlay-surface/overlay-surface.spec.md` — Aside modal mode 上層 SSOT
 - `components/Sheet/sheet.spec.md` — modal fallback SSOT(`aria-labelledby` 強制 + `z-50`)
 - `tokens/layoutSpace/layoutSpace.spec.md` — Main 內 layout 6 條規則 SSOT
-- `tokens/uiSize/uiSize.spec.md` — `--chrome-header-height` / `--sidebar-mobile-breakpoint` 等 size token
+- `tokens/uiSize/uiSize.spec.md` — `--chrome-header-height` 等 size token

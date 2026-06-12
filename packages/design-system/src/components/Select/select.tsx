@@ -604,8 +604,13 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
         data-error={error ? '' : undefined}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            if (!searchable) { e.preventDefault(); setOpen(true) }
+            // 2026-06-11 P0 a11y(R2 deep-audit):原 guard `!searchable` 連「關閉時的鍵盤開啟」一起擋
+            // → searchable Select / PeoplePicker single 鍵盤打不開(WCAG 2.1.1)。原意只是開啟後
+            // 別吃掉搜尋框的 Space/Enter → 正確 guard = !open(關閉才攔;開啟後不干擾 input 輸入)。
+            if (!open) { e.preventDefault(); setOpen(true) }
           }
+          // APG combobox 展開鍵:ArrowDown 也可開(對齊 combobox.tsx 同 pattern;open 後不攔讓方向鍵導覽選單)
+          if (e.key === 'ArrowDown' && !open) { e.preventDefault(); setOpen(true) }
           if (e.key === 'Escape') setOpen(false)
         }}
       >

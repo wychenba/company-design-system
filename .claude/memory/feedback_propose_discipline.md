@@ -85,3 +85,9 @@ User 2026-05-15 + 2026-05-27 系列 directives codified per Rule-of-3 absorb pri
 - M22 benchmark cite mandate
 - mindset #1 不取巧:propose 用 jargon = 取巧;沒 cite = 取巧
 - Linux kernel patch:每 claim cite source / Atlassian RFC discipline
+
+
+## Sub-rule:選項題最終訊息必自包含(2026-06-11 第 2 次 mobile 摺疊事故)
+
+**Rule**:turn 的「最後一條訊息」若要 user 拍板選項,必須**完整重述每個選項的人話說明 + 建議 + 理由**,禁止「選 (a) 還是 (b)」引用前文 — 手機 app 會摺疊訊息中段(tool call 之間的文字),user 只看得到最後一條。
+**Anchor**:2026-06-11 R2 拍板題 6/8 完整說明寫在中段、結尾只剩「選 (a) 還是 (b)」→ user 截圖怒「叫你解釋然後又沒解釋」(同 2026-06-10 沙箱三步驟事故同 failure mode)。

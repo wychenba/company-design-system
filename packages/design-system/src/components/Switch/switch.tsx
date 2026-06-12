@@ -273,9 +273,9 @@ export const switchMeta = {
 
   },
   sizes: {
-    sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
-    md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
-    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },
+    sm: { fieldHeight: 28, iconSize: 12, typography: 'body' },
+    md: { fieldHeight: 32, iconSize: 12, typography: 'body' },
+    lg: { fieldHeight: 36, iconSize: 16, typography: 'body-lg' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {

@@ -19,6 +19,10 @@ LinkInput 是 **URL 的**輸入與顯示元件。外觀基於 Input，但 value 
 
 共用規則見 `../Field/field-controls.spec.md`。本文件只記錄 LinkInput 特有的原則。
 
+## Controlled-only rationale(Dim 26)
+
+本元件採 **controlled-only**:`value` + `onChange`,不支援 `defaultValue` uncontrolled fallback(value pair V1)。對齊 Field 家族 canonical(Combobox / DatePicker / TimePicker / SelectMenu 同,rationale 見各 spec 同名段);LinkInput 內部另有「連結顯示 ↔ 編輯中」狀態與 `value` 雙向 sync,dual-mode 會引入 race condition。未來要改 dual-mode 需 `useControllableState` helper,屬 major API 擴充。
+
 **Layout Family**：CLAUDE.md 4-Family Model **Family 4（Field control layout）** 消費者。結構繼承 `components/Field/field-controls.spec.md` 的 `fieldWrapperStyles + [startIcon?] [<editable>] [endAction?]` 規格,視覺對齊 Family 1（Menu item）讓 SelectMenu trigger + options 連續一致。
 
 ---
@@ -64,7 +68,7 @@ LinkInput 是 **URL 的**輸入與顯示元件。外觀基於 Input，但 value 
 遵循 Field 共用驗證標準（blur validation）：
 
 1. **blur 時驗證**——使用者離開 field 時才檢查格式
-2. **開始編輯時清除 error**——重新 focus 或開始打字時移除錯誤狀態
+2. **開始打字時清除 error**——輸入任一字元即移除錯誤狀態(Escape 還原原值亦清除);單純重新 focus 不清除
 3. **Enter 觸發 blur**——等同離開 field
 4. **Escape 取消編輯**——回復原值，不觸發驗證
 

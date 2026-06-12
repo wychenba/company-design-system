@@ -47,7 +47,7 @@ export const Overview: Story = {
                 ['name', 'string', '必填', '檔名'],
                 ['mode', "'compact' | 'rich'", "'compact'", 'compact=Paperclip 16px icon / rich=Avatar 48px 縮圖'],
                 ['status', "'uploading' | 'completed' | 'error'", '—', '上傳狀態(不傳=已上傳靜態)'],
-                ['progress', 'number', '—', '上傳進度 0-100(uploading 時顯示 bar)'],
+                ['progress', 'number', '—', '上傳進度 0-100(有 status 時顯示 bar;completed 強制 100%)'],
                 ['description', 'ReactNode', '—', 'rich 任意場景 / compact 只有 error 才顯示。ReactNode — 可含 inline clickable link(如「View log」)'],
                 ['thumbnailSrc', 'string', '—', 'rich mode 的縮圖 URL(圖片類檔案)'],
                 ['actions', 'ReactNode', '—', 'suffix actions(例:delete / cancel button)'],
@@ -127,7 +127,7 @@ export const ColorMatrix: Story = {
                 <Td mono>uploading</Td>
                 <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--foreground" size="sm" /><span className="font-mono">--foreground</span></span></Td>
                 <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--fg-secondary" size="sm" /><span className="font-mono">--fg-secondary</span></span></Td>
-                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--primary" size="sm" /><span className="font-mono">--primary(inProgress)</span></span></Td>
+                <Td><span className="inline-flex items-center gap-1.5"><Swatch value="--info" size="sm" /><span className="font-mono">--info(inProgress)</span></span></Td>
                 <Td>—(只顯示 bar)</Td>
               </tr>
               <tr>
@@ -253,7 +253,7 @@ export const SizeMatrix: Story = {
         <div className="grid grid-cols-2 gap-6">
           <div>
             <div className="text-caption text-fg-muted mb-2 font-mono">mode="compact"</div>
-            <div className="flex flex-col gap-0 max-w-sm border border-border rounded-md">
+            <div className="flex flex-col gap-1 max-w-sm">
               <FileItem name="Q1-report.pdf" mode="compact" status="completed" progress={100} />
               <FileItem name="users.csv" mode="compact" status="completed" progress={100} />
               <FileItem name="products.xlsx" mode="compact" status="uploading" progress={62} />
@@ -300,7 +300,7 @@ export const StateBehavior: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>Status</Th><Th>Progress bar 色</Th><Th>Status icon</Th></tr></thead>
             <tbody>
-              <tr><Td mono>uploading</Td><Td mono>bg-primary</Td><Td>—</Td></tr>
+              <tr><Td mono>uploading</Td><Td mono>bg-info</Td><Td>—</Td></tr>
               <tr><Td mono>completed</Td><Td mono>bg-success(100%)</Td><Td>CircleCheck(text-success)</Td></tr>
               <tr><Td mono>error</Td><Td mono>bg-error(寬度 = consumer 傳入 progress)</Td><Td>XCircle(text-error)</Td></tr>
               <tr><Td>(無 status)</Td><Td>無 bar</Td><Td>—</Td></tr>

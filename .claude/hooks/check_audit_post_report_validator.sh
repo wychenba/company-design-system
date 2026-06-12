@@ -115,6 +115,19 @@ if [ "${CRITICAL_FAIL:-0}" -eq 1 ]; then
   exit 2
 fi
 
+# ─ Validator H: 拍板清單 SSOT-理由 強制(2026-06-11 user 第 3 次糾正「要我拍板的都是 SSOT 的 UI/UX 嗎」)─
+# 報告含「待你拍板」/「拍板清單」區塊時:區塊內每個編號題必含「SSOT 理由」字樣;
+# 題數 > SSOT-理由數 = 有題目沒標理由 = 混入非 SSOT 項 → BLOCK。
+if grep -qE '待你拍板|拍板清單' "$FILE_PATH" 2>/dev/null; then
+  _BLOCK_SEG=$(sed -n '/待你拍板\|拍板清單/,$p' "$FILE_PATH" 2>/dev/null)
+  _Q_COUNT=$(echo "$_BLOCK_SEG" | grep -cE '^[[:space:]]*([0-9]+[.、)]|##+ *決策)' || true)
+  _R_COUNT=$(echo "$_BLOCK_SEG" | grep -c 'SSOT 理由' || true)
+  if [ "${_Q_COUNT:-0}" -gt "${_R_COUNT:-0}" ]; then
+    CRITICAL_FAIL=1
+    WARNINGS="${WARNINGS}\n  • Validator H:拍板清單 ${_Q_COUNT} 題但僅 ${_R_COUNT} 題標「SSOT 理由」— 寫不出理由的題 = 非 SSOT,移回 AUTO 自己做,不問 user。"
+  fi
+fi
+
 # ─ Validator E: prune-chain-trigger emit ──────────────────────────────────
 # 2026-06-11 擴充(user 糾正「為何每次都要問我是否要跑 knowledge prune」機械兜底,SSOT = deep-audit SKILL C.0a):
 # deep-audit 規模 report(DIM_COUNT≥10)→ 無條件 fire prune-chain trigger,非僅 coverage 不足時。

@@ -185,12 +185,11 @@ interface BulkActionBarLabels {
 
 ## 視覺與動畫
 
-- **出現 / 消失**:`selection.length` 0→>0 時 fade in;>0→0 時 fade out（animation timing — see motion canonical, not invariant）。**不 layout shift**(預留位置或 absolute / fixed)
+- **出現 / 消失**:`selection.length` 0→>0 直接 mount;>0→0 回 null 直接 unmount(無 fade 動畫)。inline composition 下自然 reflow;consumer 需固定高度時自擺 placeholder(見「禁止事項」)
 - **底色**:**無底色 contrast**,跟 page 同色(`bg-canvas` / `bg-surface` 視 placement 繼承)。對齊 Notion / Linear minimalist — 用文字內容切換呈現「mode」,**不**用底色 highlight。**不像 Polaris 那種顯著底色變化** <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
-- **邊界**:**無外框邊界**(融入 page chrome)— Top 模式跟 toolbar 共位置;Footer 模式 **`border-top` border-divider 切割 layout**(因 footer 是 page 結構,不是 floating overlay,不用 box-shadow 製造「浮層」誤導)
-- **與 table 的關係**:Top scenario 跟 toolbar 共邊;Footer scenario 是 page 結構性 footer,純 border-top 切
+- **邊界**:**無外框邊界**(融入 page chrome)— 恆 **`border-top` border-divider 切割 layout**(bar 是 page 結構,不是 floating overlay,不用 box-shadow 製造「浮層」誤導)。top-toolbar 變體為未來項(見「Size canonical」)
+- **與 table 的關係**:inline composition — bar 接在 DataTable 下方,toolbar 永遠保留(見「Placement」)
 - **Action variant**:`tertiary`(主)+ `tertiary danger`(destructive)— **不用 primary**(留給 dialog 確認最終 action)
-- **respects `motion-reduce`**:fade 動畫 disable
 
 ---
 

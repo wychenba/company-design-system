@@ -1,4 +1,4 @@
-# Advanced Filter — Operator × ColumnType × ValueShape SSOT(v3)
+# Advanced Filter 設計原則(Operator × ColumnType × ValueShape SSOT,v3)
 
 > **狀態**:已落地 — registry 寫成 `filter-operators.ts`,`filter-tree.ts` + `data-table-filter-panel.tsx` 消費(原 draft 兩個升級條件皆已達成,2026-06-11 對齊)。
 > **M8 benchmark**:對照 ClickUp(CU)/ Airtable(AT)/ Notion(NT)三家。**v3 加 datetime / includeTime + 砍 number.between(2/3 業界共識)**。
@@ -10,7 +10,7 @@
 - **砍 `number.between`**(9→8 ops)— Notion + Airtable 共識,同 field 重複 condition 可組合 `gte X AND lte Y`,無自然視覺也無業界 NumberRangeInput 元件
 - **加 `column.meta.includeTime: boolean` 旗標** — 對齊 Notion idiom,不另設 datetime column type
 - **加 ValueShape `datetime_single` / `datetime_range`** — `includeTime=true` 時切到這兩個 shape
-- **加 ValueShape `datetime_relative`**(同 date_relative,relative 邏輯不變)
+- **datetime 不另設 relative shape** — `is_relative` 維持 `date_relative`(relative 邏輯不變;12-shape 表與 code `ValueShape` union 皆無 `datetime_relative`)
 - **filter 比對精度**:`includeTime=true` 走 ms 精度(避開 Airtable 著名地雷:filter 忽略 time)
 - **不新增 `time-only` column type**(業界沒人做,罕見場景)
 
@@ -247,10 +247,10 @@
 
 ## 9. Phase B 進度
 
-- [x] ValueShape × DS 元件對照 — 完成,coverage 8/12 直接消費 + 4 預留 + 2 新建(DateTimePicker / DateTimeRangePicker)
+- [x] ValueShape × DS 元件對照 — 完成,coverage 8/12 直接消費 + 4 預留;datetime 走 `<DatePicker showTime>` / `<DatePickerRange showTime>` prop variant(M21,非新元件)
 - [x] InputSurface 議題消失(配合砍 `number.between`)
-- [→] `advanced-filter.draft.md` — FilterTree data model + DataTable 耦合(本 turn 同步寫)
-- [→] `datetime-picker.draft.md` — DateTimePicker / Range spec(本 turn 同步寫)
+- [x] FilterTree data model + DataTable 耦合 — 已落地 `filter-tree.ts` + `data-table-filter-panel.tsx`(原規劃 `advanced-filter.draft.md` 未另立檔,內容即本 spec + code)
+- [x] datetime spec — 併入本 spec v3(原規劃 `datetime-picker.draft.md` 不需要,無新元件)
 - [x] i18n 策略 — 暫硬編繁中,留 i18n hook(對齊 DS 既有元件慣例)
 - [→] Phase B.5 lock canonical via `/ensure-canonical`(spec 全收斂後)
 

@@ -245,7 +245,7 @@ export const ColorMatrix: Story = {
               </tr>
               <tr>
                 <Td mono>readonly</Td>
-                <Td><TokenCell token="--bg-disabled" display="bg-disabled(鎖定底)" /></Td>
+                <Td><TokenCell token="--bg-readonly" display="bg-readonly(鎖定底)" /></Td>
                 <Td>—(no border)</Td>
                 <Td><TokenCell token="--foreground" /></Td>
               </tr>

@@ -4,7 +4,7 @@ import * as React from 'react'
 import { ResizeHandle } from './resize-handle'
 
 const meta: Meta<typeof ResizeHandle> = {
-  title: 'Design System/Patterns/ResizeHandle',
+  title: 'Design System/Patterns/Resize Handle',
   component: ResizeHandle,
   parameters: { layout: 'centered' },
 }

@@ -32,7 +32,7 @@ node scripts/composition-fidelity-visual-diff.mjs \
   --consumer-root=/path/to/ds-product-template --threshold-pct=0.5
 ```
 
-掛在 `.github/workflows/composition-fidelity.yml`(checkout DS + ds-product-template,build 兩邊 storybook 後比對;**build-storybook 前必先 `build:lib`** 否則 storybook-config tsc 找不到 `@qijenchen/design-system` 型別 = TS2307)。
+掛在 `.github/workflows/composition-fidelity.yml`(checkout DS + ds-product-template,build 兩邊 storybook 後比對;**build-storybook 前必先 `build:lib`** 否則 storybook-config tsc 找不到 `@qijenchen/design-system` 型別 = TS2307)。**2026-06-11 cheap pre-step**:checkout 後先秒級 grep consumer `@composition-fidelity-mode` marker(regex 對齊 diff script L118),0 命中 → skip 整段 ~30 min dual build(script 對 0 mapping 必 vacuous exit 0);≥1 命中 → full gate。現役 opt-in sentinel = `apps/template/src/CompositionFidelityReplica.stories.tsx`(Button#IconOnly 忠實複製 replica,mode pixel,經 mirror 傳播到 ds-product-template),讓 gate 名實相符。
 
 ## 不該做的事
 

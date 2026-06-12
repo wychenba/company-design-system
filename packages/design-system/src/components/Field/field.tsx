@@ -223,9 +223,9 @@ const Field = React.forwardRef<HTMLDivElement, FieldProps>(
     // - inline: min-h-field-{size} + items-center
     //   單行 control(Input、Button 等)中線置中於 min-h box。
     //
-    // - block:  flex-col + items-start + padding-top: calc((field-height - 1lh) / 2)
-    //   多行 control(RadioGroup 等),第一行往下推到 field-height 中線,
-    //   後續 item 自然往下流。不設 min-h(內容自己決定高度)。
+    // - block:  flex-col + items-start(不設 min-h、不加 padding-top,內容自己決定高度)
+    //   多行 control(RadioGroup 等),第一行中線由 block primitive 自帶 py 推到
+    //   field-height/2,後續 item 自然往下流。
     // Block control area 不加額外 paddingTop——block primitive(RadioGroup 等)
     // 的子元件(SelectionItem)已自帶 py = calc((field-height - 1lh) / 2),
     // 第一個 item 的文字自然落在 field-height/2。額外加 paddingTop 會 double padding。

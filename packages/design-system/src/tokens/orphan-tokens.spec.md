@@ -10,7 +10,7 @@ benchmark:
   - Polaris Design Tokens — semantic SOP 5-piece set canonical https://polaris.shopify.com/design/colors
 ---
 
-# Orphan Token 分類 SSOT(retire vs structural-keep)
+# Orphan Token 分類設計原則(retire vs structural-keep SSOT)
 
 > **Foundational context**(2026-05-21 codify per user verbatim「決策四你他媽仔細給我確認到底該retire的是否真的該retire還是應該結構性保留,請全盤檢查,然後確認之後請下次不要再煩我,尤其是Palette tier」+「都給我做到好」):**永久解決**「audit 每次抓 X 個 orphan tokens」噪音。本 spec 明文哪些 token 結構性保留 + 自動 audit script 識別,user 不需重複確認同一題。
 
@@ -84,7 +84,7 @@ benchmark:
 
 ### 7. SOP 5-piece semantic 完整集(1+ token,structural)
 
-**Rule**:每個 semantic role(primary / error / success / warning / info)必有 5 件套:`base / hover / active / subtle / text`,即使當前 `text` variant 無消費者也保留。
+**Rule**:每個 semantic role(primary / error / success / warning / info)必有 5 件套:`base / hover / active / subtle / text`;機械保護集另含 `emphasis / foreground / focus`(下方 Regex 共 7 後綴,與 `audit-orphan-tokens.mjs` 一致;無後綴 base 由消費者直接引用不在 regex 內)。即使當前 variant 無消費者也保留。
 
 **Why**:Consistency invariant — 缺 `-text` variant 設計時找不到「on-emphasis 文字色」會 hot-create,違反 SSOT。Polaris「Status colors complete set」canonical。
 

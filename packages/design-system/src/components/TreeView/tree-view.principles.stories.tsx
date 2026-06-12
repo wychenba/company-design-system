@@ -170,7 +170,7 @@ export const IndentRule: Story = {
       </Rule>
 
       <Rule
-        title="Chevron / Icon placeholder 保留對齊"
+        title="Chevron placeholder 保留對齊"
         note="同層 siblings 有展開 icon、有的沒有 → label 不對齊。TreeView 自動給葉節點留 chevron 位置(透明 placeholder),consumer 不需介入"
       >
         <div className="border border-border rounded-lg p-3 w-80">

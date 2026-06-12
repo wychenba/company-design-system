@@ -74,6 +74,16 @@ const [country, setCountry] = useState('tw')
 - **2026-05-21 前**:刻意 controlled-only,理由「內部狀態複雜易 race」
 - **2026-05-21 D3 audit**:per Dim 26 verify + user 拍板(「決策三照妳建議」),補 `defaultValue` + 互斥 signal。NativeSelect / CustomSelect 統一走既有 `useControllable` hook,`valueProp !== undefined` 為 controlled signal(對齊 M17 SSOT)
 
+### Open-pair 例外:open 軸維持 uncontrolled-only(2026-06-12 deep-audit R2 補)
+
+value 軸 dual-mode,open 軸**刻意只有** `defaultOpen`(初始開)+ `onOpenChange`(通知 callback),無 controlled `open` prop:
+
+- **已知需求只要「初始開 + 知道何時關」**:(1) 視覺快照 — Storybook OpenSnapshot / visual-audit(M15)需「免互動即開」state,`defaultOpen` 一行達成;(2) DataTable cell-as-input(`DataTable/cell-registry.tsx`)— click → 1-step 開選單靠 `defaultOpen`,dismiss 後 `onOpenChange(false)` → cell exit edit mode
+- **受控成本高**:open 是內部 interaction state machine 的一環 — 關閉自動清 search(select.tsx「關閉時清搜尋」effect)/ searchable trigger 在 open 時切 input 顯示模式 / Enter / Space / ArrowDown opener + Esc dismiss 全是內部 intent。controlled `open` 要 consumer 忠實 echo 每一條,漏接任一 → 卡開 / 卡關 / search 殘留
+- **世界級對照**:Radix Popover([radix-ui.com/primitives/docs/components/popover](https://www.radix-ui.com/primitives/docs/components/popover))/ Ant Select([ant.design/components/select](https://ant.design/components/select))/ MUI Select([mui.com/material-ui/api/select](https://mui.com/material-ui/api/select/))皆提供 controlled `open` — 它們是泛用 primitive / library,必須支援任意 orchestration;本 DS 是 opinionated form control,無真實 consumer 需求前不為「可能性」付受控成本(Rule-of-3)
+
+**若未來要開 controlled open**:同 value 軸走既有 `useControllable` hook(M17 SSOT)+ 測 controlled↔uncontrolled switch,屬 major API 擴充,目前不在 scope。
+
 ---
 
 ## 何時用
@@ -230,7 +240,7 @@ Select 的值套用時機是**由 onChange handler 的副作用決定**，不是
 - Tag 元件呈現選中值 + 隱藏的原生 select overlay
 - Tag 設為 `pointer-events-none`，點擊穿透到底層 select
 - edit 模式：Tag + ChevronDown + 可選 clear
-- readonly / disabled：Tag 只顯示，無 ChevronDown
+- readonly / disabled：Tag 顯示 + ChevronDown 恆顯(類型身份 indicator;readonly fg-muted / disabled fg-disabled),不可開選單
 
 ---
 
@@ -263,7 +273,7 @@ Select 的值套用時機是**由 onChange handler 的副作用決定**，不是
 
 ## Loading
 
-`loading?: boolean`(forward 給 SelectMenu SSOT,2026-05-15 audit B 補):dropdown body 內取代 options 顯 `<Empty icon={<CircularProgress size={48}/>}/>`(消費 既有 empty.spec.md:182 SSOT)+ `aria-busy`。Trigger 不變(chevron 保留,user 隨時可開)。對齊 MUI Autocomplete `loadingText` 雙層 + Ant Select loading,反 trigger spinner 派。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+`loading?: boolean`(forward 給 SelectMenu SSOT,2026-05-15 audit B 補):dropdown body 內取代 options 顯 `<Empty icon={<CircularProgress size={48}/>}/>`(消費 既有 empty.spec.md「現有消費者」SelectMenu loading row SSOT)+ `aria-busy`。Trigger 不變(chevron 保留,user 隨時可開)。對齊 MUI Autocomplete `loadingText` 雙層 + Ant Select loading,反 trigger spinner 派。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ---
 
@@ -312,7 +322,7 @@ Select 是 **Field Controls family 成員**——互動狀態(focus / invalid / 
 - ↑ / ↓ — 選單展開後在選項間移動
 - Esc — 關閉選單(清除值走右側 clear 按鈕,非 Esc)
 
-**Focus**:DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供;手機原生 `<select>` 另有系統 focus ring。
+**Focus**:DS focus 藍框(`focus-within:!border-primary`)由 Field wrapper 提供;手機原生 `<select>` 另有系統 focus ring。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

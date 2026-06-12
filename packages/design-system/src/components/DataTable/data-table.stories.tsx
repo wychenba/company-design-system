@@ -296,6 +296,7 @@ export const RowAutoHeight: Story = {
 }
 
 /* ── Empty State ── */
+// 「預設空狀態」pane = 「自訂空狀態」的對照基線;Empty primitive 消費教學 canonical → anatomy.EmptyState,此處不重複教學
 export const EmptyState: Story = {
   name: '空狀態',
   render: () => (
@@ -1432,14 +1433,14 @@ export const FilterPanelLongTagOverflow: Story = {
 
 /* ── 列拖曳重排(Jira-style + 3-panel pinned columns)──────────────────────
    enableRowDrag + onRowReorder 整合範例(v3 Jira 設計準則):
-   - handle absolute 浮在 row 左 border(Button tertiary iconOnly xs = elevated chip)
+   - handle 浮在 row 左緣(fixed-position;Button tertiary iconOnly xs = elevated chip)
    - 不佔 column 空間 — table 看起來乾淨,沒有預留拖曳欄位
-   - hover row → handle 浮現(opacity 0 → 100)
-   - 拖曳 row → @dnd-kit/sortable 重排;放下 → onRowReorder(sourceId, targetId, 'before' | 'after')
+   - hover row → handle 浮現(JS 控 opacity)
+   - 拖曳 row → @dnd-kit/core useDraggable + useDroppable(v15.0 Path B);放下 → onRowReorder(sourceId, targetId, 'before' | 'after')
    - consumer 自管 data array mutation(同 Notion / Airtable / Linear pattern)
    - sort 啟用時 drag handle 自動 disabled + Tooltip 解釋
-   - pinned-left + pinned-right 同時存在 → mirror regions 跟動 transform(per-region useSortable
-     共享同 SortableContext state) */
+   - pinned-left + pinned-right 同時存在 → source 留原位,2px drop indicator 跨三 region 同步標示落點
+     (per-region useDraggable / useDroppable,不 auto-shift) */
 export const RowDragInteractive: Story = {
   name: '列拖曳重排（含釘選欄）',
   render: () => {
@@ -1462,8 +1463,8 @@ export const RowDragInteractive: Story = {
       <div className="flex flex-col gap-3 max-w-3xl">
         <p className="text-caption text-fg-muted">
           handle 浮在 row 左緣（不佔 column 空間，Jira 設計準則）。pinned-left（SKU）+ pinned-right（Updated）+
-          center 中段欄。拖曳任一列時，三個 region 的 row 會同步跟動 transform（per-region
-          <code>useSortable</code> 共享同 SortableContext state）。
+          center 中段欄。拖曳時 source 列留在原位（壓住視覺），2px 主色 drop indicator 跨三個 region
+          同步標示落點（per-region <code>useDraggable</code> / <code>useDroppable</code>，不 auto-shift）。
         </p>
         <DataTable
           columns={columnsWithPrice}
@@ -1510,8 +1511,8 @@ export const RowDragWithVirtualization: Story = {
     return (
       <div className="flex flex-col gap-3 max-w-3xl">
         <p className="text-caption text-fg-muted">
-          200 列 + 虛擬捲動。v3 修正:enableRowDrag 自動拉高 overscan ≥ 10、drag 期間 freeze
-          measureElement、modifier 鎖 Y 軸 — 拖曳 + 持續往下捲不再錯位。
+          200 列 + 虛擬捲動。v3 修正:enableRowDrag 自動拉高 overscan ≥ 5、drag 期間 freeze
+          measureElement、snapToCursorModifier ghost 對齊游標（不鎖軸）— 拖曳 + 持續往下捲不再錯位。
         </p>
         <DataTable
           columns={baseColumns}
@@ -1888,5 +1889,49 @@ export const RoadmapAllInOne: Story = {
     if (visibleCount < 5) {
       throw new Error(`Virtualization too aggressive:rendered only ${visibleCount} rows`)
     }
+  },
+}
+
+/* ── Feature-split perf budget story(2026-05-14 codex perf debate verdict;2026-06-12 deep-audit
+   R2 重建 — 2026-05-17 stories 整併批次誤 retire,但 spec「六之三」Case B hard gate +
+   scripts/runtime-perf-datatable.mjs:20 仍指向本 story,gate 形同不可跑):──────────────────
+   獨立 perf 量測 story — 同 Roadmap 13 cols rich-cell data(useRoadmapColumns SSOT),但**禁用**
+   row drag / column reorder / column resize / selection / spreadsheet overlay,只保 inline edit
+   display。目的:隔離 feature-stack 疊加 cost(SortableRowProvider / filter / sort / columnOrder
+   state),驗證 rich cell 本體 scroll budget(avg ≤ 50ms / p95 ≤ 80ms / long-task ≤ 1,CPU 4x
+   throttle)。**不動** RoadmapAllInOne demo IA(user 2026-05-10 directive 全合一)。
+   重建版去掉原手刻說明 banner(px-loose + border-b border-divider = R9 chrome-header drift
+   簽名,且量測 story 不需 chrome;說明留本註解)。 */
+export const RoadmapPerfBudget: Story = {
+  name: '效能預算量測',
+  parameters: { layout: 'fullscreen' },
+  tags: ['!autodocs'],
+  render: () => {
+    const bigData = React.useMemo(() => {
+      const arr: RoadmapItem[] = []
+      for (let i = 0; i < 500; i++) {
+        const base = ROADMAP_DATA[i % ROADMAP_DATA.length]
+        const id = `RDM-${String(i + 100).padStart(3, '0')}`
+        arr.push({ ...base, id, title: `${base.title} (#${i + 1})` })
+      }
+      return arr
+    }, [])
+    const [data, setData] = React.useState(bigData)
+    const columns = useRoadmapColumns()
+    const handleCommit = (rowId: string, colId: string, value: unknown) => {
+      setData((prev) => prev.map((r) => (r.id === rowId ? { ...r, [colId]: value } : r)))
+    }
+    return (
+      <div className="mx-[var(--layout-space-loose)] mb-[var(--layout-space-loose)]">
+        <DataTable
+          columns={columns}
+          data={data}
+          height="600px"
+          inlineEdit
+          getRowId={(row) => row.id}
+          onCellCommit={handleCommit}
+        />
+      </div>
+    )
   },
 }

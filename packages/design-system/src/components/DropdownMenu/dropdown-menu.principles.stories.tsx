@@ -87,11 +87,11 @@ export const UsageGuidance: Story = {
             <Button variant="tertiary" size="sm" iconOnly startIcon={MoreVertical} aria-label="更多操作" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem><Copy size={16} />複製</DropdownMenuItem>
-            <DropdownMenuItem><Share2 size={16} />分享</DropdownMenuItem>
-            <DropdownMenuItem><Download size={16} />匯出</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Copy}>複製</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Share2}>分享</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Download}>匯出</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-error"><Trash2 size={16} />刪除</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Trash2} className="text-error">刪除</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <Label>↑ 執行動作：複製 / 分享 / 刪除，選完關閉，畫面沒有「選中狀態」</Label>
@@ -217,10 +217,10 @@ export const ItemTypeRule: Story = {
               <Button variant="tertiary">檔案操作</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem><Copy size={16} />複製連結<DropdownMenuShortcut>⌘C</DropdownMenuShortcut></DropdownMenuItem>
-              <DropdownMenuItem><Download size={16} />下載<DropdownMenuShortcut>⌘S</DropdownMenuShortcut></DropdownMenuItem>
+              <DropdownMenuItem startIcon={Copy} shortcut="⌘C">複製連結</DropdownMenuItem>
+              <DropdownMenuItem startIcon={Download} shortcut="⌘S">下載</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-error"><Trash2 size={16} />刪除<DropdownMenuShortcut>⌫</DropdownMenuShortcut></DropdownMenuItem>
+              <DropdownMenuItem startIcon={Trash2} shortcut="⌫" className="text-error">刪除</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </Rule>
@@ -280,12 +280,11 @@ export const DestructiveRule: Story = {
             <Button variant="tertiary" size="sm" iconOnly startIcon={MoreVertical} aria-label="更多" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem><Copy size={16} />複製</DropdownMenuItem>
-            <DropdownMenuItem><Share2 size={16} />分享</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Copy}>複製</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Share2}>分享</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-error">
-              <Trash2 size={16} />永久刪除
-              <DropdownMenuShortcut>⌫</DropdownMenuShortcut>
+            <DropdownMenuItem startIcon={Trash2} shortcut="⌫" className="text-error">
+              永久刪除
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

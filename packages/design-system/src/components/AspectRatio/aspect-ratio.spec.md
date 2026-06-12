@@ -114,7 +114,7 @@ AspectRatio 是 pure layout primitive(container 鎖比例),本身:
 - **無 size prop**:寬度由 parent / className 控制,高度由 `ratio` 公式自動推導(`height = width / ratio`)。因此不提供 sm/md/lg size variant,不同尺寸透過外層容器寬度達成。故不建立 `SizeMatrix`——元件特有視覺對照改為 `StandardRatios`(DS 慣用 5 種 ratio)。
 - **無互動狀態**:無 hover / focus / active / selected / disabled(非互動元件,純 structural container)。故不建立 `StateBehavior`。
 
-對應 anatomy story:保留 `Overview` + `Inspector`(ratio 切換互動)+ 元件特有 `StandardRatios`。
+對應 anatomy story:保留 `Overview` + `Inspector`(ratio 切換互動)+ 元件特有 `StandardRatios` + `Accessibility`(2026-05-17 Dim 13)。
 
 ---
 

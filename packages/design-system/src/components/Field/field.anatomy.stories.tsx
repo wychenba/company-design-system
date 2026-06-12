@@ -53,7 +53,7 @@ export const Overview: Story = {
               <tr><Td>資料格式化(千分位/貨幣/locale)</Td><Td>—</Td><Td>✓ 管</Td></tr>
               <tr><Td>驗證邏輯</Td><Td>—</Td><Td>✓ 管(+ zod schema 於 form 層)</Td></tr>
               <tr><Td>readonly 呈現</Td><Td>—</Td><Td>✓ 管</Td></tr>
-              <tr><Td>DataTable cell 顯示</Td><Td>—</Td><Td>✓ 管(Display 子元件)</Td></tr>
+              <tr><Td>DataTable cell 顯示</Td><Td>—</Td><Td>✓ 管(mode="display" 渲染分支)</Td></tr>
             </tbody>
           </table>
         </div>
@@ -417,7 +417,7 @@ export const ColorMatrix: Story = {
                 <Td mono>Control border(傳給 Field Controls)</Td>
                 <Td><TokenCell token="--border" display="border" /></Td>
                 <Td><TokenCell token="--error" display="error(border)" /></Td>
-                <Td><TokenCell token="--border" display="border" /></Td>
+                <Td>—(border-transparent,無可見邊框)</Td>
               </tr>
               <tr>
                 <Td mono>Control bg(disabled)</Td>
@@ -503,7 +503,8 @@ export const FieldGroupBehavior: Story = {
           </div>
           <div className="border border-dashed border-divider rounded-md p-4">
             <div className="text-caption text-fg-muted mb-3 font-mono">horizontal orientation</div>
-            <FieldGroup>
+            {/* horizontalLabelWidth:同表單 horizontal Field 必統一 label 寬(field.spec.md「FieldGroup horizontalLabelWidth cascade」硬規則)*/}
+            <FieldGroup horizontalLabelWidth="120px">
               <Field orientation="horizontal" required>
                 <FieldLabel>姓名</FieldLabel>
                 <Input placeholder="請輸入姓名" />

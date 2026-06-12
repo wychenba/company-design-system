@@ -90,9 +90,9 @@ export const UsageGuidance: Story = {
 
         <Rule
           title="❌ 不用 DatePicker 選時間(時 / 分 / 秒)→ TimePicker"
-          note="時間改用 TimePicker。如需同時選日期 + 時間 → DatePicker + TimePicker 並列。Notion calendar event 的 time 欄是獨立 TimePicker"
+          note="只選時間改用 TimePicker。如需同時選日期 + 時間 → DatePicker 加 showTime prop(canonical 2026-05-02,Ant idiom;非獨立並列組合,見 spec「showTime」段)。Notion calendar event 的 time 欄是獨立 TimePicker"
         >
-          <Label warn>時間用 TimePicker,日期 + 時間用並列組合</Label>
+          <Label warn>時間用 TimePicker,日期 + 時間用 showTime prop</Label>
         </Rule>
 
         <Rule
@@ -138,8 +138,8 @@ export const FormattingRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="Display 與 Edit trigger 皆用 Intl.DateTimeFormat"
-        note="formatOptions + locale 同時控制 readonly / disabled 的 Display 文字,以及 edit 模式 trigger 顯示的已選日期文字。跨模式一致、跨頁面可預期。Calendar popup 的月份語言由 Calendar 內部 locale 處理"
+        title="格式化跨模式一致 — 預設 YYYY/MM/DD,傳 formatOptions / locale 走 Intl.DateTimeFormat"
+        note="未傳格式 prop 時預設直接組 YYYY/MM/DD(locale-independent);傳 formatOptions + locale 才啟用 Intl.DateTimeFormat,同時控制 readonly / disabled 的 Display 文字與 edit trigger 顯示文字。跨模式一致、跨頁面可預期。Calendar popup 的月份語言由 Calendar 內部 locale 處理"
       >
         <DatePicker
           mode="readonly"

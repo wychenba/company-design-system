@@ -331,7 +331,7 @@ upload-manager 的 completed(100% bar + ✓)屬「剛完成的 upload session」
 ```
 
 **Clickable → 下載 / 預覽 canonical**(AR15):
-- FileItem 提供 `onClick` prop,consumer 傳入即進 clickable 模式(hover + cursor + keyboard)
+- FileItem 提供 `onClick` prop,consumer 傳入即進 clickable 模式(僅滑鼠可點 + `cursor-pointer`;刻意不加整列 keyboard 焦點 / hover-bg — 見「A11y 預設」nested-interactive rationale 與「Hover 行為 canonical」)
 - 兩種 surface 都可以用 `onClick`(upload-manager 可跟 `onDownload` hover-swap 並存)
 - consumer 決定具體行為(download / FileViewer),元件只提供 row 可點擊能力
 
@@ -386,7 +386,7 @@ Consumer 自行組合。按 `patterns/element-anatomy/item-anatomy.spec.md`「Pr
 - `mode="rich"` → `var(--field-height-xs)`(24 固定,與 Button xs iconOnly 同)
 - `mode="compact"` → `var(--field-height-xs)`(24,同 rich;compact 靠 status slot wrapper 的 `[&>[data-unbounded]]:my-[calc((1lh-var(--field-height-xs))/2)]` 把 24 footprint 收斂到 1lh,不撐高 row,視覺 / touch target 仍 24)
 
-Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿同一容器。這讓 flex gap token 測量的是**兩個同尺寸 action slot 之間的真實 gap**,不被 hover bg overflow 吃掉——status slot 尺寸 = 同 size delete slot,gap token 才能如實呈現;歷史 bug 細節見 CLAUDE.md `# 失敗記憶索引`。
+Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿同一容器。這讓 flex gap token 測量的是**兩個同尺寸 action slot 之間的真實 gap**,不被 hover bg overflow 吃掉——status slot 尺寸 = 同 size delete slot,gap token 才能如實呈現;歷史 bug 細節見 `.claude/skills/design-system-audit/references/historical-bugs.md`。
 
 世界級 DS 的幾何鐵律:**同一 flex 列的互動元素必須有統一 box 尺寸**,gap token 才能如實呈現。
 

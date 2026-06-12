@@ -93,7 +93,7 @@ TabsContent ← 對應被選中的 trigger
 ```
 
 - **Trigger 三層 slot 間 gap-2**（8px），對標 **item-layout pattern** 的橫向 inline 變體
-- **suffix 內 gap-1**（4px），對標 **Button** suffix wrapper（`button.tsx:288`）
+- **suffix 內 gap-1**（4px），對標 **Button** suffix wrapper（`button.tsx` 的 `<span className="inline-flex items-center gap-1">`）
 - `startIcon` 描述 tab 的內容性質（人像 icon 配「成員」、齒輪 icon 配「設定」）
 - `badge` 傳達該 tab 底下的待處理計數（「通知 3」「成員 12」）
 - `endIcon` **純視覺 indicator only**（方向 / 狀態 — ChevronDown 暗示「展開後看到子內容」、Pin / Star 狀態徽記）。**不拼 click 行為** — 點到 endIcon 跟點到 tab body 同效果（切 tab）
@@ -193,7 +193,7 @@ TabsList 底部有 1px gray border（`border-divider`，neutral-4），selected 
 - 跟 Dialog / Sheet / Popover / Sidebar header `border-b border-divider` 同色 — chrome separator 一致
 - withTabs scenario 下 tabs underline = chrome separator,色不同會視覺斷裂
 - Selected trigger 2px primary indicator overlay underlying 1px divider 對比仍清楚(primary 比 neutral-4 強得多)
-- 對齊 `color.spec.md:706-708` outer-vs-divider 判準的「T-junction seamless」直覺(tabs underline 跟 header separator T 字交接)
+- 對齊 `color.spec.md`「T-junction connectivity 原則」段 outer-vs-divider 判準的「T-junction seamless」直覺(tabs underline 跟 header separator T 字交接)
 
 在 Dialog / Sidebar header 內特別重要——header 的 `border-b` 和 Tabs 的 `border-b` 必須感知為同一條水平線。
 
@@ -203,7 +203,7 @@ TabsList 底部有 1px gray border（`border-divider`，neutral-4），selected 
 
 Tabs 常與容器 header 的底邊 border 合併——**視覺上只有一條線**,不是 header border + tabs border 疊兩條。
 
-**做法**:Tabs 的 `TabsList` 底部 border 與 header 的 `border-b` 實際上是**同一條線**(設計上重疊、實作上不重複渲染)。**Header 退讓**(移除自己 `border-b`),**Tabs 接管**(自身 `border-b border-divider` per `TABS_LIST_BASE`,2026-05-18 fd843c25 統一 chrome separator 色)。none overflow mode → TabsList block-level full-width 延展;scroll / menu overflow mode → TabsList `inline-flex w-fit`(2026-05-19 c359c711 border owner 升 list 內部 + `overflow-y-hidden` 阻 y auto-promote)。
+**做法**:Tabs 的 `TabsList` 底部 border 與 header 的 `border-b` 實際上是**同一條線**(設計上重疊、實作上不重複渲染)。**Header 退讓**(移除自己 `border-b`),**Tabs 接管**(自身 `border-b border-divider` per `TABS_LIST_BASE`,2026-05-18 fd843c25 統一 chrome separator 色)。三種 overflow mode(none / scroll / menu)的 TabsList 一律 `inline-flex w-fit`(`TABS_LIST_BASE` + `w-fit`;2026-05-19 c359c711 border owner 升 list 內部 + `overflow-y-hidden` 阻 y auto-promote);chrome header 內的全寬 paint 由 `ChromeHeader` tabsSlot wrapper 以 `[&>[role=tablist]]:w-full` 強制(見 `header-canonical.spec.md`)。
 
 **世界級對照(verbatim cite)**:
 - **GitHub Primer PageHeader**:「`hasBorder` defaults true,**but border NOT rendered if Navigation child contains UnderlineNav**;UnderlineNav itself provides bottom border」(`primer.style/components/page-header/react`)
@@ -280,7 +280,7 @@ Size 建議:overlay / chrome header 內用 `sm`(32/40)— 對應 close X 也是 
 Tabs anatomy 採 DS 標準結構 + 元件特有矩陣:
 
 - `Overview` —— 預設視覺概覽
-- `Inspector`(`元件檢閱器`)—— 互動式 prop 試玩(`size` × `variant` 即時切換),對齊全部同類元件「單組合即時試玩 prop」的 DS 慣例
+- `Inspector`(`元件檢閱器`)—— 互動式 prop 試玩(`size` × `overflow` × `value` 即時切換),對齊全部同類元件「單組合即時試玩 prop」的 DS 慣例
 - 標準 `SizeMatrix` / `ColorMatrix` / `StateBehavior`(selected / hover / disabled)—— 結構性對照,呈現 underline / selected border 與 TabsList border 的視覺關係(見「Underline 與 TabsList border 的視覺關係」段),單組合 Inspector 無法並列呈現
 - 元件特有 `OverflowMatrix`(scroll / menu / fade 三模式)—— 「tabs 放不下時怎麼處理」是設計決策題,需三方案 side-by-side 同時比較,Inspector 單組合無法呈現
 - `SpacingTokens` —— 間距 token 對照

@@ -29,16 +29,16 @@ Separator 是語意分隔元件，用於標示內容群組之間的邊界。
 ### Consumer 手動放 → Separator 元件
 
 Consumer 在 JSX 裡明確放置分隔線的場景：
-- `<SidebarSeparator />` 在 sidebar 群組間
-- `<DropdownMenuSeparator />` 在操作選單項目間
-- `<ButtonDivider />` 在按鈕群組內
+- `<SidebarSeparator />` 在 sidebar 群組間（消費 DS Separator）
+- `<DropdownMenuSeparator />` 在操作選單項目間（Radix Menu 自有 separator primitive，非 DS Separator）
+- `<ButtonDivider />` 在按鈕群組內（raw div + `role="separator"`，非 DS Separator）
 
-為什麼：Consumer 控制的分隔點需要語意標記（`role="separator"`），讓輔助技術能辨識內容群組邊界。
+為什麼：Consumer 控制的分隔點由放置者宣告語意——DS Separator 預設 decorative（`role="none"`，SR 靜默），真實切分內容區段時 `decorative={false}` 才輸出 `role="separator"`（詳「A11y 預設」段）。
 
 ### 元件自動分隔相鄰群組 → CSS `[&+&]`
 
 元件內部自動在相鄰同類群組間產生分隔線：
-- `MenuGroup`:相鄰同類群組之間自動出現 `border-divider` 分隔(見 `menu.tsx`)
+- `MenuGroup`:相鄰同類群組之間自動出現 `border-divider` 分隔(見 `menu-item.tsx`)
 - `SidebarGroup`:相鄰群組之間自動產生分隔線(見 `sidebar.tsx`)
 
 為什麼：Consumer 只需要思考「分組」，不需要記得放分隔線。CSS 相鄰選擇器無法用元件替代（無處插入 DOM node）。

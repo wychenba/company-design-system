@@ -3,8 +3,6 @@ component: ScrollArea
 family: self-contained
 variants: {}
 sizes: {}
-traits:
-  - hasInteractiveStates
 benchmark:
   - Radix ScrollArea primitive: github.com/radix-ui/primitives/tree/main/packages/react/scroll-area
 ---
@@ -40,7 +38,7 @@ ScrollArea 用 Radix 自訂 overlay 捲軸 → **跨 OS 一致、不吃寬度、
 
 ## 何時用
 
-- **DataTable 橫向捲動**——最明顯跑版場景,欄位多於容器寬度時
+- **寬內容橫向捲動**——內容寬於容器的一般場景(寬表格類 demo、程式碼區塊等)。**例外:DataTable 中央捲動區不用 ScrollArea**——走 native `overflow-x-auto` + JS scrollLeft 同步(pinned column 結構需求,理由與 post-v1 重構計畫見 `data-table.spec.md`「捲軸 canonical」節;2026-06-12 收斂跨 spec 張力,以已實作且有 rationale 的 DataTable 側為準)
 - **Sheet / Dialog body 垂直捲動**——內容可能超出容器高度
 - **Sidebar nav 長列表**——導覽項目多於可見高度
 - **任何「內容可能溢出容器」且「跨 OS 視覺必須一致」的 sub-region**
@@ -102,7 +100,7 @@ ScrollArea 用 Radix 自訂 overlay 捲軸 → **跨 OS 一致、不吃寬度、
 Radix primitive + 本 DS a11y 橋接:
 
 - **鍵盤捲動**:本 DS 在 Viewport 加 `tabIndex={0}` 使其可被鍵盤聚焦(Radix 不自動把 scroll container 標 focusable,Safari 尤其需要;此即 axe `scrollable-region-focusable` fix)。聚焦後 `ArrowUp/Down/Left/Right` / `PageUp/Down` / `Home/End` 捲動為瀏覽器原生行為,非 Radix 提供
-- **Focus 可見**:聚焦的 Viewport 顯示 DS focus ring(`focus-visible:outline-primary`,inset 2px),非瀏覽器原生 focus ring
+- **Focus 可見**:聚焦的 Viewport 顯示 DS focus ring(`focus-visible:outline-ring`,inset 2px),非瀏覽器原生 focus ring
 - **Scrollbar 非 tab stop**:scrollbar thumb 不搶焦點,使用鍵盤的使用者透過 viewport 捲動(Radix 內建)
 - **Pointer 支援**:thumb 可拖曳,track 可 click-to-jump(Radix 內建)
 
@@ -123,7 +121,7 @@ Radix primitive + 本 DS a11y 橋接:
 
 ScrollArea 是**捲動容器 primitive**,本身**無互動狀態**(見「邊界案例」段:無 disabled,內容捲動由瀏覽器原生處理)。唯一的 state 是「scrollbar visible / hidden」,但這由 Radix 依 overflow 自動偵測,非 consumer 或元件 prop 可控。重寫 StateBehavior 會讓 consumer 誤以為有 hover / focus / disabled prop 可切。orientation(水平 / 垂直 / 雙向)的結構變化由元件特有 `OrientationBehavior` own。
 
-對應 anatomy story:保留 `Overview` + `Inspector` + `ColorMatrix`(scrollbar track / thumb 色) + `SizeMatrix` + 元件特有 `OrientationBehavior`。
+對應 anatomy story:保留 `Overview` + `Inspector` + `ColorMatrix`(scrollbar track / thumb 色) + `SizeMatrix` + `Accessibility` + 元件特有 `OrientationBehavior`。
 
 ---
 

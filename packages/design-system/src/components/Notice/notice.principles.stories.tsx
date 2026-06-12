@@ -47,7 +47,7 @@ export const UsageGuidance: Story = {
       <Section title="何時不用 + 替代">
         <p>Notice 是 internal primitive,自身有 dismiss 按鈕 + <code>onDismiss</code> callback,但不管 dismiss 後的 mount / unmount 生命週期,也無 auto-dismiss 計時——需要這些行為改用以下 consumer:</p>
         <ul>
-          <li><strong>需要管理 dismiss 後移除(永久 inline)</strong> → 用 <code>Alert</code>(內部消費 Notice + 處理 unmount + role="alert")</li>
+          <li><strong>需要管理 dismiss 後移除(永久 inline)</strong> → 用 <code>Alert</code>(內部消費 Notice + 處理 unmount + live region:error/warning role="alert"、其餘 role="status")</li>
           <li><strong>需要 auto-dismiss(短暫 toast)</strong> → 用 <code>Toast</code></li>
           <li><strong>表單欄位錯誤訊息</strong> → 用 <code>Field</code> 內建 errorText,不用 Notice</li>
         </ul>
@@ -74,7 +74,7 @@ export const CompositionRules: Story = {
     <div>
       <Section title="Pattern 1 — Alert(persistent inline announcement)">
         <div className="prose prose-sm max-w-prose">
-          <p>需要「持續顯示直到 user 主動 dismiss」→ <LinkTo kind="Design System/Components/Alert/展示" name="低調單行"><span className="text-primary hover:underline font-medium cursor-pointer">Alert 低調單行</span></LinkTo>。Alert 內部消費 Notice + 加上 dismiss button + role="alert" ARIA。</p>
+          <p>需要「持續顯示直到 user 主動 dismiss」→ <LinkTo kind="Design System/Components/Alert/展示" name="低調單行"><span className="text-primary hover:underline font-medium cursor-pointer">Alert 低調單行</span></LinkTo>。Alert 內部消費 Notice + 加上 dismiss button + live region ARIA(error/warning → role="alert" assertive;info/success/neutral → role="status" polite)。</p>
           <ul>
             <li>典型場景:付款失敗 banner / workspace 警告 / 重要通知 user 必看</li>
             <li>對齊世界級:Polaris <code>Banner</code> / Material <code>Banner</code> / Atlassian <code>InlineMessage</code> — 共識用「persistent + dismissible」</li>

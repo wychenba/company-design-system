@@ -161,7 +161,7 @@ export const FormatOptionsRule: Story = {
     <div>
       <Rule
         title="prefix — 置於數字前的符號(貨幣是最常見場景)"
-        note="prefix 會同時出現在 edit、readonly、DataTable cell。使用者不需要自己輸入 $——打字就是純數字"
+        note="prefix 出現在 readonly / display / disabled 與 DataTable cell 的格式化值;edit 模式輸入 raw 純數字、不渲染 prefix——使用者不需要自己輸入 $"
       >
         <NumberInput mode="readonly" value={2490} prefix="$" />
         <NumberInput mode="readonly" value={12500} prefix="NT$" precision={0} />

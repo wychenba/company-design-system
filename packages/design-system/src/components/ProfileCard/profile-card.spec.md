@@ -74,7 +74,7 @@ ProfileCard 是**三層 chrome 結構**(2026-04-23 canonical):
 
 Section 之間用 `border-t border-divider` 分隔(見 `separator.spec.md`「元件固定結構 → CSS border-t/b」)。詳細 class / padding token 見 `profile-card.tsx`。
 
-<!-- 2026-05-18 D2 fix:width SSOT 統一 320(對齊 tsx `w-[320px]`)。本檔之前 L150 殘留「280px」自相矛盾已撤,只保留 L72 320 canonical。 -->
+<!-- 2026-05-18 D2 fix:width SSOT 統一 320(對齊 tsx `w-[320px]`)。本檔之前殘留「280px」自相矛盾已撤,只保留「## 寬度」段 320 canonical。 -->
 
 **View more 按鈕 padding**:固定 `py-3`(12px),比 Body `py-3` 同位 — 讓 footer 有明顯呼吸空間,不跟 body section 邊界混淆。
 
@@ -86,7 +86,7 @@ ProfileCard 固定 **320px 寬**（見 `.tsx` 的 `w-[320px]`）——HoverCard 
 
 ## Action 行(2026-04-20 canonical)
 
-Action 區的 layout **永遠等寬均分容器寬度**——multiple actions 每個 Button 取相同 `1fr` 寬、single action 撐滿整個 ProfileCard width。實作 = `grid grid-flow-col auto-cols-fr gap-2` + `[&>*]:w-full` 強制每個 child fill grid cell。
+Action 區的 layout **永遠等寬均分容器寬度**——multiple actions 每個 Button 取相同 `1fr` 寬、single action 撐滿整個 ProfileCard width。實作(grid 等寬均分 class)見 `profile-card.tsx` Action 區註解。
 
 ```
 [ Chat      ][ Audio call ▾ ]   ← 2 個 action:各 50%
@@ -156,7 +156,7 @@ ProfileCard 的 default actions **是 `Chat + Audio call`**(chat app 標配,cano
 > 命名對齊 DS canonical(2026-05-18,per `# 命名與語言一致性`)。本節原標題「無障礙」,改「A11y 預設」與其他 spec 一致。
 
 - **Trigger 整合**:Avatar 作為 HoverCard trigger 時,`onFocus` / `onBlur` 與 mouseenter/leave 同時觸發由 Radix HoverCard 管理——鍵盤使用者 Tab 到 avatar 可自動顯示 card,Escape 關閉
-- **Focus 順序**:Radix `HoverCard` 預設**不抓取 focus 進入浮層**——`HoverCardContent` 每次 render 用 TreeWalker 把浮層內所有 `tabIndex >= 0` 節點 set `tabindex="-1"`(`@radix-ui/react-hover-card` dist `index.js` L217-222 + `getTabbableNodes` L279-288),刻意把 ProfileCard 的 action button / view more 移出 tab order。因此 hover-integrated 路徑下,鍵盤使用者 Tab 只停在 trigger(Avatar),**無法 Tab 逐一聚焦浮層內的 action / view more**(與 Popover 的 focus trap 截然不同,這是 HoverCard 作為「hover-only 預覽」的刻意設計)。需要鍵盤可達 action 的情境應改用 Popover / Dialog,不要用 HoverCard
+- **Focus 順序**:Radix `HoverCard` 預設**不抓取 focus 進入浮層**——`HoverCardContent` 每次 render 用 TreeWalker 把浮層內所有 `tabIndex >= 0` 節點 set `tabindex="-1"`(`@radix-ui/react-hover-card` dist `index.js` 的 TreeWalker + `getTabbableNodes`;dist 行號隨安裝版本浮動,不 pin),刻意把 ProfileCard 的 action button / view more 移出 tab order。因此 hover-integrated 路徑下,鍵盤使用者 Tab 只停在 trigger(Avatar),**無法 Tab 逐一聚焦浮層內的 action / view more**(與 Popover 的 focus trap 截然不同,這是 HoverCard 作為「hover-only 預覽」的刻意設計)。需要鍵盤可達 action 的情境應改用 Popover / Dialog,不要用 HoverCard
 - **Live region 語意**:ProfileCard 是展示內容,非 announcement,不套 `aria-live`
 - **DL 語意**:Info Fields 使用 DescriptionList(`<dl>/<dt>/<dd>`),screen reader 會讀成「term X, description Y」對話;詳見 `../DescriptionList/description-list.spec.md`「無障礙」段
 - **CTA button aria-label**:icon-only action button 必須帶 `aria-label`(「傳訊息給 {name}」「加入 {name} 為好友」),不只是 icon 視覺
@@ -164,12 +164,11 @@ ProfileCard 的 default actions **是 `Chat + Audio call`**(chat app 標配,cano
 
 ---
 
-## 為何無 Inspector / SizeMatrix
+## 為何無 SizeMatrix
 
-- **無 Inspector**:ProfileCard 的決策維度是「section 組合」(avatar + profile / status / info / viewMore 的開關)——互動 Inspector 切換 toggle 可以做,但 `SectionMatrix` 的 side-by-side 矩陣(最簡 → 中 → full)對 consumer 的判斷更直接(「什麼 section 組合適合什麼 context」)。多維組合用矩陣呈現比單組合互動玩耍有效。
 - **無 SizeMatrix**:ProfileCard 固定 **320px 寬**(元件級常數,見本 spec「寬度」段),跨 consumer / variant 不變——人員資訊卡的 canonical width 屬於元件自身,不抽為 token。Section 高度由內容撐開,無 size tier。
 
-對應 anatomy story:保留 `Overview` + `SectionMatrix` + `ColorMatrix`(Status 色) + 元件特有 `HoverCardIntegration`(canonical usage pattern) + `StateBehavior`(空值 / 過長文字邊界)。
+對應 anatomy story:保留 `Overview` + `Inspector`(section 開關 Controls,單組合互動檢閱)+ `SectionMatrix`(side-by-side 組合矩陣)+ `ColorMatrix`(Status 色)+ 元件特有 `HoverCardIntegration`(canonical usage pattern)+ `StateBehavior`(空值 / 過長文字邊界)+ `Accessibility`。
 
 ---
 
@@ -185,6 +184,7 @@ ProfileCard 的 default actions **是 `Chat + Audio call`**(chat app 標配,cano
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `avatar.spec.md`
 - `description-list.spec.md`
 - `hover-card.spec.md`
 - `people-picker.spec.md`
