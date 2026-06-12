@@ -625,7 +625,7 @@ function AddInvoiceModal({
               <div className="grid grid-cols-2 gap-6 p-3 rounded-lg bg-surface-raised border border-divider">
                 <div>
                   <p className="text-caption text-fg-tertiary mb-0.5">請款單號</p>
-                  <p className="text-sm font-medium">{invoiceNumber}</p>
+                  <p className="text-body font-medium">{invoiceNumber}</p>
                 </div>
                 <div>
                   <p className="text-caption text-fg-tertiary mb-0.5">狀態</p>
@@ -687,7 +687,7 @@ function AddInvoiceModal({
                 </Field>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 p-3 rounded-lg bg-surface-raised border border-divider text-sm">
+              <div className="grid grid-cols-2 gap-4 p-3 rounded-lg bg-surface-raised border border-divider text-body">
                 <div className="flex items-baseline gap-2">
                   <span className="text-fg-tertiary whitespace-nowrap">稅後金額</span>
                   <span className="font-medium">{taxAfterDisplay}</span>
@@ -745,7 +745,7 @@ function AddInvoiceModal({
 
               <div className="flex items-center gap-2">
                 <Checkbox id="partial" checked={s1.usePartialAmount} onCheckedChange={v => setS1(p => ({ ...p, usePartialAmount: !!v }))} />
-                <label htmlFor="partial" className="text-sm cursor-pointer select-none">使用不足額請款</label>
+                <label htmlFor="partial" className="text-body cursor-pointer select-none">使用不足額請款</label>
               </div>
             </div>
           )}
@@ -756,15 +756,15 @@ function AddInvoiceModal({
               <div className="grid grid-cols-3 gap-4 p-3 rounded-lg bg-surface-raised border border-divider">
                 <div>
                   <p className="text-caption text-fg-tertiary mb-0.5">請款單號</p>
-                  <p className="text-sm font-medium">{invoiceNumber}</p>
+                  <p className="text-body font-medium">{invoiceNumber}</p>
                 </div>
                 <div>
                   <p className="text-caption text-fg-tertiary mb-0.5">發票號碼</p>
-                  <p className="text-sm font-medium">{s1.invoiceNo || '-'}</p>
+                  <p className="text-body font-medium">{s1.invoiceNo || '-'}</p>
                 </div>
                 <div>
                   <p className="text-caption text-fg-tertiary mb-0.5">序號</p>
-                  <p className="text-sm font-medium">1</p>
+                  <p className="text-body font-medium">1</p>
                 </div>
               </div>
 
@@ -821,15 +821,15 @@ function AddInvoiceModal({
 
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm font-medium mb-2">是否提供合約編號</p>
+                  <p className="text-body font-medium mb-2">是否提供合約編號</p>
                   <RadioGroup value={s2.contractProvided} onValueChange={v => {
                     setS2(p => ({ ...p, contractProvided: v as Step2State['contractProvided'], noContractReason: '' }))
                     if (v !== 'yes') setContractNums([''])
                   }}>
                     <div className="flex items-center gap-6">
-                      <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="yes" />是</label>
-                      <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="no" />否</label>
-                      <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="not-required" />無需提供</label>
+                      <label className="flex items-center gap-2 cursor-pointer text-body"><RadioGroupItem value="yes" />是</label>
+                      <label className="flex items-center gap-2 cursor-pointer text-body"><RadioGroupItem value="no" />否</label>
+                      <label className="flex items-center gap-2 cursor-pointer text-body"><RadioGroupItem value="not-required" />無需提供</label>
                     </div>
                   </RadioGroup>
                 </div>
@@ -1007,8 +1007,8 @@ function AddAttachmentModal({
               <FieldLabel required>附件類型</FieldLabel>
               <RadioGroup value={attType} onValueChange={v => setAttType(v as 'invoice' | 'auxiliary')}>
                 <div className="flex items-center gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="invoice" />發票</label>
-                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="auxiliary" />輔助文件</label>
+                  <label className="flex items-center gap-2 cursor-pointer text-body"><RadioGroupItem value="invoice" />發票</label>
+                  <label className="flex items-center gap-2 cursor-pointer text-body"><RadioGroupItem value="auxiliary" />輔助文件</label>
                 </div>
               </RadioGroup>
             </Field>
@@ -1089,8 +1089,8 @@ function EditAttachmentModal({
               <FieldLabel required>附件類型</FieldLabel>
               <RadioGroup value={attType} onValueChange={v => setAttType(v as 'invoice' | 'auxiliary')}>
                 <div className="flex items-center gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="invoice" />發票</label>
-                  <label className="flex items-center gap-2 cursor-pointer text-sm"><RadioGroupItem value="auxiliary" />輔助文件</label>
+                  <label className="flex items-center gap-2 cursor-pointer text-body"><RadioGroupItem value="invoice" />發票</label>
+                  <label className="flex items-center gap-2 cursor-pointer text-body"><RadioGroupItem value="auxiliary" />輔助文件</label>
                 </div>
               </RadioGroup>
             </Field>
@@ -1150,8 +1150,8 @@ function PreviewCard({
         className="w-full flex items-center justify-between px-4 min-h-[52px] hover:bg-surface-raised transition-colors"
         onClick={() => setOpen(o => !o)}
       >
-        <span className="text-xl font-semibold text-fg-primary">{title}</span>
-        <span className="flex items-center gap-1 text-base text-fg-primary font-medium">
+        <span className="text-h4 font-semibold text-fg-primary">{title}</span>
+        <span className="flex items-center gap-1 text-body-lg text-fg-primary font-medium">
           {open ? '收合資訊' : '更多資訊'}
           <ChevronDown size={16} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
         </span>
@@ -1201,7 +1201,7 @@ function PreviewDialog({
           <div className="space-y-3 p-1">
 
             <PreviewCard title="基本資訊">
-              <div className="grid grid-cols-3 gap-y-3 text-sm pt-1">
+              <div className="grid grid-cols-3 gap-y-3 text-body pt-1">
                 <div>
                   <p className="text-fg-tertiary mb-0.5">公司代號</p>
                   <p className="text-fg-primary">TA01</p>
@@ -1227,10 +1227,10 @@ function PreviewDialog({
 
             <PreviewCard title="請款資訊">
               {invoices.length === 0 ? (
-                <p className="text-sm text-fg-tertiary pt-1">無請款資訊</p>
+                <p className="text-body text-fg-tertiary pt-1">無請款資訊</p>
               ) : (
                 <div className="rounded-lg border border-divider overflow-hidden mt-1">
-                  <table className="w-full text-sm">
+                  <table className="w-full text-body">
                     <thead className="bg-surface-raised border-b border-divider">
                       <tr>
                         <th className="text-left px-4 py-2 font-medium text-fg-secondary">請款單號</th>
@@ -1256,10 +1256,10 @@ function PreviewDialog({
 
             <PreviewCard title="憑證附件資訊">
               {attachments.length === 0 ? (
-                <p className="text-sm text-fg-tertiary pt-1">無附件資訊</p>
+                <p className="text-body text-fg-tertiary pt-1">無附件資訊</p>
               ) : (
                 <div className="rounded-lg border border-divider overflow-hidden mt-1">
-                  <table className="w-full text-sm">
+                  <table className="w-full text-body">
                     <thead className="bg-surface-raised border-b border-divider">
                       <tr>
                         <th className="text-left px-4 py-2 font-medium text-fg-secondary">類型</th>
@@ -1280,7 +1280,7 @@ function PreviewDialog({
                                 {att.files.map(f => (
                                   <div key={f.id} className="flex items-center gap-1.5">
                                     <Paperclip size={13} className="text-fg-tertiary shrink-0" />
-                                    <span className="text-[var(--info)] text-sm truncate">{f.name}</span>
+                                    <span className="text-[var(--info)] text-body truncate">{f.name}</span>
                                   </div>
                                 ))}
                               </div>
@@ -1297,11 +1297,11 @@ function PreviewDialog({
             <PreviewCard title="審核流程" defaultOpen>
               <div className="space-y-3 pt-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-fg-secondary">您可以依照需求新增審核人員。</p>
+                  <p className="text-body text-fg-secondary">您可以依照需求新增審核人員。</p>
                   <Button variant="outline" size="sm" startIcon={Plus}>新增審核人員</Button>
                 </div>
                 <div className="rounded-lg border border-divider overflow-hidden">
-                  <table className="w-full text-sm">
+                  <table className="w-full text-body">
                     <thead className="bg-surface-raised border-b border-divider">
                       <tr>
                         <th className="text-left px-3 py-2 font-medium text-fg-secondary">流程角色</th>
@@ -1342,9 +1342,9 @@ function PreviewDialog({
             </PreviewCard>
 
             <div className="bg-surface border border-[var(--divider)] rounded-lg p-4 space-y-4">
-              <h3 className="text-xl font-semibold text-fg-primary">簽核補充說明</h3>
+              <h3 className="text-h4 font-semibold text-fg-primary">簽核補充說明</h3>
               <div className="space-y-2">
-                <p className="text-sm text-fg-secondary">您可以填寫簽核補充說明，協助下一階段簽核人員快速完成審核</p>
+                <p className="text-body text-fg-secondary">您可以填寫簽核補充說明，協助下一階段簽核人員快速完成審核</p>
                 <Textarea
                   value={reason}
                   onChange={e => onReasonChange(e.target.value)}
@@ -1404,12 +1404,12 @@ function BatchImportModal({
           {phase === 'loading' ? (
             <div className="flex flex-col items-center justify-center py-10 gap-3">
               <Loader2 size={40} className="text-[var(--info)] animate-spin" />
-              <p className="text-base font-semibold text-fg-primary">檔案匯入中</p>
-              <p className="text-sm text-fg-secondary">檔案正在匯入中，請稍候。</p>
+              <p className="text-body-lg font-semibold text-fg-primary">檔案匯入中</p>
+              <p className="text-body text-fg-secondary">檔案正在匯入中，請稍候。</p>
             </div>
           ) : (
             <div className="space-y-4">
-              <p className="text-sm text-fg-secondary">
+              <p className="text-body text-fg-secondary">
                 請先下載{' '}
                 <span className="text-[var(--info)] underline cursor-pointer">Excel 付款細項範本</span>
                 ，填寫完成後到此匯入檔案。
@@ -1418,8 +1418,8 @@ function BatchImportModal({
               <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-[var(--divider)] rounded-lg py-10 cursor-pointer hover:border-[var(--info-hover)] transition-colors bg-surface-raised">
                 <Upload size={32} className="text-fg-tertiary" />
                 <div className="text-center">
-                  <p className="text-base font-semibold text-fg-primary">點擊或拖曳到此上傳檔案</p>
-                  <p className="text-sm text-fg-tertiary mt-0.5">Excel 檔案筆數不得超過 5000 筆。</p>
+                  <p className="text-body-lg font-semibold text-fg-primary">點擊或拖曳到此上傳檔案</p>
+                  <p className="text-body text-fg-tertiary mt-0.5">Excel 檔案筆數不得超過 5000 筆。</p>
                 </div>
                 <input
                   type="file"
@@ -1439,7 +1439,7 @@ function BatchImportModal({
               {fileName && (
                 <div className="flex items-center gap-2 px-3 py-2 border-b-2 border-[var(--info)]">
                   <Paperclip size={14} className="text-fg-tertiary shrink-0" />
-                  <span className="text-sm text-[var(--info)] flex-1 truncate underline">{fileName}</span>
+                  <span className="text-body text-[var(--info)] flex-1 truncate underline">{fileName}</span>
                   <button
                     onClick={() => setFileName(null)}
                     className="p-1 rounded text-fg-tertiary hover:text-error-default transition-colors"
@@ -1536,17 +1536,17 @@ function AddItemModal({
         <DialogBody>
           <div className="space-y-4">
             {/* Info bar */}
-            <div className="grid grid-cols-3 gap-4 bg-surface-raised border border-divider rounded-lg px-4 py-3 text-sm">
+            <div className="grid grid-cols-3 gap-4 bg-surface-raised border border-divider rounded-lg px-4 py-3 text-body">
               <div>
-                <p className="text-fg-tertiary text-xs mb-0.5">請款單號</p>
+                <p className="text-fg-tertiary text-caption mb-0.5">請款單號</p>
                 <p className="text-fg-primary font-medium">{invoiceNumber}</p>
               </div>
               <div>
-                <p className="text-fg-tertiary text-xs mb-0.5">發票號碼</p>
+                <p className="text-fg-tertiary text-caption mb-0.5">發票號碼</p>
                 <p className="text-fg-primary font-medium">{invoiceNo || '-'}</p>
               </div>
               <div>
-                <p className="text-fg-tertiary text-xs mb-0.5">序號</p>
+                <p className="text-fg-tertiary text-caption mb-0.5">序號</p>
                 <p className="text-fg-primary font-medium">{seqNum}</p>
               </div>
             </div>
@@ -1625,19 +1625,19 @@ function AddItemModal({
             </div>
             {/* 合約編號 */}
             <div>
-              <p className="text-sm text-fg-secondary mb-2">是否提供合約編號</p>
+              <p className="text-body text-fg-secondary mb-2">是否提供合約編號</p>
               <RadioGroup
                 value={contractProvided}
                 onValueChange={v => setContractProvided(v as 'yes' | 'no' | 'not-required')}
                 className="flex items-center gap-4"
               >
-                <label className="flex items-center gap-1.5 cursor-pointer text-sm">
+                <label className="flex items-center gap-1.5 cursor-pointer text-body">
                   <RadioGroupItem value="yes" />是
                 </label>
-                <label className="flex items-center gap-1.5 cursor-pointer text-sm">
+                <label className="flex items-center gap-1.5 cursor-pointer text-body">
                   <RadioGroupItem value="no" />否
                 </label>
-                <label className="flex items-center gap-1.5 cursor-pointer text-sm">
+                <label className="flex items-center gap-1.5 cursor-pointer text-body">
                   <RadioGroupItem value="not-required" />無需提供
                 </label>
               </RadioGroup>
@@ -1747,7 +1747,7 @@ function AddInvoiceBModal({
             <div className="grid grid-cols-2 gap-6 p-3 rounded-lg bg-surface-raised border border-divider">
               <div>
                 <p className="text-caption text-fg-tertiary mb-0.5">請款單號</p>
-                <p className="text-sm font-medium">{invoiceNumber}</p>
+                <p className="text-body font-medium">{invoiceNumber}</p>
               </div>
               <div>
                 <p className="text-caption text-fg-tertiary mb-0.5">狀態</p>
@@ -1806,7 +1806,7 @@ function AddInvoiceBModal({
               </Field>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 p-3 rounded-lg bg-surface-raised border border-divider text-sm">
+            <div className="grid grid-cols-2 gap-4 p-3 rounded-lg bg-surface-raised border border-divider text-body">
               <div className="flex items-baseline gap-2">
                 <span className="text-fg-tertiary whitespace-nowrap">稅後金額</span>
                 <span className="font-medium">{taxAfterDisplay}</span>
@@ -1848,7 +1848,7 @@ function AddInvoiceBModal({
 
             <div className="flex items-center gap-2">
               <Checkbox id="partial-b" checked={usePartialAmount} onCheckedChange={v => setUsePartialAmount(!!v)} />
-              <label htmlFor="partial-b" className="text-sm cursor-pointer select-none">使用不足額請款</label>
+              <label htmlFor="partial-b" className="text-body cursor-pointer select-none">使用不足額請款</label>
             </div>
           </div>
         </DialogBody>
@@ -1913,10 +1913,10 @@ function AddItemBModal({
         <DialogHeader><DialogTitle>新增細項</DialogTitle></DialogHeader>
         <DialogBody>
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4 bg-surface-raised border border-divider rounded-lg px-4 py-3 text-sm">
-              <div><p className="text-fg-tertiary text-xs mb-0.5">請款單號</p><p className="text-fg-primary font-medium">{invoiceNumber}</p></div>
-              <div><p className="text-fg-tertiary text-xs mb-0.5">發票號碼</p><p className="text-fg-primary font-medium">{invoiceNo || '-'}</p></div>
-              <div><p className="text-fg-tertiary text-xs mb-0.5">序號</p><p className="text-fg-primary font-medium">{seqNum}</p></div>
+            <div className="grid grid-cols-3 gap-4 bg-surface-raised border border-divider rounded-lg px-4 py-3 text-body">
+              <div><p className="text-fg-tertiary text-caption mb-0.5">請款單號</p><p className="text-fg-primary font-medium">{invoiceNumber}</p></div>
+              <div><p className="text-fg-tertiary text-caption mb-0.5">發票號碼</p><p className="text-fg-primary font-medium">{invoiceNo || '-'}</p></div>
+              <div><p className="text-fg-tertiary text-caption mb-0.5">序號</p><p className="text-fg-primary font-medium">{seqNum}</p></div>
             </div>
             <Alert variant="info" title="注意事項" description={<>自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往<span className="text-[var(--info)] underline cursor-pointer">專區</span>請款。</>} />
             <div className="grid grid-cols-2 gap-4">
@@ -1954,11 +1954,11 @@ function AddItemBModal({
               </Field>
             </div>
             <div>
-              <p className="text-sm text-fg-secondary mb-2">是否提供合約編號</p>
+              <p className="text-body text-fg-secondary mb-2">是否提供合約編號</p>
               <RadioGroup value={contractProvided} onValueChange={v => setContractProvided(v as 'yes' | 'no' | 'not-required')} className="flex items-center gap-4">
-                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="yes" />是</label>
-                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="no" />否</label>
-                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="not-required" />無需提供</label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-body"><RadioGroupItem value="yes" />是</label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-body"><RadioGroupItem value="no" />否</label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-body"><RadioGroupItem value="not-required" />無需提供</label>
               </RadioGroup>
             </div>
           </div>
@@ -2015,17 +2015,17 @@ function EditItemModal({
         </DialogHeader>
         <DialogBody>
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4 bg-surface-raised border border-divider rounded-lg px-4 py-3 text-sm">
+            <div className="grid grid-cols-3 gap-4 bg-surface-raised border border-divider rounded-lg px-4 py-3 text-body">
               <div>
-                <p className="text-fg-tertiary text-xs mb-0.5">請款單號</p>
+                <p className="text-fg-tertiary text-caption mb-0.5">請款單號</p>
                 <p className="text-fg-primary font-medium">{invoiceNumber}</p>
               </div>
               <div>
-                <p className="text-fg-tertiary text-xs mb-0.5">發票號碼</p>
+                <p className="text-fg-tertiary text-caption mb-0.5">發票號碼</p>
                 <p className="text-fg-primary font-medium">{invoiceNo || '-'}</p>
               </div>
               <div>
-                <p className="text-fg-tertiary text-xs mb-0.5">序號</p>
+                <p className="text-fg-tertiary text-caption mb-0.5">序號</p>
                 <p className="text-fg-primary font-medium">{seqNum}</p>
               </div>
             </div>
@@ -2099,15 +2099,15 @@ function EditItemModal({
               </Field>
             </div>
             <div>
-              <p className="text-sm text-fg-secondary mb-2">是否提供合約編號</p>
+              <p className="text-body text-fg-secondary mb-2">是否提供合約編號</p>
               <RadioGroup
                 value={contractProvided}
                 onValueChange={v => setContractProvided(v as 'yes' | 'no' | 'not-required')}
                 className="flex items-center gap-4"
               >
-                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="yes" />是</label>
-                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="no" />否</label>
-                <label className="flex items-center gap-1.5 cursor-pointer text-sm"><RadioGroupItem value="not-required" />無需提供</label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-body"><RadioGroupItem value="yes" />是</label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-body"><RadioGroupItem value="no" />否</label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-body"><RadioGroupItem value="not-required" />無需提供</label>
               </RadioGroup>
             </div>
           </div>
@@ -2141,7 +2141,7 @@ function DeleteItemModal({
           <DialogTitle>是否刪除付款細項</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          <p className="text-sm text-fg-secondary">
+          <p className="text-body text-fg-secondary">
             刪除後此筆付款細項資料將無法保留，是否仍要刪除？
           </p>
         </DialogBody>
@@ -2189,7 +2189,7 @@ function EditInvoiceModal({
         </DialogHeader>
         <DialogBody className="space-y-4">
           {/* Info row: 請款單號 + 狀態 */}
-          <div className="flex gap-2 bg-surface-raised border border-divider rounded-md px-4 py-2 text-sm">
+          <div className="flex gap-2 bg-surface-raised border border-divider rounded-md px-4 py-2 text-body">
             <div className="flex-1 space-y-0.5">
               <p className="text-fg-tertiary">請款單號</p>
               <p className="text-fg-primary font-medium">{invoice.number}</p>
@@ -2254,17 +2254,17 @@ function EditInvoiceModal({
           </div>
 
           {/* 稅後金額 summary */}
-          <div className="flex gap-2 bg-surface-raised border border-divider rounded-md px-4 py-2 text-sm">
+          <div className="flex gap-2 bg-surface-raised border border-divider rounded-md px-4 py-2 text-body">
             <div className="flex-1 space-y-0.5">
               <p className="text-fg-secondary">稅後金額</p>
               <p className="text-fg-primary font-medium">{invoice.currency} {taxAfterNum !== null ? taxAfterNum.toLocaleString() : '-'}</p>
-              <p className="text-fg-tertiary text-xs">實發金額&nbsp;<InfoTooltip content="實發金額 = 稅後金額 × 匯率" />&nbsp;{invoice.currency} {taxAfterNum !== null ? taxAfterNum.toLocaleString() : '-'}</p>
+              <p className="text-fg-tertiary text-caption">實發金額&nbsp;<InfoTooltip content="實發金額 = 稅後金額 × 匯率" />&nbsp;{invoice.currency} {taxAfterNum !== null ? taxAfterNum.toLocaleString() : '-'}</p>
             </div>
             <div className="w-px bg-divider shrink-0" />
             <div className="flex-1 space-y-0.5">
               <p className="text-fg-secondary">匯率</p>
               <p className="text-fg-primary font-medium">{rate}</p>
-              <p className="text-fg-tertiary text-xs">更新時間 {new Date().getFullYear()}/5/26 9:00</p>
+              <p className="text-fg-tertiary text-caption">更新時間 {new Date().getFullYear()}/5/26 9:00</p>
             </div>
           </div>
 
@@ -2283,7 +2283,7 @@ function EditInvoiceModal({
           {/* 使用不足額請款 */}
           <div className="flex items-center gap-2">
             <Checkbox id="edit-insufficient" />
-            <label htmlFor="edit-insufficient" className="text-sm cursor-pointer select-none">使用不足額請款</label>
+            <label htmlFor="edit-insufficient" className="text-body cursor-pointer select-none">使用不足額請款</label>
           </div>
         </DialogBody>
         <DialogFooter>
@@ -2407,7 +2407,7 @@ function CreateFormPage({
       {/* Page header */}
       <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div>
-          <div className="flex items-center gap-1 text-sm text-fg-tertiary mb-1">
+          <div className="flex items-center gap-1 text-body text-fg-tertiary mb-1">
             <button
               onClick={onBack}
               className="hover:text-fg-secondary transition-colors"
@@ -2416,10 +2416,10 @@ function CreateFormPage({
             </button>
             <span>/</span>
           </div>
-          <h1 className="text-2xl font-semibold">一般項目申請單 {formNumber}</h1>
+          <h1 className="text-h3 font-semibold">一般項目申請單 {formNumber}</h1>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex rounded-md border border-divider overflow-hidden text-sm font-medium">
+          <div className="flex rounded-md border border-divider overflow-hidden text-body font-medium">
             <button
               onClick={() => setScenarioBMode(false)}
               className={`px-3 py-1.5 transition-colors ${!scenarioBMode ? 'bg-[var(--info)] text-white' : 'text-fg-secondary hover:bg-surface-raised'}`}
@@ -2442,7 +2442,7 @@ function CreateFormPage({
 
         {/* 基本資訊 */}
         <section className="bg-surface border border-divider rounded-lg p-6">
-          <h2 className="text-base font-semibold mb-4">付款資訊</h2>
+          <h2 className="text-body-lg font-semibold mb-4">付款資訊</h2>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <Field mode="readonly">
@@ -2481,14 +2481,14 @@ function CreateFormPage({
 
         {/* 請款資訊 */}
         <section className="bg-surface border border-divider rounded-lg p-6">
-          <h2 className="text-base font-semibold mb-4">請款資訊</h2>
+          <h2 className="text-body-lg font-semibold mb-4">請款資訊</h2>
           {!scenarioBMode ? (
             <>
               <Button variant="tertiary" startIcon={Plus} onClick={() => setInvoiceModalOpen(true)}>
                 新增請款
               </Button>
               {invoices.length === 0 ? (
-                <div className="mt-4 rounded-lg border border-divider py-12 text-center text-sm text-fg-tertiary">
+                <div className="mt-4 rounded-lg border border-divider py-12 text-center text-body text-fg-tertiary">
                   沒有任何資料
                 </div>
               ) : (
@@ -2509,25 +2509,25 @@ function CreateFormPage({
                           <span className="font-medium text-fg-primary shrink-0">{inv.number}</span>
                           <Tag color="neutral" size="sm">Draft</Tag>
                           <div className="flex-1" />
-                          <span className="text-fg-secondary text-sm shrink-0">{inv.currency} {Number(inv.subtotal).toLocaleString()}</span>
+                          <span className="text-fg-secondary text-body shrink-0">{inv.currency} {Number(inv.subtotal).toLocaleString()}</span>
                           <div className="flex items-center gap-0.5 shrink-0">
                             <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditInvoiceTarget(inv)}><Pencil size={14} /></button>
                             <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors disabled:opacity-40 disabled:pointer-events-none" aria-label="複製" onClick={() => setInvoiceModalOpen(true)} disabled={isModifying}><Copy size={14} /></button>
                             <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors disabled:opacity-40 disabled:pointer-events-none" aria-label="刪除" onClick={() => setDeleteInvoiceTarget(inv.id)} disabled={isModifying}><Trash2 size={14} /></button>
                           </div>
                         </div>
-                        <p className="text-sm text-fg-tertiary px-4 pb-3">收款人：{inv.payee}&nbsp;|&nbsp;日期：{inv.date}</p>
+                        <p className="text-body text-fg-tertiary px-4 pb-3">收款人：{inv.payee}&nbsp;|&nbsp;日期：{inv.date}</p>
                         {isExpanded && (
                           <div className="border-t border-divider">
                             <div className="grid grid-cols-4 gap-4 px-4 py-4 bg-surface-raised">
-                              <div><p className="text-xs text-fg-tertiary mb-1">憑證類型</p><p className="text-sm text-fg-primary">{voucherLabel}</p></div>
-                              <div><p className="text-xs text-fg-tertiary mb-1">發票號碼</p><p className="text-sm text-fg-primary">{inv.invoiceNo || '-'}</p></div>
-                              <div><p className="text-xs text-fg-tertiary mb-1">合計金額（未稅）</p><p className="text-sm text-fg-primary">{inv.currency} {Number(inv.subtotal).toLocaleString()}</p></div>
-                              <div><p className="text-xs text-fg-tertiary mb-1">稅額</p><p className="text-sm text-fg-primary">{inv.tax || '0'}</p></div>
+                              <div><p className="text-caption text-fg-tertiary mb-1">憑證類型</p><p className="text-body text-fg-primary">{voucherLabel}</p></div>
+                              <div><p className="text-caption text-fg-tertiary mb-1">發票號碼</p><p className="text-body text-fg-primary">{inv.invoiceNo || '-'}</p></div>
+                              <div><p className="text-caption text-fg-tertiary mb-1">合計金額（未稅）</p><p className="text-body text-fg-primary">{inv.currency} {Number(inv.subtotal).toLocaleString()}</p></div>
+                              <div><p className="text-caption text-fg-tertiary mb-1">稅額</p><p className="text-body text-fg-primary">{inv.tax || '0'}</p></div>
                             </div>
                             <div className="px-4 py-3">
                               <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-1.5 text-sm font-medium text-fg-primary">
+                                <div className="flex items-center gap-1.5 text-body font-medium text-fg-primary">
                                   <ClipboardList size={16} className="text-fg-secondary" />
                                   付款細項：{(paymentItemsMap[inv.id] ?? []).length} 項
                                 </div>
@@ -2537,10 +2537,10 @@ function CreateFormPage({
                                 </div>
                               </div>
                               {(paymentItemsMap[inv.id] ?? []).length === 0 ? (
-                                <div className="rounded-lg border border-divider py-8 text-center text-sm text-fg-tertiary">沒有任何資料</div>
+                                <div className="rounded-lg border border-divider py-8 text-center text-body text-fg-tertiary">沒有任何資料</div>
                               ) : (
                                 <div className="rounded-lg border border-divider overflow-x-auto">
-                                  <table className="text-sm" style={{ minWidth: '1100px' }}>
+                                  <table className="text-body" style={{ minWidth: '1100px' }}>
                                     <thead className="bg-surface-raised border-b border-divider">
                                       <tr>
                                         <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 44 }}>序號</th>
@@ -2560,13 +2560,13 @@ function CreateFormPage({
                                         <tr key={item.id} className="hover:bg-surface-raised transition-colors">
                                           <td className="px-3 py-2 text-fg-secondary">{item.seq}</td>
                                           <td className="px-3 py-2">
-                                            <p className="text-fg-primary text-sm truncate">{item.category}</p>
-                                            <p className="text-fg-tertiary text-xs truncate mt-0.5">{item.subCategory}</p>
+                                            <p className="text-fg-primary text-body truncate">{item.category}</p>
+                                            <p className="text-fg-tertiary text-caption truncate mt-0.5">{item.subCategory}</p>
                                           </td>
                                           <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
                                           <td className="px-3 py-2">
-                                            <p className="text-fg-primary text-sm">{item.accountCode}</p>
-                                            <p className="text-fg-tertiary text-xs mt-0.5">{item.accountName || '-'}</p>
+                                            <p className="text-fg-primary text-body">{item.accountCode}</p>
+                                            <p className="text-fg-tertiary text-caption mt-0.5">{item.accountName || '-'}</p>
                                           </td>
                                           <td className="px-3 py-2 text-fg-secondary">{item.total}</td>
                                           <td className="px-3 py-2 text-fg-secondary">{item.taxRate}</td>
@@ -2601,7 +2601,7 @@ function CreateFormPage({
                 新增發票
               </Button>
               {bInvoices.length === 0 ? (
-                <div className="mt-4 rounded-lg border border-divider py-12 text-center text-sm text-fg-tertiary">
+                <div className="mt-4 rounded-lg border border-divider py-12 text-center text-body text-fg-tertiary">
                   沒有任何資料
                 </div>
               ) : (
@@ -2619,22 +2619,22 @@ function CreateFormPage({
                           <span className="font-medium text-fg-primary shrink-0">{inv.number}</span>
                           <Tag color="neutral" size="sm">Draft</Tag>
                           <div className="flex-1" />
-                          <span className="text-fg-secondary text-sm shrink-0">{inv.currency} {Number(inv.subtotal).toLocaleString()}</span>
+                          <span className="text-fg-secondary text-body shrink-0">{inv.currency} {Number(inv.subtotal).toLocaleString()}</span>
                           <div className="flex items-center gap-0.5 shrink-0">
                             <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯"><Pencil size={14} /></button>
                             <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setBInvoices(prev => prev.filter(i => i.id !== inv.id))}><Trash2 size={14} /></button>
                           </div>
                         </div>
-                        <p className="text-sm text-fg-tertiary px-4 pb-3">收款人：{inv.payee}&nbsp;|&nbsp;日期：{inv.date}</p>
+                        <p className="text-body text-fg-tertiary px-4 pb-3">收款人：{inv.payee}&nbsp;|&nbsp;日期：{inv.date}</p>
                         <div className="border-t border-divider grid grid-cols-4 gap-4 px-4 py-4 bg-surface-raised">
-                          <div><p className="text-xs text-fg-tertiary mb-1">憑證類型</p><p className="text-sm text-fg-primary">{voucherLabel}</p></div>
-                          <div><p className="text-xs text-fg-tertiary mb-1">發票號碼</p><p className="text-sm text-fg-primary">{inv.invoiceNo || '-'}</p></div>
-                          <div><p className="text-xs text-fg-tertiary mb-1">合計金額（未稅）</p><p className="text-sm text-fg-primary">{inv.currency} {Number(inv.subtotal).toLocaleString()}</p></div>
-                          <div><p className="text-xs text-fg-tertiary mb-1">稅額</p><p className="text-sm text-fg-primary">{inv.tax || '0'}</p></div>
+                          <div><p className="text-caption text-fg-tertiary mb-1">憑證類型</p><p className="text-body text-fg-primary">{voucherLabel}</p></div>
+                          <div><p className="text-caption text-fg-tertiary mb-1">發票號碼</p><p className="text-body text-fg-primary">{inv.invoiceNo || '-'}</p></div>
+                          <div><p className="text-caption text-fg-tertiary mb-1">合計金額（未稅）</p><p className="text-body text-fg-primary">{inv.currency} {Number(inv.subtotal).toLocaleString()}</p></div>
+                          <div><p className="text-caption text-fg-tertiary mb-1">稅額</p><p className="text-body text-fg-primary">{inv.tax || '0'}</p></div>
                         </div>
                         <div className="border-t border-divider px-4 py-3">
                           <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-1.5 text-sm font-medium text-fg-primary">
+                            <div className="flex items-center gap-1.5 text-body font-medium text-fg-primary">
                               <ClipboardList size={16} className="text-fg-secondary" />
                               付款細項：{bItems.length} 項
                             </div>
@@ -2644,10 +2644,10 @@ function CreateFormPage({
                             </div>
                           </div>
                           {bItems.length === 0 ? (
-                            <div className="rounded-lg border border-divider py-8 text-center text-sm text-fg-tertiary">沒有任何資料</div>
+                            <div className="rounded-lg border border-divider py-8 text-center text-body text-fg-tertiary">沒有任何資料</div>
                           ) : (
                             <div className="rounded-lg border border-divider overflow-x-auto">
-                              <table className="text-sm" style={{ minWidth: '1100px' }}>
+                              <table className="text-body" style={{ minWidth: '1100px' }}>
                                 <thead className="bg-surface-raised border-b border-divider">
                                   <tr>
                                     <th className="text-left px-3 py-2 font-medium text-fg-secondary" style={{ width: 44 }}>序號</th>
@@ -2667,13 +2667,13 @@ function CreateFormPage({
                                     <tr key={item.id} className="hover:bg-surface-raised transition-colors">
                                       <td className="px-3 py-2 text-fg-secondary">{item.seq}</td>
                                       <td className="px-3 py-2">
-                                        <p className="text-fg-primary text-sm truncate">{item.category}</p>
-                                        <p className="text-fg-tertiary text-xs truncate mt-0.5">{item.subCategory}</p>
+                                        <p className="text-fg-primary text-body truncate">{item.category}</p>
+                                        <p className="text-fg-tertiary text-caption truncate mt-0.5">{item.subCategory}</p>
                                       </td>
                                       <td className="px-3 py-2 text-fg-secondary">{item.costCenter}</td>
                                       <td className="px-3 py-2">
-                                        <p className="text-fg-primary text-sm">{item.accountCode}</p>
-                                        <p className="text-fg-tertiary text-xs mt-0.5">{item.accountName || '-'}</p>
+                                        <p className="text-fg-primary text-body">{item.accountCode}</p>
+                                        <p className="text-fg-tertiary text-caption mt-0.5">{item.accountName || '-'}</p>
                                       </td>
                                       <td className="px-3 py-2 text-fg-secondary">{item.total}</td>
                                       <td className="px-3 py-2 text-fg-secondary">{item.taxRate}</td>
@@ -2704,18 +2704,18 @@ function CreateFormPage({
 
         {/* 檢附憑證 / 證明 */}
         <section className="bg-surface border border-divider rounded-lg p-6">
-          <h2 className="text-base font-semibold mb-4">檢附憑證 / 證明</h2>
+          <h2 className="text-body-lg font-semibold mb-4">檢附憑證 / 證明</h2>
           <Button variant="tertiary" startIcon={Plus} onClick={() => setAttachmentModalOpen(true)}>
             新增附件
           </Button>
 
           {attachments.length === 0 ? (
-            <div className="mt-4 rounded-lg border border-divider py-12 text-center text-sm text-fg-tertiary">
+            <div className="mt-4 rounded-lg border border-divider py-12 text-center text-body text-fg-tertiary">
               沒有任何資料
             </div>
           ) : (
             <div className="mt-4 rounded-lg border border-divider overflow-hidden">
-              <table className="w-full text-sm">
+              <table className="w-full text-body">
                 <thead className="bg-surface-raised border-b border-divider">
                   <tr>
                     <th className="text-left px-4 py-2 font-medium text-fg-secondary">類型</th>
@@ -2737,7 +2737,7 @@ function CreateFormPage({
                             {att.files.map(f => (
                               <div key={f.id} className="flex items-center gap-1.5">
                                 <Paperclip size={14} className="text-fg-tertiary shrink-0" />
-                                <span className="text-[var(--info)] text-sm truncate">{f.name}</span>
+                                <span className="text-[var(--info)] text-body truncate">{f.name}</span>
                               </div>
                             ))}
                           </div>
@@ -2803,7 +2803,7 @@ function CreateFormPage({
                 onCheckedChange={v => setUseUrgentDate(!!v)}
                 disabled={isModifying}
               />
-              <label htmlFor="urgent" className="text-sm cursor-pointer select-none">
+              <label htmlFor="urgent" className="text-body cursor-pointer select-none">
                 使用緊急/指定付款
               </label>
             </div>
@@ -2867,7 +2867,7 @@ function CreateFormPage({
             <DialogTitle>是否刪除附件</DialogTitle>
           </DialogHeader>
           <DialogBody>
-            <p className="text-sm text-fg-secondary">
+            <p className="text-body text-fg-secondary">
               刪除後此筆附件資料將無法保留，是否仍要刪除？
             </p>
           </DialogBody>
@@ -2963,7 +2963,7 @@ function CreateFormPage({
                 <DialogTitle>是否刪除 {invDel?.number ?? ''}</DialogTitle>
               </DialogHeader>
               <DialogBody>
-                <p className="text-sm text-fg-secondary">
+                <p className="text-body text-fg-secondary">
                   刪除後將無法復原。若此發票已綁定請款單，相關請款資料可能受到影響，確定要刪除嗎？
                 </p>
               </DialogBody>
@@ -2987,7 +2987,7 @@ function CreateFormPage({
             <DialogTitle>是否取消申請</DialogTitle>
           </DialogHeader>
           <DialogBody>
-            <p className="text-sm text-fg-secondary">
+            <p className="text-body text-fg-secondary">
               您尚未儲存目前填寫的內容。若取消申請，已填寫的資料將無法保留，是否仍要取消？
             </p>
           </DialogBody>
@@ -3091,7 +3091,7 @@ function DraftListPage({
 
   return (
     <div className="p-6 w-full">
-      <h1 className="text-xl font-semibold mb-6">暫存申請單</h1>
+      <h1 className="text-h4 font-semibold mb-6">暫存申請單</h1>
 
       <Tabs defaultValue="general">
         <TabsList>
@@ -3119,7 +3119,7 @@ function DraftListPage({
 
           <div className="flex gap-0">
           <div className={`flex-1 min-w-0 rounded-lg border border-divider overflow-x-auto transition-[margin] duration-300 ease-in-out ${infoTarget ? 'mr-4' : ''}`}>
-            <table className="w-full text-sm min-w-[720px]">
+            <table className="w-full text-body min-w-[720px]">
               <thead className="bg-surface-raised border-b border-divider">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">單號</th>
@@ -3177,8 +3177,8 @@ function DraftListPage({
                       {/* Panel header */}
                       <div className="px-4 py-3 border-b border-divider flex items-start justify-between gap-2 flex-shrink-0">
                         <div className="min-w-0">
-                          <p className="text-xs text-fg-tertiary mb-1">一般申請單</p>
-                          <p className="text-sm font-medium text-fg-primary leading-snug">{entry.number}</p>
+                          <p className="text-caption text-fg-tertiary mb-1">一般申請單</p>
+                          <p className="text-body font-medium text-fg-primary leading-snug">{entry.number}</p>
                           <div className="mt-1"><Tag color={meta.color} size="sm">{meta.label}</Tag></div>
                         </div>
                         <button
@@ -3193,8 +3193,8 @@ function DraftListPage({
                       <ScrollArea className="flex-1"><div className="divide-y divide-divider">
                         {/* 基本資訊 */}
                         <div className="px-4 py-3">
-                          <p className="text-xs font-medium text-fg-secondary uppercase tracking-wide mb-3">基本資訊</p>
-                          <dl className="space-y-2 text-sm">
+                          <p className="text-caption font-medium text-fg-secondary uppercase tracking-wide mb-3">基本資訊</p>
+                          <dl className="space-y-2 text-body">
                             <div className="flex justify-between gap-2">
                               <dt className="text-fg-tertiary flex-shrink-0">收款人</dt>
                               <dd className="text-fg-primary text-right">{entry.applicant}</dd>
@@ -3219,14 +3219,14 @@ function DraftListPage({
                         </div>
                         {/* 請款資訊 */}
                         <div className="px-4 py-3">
-                          <p className="text-xs font-medium text-fg-secondary uppercase tracking-wide mb-3">請款資訊</p>
+                          <p className="text-caption font-medium text-fg-secondary uppercase tracking-wide mb-3">請款資訊</p>
                           {invList.length === 0 ? (
-                            <p className="text-sm text-fg-tertiary">無請款資訊</p>
+                            <p className="text-body text-fg-tertiary">無請款資訊</p>
                           ) : (
                             <div className="space-y-4">
                               {invList.map((inv, idx) => (
-                                <div key={idx} className="space-y-2 text-sm">
-                                  <p className="text-xs font-medium text-fg-secondary">{inv.number}</p>
+                                <div key={idx} className="space-y-2 text-body">
+                                  <p className="text-caption font-medium text-fg-secondary">{inv.number}</p>
                                   <dl className="space-y-1.5">
                                     <div className="flex justify-between gap-2">
                                       <dt className="text-fg-tertiary flex-shrink-0">收款人</dt>
@@ -3260,13 +3260,13 @@ function DraftListPage({
                         </div>
                         {/* 檢附憑證/證明 */}
                         <div className="px-4 py-3">
-                          <p className="text-xs font-medium text-fg-secondary uppercase tracking-wide mb-3">檢附憑證/證明</p>
+                          <p className="text-caption font-medium text-fg-secondary uppercase tracking-wide mb-3">檢附憑證/證明</p>
                           {invList.length === 0 ? (
-                            <p className="text-sm text-fg-tertiary">無附件</p>
+                            <p className="text-body text-fg-tertiary">無附件</p>
                           ) : (
                             <ul className="space-y-2">
                               {invList.map((inv, idx) => (
-                                <li key={idx} className="flex items-center gap-2 text-sm text-fg-secondary">
+                                <li key={idx} className="flex items-center gap-2 text-body text-fg-secondary">
                                   <Paperclip size={13} className="text-fg-tertiary flex-shrink-0" />
                                   <span className="truncate">{inv.invoiceNo}_receipt.pdf</span>
                                 </li>
@@ -3303,7 +3303,7 @@ function DraftListPage({
             <DialogTitle>是否刪除申請單</DialogTitle>
           </DialogHeader>
           <DialogBody>
-            <p className="text-sm text-fg-secondary">
+            <p className="text-body text-fg-secondary">
               您尚未儲存目前填寫的內容。若刪除申請，已填寫的資料將無法保留，是否仍要刪除？
             </p>
           </DialogBody>
