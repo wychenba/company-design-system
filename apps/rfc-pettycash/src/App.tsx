@@ -1145,7 +1145,7 @@ function PreviewCard({
 }) {
   const [open, setOpen] = useState(defaultOpen)
   return (
-    <div className="bg-surface border border-[var(--color-neutral-4)] rounded-lg overflow-hidden">
+    <div className="bg-surface border border-[var(--divider)] rounded-lg overflow-hidden">
       <button
         className="w-full flex items-center justify-between px-4 min-h-[52px] hover:bg-surface-raised transition-colors"
         onClick={() => setOpen(o => !o)}
@@ -1280,7 +1280,7 @@ function PreviewDialog({
                                 {att.files.map(f => (
                                   <div key={f.id} className="flex items-center gap-1.5">
                                     <Paperclip size={13} className="text-fg-tertiary shrink-0" />
-                                    <span className="text-[var(--color-blue-6)] text-sm truncate">{f.name}</span>
+                                    <span className="text-[var(--info)] text-sm truncate">{f.name}</span>
                                   </div>
                                 ))}
                               </div>
@@ -1341,7 +1341,7 @@ function PreviewDialog({
               </div>
             </PreviewCard>
 
-            <div className="bg-surface border border-[var(--color-neutral-4)] rounded-lg p-4 space-y-4">
+            <div className="bg-surface border border-[var(--divider)] rounded-lg p-4 space-y-4">
               <h3 className="text-xl font-semibold text-fg-primary">簽核補充說明</h3>
               <div className="space-y-2">
                 <p className="text-sm text-fg-secondary">您可以填寫簽核補充說明，協助下一階段簽核人員快速完成審核</p>
@@ -1403,7 +1403,7 @@ function BatchImportModal({
         <DialogBody>
           {phase === 'loading' ? (
             <div className="flex flex-col items-center justify-center py-10 gap-3">
-              <Loader2 size={40} className="text-[var(--color-blue-6)] animate-spin" />
+              <Loader2 size={40} className="text-[var(--info)] animate-spin" />
               <p className="text-base font-semibold text-fg-primary">檔案匯入中</p>
               <p className="text-sm text-fg-secondary">檔案正在匯入中，請稍候。</p>
             </div>
@@ -1411,11 +1411,11 @@ function BatchImportModal({
             <div className="space-y-4">
               <p className="text-sm text-fg-secondary">
                 請先下載{' '}
-                <span className="text-[var(--color-blue-6)] underline cursor-pointer">Excel 付款細項範本</span>
+                <span className="text-[var(--info)] underline cursor-pointer">Excel 付款細項範本</span>
                 ，填寫完成後到此匯入檔案。
               </p>
               {/* Upload zone */}
-              <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-[var(--color-neutral-4)] rounded-lg py-10 cursor-pointer hover:border-[var(--color-blue-5)] transition-colors bg-surface-raised">
+              <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-[var(--divider)] rounded-lg py-10 cursor-pointer hover:border-[var(--info-hover)] transition-colors bg-surface-raised">
                 <Upload size={32} className="text-fg-tertiary" />
                 <div className="text-center">
                   <p className="text-base font-semibold text-fg-primary">點擊或拖曳到此上傳檔案</p>
@@ -1437,9 +1437,9 @@ function BatchImportModal({
               </label>
               {/* Selected file */}
               {fileName && (
-                <div className="flex items-center gap-2 px-3 py-2 border-b-2 border-[var(--color-blue-6)]">
+                <div className="flex items-center gap-2 px-3 py-2 border-b-2 border-[var(--info)]">
                   <Paperclip size={14} className="text-fg-tertiary shrink-0" />
-                  <span className="text-sm text-[var(--color-blue-6)] flex-1 truncate underline">{fileName}</span>
+                  <span className="text-sm text-[var(--info)] flex-1 truncate underline">{fileName}</span>
                   <button
                     onClick={() => setFileName(null)}
                     className="p-1 rounded text-fg-tertiary hover:text-error-default transition-colors"
@@ -1557,7 +1557,7 @@ function AddItemModal({
               description={
                 <>
                   自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
-                  <span className="text-[var(--color-blue-6)] underline cursor-pointer">專區</span>
+                  <span className="text-[var(--info)] underline cursor-pointer">專區</span>
                   請款。
                 </>
               }
@@ -1918,7 +1918,7 @@ function AddItemBModal({
               <div><p className="text-fg-tertiary text-xs mb-0.5">發票號碼</p><p className="text-fg-primary font-medium">{invoiceNo || '-'}</p></div>
               <div><p className="text-fg-tertiary text-xs mb-0.5">序號</p><p className="text-fg-primary font-medium">{seqNum}</p></div>
             </div>
-            <Alert variant="info" title="注意事項" description={<>自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往<span className="text-[var(--color-blue-6)] underline cursor-pointer">專區</span>請款。</>} />
+            <Alert variant="info" title="注意事項" description={<>自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往<span className="text-[var(--info)] underline cursor-pointer">專區</span>請款。</>} />
             <div className="grid grid-cols-2 gap-4">
               <Field invalid={submitted && !category}>
                 <FieldLabel required>分類</FieldLabel>
@@ -2035,7 +2035,7 @@ function EditItemModal({
               description={
                 <>
                   自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
-                  <span className="text-[var(--color-blue-6)] underline cursor-pointer">專區</span>
+                  <span className="text-[var(--info)] underline cursor-pointer">專區</span>
                   請款。
                 </>
               }
@@ -2422,13 +2422,13 @@ function CreateFormPage({
           <div className="flex rounded-md border border-divider overflow-hidden text-sm font-medium">
             <button
               onClick={() => setScenarioBMode(false)}
-              className={`px-3 py-1.5 transition-colors ${!scenarioBMode ? 'bg-[var(--color-blue-6)] text-white' : 'text-fg-secondary hover:bg-surface-raised'}`}
+              className={`px-3 py-1.5 transition-colors ${!scenarioBMode ? 'bg-[var(--info)] text-white' : 'text-fg-secondary hover:bg-surface-raised'}`}
             >
               流程 A
             </button>
             <button
               onClick={() => setScenarioBMode(true)}
-              className={`px-3 py-1.5 transition-colors ${scenarioBMode ? 'bg-[var(--color-blue-6)] text-white' : 'text-fg-secondary hover:bg-surface-raised'}`}
+              className={`px-3 py-1.5 transition-colors ${scenarioBMode ? 'bg-[var(--info)] text-white' : 'text-fg-secondary hover:bg-surface-raised'}`}
             >
               流程 B
             </button>
@@ -2737,7 +2737,7 @@ function CreateFormPage({
                             {att.files.map(f => (
                               <div key={f.id} className="flex items-center gap-1.5">
                                 <Paperclip size={14} className="text-fg-tertiary shrink-0" />
-                                <span className="text-[var(--color-blue-6)] text-sm truncate">{f.name}</span>
+                                <span className="text-[var(--info)] text-sm truncate">{f.name}</span>
                               </div>
                             ))}
                           </div>
