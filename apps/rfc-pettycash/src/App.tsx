@@ -18,12 +18,14 @@ import {
   FileUpload,
   type FileUploadStatus,
   ScrollArea,
+  DataTable,
 } from '@qijenchen/design-system'
 import {
   Home, FileText, Upload, ClipboardList, Users, BookOpen,
   MessageSquare, Plus, Pencil, Trash2, Download,
   Info, ChevronDown, Copy, Paperclip, Loader2,
 } from 'lucide-react'
+import { createColumnHelper } from '@tanstack/react-table'
 
 // ─── Constants ───────────────────────────────────────────────
 
@@ -3060,6 +3062,35 @@ function CreateFormPage({
 
 // ─── DraftListPage ───────────────────────────────────────────
 
+const draftCol = createColumnHelper<DraftEntry>()
+
+const DRAFT_COLUMNS = [
+  draftCol.accessor('number', {
+    header: '單號',
+    meta: { type: 'string', width: 200, minWidth: 150 } as any,
+    cell: ({ row }) => {
+      const m = STATUS_META[row.original.status]
+      return (
+        <div>
+          <p className="font-medium text-fg-primary">{row.original.number}</p>
+          <div className="mt-1"><Tag color={m.color} size="sm">{m.label}</Tag></div>
+        </div>
+      )
+    },
+  }),
+  draftCol.accessor('date', { header: '申請日期', meta: { type: 'string', width: 120 } as any }),
+  draftCol.accessor('company', { header: '公司代號', meta: { type: 'string', width: 110 } as any }),
+  draftCol.accessor('applicant', { header: '申請人', meta: { type: 'string', width: 170 } as any }),
+  draftCol.accessor('payee', { header: '收款對象', meta: { type: 'string', width: 110 } as any }),
+  draftCol.accessor('total', {
+    header: '總額',
+    meta: { type: 'currency', width: 110 } as any,
+    cell: ({ getValue }) => (getValue() as number).toLocaleString(),
+  }),
+  draftCol.accessor('urgentDate', { header: '緊急/指定付款日期', meta: { type: 'string', width: 180 } as any }),
+  draftCol.accessor('reason', { header: '申請原因', meta: { type: 'string', width: 140 } as any }),
+]
+
 function DraftListPage({
   entries,
   onAddSingle,
@@ -3118,51 +3149,19 @@ function DraftListPage({
           </div>
 
           <div className="flex gap-0">
-          <div className={`flex-1 min-w-0 rounded-lg border border-divider overflow-x-auto transition-[margin] duration-300 ease-in-out ${infoTarget ? 'mr-4' : ''}`}>
-            <table className="w-full text-body min-w-[720px]">
-              <thead className="bg-surface-raised border-b border-divider">
-                <tr>
-                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">單號</th>
-                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">申請日期</th>
-                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">公司代號</th>
-                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">申請人</th>
-                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">收款對象</th>
-                  <th className="text-right px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">總額</th>
-                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">緊急/指定付款日期</th>
-                  <th className="text-left px-4 py-3 font-medium text-fg-secondary whitespace-nowrap">申請原因</th>
-                  <th className="px-4 py-3"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-divider">
-                {entries.map(entry => {
-                  const meta = STATUS_META[entry.status]
-                  return (
-                    <tr key={entry.id} className="hover:bg-surface-raised transition-colors">
-                      <td className="px-4 py-3">
-                        <p className="font-medium text-fg-primary">{entry.number}</p>
-                        <div className="mt-1">
-                          <Tag color={meta.color} size="sm">{meta.label}</Tag>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-fg-secondary">{entry.date}</td>
-                      <td className="px-4 py-3 text-fg-secondary">{entry.company}</td>
-                      <td className="px-4 py-3 text-fg-secondary">{entry.applicant}</td>
-                      <td className="px-4 py-3 text-fg-secondary">{entry.payee}</td>
-                      <td className="px-4 py-3 text-fg-secondary text-right">{entry.total.toLocaleString()}</td>
-                      <td className="px-4 py-3 text-fg-secondary">{entry.urgentDate}</td>
-                      <td className="px-4 py-3 text-fg-secondary">{entry.reason}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-0.5">
-                          <Button variant="ghost" size="sm" iconOnly startIcon={Info} aria-label="查看" onClick={() => setInfoTarget(infoTarget?.id === entry.id ? null : entry)} />
-                          <Button variant="ghost" size="sm" iconOnly startIcon={Pencil} aria-label="編輯" onClick={() => onEdit(entry)} disabled={entry.status === 'reviewing'} />
-                          <Button variant="ghost" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={() => setDeleteTargetId(entry.id)} disabled={entry.status === 'reviewing'} />
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+          <div className={`flex-1 min-w-0 transition-[margin] duration-300 ease-in-out ${infoTarget ? 'mr-4' : ''}`}>
+            <DataTable
+              columns={DRAFT_COLUMNS}
+              data={entries}
+              height="auto"
+              rowActions={(entry) => (
+                <div className="flex items-center gap-0.5">
+                  <Button variant="ghost" size="sm" iconOnly startIcon={Info} aria-label="查看" onClick={() => setInfoTarget(infoTarget?.id === entry.id ? null : entry)} />
+                  <Button variant="ghost" size="sm" iconOnly startIcon={Pencil} aria-label="編輯" onClick={() => onEdit(entry)} disabled={entry.status === 'reviewing'} />
+                  <Button variant="ghost" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={() => setDeleteTargetId(entry.id)} disabled={entry.status === 'reviewing'} />
+                </div>
+              )}
+            />
           </div>
           {/* Right info panel — always rendered, slides via width transition (offcanvas pattern) */}
           {(() => {
