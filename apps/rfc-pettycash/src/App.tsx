@@ -774,7 +774,7 @@ function AddInvoiceModal({
                 description={
                   <>
                     自 2026/12/31 起「國內出差」、「現金獎金」、「QIF」、「銀行自動扣款」已移至首頁/專區，如有需求請前往
-                    <span className="underline cursor-pointer text-[var(--color-blue-9)]">專區</span>請款。
+                    <span className="underline cursor-pointer text-[var(--info-text)]">專區</span>請款。
                   </>
                 }
               />
@@ -862,7 +862,7 @@ function AddInvoiceModal({
                         />
                         <button
                           type="button"
-                          className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors shrink-0"
+                          className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--error-subtle)] transition-colors shrink-0"
                           aria-label="刪除合約編號"
                           onClick={() => setContractNums(prev => prev.filter((_, i) => i !== idx + 1))}
                         >
@@ -2511,9 +2511,9 @@ function CreateFormPage({
                           <div className="flex-1" />
                           <span className="text-fg-secondary text-body shrink-0">{inv.currency} {Number(inv.subtotal).toLocaleString()}</span>
                           <div className="flex items-center gap-0.5 shrink-0">
-                            <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditInvoiceTarget(inv)}><Pencil size={14} /></button>
-                            <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors disabled:opacity-40 disabled:pointer-events-none" aria-label="複製" onClick={() => setInvoiceModalOpen(true)} disabled={isModifying}><Copy size={14} /></button>
-                            <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors disabled:opacity-40 disabled:pointer-events-none" aria-label="刪除" onClick={() => setDeleteInvoiceTarget(inv.id)} disabled={isModifying}><Trash2 size={14} /></button>
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--neutral-active)] transition-colors" aria-label="編輯" onClick={() => setEditInvoiceTarget(inv)}><Pencil size={14} /></button>
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--neutral-active)] transition-colors disabled:opacity-40 disabled:pointer-events-none" aria-label="複製" onClick={() => setInvoiceModalOpen(true)} disabled={isModifying}><Copy size={14} /></button>
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--error-subtle)] transition-colors disabled:opacity-40 disabled:pointer-events-none" aria-label="刪除" onClick={() => setDeleteInvoiceTarget(inv.id)} disabled={isModifying}><Trash2 size={14} /></button>
                           </div>
                         </div>
                         <p className="text-body text-fg-tertiary px-4 pb-3">收款人：{inv.payee}&nbsp;|&nbsp;日期：{inv.date}</p>
@@ -2575,8 +2575,8 @@ function CreateFormPage({
                                           <td className="px-3 py-2 text-fg-secondary">{item.contractInfo}</td>
                                           <td className="sticky right-0 bg-surface border-l border-divider px-3 py-2">
                                             <div className="flex items-center gap-0.5">
-                                              <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditItemTarget({ invoiceId: inv.id, seq: item.seq })}><Pencil size={13} /></button>
-                                              <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors disabled:opacity-40 disabled:pointer-events-none" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq: item.seq })} disabled={isModifying}><Trash2 size={13} /></button>
+                                              <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--neutral-active)] transition-colors" aria-label="編輯" onClick={() => setEditItemTarget({ invoiceId: inv.id, seq: item.seq })}><Pencil size={13} /></button>
+                                              <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--error-subtle)] transition-colors disabled:opacity-40 disabled:pointer-events-none" aria-label="刪除" onClick={() => setDeleteItemTarget({ invoiceId: inv.id, seq: item.seq })} disabled={isModifying}><Trash2 size={13} /></button>
                                             </div>
                                           </td>
                                         </tr>
@@ -2621,8 +2621,8 @@ function CreateFormPage({
                           <div className="flex-1" />
                           <span className="text-fg-secondary text-body shrink-0">{inv.currency} {Number(inv.subtotal).toLocaleString()}</span>
                           <div className="flex items-center gap-0.5 shrink-0">
-                            <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯"><Pencil size={14} /></button>
-                            <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setBInvoices(prev => prev.filter(i => i.id !== inv.id))}><Trash2 size={14} /></button>
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--neutral-active)] transition-colors" aria-label="編輯"><Pencil size={14} /></button>
+                            <button className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--error-subtle)] transition-colors" aria-label="刪除" onClick={() => setBInvoices(prev => prev.filter(i => i.id !== inv.id))}><Trash2 size={14} /></button>
                           </div>
                         </div>
                         <p className="text-body text-fg-tertiary px-4 pb-3">收款人：{inv.payee}&nbsp;|&nbsp;日期：{inv.date}</p>
@@ -2682,8 +2682,8 @@ function CreateFormPage({
                                       <td className="px-3 py-2 text-fg-secondary">{item.contractInfo}</td>
                                       <td className="sticky right-0 bg-surface border-l border-divider px-3 py-2">
                                         <div className="flex items-center gap-0.5">
-                                          <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setBEditItemTarget({ invoiceId: inv.id, seq: item.seq })}><Pencil size={13} /></button>
-                                          <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors" aria-label="刪除" onClick={() => setBItemsMap(prev => ({ ...prev, [inv.id]: (prev[inv.id] ?? []).filter(i => i.id !== item.id).map((i, idx) => ({ ...i, seq: idx + 1 })) }))}><Trash2 size={13} /></button>
+                                          <button className="p-1 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--neutral-active)] transition-colors" aria-label="編輯" onClick={() => setBEditItemTarget({ invoiceId: inv.id, seq: item.seq })}><Pencil size={13} /></button>
+                                          <button className="p-1 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--error-subtle)] transition-colors" aria-label="刪除" onClick={() => setBItemsMap(prev => ({ ...prev, [inv.id]: (prev[inv.id] ?? []).filter(i => i.id !== item.id).map((i, idx) => ({ ...i, seq: idx + 1 })) }))}><Trash2 size={13} /></button>
                                         </div>
                                       </td>
                                     </tr>
@@ -2745,11 +2745,11 @@ function CreateFormPage({
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-0.5">
-                          <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--color-neutral-2)] transition-colors" aria-label="編輯" onClick={() => setEditAttachmentTarget(att)}>
+                          <button className="p-1.5 rounded text-fg-tertiary hover:text-fg-secondary hover:bg-[var(--neutral-active)] transition-colors" aria-label="編輯" onClick={() => setEditAttachmentTarget(att)}>
                             <Pencil size={14} />
                           </button>
                           <button
-                            className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--color-red-1)] transition-colors"
+                            className="p-1.5 rounded text-fg-tertiary hover:text-error-default hover:bg-[var(--error-subtle)] transition-colors"
                             aria-label="刪除"
                             onClick={() => setDeleteAttachmentTarget(att.id)}
                           >
