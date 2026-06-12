@@ -17,6 +17,7 @@ import {
   DescriptionList, DescriptionItem,
   FileUpload,
   type FileUploadStatus,
+  ScrollArea,
 } from '@qijenchen/design-system'
 import {
   Home, FileText, Upload, ClipboardList, Users, BookOpen,
@@ -3189,7 +3190,7 @@ function DraftListPage({
                         </button>
                       </div>
                       {/* Scrollable body */}
-                      <div className="overflow-y-auto flex-1 divide-y divide-divider">
+                      <ScrollArea className="flex-1"><div className="divide-y divide-divider">
                         {/* 基本資訊 */}
                         <div className="px-4 py-3">
                           <p className="text-xs font-medium text-fg-secondary uppercase tracking-wide mb-3">基本資訊</p>
@@ -3273,7 +3274,7 @@ function DraftListPage({
                             </ul>
                           )}
                         </div>
-                      </div>
+                      </div></ScrollArea>
                     </>
                   )}
                 </div>
