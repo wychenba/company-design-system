@@ -7,7 +7,7 @@
       "scripts/composition-fidelity-visual-diff.mjs",
       "product-workspace apps/template/src/AllDsComponents.stories.tsx (ImportSmoke portal → DS Storybook link)"
     ],
-    "generatedAt": "2026-06-10T20:19:23.883Z"
+    "generatedAt": "2026-06-12T01:14:25.965Z"
   },
   "components": {
     "accordion": {
@@ -80,7 +80,8 @@
           "design-system-components-appshell-設計規格--size-matrix"
         ],
         "設計原則": [
-          "design-system-components-appshell-設計原則--usage-guidance"
+          "design-system-components-appshell-設計原則--usage-guidance",
+          "design-system-components-appshell-設計原則--layout-mode-rule"
         ]
       },
       "openSnapshotIds": [],
@@ -497,7 +498,8 @@
           "design-system-components-datatable-展示--filter-panel-long-tag-overflow",
           "design-system-components-datatable-展示--row-drag-interactive",
           "design-system-components-datatable-展示--row-drag-with-virtualization",
-          "design-system-components-datatable-展示--roadmap-all-in-one"
+          "design-system-components-datatable-展示--roadmap-all-in-one",
+          "design-system-components-datatable-展示--roadmap-perf-budget"
         ],
         "設計規格": [
           "design-system-components-datatable-設計規格--overview",
@@ -596,8 +598,7 @@
           "design-system-components-descriptionlist-展示--product-spec",
           "design-system-components-descriptionlist-展示--order-summary",
           "design-system-components-descriptionlist-展示--detail-panel",
-          "design-system-components-descriptionlist-展示--horizontal",
-          "design-system-components-descriptionlist-展示--retired-horizontal-divided"
+          "design-system-components-descriptionlist-展示--horizontal"
         ],
         "設計規格": [
           "design-system-components-descriptionlist-設計規格--overview",
@@ -1678,5 +1679,5 @@
     }
   },
   "totalComponents": 62,
-  "totalStories": 908
+  "totalStories": 909
 }

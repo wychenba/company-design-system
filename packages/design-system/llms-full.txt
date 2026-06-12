@@ -1,6 +1,6 @@
 # @qijenchen/design-system — 完整設計參考(llms-full)
 
-> 全 component / pattern 的 variants / sizes / 禁止事項。build-time 從 spec.md frontmatter 生成,禁手改。v0.1.0-beta.62。
+> 全 component / pattern 的 variants / sizes / 禁止事項。build-time 從 spec.md frontmatter 生成,禁手改。v0.1.0-beta.63。
 
 # Components
 
@@ -36,7 +36,7 @@ Source(AI 讀此看官方範例): src/components/AspectRatio/
 Storybook: https://ajenchen-design-system.netlify.app
 Source(AI 讀此看官方範例): src/components/Avatar/
 
-## Badge(family 3)
+## Badge(family self-contained)
 
 Storybook: https://ajenchen-design-system.netlify.app
 Source(AI 讀此看官方範例): src/components/Badge/
@@ -180,6 +180,10 @@ Source(AI 讀此看官方範例): src/components/FileItem/
 Storybook: https://ajenchen-design-system.netlify.app
 Source(AI 讀此看官方範例): src/components/FileUpload/
 
+### Variants
+- **dropzone**: 預設 — 大型 dashed 拖放區;「拖放有價值」+ 主要上傳區(drag + click)
+- **button**: form 內單欄 / 空間省 / 與其他 field 並列 — 緊湊 Button 觸發(click-only)
+
 ## FileViewer(family composite)
 
 Storybook: https://ajenchen-design-system.netlify.app
@@ -280,7 +284,7 @@ Source(AI 讀此看官方範例): src/components/Sidebar/
 Storybook: https://ajenchen-design-system.netlify.app
 Source(AI 讀此看官方範例): src/components/Skeleton/
 
-## Slider(family 4)
+## Slider(family self-contained)
 
 Storybook: https://ajenchen-design-system.netlify.app
 Source(AI 讀此看官方範例): src/components/Slider/
