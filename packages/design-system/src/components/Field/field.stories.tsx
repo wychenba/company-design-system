@@ -11,6 +11,9 @@ import { RadioGroup, RadioGroupItem } from '@/design-system/components/RadioGrou
 import { SegmentedControl, SegmentedControlItem } from '@/design-system/components/SegmentedControl/segmented-control'
 import { Slider } from '@/design-system/components/Slider/slider'
 import { NumberInput } from '@/design-system/components/NumberInput/number-input'
+import { Select } from '@/design-system/components/Select/select'
+import { DatePicker } from '@/design-system/components/DatePicker/date-picker'
+import { Rating } from '@/design-system/components/Rating/rating'
 
 const meta: Meta = {
   title: 'Design System/Components/Field/展示',
@@ -54,6 +57,49 @@ export const Vertical: Story = {
   ),
 }
 
+// ── Field 狀態 cascade（2026-06-08 補：disabled / mode 透過 context 流給所有 field 控件）──────
+// @story-trait-rationale: Field 透過 context 把 disabled / mode 流給「所有」field 控件。此前無 story 覆蓋此
+// cascade，致 picker 漏讀 fieldCtx.mode、Switch/Rating/Slider/PeoplePicker 漏讀 fieldCtx.disabled 的 cascade
+// bug 長期隱形（M15）。本 story 為 cascade 視覺驗證 SSOT —— 控件「皆不」自帶 disabled/mode prop，純靠 <Field> cascade。
+
+const CASCADE_PRIORITY = [
+  { value: 'high', label: '高' },
+  { value: 'medium', label: '中' },
+  { value: 'low', label: '低' },
+]
+
+export const StateCascade: Story = {
+  name: '欄位狀態連動 — 停用態 / 純展示態 流給所有控件',
+  render: () => (
+    <div className="flex flex-col gap-8">
+      <div>
+        <p className="text-body-sm font-medium text-fg-secondary mb-3">{'<Field disabled> — 所有控件自動停用（含 Switch / Rating / Slider / Select / DatePicker）'}</p>
+        <div className="flex flex-wrap gap-x-8 gap-y-4 max-w-3xl">
+          <Field disabled className="w-44"><FieldLabel>負責人</FieldLabel><Input value="王小明" onChange={() => {}} /></Field>
+          <Field disabled className="w-44"><FieldLabel>優先級</FieldLabel><Select options={CASCADE_PRIORITY} value="high" onChange={() => {}} aria-label="優先級" /></Field>
+          <Field disabled className="w-44"><FieldLabel>截止日</FieldLabel><DatePicker value="2026-06-20" onChange={() => {}} /></Field>
+          <Field disabled className="w-44"><FieldLabel>啟用通知</FieldLabel><Switch defaultChecked /></Field>
+          <Field disabled className="w-44"><FieldLabel>滿意度</FieldLabel><Rating value={4} aria-label="滿意度" /></Field>
+          <Field disabled className="w-44"><FieldLabel>完成度</FieldLabel><Slider value={[60]} onValueChange={() => {}} /></Field>
+          <Field disabled className="w-44"><FieldLabel>同意條款</FieldLabel><Checkbox defaultChecked /></Field>
+          <Field disabled className="w-44"><FieldLabel>付款方式</FieldLabel><RadioGroup defaultValue="card"><RadioGroupItem value="card" label="信用卡" /><RadioGroupItem value="cash" label="貨到付款" /></RadioGroup></Field>
+        </div>
+      </div>
+      <div>
+        <p className="text-body-sm font-medium text-fg-secondary mb-3">{'<Field mode="display"> — 有展示態的控件自動切純展示（Select / DatePicker / Checkbox / Switch 修復後生效）'}</p>
+        <div className="flex flex-wrap gap-x-8 gap-y-4 max-w-3xl">
+          <Field mode="display" className="w-44"><FieldLabel>負責人</FieldLabel><Input value="王小明" onChange={() => {}} /></Field>
+          <Field mode="display" className="w-44"><FieldLabel>優先級</FieldLabel><Select options={CASCADE_PRIORITY} value="high" aria-label="優先級" /></Field>
+          <Field mode="display" className="w-44"><FieldLabel>截止日</FieldLabel><DatePicker value="2026-06-20" onChange={() => {}} /></Field>
+          <Field mode="display" className="w-44"><FieldLabel>數量</FieldLabel><NumberInput value={42} onChange={() => {}} /></Field>
+          <Field mode="display" className="w-44"><FieldLabel>已啟用</FieldLabel><Switch checked /></Field>
+          <Field mode="display" className="w-44"><FieldLabel>同意條款</FieldLabel><Checkbox checked /></Field>
+        </div>
+      </div>
+    </div>
+  ),
+}
+
 // ── Horizontal ──────────────────────────────────────────────────────────
 
 export const Horizontal: Story = {
@@ -85,7 +131,7 @@ export const Horizontal: Story = {
 // ── Horizontal 垂直對齊公式驗證 ─────────────────────────────────────────
 
 export const HorizontalLabelAlignment: Story = {
-  name: '水平 — 標籤 垂直對齊公式驗證',
+  name: '水平:標籤垂直對齊公式驗證',
   render: () => (
     <div className="max-w-3xl flex flex-col gap-8">
       <div>
@@ -140,14 +186,14 @@ export const HorizontalLabelAlignment: Story = {
 // ── Checkbox / Switch 在 Field 內的高度對齊 ─────────────────────────────
 
 export const MixedControlAlignment: Story = {
-  name: '混合 控制元件 的 field 高度對齊',
+  name: '混合控制元件的高度對齊',
   render: () => (
     <div className="flex flex-col gap-8 max-w-3xl">
       <div>
         <h3 className="text-body font-bold mb-2">垂直 Field：Input / Checkbox / Switch 高度節奏一致</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          每個 Field 的 control area 都是 `min-h-field-md` + items-center。
-          Input 填滿 32px，Checkbox / Switch 維持 primitive 原生尺寸並垂直置中。
+          每個欄位的控件區都有相同的最小高度,讓整欄看起來節奏一致。
+          文字輸入框會撐滿整個高度,勾選框與開關則維持原本尺寸並在區內垂直置中。
         </p>
         <FieldGroup>
           <Field>
@@ -216,8 +262,8 @@ export const SegmentedControlInField: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">Vertical：SegmentedControl 自動繼承 Field size</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          SegmentedControl 在 Field 內透過 useFieldContext() 讀取 size，不需重複傳——跟 Button / Input 同機制。
-          整個 Field 改 size 時，SegmentedControl 跟著一起縮放。
+          分段控制器放進欄位後,會自動沿用欄位設定的尺寸,不需要再單獨指定——跟按鈕、輸入框的做法一致。
+          整個欄位改尺寸時,分段控制器也會跟著一起縮放。
         </p>
         <FieldGroup>
           <Field size="sm">
@@ -251,8 +297,8 @@ export const SegmentedControlInField: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">Horizontal：label 與 SegmentedControl 中線對齊</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          Horizontal Field 內 SegmentedControl 跟其他 control（Input / Checkbox / Switch）一樣
-          參與 field-height 韻律，label 第一行對齊 control 中線。
+          水平排列時,分段控制器跟其他控件(輸入框、勾選框、開關)一樣維持相同的行高節奏,
+          標籤的第一行會對齊控件的垂直中線。
         </p>
         <FieldGroup>
           <Field orientation="horizontal" labelWidth="120px">
@@ -269,7 +315,9 @@ export const SegmentedControlInField: Story = {
           </Field>
           <Field orientation="horizontal" labelWidth="120px">
             <FieldLabel>訂閱通知</FieldLabel>
-            <Switch />
+            {/* 混合表單(Input/SegmentedControl 同列)= Form-edit 情境 → Switch 跟其他控件靠左
+                (switch.spec.md「兩種對齊慣例」判準;ml-0 覆寫 Field 內預設 ml-auto 齊右 —— 齊右屬純 settings list)*/}
+            <Switch className="ml-0" />
           </Field>
         </FieldGroup>
       </div>
@@ -306,9 +354,9 @@ export const BlockControlRadioGroup: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">Vertical:RadioGroup 在 control area 內堆疊</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          RadioGroup 的 `fieldLayout = 'block'` static 屬性讓 Field 自動切 block 模式——
-          control area 不設 min-h、改用 padding-top 公式,第一個 option 的中線錨在 field-height/2。
-          Consumer 不需要傳任何 prop。
+          單選群組會讓欄位自動切換成「多行區塊」排版——
+          控件區不固定高度,而是把第一個選項的中線對齊到單行控件的中線位置。
+          使用時不需要額外傳任何設定。
         </p>
         <div className="max-w-sm">
           <Field>
@@ -326,9 +374,8 @@ export const BlockControlRadioGroup: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">Horizontal:label 第一行對齊第一個 option 中線</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          horizontal 模式下,label 的 padding-top 公式不變,
-          control area 的 padding-top 也用同一條公式——兩者「第一行中線」都落在 field-height/2,
-          所以 label 文字精確對齊第一個 Radio 的文字中線,後續 option 往下流。
+          水平排列時,標籤與控件區用同一套對齊方式,讓兩者的「第一行中線」落在同一條基準線上,
+          所以標籤文字會精準對齊第一個單選項的文字中線,後面的選項往下排列。
         </p>
         <Field orientation="horizontal" labelWidth="120px">
           <FieldLabel>性別</FieldLabel>
@@ -343,9 +390,9 @@ export const BlockControlRadioGroup: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">Inline + Block 並排:FieldGroup 韻律不斷</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          同一個 FieldGroup 內混用 inline(Input)和 block(RadioGroup),每個 Field 的 label
-          第一行中線都落在同一條視覺基準上——姓名 Input 的中線、性別第一個 Radio(男性)的中線、Email Input 的中線。
-          這就是 field-height 韻律。
+          同一組欄位裡混用單行控件(輸入框)和多行控件(單選群組)時,每個欄位標籤的
+          第一行中線都落在同一條視覺基準上——姓名輸入框的中線、性別第一個選項(男性)的中線、Email 輸入框的中線。
+          這就是整套欄位一致的行高節奏。
         </p>
         <FieldGroup>
           <Field orientation="horizontal" labelWidth="120px" required>
@@ -373,7 +420,7 @@ export const BlockControlRadioGroup: Story = {
 // ── Button as Data Input Affordance ─────────────────────────────────────
 
 export const ButtonAsControl: Story = {
-  name: 'Button 作為 控制元件',
+  name: 'Button 作為控制元件',
   render: () => (
     <div className="flex flex-col gap-8 max-w-3xl">
       <div>
@@ -415,7 +462,7 @@ export const ButtonAsControl: Story = {
 // ── Label Width 變化 ────────────────────────────────────────────────────
 
 export const LabelWidth: Story = {
-  name: 'Label 寬度',
+  name: '標籤寬度',
   render: () => (
     <div className="max-w-2xl flex flex-col gap-4">
       <p className="text-caption text-fg-muted">labelWidth 支援任何 CSS length 值</p>

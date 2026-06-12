@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Star, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled } from '@/design-system/components/Field/field-context'
 
 /**
  * Rating — 星星評分元件
@@ -80,7 +80,11 @@ export interface RatingProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   loading?: boolean
   /** 自訂 icon(預設 Star);傳 LucideIcon */
   icon?: LucideIcon
-  /** a11y label(readOnly 時必填,interactive 時建議填) */
+  /**
+   * a11y label。readOnly(role=img)時必填。
+   * interactive(role=slider)時:在 Field 內免填(自動 aria-labelledby 指向 FieldLabel);
+   * standalone(無 Field)時必填——role=slider 依 WAI-ARIA APG 必有 accessible name。
+   */
   'aria-label'?: string
 }
 
@@ -95,7 +99,7 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
       size: sizeProp,
       precision = 'full',
       readOnly = false,
-      disabled = false,
+      disabled: disabledProp,
       loading = false,
       icon: Icon = Star,
       className,
@@ -108,10 +112,10 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
     //   - Standalone(無 Field context) → default `xs`(24px,對齊 Avatar / Tag sm / iOS HIG standalone)
     // consumer 可傳 size 顯式 override。世界級對照:Material Rating standalone 24dp、
     // Ant Rate in Form 跟 Form.itemSize,standalone 24px。
-    const fieldCtx = useFieldContext()
-    const fieldSize = fieldCtx?.size as ('sm' | 'md' | 'lg' | undefined)
-    const size: 'xs' | 'sm' | 'md' | 'lg' =
-      sizeProp ?? fieldSize ?? 'xs'
+    const fieldCtx = useFieldContext()  // 保留:aria-labelledby 用 fieldCtx.labelId
+    // 2026-06-08 SSOT:<Field disabled> cascade(原 isInteractive 只看 local disabled prop)
+    const disabled = useResolvedFieldDisabled(disabledProp)
+    const size = useResolvedFieldSize<'xs' | 'sm' | 'md' | 'lg'>(sizeProp, 'xs')  // SSOT:統一 size resolution(Rating default 'xs')
     const [internalValue, setInternalValue] = React.useState(defaultValue)
     const [hoverValue, setHoverValue] = React.useState<number | null>(null)
     const isControlled = value !== undefined
@@ -148,13 +152,19 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
       <div
         ref={ref}
         role={isInteractive ? 'slider' : 'img'}
+        // a11y(#30):role=slider 必有 accessible name(WAI-ARIA APG slider pattern)。
+        //   Field 內 → 自動 aria-labelledby 指向 FieldLabel 的 id(fieldCtx.labelId,免填);
+        //   Standalone → 仍需 consumer 傳 aria-label。對齊 TimePicker / DatePicker 同 canonical
+        //   (time-picker.tsx:313 / date-picker.tsx:514:aria-labelledby={fieldCtx?.labelId})。
+        //   置於 {...props} 前,consumer 顯式傳的 aria-labelledby 仍可覆寫。
+        aria-labelledby={isInteractive ? fieldCtx?.labelId : undefined}
         aria-valuenow={isInteractive ? currentValue : undefined}
         aria-valuemin={isInteractive ? 0 : undefined}
         aria-valuemax={isInteractive ? max : undefined}
         aria-valuetext={isInteractive ? `${currentValue} of ${max} stars` : undefined}
         aria-disabled={disabled || undefined}
-        // a11y: aria-readonly 只允許於 slider role(非 img)— axe aria-allowed-attr 2026-04-25
-        aria-readonly={isInteractive && readOnly ? true : undefined}
+        // a11y: 刻意不設 aria-readonly — readOnly 時 role=img(axe aria-allowed-attr 禁 img 用 aria-readonly,2026-04-25);
+        //       interactive 時 role=slider 但必非 readOnly(isInteractive = !readOnly)。兩 state 皆不該有此屬性,故省略。
         aria-busy={loading || undefined}
         tabIndex={isInteractive ? 0 : undefined}
         onKeyDown={handleKeyDown}
@@ -236,8 +246,9 @@ function StarIcon({ Icon, sizePx, fillRatio, isHalf, interactive, onHover, onCli
         style={{ color: fill }}
         aria-hidden
       >
-        {/* stroke="none" 移除 Lucide Star 預設的 outline stroke(1.5px 黑線),
-            讓星星是純 fill-only 的 shape——fill 與 outline 同色視覺上仍有亮度差。
+        {/* stroke="none" 移除 Lucide Star 預設的 outline stroke(lucide defaultAttributes
+            strokeWidth=2 + stroke=currentColor 會畫輪廓),讓星星是純 fill-only 的 shape——
+            fill 與 outline 同色視覺上仍有亮度差。
             世界級對照:Ant Rate / Material MUI Rating 皆純 fill,無 outline stroke。*/}
         <Icon size={sizePx} fill={fill} stroke="none" className="shrink-0" />
       </span>
@@ -277,7 +288,7 @@ function StarIcon({ Icon, sizePx, fillRatio, isHalf, interactive, onHover, onCli
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const ratingMeta = {
   component: 'Rating',
-  family: 4,
+  family: null, // self-contained primitive(對齊 spec frontmatter self-contained + body L24;非 Family 4)
   variants: {
 
   },

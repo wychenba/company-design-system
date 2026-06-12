@@ -227,14 +227,14 @@ const InspectorInner = () => {
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-fg-muted w-16 shrink-0">Variant</span>
           <div className="flex flex-wrap gap-1.5">
-            {VARIANTS.map((v) => <Tab key={v} active={variant === v} onClick={() => setVariant(v)}>{v}</Tab>)}
+            {(isDot ? VARIANTS.filter((v) => v === 'critical' || v === 'high') : VARIANTS).map((v) => <Tab key={v} active={variant === v} onClick={() => setVariant(v)}>{v}</Tab>)}
           </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-fg-muted w-16 shrink-0">Mode</span>
           <div className="flex gap-1.5">
             <Tab active={mode === 'count'} onClick={() => setMode('count')}>count</Tab>
-            <Tab active={mode === 'dot'} onClick={() => setMode('dot')}>dot</Tab>
+            <Tab active={mode === 'dot'} onClick={() => { setMode('dot'); if (variant !== 'critical' && variant !== 'high') setVariant('critical') }}>dot</Tab>
           </div>
         </div>
         {!isDot && (
@@ -253,7 +253,7 @@ const InspectorInner = () => {
         <div className="flex flex-col gap-5 min-w-[280px]">
           <div className="px-10 py-8 rounded-lg bg-canvas border border-divider flex items-center justify-center">
             {isDot
-              ? <Badge dot variant={variant} />
+              ? <Badge dot variant={variant === 'high' ? 'high' : 'critical'} />
               : <Badge count={count} variant={variant} max={count > 99 ? 99 : undefined} />
             }
           </div>
@@ -440,13 +440,15 @@ export const ColorMatrix = {
                   <tr key={v}>
                     <td className="p-3 border-b border-divider font-mono text-caption font-medium align-middle">{v}</td>
                     <td className="p-3 border-b border-divider align-middle">
-                      <Badge dot variant={v} />
+                      {(v === 'critical' || v === 'high') ? <Badge dot variant={v} /> : <span className="text-fg-muted text-caption">—</span>}
                     </td>
                     <td className="p-3 border-b border-divider align-middle">
-                      <span className="inline-flex items-center gap-1.5">
-                        <Swatch value={c.bg} />
-                        <span className="font-mono text-[12px] text-fg-secondary">{c.bg}</span>
-                      </span>
+                      {(v === 'critical' || v === 'high') ? (
+                        <span className="inline-flex items-center gap-1.5">
+                          <Swatch value={c.bg} />
+                          <span className="font-mono text-[12px] text-fg-secondary">{c.bg}</span>
+                        </span>
+                      ) : <span className="text-fg-muted text-caption">—</span>}
                     </td>
                   </tr>
                 )
@@ -458,18 +460,19 @@ export const ColorMatrix = {
 
       {/* Button pairing guidance */}
       <div className="flex flex-col gap-3">
-        <span className="text-caption font-medium text-fg-secondary">按鈕搭配規則</span>
-        <Desc>Badge 層級應匹配容器視覺重量。深色按鈕只適合 critical；低層級 badge 放在高視覺重量按鈕上是設計矛盾。</Desc>
+        <span className="text-caption font-medium text-fg-secondary">容器 Contrast floor 對照</span>
+        <Desc>容器 bg 決定 badge 的 contrast floor（可見度下限）——badge 至少要到此層級才看得清。Floor 是下限不是上限：semantic 永遠可往上升（floor 以上的所有層級都合法）。critical 的紅白對比在任何底色都清楚，不受 floor 限制。</Desc>
         <div className="overflow-x-auto">
           <table className="border-collapse text-caption">
-            <thead><tr><Th>按鈕 variant</Th><Th>適合的 Badge 層級</Th></tr></thead>
+            <thead><tr><Th>容器</Th><Th>Contrast floor（最低層級）</Th></tr></thead>
             <tbody>
               {[
-                ['primary / checked / secondary+danger', 'critical'],
-                ['secondary / tertiary', 'critical、high'],
-                ['text', '全部'],
-              ].map(([btn, badge]) => (
-                <tr key={btn}><Td>{btn}</Td><Td>{badge}</Td></tr>
+                ['text / tab item / icon button（透明 / 極淺）', 'low'],
+                ['secondary / tertiary（淺底帶邊框）', 'low'],
+                ['checked（pressed，淺灰 / subtle 底）', 'low / medium'],
+                ['primary / secondary+danger（飽和深底）', 'high'],
+              ].map(([container, floor]) => (
+                <tr key={container}><Td>{container}</Td><Td>{floor}</Td></tr>
               ))}
             </tbody>
           </table>
@@ -508,7 +511,7 @@ export const SizeMatrix = {
               { label: '字體', count: { token: 'text-[10px]', value: '10px' }, dot: { token: '—', value: '無文字' } },
               { label: 'Font Weight', count: { token: 'font-medium', value: '500' }, dot: { token: '—', value: '' } },
               { label: 'Line Height', count: { token: 'leading-none', value: '1' }, dot: { token: '—', value: '' } },
-              { label: 'Radius', count: { token: 'rounded-full', value: '9999px' }, dot: { token: 'rounded-full', value: '9999px（implicit via w/h）' } },
+              { label: 'Radius', count: { token: 'rounded-full', value: '9999px' }, dot: { token: 'rounded-full', value: '9999px（base rounded-full）' } },
             ].map((row) => (
               <tr key={row.label}>
                 <Td>{row.label}</Td>
@@ -557,7 +560,7 @@ export const SizeMatrix = {
                   <td className="p-3 border-b border-divider align-middle"><Badge count={3} variant={v} /></td>
                   <td className="p-3 border-b border-divider align-middle"><Badge count={42} variant={v} /></td>
                   <td className="p-3 border-b border-divider align-middle"><Badge count={150} variant={v} max={99} /></td>
-                  <td className="p-3 border-b border-divider align-middle"><Badge dot variant={v} /></td>
+                  <td className="p-3 border-b border-divider align-middle">{(v === 'critical' || v === 'high') ? <Badge dot variant={v} /> : <span className="text-fg-muted text-caption">—</span>}</td>
                 </tr>
               ))}
             </tbody>
@@ -573,9 +576,16 @@ export const SizeMatrix = {
 export const Accessibility = {
   name: '無障礙',
   render: () => (
-    <div className="max-w-3xl text-body text-fg-secondary">
-      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"本元件為純視覺呈現,無 keyboard / ARIA role / focus state 需求。Consumer 包 Badge 進互動容器(Button / Card / Link)時 a11y 由容器決定。"}</p>
+    <div className="max-w-3xl text-body text-fg-secondary flex flex-col gap-3">
+      <h3 className="text-h5 text-foreground mb-1">無障礙設計</h3>
+      <p>Badge 不可聚焦、無鍵盤互動（非互動元件），但**不是**完全無語意：元件預設帶 <code className="font-mono text-fg-secondary">role="status"</code>（live region，計數變化可被 screen reader 播報），consumer 可傳 <code className="font-mono text-fg-secondary">role</code> override。</p>
+      <ul className="list-disc pl-5 space-y-1 text-caption text-fg-muted">
+        <li><span className="font-mono text-fg-secondary">role="status"</span>：元件預設（forwardRef render，consumer 可傳 role override），計數更新時自動播報，不需 consumer 設定。</li>
+        <li>Count 模式：數字會被讀出，但需 parent 容器的 <span className="font-mono text-fg-secondary">aria-label</span> 補 context（「通知 (3 則未讀)」）。</li>
+        <li>Dot 模式：無文字 → screen reader 看不到 → <span className="font-mono text-fg-secondary">aria-label</span> 為必填。</li>
+        <li>色彩不獨立承載語意（color-blind）：level 不能只靠紅 / 藍 / 灰，需搭配 count 數字或 aria-label。</li>
+      </ul>
+      <p className="text-caption text-fg-muted">完整 aria-label 整合 / dot 必填 / color-blind 反例 demo 見「設計原則」頁的「無障礙必備」story；keyboard / focus 由宿主互動容器（Button / Card / Link）負責。</p>
     </div>
   ),
 }

@@ -1,0 +1,239 @@
+[
+ {
+  "file": "patterns/element-anatomy/item-anatomy.stories.tsx",
+  "line": 926,
+  "name": "對齊容器（24px 閾值）",
+  "bad": [
+   "px"
+  ]
+ },
+ {
+  "file": "components/FileUpload/file-upload.stories.tsx",
+  "line": 84,
+  "name": "內建 files 屬性",
+  "bad": [
+   "files"
+  ]
+ },
+ {
+  "file": "components/DateGrid/date-grid.principles.stories.tsx",
+  "line": 302,
+  "name": "Locale 與週首日",
+  "bad": [
+   "Locale"
+  ]
+ },
+ {
+  "file": "components/TreeView/tree-view.anatomy.stories.tsx",
+  "line": 377,
+  "name": "鍵盤導覽（ARIA tree）",
+  "bad": [
+   "tree"
+  ]
+ },
+ {
+  "file": "components/Separator/separator.anatomy.stories.tsx",
+  "line": 80,
+  "name": "設計變數 規則（--divider vs --border）",
+  "bad": [
+   "divider",
+   "border"
+  ]
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+  "line": 194,
+  "name": "如何選 ratio",
+  "bad": [
+   "ratio"
+  ]
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+  "line": 225,
+  "name": "children 要填滿容器",
+  "bad": [
+   "children"
+  ]
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+  "line": 263,
+  "name": "背景-muted 占位 與 Skeleton 的分界",
+  "bad": [
+   "muted"
+  ]
+ },
+ {
+  "file": "components/Slider/slider.anatomy.stories.tsx",
+  "line": 173,
+  "name": "範圍 ↔ Thumb 邊框 綁定規則",
+  "bad": [
+   "Thumb"
+  ]
+ },
+ {
+  "file": "components/Slider/slider.principles.stories.tsx",
+  "line": 213,
+  "name": "Thumb 白底 + 邊框,不用實心",
+  "bad": [
+   "Thumb"
+  ]
+ },
+ {
+  "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+  "line": 322,
+  "name": "Filmstrip 顯示判準",
+  "bad": [
+   "Filmstrip"
+  ]
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.principles.stories.tsx",
+  "line": 211,
+  "name": "Status 語意",
+  "bad": [
+   "Status"
+  ]
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.principles.stories.tsx",
+  "line": 265,
+  "name": "Affix 選擇",
+  "bad": [
+   "Affix"
+  ]
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.anatomy.stories.tsx",
+  "line": 351,
+  "name": "Affix 行為",
+  "bad": [
+   "Affix"
+  ]
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 143,
+  "name": "混合 控制元件 的 field 高度對齊",
+  "bad": [
+   "field"
+  ]
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.stories.tsx",
+  "line": 84,
+  "name": "垂直捲動 — Notion sidebar 導覽",
+  "bad": [
+   "sidebar"
+  ]
+ },
+ {
+  "file": "components/Combobox/combobox.principles.stories.tsx",
+  "line": 134,
+  "name": "Wrap 模式選擇",
+  "bad": [
+   "Wrap"
+  ]
+ },
+ {
+  "file": "components/SelectionControl/selection-item.anatomy.stories.tsx",
+  "line": 386,
+  "name": "Prefix 對齊規則（24px 閾值）",
+  "bad": [
+   "Prefix",
+   "px"
+  ]
+ },
+ {
+  "file": "components/Textarea/textarea.anatomy.stories.tsx",
+  "line": 263,
+  "name": "Rows 與 縮放",
+  "bad": [
+   "Rows"
+  ]
+ },
+ {
+  "file": "components/Steps/steps.principles.stories.tsx",
+  "line": 184,
+  "name": "規則:藍色 連線 只跟 completed 走",
+  "bad": [
+   "completed"
+  ]
+ },
+ {
+  "file": "components/Avatar/avatar.principles.stories.tsx",
+  "line": 120,
+  "name": "Fallback 順序",
+  "bad": [
+   "Fallback"
+  ]
+ },
+ {
+  "file": "components/ProfileCard/profile-card.principles.stories.tsx",
+  "line": 157,
+  "name": "寬度固定 320px",
+  "bad": [
+   "px"
+  ]
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.stories.tsx",
+  "line": 298,
+  "name": "整合 React Router / Next.js Link",
+  "bad": [
+   "js",
+   "Link"
+  ]
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.anatomy.stories.tsx",
+  "line": 417,
+  "name": "長路徑收合（Ellipsis）",
+  "bad": [
+   "Ellipsis"
+  ]
+ },
+ {
+  "file": "components/Sheet/sheet.principles.stories.tsx",
+  "line": 230,
+  "name": "Side 屬性：消費者用 right（其餘內部基建）",
+  "bad": [
+   "Side",
+   "right"
+  ]
+ },
+ {
+  "file": "components/Sheet/sheet.anatomy.stories.tsx",
+  "line": 138,
+  "name": "Side 方向 × 用途",
+  "bad": [
+   "Side"
+  ]
+ },
+ {
+  "file": "components/Coachmark/coachmark.principles.stories.tsx",
+  "line": 314,
+  "name": "Media 內容原則",
+  "bad": [
+   "Media"
+  ]
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 470,
+  "name": "bordered 屬性（預設 true）",
+  "bad": [
+   "bordered",
+   "true"
+  ]
+ },
+ {
+  "file": "components/DataTable/data-table.principles.stories.tsx",
+  "line": 121,
+  "name": "用 欄 type 自動渲染,不手寫 儲存格",
+  "bad": [
+   "type"
+  ]
+ }
+]

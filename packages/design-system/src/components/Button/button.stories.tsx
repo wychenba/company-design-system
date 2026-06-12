@@ -12,7 +12,7 @@ const meta: Meta<typeof Button> = {
   parameters: {
     docs: {
       description: {
-        component: '觸發操作或導覽的基礎互動元件。支援六種視覺強調等級（variant）、danger 語意疊加、四種尺寸、icon-only 模式。',
+        component: '觸發操作或導覽的基礎互動元件。支援五種視覺強調等級（variant）、danger 語意疊加、四種尺寸、icon-only 模式。',
       },
     },
   },
@@ -24,7 +24,7 @@ const meta: Meta<typeof Button> = {
     },
     danger: {
       control: 'boolean',
-      description: '套用危險色（紅色）。可與任何 variant 組合，與 variant 正交。',
+      description: '套用危險色（紅色）。僅 `primary` / `secondary` / `text` 支援（`tertiary` 視覺與 secondary+danger 重複、`link` 語義矛盾，見 spec 禁止事項）。',
     },
     size: {
       control: 'select',
@@ -91,18 +91,18 @@ export const Pressed: Story = {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-caption text-fg-muted w-24">secondary</span>
-        <Button variant="secondary">Not pressed</Button>
-        <Button variant="secondary" pressed>Pressed</Button>
+        <Button variant="secondary">顯示側欄</Button>
+        <Button variant="secondary" pressed>已顯示側欄</Button>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-caption text-fg-muted w-24">tertiary</span>
-        <Button variant="tertiary">Not pressed</Button>
-        <Button variant="tertiary" pressed>Pressed</Button>
+        <Button variant="tertiary">自動儲存</Button>
+        <Button variant="tertiary" pressed>自動儲存中</Button>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-caption text-fg-muted w-24">text</span>
-        <Button variant="text">Not pressed</Button>
-        <Button variant="text" pressed>Pressed</Button>
+        <Button variant="text">靜音</Button>
+        <Button variant="text" pressed>已靜音</Button>
       </div>
     </div>
   ),
@@ -111,7 +111,7 @@ export const Pressed: Story = {
 // ── danger prop ─────────────────────────────────────────────────
 
 export const Danger: Story = {
-  name: 'Danger 語意',
+  name: '危險 語意',
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-3">
@@ -243,15 +243,15 @@ export const Loading: Story = {
         <p className="mb-2 text-caption text-fg-muted">行為對照：原始 → loading</p>
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
-            <Button startIcon={Download}>匯出</Button>
+            <Button variant="primary" startIcon={Download}>匯出</Button>
             <span className="text-caption text-fg-muted">→</span>
-            <Button startIcon={Download} loading>匯出中</Button>
+            <Button variant="primary" startIcon={Download} loading>匯出中</Button>
             <span className="text-caption text-fg-muted">startIcon 被 spinner 替換，位置不變</span>
           </div>
           <div className="flex items-center gap-3">
-            <Button>儲存</Button>
+            <Button variant="primary">儲存</Button>
             <span className="text-caption text-fg-muted">→</span>
-            <Button loading>儲存中</Button>
+            <Button variant="primary" loading>儲存中</Button>
             <span className="text-caption text-fg-muted">spinner 出現在文字左側，按鈕略寬</span>
           </div>
           <div className="flex items-center gap-3">
@@ -267,7 +267,7 @@ export const Loading: Story = {
       <div>
         <p className="mb-2 text-caption text-fg-muted">全 variants — with startIcon(匯出 / 同步情境)</p>
         <div className="flex flex-wrap items-center gap-3">
-          <Button startIcon={Download} loading>匯出報表</Button>
+          <Button variant="primary" startIcon={Download} loading>匯出報表</Button>
           <Button variant="secondary" startIcon={Download} loading>同步 Stripe</Button>
           <Button variant="tertiary" startIcon={Download} loading>重新整理</Button>
           <Button variant="text" startIcon={Download} loading>取消</Button>
@@ -280,7 +280,7 @@ export const Loading: Story = {
       <div>
         <p className="mb-2 text-caption text-fg-muted">全 variants — without startIcon(匯出 / 同步情境)</p>
         <div className="flex flex-wrap items-center gap-3">
-          <Button loading>匯出報表</Button>
+          <Button variant="primary" loading>匯出報表</Button>
           <Button variant="secondary" loading>同步 Stripe</Button>
           <Button variant="tertiary" loading>重新整理</Button>
           <Button variant="text" loading>取消</Button>
@@ -308,7 +308,7 @@ export const FullWidth: Story = {
   name: '全寬',
   render: () => (
     <div className="flex flex-col gap-3 max-w-xs">
-      <Button fullWidth>確認送出</Button>
+      <Button variant="primary" fullWidth>確認送出</Button>
       <Button variant="tertiary" fullWidth>取消</Button>
       <Button variant="primary" danger fullWidth startIcon={Trash2}>永久刪除</Button>
     </div>

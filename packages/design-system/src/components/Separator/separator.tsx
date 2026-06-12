@@ -30,14 +30,14 @@ Separator.displayName = "Separator"
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const separatorMeta = {
   component: 'Separator',
-  family: null, // non-family composite / overlay / layout
+  family: 'self-contained', // 純視覺 divider,獨立視覺無 slot 結構(對齊 spec frontmatter L3 family: self-contained)
   variants: {
 
   },
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'], // 純 Radix Separator.Root,非互動,無 hover/active/focus/disabled(對齊 spec L86/L99 + Tag tag.tsx:232 canonical)
   tokens: {
     bg: [],
     fg: [],

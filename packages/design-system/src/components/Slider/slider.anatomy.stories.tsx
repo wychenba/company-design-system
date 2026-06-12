@@ -93,7 +93,7 @@ export const ColorMatrix: Story = {
     <div className="flex flex-col gap-8">
       <div>
         <H3>一種視覺,多種容器尺寸</H3>
-        <Desc>Slider 的視覺(track 厚度、thumb 直徑、focus ring)是**固定單一值**——不隨 `size` 變動。業界(Material / Ant / Radix Themes / shadcn)共識:thumb 必須足夠大以便手指/鼠標捕捉,track 太細會看不清 range。</Desc>
+        <Desc>Slider 的視覺(track 厚度、thumb 直徑、thumb 邊框寬度)是**固定單一值**——不隨 `size` 變動。業界(Material / Ant / Radix Themes / shadcn)共識:thumb 必須足夠大以便手指/鼠標捕捉,track 太細會看不清 range。</Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
             <thead><tr><Th>元素</Th><Th>值</Th><Th>Token</Th></tr></thead>
@@ -109,7 +109,7 @@ export const ColorMatrix: Story = {
               <tr><Td>Thumb 邊框 disabled</Td><Td><TokenCell token="--border" display="border-border" /></Td><Td><TokenCell token="--border" display="--border(與 Range disabled 同色)" /></Td></tr>
               <tr><Td>Thumb hover</Td><Td mono>border primary-hover + --elevation-100</Td><Td>—</Td></tr>
               <tr><Td>Thumb active</Td><Td mono>--elevation-200</Td><Td>—</Td></tr>
-              <tr><Td>Focus ring</Td><Td mono>ring-2 ring-ring ring-offset-2</Td><Td><TokenCell token="--ring" /></Td></tr>
+              <tr><Td>Thumb focus</Td><Td mono>border-primary-hover(加深,不加 ring/halo)</Td><Td><TokenCell token="--primary-hover" /></Td></tr>
             </tbody>
           </table>
         </div>
@@ -124,7 +124,7 @@ export const SizeMatrix: Story = {
     <div className="flex flex-col gap-6">
       <div>
         <H3>Size 只決定 root 容器的 `h-field-*` class</H3>
-        <Desc>Track / thumb / ring 尺寸不變——內部元素用 flex `items-center` 在容器垂直置中。這樣同一組 Field 並排(Input + Slider + NumberInput)高度完美對齊,但 Slider 本身視覺體驗一致。</Desc>
+        <Desc>Track / thumb / 邊框尺寸不變——內部元素用 flex `items-center` 在容器垂直置中。這樣同一組 Field 並排(Input + Slider + NumberInput)高度完美對齊,但 Slider 本身視覺體驗一致。</Desc>
         <div className="flex flex-col gap-3 max-w-md">
           {(['sm', 'md', 'lg'] as const).map(size => (
             <div key={size} className="flex items-center gap-3 border border-dashed border-divider rounded-md p-3">
@@ -210,7 +210,7 @@ export const KeyboardMatrix: Story = {
             <thead><tr><Th>按鍵</Th><Th>行為</Th></tr></thead>
             <tbody>
               <tr><Td mono>← / →</Td><Td>- / + step</Td></tr>
-              <tr><Td mono>↓ / ↑</Td><Td>+ / - step(vertical-inverted 時相反)</Td></tr>
+              <tr><Td mono>↑ / ↓</Td><Td>+ / - step(vertical-inverted 時相反)</Td></tr>
               <tr><Td mono>PageDown / PageUp</Td><Td>± step × 10</Td></tr>
               <tr><Td mono>Home / End</Td><Td>跳到 min / max</Td></tr>
               <tr><Td mono>Tab</Td><Td>range mode 在多 thumb 間切換焦點</Td></tr>
@@ -229,7 +229,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `slider.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  slider  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/slider#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — focus thumb\n- ←/→ — 微調\n- Home/End — min/max\n- PageUp/Down — 大步階\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA c"}</p>
+      <p className="whitespace-pre-line">{"ARIA / 角色:繼承 Radix slider 的無障礙預設(role、aria-* 屬性、鍵盤導覽都由 primitive 提供)。\n\n鍵盤操作:\n\n- Tab — 聚焦到 thumb\n- ←/→ — 微調數值\n- Home/End — 跳到最小/最大值\n- PageUp/PageDown — 大步階調整\n\n聚焦樣式:thumb 鍵盤聚焦時,邊框加深成 primary-hover 色(跟滑鼠 hover 同一個視覺),不另外加外框光暈(ring/halo)。\n\n驗證:Storybook a11y 面板應為 0 個 critical violation;不用滑鼠、純鍵盤也能完整操作。文字對比 ≥ 4.5:1、UI 元件對比 ≥ 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

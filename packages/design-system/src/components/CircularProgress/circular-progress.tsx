@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils'
  * affix:     (determinate only)'value' | ReactNode
  *
  * ── 視覺 ──
- * SVG 雙圓:底 track(`var(--secondary)`)+ 進度 arc(`text-primary`,不隨狀態變色)。
+ * SVG 雙圓:底 track(`var(--secondary)`)+ 進度 arc(`text-info`,status 進度色,不隨狀態變色)。
  * stroke-linecap round,rotate -90deg。
  * Indeterminate mode:arc 固定 25%,外層 `animate-spin` 旋轉,視覺同 Spinner。
  *
@@ -52,7 +52,6 @@ export interface CircularProgressProps extends React.HTMLAttributes<HTMLSpanElem
   value?: number
   /** 直徑(px)。預設 24,建議 ≤ 64。 */
   size?: number
-  /** 狀態色(lifecycle,與 ProgressBar 同契約)。 */
   /**
    * 視覺 label(inline 顯示於右側)。
    * - font-size 繼承 parent(不設 text-size class,CSS inherit)
@@ -133,7 +132,7 @@ const CircularProgress = React.forwardRef<HTMLSpanElement, CircularProgressProps
         className={cn(
           // align-middle:inline context 內讓 SVG 對齊 adjacent text 的 x-height 中線
           //(不加會按 baseline 對齊,在 inline-flex cell 裡視覺下沉 1-2px 看起來歪)
-          'inline-flex shrink-0 align-middle text-primary',
+          'inline-flex shrink-0 align-middle text-info',
           // motion-reduce:Material 流派 — prefers-reduced-motion 時不停止旋轉(loading 仍需可見回饋),
           // 而是放慢到 3s/cycle(預設 1s),保留資訊不刺激前庭。
           !isDeterminate && 'animate-spin motion-reduce:[animation-duration:3s]',
@@ -193,10 +192,10 @@ export const circularProgressMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'], // 無 hover / focus / active(spec);disabled 屬 consumer host(spec「邊界案例」)
   tokens: {
     bg: [],
-    fg: ['text-fg-muted', 'text-foreground', 'text-primary'],
+    fg: ['text-fg-muted', 'text-foreground', 'text-info'],
     ring: [],
   },
 } as const

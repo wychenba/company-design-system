@@ -128,8 +128,8 @@ export interface FieldProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
   /**
    * Control area 佈局模型(逃生艙)。
    *
-   * 預設由 Field 自動偵測——讀第一個 control child 的 `type.fieldLayout` static 屬性,
-   * primitive 沒宣告時視為 `'inline'`。
+   * 預設由 Field 自動偵測——迭代全部 control child 的 `type.fieldLayout` static 屬性,
+   * 任一宣告為 `'block'` 即整個 area 切 block(first-block-wins);全部缺宣告時視為 `'inline'`。
    *
    * 只有兩種情況需要手動指定:
    * 1. consumer 把自己手寫的 JSX(`<div>` / 函式元件)當 control,系統無法偵測——強制 `'block'`
@@ -223,9 +223,9 @@ const Field = React.forwardRef<HTMLDivElement, FieldProps>(
     // - inline: min-h-field-{size} + items-center
     //   單行 control(Input、Button 等)中線置中於 min-h box。
     //
-    // - block:  flex-col + items-start + padding-top: calc((field-height - 1lh) / 2)
-    //   多行 control(RadioGroup 等),第一行往下推到 field-height 中線,
-    //   後續 item 自然往下流。不設 min-h(內容自己決定高度)。
+    // - block:  flex-col + items-start(不設 min-h、不加 padding-top,內容自己決定高度)
+    //   多行 control(RadioGroup 等),第一行中線由 block primitive 自帶 py 推到
+    //   field-height/2,後續 item 自然往下流。
     // Block control area 不加額外 paddingTop——block primitive(RadioGroup 等)
     // 的子元件(SelectionItem)已自帶 py = calc((field-height - 1lh) / 2),
     // 第一個 item 的文字自然落在 field-height/2。額外加 paddingTop 會 double padding。
@@ -383,6 +383,9 @@ const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
         style={{ ...horizontalBlockStyle, ...style }}
         data-field-slot="label"
         data-field-disabled={disabled ? '' : undefined}
+        // 2026-06-10 a11y:styled-disabled label 必明告 inactive(WCAG 1.4.3 inactive-UI 豁免需可機判;
+        // axe 對無 aria-disabled 的 fg-disabled 文字誤報 color-contrast — deep-audit 抓 8 筆)
+        aria-disabled={disabled || undefined}
         {...props}
       >
         <span className="inline-flex items-center gap-1">

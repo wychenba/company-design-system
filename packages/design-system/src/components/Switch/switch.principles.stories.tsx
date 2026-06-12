@@ -46,16 +46,16 @@ export const UsageGuidance: Story = {
       <p>適合 Switch 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/Switch/展示" name="搭配 Label"><span className="text-primary hover:underline font-medium cursor-pointer">搭配 Label</span></LinkTo>
+          <LinkTo kind="Design System/Components/Switch/展示" name="搭配標籤"><span className="text-primary hover:underline font-medium cursor-pointer">搭配標籤</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時,問自己:這是切換即生效的獨立開關,還是表單裡要按送出才成立的勾選?前者用 Switch,後者用 Checkbox。下面幾段有完整對照。</p>
     </div>
 
       {/* vs 近親元件 — 原 VsCheckboxRule */}
       <div>
         <Rule
-          title="vs 近親元件 — Switch 是即時套用的布林開關 (sweet spot)"
+          title="vs 近親元件 — Switch 最適合即時生效的布林開關"
           note="切換即生效——物理開關類比(牆上 light switch、iPhone settings)。使用者按下那刻 Bluetooth 就開了,不經任何 submit 流程"
         >
           <div className="border border-border rounded-lg p-4 space-y-3">
@@ -92,7 +92,7 @@ export const UsageGuidance: Story = {
           title="vs 近親元件 — 判斷法:「旁邊有 submit / cancel button 嗎?」"
           note="有 → Checkbox(form 流程、值隨 submit 送出);沒有,是獨立 inline control → Switch(切換即生效)"
         >
-          <Label>完整三角度對照 完整定義在 checkbox.spec.md「與 Switch 的分界」</Label>
+          <Label>三個判斷角度(套用時機、心智模型、是否可反悔)的完整對照,以 Checkbox 為主要說明對象</Label>
         </Rule>
       </div>
 
@@ -118,7 +118,7 @@ export const UsageGuidance: Story = {
         title="使用場景對照"
         note="Readonly:表單 readonly 呈現、DataTable cell 非編輯態——值重要、視覺不能弱化。Disabled:外部條件造成暫時不可用(方案限制、權限不足)——傳達「現在用不到」"
       >
-        <Label>兩者都 `pointer-events-none` + 不在 tab order 內,互動鎖定一致,差別在視覺訊號</Label>
+        <Label>兩者都不可切換、不在 tab order 內,但機制不同:readonly 用 `pointer-events-none`(視覺正常);disabled 走 native `disabled` + `cursor-not-allowed`(降透明度)</Label>
       </Rule>
     </div>
     </div>

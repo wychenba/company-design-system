@@ -8,7 +8,7 @@
  * Purpose: Consumer apps(product-workspace etc.)consume this manifest to:
  *   (a) `check-consumer-story-baseline.sh` — verify @story-baseline: marker references valid DS story id
  *   (b) `composition-fidelity-visual-diff.mjs` — drive cross-side pixel diff
- *   (c) PW DsCanonicalPortal — link to DS canonical Storybook per-component
+ *   (c) PW AllDsComponents portal(ImportSmoke)— link to DS canonical Storybook
  *
  * Run automatically in `build-storybook` postbuild + CI release.yml audit gate.
  *
@@ -63,7 +63,7 @@ const manifest = {
     consumedBy: [
       '.claude/hooks/check_consumer_story_baseline.sh',
       'scripts/composition-fidelity-visual-diff.mjs',
-      'product-workspace apps/template/src/AllDsComponents.stories.tsx (DsCanonicalPortal)',
+      'product-workspace apps/template/src/AllDsComponents.stories.tsx (ImportSmoke portal → DS Storybook link)',
     ],
     generatedAt: new Date().toISOString(),
   },
@@ -92,5 +92,14 @@ if (CHECK_MODE) {
   process.exit(0)
 }
 
+// 2026-06-06 fix:idempotent write —— 內容(排除 generatedAt)無變則沿用既有時戳,
+// 避免每次 build 都換 generatedAt 讓 git tree 永遠顯示此檔 dirty(cosmetic churn)。
+const normalize = (m) => JSON.stringify({ ...m, _meta: { ...m._meta, generatedAt: undefined } }, null, 2)
+if (existsSync(OUTPUT_FILE)) {
+  const existing = JSON.parse(readFileSync(OUTPUT_FILE, 'utf8'))
+  if (normalize(existing) === normalize(manifest) && existing._meta?.generatedAt) {
+    manifest._meta.generatedAt = existing._meta.generatedAt // 內容無變 → 沿用舊時戳,輸出 byte-identical
+  }
+}
 writeFileSync(OUTPUT_FILE, JSON.stringify(manifest, null, 2))
 console.log(`✓ ${manifest.totalComponents} components / ${manifest.totalStories} stories → ${OUTPUT_FILE}`)

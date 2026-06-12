@@ -30,7 +30,7 @@ type AffixKey = 'none' | 'value' | 'status-icon'
 const STATUSES: StatusKey[] = ['inProgress', 'success', 'error']
 
 const STATUS_TOKEN: Record<StatusKey, { fill: string; desc: string; affixIcon?: string }> = {
-  inProgress: { fill: '--primary', desc: '進行中 / 未完成 ratio' },
+  inProgress: { fill: '--info', desc: '進行中 / 未完成 ratio' },
   success: { fill: '--success', desc: '完成 / 成功', affixIcon: '--success' },
   error:   { fill: '--error',   desc: '失敗 / 中斷', affixIcon: '--error' },
 }
@@ -58,9 +58,9 @@ export const Overview = {
               <div className="relative">
                 {/* fake track with labels */}
                 <div className="rounded-full bg-secondary overflow-hidden" style={{ height: 6 }}>
-                  <div className="h-full rounded-full bg-primary" style={{ width: '45%' }} />
+                  <div className="h-full rounded-full bg-info" style={{ width: '45%' }} />
                 </div>
-                <span className="absolute -left-1 -top-5 text-[10px] font-mono" style={{ color: 'var(--primary)' }}>fill 45%</span>
+                <span className="absolute -left-1 -top-5 text-[10px] font-mono" style={{ color: 'var(--info)' }}>fill 45%</span>
                 <span className="absolute right-0 -bottom-5 text-[10px] font-mono text-fg-muted">track</span>
               </div>
             </div>
@@ -71,7 +71,7 @@ export const Overview = {
             <div className="inline-flex items-center gap-2 border-2 border-dashed border-primary/30 rounded-md px-3 py-3 w-[360px]">
               <div className="flex-1 min-w-0">
                 <div className="rounded-full bg-secondary overflow-hidden" style={{ height: 6 }}>
-                  <div className="h-full rounded-full bg-primary" style={{ width: '45%' }} />
+                  <div className="h-full rounded-full bg-info" style={{ width: '45%' }} />
                 </div>
               </div>
               <span className="rounded px-2 py-0.5 text-[11px] font-mono border border-dashed"
@@ -115,7 +115,6 @@ export const Overview = {
               {[
                 ['value', 'number (0-100)', '—', '當前進度,超出自動 clamp'],
                 ['status', "'inProgress' | 'success' | 'error'", "'inProgress'", 'fill 色語意'],
-                ['size', "'sm' | 'md' | 'lg'", "'md'", 'track 高度(2 / 4 / 6 px)'],
                 ['affix', "'value' | 'status-icon' | ReactNode", '—', '右側附加:百分比文字 / 狀態 icon / 客製內容'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}>
@@ -258,7 +257,7 @@ const InspectorInner = () => {
               <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Style</span>
             </div>
             <PropRow label="Radius">rounded-full(track & fill)</PropRow>
-            <PropRow label="Transition">width 300ms</PropRow>
+            <PropRow label="Transition">all 300ms(fill width + status color)</PropRow>
             <PropRow label="A11y">role=progressbar · aria-valuenow=value</PropRow>
             {affix === 'value' && (
               <PropRow label="Value text">text-caption · tabular-nums · text-foreground</PropRow>
@@ -279,7 +278,7 @@ export const Inspector = {
     <div className="flex flex-col gap-4">
       <H3>元件檢閱器</H3>
       <Desc>
-        選擇任意組合,即時查看 fill / track token 與 layout。藍圖展示 track 高度隨 size 切換。
+        選擇任意組合,即時查看 fill / track token 與 layout。藍圖標示固定的 track 高度(4px)與 fill 寬度。
       </Desc>
       <InspectorInner />
     </div>
@@ -304,7 +303,7 @@ export const ColorMatrix = {
           <thead>
             <tr>
               <Th>Status</Th>
-              <Th>預覽(md, value=60)</Th>
+              <Th>預覽(value=60)</Th>
               <Th>Track</Th>
               <Th>Fill</Th>
               <Th>Affix icon</Th>
@@ -383,7 +382,7 @@ export const AffixBehavior = {
             <ProgressBar value={100} status="success" affix="status-icon" />
             <ProgressBar value={72} status="error" affix="status-icon" />
             <ProgressBar value={50} status="inProgress" affix="status-icon" />
-            <span className="text-footnote text-fg-muted">↑ inProgress 傳 status-icon 時不渲染 icon(仍保留 wrapper gap)</span>
+            <span className="text-footnote text-fg-muted">↑ inProgress 傳 status-icon 時不渲染 icon,且因無 affix 內容而 collapse 成純 bar(無 wrapper、無 gap,與不傳 affix 等價)</span>
           </div>
         </div>
 
@@ -433,7 +432,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"本元件為純視覺呈現,無 keyboard / ARIA role / focus state 需求。Consumer 包 ProgressBar 進互動容器(Button / Card / Link)時 a11y 由容器決定。"}</p>
+      <p className="whitespace-pre-line">{"詳 `progress-bar.spec.md`「A11y 預設」段。摘要:\n\nRadix Progress.Root 自動提供:\n- role=\"progressbar\"\n- aria-valuenow={value} / aria-valuemin={0} / aria-valuemax={100}\n- 客製 announce(如「上傳中 45%」)→ parent 傳 aria-valuetext override\n\nConsumer 需補:代表特定語境任務時在 parent 加 aria-label(如「檔案上傳進度」)讓螢幕閱讀器辨認。\n\n無 keyboard / focus state(非互動元件,進度語意由 progressbar role 承載)。"}</p>
     </div>
   ),
 }

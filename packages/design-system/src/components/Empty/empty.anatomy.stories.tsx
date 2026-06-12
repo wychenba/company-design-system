@@ -5,8 +5,10 @@
 //     state 色彩。
 //   SizeMatrix N/A — 不提供 size prop;由 slot 組合決定外觀,SlotCombinations
 //     已涵蓋 4 種強度從 minimal 到 full。
-//   StateBehavior N/A — Empty 是純展示 layout,本身無 hover / focus / disabled。
-//     互動由 action slot 的 Button 提供,屬 Button 元件範疇。
+//   StateBehavior N/A — Empty 是純展示 layout,本身無 hover / focus / active /
+//     selected 互動狀態。互動由 action slot 的 Button 提供,屬 Button 元件範疇。
+//     例外:disabled context state(disabled prop,2026-06-03 加)非互動但元件支援——
+//     title / description / icon glyph 轉 text-fg-disabled(供 FileUpload disabled 消費)。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Inbox, Search, FileText, FolderOpen, Bell, Users } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -64,9 +66,9 @@ export const Overview: Story = {
             <thead><tr><Th>Slot</Th><Th>可選</Th><Th>Typography</Th><Th>上方間距</Th></tr></thead>
             <tbody>
               <tr><Td mono>icon</Td><Td>選填</Td><Td>Avatar 48px neutral + icon</Td><Td>—</Td></tr>
-              <tr><Td mono>title</Td><Td>選填</Td><Td>16px font-medium centered</Td><Td mono>--layout-space-tight</Td></tr>
-              <tr><Td mono>description</Td><Td>必有(預設唯一 slot)</Td><Td>14px · fg-secondary(有 title/action 時)/ fg-muted(孤身 description,placeholder tier)· centered</Td><Td mono>--item-gap-label-desc-reading-lg(2px,title body-lg)</Td></tr>
-              <tr><Td mono>action</Td><Td>選填</Td><Td>CTA Button</Td><Td mono>--layout-space-loose</Td></tr>
+              <tr><Td mono>title</Td><Td>選填</Td><Td>16px font-medium centered</Td><Td>icon → 文字固定 16px(mb-4)</Td></tr>
+              <tr><Td mono>description</Td><Td>必有(預設唯一 slot)</Td><Td>14px(standalone / sm·md row 子樹)/ 16px(lg RowSizeContext 子樹,如 lg menu)· fg-secondary(有 title/action 時)/ fg-muted(孤身 description,placeholder tier)· centered</Td><Td mono>--item-gap-label-desc-reading-lg(2px,title body-lg)</Td></tr>
+              <tr><Td mono>action</Td><Td>選填</Td><Td>CTA Button</Td><Td>固定 24px(mt-6)</Td></tr>
             </tbody>
           </table>
         </div>
@@ -81,8 +83,9 @@ export const Overview: Story = {
               {[
                 ['icon', 'LucideIcon', '—', 'Avatar 48px 內的 icon'],
                 ['title', 'string', '—', '主要標題(16px medium)'],
-                ['description', 'string', '必填(預設唯一 slot)', '說明文字(14px fg-secondary)'],
+                ['description', 'string', '必填(預設唯一 slot)', '說明文字(14px;lg RowSizeContext 子樹內 16px · fg-secondary)'],
                 ['action', 'ReactNode', '—', 'CTA button / 操作區'],
+                ['disabled', 'boolean', 'false', 'disabled context（FileUpload disabled 等情境）— title / description / icon glyph 轉 fg-disabled'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -243,14 +246,14 @@ export const SlotCombinations: Story = {
             <thead>
               <tr>
                 <Th>關係</Th>
-                <Th>Spacing token</Th>
+                <Th>間距來源</Th>
                 <Th>數值</Th>
               </tr>
             </thead>
             <tbody>
-              <tr><Td>icon → title</Td><Td mono>--layout-space-tight</Td><Td>12/16 px(density)</Td></tr>
-              <tr><Td>title → description</Td><Td mono>--item-gap-label-desc-reading-lg</Td><Td>2px(緊密配對,title=body-lg 16 + desc=body 14 → reading-lg token)</Td></tr>
-              <tr><Td>description → action</Td><Td mono>--layout-space-loose</Td><Td>24/32 px(density)</Td></tr>
+              <tr><Td>icon → 文字</Td><Td mono>mb-4</Td><Td>固定 16px(展示性元件,不隨密度變)</Td></tr>
+              <tr><Td>title → description</Td><Td mono>--item-gap-label-desc-reading-lg</Td><Td>2px(緊密配對,title=body-lg 16 + desc=body 14)</Td></tr>
+              <tr><Td>description → action</Td><Td mono>mt-6</Td><Td>固定 24px(展示性元件,不隨密度變)</Td></tr>
             </tbody>
           </table>
         </div>

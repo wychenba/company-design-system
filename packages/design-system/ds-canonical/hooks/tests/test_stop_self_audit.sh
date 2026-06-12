@@ -16,8 +16,8 @@ run_test() {
   printf '%s\n' "$transcript_content" > "$transcript"
   local input
   input=$(printf '{"transcript_path":"%s","session_id":"test"}' "$transcript")
-  # Reset state to avoid block-once dedup interference
-  rm -f "$PROJECT_DIR/.claude/logs/.last-blocked-claim.txt" 2>/dev/null
+  # Reset state to avoid block-once dedup interference(all mechanisms' .last-blocked-*)
+  rm -f "$PROJECT_DIR"/.claude/logs/.last-blocked-*.txt 2>/dev/null
   local stdout; stdout=$(echo "$input" | bash "$HOOK" 2>/dev/null)
   if [ "$expect_block" = "1" ]; then
     if echo "$stdout" | grep -q '"decision":"block"'; then
@@ -69,8 +69,30 @@ T6="$USER_MSG
 "'{"message":{"role":"assistant","content":[{"type":"text","text":"我這次明確不 claim verified,只 tsc 過,實際 browser 行為要 user 驗"}]}}'
 run_test "Test 6: preemptive claim denial → no block" 0 "$T6"
 
+# Test 7: Mechanism 7 完整性宣告閘 — 宣告「全部做完」+ 2 edits + 無全庫掃描 → BLOCK
+T7="$USER_MSG
+"'{"message":{"role":"assistant","content":[{"type":"tool_use","name":"Edit","input":{}}]}}
+{"message":{"role":"assistant","content":[{"type":"tool_use","name":"Write","input":{}}]}}
+{"message":{"role":"assistant","content":[{"type":"text","text":"全部做完了,beta 已上架,tree 乾淨。"}]}}'
+run_test "Test 7: M7 完整性宣告+多改+無掃描 → block" 1 "$T7"
+
+# Test 8: 同上但本 turn 有 grep -rn 全庫掃描 → no block(掃描證據被認列)
+T8="$USER_MSG
+"'{"message":{"role":"assistant","content":[{"type":"tool_use","name":"Edit","input":{}}]}}
+{"message":{"role":"assistant","content":[{"type":"tool_use","name":"Bash","input":{"command":"grep -rn foo .claude packages"}}]}}
+{"message":{"role":"assistant","content":[{"type":"tool_use","name":"Write","input":{}}]}}
+{"message":{"role":"assistant","content":[{"type":"text","text":"全部做完了,已全庫掃描確認無 loose end。"}]}}'
+run_test "Test 8: M7 完整性宣告+多改+有全庫掃描 → no block" 0 "$T8"
+
+# Test 9: M7 negation 排除 — 含「全做完」字串但是 disclaimer(還沒說全做完)+ 多改 + 無掃描 → NO block
+T9="$USER_MSG
+"'{"message":{"role":"assistant","content":[{"type":"tool_use","name":"Edit","input":{}}]}}
+{"message":{"role":"assistant","content":[{"type":"tool_use","name":"Write","input":{}}]}}
+{"message":{"role":"assistant","content":[{"type":"text","text":"還沒說「全做完」——等 beta.51 落地 + 最後掃過才有資格。核心做完,完整性掃描待跑。"}]}}'
+run_test "Test 9: M7 negation disclaimer(還沒說全做完)→ no block" 0 "$T9"
+
 # Cleanup state file
-rm -f "$PROJECT_DIR/.claude/logs/.last-blocked-claim.txt" 2>/dev/null
+rm -f "$PROJECT_DIR"/.claude/logs/.last-blocked-*.txt 2>/dev/null
 
 echo "Results: $PASS PASS, $FAIL FAIL"
 [ "$FAIL" -eq 0 ] || exit 1

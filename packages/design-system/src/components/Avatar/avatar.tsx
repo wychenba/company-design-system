@@ -3,10 +3,11 @@ import * as React from 'react'
 import { User } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CAT_SUBTLE_TOKENS, CAT_SOLID_TOKENS, type CategoricalColor } from '@/design-system/tokens/categorical-color'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/design-system/components/HoverCard/hover-card'
 import { HOVER_DELAY_RICH_MS, HOVER_DELAY_CLOSE_MS } from '@/design-system/tokens/motion/motion'
 import { Badge } from '@/design-system/components/Badge/badge'
-import { useFieldContext, useTableIsScrolling } from '@/design-system/components/Field/field-context'
+import { useResolvedFieldDisabled, useTableIsScrolling } from '@/design-system/components/Field/field-context'
 
 /**
  * Avatar — 頭像元件
@@ -27,34 +28,22 @@ import { useFieldContext, useTableIsScrolling } from '@/design-system/components
  */
 
 // ── 色彩 ──
-// 直接引用 primitive（bg=step-1, text=step-7），不經過語義層
-// solid：step-6 全色底 + 白色前景（yellow 例外用 --warning-foreground）
-// neutral solid：neutral-9 + --inverse-fg（自動反轉）
-type ColorKey = 'neutral' | 'blue' | 'red' | 'green' | 'yellow' | 'turquoise' | 'purple' | 'magenta' | 'indigo'
+// **消費 categorical-color SSOT**(CAT_SUBTLE_TOKENS / CAT_SOLID_TOKENS,key X 一律對 `--color-X-*`,
+// 1:1 零 offset)。subtle=step-1 底 + step-7 字;solid=step-6 全色底 + on-emphasis 字
+//(亮 hue yellow/amber/orange/lime 用 --on-emphasis-dark 深字;green 白字例外)。neutral 非色相,自處理(subtle=muted、solid=neutral-9)。
+// 2026-06-04 修:原 `red` 誤接 `--color-deep-orange-*`(red=品牌紅 hue-25 ≠ deep-orange);
+// 改消費 SSOT 後 red→`--color-red-*`,並補齊全 12 色相。
+type ColorKey = CategoricalColor
 type VariantKey = 'subtle' | 'solid'
 
 const COLOR_MAP: Record<VariantKey, Record<ColorKey, { bg: string; text: string }>> = {
   subtle: {
-    neutral:   { bg: 'var(--muted)',                text: 'var(--foreground)' },
-    blue:      { bg: 'var(--color-blue-1)',         text: 'var(--color-blue-7)' },
-    red:       { bg: 'var(--color-deep-orange-1)',  text: 'var(--color-deep-orange-7)' },
-    green:     { bg: 'var(--color-green-1)',        text: 'var(--color-green-7)' },
-    yellow:    { bg: 'var(--color-yellow-1)',       text: 'var(--color-yellow-7)' },
-    turquoise: { bg: 'var(--color-turquoise-1)',    text: 'var(--color-turquoise-7)' },
-    purple:    { bg: 'var(--color-purple-1)',       text: 'var(--color-purple-7)' },
-    magenta:   { bg: 'var(--color-magenta-1)',      text: 'var(--color-magenta-7)' },
-    indigo:    { bg: 'var(--color-indigo-1)',       text: 'var(--color-indigo-7)' },
+    neutral: { bg: 'var(--muted)', text: 'var(--foreground)' },
+    ...CAT_SUBTLE_TOKENS,
   },
   solid: {
-    neutral:   { bg: 'var(--color-neutral-9)',      text: 'var(--inverse-fg)' },
-    blue:      { bg: 'var(--color-blue-6)',         text: 'var(--on-emphasis)' },
-    red:       { bg: 'var(--color-deep-orange-6)',  text: 'var(--on-emphasis)' },
-    green:     { bg: 'var(--color-green-6)',        text: 'var(--on-emphasis)' },
-    yellow:    { bg: 'var(--color-yellow-6)',       text: 'var(--warning-foreground)' },
-    turquoise: { bg: 'var(--color-turquoise-6)',    text: 'var(--on-emphasis)' },
-    purple:    { bg: 'var(--color-purple-6)',       text: 'var(--on-emphasis)' },
-    magenta:   { bg: 'var(--color-magenta-6)',      text: 'var(--on-emphasis)' },
-    indigo:    { bg: 'var(--color-indigo-6)',       text: 'var(--on-emphasis)' },
+    neutral: { bg: 'var(--color-neutral-9)', text: 'var(--inverse-fg)' },
+    ...CAT_SOLID_TOKENS,
   },
 }
 
@@ -79,10 +68,10 @@ const STATUS_DOT_COLOR: Record<string, string> = {
 }
 
 // ── useDocumentTheme(2026-04-23;M3 Portal 逃脫防線,scope verified 2026-04-25)──
-// 讀 `<html data-theme>` 並 observe mutation。用於 Avatar hoverCard NameCard:
+// 讀 `<html data-theme>` 並 observe mutation。用於 Avatar hoverCard ProfileCard:
 // Portal 後的 HoverCardContent 會繼承 trigger subtree theme(如 OverflowIndicator
-// dark tooltip 內部),造成 NameCard 被污染成 dark。顯式 bind app-level theme
-// 確保 NameCard 永遠跟 app 本身 theme 一致(light-in-light-app / dark-in-dark-app)。
+// dark tooltip 內部),造成 ProfileCard 被污染成 dark。顯式 bind app-level theme
+// 確保 ProfileCard 永遠跟 app 本身 theme 一致(light-in-light-app / dark-in-dark-app)。
 //
 // 範圍 audit 2026-04-25:觀察對象是 `document.documentElement` 自有 DOM,非 3rd-party
 // lib 內部(不屬 M2 scope);attributeFilter 限定 `data-theme` 單一 attr,re-render 成本
@@ -118,7 +107,7 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: LucideIcon
   /** Icon / text fallback 的背景色，預設 neutral */
   color?: ColorKey
-  /** 深底白字模式（step-6 背景 + 白色前景，warning 例外），預設 false */
+  /** 深底模式（step-6 背景 + on-emphasis 配對前景；亮色 hue yellow/amber/orange/lime 用深字 --on-emphasis-dark），預設 false */
   solid?: boolean
   /**
    * 在線狀態指示器(presence),顯示在 avatar **右下角**。
@@ -135,7 +124,7 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
    */
   badgeCount?: number
   /**
-   * 傳入 HoverCard 內容（如 NameCard），hover avatar 時自動顯示。
+   * 傳入 HoverCard 內容（如 ProfileCard），hover avatar 時自動顯示。
    * 只有人員 avatar 需要傳；實體 avatar（專案、組織）不傳。
    */
   hoverCard?: React.ReactNode
@@ -156,12 +145,12 @@ const AvatarInner = React.forwardRef<HTMLDivElement, AvatarProps>(
     // 2026-05-13 R3.5(per codex Q3 verdict + user 拍「想盡辦法 auto-handle prereq」):
     // Avatar self-dim when in disabled Field wrapper context(取代既有 wrapper opacity-disabled blanket
     // 逃生艙 — color.spec.md:729 specific-disabled-color canonical)。
-    // Scope narrowest:`fieldCtx?.mode === 'disabled' && fieldCtx?.hasFieldWrapper === true`,標準 Field
-    // 家族 wrapper disabled 時才 dim;**沒包在 Field wrapper 內的 standalone Avatar**(NameCard / FileItem /
+    // Scope:`useResolvedFieldDisabled()`(= fieldCtx.disabled,涵蓋 <Field disabled> 與 <Field mode="disabled">),標準 Field
+    // 家族 wrapper disabled 時才 dim;**沒包在 Field wrapper 內的 standalone Avatar**(ProfileCard / FileItem /
     // HoverCard / Dialog 等 display 場景)**backward compat 不變**。對齊 avatar.spec.md「Avatar 在 disabled
     // 元件內 host-controlled opacity」canonical — 升級成「Avatar self-managed via fieldCtx」。
-    const fieldCtx = useFieldContext()
-    const isDisabledInField = fieldCtx?.mode === 'disabled' && fieldCtx?.hasFieldWrapper === true
+    // 2026-06-08 SSOT:欄位內 Avatar 跟隨 <Field disabled>/<Field mode="disabled"> 變淡(fieldCtx-scoped,cell 無 fieldCtx → 不影響)
+    const isDisabledInField = useResolvedFieldDisabled()
     const isFill = size === 'fill'
     // Fill 模式下 icon 用 60% 寬高、text 用 50cqi（container query inline-size）；
     // 數字模式下用既有 px 計算
@@ -204,6 +193,8 @@ const AvatarInner = React.forwardRef<HTMLDivElement, AvatarProps>(
           color: showImage ? undefined : colors.text,
         }}
         data-avatar-size={isFill ? 'fill' : numSize}
+        role={!showImage && alt && !hoverCard ? 'img' : undefined}
+        aria-label={!showImage && alt && !hoverCard ? alt : undefined}
       >
         {showImage && (
           <img
@@ -233,7 +224,7 @@ const AvatarInner = React.forwardRef<HTMLDivElement, AvatarProps>(
     const hasOverlay = status || typeof badgeCount === 'number'
     // Keyboard access canonical(D4 UX audit 2026-04-22 finding):Avatar with `hoverCard`
     // 需 keyboard 可達 — Radix `HoverCardTrigger asChild` 不自動加 tabIndex,non-focusable
-    // `<div>` 會讓 keyboard-only user 無法 reach NameCard popover(WCAG 2.1.1 / 4.1.2 違反)。
+    // `<div>` 會讓 keyboard-only user 無法 reach ProfileCard popover(WCAG 2.1.1 / 4.1.2 違反)。
     // 解:當 `hoverCard` 存在時,wrapper `<div>` 變 focusable(`tabIndex=0` + `role="button"` +
     // `aria-haspopup="dialog"` + focus-visible ring)。若無 hoverCard 則維持純展示 `<div>`。
     const focusableProps = hoverCard
@@ -244,8 +235,11 @@ const AvatarInner = React.forwardRef<HTMLDivElement, AvatarProps>(
           'aria-label': alt ?? 'View profile',
         }
       : {}
+    // 2026-05-31:focus ring 圓角跟隨 shape(circle→rounded-full / square→rounded-md,對齊 body 的 `radius` 變數 '9999px'/'4px'),
+    // 原寫死 rounded-full 會讓方形 avatar(實體)配 hoverCard 時出現圓形 ring。hoverCard 為通用行為(任意內容),
+    // 方形 avatar 合法可配(內容非 ProfileCard 而已),故 ring 必跟形狀。
     const focusableClass = hoverCard
-      ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 rounded-full'
+      ? cn('focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1', shape === 'circle' ? 'rounded-full' : 'rounded-md')
       : ''
     const baseEl = !hasOverlay
       ? <div ref={ref} className={cn('inline-flex shrink-0', focusableClass, className)} style={style} {...focusableProps} {...props}>{avatarEl}</div>
@@ -292,7 +286,7 @@ const AvatarInner = React.forwardRef<HTMLDivElement, AvatarProps>(
     // 2026-05-13 (c) scroll-defer perf(per user 拍 Path (c) + codex Q3 verdict):
     // DataTable scrolling 期間跳 HoverCard wrapper(Portal + useDocumentTheme observer 是
     // Roadmap 重渲 hotspot,per codex Layer C 分析)。scroll 結束 → context flips false →
-    // re-render 接回完整 HoverCard tree(NameCard 仍可 hover 顯示)。
+    // re-render 接回完整 HoverCard tree(ProfileCard 仍可 hover 顯示)。
     // 對齊 AG Grid `deferRender` for slow React cell components / MUI X DataGrid scroll-defer。
     if (!hoverCard || isTableScrolling) return baseEl
 
@@ -302,14 +296,14 @@ const AvatarInner = React.forwardRef<HTMLDivElement, AvatarProps>(
           {baseEl}
         </HoverCardTrigger>
         {/* HoverCardContent canonical(2026-04-23):
-            - 無 inner padding(consumer NameCard 自帶 `px-4 py-3` chrome)
-            - `overflow-hidden` + `rounded-lg` → child(NameCard)圓角裁切
-            - **不設 max-height**:NameCard 自己消費 `--radix-hover-card-content-available-height`
+            - 無 inner padding(consumer ProfileCard 自帶 `px-4 py-3` chrome)
+            - `overflow-hidden` + `rounded-lg` → child(ProfileCard)圓角裁切
+            - **不設 max-height**:ProfileCard 自己消費 `--radix-hover-card-content-available-height`
               自約束高度 + 內部 ScrollArea 處理捲動
-            - `data-theme={documentTheme}`:NameCard 永遠跟隨 **app-level theme**(從 `<html data-theme>`
+            - `data-theme={documentTheme}`:ProfileCard 永遠跟隨 **app-level theme**(從 `<html data-theme>`
               動態讀),不受 trigger subtree theme 污染。範例:Avatar 位於 OverflowIndicator 的 dark
-              tooltip 內,其 Portal 會繼承該 subtree dark theme → NameCard 變全黑。顯式設回 app theme
-              確保 NameCard 永遠 light-in-light-app / dark-in-dark-app。 */}
+              tooltip 內,其 Portal 會繼承該 subtree dark theme → ProfileCard 變全黑。顯式設回 app theme
+              確保 ProfileCard 永遠 light-in-light-app / dark-in-dark-app。 */}
         <HoverCardContent
           data-theme={documentTheme ?? undefined}
           className="bg-surface-raised rounded-lg border border-border overflow-hidden"
@@ -335,9 +329,9 @@ export interface AvatarData {
   /** Icon / text fallback 的背景色，預設 neutral */
   color?: ColorKey
   /**
-   * Person avatar hover NameCard(DS-wide canonical,person avatar 預設必有,見 avatar.spec.md)。
+   * Person avatar hover ProfileCard(DS-wide canonical,person avatar 預設必有,見 avatar.spec.md)。
    * Entity avatar(專案 / 組織 logo)不帶 → consumer 不傳 hoverCard 即豁免。
-   * 所有消費 AvatarData 的 primitive(MenuItem / DropdownMenu / SelectMenu / SelectionItem / NameCard)
+   * 所有消費 AvatarData 的 primitive(MenuItem / DropdownMenu / SelectMenu / SelectionItem / ProfileCard)
    * 需 forward 此 prop 到內部 <Avatar hoverCard={avatar.hoverCard} />。
    */
   hoverCard?: React.ReactNode
@@ -354,7 +348,7 @@ export const avatarMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default', 'focus-visible', 'disabled'], // 2026-06-11 R2:本身無自有 hover/active(spec L279;hoverCard 互動屬 HoverCard),
   tokens: {
     bg: ['bg-surface-raised'],
     fg: ['--foreground', '--on-emphasis'],

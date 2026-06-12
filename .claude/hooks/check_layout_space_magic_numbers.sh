@@ -49,10 +49,22 @@ if [ -z "$MAGIC_LINES" ]; then
   exit 0
 fi
 
-# Filter out lines with escape marker on same line OR preceding line
+# Filter out lines with escape marker on same line OR immediately preceding line
+# 2026-06-03 修(doc-vs-code bug,M32):L41 文件宣稱支援「preceding line OR same line」,
+# 但原 code 只檢查同行 → JSX className 行無法放同行 `//` comment(會破壞 JSX)→ escape 對 JSX
+# 實質失效。補實作前一行檢查(grep -n 行號 → sed 取前一行),對齊文件 + 解 JSX 必需。
 UNJUSTIFIED=""
 while IFS= read -r line; do
+  # same-line marker
   if echo "$line" | grep -qF "$ESCAPE_MARKER"; then continue; fi
+  # preceding-line marker(JSX `{/* @layout-space-magic-ok: ... */}` 在上一行)。
+  # 對齊 ESLint disable-next-line 慣例:前一行 marker 僅在該行是「註解專用行」(trimmed 開頭
+  # //、{/*、/*、*)時生效 — 否則上一行 code 的「同行 escape」會誤串到下一行(P8 conflict)。
+  lineno="${line%%:*}"
+  if [ "$lineno" -gt 1 ] 2>/dev/null; then
+    prev=$(echo "$NEW_CONTENT" | sed -n "$((lineno-1))p")
+    if echo "$prev" | grep -qF "$ESCAPE_MARKER" && echo "$prev" | grep -qE '^[[:space:]]*(//|\{?/\*|\*)'; then continue; fi
+  fi
   UNJUSTIFIED="${UNJUSTIFIED}${line}\n"
 done <<< "$MAGIC_LINES"
 

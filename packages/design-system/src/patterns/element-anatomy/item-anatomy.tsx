@@ -215,7 +215,7 @@ ItemPrefix.displayName = "ItemPrefix"
  * 直接用 `<ItemPrefix>` 就好,不需此 cva。
  *
  * ── SSOT 傳播 ──
- * gap 用 `var(--item-gap-label-desc)` token;font-size 用 token-awareness
+ * gap 用 `var(--item-gap-label-desc-scanning[-lg])` token(bare 變體已不存在,4 個 mode×size 變體);font-size 用 token-awareness
  * (`var(--font-caption-size)` / `var(--font-body-size)`)。改 token → 公式同步。
  */
 // code-quality-allow: long-function — cva variant/styles table — 拆 fn 會失去 type inference + 跨 fn 傳 config 反而難讀
@@ -270,7 +270,7 @@ ItemLabel.displayName = "ItemLabel"
  * `<ItemContent>` — Row primitive 的 label + optional description 內容區(SSOT)。
  *
  * ── 存在的唯一理由 ──
- * 封裝「flex-col + label + description + `mt-[var(--item-gap-label-desc)]` gap」結構,
+ * 封裝「flex-col + label + description + `mt-[var(--item-gap-label-desc-<mode>[-lg])]` gap」結構,
  * 避免 13+ 消費者各自 hard-code `mt-0.5`。改 token 一處,全 DS 同步。
  *
  * ── Consumer 偏離 canonical ──
@@ -278,7 +278,7 @@ ItemLabel.displayName = "ItemLabel"
  * 該元件 `spec.md` 明文寫下 rationale(對齊 item-anatomy canonical「偏離必明文」)。
  * 合法偏離範例:
  *   - MenuItem 的 `leading-compact + text-caption` scanning-mode typography
- *     → MenuItem spec 明文 rationale + 消費 `--item-gap-label-desc` token 直接用
+ *     → MenuItem spec 明文 rationale + 消費 `--item-gap-label-desc-scanning[-lg]` token 直接用
  *   - SelectionItem 的 control slot 跟 block formula 綁定
  *     → SelectionItem spec 明文 rationale
  *
@@ -293,6 +293,7 @@ ItemLabel.displayName = "ItemLabel"
  *   - `"secondary"`(預設):`text-fg-secondary`
  *   - `"error"`:`text-error-text`
  *   - `"muted"`:`text-fg-muted`
+ *   - `"disabled"`:`text-fg-disabled`(對齊 M24 state precedence:disabled > muted > emphasis)
  * - `descriptionWrap`:desc 多行 wrap(預設 true)/ false = truncate
  * - `labelClassName` / `descriptionClassName`:escape hatches(明文 rationale 才用)
  *
@@ -338,7 +339,7 @@ export interface ItemContentProps extends Omit<React.HTMLAttributes<HTMLDivEleme
   descriptionBreakWords?: boolean
   /**
    * Label truncate (default `true`, 對齊 row-item 大宗 idiom)。
-   * Opt-out(`false`)for card-like consumers(e.g. NameCard label 允許 wrap)。
+   * Opt-out(`false`)for card-like consumers(e.g. ProfileCard label 允許 wrap)。
    * World-class 對照:Material `ListItemText primaryTypographyProps.noWrap` default true。
    */
   labelTruncate?: boolean
@@ -444,6 +445,7 @@ ItemContent.displayName = "ItemContent"
 
 const RowSizeContext = React.createContext<RowSize | null>(null)
 
+/** @internal — L3 row-size primitive;app code 不直接 import,由 MenuItem/Row/Field 等內部消費(inline-action.spec.md)。 */
 export const RowSizeProvider = RowSizeContext.Provider
 
 /**
@@ -576,7 +578,7 @@ export interface ItemInlineActionButtonProps
    *
    * 預設 `group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active`。
    * 提供後**完全取代** hover + active 雙態 className,但**不影響** rest 態(永遠 bg-transparent)
-   * 與 overlay-trigger 態(`group-data-[state=open]:bg-neutral-selected`)。
+   * 與 overlay-trigger 態(`group-data-[state=open]/action:bg-neutral-hover` — 維持 host hover bg)。
    *
    * Consumer 須**同時**包含 hover + active 兩態 selector,例:
    * `'group-hover/action:bg-[var(--my-hover)] group-active/action:bg-[var(--my-active)]'`
@@ -600,6 +602,7 @@ export interface ItemInlineActionButtonProps
   overlayTrigger?: boolean
 }
 
+/** @internal — L3 inline-action primitive;app code 禁直接 import,經 MenuItem/Row endActions 消費(inline-action.spec.md)。 */
 export const ItemInlineActionButton = React.forwardRef<
   HTMLButtonElement,
   ItemInlineActionButtonProps
@@ -665,6 +668,7 @@ export interface ItemInlineActionProps {
   size?: RowSize
 }
 
+/** @internal — L3 inline-action primitive;app code 禁直接 import,經 row 元件消費(inline-action.spec.md)。 */
 export const ItemInlineAction = React.forwardRef<
   HTMLButtonElement,
   ItemInlineActionProps

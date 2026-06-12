@@ -40,14 +40,16 @@ AspectRatio.displayName = 'AspectRatio'
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const aspectRatioMeta = {
   component: 'AspectRatio',
-  family: null, // non-family composite / overlay / layout
+  family: null, // self-contained primitive(對齊 spec frontmatter self-contained + L22;非 Family 1-4)
   variants: {
 
   },
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  // 2026-06-05 fix(deep-audit):純 structural container,無互動狀態(spec.md L101「無 hover/focus/active/disabled」)。
+  // 原 ['default','hover','active','focus-visible','disabled'] 是 Phase 1 mechanical placeholder,與 spec 矛盾。
+  states: ['default'],
   tokens: {
     bg: [],
     fg: [],

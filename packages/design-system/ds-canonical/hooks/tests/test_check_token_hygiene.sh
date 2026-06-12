@@ -1,5 +1,5 @@
 #!/bin/bash
-# Smoke test for check_token_hygiene.sh
+# Smoke test for lib/_token_hygiene.sh (HOOK= resolves to ../lib/_token_hygiene.sh; check_token_hygiene.sh was never a standalone file)
 set -u
 HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/_token_hygiene.sh"
 [ -x "$HOOK" ] || { echo "FATAL"; exit 1; }

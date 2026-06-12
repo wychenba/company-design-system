@@ -198,6 +198,9 @@ const ChartTooltipContent = React.forwardRef<HTMLDivElement, ChartTooltipContent
     return (
       <div
         ref={ref}
+        // 2026-05-31 #5:自訂 tooltip 補 role=status + aria-live,保留 Recharts 原生 SR 朗讀(spec L146 宣稱鍵盤可達+讀屏)
+        role="status"
+        aria-live="polite"
         className={cn(
           'grid min-w-32 items-start gap-1.5 rounded-md border border-border bg-surface-raised px-2.5 py-1.5 text-caption shadow-[var(--elevation-200)]',
           className,
@@ -358,7 +361,7 @@ export const chartMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'],
   tokens: {
     bg: ['bg-surface-raised', 'bg-transparent'],
     fg: ['text-fg-muted', 'text-fg-secondary', 'text-foreground'],

@@ -8,7 +8,7 @@ const meta: Meta<typeof Badge> = {
   parameters: {
     docs: {
       description: {
-        component: '通知計數指示器，用於未讀數量、待辦計數。四個層級（critical / high / medium / low）＋ dot 模式。',
+        component: '通知計數指示器，用於未讀數量、待辦計數。count 四級 severity（critical / high / medium / low）；dot 模式只 critical / high（單一 attention 點）。',
       },
     },
   },
@@ -45,21 +45,19 @@ export const Shape: Story = {
 
 /* ── Dot 模式 ── */
 export const Dot: Story = {
-  name: 'Dot 模式',
+  name: '圓點模式',
   render: () => (
     <div className="flex items-center gap-4">
       <Badge dot variant="critical" />
       <Badge dot variant="high" />
-      <Badge dot variant="medium" />
-      <Badge dot variant="low" />
-      <span className="text-caption text-fg-muted">6×6px 純色圓點</span>
+      <span className="text-caption text-fg-muted">6×6px attention 點 —— 只 critical / high(單一注意點,不分 medium/low)</span>
     </div>
   ),
 }
 
 /* ── Max 上限 ── */
 export const MaxCount: Story = {
-  name: 'Max 上限',
+  name: '數量上限',
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3">

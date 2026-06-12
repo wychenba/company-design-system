@@ -108,13 +108,13 @@ export const Overview: Story = {
                   <Td mono>cmdk</Td>
                 </tr>
                 <tr>
-                  <Td mono>CommandInput</Td>
-                  <Td>搜尋框(searchable 模式,高度對齊 field-height)</Td>
+                  <Td mono>CommandPrimitive.Input</Td>
+                  <Td>搜尋框(raw cmdk input + 自建 wrapper,searchable 模式,高度對齊 field-height)</Td>
                   <Td mono>cmdk</Td>
                 </tr>
                 <tr>
                   <Td mono>CommandList</Td>
-                  <Td>捲動區(min-height 依 minRows)</Td>
+                  <Td>捲動區(自然 fit content;空狀態 minHeight 由 CommandEmpty 撐起)</Td>
                   <Td mono>cmdk</Td>
                 </tr>
                 <tr>
@@ -165,7 +165,7 @@ export const Overview: Story = {
                   <Td mono>value</Td>
                   <Td mono>string | string[] | null</Td>
                   <Td mono>undefined</Td>
-                  <Td>型別決定單 / 多選</Td>
+                  <Td>當前值（單選 string / 多選 string[]）；單 / 多選由 `multiple` prop 決定，非 value 型別</Td>
                 </tr>
                 <tr>
                   <Td mono>multiple</Td>
@@ -183,7 +183,7 @@ export const Overview: Story = {
                   <Td mono>creatable</Td>
                   <Td mono>boolean</Td>
                   <Td mono>false</Td>
-                  <Td>無結果時顯示「建立 xxx」option</Td>
+                  <Td>無結果時顯示「直接使用「xxx」」option(createLabel 可自訂文案)</Td>
                 </tr>
                 <tr>
                   <Td mono>groups</Td>
@@ -206,7 +206,7 @@ export const Overview: Story = {
                 <tr>
                   <Td mono>minWidth</Td>
                   <Td mono>number</Td>
-                  <Td mono>trigger 寬度</Td>
+                  <Td>跟隨 trigger（下限 240px）</Td>
                   <Td>浮層最小寬度</Td>
                 </tr>
                 <tr>
@@ -286,7 +286,7 @@ function SelectMenuInspector() {
 │ │${searchable ? ' │ [🔍] 搜尋…                                           │ │' : ''}
 │ │${searchable ? ' │ min-h = field-height(${size}) + 8px / border-b              │ │' : ''}
 │ │${searchable ? ' └─────────────────────────────────────────────────────┘ │' : ''}
-│ │ ┌─ CommandList (min-h = ${3} × MenuItem) ───────────────────┐  │
+│ │ ┌─ CommandList — fit content (empty min-h=field×3+16px) ─┐  │
 │ │ │ CommandGroup (p-0 py-2)                                 │  │
 │ │ │ ▸ MenuItem size=${size} [checkbox=${multiple}] label + desc       │  │
 │ │ │ ▸ MenuItem ...                                           │  │
@@ -609,7 +609,8 @@ export const SizeMatrix: Story = {
           <H3>Size token 對照</H3>
           <Desc>
             size 傳遞到浮層內的 CommandInput / MenuItem,三者統一尺寸。RowSizeProvider 確保所有 slot 自動讀取正確
-            size,不需在每個 item 重設。
+            size,不需在每個 item 重設。注意:PopoverContent 鎖 data-density="md"(popover.tsx),故 lg size 下
+            --field-height-lg 仍解析為 md-default 36px(非 lg-density 的 40px),下表數值已反映此 overlay 鎖密度行為。
           </Desc>
           <div className="overflow-x-auto">
             <table className="text-caption border-collapse">
@@ -639,10 +640,10 @@ export const SizeMatrix: Story = {
                 </tr>
                 <tr>
                   <Td mono>lg</Td>
-                  <Td mono>calc(--field-height-lg + 8px) · 48px</Td>
+                  <Td mono>calc(--field-height-lg + 8px) · 44px</Td>
                   <Td mono>text-body-lg · 16px</Td>
                   <Td mono>20px</Td>
-                  <Td mono>--field-height-lg · 40px</Td>
+                  <Td mono>--field-height-lg · 36px</Td>
                 </tr>
               </tbody>
             </table>
@@ -693,7 +694,7 @@ export const StateBehavior: Story = {
         <div>
           <H3>搜尋 empty state</H3>
           <Desc>
-            搜尋無結果時顯示 Empty primitive,垂直水平置中於 CommandList(absolute inset-0)。
+            搜尋無結果時顯示 Empty primitive,以 flex items-center justify-center + minHeight 撐高並垂直水平置中。
             Creatable 模式會額外顯示「建立 xxx」option。
           </Desc>
           <div className="flex items-center gap-4">
@@ -804,7 +805,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `select-menu.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :基於  cmdk  library a11y(combobox / listbox / option role + aria-activedescendant)。詳 [cmdk a11y](https://cmdk.paco.me/#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — focus trigger\n- Enter / Space / ↓ — 開啟 menu\n- ↑/↓ — 導覽 options\n- Enter — 選擇\n- 字母鍵 — type-ahead 過濾(search 模式)\n- Esc — 關閉\n\n  Focus  :menu 開啟時 focus 第一 option / 選中項;關閉時 focus 回 trigger。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"詳 `select-menu.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :基於  cmdk  library a11y(combobox / listbox / option role + aria-activedescendant)。詳 [cmdk a11y](https://cmdk.paco.me/#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — focus trigger\n- Enter / Space — 開啟 menu(trigger 由 consumer 經 PopoverTrigger asChild 提供:Select / Combobox 的 trigger 是 role=\"combobox\" 容器自綁 Enter / Space handler;若 consumer 用 DS Button 則由 native click 觸發)\n- ↑/↓ — 導覽 options(menu 開啟後)\n- Enter — 選擇\n- 字母鍵 — type-ahead 過濾(search 模式)\n- Esc — 關閉\n\n  Focus  :menu 開啟時 active-descendant 虛擬焦點落在第一個 / 已選 option(aria-activedescendant 高亮,非 DOM focus);searchable 時 DOM focus 給搜尋 input;option 無 tabIndex,DOM focus 不落在 option 上。關閉時 focus 回 trigger。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

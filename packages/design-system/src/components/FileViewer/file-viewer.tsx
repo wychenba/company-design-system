@@ -39,11 +39,13 @@ import {
   buildFadeMask,
   OverflowScrollArrow,
 } from '@/design-system/patterns/horizontal-overflow/horizontal-overflow'
+import { useControllable } from '@/design-system/hooks/use-controllable'
 import { ImageRenderer, canRenderImage } from './image-renderer'
 import type {
   FileInfo,
   FileRenderer,
   FileRendererCapabilities,
+  FileRendererProps,
 } from './file-viewer-types'
 
 /**
@@ -79,20 +81,30 @@ import type {
  * Fallback renderer — 無 renderer 能處理時兜底。
  * 顯示 Empty 佈局:icon + 檔名 + 「請下載檢視」提示。
  */
-const FallbackRenderer: React.FC<{ file: FileInfo }> = ({ file }) => (
-  <div className="w-full h-full flex items-center justify-center p-8">
-    <Empty
-      icon={FileText}
-      title={file.name}
-      description={`無法在瀏覽器中預覽此檔案類型（${file.mimeType || 'unknown'}）。請下載後檢視。`}
-    />
-  </div>
-)
+const FallbackRenderer: React.FC<FileRendererProps> = ({ file, onCapabilitiesChange }) => {
+  // Contract(file-viewer-types.ts `onCapabilitiesChange` doc):「第一個 renderer mount
+  // 時必須 emit」。fallback 不支援 zoom → emit { zoom: false };不 emit 的話 shell 會沿用
+  // 上一個 renderer 的 capability(image → 未知檔切換時 toolbar 殘留 zoom controls,
+  // `+`/`-`/`0`/`F` 快捷鍵也會對不支援 zoom 的檔案生效)。同 image-renderer.tsx mount emit pattern。
+  React.useEffect(() => {
+    onCapabilitiesChange({ zoom: false })
+  }, [onCapabilitiesChange])
+
+  return (
+    <div className="w-full h-full flex items-center justify-center p-8">
+      <Empty
+        icon={FileText}
+        title={file.name}
+        description={`無法在瀏覽器中預覽此檔案類型（${file.mimeType || 'unknown'}）。請下載後檢視。`}
+      />
+    </div>
+  )
+}
 
 const fallbackRenderer: FileRenderer = {
   id: 'fallback',
   canRender: () => true,
-  component: ({ file }) => <FallbackRenderer file={file} />,
+  component: FallbackRenderer,
 }
 
 const imageRenderer: FileRenderer = {
@@ -164,8 +176,8 @@ interface ZoomInputProps {
  *
  * ── 消費 DS primitive ──
  *   - `<Button>` iconOnly size="sm" 作 ±按鈕
- *   - `<Input variant="bare" size="sm">` 作 %輸入(Toolbar inline editing canonical)
- *   - Input `endAction` slot 提供 ⌄ chevron 觸發 DropdownMenu
+ *   - `<Input size="sm" autoWidth>` 作 %輸入(Toolbar inline editing canonical;autoWidth 隨文字寬)
+ *   - Input `endSlot` escape hatch 包 `<DropdownMenuTrigger asChild>` + chevron 觸發 DropdownMenu
  *   - `<DropdownMenu>` 作 preset + fit 選單(取代原先 Popover + 手刻 button list)
  *
  * ── 為什麼 inline(不抽獨立 primitive)──
@@ -355,8 +367,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
           ── gap-2 canonical(2026-04-21 follow-up)──
           按鈕間距 **8px**(gap-2),對齊 Dialog footer `gap-2` / CLAUDE 按鈕間距 SSOT。
-          zoom group 內部例外 gap-0.5(見 ZoomInput) — 那是「連緊 segmented pill」語意,
-          跟這裡 action-group-to-action-group 的 gap-2 不同層級。 */}
+          zoom group(ZoomInput)內部同樣是 gap-2(見 `ZoomInput` L197),
+          與這裡 action-group-to-action-group 的 gap-2 一致。 */}
       <div className="flex items-center gap-2 shrink-0">
         {capabilities.zoom && (
           <>
@@ -578,9 +590,11 @@ const Filmstrip: React.FC<FilmstripProps> = ({ files, activeIndex, onSelect, lab
             gap-[var(--layout-space-tight)] 走 DS density-aware token(不用 raw gap-1)——
             世界級 idiom:Google Drive / Dropbox / Notion file preview 的 filmstrip 都是
             少量置中 / 多量靠 start scroll。
-            role="tablist" 擺在 tabs 的直接父元件,符合 ARIA tab pattern 語意。 */}
+            ARIA role="group"(非 tablist):filmstrip 是「選圖導航」不是「切換 N 個 tabpanel」——
+            lightbox 縮圖膠卷只有單一 viewport,不符 W3C tabs pattern(tab MUST 對應自己的 tabpanel + roving tabindex)。
+            對齊 APG grouped-carousel + PhotoSwipe / codeaccessible.com lightbox 共識:group + button + aria-current。 */}
         <div
-          role="tablist"
+          role="group"
           aria-label={labels.filmstripLabel}
           className="flex items-center gap-[var(--layout-space-tight)] mx-auto shrink-0"
         >
@@ -592,8 +606,7 @@ const Filmstrip: React.FC<FilmstripProps> = ({ files, activeIndex, onSelect, lab
             <button
               key={file.id}
               type="button"
-              role="tab"
-              aria-selected={active}
+              aria-current={active ? 'true' : undefined}
               aria-label={`${i + 1} / ${files.length}:${file.name}`}
               data-thumb-index={i}
               onClick={() => onSelect(i)}
@@ -669,7 +682,7 @@ export interface FileViewerLabels {
   descriptionPlaceholderEdit?: string
   /** Detail section — file info section heading */
   fileInfoHeading?: string
-  /** Filmstrip tablist ARIA label */
+  /** Filmstrip group ARIA label（role="group" + thumb button + aria-current,非 tablist）*/
   filmstripLabel?: string
   /** Previous-file nav button ARIA label */
   previousFile?: string
@@ -728,7 +741,7 @@ export interface FileViewerProps
 const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function FileViewer({
   files,
   initialIndex = 0,
-  open,
+  open: openProp,
   defaultOpen,
   onOpenChange,
   index: indexProp,
@@ -745,6 +758,18 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
     () => ({ ...DEFAULT_LABELS, ...labelsOverride }) satisfies Required<FileViewerLabels>,
     [labelsOverride],
   )
+  // Open:受控/非受控雙模式鏡像(消費 DS useControllable;select-menu.tsx 2026-06-11 同修先例)。
+  // 原本 keyboard shortcuts effect 與 index-reset effect 直接讀 `open` prop ——
+  // uncontrolled(defaultOpen)場景 open === undefined,兩 effect 永遠不啟動(快捷鍵全失效
+  // + 重開不重置 index),Toolbar X / backdrop click 的 onOpenChange?.(false) 也是 no-op。
+  // 鏡像後 effect / close 都走 mirror:controlled 時純 passthrough,
+  // uncontrolled 時 internal state 為準 + onOpenChange 僅通知。
+  const [open, setOpen] = useControllable<boolean>({
+    value: openProp,
+    defaultValue: defaultOpen ?? false,
+    onChange: onOpenChange,
+  })
+
   // Index:uncontrolled fallback
   const [internalIndex, setInternalIndex] = React.useState(initialIndex)
   const activeIndex = indexProp ?? internalIndex
@@ -876,8 +901,10 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
   const showFilmstripResolved = showFilmstrip && files.length > 1
   const showArrows = files.length > 1
 
+  // Root 永遠餵 mirror(Radix 視角 controlled);uncontrolled 的 defaultOpen 由
+  // useControllable internal state 承載,Radix Esc / dismiss 經 setOpen 同步回 mirror。
   return (
-    <DialogPrimitive.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
+    <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
       <DialogPrimitive.Portal>
         {/* Overlay — FileViewer 固定深色氛圍,與 Dialog 共用 bg-overlay。
             **data-theme="dark"**(2026-04-30):Overlay 在 Portal 內、是 Content 的 sibling,
@@ -933,7 +960,7 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
               onInfoToggle={() => setInfoOpen((o) => !o)}
               onDownload={handleDownload}
               allowDownload={allowDownload}
-              onClose={() => onOpenChange?.(false)}
+              onClose={() => setOpen(false)}
               labels={labels}
             />
 
@@ -962,8 +989,8 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
                     const r = img.getBoundingClientRect()
                     if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) return
                   }
-                  // 否則 = 點到 backdrop(image-renderer TransformComponent 透出的 bg-canvas)→ close
-                  onOpenChange?.(false)
+                  // 否則 = 點到 backdrop(outer 不設 bg,半透明 bg-overlay 透出 — 見 Q1 註解)→ close
+                  setOpen(false)
                 }}
               >
                 {showArrows && activeIndex > 0 && (
@@ -1055,7 +1082,7 @@ export const fileViewerMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: ['bg-muted', 'bg-surface', 'bg-surface-raised'],
+    bg: ['bg-muted', 'bg-overlay', 'bg-surface-raised'],
     fg: ['text-fg-muted', 'text-foreground'],
     ring: ['ring-primary', 'ring-ring'],
   },

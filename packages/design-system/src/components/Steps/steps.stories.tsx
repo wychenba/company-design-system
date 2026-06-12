@@ -60,7 +60,7 @@ export const Default: Story = {
       return (
         <div className="w-[480px] flex flex-col gap-4 p-6 bg-muted rounded-md border border-border">
           <div className="flex items-center gap-3">
-            <span className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+            <span className="h-8 w-8 rounded-full bg-info flex items-center justify-center shrink-0">
               <Check className="text-white" size={20} strokeWidth={2.5} aria-hidden />
             </span>
             <span className="text-body-lg font-medium text-foreground">
@@ -95,7 +95,7 @@ export const Default: Story = {
                   請輸入你的姓名、電子郵件與電話。
                 </p>
                 <div className="flex gap-2">
-                  <Button onClick={advance}>下一步</Button>
+                  <Button variant="primary" onClick={advance}>下一步</Button>
                 </div>
               </div>
             </StepContent>
@@ -110,7 +110,7 @@ export const Default: Story = {
                   設定登入帳號。使用者名稱至少 3 個字元。
                 </p>
                 <div className="flex gap-2">
-                  <Button onClick={advance}>下一步</Button>
+                  <Button variant="primary" onClick={advance}>下一步</Button>
                   <Button variant="secondary" onClick={back}>
                     上一步
                   </Button>
@@ -128,7 +128,7 @@ export const Default: Story = {
                   請確認所有欄位正確,按下送出後系統會建立您的帳號。
                 </p>
                 <div className="flex gap-2">
-                  <Button onClick={submit}>送出</Button>
+                  <Button variant="primary" onClick={submit}>送出</Button>
                   <Button variant="secondary" onClick={back}>
                     上一步
                   </Button>
@@ -151,7 +151,7 @@ export const Default: Story = {
 // Ring 跟 content state 正交:任何 state + focused 都能組合
 
 export const FocusRingCombinations: Story = {
-  name: 'Ring 正交示範',
+  name: '聚焦環正交示範',
   render: () => {
     const [value, setValue] = React.useState('step-2')
     return (
@@ -185,7 +185,7 @@ export const FocusRingCombinations: Story = {
           </StepItem>
           <StepItem value="step-2">
             <StepLabel>Current</StepLabel>
-            <StepDescription>藍底數字 + ring(若 focused)</StepDescription>
+            <StepDescription>中性底(bg-secondary)數字 + ring(若 focused)</StepDescription>
           </StepItem>
           <StepItem value="step-3">
             <StepLabel>Completed</StepLabel>
@@ -279,11 +279,11 @@ export const Horizontal: Story = {
 // ── Multiple expansion ─────────────────────────────────────────────────
 
 export const MultipleExpansion: Story = {
-  name: 'Multiple 展開模式',
+  name: '多重展開模式',
   render: () => (
     <div className="w-[480px]">
       <p className="text-caption text-fg-secondary mb-4">
-        點 step header 切換展開。預設 `all` = 全部展開起手。
+        點 step header 切換展開(並更新 value)。本例顯式傳 `defaultExpanded="all"` 全部展開起手(預設 `"none"`)。
       </p>
       <Steps
         defaultValue="b"
@@ -330,41 +330,6 @@ export const MultipleExpansion: Story = {
   ),
 }
 
-// ── Without description ─────────────────────────────────────────────────
-// 驗證 column rhythm:混用有/無 description 的 step,indicator y 位置不變
-
-export const MixedDescription: Story = {
-  name: '欄 節奏 驗證',
-  render: () => (
-    <div className="flex gap-12">
-      {(['md', 'lg'] as const).map(size => (
-        <div key={size} className="w-[280px]">
-          <div className="text-caption text-fg-muted mb-4">size = {size}</div>
-          <Steps
-            defaultValue="step-3"
-            completedValues={['step-1', 'step-2']}
-            size={size}
-          >
-            <StepItem value="step-1">
-              <StepLabel>建立帳號</StepLabel>
-            </StepItem>
-            <StepItem value="step-2">
-              <StepLabel>驗證 Email</StepLabel>
-              <StepDescription>發送確認信至你的信箱</StepDescription>
-            </StepItem>
-            <StepItem value="step-3">
-              <StepLabel>設定團隊</StepLabel>
-              <StepDescription>
-                命名你的工作區、選擇方案、匯入現有專案;這個步驟結束後可隨時在設定頁
-                調整
-              </StepDescription>
-            </StepItem>
-            <StepItem value="step-4">
-              <StepLabel>邀請成員</StepLabel>
-            </StepItem>
-          </Steps>
-        </div>
-      ))}
-    </div>
-  ),
-}
+// @story-trait-rationale: MixedDescription(欄節奏驗證 grid)retired 2026-06-11 per audit
+//   EXAMPLE_REDUNDANT — indicator 對齊 label 第一行的 column rhythm 已由 anatomy「欄位節奏」+
+//   principles「規則:指示欄節奏一致」雙層 own;展示層不重複 trait 驗證 grid。

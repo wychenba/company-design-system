@@ -11,7 +11,7 @@
 // 在主檔 SSOT-bearing API 邊界處,本檔屬機械搬移。
 import { nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
 import type { SelectOption } from '@/design-system/components/Select/select'
-import { buildPersonNameCard, resolvePerson, type PersonValue } from './person-display'
+import { buildPersonProfileCard, resolvePerson, type PersonValue } from './person-display'
 
 // ── Tag wrapper className SSOT ──────────────────────────────────────────────
 //
@@ -26,7 +26,7 @@ import { buildPersonNameCard, resolvePerson, type PersonValue } from './person-d
 // 必經此 helper(hook `check_peoplepicker_ssot_drift.sh` 攔接 wrapper class literal in tsx)。
 //
 // **2026-05-15 SSOT alignment**(user verbatim「單選 people picker 沒壞,難道沒有 SSOT?」):
-// 單選 picker wrapper(`select.tsx:229`)= `flex-1 min-w-0 inline-flex items-center +
+// 單選 picker wrapper(`select.tsx:244` selectedItemRenderer wrapper)= `flex-1 min-w-0 inline-flex items-center +
 // nakedCellRowModeAlign` — proven working,canonical SSOT。本 helper 對齊 single SSOT,
 // **不**自定一套(spec.md §C row 1 +「length=1 視覺 = 跟單人 closed 一致」+ §E「PersonDisplay
 // 共享 renderer」)。
@@ -46,7 +46,7 @@ export const PEOPLE_PICKER_LENGTH1_WRAPPER_CLASS = `flex-1 min-w-0 inline-flex i
 // code-quality-allow: dead-export — paired helper for SSOT primitive(同上 hook + future use rationale)
 export function getPeoplePickerTagWrapperClass(selectedCount: number): string {
   return selectedCount === 1
-    ? PEOPLE_PICKER_LENGTH1_WRAPPER_CLASS  // SSOT aligned to single picker wrapper(select.tsx:229)
+    ? PEOPLE_PICKER_LENGTH1_WRAPPER_CLASS  // SSOT aligned to single picker wrapper(select.tsx:244 selectedItemRenderer wrapper)
     // length>=2 stack 視覺(spec.md §D row 1):圓形 avatar overlap + group/avatar selector for dismiss overlay
     : '-ml-0.5 first:ml-0 relative inline-flex group/avatar'
 }
@@ -58,7 +58,7 @@ export function getPeoplePickerTagWrapperClass(selectedCount: number): string {
 // menu 時 dropdown row 只顯純文字 name(資訊弱)— 現透過 wrapper schema unify 直接帶 avatar /
 // description 給 SelectMenu primitive 渲。
 //
-// 2026-05-18 fix(per user directive「所有 avatar hover 都要 NameCard」+ avatar.spec.md
+// 2026-05-18 fix(per user directive「所有 avatar hover 都要 ProfileCard」+ avatar.spec.md
 // DS-wide canonical):dropdown menu items Avatar 必帶 hoverCard,跟 PersonDisplay / Tag
 // avatar 對齊。漏掉 = user 抓「PeoplePicker 選單內 avatar 沒有 namecard」。
 export function personToSelectOption(person: PersonValue): SelectOption {
@@ -66,7 +66,7 @@ export function personToSelectOption(person: PersonValue): SelectOption {
   return {
     value: p.name,
     label: p.name,
-    avatar: { src: p.avatarUrl, alt: p.name, hoverCard: buildPersonNameCard(p) },
+    avatar: { src: p.avatarUrl, alt: p.name, hoverCard: buildPersonProfileCard(p) },
     description: p.description,
   }
 }

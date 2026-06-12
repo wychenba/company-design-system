@@ -1,15 +1,15 @@
 ---
 name: propose-options
-description: Auto-invoke when listing options / 建議 / 候選方案. Forces inline 4-Q principle check(M8 benchmark / M17 SSOT / Rule-of-3 / M10 subsumption)per option BEFORE listing. Failures filtered or labeled. Codifies「verify before propose」runtime discipline.
+description: Auto-invoke when listing options / 建議 / 候選方案. Forces inline 7-Q principle check(M8 benchmark / M17 SSOT / Rule-of-3 / M10 subsumption)per option BEFORE listing. Failures filtered or labeled. Codifies「verify before propose」runtime discipline.
 ---
 
-# /propose-options — Propose-time 4-Q Gate
+# /propose-options — Propose-time 7-Q Gate
 
-**目的**:Claude 對 user 提建議 / 列 option list 時,**先跑 4 題原則自檢**,通過才寫進回覆。Reject 的不列 OR 列出時標 fail 原因。
+**目的**:Claude 對 user 提建議 / 列 option list 時,**先跑 7 題原則自檢**,通過才寫進回覆。Reject 的不列 OR 列出時標 fail 原因。
 
 **對齊**:
 - CLAUDE.md mindset #1(不取巧)+ #2(消費既有)+ #5(猶豫就問)+ #6(meta 抽象)
-- M8 benchmark / M17 SSOT / M12 binary rule / 資訊治理「加規則前 3 題」
+- M8 benchmark / M17 SSOT / M12 binary rule / 治理「加規則前 3 題」
 - 本 skill 是上述 meta 的**propose-time 落地** — meta 寫成文字不夠,要 mechanical workflow 釘住
 
 ## When to invoke
@@ -27,9 +27,9 @@ description: Auto-invoke when listing options / 建議 / 候選方案. Forces in
 
 ---
 
-## Workflow(強制 6 題,缺一就 reject 此 option)
+## Workflow(強制 7 題,缺一就 reject 此 option)
 
-每個 candidate option 過以下 6 題,inline 寫進回覆:
+每個 candidate option 過以下 7 題,inline 寫進回覆:
 
 ### Q0 — **Pre-ASK self-verify problem 真存在**(2026-05-18 加,absorbs Sheet/inline-action/SurfaceBody 三題誤判事件)
 
@@ -93,7 +93,7 @@ description: Auto-invoke when listing options / 建議 / 候選方案. Forces in
 
 ### Q4 — M10 下游吸收
 **問**:本 option 加入後,既有哪些 rule / memory / bug case 被吸收可刪?
-**Fail**:純 append 沒 retire,違反「上游加 = 下游減」 + 資訊治理 anti-bloat
+**Fail**:純 append 沒 retire,違反「上游加 = 下游減」 + 治理 anti-bloat
 **例**:
 - ✅ "M18 加,M12 部分 overlap 但 scope 不同共存(說明)"
 - ❌ "新加 M18,既有 M-row 全保留(沒檢查)"
@@ -109,7 +109,7 @@ description: Auto-invoke when listing options / 建議 / 候選方案. Forces in
 
 ## Workflow Output Format
 
-對 user 回覆中的 option list 必含 **inline 5-Q 表 + Issue mapping**(plan iteration 場景):
+對 user 回覆中的 option list 必含 **inline 7-Q 表 + Issue mapping**(plan iteration 場景):
 
 ```markdown
 | 選項 | M23 DS grep | M8 benchmark | M17 SSOT | Rule-of-3 | M10 下游 | Issue cover | 結論 |
@@ -126,17 +126,17 @@ description: Auto-invoke when listing options / 建議 / 候選方案. Forces in
 | ... | ... | ... |
 ```
 
-**所有 fail 過 4-Q 的 option 必明示 reject + 原因**,不只 list 不過的。User 看見 reject 過程才能信 propose 過原則。
+**所有 fail 過 7-Q 的 option 必明示 reject + 原因**,不只 list 不過的。User 看見 reject 過程才能信 propose 過原則。
 
 ---
 
 ## Edge cases
 
 ### 緊急 / surgical bug fix
-不需走全 4 題(沒 option list,直接修)。但 commit message 仍應簡述「修法已知 root cause + 不取巧」(對齊 mindset #1)。
+不需走全 7 題(沒 option list,直接修)。但 commit message 仍應簡述「修法已知 root cause + 不取巧」(對齊 mindset #1)。
 
 ### Option 內含 sub-option(nested)
-每層各自跑 4 題。Skill 不限深度但實作上 ≥ 3 層 nested 已是設計問題,user 該停下重整。
+每層各自跑 7 題。Skill 不限深度但實作上 ≥ 3 層 nested 已是設計問題,user 該停下重整。
 
 ### User 已明示要 X(非 propose)
 不跑 skill。直接執行。
@@ -147,19 +147,19 @@ description: Auto-invoke when listing options / 建議 / 候選方案. Forces in
 
 User 已就「為什麼會給錯誤建議」糾正 ≥ 3 次:
 - session 初:G6/G7/G8 推力,我自己沒 dogfood test → 第 3 次問才補
-- 中:c hook + d M18-inner-area propose,**user sign-off 前剛好我自己覺察跑 4-Q 才撤回**
+- 中:c hook + d M18-inner-area propose,**user sign-off 前剛好我自己覺察跑 7-Q 才撤回**
 - 末:user 直接質問「為什麼會給錯誤建議?如果我答應了會直接執行嗎?」(本 skill 的觸發)
 
-**Infra G6/G7/G8 是 post-edit / session-start 防線,沒 propose-time gate**。Claude Code event model 沒 OnAssistantMessage hook,**只能靠 model-runtime 紀律 + skill self-invoke**。本 skill 就是 mechanical 補位 — invoke 時讀本檔,4-Q 表格自然寫進回覆。
+**Infra G6/G7/G8 是 post-edit / session-start 防線,沒 propose-time gate**。Claude Code event model 沒 OnAssistantMessage hook,**只能靠 model-runtime 紀律 + skill self-invoke**。本 skill 就是 mechanical 補位 — invoke 時讀本檔,7-Q 表格自然寫進回覆。
 
 ---
 
 ## Self-improvement capture
 
 每次 invoke 完,session 結束前自問:
-- (a) 是否每個 option 真跑了 4-Q 還是糊弄填表?
+- (a) 是否每個 option 真跑了 7-Q 還是糊弄填表?
 - (b) 是否有 reject option 曾被 list?(reject 不該被列出)
-- (c) 是否 user 仍質疑 propose 品質?(若是 → 4-Q 沒抓到的 gap → 加 Q5)
+- (c) 是否 user 仍質疑 propose 品質?(若是 → 7-Q 沒抓到的 gap → 加 Q5)
 
 回填到本 SKILL.md 或 CLAUDE.md M18(若需 escalate)。
 
@@ -170,8 +170,8 @@ User 已就「為什麼會給錯誤建議」糾正 ≥ 3 次:
 | Skill | scope |
 |---|---|
 | `pre_write_subsumption_check.sh`(hook)| Edit/Write 已發生時 |
-| `post_edit_canonical_interrogate.sh`(hook)| 寫完 canonical 後 3 題 |
-| `check_governance_compliance.sh`(hook)| 寫新 hook 7 題 |
-| **本 skill** `/propose-options` | **propose-time(寫進 user 回覆前)4 題** |
+| `post_edit_canonical_interrogate.sh`(retired/未實作 — mindset enforcement)| 寫完 canonical 後 3 題 |
+| `check_governance_compliance.sh`(retired/未實作 — 靠 `check_propose_pre_grep_verify.sh` + 加 hook 前 3 題)| 寫新 hook 7 題 |
+| **本 skill** `/propose-options` | **propose-time(寫進 user 回覆前)7 題** |
 
 4 個正交 — propose 前 / write 前 / write 中 / write 後 全 cover。

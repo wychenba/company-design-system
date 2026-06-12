@@ -5,7 +5,7 @@ description: Batch-migrate design system components to Story Auto-Compile Phase 
 
 # Story Auto-Compile Migrate — 批次將元件移到 Phase 1+2 結構
 
-**目的**:把 44+ 元件從 hand-written stories 遷到 auto-compile-able 結構(tsx `componentMeta` export + spec YAML frontmatter)。分「mechanical auto」+「judgment checkpoint」兩層。
+**目的**:把全部元件從 hand-written stories 遷到 auto-compile-able 結構(tsx `componentMeta` export + spec YAML frontmatter)。分「mechanical auto」+「judgment checkpoint」兩層。元件總數 Phase 0 動態計(`ls -d packages/design-system/src/components/*/ | wc -l`,當前 62),禁 hardcode。
 
 **不含**:不改元件實作(cva / tsx logic 不動);不產 stories(compile-stories 負責)。只加 metadata。
 
@@ -121,7 +121,7 @@ Commit 每批 5-10 元件一個(不一次全推,好 review)。
 ## Self-improvement capture
 - 新發現 cva patterns: {特殊邏輯整理到 planning/story-auto-compile.md 供未來參考}
 - Mechanical migration 失敗 case: {列出 + 手動 workaround 紀錄}
-- Migration 覆蓋率:{N migrated / 44 total}
+- Migration 覆蓋率:{N migrated / total}(total = Phase 0 動態計 `ls -d packages/design-system/src/components/*/ | wc -l`)
 ```
 
 ---

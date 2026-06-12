@@ -4,6 +4,7 @@ import * as React from 'react'
 import { Check, ChevronDown, X } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
+import { ItemPrefix, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -47,7 +48,7 @@ function getOuterRingShadow(ringColor: string): string {
 function resolveRingColor(state: StepContentState, linear: boolean): string {
   if (state === 'error') return 'var(--error-hover)'
   if (state === 'current' && !linear) return 'var(--border-hover)'
-  return 'var(--primary-hover)'
+  return 'var(--info-hover)'
 }
 
 // ── Contexts ──────────────────────────────────────────────────────────────
@@ -64,6 +65,7 @@ interface StepsContextValue {
   expandedSet: Set<string>
   setValue: (value: string) => void
   toggleExpanded: (value: string) => void
+  total: number
 }
 
 const StepsContext = React.createContext<StepsContextValue | null>(null)
@@ -240,6 +242,8 @@ const Steps = React.forwardRef<HTMLOListElement, StepsProps>(
       })
     }, [])
 
+    const stepCount = React.Children.count(children)
+
     const ctxValue = React.useMemo<StepsContextValue>(
       () => ({
         value,
@@ -253,12 +257,13 @@ const Steps = React.forwardRef<HTMLOListElement, StepsProps>(
         expandedSet,
         setValue,
         toggleExpanded,
+        total: stepCount,
       }),
-      [value, completedValues, errorValues, reachableValues, linear, size, orientation, expansion, expandedSet, setValue, toggleExpanded],
+      [value, completedValues, errorValues, reachableValues, linear, size, orientation, expansion, expandedSet, setValue, toggleExpanded, stepCount],
     )
 
     // Interleave horizontal connectors between items
-    const count = React.Children.count(children)
+    const count = stepCount
     const itemsWithIndex: React.ReactNode[] = []
 
     React.Children.forEach(children, (child, index) => {
@@ -421,8 +426,20 @@ function StepItemLayout({ children }: { children: React.ReactNode }) {
 
 // ── Clickable header ─────────────────────────────────────────────────────
 
+// SR-only 狀態文字 map(2026-06-01 #25 a11y:indicator 是 aria-hidden 純視覺,故「第 N 步/共 M 步/狀態」
+// 需經 sr-only span 給螢幕報讀器。對齊 Carbon ProgressIndicator `--assistive-text`(已完成/進行中/未開始)慣例)
+const STEP_STATUS_TEXT: Record<StepContentState, string> = {
+  completed: '已完成',
+  current: '進行中',
+  error: '錯誤',
+  reachable: '未開始',
+  upcoming: '未開始',
+}
+
 function StepItemHeader({ children, className, style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
   const item = useStepItemContext()
+  const steps = useStepsContext()
+  const index = React.useContext(StepIndexContext)
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!item.clickable) return
     if (e.key === 'Enter' || e.key === ' ') {
@@ -446,6 +463,7 @@ function StepItemHeader({ children, className, style }: { children: React.ReactN
       )}
       style={style}
     >
+      <span className="sr-only">{`第 ${index} 步,共 ${steps.total} 步,${STEP_STATUS_TEXT[item.state]}`}</span>
       {children}
     </div>
   )
@@ -472,18 +490,20 @@ function VerticalLayout({
   return (
     <>
       <StepItemHeader className="flex items-start gap-3">
-        <div className="shrink-0" style={{ width: indicatorBox }}>
-          <div className="h-[1lh] flex items-center justify-center">
-            <StepIndicator />
-          </div>
-        </div>
-        <div className="flex-1 min-w-0 flex items-start">
+        {/* Row prefix slot — 消費 item-anatomy <ItemPrefix>(h-[1lh] 對齊 label 第一行 SSOT);
+            width = INDICATOR_BOX_WIDTH 固定欄寬,base justify-center 讓 sm dot 在欄內置中 */}
+        <ItemPrefix style={{ width: indicatorBox }}>
+          <StepIndicator />
+        </ItemPrefix>
+        <div className="flex-1 min-w-0 flex items-start gap-2">
           <div className="flex-1 min-w-0 flex flex-col">
             {label}
             {description}
           </div>
+          {/* Row suffix slot — 消費 item-anatomy <ItemSuffix>(h-[1lh] 對齊 label 第一行);
+              text col 是 flex-1 → base ml-auto 惰性,8px 間距由父層 gap-2 提供(= MenuItem 父層 gap idiom)*/}
           {steps.expansion === 'multiple' && !!content && (
-            <span aria-hidden className="h-[1lh] flex items-center shrink-0 ml-2">
+            <ItemSuffix aria-hidden>
               <ChevronDown
                 size={16}
                 className={cn(
@@ -491,7 +511,7 @@ function VerticalLayout({
                   item.expanded && 'rotate-180',
                 )}
               />
-            </span>
+            </ItemSuffix>
           )}
         </div>
       </StepItemHeader>
@@ -520,7 +540,7 @@ function VerticalConnectorLine() {
       aria-hidden
       className={cn(
         'absolute w-px',
-        isBlue ? 'bg-primary' : 'bg-border',
+        isBlue ? 'bg-info' : 'bg-border',
       )}
       style={{
         left: INDICATOR_BOX_WIDTH[steps.size] / 2,
@@ -563,14 +583,15 @@ function HorizontalLayout({
     <>
       {/* Row 1: indicator + label + connector(在同一個 flex row) */}
       <StepItemHeader className="flex items-start gap-3">
-        <div className="h-[1lh] flex items-center shrink-0">
+        {/* Row prefix slot — 消費 item-anatomy <ItemPrefix>(h-[1lh] 對齊 label 第一行 SSOT)*/}
+        <ItemPrefix>
           <StepIndicator />
-        </div>
+        </ItemPrefix>
         <div className="shrink-0 min-w-0">{label}</div>
         {/* Connector 在 item 內部,flex-1 填滿剩餘寬度 */}
         {!item.isLast && (
           <div className="h-[1lh] flex-1 flex items-center min-w-4" aria-hidden>
-            <div className={cn('h-px w-full', isBlue ? 'bg-primary' : 'bg-border')} />
+            <div className={cn('h-px w-full', isBlue ? 'bg-info' : 'bg-border')} />
           </div>
         )}
       </StepItemHeader>
@@ -618,12 +639,12 @@ function SmIndicator({
       width: INDICATOR_SIZE.sm,
       height: INDICATOR_SIZE.sm,
       background: 'transparent',
-      border: '2px solid var(--primary-hover)',
+      border: '2px solid var(--info-hover)',
       boxShadow: focused ? getOuterRingShadow(resolveRingColor(state, linear)) : undefined,
     }
   } else {
     const dotBg =
-      state === 'completed' ? 'var(--primary)'
+      state === 'completed' ? 'var(--info)'
         : state === 'error' ? 'var(--error)'
           : state === 'current' && !linear ? 'var(--fg-disabled)'
             : 'var(--fg-disabled)' // upcoming + non-linear fallback
@@ -677,12 +698,12 @@ function MdLgIndicator({
       contentColor = 'var(--on-emphasis)'
       break
     case 'completed':
-      fillBg = 'var(--primary)'
+      fillBg = 'var(--info)'
       contentColor = 'var(--on-emphasis)'
       break
     case 'current':
       if (linear) {
-        fillBg = 'var(--primary)'
+        fillBg = 'var(--info)'
         contentColor = 'var(--on-emphasis)'
       } else {
         fillBg = 'var(--secondary)'
@@ -690,7 +711,7 @@ function MdLgIndicator({
       }
       break
     case 'reachable':
-      fillBg = 'var(--primary)'
+      fillBg = 'var(--info)'
       contentColor = 'var(--on-emphasis)'
       break
     default: // upcoming
@@ -717,7 +738,8 @@ function MdLgIndicator({
         height: diameter,
         background: fillBg,
         color: contentColor,
-        fontSize: size === 'lg' ? 'var(--font-body-size)' : 'var(--font-caption-size)',
+        // 2026-06-11 R2:對齊 spec canonical「indicator 數字與 label 同級」(steps.spec.md 狀態表 md=14/lg=16;spec 明文「之前寫小一號(md=12,lg=14)是錯的」)
+        fontSize: size === 'lg' ? 'var(--font-body-lg-size)' : 'var(--font-body-size)',
         boxShadow: focused ? getOuterRingShadow(resolveRingColor(state, linear)) : undefined,
       }}
     >
@@ -839,9 +861,9 @@ export const stepsMeta = {
     md: { px: 24, when: '預設 — wizard / checkout / 註冊主流程;indicator 24px circle' },
     lg: { px: 32, when: 'Marketing 流程展示 / 重要 onboarding;indicator 32px circle' },
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['upcoming', 'reachable', 'current', 'completed', 'error'], // 2026-06-11 R2:content-state 模型(spec 狀態表),非 Phase-1 boilerplate 互動 states,
   tokens: {
-    bg: ['bg-primary'],
+    bg: ['bg-info'],
     fg: ['--fg-disabled', '--foreground', '--on-emphasis', 'text-error-text', 'text-fg-disabled', 'text-fg-muted', 'text-fg-secondary', 'text-foreground'],
     ring: [],
   },

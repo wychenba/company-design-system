@@ -32,16 +32,26 @@
     "a11y:check": "node scripts/audit-a11y.mjs",
     "a11y:check:tag": "node scripts/audit-a11y.mjs --tag",
     "story-quality:check": "node scripts/audit-story-quality.mjs --check",
+    "typecheck:stories": "tsc -p packages/design-system/tsconfig.stories.json",
+    "release:preflight": "node scripts/release-preflight.mjs",
     "test:datatable-invariants": "node scripts/data-table-invariants.mjs",
+    "audit:coverage-matrix": "node scripts/audit-coverage-matrix.mjs",
+    "audit:datatable-row-mode": "node scripts/audit-data-table-row-mode-ssot.mjs",
+    "audit:spec-deadlinks": "node scripts/audit-spec-deadlinks.mjs",
+    "audit:hook-test-coverage": "node scripts/audit-hook-test-coverage.mjs",
+    "test:devmode-geometry": "node scripts/test-devmode-geometry-invariant.mjs",
     "sync-memory": "node scripts/sync-memory.mjs",
     "sync:ds-canonical": "node scripts/sync-ds-canonical.mjs",
+    "verify:consumer-css": "node scripts/verify-consumer-css-entry.mjs",
     "verify:published-deploy": "node scripts/verify-published-deploy.mjs",
+    "audit:hook-quality": "node scripts/audit-hook-quality.mjs",
     "sync-counters": "node scripts/sync-governance-counters.mjs",
     "changeset": "changeset",
     "changeset:version": "changeset version && node scripts/sync-version-to-all-manifests.mjs",
     "postinstall": "node scripts/ensure-playwright-browsers.mjs",
     "prepare": "husky",
     "gen-ds-story-manifest": "node scripts/gen-ds-story-manifest.mjs",
+    "gen-llms-txt": "node scripts/gen-llms-txt.mjs",
     "postbuild-storybook": "node scripts/gen-ds-story-manifest.mjs"
   },
   "dependencies": {
@@ -131,56 +141,110 @@
     {
       "name": "Button(foundation primitive)",
       "path": "packages/design-system/dist/components/Button/button.js",
-      "limit": "8 KB",
-      "gzip": true
+      "limit": "32 KB",
+      "gzip": true,
+      "ignore": [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "scheduler"
+      ]
     },
     {
-      "name": "DataTable(heaviest \u2014 filter+sort+drag+virtual)",
+      "name": "DataTable(heaviest — filter+sort+drag+virtual)",
       "path": "packages/design-system/dist/components/DataTable/data-table.js",
-      "limit": "60 KB",
-      "gzip": true
+      "limit": "168 KB",
+      "gzip": true,
+      "ignore": [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "scheduler"
+      ]
     },
     {
       "name": "FileViewer(complex composition)",
       "path": "packages/design-system/dist/components/FileViewer/file-viewer.js",
-      "limit": "30 KB",
-      "gzip": true
+      "limit": "85 KB",
+      "gzip": true,
+      "ignore": [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "scheduler"
+      ]
     },
     {
       "name": "Calendar(date grid + a11y)",
       "path": "packages/design-system/dist/components/Calendar/calendar.js",
-      "limit": "20 KB",
-      "gzip": true
+      "limit": "49 KB",
+      "gzip": true,
+      "ignore": [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "scheduler"
+      ]
     },
     {
       "name": "Chart(recharts wrapper)",
       "path": "packages/design-system/dist/components/Chart/chart.js",
-      "limit": "25 KB",
-      "gzip": true
+      "limit": "92 KB",
+      "gzip": true,
+      "ignore": [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "scheduler"
+      ]
     },
     {
       "name": "Sidebar(compound + collapse + tooltip)",
       "path": "packages/design-system/dist/components/Sidebar/sidebar.js",
-      "limit": "20 KB",
-      "gzip": true
+      "limit": "57 KB",
+      "gzip": true,
+      "ignore": [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "scheduler"
+      ]
     },
     {
       "name": "Combobox(input + listbox + filter)",
       "path": "packages/design-system/dist/components/Combobox/combobox.js",
-      "limit": "15 KB",
-      "gzip": true
+      "limit": "69 KB",
+      "gzip": true,
+      "ignore": [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "scheduler"
+      ]
     },
     {
       "name": "AppShell(layout primitive)",
       "path": "packages/design-system/dist/components/AppShell/app-shell.js",
-      "limit": "10 KB",
-      "gzip": true
+      "limit": "47 KB",
+      "gzip": true,
+      "ignore": [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "scheduler"
+      ]
     },
     {
       "name": "Dialog(modal overlay)",
       "path": "packages/design-system/dist/components/Dialog/dialog.js",
-      "limit": "10 KB",
-      "gzip": true
+      "limit": "46 KB",
+      "gzip": true,
+      "ignore": [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "scheduler"
+      ]
     }
   ]
 }

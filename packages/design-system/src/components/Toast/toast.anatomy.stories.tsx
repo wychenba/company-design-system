@@ -5,7 +5,7 @@
 //     載體(對齊 Polaris / Material / Sonner 共識)。Toast 本身無尺寸決策,
 //     由 sonner Provider 控制 viewport position 與 stacking。
 import type { Meta, StoryObj } from '@storybook/react'
-import { toast } from './toast'
+import { toast, Toaster } from './toast'
 import { Button } from '@/design-system/components/Button/button'
 import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
@@ -38,6 +38,7 @@ export const Overview: Story = {
           })}>觸發 action toast</Button>
         </div>
       </div>
+      <Toaster />
 
       <div>
         <H3>ToastOptions(toast 函式參數)</H3>
@@ -127,22 +128,23 @@ export const Inspector: Story = {
           觸發 toast
         </Button>
         <p className="text-footnote text-fg-muted">
-          toast 會在右下角跳出(由 Provider 層 `&lt;Toaster /&gt;` 決定位置)。連續點擊觸發多個 toast 觀察 stacking。
+          toast 會在右下角跳出(由 Provider 層的 Toaster 決定位置)。連續點擊觸發多個 toast 觀察堆疊。
         </p>
+        <Toaster />
       </div>
     )
   },
 }
 
 export const ContainerArchitecture: Story = {
-  name: 'Container 三層架構',
+  name: '容器 三層架構',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
         <H3>為什麼分三層</H3>
         <Desc>
           Toast 的 container 結構是**刻意三層**——解決陰影 token 在 light / dark
-          mode 不同強度的問題(dark 45% black,light 4% black)。若陰影跟
+          mode 不同強度的問題(dark 25% black,light 4% black)。若陰影跟
           `data-theme="dark"` 在同一層,light 頁面上的 dark toast 會有過重陰影。
         </Desc>
       </div>
@@ -186,14 +188,21 @@ export const ColorMatrix: Story = {
       </div>
 
       <div>
-        <H3>觸發各 variant 測試</H3>
+        <H3>觸發各 variant 比較</H3>
         <div className="flex flex-wrap gap-2">
-          {(['neutral', 'info', 'success', 'warning', 'error'] as const).map(v => (
-            <Button key={v} variant="tertiary" size="sm" onClick={() => toast({ variant: v, title: `${v} toast`, description: '範例訊息' })}>
-              {v}
+          {([
+            { variant: 'neutral', label: 'neutral', title: '已複製到剪貼簿', description: '連結已加入剪貼簿' },
+            { variant: 'info', label: 'info', title: '有新版本可用', description: '重新整理即可套用更新' },
+            { variant: 'success', label: 'success', title: '訂單已寄送', description: '預計 3 個工作天送達' },
+            { variant: 'warning', label: 'warning', title: '連線不穩', description: '部分變更可能尚未同步' },
+            { variant: 'error', label: 'error', title: '匯入失敗', description: '檔案格式不符,請改用 CSV' },
+          ] as const).map(({ variant, label, title, description }) => (
+            <Button key={variant} variant="tertiary" size="sm" onClick={() => toast({ variant, title, description })}>
+              {label}
             </Button>
           ))}
         </div>
+        <Toaster />
       </div>
     </div>
   ),
@@ -212,9 +221,9 @@ export const StateBehavior: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>階段</Th><Th>觸發</Th><Th>行為</Th><Th>Token / 數值</Th></tr></thead>
             <tbody>
-              <tr><Td mono>進場</Td><Td mono>toast()</Td><Td>從右下滑入 + fade-in + stacking shift</Td><Td mono>duration-200</Td></tr>
+              <tr><Td mono>進場</Td><Td mono>toast()</Td><Td>從右下滑入 + fade-in + stacking shift</Td><Td mono>~400ms(sonner 內建)</Td></tr>
               <tr><Td mono>自動關閉</Td><Td>`duration` 到期</Td><Td>fade-out + 向右滑出</Td><Td mono>duration ?? 4000ms</Td></tr>
-              <tr><Td mono>手動 dismiss</Td><Td>X button / Swipe right</Td><Td>立即 fade-out + swipe</Td><Td mono>swipe threshold 20px</Td></tr>
+              <tr><Td mono>手動 dismiss</Td><Td>X button / 向右滑動</Td><Td>立即 fade-out + 滑出</Td><Td mono>滑動 ≥ 45px 或速度夠快(velocity {'>'} 0.11)</Td></tr>
               <tr><Td mono>Pause on hover</Td><Td>Hover 任一 toast</Td><Td>倒數暫停;離開後 resume</Td><Td mono>sonner 預設開啟</Td></tr>
             </tbody>
           </table>
@@ -224,17 +233,17 @@ export const StateBehavior: Story = {
       <div>
         <H3>Stacking — 多個 toast 堆疊</H3>
         <Desc>
-          連續觸發多個 toast 時,sonner 自動堆疊(最新的在上,舊的往下縮到後層)。超過 `visibleToasts`
-          數量時,溢出部分隱藏但保留計數。Hover 任一 toast 時展開全部,離開後收合。
+          連續觸發多個 toast 時,sonner 自動堆疊(最新的在上,舊的往下縮到後層)。預設最多同時顯示 3 則,
+          超過的會直接隱藏(不顯示「+N」計數)。Hover 任一 toast 時展開全部,離開後收合。
         </Desc>
         <div className="flex flex-wrap gap-2">
           <Button
             variant="tertiary"
             onClick={() => {
-              toast({ variant: 'info', title: '第 1 個 toast', description: '剛剛觸發' })
-              setTimeout(() => toast({ variant: 'success', title: '第 2 個 toast', description: '1 秒後' }), 1000)
-              setTimeout(() => toast({ variant: 'warning', title: '第 3 個 toast', description: '2 秒後' }), 2000)
-              setTimeout(() => toast({ variant: 'error', title: '第 4 個 toast', description: '3 秒後' }), 3000)
+              toast({ variant: 'info', title: '開始同步工作區', description: '剛剛觸發,最上層' })
+              setTimeout(() => toast({ variant: 'success', title: '設計稿已上傳', description: '1 秒後,推下前一則' }), 1000)
+              setTimeout(() => toast({ variant: 'warning', title: '網路速度偏慢', description: '2 秒後,繼續往下堆疊' }), 2000)
+              setTimeout(() => toast({ variant: 'error', title: '部分檔案上傳逾時', description: '3 秒後,最底層' }), 3000)
             }}
           >
             連續觸發 4 個 toast(觀察堆疊)
@@ -248,14 +257,14 @@ export const StateBehavior: Story = {
       <div>
         <H3>Swipe to dismiss — 觸控 / 滑鼠拖曳關閉</H3>
         <Desc>
-          Toast 支援向右 swipe 關閉(mobile 友善)。拖曳超過 20px threshold → 鬆開觸發 dismiss;
-          未達 threshold → 彈回原位。
+          Toast 支援向右滑動關閉(mobile 友善)。拖曳超過 45px(或滑動速度夠快)→ 鬆開觸發關閉;
+          未達門檻 → 彈回原位。
         </Desc>
         <Button
           variant="tertiary"
-          onClick={() => toast({ variant: 'info', title: '試著向右拖我', description: '超過 20px 會被關掉' })}
+          onClick={() => toast({ variant: 'info', title: '試著向右拖我', description: '向右拖超過 45px 會被關掉' })}
         >
-          觸發可 swipe 的 toast
+          觸發可滑動關閉的 toast
         </Button>
       </div>
 
@@ -297,6 +306,7 @@ export const StateBehavior: Story = {
           </table>
         </div>
       </div>
+      <Toaster />
     </div>
   ),
 }
@@ -308,7 +318,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `toast.spec.md` 「A11y 預設」段。摘要:\n\n-   預設  （success / info / neutral）： role=\"status\"  +  aria-live=\"polite\" ——screen reader 在空閒時讀出，不中斷使用者\n-   error / warning 升級  ： role=\"alert\"  +  aria-live=\"assertive\" ——立即中斷朗讀通知使用者\n-   由 sonner 自動管理  ：本 DS 不覆寫 sonner 的 a11y 行為，consumer 無需額外處理\n-   關閉按鈕  ：若 consumer 自訂 action,務必提供  aria-label （sonner 內建 dismiss 已處理）"}</p>
+      <p className="whitespace-pre-line">{"詳 `toast.spec.md` 「A11y 預設」段。摘要:\n\n-   預設  （success / info / neutral）： role=\"status\"  +  aria-live=\"polite\" ——screen reader 在空閒時讀出，不中斷使用者\n-   error / warning 升級  ： role=\"alert\"  +  aria-live=\"assertive\" ——立即中斷朗讀通知使用者\n-   由本 DS 在 outer wrapper 上依 variant 設 role / aria-live  ：非 sonner 內建（sonner runtime 本身 0 個 role,只有外層 <section> 容器固定 aria-live=polite），consumer 無需額外處理\n-   關閉按鈕  ：畫面上可見的 X 由 Notice 渲染（<Button dismiss> 自帶 aria-label='關閉通知'），非 sonner 內建 close 鈕；若 consumer 自訂 action,務必為自訂互動元素提供  aria-label "}</p>
     </div>
   ),
 }

@@ -60,7 +60,7 @@ const PopoverContent = React.forwardRef<
       onOpenAutoFocus={onOpenAutoFocus ?? handlePopoverOpenAutoFocus}
       className={cn(
         "z-50 w-72 rounded-lg border border-border bg-surface-raised text-foreground shadow-[var(--elevation-200)] outline-none",
-        // 2026-05-04 viewport-aware max-h SSOT(從 NameCard 升 DS-wide):header/footer 永遠 in-viewport,body 壓縮 scroll
+        // 2026-05-04 viewport-aware max-h SSOT(從 ProfileCard 升 DS-wide):header/footer 永遠 in-viewport,body 壓縮 scroll
         // 2026-05-05 audit dim 35 補:加 `min-h-0` 完成 M25 chain invariant(flex item default min-h: auto 阻 shrink)
         "max-h-[var(--radix-popover-content-available-height,100vh)] flex flex-col overflow-hidden min-h-0",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 motion-reduce:animate-none",
@@ -138,7 +138,7 @@ PopoverFooter.displayName = "PopoverFooter"
 // 的 header title 多半比 modal dialog title 小一級(16→14 或同比),視覺宣告「此浮層可忽略」
 //
 // Coachmark 同樣消費 PopoverTitle 作 header 小標籤(如 "新功能介紹" / "Tip 1 of 3"),
-// CoachmarkBody 的主 title 另走 text-body-lg(見 coachmark.tsx L178)。
+// CoachmarkBody 的主 title 另走 text-body-lg(見 coachmark.tsx CoachmarkBody 主 title <h3>)。
 const PopoverTitle = React.forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
@@ -162,7 +162,7 @@ export const popoverMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'], // 浮層容器 primitive,無自己的 variant/size/disabled 互動 state(spec「為何無 Inspector」段;對齊 separator.tsx meta canonical)
   tokens: {
     bg: ['bg-surface-raised'],
     fg: ['text-foreground'],

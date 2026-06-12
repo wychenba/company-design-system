@@ -47,7 +47,7 @@ benchmark:
 | Mode | Prefix | Typography | 適用場景 |
 |---|---|---|---|
 | `compact`（預設） | Paperclip icon 16px | 掃描模式 | 批次上傳的一般檔案（CSV、JSON） |
-| `rich` | Avatar 48px square(固定) | 閱讀模式（ListItem md） | 需要縮圖預覽的檔案（圖片、文件） |
+| `rich` | Avatar 48px square(固定) | 掃描模式(兩 mode 統一,見下「為什麼兩 mode 都 scanning」) | 需要縮圖預覽的檔案（圖片、文件） |
 
 compact 為預設——多數 upload 清單是「快速掃視多檔」場景，只有需要縮圖預覽才升級為 rich。
 
@@ -121,17 +121,24 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
 
 ## Padding
 
-| Mode | 規則 |
+| Mode × surface | 規則 |
 |---|---|
-| compact(預設) | 消費 item-layout 公式(py 隨 size / density 變化,padding / gap 對齊 menu item 規格) |
-| rich | py 固定(高度由 avatar 決定,不走 row 公式),padding / gap 採 rich 專屬 token(具體值見 `file-item.tsx` cva) |
+| compact(`surface=form` 預設) | `px-3 py-2`(FileItem 無 size prop,不走 `ROW_PADDING_BY_SIZE` 公式;`gap-2` 對齊 item-anatomy row) |
+| compact(`surface=upload-manager`) | **`py-2` 保留 + 左右 padding 拿掉**(`px-0`)。py 是**純文字列高來源**(無 avatar 撐高)不可拿;左右拿掉讓列對齊面板 loose L/R |
+| rich(`surface=form` 預設) | `px-3 py-3` border card(py 固定,高度由 avatar 決定不走 row 公式)|
+| rich(`surface=upload-manager`) | **左右 + 上下 padding 全拿掉**(`px-0 py-0`)。**列高靠 avatar 48(content `minHeight`)**,卡片移除後 py 多餘 → 由面板 + gap 控制間距(2026-06-03 user 校準:rich 拿上下、compact 保留上下,因列高來源不同)|
+
+**item 與容器分工**:item 只控「容器不該管的內距」—— compact `py-2`(純文字列高來源,無 avatar 撐高)/ rich `0`(列高靠 avatar 48);左右一律拿掉交給容器。**`surface=upload-manager` 浮層面板(容器)的左右 / 上下 padding / 列間 gap → 見「List wrapper canonical」的「upload-manager 浮層面板 composition」段**(SSOT 不在此重述,避免 drift)。
 
 ## 邊框 / 背景(AR15-21 canonical,2026-04-21 · 2026-04-22 擴充)
 
-| Mode | 容器視覺 | Rationale |
+**容器視覺由 `mode` × `surface` 決定**（2026-06-03 加 surface 維度，codify rich-borderless）。`surface` prop：`form`（預設）/ `upload-manager`。
+
+| Mode × surface | 容器視覺 | Rationale |
 |------|---------|-----------|
-| **rich**(所有 status) | `border border-divider rounded-md bg-surface` | Rich mode **永遠是「檔案 card」**,不因 status 改變——Slack / Notion / Linear attachment 皆獨立 card;邊框讓每個 row 視覺上是自立單元 |
-| **compact + 有 progress**(上傳中 / 類 Upload manager 完成態) | 無背景、無邊框,只靠 progress bar 提供 affordance | 「正在發生」/「剛發生」的動態 narrative,progress 本身就是視覺焦點 |
+| **rich + `surface=form`**（預設，表單/訊息附件）| `border border-divider rounded-md bg-surface` | Rich = 「檔案 card」自立輪廓——Slack / Notion / Linear attachment 慣例；邊框讓每 row 視覺獨立 |
+| **rich + `surface=upload-manager`**（Google Drive / Dropbox 背景上傳 box）| **無邊框 + 無 bg**（`rounded-md` 保留供 thumbnail 切角）；avatar 作每筆 item 視覺邊界 | box 自身已是容器 → card border 多餘＝雙層容器；avatar thumbnail 提供「每筆檔案」邊界節奏。2026-06-03 codify（原僅 L116 旁註「consumer 自己移除 border」，現 `surface` prop 機械化）|
+| **compact + 有 status**（uploading / error / upload-manager completed，有 progress bar）| 無背景、無邊框,只靠 progress bar 提供 affordance | 「正在發生」/「剛發生」的動態 narrative,progress 本身就是視覺焦點 |
 | **compact + 無 progress**(form attachment 靜態態) | `bg-secondary rounded-md`(= neutral-3 色) | 靜態清單(form / 訊息附件)背景色區隔出「檔案 row」邊界,跟純文字內容區分。**為何 `bg-secondary` 不 `bg-neutral-3`**:`--secondary` 是 semantic token 經 `@theme inline` 橋接成合法 Tailwind utility,`--color-neutral-3` 是 primitive token(僅 `:root` CSS var)不生成 utility,寫 `bg-neutral-3` 會 silent 失效。對齊 Badge low / ProgressBar track SSOT(同色) |
 
 ### Hover 行為 canonical(2026-04-23)
@@ -143,8 +150,8 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
 | Mode | 永久 visual anchor | 加 hover-bg 後果 |
 |------|-------------------|-----------------|
 | rich | `border + rounded-md + bg-surface` 永遠 card | card + hover-bg = 雙層強調,視覺 heavy |
-| compact Type B(無 status) | `bg-secondary rounded-md` 永遠 pill | pill bg + hover-bg neutral-hover 兩層相近灰,視覺雜 |
-| compact Type A(uploading / error / completed with bar) | 底部 2px progress bar(分隔線型 permanent affordance) | bar + hover-bg 同時並存,affordance 重複 |
+| compact 無 status(靜態) | `bg-secondary rounded-md` 永遠 pill | pill bg + hover-bg neutral-hover 兩層相近灰,視覺雜 |
+| compact 有 status(uploading / error / completed with bar) | 底部 2px progress bar(分隔線型 permanent affordance) | bar + hover-bg 同時並存,affordance 重複 |
 
 三種型態**都已 anchored**,hover-bg 是多餘的視覺層。Cursor + click 本身已是足夠互動 affordance,世界級檔案 card / attachment 皆如此。
 
@@ -161,7 +168,7 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
 **跟 MenuItem / DataTable row 對比**(它們用 hover-bg):兩者是 **flush transparent row**(無 permanent bg / border),hover-bg 是唯一 affordance。FileItem 三種型態皆已 anchored → 反向 canonical。
 
 **反例**(本 session 修正):
-- 原 code `hoverClass = onClick ? 'cursor-pointer hover:bg-neutral-hover' : ''` → rich card 上 hover 多一層灰 bg 雙層強調;Type B pill 上 hover 加 `bg-neutral-hover` 跟 pill 底色近似造成視覺雜
+- 原 code `hoverClass = onClick ? 'cursor-pointer hover:bg-neutral-hover' : ''` → rich card 上 hover 多一層灰 bg 雙層強調;無 status pill 上 hover 加 `bg-neutral-hover` 跟 pill 底色近似造成視覺雜
 - 修為 `hoverClass = onClick ? 'cursor-pointer' : ''`
 
 **❌ 反例**:
@@ -173,26 +180,27 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
 
 ## 可下載狀態 canonical(2 use case)
 
-**核心區分**:「檔案可下載」不是單一 state,而是 **2 種使用場景**,各自有 prop signature + 視覺節奏。
+**核心區分**:同一個 FileItem,依**所在 surface** 分 2 種使用場景,各有 prop signature + 視覺節奏。唯一詞彙 = `surface` prop(`form` / `upload-manager`),以下兩節即其兩值。**一句話差別:`upload-manager` 完成後保留狀態(管理上傳是重點)/ `form` 完成後清除狀態變靜態附件。進度條兩者上傳中都會顯示(`progressBar` 只看 `status` 不看 `surface`,見 `file-item.tsx`)。**
 
-### Type A — Upload manager(Google Drive / Dropbox 類上傳管理 box)
+### `surface="upload-manager"` — 上傳管理面板(Google Drive / Dropbox 右下角類)
 
-**語意**:上傳流程的延續——完成後**仍保留 progress + status narrative**,使用者能回顧「這檔剛被上傳且已完成」。
+**語意**:管理檔案上傳的 UI —— **上傳狀態是重點,完成後仍保留 progress + status narrative**(不清除),使用者回顧「這檔剛上傳完成」。裝在獨立浮層面板(非 dropzone)。
 
 | 屬性 | 值 |
 |------|---|
-| `status` | `"completed"`(持續保留,不清除) |
-| Progress bar | 100% 完成條(不隱藏) |
-| Status icon | 綠 ✓(passive) |
+| `status` | `uploading` / `error` / `completed`(**completed 持續保留不清除** = 此情境精髓) |
+| Progress bar | 隨 status 顯示;completed = 100% 完成條(不隱藏) |
+| Status icon | uploading 無 / completed 綠 ✓ / error 紅 ✗ |
 | hover 行為 | **status slot hover-swap**:✓ → Download ↓(icon button)觸發 `onDownload` |
-| **Row-click**(= Type B 行為) | **推薦**:consumer 傳 `onClick` 讓整 row 可點 → **預設用 FileViewer 開啟**(consumer 決定,也可直接下載)。Hover-swap + Row-click 可並存。 |
-| Rich 背景 | `border card`(永遠) |
-| Compact 背景 | 無(progress bar 還在) |
+| Row-click | optional `onClick` 讓整 row 可點 → 預設 FileViewer 開啟;可與 hover-swap 並存 |
+| Rich 容器 | **無邊框 + 無 bg**(面板自身是容器,avatar 作 item 邊界)。**2026-06-03 修正:原寫「border card 永遠」與 surface=upload-manager 無邊框矛盾** |
+| Compact 容器 | 無 bg(progress bar 提供 affordance) |
 | 刪除按鈕 | optional(業務權限) |
 
 ```tsx
 <FileItem
   mode="rich"
+  surface="upload-manager"
   name="report.pdf"
   status="completed"
   onDownload={() => download(id)}
@@ -200,19 +208,19 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
 />
 ```
 
-### Type B — Form attachment(表單 / 訊息附件靜態態)
+### `surface="form"`(預設)— 表單 / 訊息附件
 
-**語意**:附件列表——檔案「已經在那」,不再是 upload 動作的延續。
+**語意**:檔案是「已存在的附件」。**上傳中會顯示進度**(`status="uploading"`,暫時),**完成後 consumer 清掉 status → 變靜態**(無 bar、無 icon),不再是 upload 動作延續。
 
 | 屬性 | 值 |
 |------|---|
-| `status` | **`undefined`**(不傳;無 progress / 無 status icon) |
-| Progress bar | 無 |
-| Status icon | 無 |
-| hover 行為 | 整 row `hover:bg-neutral-hover` + cursor-pointer |
+| `status` | 上傳中暫時 `uploading` / `error`;**靜態態 `undefined`**(清除) |
+| Progress bar | 上傳中顯示;靜態態無 |
+| Status icon | 同上 |
+| hover 行為 | `cursor-pointer`(永不顯示 hover-bg ——permanent-anchored 元件不加 double-emphasis) |
 | Row-click | **`onClick` 為主要 affordance** → **預設 FileViewer 開啟**(consumer 決定,也可下載) |
-| Rich 背景 | `border card`(永遠) |
-| Compact 背景 | `bg-secondary`(區隔「這是檔案 row」;primitive `--color-neutral-3` 的 semantic 橋接名,見邊框 / 背景章節) |
+| Rich 容器 | `border card`(永遠) |
+| Compact 容器 | 靜態態 `bg-secondary`(灰底區隔「這是檔案 row」;= `--color-neutral-3` semantic 橋接名,見邊框 / 背景章節);上傳中有 bar 時無灰底 |
 | 刪除按鈕 | optional(業務權限) |
 
 ```tsx
@@ -221,13 +229,13 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
   name="report.pdf"
   description="2.3 MB"
   onClick={() => openViewer(id)}
-  actions={hasDeletePermission ? <ItemInlineActionButton icon={Trash2} size="sm" onClick={del} /> : undefined}
+  actions={hasDeletePermission ? <Button size="xs" iconOnly variant="text" startIcon={Trash2} onClick={del} aria-label="刪除" /> : undefined}
 />
 ```
 
 **選用判斷**:
-- 上傳剛發生 / 還在 upload box 情境 → Type A(保留 narrative)
-- 檔案進駐表單 / 留言 / 既有資料 → Type B(靜態)
+- 管理上傳、完成後仍要看狀態 → `surface="upload-manager"`
+- 檔案進駐表單 / 留言 / 既有資料(完成後靜態)→ `surface="form"`(預設)
 
 ### Description ReactNode 可含 clickable 元素
 
@@ -259,21 +267,43 @@ Description 是 ReactNode,**不限純文字**。常見場景:
 - Avatar vs paperclip prefix 視覺語言衝突
 - consumer 要混用代表情境定位不清 —— 選一種
 
-**Invariant 2 — Type A completed 跟 Type B 不共存**:
-Type A completed(100% bar + ✓)屬「剛完成的 upload session」視覺;Type B(無 bar)屬「已存 attachment」視覺 —— 業務語義互斥。完成後 consumer 會把 item 轉成 Type B(移除 status 屬性),不會同時顯示「completed with bar」+「無 bar」。
+**Invariant 2 — completed-保留 跟 靜態-無 status 不共存**:
+upload-manager 的 completed(100% bar + ✓)屬「剛完成的 upload session」視覺;form 靜態(無 bar / status=undefined)屬「已存 attachment」視覺 —— 業務語義互斥。表單情境完成後 consumer 把 item 清掉 status 轉靜態,不會同時顯示「completed with bar」+「無 bar」。
 
-**合法 mixed 情境**(email 草稿 / 多步驟 upload flow):Type A **active**(`uploading` / `error`)+ Type B(saved attachments)— 只在 **compact mode 內**。
+**合法 mixed 情境**(email 草稿 / 多步驟 upload flow):同一 form list 內「上傳中」(`status="uploading"`/`error`,顯示進度)+「已存附件」(無 status,靜態)— 只在 **compact mode 內**。
 
 ---
 
 ## List wrapper canonical(多 item 間距)
 
-`FileItem` 連續排列時 list wrapper gap,**統一規則**(2026-04-23 簡化,user 指示):
+**規則:gap 由「item 視覺密度」決定** —— rich form(有邊框 card)`gap-2`(8px,邊框不相黏);rich `surface=upload-manager`(無邊框)`gap-[var(--layout-space-tight)]`(12px);compact(所有情境)`gap-1`(4px)。
 
-| Mode | List wrapper gap | Rationale |
+| Mode × surface | List wrapper gap | Rationale |
 |------|----------------|-----------|
-| **Rich**(單一 mode list) | `gap-2`(8px) | card 邊框不相黏(standalone card invariant) |
-| **Compact**(單一 mode list,所有情境) | `gap-1`(4px) | 統一 — 不論 Type A only / Type B only / Type A+B mixed,都用 gap-1 簡化 canonical。Type A 無 bg 的 0-gap 選項已捨棄,簡化 consumer 心智負擔 |
+| **Rich + `surface=form`**(border card)| `gap-2`(8px) | card 邊框不相黏(standalone card invariant) |
+| **Rich + `surface=upload-manager`**(無邊框浮層面板)| `gap-[var(--layout-space-tight)]`(12px)| 卡片 + 48 縮圖列需垂直呼吸。**2026-06-03 圖五 user 校準:rich upload-manager 初版誤設 4px,已校正為 tight(12px)**,因 rich 列比 compact 大 |
+| **Compact**(所有情境)| `gap-1`(4px) | 統一 — 有 status only / 無 status only / mixed 都 gap-1(2026-04-23 user 指示簡化:原條件式「全上傳中 → 0 gap」是 consumer 心智負擔 + state 轉換時 fragile,故捨棄 0-gap)|
+
+**control→list gap(FileUpload 內建 list 消費)**:dropzone / button 控制項 ↔ 第一個 FileItem 的間距 = **同上 form gap 同值**(rich card 8px / compact bg-pill 4px),由 `file-upload.tsx` 依 `fileListMode` 套用。**FileUpload 內建 list 一律 `surface=form`**(dropzone 是表單上傳框,非獨立浮層 upload manager),故不套用下方 upload-manager 的 12px / 面板 padding。
+
+### upload-manager 浮層面板 composition(Google Drive 右下角類獨立面板,**非** FileUpload dropzone)
+
+`surface=upload-manager` 的 FileItem list 裝在獨立浮層面板(header + 列表),item 拿掉的左右 / 上下邊距改由容器負責:
+
+- **它是 popover-class 浮層 surface,但不是 Radix `<Popover>`**(常駐面板:不靠 trigger 開、不 outside-click 關、用 chevron 收合非 X dismiss)→ **不包 `<Popover>`**,而是直接消費 overlay-surface 三件套 primitive。
+- **殼 + header + body 全消費 overlay-surface SSOT(禁手刻)**:
+  - 殼:用 Popover 同款 chrome token `rounded-lg border border-border bg-surface-raised shadow-[var(--elevation-200)] flex flex-col`(DS 無獨立 shell primitive — `PopoverContent`/`DialogContent` 各自套這組 token;常駐面板鏡像同值)。
+  - header:`<SurfaceHeader className="justify-between [--chrome-slot-h:1.25rem]">` + `<PopoverTitle>`(輕量浮層 header SSOT,padding = px-loose py-tight + border-b + unbounded-slot 負 my trick)。
+  - body:**`<SurfaceBody>`(body SSOT,含 px-loose py-tight + flex-1 scroll 鏈)**,FileItem-specific padding 用 className override(見下)。**這不是「List-as-region」**(那專指 edge-to-edge 選單清單:item hover-bg 貼容器、px-0;Cmd+K / menu / nav)—— upload-manager list 有 px-loose、item 無 hover-bg、是 chrome-padded body,故就用 SurfaceBody。**scroll(consumer 注意)**:SurfaceBody 的 `flex-1 / overflow-y-auto` 只在 shell 有 `max-h` + `overflow-hidden` 時生效;常駐面板若檔案數可超 viewport,shell 須加 `max-h`(對齊 overlay-surface.spec.md「viewport-aware scroll」),demo 短內容不需。
+  - **禁手刻**:`<div px-loose py-2 border-b>`(header)/ 手刻 `<div px-loose py-tight>`(body)= drift(2026-06-03/04 user 抓:py-2≠py-tight / 殼 token 全偏 / body 重刻 SurfaceBody)。Hook `check_story_invariants.sh R9` 機械攔手刻 header。
+
+- **左右**:`SurfaceBody` 預設 `px-[var(--layout-space-loose)]`(16px,item 內容左緣對齊 header 標題),不需 override。
+- **上下:目標 = 邊緣到 item「ink」(可見內容)距離 `var(--layout-space-tight)`(12px),兩 mode + 上下都一致**。通則:**容器該側 padding = 12 − item 在該側自己的留白(ink inset)**。
+  - **rich**:item 上下 ink inset 皆 0(avatar 頂、bar/content 底貼齊)→ 用 `SurfaceBody` 預設 `py-[var(--layout-space-tight)]`(12 / 12 對稱,不需 override)。
+  - **compact**:item 上方自帶 `py-2`(8px)→ top 補 `4`(4+8=12);**進度條 `absolute bottom-0` 貼 item 底、下方無留白(inset 0)**→ bottom 留 SurfaceBody 預設 `py-tight`(12,12+0=12)。故 compact 用 **`SurfaceBody className="!pt-1"`** override 成上下不對稱(top=4 / bottom=12)。**為何用 `!`(important)**:twMerge 不 strip SurfaceBody 基底 `py-[tight]`,非 important 的 `pt-1` 跟基底 `py` 競爭 top 看 Tailwind stylesheet 生成順序(非決定性 → 可能 silent 變 12);`!pt-1` 強制決定性勝。對齊 List-as-region `!px-0` SurfaceBody override 慣例。
+- **列間 gap**:套在 SurfaceBody className;值見上方「List wrapper canonical」gap 表(SSOT,不在此重述:rich upload-manager 12px / compact 4px)。
+- **為何 compact container 上下不對稱**(2026-06-03 圖一研究校準):compact 進度條 absolute 貼底,item 的 py-2 那 8px 落在「文字↔bar」之間、bar 下方無 padding;若上下都用同值 → 下邊距(bar→邊緣)只剩容器值、比上邊距(含 item 8px)小。故用「12 − ink inset」逐側補。世界級對照:密集 list / dropdown 容器上下 padding 慣例 4–8px(Atlassian space.050–100 / 8px-base 共識);此處目標 12px 是「邊緣→ink」視覺值(含 item 自身留白),非容器裸值。
+- Demo:`file-item.stories.tsx` 的 `UploadManagerSurface`(rich)/ `UploadManagerCompactSurface`(compact)。
 
 **Rich + Compact 不可混用**(見 Invariant 1 上方),故無「混用 gap」決策。
 
@@ -289,19 +319,9 @@ Type A completed(100% bar + ✓)屬「剛完成的 upload session」視覺;Type 
   {files.map(f => <FileItem key={f.id} mode="rich" {...f} />)}
 </div>
 
-// ✅ Compact Type B(form attachment,靜態灰底)
+// ✅ Compact 一律 gap-1(無 status / 有 status / mixed 上傳中+已存附件 都同此 wrapper,見上表)
 <div className="flex flex-col gap-1">
-  {files.map(f => <FileItem key={f.id} mode="compact" {...f} />)}
-</div>
-
-// ✅ Compact Type A only(upload manager,全有 status)
-<div className="flex flex-col">
-  {files.map(f => <FileItem key={f.id} mode="compact" status={f.status} progress={f.progress} {...f} />)}
-</div>
-
-// ✅ Compact mixed Type A + Type B(email 草稿、舊附件 + 新上傳)
-<div className="flex flex-col gap-1">
-  {allFiles.map(f => <FileItem key={f.id} mode="compact" status={f.isUploading ? 'uploading' : undefined} {...f} />)}
+  {files.map(f => <FileItem key={f.id} mode="compact" status={f.isUploading ? 'uploading' : undefined} {...f} />)}
 </div>
 
 // ❌ 反例:list 加外框 + overflow-hidden(雙重 card / 強制邊框相黏)
@@ -311,8 +331,8 @@ Type A completed(100% bar + ✓)屬「剛完成的 upload session」視覺;Type 
 ```
 
 **Clickable → 下載 / 預覽 canonical**(AR15):
-- FileItem 提供 `onClick` prop,consumer 傳入即進 clickable 模式(hover + cursor + keyboard)
-- Type A / Type B 都可以用 `onClick`(Type A 可跟 `onDownload` hover-swap 並存)
+- FileItem 提供 `onClick` prop,consumer 傳入即進 clickable 模式(僅滑鼠可點 + `cursor-pointer`;刻意不加整列 keyboard 焦點 / hover-bg — 見「A11y 預設」nested-interactive rationale 與「Hover 行為 canonical」)
+- 兩種 surface 都可以用 `onClick`(upload-manager 可跟 `onDownload` hover-swap 並存)
 - consumer 決定具體行為(download / FileViewer),元件只提供 row 可點擊能力
 
 ## ProgressBar
@@ -332,30 +352,23 @@ Type A completed(100% bar + ✓)屬「剛完成的 upload session」視覺;Type 
 
 Consumer 自行組合。按 `patterns/element-anatomy/item-anatomy.spec.md`「Predicate」+「Row action 絕對值 cap」,**row dedicated action 絕對值 cap = ≤ 24px,不隨 row tier 放大**。依 row 高度分兩種實作:
 
-| Mode | Row 高度 | 實作 | 尺寸 |
-|------|---------|------|------|
-| `rich` | 56 (≥ 28) | **Button iconOnly `size="xs"`**(24 固定,不隨 row 放大) | 24 |
-| `compact` | 24 | **ItemInlineActionButton**(row 太小容不下 Button xs 24,會填滿 row 無呼吸) | icon 16, hover-bg 22 |
+**兩 mode 統一(2026-04-23 canonical)**:rich + compact 都用 **Button iconOnly `size="xs"`**(24 固定,≤ cap):
+
+| Mode | 實作 | 尺寸 |
+|------|------|------|
+| `rich` | **Button iconOnly `size="xs"`**(24 固定,不隨 row 放大) | 24 |
+| `compact` | **Button iconOnly `size="xs"`**(同 rich;靠 suffix wrapper `[&>[data-unbounded]]:my-[calc((1lh-var(--field-height-xs))/2)]` trick 把 24 footprint 收斂到 1lh,不撐高 row,視覺 / touch target 仍 24) | 24 |
 
 ```tsx
-// Rich(row 56)→ Button xs iconOnly 固定 24(≤ 24 cap)
+// Rich + Compact 統一 → Button xs iconOnly 固定 24(≤ 24 cap)
 <FileItem actions={
   <Button size="xs" iconOnly variant="text" startIcon={Trash2} aria-label="刪除" onClick={del} />
 } />
-
-// Compact(row 24)→ Inline Action(因 Button xs 24 會填滿 row)
-<FileItem actions={
-  <ItemInlineActionButton icon={Trash2} size="sm" aria-label="刪除" onClick={del} />
-} />
 ```
 
-**為什麼 Row ≥ 28 用 Button xs 固定**:row 放大不代表 action 要放大——世界級 DS(Material DataGrid / Polaris / Atlassian / Apple HIG)row action 都是固定小 icon button(20–24),row 高度變化只影響 row padding 與 content,不影響 action 尺寸。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+**為什麼 row action 固定 Button xs(24)**:row 放大不代表 action 要放大——世界級 DS(Material DataGrid / Polaris / Atlassian / Apple HIG)row action 都是固定小 icon button(20–24),row 高度變化只影響 row padding 與 content,不影響 action 尺寸。compact row 雖矮,但 Button 24 透過 suffix wrapper 的 data-unbounded margin trick 收斂到 1lh footprint(同 chrome SurfaceHeader dismiss canonical),不會填滿 row。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
-**為什麼 Row ≤ 24 用 Inline Action**:compact row 高度 24 裝不下 Button xs(24)——Button 會填滿整個 row,失去 row padding 與 icon 呼吸空間。Inline Action(icon 16 + hover-bg 22)剛好符合「action ≤ row - padding」的呼吸需求。
-
-**Trash/Delete 不是 dismiss 語意**:`dismiss` 嚴格保留給「X close overlay session」(Dialog / Sheet / Popover / Alert close X)。Row 的 Trash/Delete 語意是 `onRemove`(從集合移除一個 item,見 `.claude/rules/ui-development.md`「元件 Props 命名」「onRemove」),**不套 Button `dismiss` prop**:
-- Rich mode Button `variant="text"` 預設 icon 已是 fg-muted → foreground,hover 弱化視覺自然呈現
-- Compact mode ItemInlineActionButton 本來就 fg-muted → foreground(Inline Action default)
+**Trash/Delete 不是 dismiss 語意**:`dismiss` 嚴格保留給「X close overlay session」(Dialog / Sheet / Popover / Alert close X)。Row 的 Trash/Delete 語意是 `onRemove`(從集合移除一個 item,見 `.claude/rules/ui-development.md`「元件 Props 命名」「onRemove」),**不套 Button `dismiss` prop**:Button `variant="text"` 預設 icon 已是 fg-muted → foreground,hover 弱化視覺自然呈現(兩 mode 同)。
 
 參見 `patterns/element-anatomy/item-anatomy.spec.md`「Predicate」+「Real case 表」+「Row action 絕對值 cap」。
 
@@ -369,11 +382,11 @@ Consumer 自行組合。按 `patterns/element-anatomy/item-anatomy.spec.md`「Pr
 | `error` | `XCircle` 紅 ✗ | `RotateCw ⟲` | `onRetry` |
 | `uploading` | *(progress %)* | *(無 swap)* | — |
 
-**幾何一致性(2026-04-22 canonical · row action ≤ 24 cap)**:status slot 容器大小 **= consumer 的 delete action 尺寸**:
+**幾何一致性(2026-04-23 統一 canonical · row action ≤ 24 cap)**:status slot 容器大小 **= consumer 的 delete action 尺寸**,兩 mode 統一:
 - `mode="rich"` → `var(--field-height-xs)`(24 固定,與 Button xs iconOnly 同)
-- `mode="compact"` → 16px(與 ItemInlineActionButton icon 同)
+- `mode="compact"` → `var(--field-height-xs)`(24,同 rich;compact 靠 status slot wrapper 的 `[&>[data-unbounded]]:my-[calc((1lh-var(--field-height-xs))/2)]` 把 24 footprint 收斂到 1lh,不撐高 row,視覺 / touch target 仍 24)
 
-Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿同一容器。這讓 flex gap token 測量的是**兩個同尺寸 action slot 之間的真實 gap**,不被 hover bg overflow 吃掉——status slot 尺寸 = 同 size delete slot,gap token 才能如實呈現;歷史 bug 細節見 CLAUDE.md `# 失敗記憶索引`。
+Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿同一容器。這讓 flex gap token 測量的是**兩個同尺寸 action slot 之間的真實 gap**,不被 hover bg overflow 吃掉——status slot 尺寸 = 同 size delete slot,gap token 才能如實呈現;歷史 bug 細節見 `.claude/skills/design-system-audit/references/historical-bugs.md`。
 
 世界級 DS 的幾何鐵律:**同一 flex 列的互動元素必須有統一 box 尺寸**,gap token 才能如實呈現。
 
@@ -389,35 +402,27 @@ Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿
   mode="rich"
   name="report.pdf"
   status="completed"
-  onDownload={() => downloadFile(id)}   // hover ✓ → ↓
+  onDownload={() => downloadFile(id)}   // hover ✓ → ↓;error 場景同理:onRetry → hover ✗ → ⟲
   actions={<Button size="xs" iconOnly variant="text" startIcon={Trash2} onClick={del} aria-label="刪除" />}
-/>
-
-<FileItem
-  mode="compact"
-  name="backup.json"
-  status="error"
-  description="There's something wrong."
-  onRetry={() => retryUpload(id)}        // hover ✗ → ⟲
-  actions={<ItemInlineActionButton icon={Trash2} size="sm" onClick={del} aria-label="刪除" />}
 />
 ```
 
 ## Suffix 24px 閾值
 
-| Mode | 最大 suffix 元素 | 有 desc 時 | alignment |
-|---|---|---|---|
-| compact（預設） | Button xs = 24px ≤ 24px | — | `h-[1lh]` inline |
-| rich | Button sm = 28px > 24px | block | `h-[calc(1lh+2px+desc_lh)]` |
+兩 mode 統一:suffix 最大元素 = Button xs = 24px ≤ 24px(小 suffix)→ `h-[1lh]` inline,不因 desc wrap 改公式(對齊 item-anatomy「24px 閾值對齊規則」)。
+
+| Mode | 最大 suffix 元素 | alignment |
+|---|---|---|
+| compact（預設） | Button xs = 24px ≤ 24px | `h-[1lh]` inline |
+| rich | Button xs = 24px ≤ 24px | `h-[1lh]` inline |
 
 ## A11y 預設
 
-- **`aria-busy` for uploading**:`status="uploading"` 時 row 自動 `aria-busy="true"`,SR 朗讀「busy」避免 user 嘗試互動已 in-flight item。
-- **Error state live region**:`status="error"` row 自動 `role="status"` + `aria-live="polite"`,error 訊息(label + description)即時 announce,user 不用主動 navigate 過去。`polite` 不打斷既有 SR 朗讀,適合 file upload 非緊急情境。
+- **ProgressBar 整合(進度 context 帶檔名)**:消費的 `<ProgressBar>` 自帶 `role="progressbar"` + `aria-valuenow` / `aria-valuemax`(Radix Progress primitive 提供),本元件再傳 `aria-label={檔名 上傳進度}` 作 context;keyboard 不需 focus progress bar(被動指示器,非互動元素)。
 - **Action button labels**:Download / retry / remove 等 inline action 必傳 `aria-label`(中文 / consumer locale)— 「下載 report.pdf」/「重試上傳」/「移除附件」,單純「下載」/「刪除」缺檔名 context SR user 無法區分多 row。
-- **ProgressBar 整合**:消費的 `<ProgressBar>` 自帶 `role="progressbar"` + `aria-valuenow` / `aria-valuemax`,本元件不再重複;keyboard 不需 focus progress bar(被動指示器,非互動元素)。
-- **Row clickable**:傳 `onClick` 時自動 `role="button"` + `tabIndex=0` + Enter / Space activate,keyboard user 與 mouse user 等價可達 FileViewer / download。
-- **Status icon hover-swap a11y**:hover-swap 不改變 SR 語意 — passive icon `aria-hidden`,active action button 自帶 `aria-label`,避免 SR user 收到視覺 swap 噪音。
+- **Status icon hover-swap a11y**:hover-swap 不改變 SR 語意 — passive status icon `aria-hidden`,active action button 自帶 `aria-label`,避免 SR user 收到視覺 swap 噪音。
+- **Row clickable 不做整列 keyboard 焦點**:傳 `onClick` 時整列僅滑鼠可點(`onClick` 直接掛在 row);**刻意不**把整列設成單一可聚焦按鈕(不加 `role="button"` / `tabIndex` / Enter-Space handler),避免與列內操作按鈕(下載 / 重試 / 移除)構成巢狀互動(axe nested-interactive)。keyboard user 直接 Tab 到列內 explicit 操作按鈕取得等價能力。世界級對照:Slack message row / Notion page row 同模式(整列只滑鼠點,鍵盤走列內按鈕)。
+- **status / error 不額外加 row ARIA**:`status="uploading"` / `status="error"` 不在 row 上加 `aria-busy` / `role="status"` / `aria-live`;狀態由 progress bar 的 `role="progressbar"` 與 description 文字本身傳達。若 consumer 需要上傳完成 / 失敗的即時 announce,由外層上傳流程容器(FileUpload)統一管理 live region,避免每列各自宣告造成 SR 噪音。
 
 ---
 
@@ -427,12 +432,13 @@ Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿
 |------|------|------|
 | **FileItem** | 單一檔案 row primitive — 顯示一個檔案的 name / status / progress / actions | List 內的單筆 / detail / preview / message attachment |
 | **FileUpload** | Dropzone + file list orchestrator — 拖放區 + 多 FileItem 排列 + 上傳狀態管理 | 完整上傳流程入口 |
+| **FileViewer** | 檔案內容預覽 overlay — FileItem `onClick` 的預設開啟目標 | 點 row 後的檔案全幅預覽 |
 
 **判斷**:
 
 - **完整上傳流程**(drag-drop / validate / list multiple files)→ 用 `FileUpload`(內部消費多個 `FileItem`)
 - **單一檔案展示 / preview**(message bubble 附件 / detail page header / FileViewer 觸發點)→ 直接用 `FileItem`
-- **Form attachment field**(留言區附件、ticket attachments)→ 視場景:有上傳行為走 `FileUpload`,只展示既有附件走 `FileItem` list(Type B)
+- **Form attachment field**(留言區附件、ticket attachments)→ 視場景:有上傳行為走 `FileUpload`,只展示既有附件走 `FileItem` list(`surface="form"` 靜態)
 
 **簡單記**:**有 dropzone 用 FileUpload,沒 dropzone 用 FileItem**。FileItem 不應自帶 dropzone(會跟 FileUpload 重複職責)。
 
@@ -446,22 +452,40 @@ Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿
 - ❌ **不混用 rich + compact 在同一 list**(詳「Invariant 1」)— 高度差破壞 row rhythm,prefix 視覺語言衝突。
 - ❌ **不用 FileItem 做下載進度**(瀏覽器原生下載 UX 已足夠)— FileItem 為 upload narrative 設計,download progress 走自訂元件。
 
+**常見誤解**:FileItem 該有 hover-bg → 永不(三型態 permanent-anchored,見「Hover 行為 canonical」);status 會染整 row 底色 → 只升階 progress bar / status icon / description(見「Inspector 與矩陣的教學分工」);`surface` 影響進度條 → 進度條只看 `status`(見「可下載狀態 canonical」)。
+
 ---
 
-## 為何無 Inspector
+## 邊界案例
 
-FileItem 決策維度是 `mode`(compact / rich)× `status`(uploading / completed / error / static)× `size`——已在 `ColorMatrix` / `ModeMatrix` / `SizeMatrix` / `StateBehavior` 四張矩陣完整覆蓋。互動 Inspector 不會比結構性矩陣對照更有教學價值——「選 mode 的 test / 選 status 的 test」是需要 side-by-side 比對的決策,不是單值試玩。
+- **超長檔名**:label 經 `ItemContent` 預設 `truncate` 單行截斷(ellipsis),不換行。
+- **過長 description**:自由換行不截斷(FileItem 未傳 `descriptionClamp`);rich 多行 desc 時 progress bar 隨內容下移並保 8px min gap(見 Rich layout invariant)。
+- **progress 精度**:傳入值直接顯示(rich 的 `%` 文字與 bar 同源),元件不四捨五入;`completed` 強制 100。
+- **RTL**:未特化——compact progress bar offset 用 physical `left/right`(見 `file-item.tsx`),RTL 支援需另案。
+- **Dark mode**:走 semantic token 自動 adapt。無 `disabled` prop(展示型 row,非 form control)。
 
-ColorMatrix 已建:展示 status × 元素(filename / description / progress bar / status icon)色彩矩陣,明示 status 只驅動 **progress bar + status icon + description** 升階,**不染容器背景**(避免整 row 轉紅蓋過其他 metadata)。Container hover / selected / disabled 則走 item-anatomy row primitive SSOT。
+---
+
+## Inspector 與矩陣的教學分工
+
+FileItem 決策維度是 `mode`(compact / rich)× `status`(uploading / completed / error / static)。anatomy 同時提供 `Inspector`(右側 Controls 即時切 `mode` / `status` / `progress` / `description` 試玩單值)與 `ColorMatrix` / `SizeMatrix` / `StateBehavior` 結構矩陣——兩者分工:Inspector 給「單一組合長怎樣」的即時試玩,矩陣給「跨 status 並排比對」的 side-by-side 決策。
+
+ColorMatrix 已建:展示 status × 元素(filename / description / progress bar / status icon)色彩矩陣,明示 status 只驅動 **progress bar + status icon + description** 升階,**不染容器背景**(避免整 row 轉紅蓋過其他 metadata)。容器本身無 hover-bg / selected / disabled state——FileItem 三型態皆 permanent-anchored,反向於 MenuItem / DataTable flush row 的 hover-bg primitive(詳「Hover 行為 canonical」段),且 interface 無 `disabled` prop。
 
 ---
 
 ## 相關
 
-- `../../patterns/element-anatomy/item-anatomy.spec.md` — 閱讀模式（compact / rich）
+- `../../patterns/element-anatomy/item-anatomy.spec.md` — row anatomy primitive(ItemContent / ItemPrefix;FileItem 兩 mode 採 scanning idiom)
 - `../Avatar/avatar.spec.md` — Avatar shape（rich mode 的 icon 容器）
 - `../FileUpload/file-upload.spec.md` — **配對元件**:FileUpload 是拖放 / 點擊上傳區塊,FileItem 是已上傳檔案 row 顯示;兩者構成完整 file-handling 元件組
 - `../LinkInput/link-input.spec.md` — 純連結（非 upload 流程）替代
 - `../TreeView/tree-view.spec.md` — 階層 file structure 場景
 - `../ProgressBar/progress-bar.spec.md` — ProgressBar SSOT(FileItem consumes ProgressBar for upload bar)
 - `../../tokens/color/color.spec.md` — Track 底色（`bg-secondary` 使用原則）
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `file-upload.spec.md`

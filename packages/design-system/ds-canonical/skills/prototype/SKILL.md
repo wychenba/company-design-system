@@ -141,7 +141,7 @@ Narrative 必含:
 
 **Input**: shortlist(2-3 items)+ Phase 3.0 產出的 Object Map
 
-**Phase 3.0a — SSOT 5-step pre-check**:寫任何 candidate code 前必過 CLAUDE.md「SSOT 消費 canonical」+ memory `feedback_proactive_5layer_pipeline.md`「5-step pre-check」(SSOT 在 memory + CLAUDE.md,本 skill 不重複)。`check_story_anatomy.sh` PreToolUse 是最後安全網,但 5-step 是事前 discipline。
+**Phase 3.0a — SSOT 5-step pre-check**:寫任何 candidate code 前必過 CLAUDE.md「SSOT 消費 canonical」+ memory `feedback_proactive_5layer_pipeline.md`「5-step pre-check」(SSOT 在 memory + CLAUDE.md,本 skill 不重複)。`check_story_invariants.sh` R1 anatomy(原 check_story_anatomy.sh folded 折入)PreToolUse 是最後安全網,但 5-step 是事前 discipline。
 
 **Process**: 每個 candidate 建一個 exploration story,**各 candidate 共享 Object Map 但差異在 UI shape + CTAs 順序**。see `references/proposal-template.md` for structure。
 
@@ -209,7 +209,7 @@ User / stakeholder 決定採用某 candidate 後:
 - `(c)` 混搭 A+B 新 hybrid(新 exploration)
 - `(d)` 全部不採用(保留 explorations/ 作紀錄,也是有價值的 ruled-out)
 
-**Graduation 流程**:若升級到正式,在 `explorations/_archive/` 備份 exploration(CLAUDE.md line 633:「不再使用但需保留的內容移至 _archive/」),正式 code 進 design-system/。
+**Graduation 流程**:若升級到正式,在 `explorations/_archive/` 備份 exploration(per CLAUDE.md `# 元件完成 + Exploration`:比稿定案升級 patterns/ 或 components/,舊比稿保留作紀錄),正式 code 進 design-system/。
 
 ### Phase 5 — Cleanup
 

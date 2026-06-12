@@ -1,8 +1,13 @@
+/**
+ * @internal — DS-internal 單元(per `.claude/rules/ui-development.md` Public vs Internal canonical;spec frontmatter `isInternal`)。
+ * 不進 root barrel front-door;由 Select / Combobox wrap 消費,end-user app 請用 wrapper 元件。
+ */
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import * as React from 'react'
 import { Plus, Search } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useControllable } from '@/design-system/hooks/use-controllable'
 import type { AvatarData } from '@/design-system/components/Avatar/avatar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/design-system/components/Popover/popover'
 import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from '@/design-system/components/Command/command'
@@ -82,9 +87,9 @@ export interface SelectMenuProps {
   /** 空選項提示 */
   emptyText?: string
   /** Loading 狀態(2026-05-15 audit B fix per user verbatim「dropdown 隨時可開,讀取在 panel 中間 CircularProgress」)
-   *  true → render `<Empty icon={<CircularProgress size={48}/>} description={loadingText} />` 取代 options;
-   *  trigger 不變,user 隨時可開 dropdown。對齊 MUI Autocomplete `loadingText` dropdown-body + Ant Select
-   *  loading idiom + DS 既有 `empty.spec.md:182` 「全頁 loading = Empty + CircularProgress compose」SSOT。
+   *  true → render `<Empty icon={<CircularProgress size={48}/>} className="py-6" />` 取代 options(純 spinner,無 description);
+   *  trigger 不變,user 隨時可開 dropdown。對齊 MUI Autocomplete loading dropdown-body + Ant Select
+   *  loading idiom + DS 既有 `empty.spec.md:191` 「全頁 loading = Empty + CircularProgress compose」SSOT。
    */
   loading?: boolean
 
@@ -110,8 +115,9 @@ export interface SelectMenuProps {
   onOpenAutoFocus?: (e: Event) => void
 
   /**
-   * Popover 內容容器的 DOM id。Combobox / 自定 trigger 用 `aria-controls` 指向此 id 時,
-   * 需傳入相同 id 讓 AT 能找到對應的 listbox。
+   * Popover 內容容器的 DOM id(set 在 PopoverContent 外層 div,**非** cmdk 內層 `role="listbox"` 本身)。
+   * Combobox / 自定 trigger 用 `aria-controls` 指向此 id 時,指向的是 **popover 容器(listbox 的 ancestor)**——
+   * AT 經此容器可定位到內部 cmdk listbox(cmdk List 自帶 auto-generated `role="listbox"` id)。
    */
   contentId?: string
 
@@ -149,9 +155,15 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
   className,
 }, _ref) {
   // ── State ──
-  const [internalOpen, setInternalOpen] = React.useState(defaultOpen ?? false)
-  const open = controlledOpen ?? internalOpen
-  const setOpen = controlledOnOpenChange ?? setInternalOpen
+  // 2026-06-11 R2 bug fix:原手寫 `setOpen = controlledOnOpenChange ?? setInternalOpen` 在
+  // uncontrolled + onOpenChange listener 場景(傳 onOpenChange 不傳 open)會讓 listener 蓋掉
+  // internal setter → menu 開不了。改消費 DS 既有 useControllable(select.tsx 同 canonical):
+  // uncontrolled 時 internal state 為準、onOpenChange 僅通知。
+  const [open, setOpen] = useControllable<boolean>({
+    value: controlledOpen,
+    defaultValue: defaultOpen ?? false,
+    onChange: controlledOnOpenChange,
+  })
   const [search, setSearch] = React.useState('')
 
   // ── Value helpers ──
@@ -241,6 +253,19 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
     if (!open) setSearch('')
   }, [open])
 
+  // 2026-06-01 Select/Combobox #15(user 拍板 A):非搜尋時開選單把 focus 移到 cmdk-root,
+  // 讓 cmdk 內建方向鍵 / Enter / Home / End 導覽生效。原 PopoverContent default autofocus 找 body
+  // input/button,非搜尋無 input + 選項是 role=option div → focus 落在 content wrapper,cmdk 的 keydown
+  // handler 綁在 cmdk-root 收不到事件 → 桌機鍵盤導覽不可達(WAI-ARIA combobox 違反)。
+  // **純鍵盤路由**:滑鼠點擊路徑完全不碰;cmdk active-option highlight 是 cmdk 內部 state(非 DOM focus
+  // 驅動)故視覺不變。selector miss 時 root=null → no-op fallback(無回歸)。
+  // SSOT 在 SelectMenu → Select / Combobox / 所有 non-searchable SelectMenu consumer 自動受益。
+  const handleNonSearchableAutoFocus = React.useCallback((e: Event) => {
+    e.preventDefault()
+    const root = (e.currentTarget as HTMLElement).querySelector<HTMLElement>('[cmdk-root]')
+    root?.focus({ preventScroll: true })
+  }, [])
+
   // RowSizeProvider 讓 PopoverContent 子樹內任何 <ItemIcon> / <ItemAvatar> /
   // <ItemInlineAction> 都自動讀到對的 size,跟 SidebarProvider / TreeView 同一條規則。
   // (注:Popover 透過 Portal 渲染,context 仍然會跨 portal 傳遞——React context 是 tree-based
@@ -264,7 +289,7 @@ const SelectMenu = React.forwardRef<HTMLElement, SelectMenuProps>(function Selec
         }}
         align={align}
         sideOffset={OVERLAY_SIDE_OFFSET}
-        onOpenAutoFocus={onOpenAutoFocus}
+        onOpenAutoFocus={onOpenAutoFocus ?? (!searchable ? handleNonSearchableAutoFocus : undefined)}
         // **2026-05-07 v15.16 nested portal fix**:Tag dismiss inside trigger
         // 區的 OverflowIndicator HoverCard popup(獨立 Radix portal,DOM 不在
         // PopoverContent 內)— Radix DismissableLayer document-level outside

@@ -1,0 +1,57 @@
+name: Packaging canary
+
+# 2026-05-30 ship per user「打包給 template/fork 的所有東西都應被稽核 + 確保如預期運作」+
+# 2026-05-29 anchor:mirror 從 5/26 默默失敗數週,稽核沒抓到(無自動 canary)。
+#
+# 讓 design-system-audit packaging-integrity dims(84 mirror / 85 ds-canonical / 86 plugin / 88 infra-self-ref)
+# 的輕量 deterministic 檢查「自動排程 fire」,不必等手動 /deep-audit-cross-codex。catch packaging rot between releases。
+# 重量級 dim 87(dogfood npm install+build)+ --live netlify probe 仍留 deep-audit Phase A + release.yml(手動 / release)。
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'   # 每週一 06:17 UTC
+  workflow_dispatch:        # 手動隨時跑
+  push:
+    branches: [main]
+    paths:                  # 只在 packaging-affecting 改動時跑(省 CI)
+      - 'scripts/build-published-template-mirror.mjs'
+      - 'scripts/sync-ds-canonical.mjs'
+      - 'packages/design-system/ds-canonical/**'
+      - '.claude-plugin/**'
+      - 'apps/template/**'
+      - 'template/ds-product-template/**'
+
+permissions:
+  contents: read
+
+jobs:
+  packaging-integrity:
+    name: Packaging integrity(dims 84/85/86/88 light checks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci --legacy-peer-deps
+
+      # Dim 85 — ds-canonical npm mirror 新鮮度(== live .claude SSOT)
+      - name: ds-canonical freshness
+        run: node scripts/sync-ds-canonical.mjs --check
+
+      # Dim 86 — plugin manifest + symlink-vs-source 一致
+      - name: plugin structure validate
+        run: node scripts/plugin-structure-validate.mjs
+
+      # Dim 84 — mirror-build integrity + 2-scenario E2E
+      - name: 2-scenario architecture
+        run: node scripts/test-2-scenario-architecture.mjs
+
+      # Dim 88 — infra-self ref integrity(governance docs 引用的 hook/script / CLAUDE.md section 不死)
+      - name: infra-self ref integrity
+        run: |
+          node scripts/check-dangling-infra-ref.mjs --check
+          node scripts/check-skill-deadref.mjs --check

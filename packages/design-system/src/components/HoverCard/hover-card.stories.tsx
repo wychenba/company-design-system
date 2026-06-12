@@ -2,7 +2,7 @@
 //   要求的 OpenSnapshot/defaultOpen 用 hover trigger 真實情境(MultiAvatarTooltip / Avatar
 //   滑過顯人物卡 / DateContextOnHover 等)展示遠比 forced-open snapshot 更貼近 user 真實
 //   體驗。Default/AllVariants N/A — HoverCard 自身無視覺(bg/border/shadow 由 consumer 決定),
-//   無 variant API,Default story 等於 consumer canonical wrapper(NameCard / OverflowIndicator
+//   無 variant API,Default story 等於 consumer canonical wrapper(ProfileCard / OverflowIndicator
 //   各有自己的 Default 範例)。
 // @story-trait-allow: missing-default missing-opensnapshot
 import type { Meta, StoryObj } from '@storybook/react'
@@ -10,7 +10,7 @@ import { ExternalLink, Github, Calendar, MapPin } from 'lucide-react'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from './hover-card'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
-import { NameCard } from '@/design-system/components/NameCard/name-card'
+import { ProfileCard } from '@/design-system/components/ProfileCard/profile-card'
 import { HOVER_DELAY_RICH_MS, HOVER_DELAY_CLOSE_MS } from '@/design-system/tokens/motion/motion'
 
 const meta: Meta = {
@@ -21,7 +21,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'HoverCard 是 hover 觸發的可互動浮層 primitive(基於 Radix HoverCard)。與 Tooltip 的差異:內容可互動(按鈕、連結、hover 子元素)。HoverCard 本身**不含視覺樣式**——bg / border / shadow / padding 由 consumer 決定。以下情境展示最常見的兩種 consumer pattern(亮色 NameCard / 深色 tooltip)以及自訂情境。',
+          'HoverCard 是 hover 觸發的可互動浮層 primitive(基於 Radix HoverCard)。與 Tooltip 的差異:內容可互動(按鈕、連結、hover 子元素)。HoverCard 本身**不含視覺樣式**——bg / border / shadow / padding 由 consumer 決定。以下情境展示最常見的兩種 consumer pattern(亮色 ProfileCard / 深色 tooltip)以及自訂情境。',
       },
     },
   },
@@ -30,11 +30,11 @@ export default meta
 type Story = StoryObj
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Story 1:人員頭像 + NameCard(亮色樣式,最常見)
+   Story 1:人員頭像 + ProfileCard(亮色樣式,最常見)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export const PersonNameCard: Story = {
-  name: '人員頭像 NameCard',
+export const PersonProfileCard: Story = {
+  name: '人員頭像 ProfileCard',
   render: () => (
     <div className="flex flex-col gap-3 max-w-xl">
       <p className="text-caption text-fg-muted">
@@ -52,7 +52,7 @@ export const PersonNameCard: Story = {
             className="bg-surface-raised border border-border rounded-lg p-0"
             style={{ boxShadow: 'var(--elevation-200)', width: 280 }}
           >
-            <NameCard
+            <ProfileCard
               name="Ada Chen"
               avatar={{ alt: 'Ada Chen', color: 'indigo' }}
               subtitle="Design Engineer · Frontend"
@@ -177,7 +177,7 @@ export const OverflowList: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const RepoCard: Story = {
-  name: 'Repository 資訊卡',
+  name: '儲存庫資訊卡',
   render: () => (
     <div className="flex flex-col gap-3 max-w-xl">
       <p className="text-caption text-fg-muted">
@@ -236,7 +236,7 @@ export const RepoCard: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const TriggerShowcase: Story = {
-  name: 'Trigger 類型與 delay',
+  name: '觸發點類型與延遲',
   render: () => (
     <div className="flex flex-col gap-6 max-w-xl">
       <p className="text-caption text-fg-muted">
@@ -296,7 +296,7 @@ export const TriggerShowcase: Story = {
       </div>
 
       <div className="text-footnote text-fg-muted">
-        建議 delay:消費 <code className="font-mono mx-1">HOVER_DELAY_RICH_MS / HOVER_DELAY_CLOSE_MS</code> SSOT
+        預設 delay 已內建(<code className="font-mono mx-1">HOVER_DELAY_RICH_MS / HOVER_DELAY_CLOSE_MS</code> SSOT),特殊 tier 才需 override
         (motion.spec.md,當前 700ms / 200ms)——避免 hover 過路誤觸發 fetch waterfall;close 延遲讓 user 誤滑出可回來。
       </div>
     </div>

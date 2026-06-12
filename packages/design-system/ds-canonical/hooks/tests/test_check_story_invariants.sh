@@ -10,10 +10,11 @@
 #   R5 name_jargon(PostToolUse;reads disk;L<n> layer / canonical / 中英夾雜 jargon)
 #   R6 description_jargon(PostToolUse;TS generic in description: → stderr warn)
 #   R7 story_baseline_reference(PreToolUse;wrap Sidebar/ChromeHeader/DataTable 無 baseline marker → stderr warn)
-#   R8 story_archetype_registry(PreToolUse;讀 .claude/references/story-baseline-registry.json,warn-only)
+#   R8 story_archetype_registry(PreToolUse;讀 .claude/references/story-baseline-registry.json;
+#      block-severity antiPattern → P0 record_worst 2,2026-06-02 升 P0)
 #
 # Test 重點:silent skip / 各 rule fire / allowlist marker escape。
-# 不測 R3/R8(需 spec.md 或 registry 完整 fixture,scope 超 batch A)。
+# 不測 R3(需 spec.md frontmatter);R8 P0 block-severity 已測(#11 單行 / #12-14 多行回歸防護,2026-06-03)。
 
 set -u
 
@@ -194,11 +195,155 @@ STORIES_APP="/foo/my-project/packages/design-system/src/components/AppShell/app-
 run_hook "PreToolUse" "Write" "$STORIES_APP" '
 export const Default = () => (
   <Sidebar>
-    <SidebarHeader><span>Acme</span></SidebarHeader>
+    <SidebarHeader><WorkspaceBrand /></SidebarHeader>
   </Sidebar>
 );
 '
 expect_warn "10. R7 wrap <Sidebar> no @story-baseline → stderr warn" "R7 story_baseline_reference"
+
+# 11. R8 archetype registry P0(2026-06-02 升 P0;DS+consumer 零違規確認後升級):
+#     wrap <Sidebar> + simplified <SidebarHeader><span> mock(registry block-severity antiPattern)→ BLOCK
+#     有 @story-baseline marker(R7 missing-marker 不 fire)→ exit 2 純由 R8 record_worst 2 造成
+STORIES_R8="/foo/my-project/packages/design-system/src/components/AppShell/app-shell-r8.stories.tsx"
+run_hook "PreToolUse" "Write" "$STORIES_R8" '
+// @story-baseline: @qijenchen/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse
+export const Default = () => (
+  <Sidebar>
+    <SidebarHeader><span>Acme</span></SidebarHeader>
+  </Sidebar>
+);
+'
+expect_block "11. R8 simplified-mock <SidebarHeader><span> → P0 BLOCK" "R8 story_archetype_registry"
+
+# 12. R8 MULTI-LINE Sidebar drift(2026-06-03 回歸防護;修前 grep -E line-oriented + \s 當字面 's' → 多行靜默漏 = 假 P0):
+#     <SidebarHeader> 與 <span> 分行(真實 JSX 縮排格式)→ 修後(hook tr 換行→空格 + regex [[:space:]])應 BLOCK
+run_hook "PreToolUse" "Write" "$STORIES_R8" '
+// @story-baseline: @qijenchen/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse
+export const Default = () => (
+  <Sidebar>
+    <SidebarHeader>
+      <span>Acme</span>
+    </SidebarHeader>
+  </Sidebar>
+);
+'
+expect_block "12. R8 多行 <SidebarHeader> 換行 <span> → P0 BLOCK(回歸防護)" "R8 story_archetype_registry"
+
+# 13. R8 MULTI-LINE ChromeHeader drift:<ChromeHeader> 與 <span flex-1> 分行 → 修後應 BLOCK
+#     (修前 [\s\S]*? 在 BSD grep -E 是字元類非「任意字元」+ line-oriented → 雙重漏)
+STORIES_CH="/foo/my-project/packages/design-system/src/components/AppShell/app-shell-ch.stories.tsx"
+run_hook "PreToolUse" "Write" "$STORIES_CH" '
+// @story-baseline: @qijenchen/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse
+export const Default = () => (
+  <ChromeHeader>
+    <SidebarTrigger />
+    <span className="flex-1 text-body-lg">儀表板</span>
+  </ChromeHeader>
+);
+'
+expect_block "13. R8 多行 <ChromeHeader> 換行 <span flex-1> → P0 BLOCK" "R8 story_archetype_registry"
+
+# 14. R8 false-positive 防護:正確多行 ChromeHeader(h1 緊鄰、無 flex-1 span)+ 另一 story 遠處(距 >160 字)
+#     有無關 flex-1 span → .{0,160} 長度界擋住跨 story 誤匹配(greedy .* boolean 等同 lazy,故必設界)→ NO block
+run_hook "PreToolUse" "Write" "$STORIES_CH" '
+// @story-baseline: @qijenchen/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse
+export const Correct = () => (
+  <ChromeHeader>
+    <SidebarTrigger />
+    <h1 className="text-body-lg font-medium">儀表板</h1>
+  </ChromeHeader>
+);
+export const Unrelated = () => (
+  <div className="grid grid-cols-3 gap-4 rounded-lg border border-border bg-surface p-6 mt-4">
+    <div className="text-body-sm text-muted">統計面板區塊內容說明文字</div>
+    <span className="flex-1">無關的彈性間距元素</span>
+  </div>
+);
+'
+expect_pass_silent "14. R8 正確多行 ChromeHeader + 遠處無關 flex-1(>160 字)→ 不誤判"
+
+# 15. R8 disk @story-baseline-allow 豁免(2026-06-03 回歸防護,fragment-vs-file bug class,對抗稽核抓到):
+#     檔頭有 @story-baseline-allow 的 disk 檔 + Edit 只送無 marker 片段(含 antiPattern)→ R8 不擋
+#     (補查整檔 disk head;修前只查片段 → 編輯有 marker 的 story 任一非 marker 行就被 R8 誤擋)。
+#     斷言 EXIT=0(R8 未 record_worst 2);R7 anti-pattern stderr 警告與否不影響此斷言。
+DISK_STORY_R8="$TMP_DIR/r8-disk-allow.stories.tsx"
+printf '%s\n' "// @story-baseline-allow: legacy migration RFC-123" "export const X = () => (<Sidebar><SidebarHeader><span>A</span></SidebarHeader></Sidebar>)" > "$DISK_STORY_R8"
+run_hook "PreToolUse" "Edit" "$DISK_STORY_R8" '  <SidebarHeader><span>Acme</span></SidebarHeader>'
+if [ "$EXIT" = "0" ]; then
+  echo "  PASS  15. R8 disk @story-baseline-allow + Edit 無 marker 片段 → R8 不擋(回歸防護)"; PASS=$((PASS+1))
+else
+  echo "  FAIL  15. R8 disk marker exempt (expected exit 0, got exit=$EXIT)"
+  echo "  --- stderr ---"; echo "$STDERR_TEXT" | sed 's/^/    /'; echo "  --- end ---"
+  FAIL=$((FAIL+1)); FAILED_TESTS="${FAILED_TESTS}\n  - 15. R8 disk marker"
+fi
+
+# 16. R9 hand-craft overlay/chrome header(2026-06-04 codify per upload-manager 面板 drift):
+#     story 內手刻 <div px-[var(--layout-space-loose)] ... border-b border-divider> → P0 BLOCK
+run_hook "PreToolUse" "Write" "$TMP_DIR/r9-handcraft.stories.tsx" '
+export const Panel = () => (
+  <div className="max-w-md rounded-lg border bg-surface shadow-[var(--elevation-200)]">
+    <div className="flex items-center justify-between px-[var(--layout-space-loose)] py-2 border-b border-divider">
+      <span className="text-body font-medium">正在上傳 3 個項目</span>
+    </div>
+  </div>
+);
+'
+expect_block "16. R9 手刻 <div px-loose border-b border-divider> overlay header → P0 BLOCK" "R9 hand-craft overlay"
+
+# 17. R9 false-positive 防護:正確消費 SurfaceHeader + PopoverTitle → 不擋(silent)
+run_hook "PreToolUse" "Write" "$TMP_DIR/r9-correct.stories.tsx" '
+export const Panel = () => (
+  <div className="max-w-md flex flex-col rounded-lg border-border bg-surface-raised shadow-[var(--elevation-200)]">
+    <SurfaceHeader className="justify-between [--chrome-slot-h:1.25rem]">
+      <div className="flex-1 min-w-0"><PopoverTitle>正在上傳 3 個項目</PopoverTitle></div>
+    </SurfaceHeader>
+  </div>
+);
+'
+expect_pass_silent "17. R9 正確消費 SurfaceHeader+PopoverTitle → 不誤判"
+
+# 18. R9 false-positive 防護:doc-table row 用 px-4(非 loose token)+ border-b → 不擋
+run_hook "PreToolUse" "Write" "$TMP_DIR/r9-doctable.stories.tsx" '
+export const Tbl = () => (<div className="px-4 py-2.5 border-b border-divider bg-neutral-hover">表頭列</div>);
+'
+expect_pass_silent "18. R9 doc-table px-4 + border-b(非 loose token)→ 不誤判"
+
+# 19. R9 escape:檔頭 @story-baseline-allow → 不擋
+run_hook "PreToolUse" "Write" "$TMP_DIR/r9-allow.stories.tsx" '// @story-baseline-allow: legacy panel demo
+export const P = () => (<div className="px-[var(--layout-space-loose)] py-2 border-b border-divider" />);
+'
+expect_pass_silent "19. R9 @story-baseline-allow 豁免 → 不擋"
+
+# 20. R9 FN-001 回歸(2026-06-04 adversarial workflow):多行 className flatten 後多空格 → 仍 BLOCK
+#     (修前單空格 regex 漏;改 border-b[[:space:]]+border-divider)
+run_hook "PreToolUse" "Write" "$TMP_DIR/r9-multispace.stories.tsx" 'export const P = () => (
+  <div
+    className="flex justify-between px-[var(--layout-space-loose)] py-2
+      border-b
+      border-divider"
+  >正在上傳</div>
+);
+'
+expect_block "20. R9 多行/多空格 className 手刻 header → BLOCK(FN-001 修)" "R9 hand-craft overlay"
+
+# 21. R9 FP-001 防護:border-b border-divider 在 data-* 屬性(非 className)→ 不擋
+#     (修前 [^>]* 跨屬性誤判;改 [^\">]* 限同 className 字串)
+run_hook "PreToolUse" "Write" "$TMP_DIR/r9-crossattr.stories.tsx" '
+export const P = () => (<div className="px-[var(--layout-space-loose)]" data-x="border-b border-divider">x</div>);
+'
+expect_pass_silent "21. R9 border-divider 在 data-* 屬性 → 不誤判(FP-001 修)"
+
+# 22. R9 FP-002 防護:純註解行含 pattern → 不擋(drop comment-only line 後 flatten)
+run_hook "PreToolUse" "Write" "$TMP_DIR/r9-comment.stories.tsx" '// 範例(禁): <div className="px-[var(--layout-space-loose)] border-b border-divider">
+export const P = () => (<SurfaceHeader>x</SurfaceHeader>);
+'
+expect_pass_silent "22. R9 純註解行含 pattern → 不誤判(FP-002 修)"
+
+# 23. R9 skip-list 補 isOverlay 家(FileViewer)→ 不擋(R9-SKIP-001)
+run_hook "PreToolUse" "Write" "/foo/my-project/packages/design-system/src/components/FileViewer/fv.stories.tsx" '
+export const P = () => (<div className="px-[var(--layout-space-loose)] border-b border-divider">x</div>);
+'
+expect_pass_silent "23. R9 skip FileViewer(isOverlay 家)→ 不檢查"
 
 echo ""
 echo "=== Summary ==="

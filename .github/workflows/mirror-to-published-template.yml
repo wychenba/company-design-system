@@ -29,6 +29,7 @@ on:
       - 'scripts/deploy-url.mjs'
       - 'scripts/lint-ds-internal-imports.mjs'
       - 'scripts/sync-all.mjs'
+      - 'scripts/verify-consumer-css-entry.mjs'
       - '.devcontainer/**'
       - 'template/ds-product-template/**'
       - 'package.json'
@@ -46,7 +47,9 @@ jobs:
   mirror:
     name: Build mirror + push to published template repo
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # 2026-06-06 fix:race — 同一 main push 同時觸發此 mirror + Release;Release npm publish 約 +11min 才完成,
+    # 此 job 的 `npm install --package-lock-only` 需新版已上 npm,故下方 poll 等版本上架(最多 15min)→ timeout 從 10 升 20。
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -82,12 +85,50 @@ jobs:
           # 即可用既有 PAT 正常 sync。Workflow 檔變更需 PAT 另加 `workflow` scope(classic)或 `Workflows: write`(fine-grained)。
           # 用 clone+rsync(非 force-push 空 tree)→ 不會誤刪 published repo 既有 workflows。
           git clone --depth 1 "$REPO_URL" /tmp/published
-          rsync -a --delete --exclude='.git' --exclude='.github/workflows' /tmp/mirror-build/ /tmp/published/
+          # 2026-06-07 C1 ROOT FIX:--checksum 強制逐檔「內容」比對,不靠 size+mtime quick-check。
+          # Root cause(本地已復現 rsync -a vs -ac):`^0.1.0-beta.36` 與 `^0.1.0-beta.58` byte 長度相同
+          # (beta.NN 恆 2 位),且 git clone 與 mirror-build 同一秒寫 package.json → rsync -a 的 size+mtime
+          # 啟發式判定「沒變」靜默跳過 → 推出去的 package.json 永遠停在舊版(beta.58 mirror 假綠 + 連環 stale 根因)。
+          rsync -a --checksum --delete --exclude='.git' --exclude='.github/workflows' /tmp/mirror-build/ /tmp/published/
           cd /tmp/published
+          # 2026-06-07 fail-closed guard:rsync 後 published package.json 的 DS dep 必 == build 寫出的版本,
+          # 否則代表 overlay 又靜默失敗 → 直接 fail,絕不再靜默推 stale package.json(C1 不可回歸)。
+          BUILT_VER=$(node -p "require('$GITHUB_WORKSPACE/packages/design-system/package.json').version")
+          # 2026-06-07 fix:fail-closed 斷言覆蓋 root + apps/template 兩個 package.json 的 DS dep
+          # (rsync size+mtime quick-check 對「任一」等長同秒檔都可能靜默 skip → 任一 stale 都 fail,不只 root)。
+          check_ds_dep() {
+            local got
+            got=$(node -p "(require('$1').dependencies||{})['@qijenchen/design-system']||''" 2>/dev/null)
+            if [ "$got" != "^$BUILT_VER" ]; then
+              echo "❌ rsync overlay 驗證失敗:$1 DS dep = '$got',預期 '^$BUILT_VER'。中止,不推 stale。"
+              exit 1
+            fi
+            echo "✓ overlay 驗證通過:$1 DS dep = $got"
+          }
+          check_ds_dep /tmp/published/package.json
+          check_ds_dep /tmp/published/apps/template/package.json
           # Regenerate package-lock.json matching the FULL published structure(scaffold + apps/template workspace).
           # Why:published Audit CI 用 setup-node cache:npm + npm ci → 需 valid committed lock 含 @product/template
           # workspace。Template source(template/ds-product-template/)無 apps/ → 只有此 mirror 結構能生正確 lock。
-          # rsync 上一步已移除 clone 的舊 lock(mirror-build 無 lock)→ 在此重生確保與 scaffold 同步。
+          #
+          # RACE:此 mirror 與 Release 同 push 觸發,Release npm publish 約 +11min 才完成。mirror-build 把剛 bump 的
+          # ^$BUILT_VER 寫進 package.json,npm install 需該版已上 npm → 否則 ETARGET(beta.56/57 連敗根因)。故 poll
+          # 等「正在發布的版本」($BUILT_VER,直接讀 DS source,不靠 clone 的舊值)上 npm 才重生 lock。
+          # 非版本變更時 $BUILT_VER 早已在 npm → 立即通過,零等待。
+          # 2026-06-10 fix:必等「兩個」套件都上 npm(beta.61 mirror 敗因:只等 design-system,
+          # storybook-config 晚幾分鐘 publish → lock 重生 ETARGET notarget storybook-config)。
+          echo "⏳ 等 @qijenchen/design-system@$BUILT_VER + @qijenchen/storybook-config@$BUILT_VER 上 npm(避開 release-publish race,最多 15min)..."
+          for i in $(seq 1 60); do
+            if npm view "@qijenchen/design-system@$BUILT_VER" version >/dev/null 2>&1 \
+               && npm view "@qijenchen/storybook-config@$BUILT_VER" version >/dev/null 2>&1; then
+              echo "✓ 兩套件 @$BUILT_VER 都已上 npm,繼續重生 lock"; break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "❌ 等 npm 逾時 15min — Release 可能失敗 / 延遲。本次不 mirror(避免寫出指向不存在版本的 lock)。"
+              exit 1
+            fi
+            sleep 15
+          done
           npm install --package-lock-only --ignore-scripts --no-audit --no-fund
           git config user.name "DS Mirror Bot"
           git config user.email "bot@noreply.github.com"
@@ -97,6 +138,15 @@ jobs:
             exit 0
           fi
           git commit -m "sync: scaffold mirror from DS repo ${GITHUB_SHA::8}(.github/workflows preserved)"
-          git push "$REPO_URL" main
-          echo "✅ Scaffold mirrored → ajenchen/ds-product-template main"
+          # 2026-06-07 fix:mirror 與 receiver(sync-design-system.yml)同一 release 都推 published main → 競態。
+          # fetch-rebase-retry 迴圈(非裸 push):被對方搶先也乾淨疊上去;真衝突 abort 後重試;5 次仍失敗才 fail
+          # (不再 non-fast-forward 直接掛 / 丟更新)。
+          for i in 1 2 3 4 5; do
+            if git fetch "$REPO_URL" main -q && git rebase FETCH_HEAD -q && git push "$REPO_URL" main; then
+              echo "✅ Scaffold mirrored → ajenchen/ds-product-template main"; break
+            fi
+            git rebase --abort 2>/dev/null || true
+            if [ "$i" -eq 5 ]; then echo "❌ push 競態重試 5 次仍失敗(mirror vs receiver)"; exit 1; fi
+            echo "⏳ push 競態,重試 $i…"; sleep $((i * 3))
+          done
           echo "ℹ️ .github/workflows 已保留未動(需 PAT 加 workflow scope 才同步 workflow 檔)"

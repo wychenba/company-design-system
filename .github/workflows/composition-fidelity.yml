@@ -49,7 +49,27 @@ jobs:
           # If private, gh PAT — for public template, none needed.
           # token: ${{ secrets.PW_REPO_PAT }}
 
+      # 2026-06-11 deep-audit R2 #6:identity diff 是明確 opt-in(composition-fidelity.md 層 3)—
+      # diff script 對 0 個 @composition-fidelity-mode mapping 必 vacuous exit 0,卻仍先花 ~30 min
+      # dual storybook build。便宜 pre-step(秒級 grep,regex 對齊 composition-fidelity-visual-diff.mjs:118)
+      # 0 命中 → skip 全部重步驟;有命中 → full gate 照跑。Marker SSOT 在 consumer story 檔
+      # (DS repo apps/template 經 mirror-to-published-template 傳播到 ds-product-template)。
+      - name: Detect identity opt-in markers (cheap pre-step)
+        id: optin
+        working-directory: ds-product-template
+        run: |
+          count=$({ grep -rE --include='*.tsx' --include='*.ts' \
+            --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=storybook-static \
+            '@composition-fidelity-mode:[[:space:]]*(pixel|shell-only|structural)' . || true; } | wc -l | tr -d ' ')
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          if [ "$count" = "0" ]; then
+            echo "::notice::0 個 @composition-fidelity-mode opt-in marker in consumer — skip dual storybook build(diff script 對 0 mapping 必 exit 0;conformance 由靜態 hook 防線保證,見 .claude/references/composition-fidelity.md 層 2)"
+          else
+            echo "Found $count opt-in marker line(s) — full identity diff gate will run."
+          fi
+
       - uses: actions/setup-node@v4
+        if: steps.optin.outputs.count != '0'
         with:
           node-version: 22
           cache: npm
@@ -58,30 +78,44 @@ jobs:
             ds-product-template/package-lock.json
 
       - name: Install DS deps
+        if: steps.optin.outputs.count != '0'
         working-directory: design-system
         run: npm ci --legacy-peer-deps
 
       - name: Install PW deps
+        if: steps.optin.outputs.count != '0'
         working-directory: ds-product-template
         run: npm ci --legacy-peer-deps
 
       - name: Install Playwright chromium (DS)
+        if: steps.optin.outputs.count != '0'
         working-directory: design-system
         run: npx playwright install --with-deps chromium
 
+      # 2026-06-02 fix:build-storybook 前必先 build:lib(chain: DS build → DS dts → storybook-config build)。
+      # 漏這步 → storybook-config preview.tsx 的 `import @qijenchen/design-system` tsc 找不到型別 → TS2307,
+      # 此 workflow 整天連紅(不擋發版,但污染 main CI 信號)。對齊 release.yml / ci.yml 已 proven 的 build 順序。
+      - name: Build DS lib(型別宣告 — storybook-config tsc 需 @qijenchen/design-system)
+        if: steps.optin.outputs.count != '0'
+        working-directory: design-system
+        run: npm run build:lib
+
       - name: Build DS storybook-static
+        if: steps.optin.outputs.count != '0'
         working-directory: design-system
         run: npm run build-storybook
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Build PW storybook-static
+        if: steps.optin.outputs.count != '0'
         working-directory: ds-product-template
         run: npm run build-storybook
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Run composition-fidelity diff
+        if: steps.optin.outputs.count != '0'
         working-directory: design-system
         run: |
           node scripts/composition-fidelity-visual-diff.mjs \
@@ -112,8 +146,12 @@ jobs:
             const reportPath = 'design-system/.claude/snapshots/composition-fidelity/report.json'
             if (!fs.existsSync(reportPath)) return
             const report = JSON.parse(fs.readFileSync(reportPath, 'utf-8'))
-            const fails = (report.results || []).filter(r => r.status === 'FAIL' || r.status === 'SIZE_MISMATCH' || r.status === 'TIMEOUT')
+            // status 真值來自 script result.status(overallStatus):PASS / DOM_FAIL / PIXEL_FAIL / BOTH_FAIL(無裸 'FAIL')+ SIZE_MISMATCH / TIMEOUT。
+            // 2026-06-03 修:原 filter 找 'FAIL' 抓不到 DOM_FAIL/PIXEL_FAIL/BOTH_FAIL → drift 時 job 紅但 PR comment 空白。
+            const fails = (report.results || []).filter(r => ['DOM_FAIL', 'PIXEL_FAIL', 'BOTH_FAIL', 'SIZE_MISMATCH', 'TIMEOUT'].includes(r.status))
             if (fails.length === 0) return
-            const rows = fails.map(r => `| \`${r.consumerStoryId}\` | \`${r.baselineStoryId}\` | ${r.status} | ${r.diffPct ?? '—'}% | ${r.threshold ?? '—'}% |`).join('\n')
+            // 2026-06-03 修:diffPct 巢狀在 r.pixel.diffPct(非頂層)+ 生效 threshold 在 r.pixel.threshold(r.threshold 是 marker 值常 null)
+            // → 原讀 r.diffPct/r.threshold 讓每行永遠顯示 '—%'。TIMEOUT/SIZE_MISMATCH 無 pixel 物件 → ?. 優雅退 fallback。
+            const rows = fails.map(r => `| \`${r.consumerStoryId}\` | \`${r.baselineStoryId}\` | ${r.status} | ${r.pixel?.diffPct ?? '—'}% | ${r.pixel?.threshold ?? r.threshold ?? report.threshold ?? '—'}% |`).join('\n')
             const body = `## ⚠️ Composition fidelity drift detected (${fails.length} mapping(s))\n\n| Consumer story | DS baseline | Status | Diff % | Threshold |\n|---|---|---|---|---|\n${rows}\n\n**Action**:download \`composition-fidelity-artifacts\` from this run to view baseline/consumer/diff PNGs. Fix consumer composition (or update threshold if intentional via \`@composition-fidelity-threshold: <pct>\` marker).`
             github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body })

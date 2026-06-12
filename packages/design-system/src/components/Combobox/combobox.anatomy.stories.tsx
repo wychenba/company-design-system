@@ -38,7 +38,7 @@ const TOKEN_MAP: Record<ModeKey, Record<StateKey, ColorSpec>> = {
     disabled: { bg: '--bg-disabled', text: '--fg-disabled', border: 'transparent', icon: '--fg-disabled' },
   },
   readonly: {
-    default:  { bg: '--bg-disabled', text: '--foreground', border: 'transparent', icon: '—' },
+    default:  { bg: '--bg-readonly', text: '--foreground', border: 'transparent', icon: '—' },
     hover:    { bg: '--bg-disabled', text: '--foreground', border: 'transparent', icon: '—' },
     focus:    { bg: '--bg-disabled', text: '--foreground', border: 'transparent', icon: '—' },
     disabled: { bg: '--bg-disabled', text: '--foreground', border: 'transparent', icon: '—' },
@@ -110,7 +110,7 @@ const H3 = ({ children }: { children: React.ReactNode }) => (
   <h3 className="text-h6 font-semibold text-foreground">{children}</h3>
 )
 const Desc = ({ children }: { children: React.ReactNode }) => (
-  <p className="text-caption text-fg-muted max-w-[720px]">{children}</p>
+  <p className="text-caption text-fg-secondary max-w-[720px]">{children}</p>
 )
 const Th = ({ children }: { children: React.ReactNode }) => (
   <th className="text-left p-2 border-b border-divider text-fg-muted font-medium text-caption whitespace-nowrap">{children}</th>
@@ -161,7 +161,7 @@ const Tab = ({ active, onClick, disabled, children }: { active: boolean; onClick
 
 const PropRow = ({ label, dot, children }: { label: string; dot?: string; children: React.ReactNode }) => (
   <div className="flex items-start gap-3 py-2 border-b border-divider last:border-b-0">
-    <span className="text-[11px] text-fg-muted font-medium w-[72px] shrink-0 pt-0.5 flex items-center gap-1.5">
+    <span className="text-[11px] text-fg-secondary font-medium w-[72px] shrink-0 pt-0.5 flex items-center gap-1.5">
       {dot && <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: dot }} />}
       {label}
     </span>
@@ -206,17 +206,17 @@ export const Overview = {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <H3>結構（Anatomy）— edit 單行</H3>
-          <Desc>Tags 陣列 + 隱藏 select overlay + ChevronDown。有值時 select 以 absolute inset-0 overlay 覆蓋整個 field，tags 和右側控件用 z-10 蓋在上方。無值時 select 顯示 placeholder 在 tags 區域內。</Desc>
+          <Desc>桌機（預設）：觸發區是一個可聚焦的容器（combobox 角色），內含 Tags 陣列 + ChevronDown，點擊開啟浮層選單（搜尋 + 選項清單）。無值時容器內顯示 placeholder。手機 / 觸控裝置另走隱藏的原生 select 結構（下方「新增選擇」段說明），桌機不使用原生 select。</Desc>
         </div>
         <div className="flex gap-8">
           <div className="flex flex-col gap-2 items-start">
-            <span className="text-[11px] text-fg-muted font-medium">有值 + clearable</span>
+            <span className="text-[11px] text-fg-secondary font-medium">有值 + clearable</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-1">
               {[
+                { name: 'combobox 容器', color: 'success' },
                 { name: 'Tag', color: 'error' },
                 { name: 'Tag', color: 'error' },
                 { name: '+N', color: 'warning' },
-                { name: 'select（hidden）', color: 'success' },
                 { name: 'clear', color: 'magenta' },
                 { name: 'chevron', color: 'info' },
               ].map((s, i) => (
@@ -224,20 +224,20 @@ export const Overview = {
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
             </div>
-            <span className="text-[10px] text-fg-muted font-mono">select absolute overlay · Tags z-10 · +N = OverflowIndicator</span>
+            <span className="text-[10px] text-fg-muted font-mono">role=combobox 觸發容器 · 點擊開浮層選單 · +N = OverflowIndicator</span>
           </div>
           <div className="flex flex-col gap-2 items-start">
-            <span className="text-[11px] text-fg-muted font-medium">空值</span>
+            <span className="text-[11px] text-fg-secondary font-medium">空值</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               {[
-                { name: 'select（placeholder）', color: 'success' },
+                { name: 'placeholder', color: 'success' },
                 { name: 'chevron', color: 'info' },
               ].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
             </div>
-            <span className="text-[10px] text-fg-muted font-mono">select 正常 flow · flex-1 min-w-20</span>
+            <span className="text-[10px] text-fg-muted font-mono">placeholder span（flex-1 min-w-0 truncate）</span>
           </div>
         </div>
       </div>
@@ -270,11 +270,11 @@ export const Overview = {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <H3>結構（Anatomy）— readonly / disabled</H3>
-          <Desc>Tag 沒有 dismiss 按鈕，沒有 ChevronDown，沒有 clear。溢出行為與 edit 相同（+N 指示器）。</Desc>
+          <Desc>Tag 沒有 dismiss 按鈕、沒有 clear;ChevronDown 保留為類型身份 indicator(pointer-events-none,readonly fg-muted / disabled fg-disabled)。溢出行為與 edit 相同(+N 指示器)。</Desc>
         </div>
         <div className="flex gap-8">
           <div className="flex flex-col gap-2 items-start">
-            <span className="text-[11px] text-fg-muted font-medium">有值</span>
+            <span className="text-[11px] text-fg-secondary font-medium">有值</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-1">
               {[
                 { name: 'Tag', color: 'error' },
@@ -285,10 +285,10 @@ export const Overview = {
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
             </div>
-            <span className="text-[10px] text-fg-muted font-mono">無 dismiss · 無 chevron · 無 clear · tagPadding</span>
+            <span className="text-[10px] text-fg-muted font-mono">無 dismiss · 無 clear · chevron=類型 indicator · tagPadding</span>
           </div>
           <div className="flex flex-col gap-2 items-start">
-            <span className="text-[11px] text-fg-muted font-medium">空值</span>
+            <span className="text-[11px] text-fg-secondary font-medium">空值</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                 style={{ borderColor: 'var(--info)', backgroundColor: 'var(--info-subtle)', color: 'var(--info)' }}>— (em dash)</span>
@@ -308,13 +308,13 @@ export const Overview = {
               {[
                 ['mode', "'edit'|'display'|'readonly'|'disabled'", "'edit'", 'FieldMode 四模式;disabled 原生屬性會自動覆蓋'],
                 ['size', "'sm'|'md'|'lg'", "'md'", '尺寸，與 Button 共用 field-height token'],
-                ['options', 'SelectOption[]', '—', '選項列表 { value, label }'],
+                ['options', 'ComboboxOption[]', '—', '選項列表（extends SelectMenuOption：value / label / icon / avatar / description / disabled / group）'],
                 ['value', 'string[]', '[]', '已選中的值陣列'],
                 ['onChange', '(value: string[]) => void', '—', '選值改變回呼'],
                 ['error', 'boolean', 'false', '紅色邊框，只在 edit 模式有視覺效果'],
                 ['wrap', 'boolean', 'false', '換行模式——高度隨內容展開，Tags 自然換行'],
                 ['clearable', 'boolean', 'false', '有值時顯示 X clear all 按鈕'],
-                ['placeholder', 'string', "'選擇...'", '無值時 select 的提示文字'],
+                ['placeholder', 'string', '—', '無值時的提示文字；未傳時桌機 fallback 到 emptyPlaceholder（預設「選擇…」全形省略號），手機原生 select fallback「選擇...」'],
                 ['disabled', 'boolean', 'false', '原生 disabled，自動覆蓋 mode'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
@@ -353,41 +353,41 @@ const InspectorInner = () => {
       {/* Controls */}
       <div className="flex flex-col gap-2.5">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-16 shrink-0">Mode</span>
+          <span className="text-[11px] text-fg-secondary w-16 shrink-0">Mode</span>
           <div className="flex gap-1.5">
             {MODES.map((m) => <Tab key={m} active={mode === m} onClick={() => setMode(m)}>{m}</Tab>)}
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-16 shrink-0">Size</span>
+          <span className="text-[11px] text-fg-secondary w-16 shrink-0">Size</span>
           <div className="flex gap-1.5">
             {SIZES.map((sz) => <Tab key={sz} active={size === sz} onClick={() => setSize(sz)}>{sz}</Tab>)}
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-16 shrink-0">Error</span>
+          <span className="text-[11px] text-fg-secondary w-16 shrink-0">Error</span>
           <div className="flex gap-1.5">
             <Tab active={!error} onClick={() => setError(false)}>off</Tab>
             <Tab active={error} onClick={() => setError(true)} disabled={!isEdit}>on</Tab>
           </div>
-          {!isEdit && <span className="text-[11px] text-fg-muted">僅 edit 模式</span>}
+          {!isEdit && <span className="text-[11px] text-fg-secondary">僅 edit 模式</span>}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-16 shrink-0">Wrap</span>
+          <span className="text-[11px] text-fg-secondary w-16 shrink-0">Wrap</span>
           <div className="flex gap-1.5">
             <Tab active={!wrap} onClick={() => setWrap(false)}>off</Tab>
             <Tab active={wrap} onClick={() => setWrap(true)}>on</Tab>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-16 shrink-0">Clearable</span>
+          <span className="text-[11px] text-fg-secondary w-16 shrink-0">Clearable</span>
           <div className="flex gap-1.5">
             <Tab active={!clearable} onClick={() => setClearable(false)}>off</Tab>
             <Tab active={clearable} onClick={() => setClearable(true)}>on</Tab>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-16 shrink-0">Value</span>
+          <span className="text-[11px] text-fg-secondary w-16 shrink-0">Value</span>
           <div className="flex gap-1.5">
             <Tab active={value.length > 0} onClick={() => setValue(['electronics', 'food', 'lifestyle'])}>有值 (3)</Tab>
             <Tab active={value.length === 0} onClick={() => setValue([])}>空值</Tab>
@@ -609,12 +609,12 @@ export const ColorMatrix = {
           <Desc>disabled 時 Tag 使用 bg-disabled (neutral-2) + text-fg-disabled (neutral-6)，品牌色完全移除。</Desc>
           <div className="flex items-center gap-4">
             <div className="flex flex-col gap-1 items-start">
-              <span className="text-[11px] text-fg-muted">正常 Tag</span>
+              <span className="text-[11px] text-fg-secondary">正常 Tag</span>
               <Tag size="sm">Electronics</Tag>
             </div>
             <span className="text-fg-muted text-caption">vs</span>
             <div className="flex flex-col gap-1 items-start">
-              <span className="text-[11px] text-fg-muted">disabled Tag</span>
+              <span className="text-[11px] text-fg-secondary">disabled Tag</span>
               <Tag size="sm" className="bg-disabled text-fg-disabled">Electronics</Tag>
             </div>
           </div>
@@ -727,7 +727,7 @@ export const SizeMatrix = {
           {SIZES.map((sz) => (
             <div key={sz} className="flex items-center gap-3">
               <Combobox size={sz} options={categoryOptions} value={['electronics', 'food']} onChange={() => {}} className="w-64" />
-              <span className="text-caption text-fg-muted font-mono">size=&quot;{sz}&quot;</span>
+              <span className="text-caption text-fg-secondary font-mono">size=&quot;{sz}&quot;</span>
             </div>
           ))}
         </div>
@@ -740,7 +740,7 @@ export const SizeMatrix = {
           {SIZES.map((sz) => (
             <div key={sz} className="flex items-center gap-3">
               <Combobox mode="readonly" size={sz} options={categoryOptions} value={['electronics', 'food']} className="w-64" />
-              <span className="text-caption text-fg-muted font-mono">size=&quot;{sz}&quot;</span>
+              <span className="text-caption text-fg-secondary font-mono">size=&quot;{sz}&quot;</span>
             </div>
           ))}
         </div>
@@ -780,10 +780,10 @@ export const StateBehavior = {
               onChange={setOverflowV}
             />
           </div>
-          <div className="flex flex-col gap-1 text-[11px] text-fg-muted">
+          <div className="flex flex-col gap-1 text-[11px] text-fg-secondary">
             <span>1. useOverflowCount hook 量測 container 寬度與每個 tag 的自然寬度</span>
             <span>2. ResizeObserver 持續監聽容器變化</span>
-            <span>3. 初次量測前 opacity:0，量測後 opacity:1，避免閃爍</span>
+            <span>3. 量測在 useLayoutEffect 內 paint 前同步完成，超出的 tag 在繪製前就已隱藏，避免閃爍</span>
             <span>4. 超出的 tag 用 DOM hidden 隱藏（非 display:none）</span>
           </div>
         </div>
@@ -798,7 +798,7 @@ export const StateBehavior = {
               value={allValues}
             />
           </div>
-          <span className="text-[11px] text-fg-muted">readonly 的 +N hover 一樣顯示隱藏項，但 Tag 沒有 dismiss 按鈕</span>
+          <span className="text-[11px] text-fg-secondary">readonly 的 +N hover 一樣顯示隱藏項，但 Tag 沒有 dismiss 按鈕</span>
         </div>
 
         {/* Wrap mode */}
@@ -807,7 +807,7 @@ export const StateBehavior = {
           <Desc>Tags 自然換行，高度隨內容展開。無 +N 指示器——全部可見。右側控件 (clear + chevron) 用 self-start 固定在第一行的 tag 高度位置。</Desc>
           <div className="flex gap-6">
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-fg-muted">edit wrap</span>
+              <span className="text-[11px] text-fg-secondary">edit wrap</span>
               <div className="w-56">
                 <Combobox
                   options={categoryOptions}
@@ -818,7 +818,7 @@ export const StateBehavior = {
               </div>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-fg-muted">readonly wrap</span>
+              <span className="text-[11px] text-fg-secondary">readonly wrap</span>
               <div className="w-56">
                 <Combobox
                   mode="readonly"
@@ -829,7 +829,7 @@ export const StateBehavior = {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-1 text-[11px] text-fg-muted">
+          <div className="flex flex-col gap-1 text-[11px] text-fg-secondary">
             <span>wrap 模式差異：flex-wrap · height: auto · py-1 (4px 上下內距)</span>
             <span>chevron 的容器高度固定為 tag 高度 (sm:20px, md/lg:24px)，self-start 對齊</span>
           </div>
@@ -855,7 +855,7 @@ export const StateBehavior = {
               重設
             </button>
           </div>
-          <div className="flex flex-col gap-1 text-[11px] text-fg-muted">
+          <div className="flex flex-col gap-1 text-[11px] text-fg-secondary">
             <span>showClear = clearable && value.length &gt; 0 && isEditable</span>
             <span>X 按鈕尺寸：sm/md = 16px icon + 18px hover bg，lg = 20px icon + 22px hover bg</span>
             <span>clear 色彩：fg-muted → hover: foreground → active: foreground</span>
@@ -865,7 +865,7 @@ export const StateBehavior = {
         {/* Tag dismiss */}
         <div className="flex flex-col gap-3">
           <span className="text-caption font-medium text-fg-secondary">個別移除（Tag dismiss）</span>
-          <Desc>每個 Tag 自帶 dismiss 按鈕（X），點擊移除該選項。select 下拉只顯示未選中的選項，已選中的不重複出現。</Desc>
+          <Desc>每個 Tag 自帶 dismiss 按鈕（X），點擊移除該選項。手機 / 觸控裝置走原生 select 時下拉只顯示未選中的選項；桌機（預設）走自建浮層選單則已選項仍留在清單中並以打勾標示。</Desc>
           <div className="flex items-center gap-4">
             <Combobox
               options={categoryOptions}
@@ -881,8 +881,8 @@ export const StateBehavior = {
               重設
             </button>
           </div>
-          <div className="flex flex-col gap-1 text-[11px] text-fg-muted">
-            <span>Tag dismiss = Tag 元件的 onDismiss prop，按鈕由 Tag 內部渲染</span>
+          <div className="flex flex-col gap-1 text-[11px] text-fg-secondary">
+            <span>Tag remove = Tag 元件的 onRemove prop，按鈕由 Tag 內部渲染</span>
             <span>dismiss icon: 16px X，hover bg: 18px rounded-md neutral-hover</span>
             <span>readonly / disabled 的 Tag 沒有 dismiss 按鈕</span>
           </div>
@@ -891,13 +891,14 @@ export const StateBehavior = {
         {/* Select behavior */}
         <div className="flex flex-col gap-3">
           <span className="text-caption font-medium text-fg-secondary">新增選擇</span>
-          <Desc>原生 select 只顯示未選中的選項。有值時 select 以 absolute inset-0 overlay 覆蓋整個 field，opacity:0 不可見。點擊 field 任何位置都會觸發 select showPicker。</Desc>
-          <div className="flex flex-col gap-1 text-[11px] text-fg-muted">
-            <span>select overlay: absolute inset-0 · w-full h-full · opacity-0 · z-0</span>
-            <span>Tags 區域: relative z-10（蓋在 select 上方）</span>
+          <Desc>新增選擇的機制依裝置分兩條路徑。桌機（預設，非觸控）走自建浮層選單（SelectMenu）：點擊欄位開啟 popover，已選項仍留在清單中並以打勾標示，再點一次即取消。手機 / 觸控裝置改走隱藏的原生 select：只顯示未選中的選項，有值時 select 以 absolute inset-0 overlay 覆蓋整個 field、opacity:0 不可見，點擊欄位任何位置都會觸發原生 picker（showPicker）。</Desc>
+          <div className="flex flex-col gap-1 text-[11px] text-fg-secondary">
+            <span>桌機（預設）: 點擊欄位 → 開 SelectMenu popover，已選項打勾保留，toggle 取消</span>
+            <span>手機 / 觸控 — select overlay: absolute inset-0 · w-full h-full · opacity-0 · z-0</span>
+            <span>手機 / 觸控 — Tags 區域: relative z-10（蓋在 select 上方）</span>
             <span>chevron / clear: relative z-10 · pointer-events-auto</span>
-            <span>Tag 本體: onClick → selectRef.showPicker()（穿透到 select）</span>
-            <span>全部選完 → selectDropdown = null（沒有未選中的選項）</span>
+            <span>手機 / 觸控 — Tag 本體: onClick → selectRef.showPicker()（穿透到原生 select）</span>
+            <span>手機 / 觸控 — 全部選完 → selectDropdown = null（沒有未選中的選項）</span>
           </div>
         </div>
       </div>
@@ -912,7 +913,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `combobox.spec.md` 「A11y 預設」段。摘要:\n\n### 鍵盤可達性的 delegation 設計\n\nCombobox 內部結構有多個  <div>  /  <Tag>  帶  onClick （tag 容器、ChevronDown 區域、搜尋輸入 wrapper 等）——  這些是 mouse 優化的 click-path delegation，不是鍵盤介面  。鍵盤路徑由  隱藏的 native  <select>    處理（tab-focusable，Enter/Space 開啟，arrow 導覽，Esc 關閉）。\n\n  設計取捨  :\n- ✅   好處  : 保留原生  <select>  的完整 a11y（包含 mobile screen reader + 語音輸入 + 所有 OS-level 整合）\n- ⚠️   後果  : 非 button 元素帶  onClick  是 mouse-only 互動,鍵盤使用者不經過它們—"}</p>
+      <p className="whitespace-pre-line">{"鍵盤可達性依裝置走兩條路徑（觸控偵測自動切換）：\n\n桌機（預設）：觸發區是一個 combobox 角色的容器，可用 Tab 聚焦，方向鍵在選項間移動，Enter 選取，Esc 關閉——由浮層選單的鍵盤導覽負責，不是原生 select。\n\n手機 / 觸控裝置：改用隱藏的原生 select（可 Tab 聚焦、方向鍵導覽、喚起原生 picker），以保留行動裝置的 screen reader、語音輸入與系統層整合。\n\n兩條路徑共通：欄位內 Tag 容器、ChevronDown、搜尋框上的點擊事件是滑鼠優化的點擊區，不是鍵盤介面——鍵盤使用者不經過它們，但兩條路徑都各自提供完整鍵盤可達性。這些點擊區不加可聚焦角色，是為了不搶走真正聚焦目標的 Tab focus。"}</p>
     </div>
   ),
 }

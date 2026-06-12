@@ -279,12 +279,12 @@ export const Overview = {
                 ['checked', "boolean | 'indeterminate'", 'false', 'checkbox 選中狀態'],
                 ['selected', 'boolean', 'false', '單選選中（bg-neutral-selected 背景）'],
                 ['tag', 'ReactNode', '—', '後綴 Tag，靠右對齊'],
-                ['disabled', 'boolean', 'false', '停用，所有子元素統一 fg-disabled'],
+                ['disabled', 'boolean', 'false', '停用：文字 / startIcon 套 fg-disabled，checkbox 用 disabled 樣式，tag / endContent 套 opacity-disabled，avatar 不變'],
                 ['header', 'boolean', 'false', '群組標題，不可選不可 hover'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '尺寸，對齊 field-height token'],
                 ['endContent', 'ReactNode', '—', '後綴自訂內容（DropdownMenu 的 badge/endIcon/shortcut 經由此注入）'],
                 ['labelMaxLines', "number | 'none'", '1', `標籤最大行數，'none' 不截斷`],
-                ['descMaxLines', "number | 'none'", '2', `描述最大行數，'none' 不截斷`],
+                ['descMaxLines', "number | 'none'", '1', `描述最大行數，'none' 不截斷`],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -513,7 +513,7 @@ const InspectorInner = () => {
             <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Typography</span></div>
             <PropRow label="Label"><TkVal token={s.labelFont} value={s.labelSize} /></PropRow>
             {hasDesc && <PropRow label="Description"><TkVal token={s.descFont} value={s.descSize} /></PropRow>}
-            {hasDesc && <PropRow label="Label-Desc 間距"><TkVal token="mt-0.5" value="2px" /></PropRow>}
+            {hasDesc && <PropRow label="Label-Desc 間距"><TkVal token={size === 'lg' ? '--item-gap-label-desc-scanning-lg' : '--item-gap-label-desc-scanning'} value="2px" /></PropRow>}
           </div>
 
           {/* SELECTION */}
@@ -774,7 +774,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `menu.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus container\n- ↑/↓ — 導覽 items\n- Enter — activate\n- Esc — 關閉(若在 menu context)\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"MenuItem 只負責單行的視覺排版,本身不接管鍵盤與焦點。真正的鍵盤導覽(上下鍵切換、Enter 選取、Esc 關閉)與焦點管理由外層的選單元件(SelectMenu / DropdownMenu)負責——MenuItem 不重複實作這些行為。\n\n  語意 role  :在 listbox 語境(SelectMenu / Combobox)MenuItem 預設渲染為 role=\"option\";在 menu 語境(DropdownMenu)外層會把每個 item 覆蓋為 role=\"presentation\",由 Radix parent 持有 role=\"menuitem\" 語意。哪一項目前被聚焦與選取由外層選單決定。\n\n  焦點外觀  :聚焦時以 bg-neutral-hover 背景高亮標示被聚焦的選項(cva base 為 outline-none + focus-visible:bg-neutral-hover),對齊 menu/listbox option 的 active-highlight 慣例,而非畫 outline ring。\n\n  驗證  :Storybook a11y addon 面板應 0 critical violation;整個選單用鍵盤即可完整操作(無需滑鼠);文字對比 ≥ 4.5:1、介面元素對比 ≥ 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

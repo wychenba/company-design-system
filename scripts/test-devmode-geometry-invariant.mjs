@@ -60,7 +60,7 @@ for (const dpr of DPRS) {
   await page.evaluate((selector) => {
     // Toggle live mode — Storybook addon channel pattern
     // (channel global available in iframe via __STORYBOOK_ADDONS_CHANNEL__ if Storybook 7+)
-    const ch = (window as unknown as { __STORYBOOK_ADDONS_CHANNEL__?: { emit: (e: string, p: unknown) => void } }).__STORYBOOK_ADDONS_CHANNEL__
+    const ch = window.__STORYBOOK_ADDONS_CHANNEL__
     if (ch?.emit) ch.emit('storybook/ds-devmode/toggle', 'live')
 
     const el = document.querySelector(selector)

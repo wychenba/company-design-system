@@ -13,12 +13,12 @@ export default meta
    Types & Data
    ═══════════════════════════════════════════════════════════════════════════ */
 
-type StateKey = 'default' | 'hover' | 'active' | 'disabled'
+type StateKey = 'default' | 'hover' | 'disabled'
 type CheckedKey = 'unchecked' | 'checked'
 type SizeKey = 'sm' | 'md' | 'lg'
 type ColorSpec = { border: string; bg: string; dot: string }
 
-const STATES: StateKey[] = ['default', 'hover', 'active', 'disabled']
+const STATES: StateKey[] = ['default', 'hover', 'disabled']
 const CHECKED_STATES: CheckedKey[] = ['unchecked', 'checked']
 const SIZES: SizeKey[] = ['sm', 'md', 'lg']
 
@@ -27,13 +27,11 @@ const TOKEN_MAP: Record<CheckedKey, Record<StateKey, ColorSpec>> = {
   unchecked: {
     default:  { border: '--border',      bg: '--surface',  dot: 'transparent' },
     hover:    { border: '--border-hover', bg: '--surface',  dot: 'transparent' },
-    active:   { border: '--border-hover', bg: '--surface',  dot: 'transparent' },
     disabled: { border: 'transparent',   bg: '--bg-disabled', dot: 'transparent' },
   },
   checked: {
     default:  { border: '--primary',       bg: '--surface',     dot: '--primary' },
     hover:    { border: '--primary-hover',  bg: '--surface',     dot: '--primary-hover' },
-    active:   { border: '--primary-active', bg: '--surface',     dot: '--primary-active' },
     disabled: { border: 'transparent',     bg: '--bg-disabled', dot: '--fg-disabled' },
   },
 }
@@ -150,7 +148,7 @@ export const Overview = {
           <H3>結構（Anatomy）</H3>
           <Desc>
             Radio 由兩個部分組成：圓形控件（indicator）和 Label。
-            控件不內建 label，label 組合使用 SelectionItem 元件。
+            控件可傳 label / description prop——傳入時自動透過 SelectionItem 包裝;無 label 時只渲染圓形控件。
             Radio 必須在 RadioGroup 內使用（互斥選擇語意）。
           </Desc>
         </div>
@@ -193,6 +191,9 @@ export const Overview = {
                 ['value', 'string', '(required)', 'RadioGroup 內的唯一值'],
                 ['size', "'sm'|'md'|'lg'", "'md'", '控件尺寸（sm/md = 16px, lg = 20px）'],
                 ['disabled', 'boolean', 'false', '不可互動，移除品牌色'],
+                ['label', 'ReactNode', '—', '選項 label；傳入時自動以 SelectionItem 包裝'],
+                ['description', 'ReactNode', '—', '次要說明文字（須與 label 搭配）'],
+                ['readOnly', 'boolean', 'false', '鎖互動、保留 checked 視覺（整組 readonly 由 RadioGroup mode="readonly" 傳遞）'],
                 ['id', 'string', '—', '搭配 SelectionItem 的 htmlFor'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
@@ -576,7 +577,7 @@ const StateBehaviorInner = () => {
         <Desc>
           Radio 的關鍵行為來自 <span className="font-mono">RadioGroup</span> 層級——單選互斥(切 A 會同時清 B),
           而非個別 item 的 toggle(那是 Checkbox)。本 story 展示 RadioGroup 特有行為,item 級別的
-          default / hover / active / checked / disabled 色彩對照見「3. 色彩對照表」。
+          default / hover / checked / disabled 色彩對照見「3. 色彩對照表」。
         </Desc>
       </div>
 
@@ -629,10 +630,10 @@ const StateBehaviorInner = () => {
       <div className="flex flex-col gap-3">
         <span className="text-caption font-medium text-fg-secondary">行為 3:整組 disabled(Field context 接管)</span>
         <Desc>
-          整個 RadioGroup 放在 disabled 的 Field 內時,所有 item 繼承 disabled——consumer 不需逐 item 傳 disabled。
+          整個 RadioGroup 放在 disabled 的 Field 內時,所有 item 經 useResolvedFieldDisabled 繼承 disabled——consumer 不需逐 item 傳 disabled(SSOT:field-controls.spec.md cascade 段)。下方示意為靜態模擬(逐 item 傳 disabled 重現相同視覺);實際使用以 {'<Field disabled>'} 包裹即可。
         </Desc>
         <div className="flex gap-6 items-start">
-          <div className="px-6 py-5 rounded-lg bg-canvas border border-divider min-w-[280px] opacity-60 pointer-events-none">
+          <div className="px-6 py-5 rounded-lg bg-canvas border border-divider min-w-[280px]">
             <RadioGroup defaultValue="b" className="flex flex-col gap-2">
               <RadioGroupItem value="a" label="個人版" disabled />
               <RadioGroupItem value="b" label="團隊版(目前方案)" disabled />
@@ -674,7 +675,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `radio-group.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  radio-group  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/radio-group#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入 group\n- ↑/↓ — 切 option\n- Space — 選擇\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1"}</p>
+      <p className="whitespace-pre-line">{"角色與語意:整組是一個單選群組,每個選項自動標記為 radio 角色,螢幕閱讀器會念出「第幾項、共幾項、是否已選」。\n\n鍵盤操作:\n\n- Tab — 進入或離開整個群組(群組只佔一個 Tab 停留點)\n- 上 / 下方向鍵 — 在選項間移動,移到哪個就直接選哪個\n- 空白鍵 — 選取目前聚焦的選項\n\n聚焦:選項被聚焦時會顯示明顯的外框(focus ring)。注意這不是「焦點鎖定」——按 Tab 仍會離開群組、跳到表單的下一個欄位,符合一般表單填寫流程。\n\n驗證:Storybook 無障礙檢查面板應為零項嚴重違規;不靠滑鼠也能完整操作。文字對比度至少 4.5:1、控件對比度至少 3:1。"}</p>
     </div>
   ),
 }

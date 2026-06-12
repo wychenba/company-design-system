@@ -4,7 +4,7 @@ import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group'
 import { cva } from 'class-variance-authority'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useResolvedFieldSize, useResolvedFieldDisabled } from '@/design-system/components/Field/field-context'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 import { ICON_SIZE } from '@/design-system/tokens/uiSize/icon-size'
 
@@ -92,7 +92,7 @@ const SegmentedControl = React.forwardRef<
       size: sizeProp,
       fullWidth = false,
       iconOnly = false,
-      disabled = false,
+      disabled,
       children,
       value,
       defaultValue,
@@ -101,11 +101,9 @@ const SegmentedControl = React.forwardRef<
     },
     ref
   ) => {
-    // Field 內自動讀 size，跟 Button 同機制
-    const fieldCtx = useFieldContext?.()
-    const resolvedSize: SegmentedControlSize =
-      sizeProp ?? (fieldCtx?.size as SegmentedControlSize) ?? 'md'
-    const resolvedDisabled = disabled || !!fieldCtx?.disabled
+    // Field 內自動讀 size + disabled,跟 Button 同機制(SSOT resolver hook)
+    const resolvedSize = useResolvedFieldSize<SegmentedControlSize>(sizeProp, 'md')  // SSOT:統一 size resolution(原散落 ?? fieldCtx?.size ?? 'md')
+    const resolvedDisabled = useResolvedFieldDisabled(disabled)
 
     // Memoize provider value(2026-04-22 D3 perf audit):避免每次父 render 重建 4-field object
     // 讓 children SegmentedControlItem 不必要 re-render
@@ -224,7 +222,8 @@ const SegmentedControlItem = React.forwardRef<
   // 2026-05-18 改 per user 拍板「沒機械化導致偏移」+「做完」approval(對齊 Button xs / uiSize Icon Tier):
   // 原 xs=14 跟 Button xs=16 不一致,xs/sm/md 統一 16 對齊 uiSize.spec.md(xs/sm/md→16, lg→20)。
   // 2026-05-18 改 import ICON_SIZE SSOT(per user『做完』approval,消除 M17 違反 7+ 重複 ternary)
-  const iconSize = ICON_SIZE[size as 'sm' | 'md' | 'lg']
+  // 2026-05-31 #14:ICON_SIZE 只有 sm/md/lg key,size='xs' 會落 undefined → 對齊上方註解「xs/sm/md 統一 16」讓 xs 取 sm(16px)。
+  const iconSize = size === 'xs' ? ICON_SIZE.sm : ICON_SIZE[size as 'sm' | 'md' | 'lg']
   const hasSuffix = badge != null
 
   // Dev-mode 語意契約檢查：group iconOnly = true 時，item 必須有 startIcon + aria-label
@@ -283,10 +282,10 @@ SegmentedControlItem.displayName = 'SegmentedControlItem'
 // SegmentedControl 無語意 variant(選中 vs 未選 是 state 不是 variant)— 與 Button.variant 刻意不同(spec「與 Button 的血緣」段)
 export const segmentedControlMeta = {
   component: 'SegmentedControl',
-  family: null, // non-family composite / overlay / layout
+  family: 3, // Family 3(Pill Layout)— 對齊 spec frontmatter family:3 + body L42
   variants: {},
   sizes: {
-    xs: { fieldHeight: 24, typography: 'caption', iconSize: 14, purpose: 'row-embedded inline action / DataTable inline filter' },
+    xs: { fieldHeight: 24, typography: 'caption', iconSize: 16, purpose: 'row-embedded inline action / DataTable inline filter' },
     sm: { fieldHeight: 28, typography: 'body', iconSize: 16, purpose: 'compact chrome bar / dense toolbar' },
     md: { fieldHeight: 32, typography: 'body', iconSize: 16, purpose: '預設 — form field 對齊' },
     lg: { fieldHeight: 36, typography: 'body-lg', iconSize: 20, purpose: 'touch / prominent CTA' },

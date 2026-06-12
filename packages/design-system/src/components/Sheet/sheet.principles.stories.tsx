@@ -10,6 +10,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
+  SheetBody,
   SheetFooter,
   SheetClose,
 } from './sheet'
@@ -32,7 +33,6 @@ import { Button } from '@/design-system/components/Button/button'
 import { Field, FieldLabel } from '@/design-system/components/Field/field'
 import { Input } from '@/design-system/components/Input/input'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
-import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
 
 const meta: Meta = {
   title: 'Design System/Components/Sheet/設計原則',
@@ -75,10 +75,10 @@ export const UsageGuidance: Story = {
       <p>適合 Sheet 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/Sheet/展示" name="右側建立 project"><span className="text-primary hover:underline font-medium cursor-pointer">右側建立 project</span></LinkTo>
+          <LinkTo kind="Design System/Components/Sheet/展示" name="建立新專案（右側滑入）"><span className="text-primary hover:underline font-medium cursor-pointer">建立新專案（右側滑入）</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Sheet/展示" name="右側編輯 user detail"><span className="text-primary hover:underline font-medium cursor-pointer">右側編輯 user detail</span></LinkTo>
+          <LinkTo kind="Design System/Components/Sheet/展示" name="編輯成員詳情（右側滑入）"><span className="text-primary hover:underline font-medium cursor-pointer">編輯成員詳情（右側滑入）</span></LinkTo>
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
@@ -99,10 +99,9 @@ export const UsageGuidance: Story = {
               <SheetTitle>專案設定</SheetTitle>
               <SheetDescription>修改此專案的基本資訊與通知偏好</SheetDescription>
             </SheetHeader>
-            {/* Overlay body 長內容必用 ScrollArea 而非 native overflow-y-auto,對齊 DS
-                跨 OS 一致設計準則(避免 Windows/Linux 右側被吃 15-17px)。 */}
-            <ScrollArea className="flex-1">
-              <div className="py-4 flex flex-col gap-4">
+            {/* Body 必用 SheetBody(內建 ScrollArea + 浮層 padding SSOT px-loose/pt-tight/pb-bottom);
+                自組 ScrollArea + py-4 = 水平 0 padding 歷史 bug,詳 sheet.tsx SheetBody comment。 */}
+            <SheetBody className="flex flex-col gap-4">
                 <Field>
                   <FieldLabel>名稱</FieldLabel>
                   <Input defaultValue="產品路線圖" />
@@ -118,8 +117,7 @@ export const UsageGuidance: Story = {
                     <Checkbox label="每日摘要" />
                   </div>
                 </Field>
-              </div>
-            </ScrollArea>
+            </SheetBody>
             <SheetFooter>
               <SheetClose asChild>
                 <Button variant="tertiary">取消</Button>
@@ -163,28 +161,12 @@ export const UsageGuidance: Story = {
         <Label>Dialog:刪除確認、放棄變更、登入、付款確認</Label>
       </Rule>
 
-      {/* 何時不用 / 替代元件 — 原 WhenNotSheetRule */}
+      {/* 何時不用 / 替代元件 — 原 WhenNotSheetRule。
+          短確認 → Dialog 的完整 live 對照已在上方「Dialog — 居中 modal」段示範,此處不重複(2026-06-11 精簡)。 */}
       <Rule
         title="何時不用 / 替代元件 — 短確認 / 不可逆動作 → Dialog"
-        note="「刪除 / 登出 / 放棄變更」這類要使用者完全停下做決定的場景,用 Dialog 的居中 modal 強制聚焦。Sheet 側滑視覺不夠強,使用者可能點旁邊就跳過"
+        note="「刪除 / 登出 / 放棄變更」這類要使用者完全停下做決定的場景,用 Dialog 的居中 modal 強制聚焦。Sheet 側滑視覺不夠強,使用者可能點旁邊就跳過(live 對照見上方「Dialog — 居中 modal」段)"
       >
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="primary" danger startIcon={Trash2}>刪除帳號</Button>
-          </DialogTrigger>
-          <DialogContent autoHeight maxWidth="420px">
-            <DialogHeader>
-              <DialogTitle>確定要刪除帳號?</DialogTitle>
-            </DialogHeader>
-            <DialogBody>
-              <p className="text-body">所有資料將於 30 天後永久移除,此動作無法復原。</p>
-            </DialogBody>
-            <DialogFooter>
-              <Button variant="tertiary">取消</Button>
-              <Button variant="primary" danger>確認刪除</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
         <Label>↑ 短決策應該用 Dialog(Sheet 太長太輕)</Label>
       </Rule>
 
@@ -227,12 +209,12 @@ export const UsageGuidance: Story = {
 }
 
 export const SidePropRule: Story = {
-  name: '位置 屬性 的世界級 慣例',
+  name: 'Side 屬性：消費者用 right（其餘內部基建）',
   render: () => (
     <div>
       <Rule
-        title="right(預設)— detail / 編輯 / 建立"
-        note="世界級 SaaS 一致的 convention:Jira issue drawer、Linear issue detail、GitHub PR file diff drawer、Stripe customer drawer、Notion database row expand 都在右側。理由是:使用者視線「從左(清單)看到右(詳情)」,右側 Sheet 符合自然閱讀動線"
+        title="right（消費者唯一合法 side，預設）— detail / 編輯 / 建立"
+        note="消費者 Sheet API 只能用 side=&quot;right&quot;。世界級 SaaS 一致的 convention:Jira issue drawer、Linear issue detail、GitHub PR file diff drawer、Stripe customer drawer、Notion database row expand 都在右側。理由是:使用者視線「從左(清單)看到右(詳情)」,右側 Sheet 符合自然閱讀動線"
       >
         <Sheet>
           <SheetTrigger asChild>
@@ -243,17 +225,17 @@ export const SidePropRule: Story = {
               <SheetTitle>任務詳情</SheetTitle>
               <SheetDescription>#PROJ-234 · 指派給Ada Chen</SheetDescription>
             </SheetHeader>
-            <div className="flex-1 py-4 text-body text-fg-secondary">
-              (詳情內容)
-            </div>
+            <SheetBody className="text-body text-fg-secondary">
+              登入頁在連續輸入錯誤密碼 3 次後未顯示鎖定提示,使用者反覆嘗試仍無回饋。建議補上鎖定倒數與重設連結。
+            </SheetBody>
           </SheetContent>
         </Sheet>
         <Label>↑ 列表點 row → 右側滑入編輯,左側列表仍可見</Label>
       </Rule>
 
       <Rule
-        title="left — navigation / filter / 主選單"
-        note="世界級 convention:Slack mobile nav、Gmail mobile hamburger、Material Design navigation drawer 都在左側。理由是:導覽的「回到哪裡」概念,視線從左開始自然找得到。Desktop 有 persistent Sidebar 的產品通常不用 left Sheet,mobile 才用"
+        title="left（DS 內部基建，非消費者 API）— Sidebar 小視口 left-slide"
+        note="left 保留 DS 內部基建用（例:Sidebar 在小視口從 left 滑入）,消費者 code 禁止傳 side=&quot;left&quot;,需 user 授權。世界級 mobile nav convention(Slack / Gmail hamburger / Material navigation drawer 在左)是此變體的設計來源,但本 DS 的 mobile navigation 應走專屬 navigation 元件,不混在消費者 Sheet。以下為內部能力示範。"
       >
         <Sheet>
           <SheetTrigger asChild>
@@ -276,8 +258,8 @@ export const SidePropRule: Story = {
       </Rule>
 
       <Rule
-        title="bottom — mobile action sheet / picker"
-        note="iOS / Material Bottom Sheet convention。手機拇指操作範圍集中在螢幕下半部,bottom Sheet 讓操作觸及成本低。桌機用 bottom Sheet 較少見(視線要向下掃,不自然)"
+        title="bottom（DS 內部基建，非消費者 API）"
+        note="bottom 保留 DS 內部基建用,消費者 code 禁止傳 side=&quot;bottom&quot;。iOS / Material Bottom Sheet convention(手機拇指操作區在螢幕下半)是此變體來源,但本 DS 若需 mobile bottom sheet 應走專屬 BottomSheet 元件,不混在消費者 Sheet 的 side prop。以下為內部能力示範。"
       >
         <Sheet>
           <SheetTrigger asChild>
@@ -287,42 +269,42 @@ export const SidePropRule: Story = {
             <SheetHeader>
               <SheetTitle>分享</SheetTitle>
             </SheetHeader>
-            <div className="flex-1 py-4 flex flex-col gap-2">
+            <SheetBody className="flex flex-col gap-2">
               {['複製連結', '傳送到 Email', '加入我的最愛', '匯出 PDF'].map(name => (
                 <button key={name} type="button" className="px-3 py-2 text-body text-left hover:bg-neutral-hover rounded-md">
                   {name}
                 </button>
               ))}
-            </div>
+            </SheetBody>
           </SheetContent>
         </Sheet>
         <Label>↑ 手機拇指操作區 → bottom Sheet</Label>
       </Rule>
 
       <Rule
-        title="top — 少見,notification center / system announcement"
-        note="iOS Control Center 的 top pull-down 是少數案例。一般產品很少用,因為視線從頭頂滑入不自然。只在「系統層級通知」的極少數情境使用"
+        title="top（DS 內部基建，非消費者 API）"
+        note="top 保留 DS 內部基建用,消費者 code 禁止傳 side=&quot;top&quot;。一般產品極少用(視線從頭頂滑入不自然),僅系統層級的內部情境保留。"
       >
-        <Label>↑ 一般業務流程不用 top(視線動線不自然)</Label>
+        <Label>↑ 消費者不用 top;為 DS 內部保留變體</Label>
       </Rule>
 
       <Rule
-        title="❌ 錯亂 side 對應 — 編輯用 left、目錄用 right"
-        note="違反世界級 convention 會讓使用者不知道浮層是什麼類型。編輯 / 詳情永遠 right,導覽永遠 left"
+        title="❌ 消費者傳 side=&quot;left&quot; / &quot;bottom&quot; / &quot;top&quot;"
+        note="消費者 Sheet API 只能用 right。傳其他方向 = 越權使用 DS 內部基建變體(需 user 授權)。需 mobile navigation / bottom sheet 請用專屬元件,不要借 Sheet 的內部 side。"
       >
-        <Label warn>↑ 不要用 left 放編輯表單(使用者以為是目錄,打開驚訝是表單)</Label>
+        <Label warn>↑ 消費者只用 side=&quot;right&quot;;left / bottom / top 是內部基建,不可直接傳</Label>
       </Rule>
     </div>
   ),
 }
 
 export const HeaderFooterStructureRule: Story = {
-  name: 'Header / Footer 結構',
+  name: '頁首 / 頁尾 結構',
   render: () => (
     <div>
       <Rule
         title="標準結構 — Header(標題 + 描述) + 主內容 + Footer(按鈕列)"
-        note="與 Dialog 共用 overlay-surface 視覺語言(bg-surface-raised / border-border)。Header 放 SheetTitle + SheetDescription,Footer 放按鈕列;主內容區 flex-1 + overflow-y-auto 吃長內容"
+        note="與 Dialog 共用 overlay-surface 視覺語言(bg-surface-raised / elevation-200;容器邊框用較淡的 border-divider,Dialog 用 border-border)。Header 放 SheetTitle + SheetDescription,Footer 放按鈕列;主內容區用 SheetBody(內建 ScrollArea 跨 OS 一致捲軸 + 浮層 padding SSOT)吃長內容"
       >
         <Sheet>
           <SheetTrigger asChild>
@@ -333,9 +315,8 @@ export const HeaderFooterStructureRule: Story = {
               <SheetTitle>建立新客戶</SheetTitle>
               <SheetDescription>填寫基本資料後可進行付款設定</SheetDescription>
             </SheetHeader>
-            {/* Overlay body 長內容必用 ScrollArea,對齊 DS 跨 OS 一致 canonical */}
-            <ScrollArea className="flex-1">
-              <div className="py-4 flex flex-col gap-4">
+            {/* Body 必用 SheetBody(內建 ScrollArea + 浮層 padding SSOT) */}
+            <SheetBody className="flex flex-col gap-4">
                 <Field>
                   <FieldLabel>公司名稱</FieldLabel>
                   <Input placeholder="輸入公司名稱" />
@@ -344,8 +325,7 @@ export const HeaderFooterStructureRule: Story = {
                   <FieldLabel>聯絡人 Email</FieldLabel>
                   <Input placeholder="contact@example.com" />
                 </Field>
-              </div>
-            </ScrollArea>
+            </SheetBody>
             <SheetFooter>
               <SheetClose asChild>
                 <Button variant="tertiary">取消</Button>

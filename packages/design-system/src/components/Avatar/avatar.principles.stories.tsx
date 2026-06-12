@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Settings, Bell, Home } from 'lucide-react'
 import { Avatar } from './avatar'
 import { MenuItem } from '@/design-system/components/Menu/menu-item'
-import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+import { ProfileCard, ProfileCardDefaultActions } from '@/design-system/components/ProfileCard/profile-card'
 
 const meta: Meta = {
   title: 'Design System/Components/Avatar/設計原則',
@@ -45,13 +45,11 @@ export const UsageGuidance: Story = {
     <div>
       <Section title="何時用">
         <div className="prose prose-sm max-w-prose mb-8">
-          <p>適合 Avatar 的真實業務場景(點擊跳轉「展示」頁範例):</p>
+          <p>Avatar 代表「誰」——人、團隊、組織、專案的視覺身份。適合的真實業務場景(點擊跳轉「展示」頁範例):</p>
           <ul className="space-y-1">
-            <li><LinkTo kind="Design System/Components/Avatar/展示" name="四模式"><span className="text-primary hover:underline font-medium cursor-pointer">四模式</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Components/Avatar/展示" name="形狀"><span className="text-primary hover:underline font-medium cursor-pointer">形狀</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Components/Avatar/展示" name="色彩"><span className="text-primary hover:underline font-medium cursor-pointer">色彩</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Components/Avatar/展示" name="Fallback"><span className="text-primary hover:underline font-medium cursor-pointer">Fallback</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Components/Avatar/展示" name="In Context"><span className="text-primary hover:underline font-medium cursor-pointer">In Context</span></LinkTo></li>
+            <li>留言者、指派者、團隊成員列表的人員識別;workspace / 組織 / App 的身份標識 —— 見 <LinkTo kind="Design System/Components/Avatar/展示" name="四模式"><span className="text-primary hover:underline font-medium cursor-pointer">四模式</span></LinkTo></li>
+            <li>成員沒上傳照片、或頭像圖片載入失敗時,以名字首字 + 色彩維持可辨識 —— 見 <LinkTo kind="Design System/Components/Avatar/展示" name="備援顯示"><span className="text-primary hover:underline font-medium cursor-pointer">備援顯示</span></LinkTo></li>
+            <li>通訊錄、成員選單、chat 列表等列表項目的主視覺 prefix —— 見 <LinkTo kind="Design System/Components/Avatar/展示" name="情境用例"><span className="text-primary hover:underline font-medium cursor-pointer">情境用例</span></LinkTo></li>
           </ul>
           <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方 vs 近親 段)。</p>
         </div>
@@ -63,12 +61,14 @@ export const UsageGuidance: Story = {
           note="「設定」「通知」「首頁」這類功能 / 動作 / 概念不是「誰」,是「做什麼」。Icon 更適合——Avatar 用在這裡會讓使用者以為是某個人的頭像"
         >
           <div className="border border-divider rounded-lg bg-surface py-1">
-            <MenuItem avatar={{ alt: 'S' }}>❌ 設定用 Avatar</MenuItem>
+            {/* 真實誤用:把功能名「設定」直接當 avatar 的 alt,fallback 渲染首字「設」的色塊,看起來像某個成員或群組 */}
+            <MenuItem avatar={{ alt: '設定' }}>設定</MenuItem>
           </div>
-          <Label warn>↑ 「S」+ icon 讓使用者誤以為是某個人(使用者 S?)。功能導覽用 Lucide icon</Label>
+          <Label warn>↑ ❌ 「設定」是功能不是「誰」,套 Avatar 後 fallback 渲染首字「設」的色塊,使用者誤以為是某位成員或群組。功能導覽應用 Lucide icon</Label>
           <div className="border border-divider rounded-lg bg-surface py-1">
-            <MenuItem startIcon={Settings}>✓ 設定用 Icon</MenuItem>
+            <MenuItem startIcon={Settings}>設定</MenuItem>
           </div>
+          <Label>↑ ✓ 功能 / 動作 / 概念用 Lucide icon,語義清楚不會誤認身份</Label>
         </Rule>
 
         <Rule
@@ -117,12 +117,12 @@ export const UsageGuidance: Story = {
 }
 
 export const FallbackRule: Story = {
-  name: 'Fallback 順序',
+  name: '後備順序',
   render: () => (
     <div>
       <Rule
         title="有 src → 顯示圖片;沒有 src / 圖片載入失敗 → 顯示 initials"
-        note="Fallback 用 `name` 取首字母(中文取第一字,英文取前兩字首字母大寫)。背景色由 `color` prop 決定"
+        note="Fallback 用 `alt` 取首字母(一律取第一個字元並轉大寫,不分中英)。背景色由 `color` prop 決定"
       >
         <div className="flex items-center gap-3">
           <Avatar alt="Ada Chen" size={40} src="https://i.pravatar.cc/80?img=1" />
@@ -130,7 +130,7 @@ export const FallbackRule: Story = {
           <Avatar alt="Alice Wang" size={40} />
           <Avatar alt="ABC Corp" size={40} color="blue" />
         </div>
-        <Label>↑ 依序:有圖 / 中文首字 / 英文前兩字 / 組織首字 + 色彩</Label>
+        <Label>↑ 依序:有圖 / 無 src 取首字母 / 英文取首字母 / 組織首字 + 色彩</Label>
       </Rule>
     </div>
   ),
@@ -150,7 +150,7 @@ export const WithBadgeOverlayRule: Story = {
           <Avatar alt="Ben" size={40} status="away" />
           <Avatar alt="Bella" size={40} status="offline" />
         </div>
-        <Label>↑ online / busy / away / offline ── dot 自動 `role="status"` + aria-label</Label>
+        <Label>↑ online / busy / away / offline ── 狀態點本身不另發語音標籤,在線狀態整合進頭像的 alt 文字(例 alt="Ada(在線)"),避免一長串成員名單同時朗讀造成讀屏洪水</Label>
       </Rule>
 
       <Rule
@@ -166,38 +166,39 @@ export const WithBadgeOverlayRule: Story = {
       </Rule>
 
       <Rule
-        title="❌ 同一個 Avatar 上同時顯示 status + badgeCount"
-        note="對齊 Badge 設計準則『一個 anchor 最多 1 個 indicator』。status(presence dot)跟 badgeCount(unread Badge)**擇一使用**,不並存 — 同時出現會讓使用者無法判斷主要訊號,違反 signal crowding 原則"
+        title="✅ status(右下 presence)+ badgeCount(右上 count)可並存"
+        note="兩者是**不同角、不同語義**的 slot(presence=這個人的線上狀態,右下;count=此對話未讀量,右上),對齊 `badge.spec.md`「Avatar 可疊 status + count」canonical + Slack / Teams / iMessage / LINE 標配。**signal crowding 只禁「同一角疊兩個同類 indicator」**(如右上同時 count + dot),不禁不同角不同語義的兩個訊號"
       >
         <div className="flex items-center gap-4">
-          <Avatar alt="Ada" size={40} status="online" />
-          <Avatar alt="Alex" size={40} badgeCount={3} />
+          <Avatar alt="Ada" size={40} status="online" badgeCount={3} />
+          <Avatar alt="Alex" size={40} status="busy" />
+          <Avatar alt="Ben" size={40} badgeCount={12} />
         </div>
-        <Label>↑ Ada 只顯示線上狀態;Alex 只顯示未讀數 —— 不合併</Label>
+        <Label>↑ Ada 同時 presence(右下)+ count(右上)並存;Alex 只 presence;Ben 只 count</Label>
       </Rule>
     </div>
   ),
 }
 
 export const HoverCardIntegrationRule: Story = {
-  name: 'Avatar + NameCard 整合',
+  name: 'Avatar + ProfileCard 整合',
   render: () => (
     <div>
       <Rule
-        title="人員 Avatar 的 hover 預覽必須用 NameCard"
-        note="NameCard 是 DS 設計準則 人員 hover 內容元件(avatar + name + subtitle + actions + status + fields 統一佈局)。Avatar 的 hoverCard prop 接 NameCard,不可手刻 JSX — 手刻會漂移出 NameCard 對齊 / 間距 / status token 規則"
+        title="人員 Avatar 的 hover 預覽必須用 ProfileCard"
+        note="ProfileCard 是 DS 設計準則 人員 hover 內容元件(avatar + name + subtitle + actions + status + fields 統一佈局)。Avatar 的 hoverCard prop 接 ProfileCard,不可手刻 JSX — 手刻會漂移出 ProfileCard 對齊 / 間距 / status token 規則"
       >
         <Avatar
           alt="Ada Chen"
           size={40}
           hoverCard={
-            <NameCard
+            <ProfileCard
               name="Ada Chen"
               subtitle="Design Engineer · 台北"
               avatar={{ alt: 'Ada Chen' }}
               status="online"
               statusMessage="Out of Office: Back on Monday!"
-              actions={<NameCardDefaultActions />}
+              actions={<ProfileCardDefaultActions />}
               fields={[
                 { label: 'ID', value: 'YHANAX' },
                 { label: 'Employee number', value: '1234567' },
@@ -206,18 +207,18 @@ export const HoverCardIntegrationRule: Story = {
             />
           }
         />
-        <Label>↑ hover avatar 彈出 NameCard(action 列:Chat + Audio call 設計準則)</Label>
+        <Label>↑ hover avatar 彈出 ProfileCard(action 列:Chat + Audio call 設計準則)</Label>
       </Rule>
 
       <Rule
         title="❌ 關鍵資訊只靠 hover 顯示(觸控裝置看不到)"
-        note="NameCard hover 本身用法沒錯,問題是「資訊的唯一出口」。觸控裝置無 hover 能力,若必看資訊(狀態角色、是否離職、權限等)只出現在 hover 浮層裡,平板 / 手機使用者完全錯過。hover 是**補充資訊**管道,不是**關鍵資訊**唯一載體"
+        note="ProfileCard hover 本身用法沒錯,問題是「資訊的唯一出口」。觸控裝置無 hover 能力,若必看資訊(狀態角色、是否離職、權限等)只出現在 hover 浮層裡,平板 / 手機使用者完全錯過。hover 是**補充資訊**管道,不是**關鍵資訊**唯一載體"
       >
         <div className="flex items-start gap-8">
           <div className="flex flex-col gap-2">
             <Avatar alt="Alex Wang" size={48}
               hoverCard={
-                <NameCard name="Alex Wang" subtitle="Engineer · 已離職" onViewMore={() => {}} />
+                <ProfileCard name="Alex Wang" subtitle="Engineer · 已離職" onViewMore={() => {}} />
               }
             />
             <Label warn>❌ 「已離職」只出現在 hover 內 — 觸控使用者看不到,可能誤發訊息給已離職成員</Label>

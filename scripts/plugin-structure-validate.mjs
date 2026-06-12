@@ -36,12 +36,29 @@ check('marketplace.json exists + valid JSON + schema', () => {
   if (!ds.version) throw new Error('design-system plugin version missing')
 })
 
-// 2. plugin.json schema
-check('plugin.json exists + valid JSON + schema', () => {
+// 2. plugin.json schema(欄位「存在」+「型別」雙驗)
+//    型別對齊官方 schema(code.claude.com/docs/en/plugins-reference):
+//    repository/homepage = STRING(非 npm package.json 的 {type,url} 物件);author = OBJECT{name}。
+//    2026-06-04 加 type 驗證 per consumer install fail anchor:repository 寫成 npm 物件 → Claude Code
+//    Zod「expected string, received object」裝不起來,而舊 check 只驗存在沒驗型別 → P0 漏出貨。
+check('plugin.json exists + valid JSON + schema(field type-checked)', () => {
   const p = JSON.parse(readFileSync(join(REPO_ROOT, '.claude-plugin/plugin.json'), 'utf8'))
   if (!p.name) throw new Error('plugin.json missing name')
   if (!p.version) throw new Error('plugin.json missing version')
   if (!p.description) throw new Error('plugin.json missing description')
+  // repository:官方 schema = STRING(URL)。npm package.json 容許 {type,url} 物件,但 Claude Code plugin 不容許。
+  if (p.repository !== undefined && typeof p.repository !== 'string') {
+    throw new Error(`plugin.json repository 必須是 string(URL),目前是 ${Array.isArray(p.repository) ? 'array' : typeof p.repository}。官方 schema 要 "https://github.com/<org>/<repo>";npm 的 {type,url} 物件寫法會讓 consumer install 失敗(Zod「expected string, received object」)`)
+  }
+  // homepage:官方 schema = STRING(URL)
+  if (p.homepage !== undefined && typeof p.homepage !== 'string') {
+    throw new Error(`plugin.json homepage 必須是 string(URL),目前是 ${typeof p.homepage}`)
+  }
+  // author:官方 schema = OBJECT { name, email?, url? };若提供必含 name
+  if (p.author !== undefined) {
+    if (typeof p.author !== 'object' || Array.isArray(p.author)) throw new Error(`plugin.json author 必須是 object { name, email?, url? },目前是 ${typeof p.author}`)
+    if (!p.author.name || typeof p.author.name !== 'string') throw new Error('plugin.json author.name 缺失或非 string')
+  }
 })
 
 // 3. skills/ + commands/ symlinks
@@ -80,6 +97,44 @@ check('hooks.json paths use ${CLAUDE_PLUGIN_ROOT}', () => {
   const cmdStr = JSON.stringify(hooks)
   if (!cmdStr.includes('${CLAUDE_PLUGIN_ROOT}')) {
     throw new Error('hooks.json commands should reference ${CLAUDE_PLUGIN_ROOT}(per Anthropic plugin spec)')
+  }
+})
+
+// 5.5 hooks.json(plugin)↔ settings.json(DS dev)hook-set sync
+//     2026-05-30 加 per user「更新了 A 卻忘了 B」directive:plugin hooks.json 是 fork user 拿到的
+//     hook 集;settings.json 是 DS repo dev 跑的。兩者漂移 = fork user 拿到跟 DS dev 不同的治理 →
+//     靜默削弱 fork 端 governance。by-basename 比對(plugin 用 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/X.sh,
+//     dev 用 $CLAUDE_PROJECT_DIR/.claude/hooks/X.sh,路徑前綴不同但 .sh 檔名須一致)。
+//     intentional asymmetry → 加進 EXEMPT 並註明理由(避免 silent drift)。
+check('hooks.json(plugin)↔ settings.json(dev)hook-set sync', () => {
+  const EXEMPT = new Set([
+    // 目前無 intentional asymmetry;未來若有 plugin-only / dev-only hook,列此 + 一行理由
+  ])
+  const extractScripts = (path) => {
+    const j = JSON.parse(readFileSync(path, 'utf8'))
+    const hooks = j.hooks || j
+    const set = new Set()
+    for (const ev of Object.keys(hooks)) {
+      for (const grp of hooks[ev]) {
+        for (const h of grp.hooks || []) {
+          const m = (h.command || '').match(/([a-zA-Z0-9_-]+\.sh)/)
+          if (m && !EXEMPT.has(m[1])) set.add(m[1])
+        }
+      }
+    }
+    return set
+  }
+  const plugin = extractScripts(join(REPO_ROOT, 'hooks/hooks.json'))
+  const settings = extractScripts(join(REPO_ROOT, '.claude/settings.json'))
+  const onlyPlugin = [...plugin].filter((x) => !settings.has(x)).sort()
+  const onlySettings = [...settings].filter((x) => !plugin.has(x)).sort()
+  if (onlyPlugin.length || onlySettings.length) {
+    throw new Error(
+      `hook-set drift(plugin ${plugin.size} vs dev ${settings.size}):\n` +
+      (onlyPlugin.length ? `  只在 plugin hooks.json(dev settings.json 漏)：${onlyPlugin.join(', ')}\n` : '') +
+      (onlySettings.length ? `  只在 dev settings.json(plugin hooks.json 漏 → fork user 拿不到)：${onlySettings.join(', ')}\n` : '') +
+      `  修:兩檔同步註冊該 hook;或 intentional → 加進本 check EXEMPT + 理由。`
+    )
   }
 })
 

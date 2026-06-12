@@ -32,8 +32,8 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
   <p className={`text-footnote leading-normal ${warn ? 'text-error font-medium' : 'text-fg-muted'}`}>{children}</p>
 )
 
-// 對齊 NameCard 預設呈現:name + subtitle + status + statusMessage + fields
-// avatar.spec.md DS-wide canonical:所有 person avatar hover 必出 NameCard,展示資訊不可精簡
+// 對齊 ProfileCard 預設呈現:name + subtitle + status + statusMessage + fields
+// avatar.spec.md DS-wide canonical:所有 person avatar hover 必出 ProfileCard,展示資訊不可精簡
 const team: PersonValue[] = [
   { name: 'Alice Chen', avatarUrl: 'https://i.pravatar.cc/128?img=1', description: 'Design｜Taipei｜EMP-3001', status: 'online', statusMessage: '可線上 review。', fields: [{ label: 'ID', value: 'AC001' }, { label: '部門', value: 'Product Design' }, { label: '時區', value: 'TST (GMT+8)' }] },
   { name: 'Bob Lin', avatarUrl: 'https://i.pravatar.cc/128?img=2', description: 'Engineering｜Tokyo｜EMP-3002', status: 'busy', statusMessage: '深度工作,2hr 後再回。', fields: [{ label: 'ID', value: 'BL002' }, { label: '部門', value: 'Frontend' }, { label: '時區', value: 'JST (GMT+9)' }] },
@@ -174,7 +174,7 @@ export const EmptyStateRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="edit 模式 — 未選時顯示「選擇...」佔位提示"
+        title="edit 模式 — 未選時顯示「請選擇人員」佔位提示"
         note="跟 Select / Combobox 的 placeholder 行為一致。不用 em-dash,因為 edit mode 是可操作的"
       >
         <PeoplePicker value={null} onChange={() => {}} people={team} />

@@ -23,15 +23,16 @@ export const Modes: Story = {
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">display</h3>
-        <Checkbox mode="display" checked aria-label="同意條款(display mode demo)" />
+        <Checkbox mode="display" checked />
+        <p className="text-caption text-fg-muted mt-1">純視覺 glyph（✓ / —）；語意由 context（如 DataTable 表頭 + 行標籤）提供，display 不暴露獨立 aria-label。需螢幕報讀器可讀的勾選請用 edit / readonly 模式。</p>
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
-        <Checkbox mode="readonly" checked aria-label="同意條款(readonly mode demo)" />
+        <Checkbox readOnly checked aria-label="同意條款(readonly mode demo)" />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">disabled</h3>
-        <Checkbox mode="disabled" checked aria-label="同意條款(disabled mode demo)" />
+        <Checkbox disabled checked aria-label="同意條款(disabled mode demo)" />
       </div>
     </div>
   ),
@@ -99,7 +100,7 @@ export const VerticalGroup: Story = {
 export const Horizontal: Story = {
   name: '水平排列',
   render: () => (
-    <div className="flex gap-6 max-w-md">
+    <div className="flex gap-4 max-w-md">
       <SelectionItem control={<Checkbox id="h-a" />} label="Electronics" htmlFor="h-a" />
       <SelectionItem control={<Checkbox id="h-b" />} label="Furniture" htmlFor="h-b" />
       <SelectionItem control={<Checkbox id="h-c" />} label="Food" htmlFor="h-c" />

@@ -12,7 +12,7 @@ import {
 } from '@/design-system/components/Field/field-wrapper'
 import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant, useResolvedFieldInvalid } from '@/design-system/components/Field/field-context'
 import { Button } from '@/design-system/components/Button/button'
 import {
   TimeColumns,
@@ -39,7 +39,8 @@ import { ICON_SIZE } from '@/design-system/tokens/uiSize/icon-size'
  * Ant DatePicker / Polaris Picker 共識)。
  *
  * ── 實作基礎 ──
- * Trigger:`<button>` + `fieldWrapperStyles`(視覺仍是 Input wrapper,改為可點擊觸發浮層)
+ * Trigger:`<div role="combobox">` + `fieldWrapperStyles`(視覺仍是 Input wrapper,改為可點擊觸發浮層;
+ *   2026-04-25 由 `<button>` 改 div 避 nested-interactive,對齊 Select / Combobox,鍵盤靠顯式 onKeyDown)
  * Popup:`Popover`(消費 overlay-surface pattern)
  * Panel 主體:自建 column picker(三欄 scrollable list),不引入第三方 time library
  *
@@ -141,10 +142,10 @@ export interface TimePickerProps
 const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
   (
     {
-      mode = 'edit',
+      mode,
       variant: variantProp,
       error: errorProp = false,
-      size = 'md',
+      size: sizeProp,
       value,
       onChange,
       placeholder,
@@ -169,10 +170,12 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
     ref,
   ) => {
     const fieldCtx = useFieldContext()
-    const error = errorProp || (fieldCtx?.invalid ?? false)
-    const disabled = disabledProp ?? fieldCtx?.disabled
-    const resolvedMode = disabled ? 'disabled' : mode
-    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+    const size = useResolvedFieldSize(sizeProp)  // B 組 cascade fix
+    const error = useResolvedFieldInvalid(errorProp)
+    const disabled = useResolvedFieldDisabled(disabledProp)
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode;修 <Field mode="display"> 漏 cascade
+    const resolvedMode = useResolvedFieldMode({ mode, disabled })
+    const variant: FieldVariant = useResolvedFieldVariant(variantProp)
     const isEditable = resolvedMode === 'edit'
     // 2026-05-18 改 import ICON_SIZE SSOT(per user『做完』approval,消除 M17 違反 7+ 重複 ternary)
   const iconSize = ICON_SIZE[size as 'sm' | 'md' | 'lg']
@@ -262,6 +265,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
         <div
           className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
+          aria-disabled={resolvedMode === 'disabled' ? true : undefined}
           {...(props as React.HTMLAttributes<HTMLDivElement>)}
         >
           <span
@@ -275,7 +279,8 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
               : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
             }
           </span>
-          {EndIconCmp && (
+          {/* 2026-06-10 類型身份 indicator gate:naked cell 依 showDisplayEndIcon=isEditable(修 disabled cell 漏顯 bug)*/}
+          {EndIconCmp && (variant === 'naked' ? showDisplayEndIcon : true) && (
             <ItemSuffix className="pointer-events-none">
               <EndIconCmp
                 size={iconSize}
@@ -296,8 +301,12 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
       <Popover open={open} onOpenChange={setOpen}>
         {/* a11y(2026-04-25 nested-interactive fix):trigger 改 <div role='combobox'>
             (對齊 Select / Combobox 同 pattern),原 <button> 會與內層 ItemInlineAction
-            清除 button 構成 nested-interactive。Radix Popover 在 trigger asChild 下會
-            自動 inject keyboard handler(Enter / Space 開啟)+ 正確 aria attributes。 */}
+            清除 button 構成 nested-interactive。
+            2026-06-01 鍵盤開啟修正:Radix PopoverTrigger 只 compose onClick
+            (@radix-ui/react-popover index.js:145),不 inject 任何 onKeyDown。原生 <button>
+            靠瀏覽器在 Enter/Space 自動派發 click 才能開;但本 trigger 是 <div role=combobox>,
+            div 不會自動派發 click → 鍵盤使用者打不開 panel。故顯式加 onKeyDown
+            (對齊 select.tsx:593-598 既有 canonical + WAI-ARIA APG combobox required keys)。 */}
         <PopoverTrigger asChild>
           <div
             ref={ref}
@@ -312,6 +321,16 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
             aria-errormessage={ariaErrorMessageProp ?? (error ? fieldCtx?.errorId : undefined)}
             aria-haspopup="dialog"
             aria-expanded={open}
+            onKeyDown={(e) => {
+              if (disabled) return
+              // Enter / Space / ArrowDown / Alt+ArrowDown → 開 panel(APG combobox required + Select canonical)
+              if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+                e.preventDefault()
+                setOpen(true)
+              }
+              // Escape → 關(Radix Content 已自帶,trigger 補位對齊 select.tsx:597)
+              if (e.key === 'Escape') setOpen(false)
+            }}
             data-field-mode="edit"
             data-error={error ? '' : undefined}
             className={cn(
@@ -352,7 +371,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
         <PopoverContent className="w-auto p-0" align="start">
           {/* Panel 對齊 ref/timepicker.png:2-3 個 SelectMenu 式欄位並排,分隔線分開。
               Width 依欄數由 TimeColumns 決定:2 欄 w-40 / 3 欄 w-60。
-              Height 由 wrapper 控:216px 預設(~7 items)。
+              Height 由 wrapper 控:216px 預設(扣 footer 後 list 約可見 5-6 items)。
               TimeColumns 本身 h-full,parent 控 height — 讓 DatePicker showTime / Range 可
               用 flex-row items-stretch 自動同 calendar 高。 */}
           <div className="flex flex-col h-[216px]">
@@ -365,7 +384,7 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
               disabled={disabledForColumns}
               // 2026-05-06 v9.1 M25 chain fix:TimeColumns 自然高 = 24 buttons × ~28.7px = 688px
               // 會撐破 parent h-[216px]。flex-1 + min-h-0 讓 TimeColumns 取 parent 剩餘空間
-              // (216 - footer 40 = 176px)→ ScrollArea h-full 才能正確收斂 →
+              // (216 − footer ≈53px ≈ 163px)→ ScrollArea h-full 才能正確收斂 →
               // listbox scrollIntoView 找對 nearest scrollable ancestor(內部 viewport),
               // 不會走到 document body 把 popover 內容推出畫面(user 報「hours 欄空白」根因)。
               className="flex-1 min-h-0"

@@ -32,6 +32,12 @@ SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // empty' 2>/dev/null)
 TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_path // empty' 2>/dev/null)
 
 # === Override flag ===
+# 2026-06-11:documented override 從 Bash command 前綴無法進到 hook env(PreToolUse 隔離)—
+# 對齊 check_substantive_edit_approval_preflight 行為,command 字串含 override token 也視為 set(audit-logged 不變)。
+_OVR_CMD=$(echo "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
+if echo "${_OVR_CMD:-}" | grep -q 'CLAUDE_BYPASS_SOLO_WORKFLOW=1' 2>/dev/null; then
+  CLAUDE_BYPASS_SOLO_WORKFLOW=1
+fi
 if [ "${CLAUDE_BYPASS_SOLO_WORKFLOW:-0}" = "1" ]; then
   mkdir -p "$(dirname "$BYPASS_LOG")"
   printf '{"ts":"%s","tool":"%s","session":"%s"}\n' \
@@ -44,8 +50,12 @@ has_push_trigger() {
   [ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ] && return 1
   # Transcript JSONL schema:每 line 一 message。real user text msg = `type:"user"` AND
   # `message.role:"user"` AND `message.content` is STRING(tool_results 的 content 是 array)。
-  jq -r 'select(.type=="user" and .message.role=="user" and (.message.content | type == "string")) | .message.content' \
+  # 2026-06-11 fix(false-negative 根因):task-notification / system-notification 也是 type:user
+  # string content,會把真 user trigger 擠出 tail-10 窗(本日 beta.62 發版鏈 6 個背景通知把
+  # 「就push」擠出窗 → R3 誤擋)。真 user 訊息掃描必排除系統通知。
+  jq -r 'select(.type=="user" and .message.role=="user" and (.message.content | type == "string")) | (.message.content | gsub("\n"; " "))' \
     "$TRANSCRIPT" 2>/dev/null \
+    | grep -v -e '<task-notification>' -e '\[SYSTEM NOTIFICATION' -e '<system-reminder>' \
     | tail -10 \
     | grep -qE "$APPROVAL_KEYWORD_RE"
 }
@@ -83,6 +93,27 @@ for i in range(len(tokens) - 2):
         for j in range(i+2, min(i+6, len(tokens))):
             t = tokens[j]
             if t == 'main' or t.endswith(':main') or t.endswith(' main'):
+                sys.exit(0)
+sys.exit(1)
+" 2>/dev/null
+}
+
+# Helper: shell-aware push-tag detect(2026-06-02 — R4 改用 shlex,對齊 R1/R2/R3,修 plain-grep
+# 對 echo/字串內字面 'git push origin v...' 的 false-positive,per M34 hook-regex 廣度對齊)。
+# shlex.split(comments=True)讓 quoted echo 字串成單一 token → 不會把字串內的 git/push 當相鄰指令。
+detect_push_tag() {
+  python3 -c "
+import shlex, sys, re
+try:
+    tokens = shlex.split(sys.stdin.read(), comments=True)
+except Exception:
+    sys.exit(1)
+for i in range(len(tokens) - 1):
+    if tokens[i] == 'git' and tokens[i+1] == 'push':
+        for j in range(i+2, len(tokens)):
+            t = tokens[j]
+            # tag-ref: --tags / refs/tags/... / v<digit>... / X:refs/tags/...
+            if t == '--tags' or 'refs/tags/' in t or re.match(r'^v[0-9]', t) or t.endswith(':v') or re.search(r':v[0-9]', t):
                 sys.exit(0)
 sys.exit(1)
 " 2>/dev/null
@@ -211,6 +242,34 @@ EOF
   1. AI 改 code → commit + push working branch (Netlify auto-preview)
   2. 告訴 user 主要改動 (or preview URL)
   3. 等 user 明確 trigger 「push」/「OK」 才 merge to main
+
+例外 override:CLAUDE_BYPASS_SOLO_WORKFLOW=1 (audit logged)
+EOF
+      exit 2
+    fi
+  fi
+
+  # === Rule 4 (Bash): push tag without release:preflight pass-marker (M28 release root-cause, 2026-06-02) ===
+  # beta.43/45 連環 push 失敗根因 = 發版前靠手動記得逐道 sync/check → 必漏。已修成單一
+  # `npm run release:preflight`(syncs + 全 gate + dogfood,全過寫 HEAD-bound marker)。
+  # 此 R4 機械強制:任何 push tag(v*)前 marker 必存在且 .head == 當前 HEAD,否則 BLOCK。
+  # 用 detect_push_tag(shlex,對齊 R1/R2/R3)而非 plain grep —— 修 echo/字串內字面誤觸發(M34)。
+  if echo "$COMMAND" | detect_push_tag; then
+    PF_MARKER="$PROJECT_DIR/.claude/logs/release-preflight-pass.json"
+    PF_HEAD=$(git -C "$PROJECT_DIR" rev-parse HEAD 2>/dev/null)
+    PF_MARKER_HEAD=$(jq -r '.head // empty' "$PF_MARKER" 2>/dev/null)
+    if [ ! -f "$PF_MARKER" ] || [ "$PF_MARKER_HEAD" != "$PF_HEAD" ]; then
+      cat >&2 <<EOF
+
+┄┄┄ check_solo_workflow — R4 BLOCKER (M28 release preflight) ┄┄┄
+
+[P0 BLOCKER] git push <tag> 但 release:preflight 未跑過(或跑後 HEAD 已變)。
+   marker.head=${PF_MARKER_HEAD:0:12} vs 當前 HEAD=${PF_HEAD:0:12}
+
+❌ 發版前必跑單一指令(自動 sync version 5-manifest + ds-canonical + 全 deterministic
+   gate + build + dogfood,fail-fast,全過寫 HEAD-bound pass-marker):
+     npm run release:preflight
+   全過才准 push tag。根治 beta.43/45 連環 push 失敗(漏手動 sync 步驟)。
 
 例外 override:CLAUDE_BYPASS_SOLO_WORKFLOW=1 (audit logged)
 EOF

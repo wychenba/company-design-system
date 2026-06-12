@@ -252,7 +252,7 @@ export const ColorMatrix: Story = {
       <div>
         <H3>Trigger 五態色彩</H3>
         <Desc>
-          Trigger 預設為 foreground(正常閱讀色),hover 走 fg-secondary(文字色 tint 弱化;不用 underline,對齊 Notion / Linear / Stripe 現代 SaaS 慣例)。focus-visible 疊加 ring,disabled 整體 opacity 50%。
+          Trigger 預設為 foreground(正常閱讀色),hover 走 fg-secondary(文字色 tint 弱化;不用 underline,對齊 Notion / Linear / Stripe 現代 SaaS 慣例)。focus-visible 疊加 ring,disabled 時 trigger 文字切換為語義 disabled 色(對齊 Button variant=text,非降透明度),且 pointer-events-none。
         </Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
@@ -436,7 +436,7 @@ export const StateBehavior: Story = {
 
       <div>
         <H3>disabled item</H3>
-        <Desc>AccordionItem 設 disabled 後,對應 trigger 的 opacity 降至 50% 且 pointer-events-none;鍵盤 Tab 仍會經過(Radix 預設行為),但 Enter/Space 無反應。</Desc>
+        <Desc>AccordionItem 設 disabled 後,對應 trigger 切語義 disabled 文字色(`text-fg-disabled`,非 opacity)且 pointer-events-none;Radix 將 disabled 設在原生 `&lt;button&gt;` 上,故鍵盤 Tab 會跳過該 trigger(原生 disabled 不可聚焦),ArrowUp/Down 也會略過它。</Desc>
         <div className="border border-border rounded-lg p-4 max-w-[640px]">
           <Accordion type="single" collapsible>
             <AccordionItem value="a">

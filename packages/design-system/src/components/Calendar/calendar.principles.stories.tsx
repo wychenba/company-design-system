@@ -58,7 +58,7 @@ export const UsageGuidance: Story = {
         <div className="space-y-4 text-body text-fg-secondary max-w-3xl">
           <ul className="list-disc pl-5 space-y-2">
             <li><b>選單一日期</b>(Due date / Birthday)→ 用 <code>DatePicker</code></li>
-            <li><b>選日期範圍</b>(訂單 from-to)→ 用 <code>DatePicker mode="range"</code></li>
+            <li><b>選日期範圍</b>(訂單 from-to)→ 用 <code>{'<DatePicker.Range>'}</code></li>
             <li><b>任務看板</b>(非時間軸 view)→ 用 <code>DataTable</code> + status column</li>
             <li><b>時段可用性</b>(會議訂房 slot picker)→ 獨立 time-slot picker(未來 primitive)</li>
             <li><b>Mini month widget</b>(sidebar 小月曆)→ 用 <code>DateGrid</code>(不 fullscreen)</li>
@@ -102,16 +102,17 @@ export const ColorSemantic: Story = {
   render: () => (
     <div className="space-y-6">
       <Rule
-        title="event `color` 是「這是哪類事件」(team / project),不是 severity"
-        note="Calendar 的 color 對齊 Tag primitive colors(blue / green / red / orange / purple / yellow)。紅色 ≠「警告」,只是一個類別選擇。若要標示緊急,另用 event title 文字(例:「🚨 Release deadline」)或 Badge overlay(未來)。"
+        title="事件的 color 是「這是哪一類事件」(團隊 / 專案),不是嚴重度"
+        note="Calendar 的 color = 12 categorical 色相,與 Tag / Avatar 共用同一組 SSOT(blue / green / deep-orange / yellow / red / orange / amber / lime / turquoise / indigo / purple / magenta),色名 1:1 對 color token。色相本身無 severity 語義——紅色 ≠「緊急」、橙色 ≠「警告」,只是類別選擇。若要標示緊急,改用事件標題文字(例:「🚨 Release deadline」)。下例以藍 / 綠 / 橙 / 紫四種色相代表四個不同團隊或專案。"
       >
         <div className="h-80 border border-divider rounded-md overflow-hidden">
           <Calendar
             events={[
               { id: '1', title: 'Design review', start: `${thisMonth}-05`, end: `${thisMonth}-05`, color: 'blue' },
               { id: '2', title: 'Sprint planning', start: `${thisMonth}-08`, end: `${thisMonth}-08`, color: 'blue' },
-              { id: '3', title: 'Release deadline', start: `${thisMonth}-12`, end: `${thisMonth}-12`, color: 'red' },
+              { id: '3', title: 'Release deadline', start: `${thisMonth}-12`, end: `${thisMonth}-12`, color: 'orange' },
               { id: '4', title: 'Q review', start: `${thisMonth}-18`, end: `${thisMonth}-18`, color: 'green' },
+              { id: '5', title: 'Marketing sync', start: `${thisMonth}-22`, end: `${thisMonth}-22`, color: 'purple' },
             ] as CalendarEvent[]}
           />
         </div>
@@ -126,8 +127,8 @@ export const MvpScope: Story = {
   render: () => (
     <div className="space-y-6">
       <Rule
-        title="月 view only;週 / 日 view / 拖拉 event 是 tech debt"
-        note="World-class Calendar(Google / Notion / Fantastical)最常用的是月 view(80%+ 使用情境是「看本月整體」)。本 DS MVP 只實作月 view,週 / 日 view / drag-create / inline edit 留待後續 iteration。若當下產品需要週 view,fallback 用 DataTable(橫向 week) + 自刻 event tile,不勉強用 Calendar。"
+        title="只支援月檢視;週 / 日檢視、拖拉新增事件尚未實作"
+        note="世界級行事曆(Google / Notion / Fantastical)最常用的是月檢視(8 成以上的使用情境是「看本月整體」)。本元件目前只實作月檢視,週 / 日檢視、拖拉新增事件、就地編輯都留待後續增量。若當下產品需要週檢視,可改用 DataTable(以橫向週為欄)搭配自訂事件樣式,不勉強套用 Calendar。"
       >
         <div className="h-80 border border-divider rounded-md overflow-hidden">
           <Calendar

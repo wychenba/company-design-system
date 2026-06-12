@@ -50,7 +50,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/LinkInput/展示" name="空值"><span className="text-primary hover:underline font-medium cursor-pointer">空值</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/LinkInput/展示" name="Blur 驗證"><span className="text-primary hover:underline font-medium cursor-pointer">Blur 驗證</span></LinkTo>
+          <LinkTo kind="Design System/Components/LinkInput/展示" name="失焦驗證"><span className="text-primary hover:underline font-medium cursor-pointer">Blur 驗證</span></LinkTo>
         </li>
         <li>
           <LinkTo kind="Design System/Components/LinkInput/展示" name="尺寸"><span className="text-primary hover:underline font-medium cursor-pointer">尺寸</span></LinkTo>
@@ -59,10 +59,10 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/LinkInput/展示" name="四模式"><span className="text-primary hover:underline font-medium cursor-pointer">四模式</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/LinkInput/展示" name="Display"><span className="text-primary hover:underline font-medium cursor-pointer">Display</span></LinkTo>
+          <LinkTo kind="Design System/Components/LinkInput/展示" name="展示樣式"><span className="text-primary hover:underline font-medium cursor-pointer">展示樣式</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:先確認這個值是不是「儲存後使用者會想直接點開的完整網址」。若不是(例如純字串代號、email、內部路徑),改用 Input。下方「vs 近親」段有正反對照範例。</p>
     </div>
 
       {/* vs 近親 — 原 VsInputRule */}
@@ -100,7 +100,7 @@ export const UsageGuidance: Story = {
 // ── 兩種顯示狀態 ───────────────────────────────────────────────────────────
 
 export const DisplayStateRule: Story = {
-  name: '兩種狀態：連結 顯示 / input 編輯',
+  name: '兩種狀態:連結顯示 / 輸入框編輯',
   render: () => (
     <div>
       <Rule
@@ -134,17 +134,17 @@ export const DisplayStateRule: Story = {
 // ── 驗證 ────────────────────────────────────────────────────────────────
 
 export const ValidationRule: Story = {
-  name: '驗證時機：blur，不即時',
+  name: '驗證時機:失焦,不即時',
   render: () => {
     const [url, setUrl] = React.useState('')
     return (
       <div>
         <Rule
           title="blur 時驗證，不在打字過程中"
-          note="使用者還在輸入時就抱怨「格式錯」= 打擾體驗。blur(離開欄位 / 按 Enter)才檢查。開始重新編輯時清除 error,讓使用者無壓力重試。對齊 Field 系統的共用驗證規則"
+          note="使用者還在輸入時就抱怨「格式錯」= 打擾體驗。blur(離開欄位 / 按 Enter)才檢查。開始打字時清除 error,讓使用者無壓力重試。對齊 Field 系統的共用驗證規則"
         >
           <LinkInput value={url} onChange={setUrl} placeholder="輸入 URL（需含 https://）" />
-          <Label>↑ 試試輸入「github.com」(無 protocol),按 Tab 離開會出現 error。重新 focus 自動清除 error</Label>
+          <Label>↑ 試試輸入「github.com」(無 protocol),按 Tab 離開會出現 error。開始打字自動清除 error</Label>
         </Rule>
 
         <Rule

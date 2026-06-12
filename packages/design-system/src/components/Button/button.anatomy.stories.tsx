@@ -201,7 +201,7 @@ export const Overview = {
           <div className="flex flex-col gap-2 items-start">
             <span className="text-[11px] text-fg-muted font-medium">標準</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
-              {[{ name: 'startIcon', color: 'info' }, { name: 'startIcon', color: 'success' }, { name: 'startIcon', color: 'warning' }, { name: 'startIcon', color: 'magenta' }].map((s) => (
+              {[{ name: 'startIcon', color: 'info' }, { name: 'label', color: 'success' }, { name: 'badge', color: 'warning' }, { name: 'endIcon', color: 'magenta' }].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
@@ -214,7 +214,7 @@ export const Overview = {
               <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                 style={{ borderColor: 'var(--info)', backgroundColor: 'var(--info-subtle)', color: 'var(--info)' }}>startIcon</span>
             </div>
-            <span className="text-[10px] text-fg-muted font-mono">px-[calc((h-icon)/2)] · 自然正方形 · 自動 tooltip</span>
+            <span className="text-[10px] text-fg-muted font-mono">p-0 + aspect-square · 自然正方形 · 自動 tooltip</span>
           </div>
         </div>
       </div>
@@ -249,7 +249,7 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['variant', "'primary'|'secondary'|'tertiary'|'text'|'link'", "'primary'", '視覺強調等級'],
+                ['variant', "'primary'|'secondary'|'tertiary'|'text'|'link'", "'tertiary'（iconOnly 時 'text'）", '視覺強調等級；CTA 必 explicit primary'],
                 ['danger', 'boolean', 'false', '套用紅色，與 variant 正交'],
                 ['pressed', 'boolean', '—', 'Toggle 按下狀態（aria-pressed + data-state），僅 secondary/tertiary/text 有視覺效果'],
                 ['pressedTone', "'emphasis'|'neutral'", "'emphasis'", 'pressed 視覺色調:emphasis 藍底 / neutral 灰底,context 決定'],
@@ -257,9 +257,11 @@ export const Overview = {
                 ['startIcon', 'LucideIcon', '—', '左側 icon，loading 時替換為 spinner'],
                 ['endIcon', 'LucideIcon', '—', '右側 icon（方向指示，如 ChevronDown）'],
                 ['badge', 'ReactNode', '—', '右側 badge（通知計數）'],
+                ['overlayBadge', 'ReactNode', '—', '角標疊於 icon 右上（僅 iconOnly=true；對齊 Material BadgedBox）'],
                 ['iconOnly', 'boolean', 'false', '正方形模式，需搭配 aria-label'],
                 ['loading', 'boolean', 'false', 'CircularProgress(indeterminate)+ 自動 disabled + aria-busy'],
                 ['fullWidth', 'boolean', 'false', '撐滿父容器'],
+                ['dismiss', 'boolean', 'false', 'X close 視覺弱化（強制 variant=text + iconOnly=true）'],
                 ['asChild', 'boolean', 'false', '透過 Radix Slot 套用至子元件'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
@@ -401,7 +403,7 @@ const InspectorInner = () => {
                 </div>
                 <div className="ml-3 flex flex-col gap-0.5">
                   <TkVal token={s.heightToken} value={s.height} />
-                  <span className="font-mono text-[10px] text-fg-muted">px-[calc((h-icon)/2)] + aspect-square · min-w-0</span>
+                  <span className="font-mono text-[10px] text-fg-muted">p-0 + aspect-square · min-w-0</span>
                 </div>
               </div>
             )}
@@ -429,8 +431,8 @@ const InspectorInner = () => {
             <PropRow label="高度" dot={Z.dim.text}><TkVal token={s.heightToken} value={s.height} /></PropRow>
             {iconOnly ? (
               <>
-                <PropRow label="內距">px-[calc((h-icon)/2)]</PropRow>
-                <PropRow label="形狀">正方形(padding 公式 + aspect-square CSS 雙重鎖)</PropRow>
+                <PropRow label="內距">p-0(padding-free)</PropRow>
+                <PropRow label="形狀">正方形(aspect-square + p-0 + flex-center)</PropRow>
                 <PropRow label="Min Width">min-w-0</PropRow>
               </>
             ) : (
@@ -586,7 +588,7 @@ export const SizeMatrix = {
               <Td>iconOnly 覆寫</Td>
               {SIZES.map((sz) => (
                 <Td key={sz} mono>
-                  <div className="text-fg-secondary">px-[calc((h-icon)/2)]</div>
+                  <div className="text-fg-secondary">p-0 + aspect-square</div>
                   <div className="text-fg-muted text-[10px]">自然正方形 · min-w-0</div>
                 </Td>
               ))}
@@ -641,10 +643,10 @@ export const StateBehavior = {
       <div className="flex flex-col gap-4">
         <span className="text-caption font-medium text-fg-secondary">Loading — CircularProgress 替換規則</span>
         {[
-          { label: '有 startIcon', before: <Button startIcon={Download}>匯出</Button>, after: <Button startIcon={Download} loading>匯出</Button>, desc: 'startIcon → CircularProgress(同位置)' },
-          { label: '無 startIcon', before: <Button>儲存</Button>, after: <Button loading>儲存</Button>, desc: 'CircularProgress 加在文字左側' },
+          { label: '有 startIcon', before: <Button variant="primary" startIcon={Download}>匯出</Button>, after: <Button variant="primary" startIcon={Download} loading>匯出</Button>, desc: 'startIcon → CircularProgress(同位置)' },
+          { label: '無 startIcon', before: <Button variant="primary">儲存</Button>, after: <Button variant="primary" loading>儲存</Button>, desc: 'CircularProgress 加在文字左側' },
           { label: 'iconOnly', before: <Button iconOnly startIcon={Download} aria-label="下載" />, after: <Button iconOnly startIcon={Download} loading aria-label="下載" />, desc: 'CircularProgress 替換 icon' },
-          { label: '有 endIcon', before: <Button startIcon={Download} endIcon={ChevronDown}>匯出</Button>, after: <Button startIcon={Download} loading endIcon={ChevronDown}>匯出</Button>, desc: 'endIcon 維持顯示' },
+          { label: '有 endIcon', before: <Button variant="primary" startIcon={Download} endIcon={ChevronDown}>匯出</Button>, after: <Button variant="primary" startIcon={Download} loading endIcon={ChevronDown}>匯出</Button>, desc: 'endIcon 維持顯示' },
         ].map(({ label, before, after, desc }) => (
           <div key={label} className="flex items-center gap-3">
             <span className="text-[11px] text-fg-muted w-20 shrink-0">{label}</span>
@@ -685,9 +687,7 @@ export const StateBehavior = {
               <span className="text-fg-muted">⇄</span>
               <Button variant={v} pressed iconOnly startIcon={Settings} aria-label={`${v}（開）`} />
               <span className="text-[11px] text-fg-muted">
-                {v === 'text'
-                  ? 'text + pressed → neutral-selected family'
-                  : `${v} + pressed → primary-subtle 系列`}
+                {`${v} + pressed → primary-subtle 系列（預設 pressedTone="emphasis"；傳 pressedTone="neutral" 則為 neutral-selected 灰底）`}
               </span>
             </div>
           ))}
@@ -704,7 +704,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `button.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  slot  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/slot#accessibility)。\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"無障礙設計摘要:\n\n  語意與鍵盤  :預設渲染原生 button 元素,自動帶有按鈕角色、Enter / 空白鍵觸發、Tab 聚焦等瀏覽器原生無障礙行為,無需額外設定。icon-only 按鈕請傳 aria-label 描述用途。\n\n  焦點外框  :鍵盤聚焦時(focus-visible)顯示一圈外框,讓鍵盤使用者看得到目前焦點落在哪顆按鈕;滑鼠點擊不會觸發這圈外框,避免視覺雜訊。\n\n  停用狀態  :disabled 時品牌 / 狀態色完全移除、統一回到 neutral 停用色,原生 disabled 屬性讓輔助技術讀出「已停用」;loading 中額外帶 aria-busy 告知處理中。\n\n  驗證  :Storybook a11y 面板應 0 項嚴重違規;全程鍵盤可操作(無需滑鼠);文字對比 ≥ 4.5:1、介面元素對比 ≥ 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

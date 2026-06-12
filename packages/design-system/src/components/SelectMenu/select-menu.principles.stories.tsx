@@ -28,11 +28,11 @@ export const UsageGuidance: Story = {
         <div className="prose prose-sm max-w-prose mb-8">
           <p>適合 SelectMenu 的真實業務場景(點擊跳轉「展示」頁範例):</p>
           <ul className="space-y-1">
-            <li><LinkTo kind="Design System/Internal/SelectMenu/展示" name="單選"><span className="text-primary hover:underline font-medium cursor-pointer">單選</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Internal/SelectMenu/展示" name="搜尋"><span className="text-primary hover:underline font-medium cursor-pointer">搜尋</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Internal/SelectMenu/展示" name="多選"><span className="text-primary hover:underline font-medium cursor-pointer">多選</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Internal/SelectMenu/展示" name="多選 + 搜尋"><span className="text-primary hover:underline font-medium cursor-pointer">多選 + 搜尋</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Internal/SelectMenu/展示" name="可清除"><span className="text-primary hover:underline font-medium cursor-pointer">可清除</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Internal/SelectMenu/展示" name="單選"><span className="text-primary hover:underline font-medium cursor-pointer">議題狀態欄位擇一指派(單選)</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Internal/SelectMenu/展示" name="搜尋"><span className="text-primary hover:underline font-medium cursor-pointer">數百人組織選負責人,輸入過濾(搜尋)</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Internal/SelectMenu/展示" name="多選"><span className="text-primary hover:underline font-medium cursor-pointer">工單同時貼多個標籤(多選)</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Internal/SelectMenu/展示" name="多選 + 搜尋"><span className="text-primary hover:underline font-medium cursor-pointer">大量標籤庫中過濾並複選(多選 + 搜尋)</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Internal/SelectMenu/展示" name="可清除"><span className="text-primary hover:underline font-medium cursor-pointer">篩選列一鍵清空已選條件(可清除)</span></LinkTo></li>
           </ul>
           <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方 vs 近親 段)。</p>
         </div>
@@ -70,7 +70,7 @@ export const CompositionRules: Story = {
     <div>
       <Section title="Pattern 1 — Select(static 單選 dropdown)">
         <div className="prose prose-sm max-w-prose">
-          <p>已知選項清單 + 單選回 form → <LinkTo kind="Design System/Components/Select/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Select</span></LinkTo>(內部 SelectMenu + cmdk + MenuItem)。對齊 Material <code>Select</code> / Ant <code>Select</code> idiom。</p>
+          <p>已知選項清單 + 單選回 form → <LinkTo kind="Design System/Components/Select/展示" name="四模式"><span className="text-primary hover:underline font-medium cursor-pointer">Select</span></LinkTo>(內部 SelectMenu + cmdk + MenuItem)。對齊 Material <code>Select</code> / Ant <code>Select</code> idiom。</p>
           <ul>
             <li>典型場景:Country picker / Status selector / Priority dropdown</li>
             <li>判斷:選項 ≤ 20 + 不需搜尋 → Select(可選 searchable mode 啟用搜尋)</li>
@@ -80,7 +80,7 @@ export const CompositionRules: Story = {
 
       <Section title="Pattern 2 — Combobox(多選 + 搜尋 + 可建立新值)">
         <div className="prose prose-sm max-w-prose">
-          <p>多選 + 大量選項需搜尋 + 可創新 tag → <LinkTo kind="Design System/Components/Combobox/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Combobox</span></LinkTo>。對齊 GitHub Label picker / Linear Multi-assignee / Notion Multi-select idiom。</p>
+          <p>多選 + 大量選項需搜尋 + 可創新 tag → <LinkTo kind="Design System/Components/Combobox/展示" name="四模式"><span className="text-primary hover:underline font-medium cursor-pointer">Combobox</span></LinkTo>。對齊 GitHub Label picker / Linear Multi-assignee / Notion Multi-select idiom。</p>
           <ul>
             <li>典型場景:Tag picker / Multi-assignee / Filter chips multi-value</li>
             <li>單行模式自動接 OverflowIndicator(`+N`)避免 tag wrap</li>
@@ -90,7 +90,7 @@ export const CompositionRules: Story = {
 
       <Section title="Pattern 3 — PeoplePicker(人員選擇 + Avatar 渲染)">
         <div className="prose prose-sm max-w-prose">
-          <p>選人員(單 / 多)+ 渲染 avatar + 名稱 + role → <LinkTo kind="Design System/Components/PeoplePicker/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">PeoplePicker</span></LinkTo>。對齊 Slack mention / Linear assignee / Asana people-search idiom。</p>
+          <p>選人員(單 / 多)+ 渲染 avatar + 名稱 + role → <LinkTo kind="Design System/Components/PeoplePicker/展示" name="單人"><span className="text-primary hover:underline font-medium cursor-pointer">PeoplePicker</span></LinkTo>。對齊 Slack mention / Linear assignee / Asana people-search idiom。</p>
           <ul>
             <li>典型場景:Task assignee / Document collaborator / Workspace member invite</li>
           </ul>

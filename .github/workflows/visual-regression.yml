@@ -26,6 +26,11 @@ permissions:
   contents: read
   pull-requests: write
 
+# 2026-06-04 SSOT 假綠根治:bash -eo pipefail → `| tail` 不再吞 exit code。
+defaults:
+  run:
+    shell: bash -eo pipefail {0}
+
 jobs:
   visual-regression:
     name: Visual Regression Diff(DS-wide pixel match)
@@ -48,6 +53,11 @@ jobs:
 
       - name: Install Playwright chromium
         run: npx playwright install --with-deps chromium
+
+      # 2026-06-04 fix(missing-build-dep):build-storybook 的 prebuild 跑 storybook-config tsc,需 DS dist 型別。
+      # 漏此步在 a11y workflow 已造成 build 早夭;此 workflow 一併補上對齊 ci.yml / release.yml。
+      - name: Build DS lib + types
+        run: npm run build:lib 2>&1 | tail -10
 
       - name: Build Storybook
         run: npm run build-storybook 2>&1 | tail -5

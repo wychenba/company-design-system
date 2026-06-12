@@ -33,7 +33,7 @@ const COLOR_MAP: Record<ModeKey, Partial<Record<StateKey, ColorSpec>>> = {
     disabled: { bg: '--bg-disabled', text: '--fg-disabled', border: 'transparent',     icon: '--fg-disabled' },
   },
   readonly: {
-    default:  { bg: '--bg-disabled', text: '--foreground',  border: 'transparent',     icon: '--fg-muted' },
+    default:  { bg: '--bg-readonly', text: '--foreground',  border: 'transparent',     icon: '--fg-muted' },
   },
   disabled: {
     default:  { bg: '--bg-disabled', text: '--fg-disabled', border: 'transparent',     icon: '--fg-disabled' },
@@ -57,7 +57,7 @@ const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
 
 const MODE_DESC: Record<ModeKey, string> = {
   edit:     'button trigger + Calendar icon — bg-surface + border + hover/focus 回饋,點擊開啟 Calendar Popover',
-  readonly: '格式化日期文字 — bg-disabled(neutral-2) + 無邊框 + 文字正常色',
+  readonly: '格式化日期文字 — bg-readonly(neutral-2) + 無邊框 + 文字正常色',
   disabled: '格式化日期文字 — bg-disabled(neutral-2) + 無邊框 + 文字灰化',
 }
 
@@ -172,7 +172,7 @@ export const Overview = {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <H3>結構（Anatomy）</H3>
-          <Desc>edit 模式：button trigger 顯示格式化文字 + Calendar icon（固定右側），點擊開啟 Calendar Popover。clearable 有值時額外顯示 X clear 按鈕。readonly / disabled 模式：Intl.DateTimeFormat 格式化文字，無 icon。</Desc>
+          <Desc>edit 模式：可點擊的觸發列顯示格式化日期文字 + 日曆圖示（固定右側），點任意位置都會展開日期面板。clearable 有值時額外顯示 X 清除按鈕。readonly / disabled 模式：格式化文字 + Calendar icon（類型身份 indicator；disabled 切 fg-disabled），無 X。</Desc>
         </div>
         <div className="flex gap-8">
           {/* Edit layout */}
@@ -180,21 +180,21 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">edit</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               {[
-                { name: 'button trigger text （flex-1）', color: 'success' },
+                { name: '日期文字 （flex-1）', color: 'success' },
                 { name: 'Calendar icon', color: 'info' },
               ].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
             </div>
-            <span className="text-[10px] text-fg-muted font-mono">&lt;button&gt; + fieldWrapperStyles(edit, size) → 點擊開啟 Popover&lt;Calendar&gt;</span>
+            <span className="text-[10px] text-fg-muted font-mono">可點擊觸發列（Input 外觀）→ 點任意位置展開日期面板</span>
           </div>
           {/* Edit + clearable layout */}
           <div className="flex flex-col gap-2 items-start">
             <span className="text-[11px] text-fg-muted font-medium">edit + clearable（有值）</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               {[
-                { name: 'button trigger text （flex-1）', color: 'success' },
+                { name: '日期文字 （flex-1）', color: 'success' },
                 { name: 'X clear', color: 'error' },
                 { name: 'Calendar icon', color: 'info' },
               ].map((s) => (
@@ -248,14 +248,14 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['mode', "'edit' | 'readonly' | 'disabled'", "'edit'", '顯示模式，disabled 原生屬性會自動覆蓋'],
+                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", "顯示模式；display 為純內容輸出（DataTable cell 用）。優先序：顯式 mode prop 永遠最優先，未傳 mode 時 disabled 才升 disabled（useResolvedFieldMode）；disabled 以 aria-disabled 表達（trigger 為 div role=combobox，非原生 disabled 屬性）"],
                 ['error', 'boolean', 'false', '紅色邊框 + aria-invalid，僅 edit 模式生效'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '高度與字體，與 Button 共用 field-height token'],
                 ['value', 'string | null', '—', 'ISO date string（YYYY-MM-DD）'],
                 ['onChange', '(value: string) => void', '—', '值變更回調'],
                 ['clearable', 'boolean', 'false', '有值時顯示 X 清除按鈕，僅 edit 模式'],
-                ['formatOptions', 'Intl.DateTimeFormatOptions', "{ year: 'numeric', month: '2-digit', day: '2-digit' }", 'readonly / disabled 格式化選項'],
-                ['locale', 'string', "'en-US'", 'Intl.DateTimeFormat locale'],
+                ['formatOptions', 'Intl.DateTimeFormatOptions', '—', '未傳 → 預設 YYYY/MM/DD 直接組（locale-independent）；傳此 prop / locale 才走 Intl.DateTimeFormat（內部 fallback options 為 year:numeric / month,day:2-digit）'],
+                ['locale', 'string', '—', '僅在傳 formatOptions / locale 啟用 Intl 時生效（fallback en-US）；未傳任何格式 prop 時不影響顯示'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -346,7 +346,7 @@ const InspectorInner = () => {
                 { c: Z.pad, l: '左右內距' },
                 ...(isEdit ? [{ c: Z.input, l: 'trigger text' }] : [{ c: Z.input, l: 'formatted text' }]),
                 ...(showClear ? [{ c: Z.action, l: 'X clear' }] : []),
-                ...(isEdit ? [{ c: Z.icon, l: 'Calendar' }] : []),
+                { c: Z.icon, l: 'Calendar' },
               ].map(({ c, l }) => (
                 <span key={l} className="inline-flex items-center gap-1">
                   <span className="w-2.5 h-2.5 rounded-md" style={{ background: c.bg, border: `1px dashed ${c.border}` }} />
@@ -364,12 +364,8 @@ const InspectorInner = () => {
                     <BpZone w={44} color={Z.action} label={`${s.icon}px`} sub="clear" />
                   </>
                 )}
-                {isEdit && (
-                  <>
-                    <BpZone w={32} color={Z.gap} label={s.gapToken} sub={`${s.gap}px`} />
-                    <BpZone w={44} color={Z.icon} label={`${s.icon}px`} sub="Calendar" />
-                  </>
-                )}
+                <BpZone w={32} color={Z.gap} label={s.gapToken} sub={`${s.gap}px`} />
+                <BpZone w={44} color={Z.icon} label={`${s.icon}px`} sub="Calendar" />
                 <BpZone w={44} color={Z.pad} label={s.pxToken} sub={`${s.px}px`} />
               </div>
               <div className="ml-3 flex items-center" style={{ height: 52 }}>
@@ -556,7 +552,7 @@ export const ColorMatrix = {
                 <Td>指示用途（開啟 picker）</Td>
                 <Td><span className="inline-flex items-center gap-1"><Swatch value="--fg-muted" size="sm" /><span className="font-mono">--fg-muted</span></span></Td>
                 <Td><span className="text-fg-muted">不變</span></Td>
-                <Td><span className="text-fg-muted">不渲染（disabled 無 Calendar）</span></Td>
+                <Td><span className="inline-flex items-center gap-1"><Swatch value="--fg-disabled" size="sm" /><span className="font-mono">--fg-disabled</span></span></Td>
               </tr>
               <tr>
                 <Td mono>X clear</Td>
@@ -690,28 +686,28 @@ export const StateBehavior = {
               <span className="text-fg-muted text-caption">→</span>
               <DatePicker mode="disabled" value="2026-04-02" className="w-56" />
             </div>
-            <span className="text-[11px] text-fg-muted">左：edit（有 X）→ 中：readonly（無 X，無 Calendar）→ 右：disabled（無 X，無 Calendar，文字灰化）</span>
+            <span className="text-[11px] text-fg-muted">左：edit（有 X）→ 中：readonly（無 X，保留 Calendar）→ 右：disabled（無 X，Calendar 與文字切 fg-disabled）</span>
           </div>
         </div>
 
         {/* Trigger opens Calendar Popover */}
         <div className="flex flex-col gap-4">
-          <span className="text-caption font-medium text-fg-secondary">Trigger — 點擊任意位置開啟 Calendar Popover</span>
+          <span className="text-caption font-medium text-fg-secondary">觸發列 — 點任意位置展開日期面板</span>
           <div className="flex flex-col gap-2 max-w-sm">
-            <span className="text-[11px] text-fg-muted">Trigger 是一個 &lt;button&gt;,Calendar icon 內建於 button 內。點擊 trigger 任意位置(含文字區與 icon)都會開啟 Popover 展開本 DS 自建的 Calendar。</span>
+            <span className="text-[11px] text-fg-muted">觸發列是一個可點擊的 combobox 控件(外觀同 Input),日曆圖示固定在右側。點觸發列任意位置(含文字區與圖示)都會展開本 DS 自建的日期面板。</span>
             <DatePicker value="2026-05-15" onChange={() => {}} />
           </div>
         </div>
 
         {/* Format options */}
         <div className="flex flex-col gap-4">
-          <span className="text-caption font-medium text-fg-secondary">格式化 — readonly / disabled / Display 使用 Intl.DateTimeFormat</span>
+          <span className="text-caption font-medium text-fg-secondary">格式化 — 預設 YYYY/MM/DD 直接組；傳 formatOptions / locale 走 Intl.DateTimeFormat</span>
           <div className="overflow-x-auto">
             <table className="border-collapse text-caption">
               <thead><tr><Th>設定</Th><Th>readonly 預覽</Th><Th>Display 預覽</Th></tr></thead>
               <tbody>
                 <tr>
-                  <Td>預設（MM/DD/YYYY）</Td>
+                  <Td>預設（YYYY/MM/DD）</Td>
                   <td className="p-2 border-b border-divider"><DatePicker mode="readonly" value="2026-04-02" /></td>
                   <td className="p-2 border-b border-divider"><DatePicker mode="display" value="2026-04-02" /></td>
                 </tr>
@@ -776,7 +772,7 @@ export const StateBehavior = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const CalendarTokens = {
-  name: 'Calendar 內部 token',
+  name: 'Calendar 內部設計變數',
   render: () => {
     const [selected, setSelected] = useState<Date | undefined>(new Date(2026, 4, 15)) // 2026-05-15 專案截止日
     return (
@@ -784,7 +780,7 @@ export const CalendarTokens = {
         <div className="flex flex-col gap-1">
           <H3>Calendar Popup — 本 DS 自建</H3>
           <Desc>
-            DatePicker 展開的 Calendar 使用 react-day-picker v9 + 本 DS token 覆寫預設視覺(見 ./calendar.tsx)。
+            DatePicker 展開的 DateGrid 使用 react-day-picker v9 + 本 DS token 覆寫預設視覺(見 ../DateGrid/date-grid.tsx)。
             所有視覺 token 由 semantic token 驅動,切 dark mode 自動聯動,不需元件內重寫。
           </Desc>
         </div>
@@ -820,8 +816,8 @@ export const CalendarTokens = {
                   <tr>
                     <Td>today</Td>
                     <Td>文字下方藍色底線</Td>
-                    <Td mono>underline · decoration-primary · decoration-2 · underline-offset-4</Td>
-                    <Td>非 ring circle(避免與 hover 混淆,對齊 Ant / Google Calendar / macOS Calendar)</Td>
+                    <Td mono>[&gt;button]:after:bg-primary · after:h-[1.5px] · after:w-[40%] · after:rounded-full · after:bottom-[5px]</Td>
+                    <Td>after 偽元素 bar(非 text-decoration underline、非 ring circle),避免與 hover 混淆,對齊 Ant / Google Calendar / macOS Calendar</Td>
                   </tr>
                   <tr>
                     <Td>disabled</Td>
@@ -838,19 +834,19 @@ export const CalendarTokens = {
                   <tr>
                     <Td>range track(中間日期)</Td>
                     <Td>灰底矩形橫條</Td>
-                    <Td mono>bg-[var(--color-neutral-3)](day 容器層)</Td>
+                    <Td mono>before:bg-neutral-selected(day 容器層 before 偽元素 track)</Td>
                     <Td>與端點圓接縫形成連續 bar</Td>
                   </tr>
                   <tr>
                     <Td>hover(未選中)</Td>
                     <Td>藍圈 outline 無 fill</Td>
-                    <Td mono>hover:ring-1 · hover:ring-primary · hover:bg-transparent</Td>
+                    <Td mono>hover:ring-[1.5px] · hover:ring-primary · hover:bg-transparent</Td>
                     <Td>非 filled 避免跟 selected 混淆</Td>
                   </tr>
                   <tr>
                     <Td>outside month</Td>
                     <Td>弱化字色</Td>
-                    <Td mono>text-fg-disabled</Td>
+                    <Td mono>text-fg-muted</Td>
                     <Td>上下月溢出日期;不套 disabled 灰底圓(outside 只是「非當月」不是「禁選」)</Td>
                   </tr>
                 </tbody>
@@ -869,18 +865,18 @@ export const CalendarTokens = {
                   </tr>
                   <tr>
                     <Td>Nav 按鈕(prev / next)</Td>
-                    <Td mono>h-9 · w-9 · rounded-md · text-fg-muted · hover:bg-neutral-hover</Td>
-                    <Td>Tertiary-style icon button,hover 才浮現背景。w-9 對齊 day cell 做左右對稱</Td>
+                    <Td mono>Button variant=&quot;text&quot; size=&quot;xs&quot; iconOnly · absolute top-0 left/right-0</Td>
+                    <Td>消費 Button(variant=&quot;text&quot;)— 尺寸由 size=&quot;xs&quot; 決定,色彩走 Button 預設 text-foreground(neutral-9),不另開 fg-muted tier;absolute 貼齊 caption 兩側</Td>
                   </tr>
                   <tr>
                     <Td>星期標頭</Td>
-                    <Td mono>h-8 · w-9 · text-caption · text-fg-muted · font-normal</Td>
-                    <Td>Mon / Tue...弱化為輔助資訊</Td>
+                    <Td mono>h-7 · text-body · text-foreground · font-medium · align-middle · text-center</Td>
+                    <Td>Mon / Tue...與 caption「May 2026」同視覺權重(都屬 calendar header 區),不弱化</Td>
                   </tr>
                   <tr>
                     <Td>日格</Td>
-                    <Td mono>h-9 · w-9</Td>
-                    <Td>36×36,容納點擊區 + 視覺指示</Td>
+                    <Td mono>h-field-sm · w-[var(--field-height-sm)]</Td>
+                    <Td>28×28 @ md / 32×32 @ lg,容納點擊區 + 視覺指示</Td>
                   </tr>
                   <tr>
                     <Td>Popover padding</Td>
@@ -904,15 +900,15 @@ export const CalendarTokens = {
         <div className="flex flex-col gap-3">
           <span className="text-caption font-medium text-fg-secondary">架構</span>
           <pre className="text-caption font-mono bg-neutral-hover rounded-md p-4 text-fg-secondary leading-relaxed">
-{`<button fieldWrapperStyles>        ← 視覺仍是 Input wrapper(不變)
+{`<div role="combobox" tabIndex={0} fieldWrapperStyles>  ← Input wrapper 外觀;div+role 非 button(避免 nested-interactive)
   <span>格式化的日期文字</span>
-  <ItemInlineAction X />            ← 選用,clearable=true 時顯示
+  <ItemInlineAction X />            ← 選用,clearable=true 時顯示(本身是 button)
   <CalendarIcon />                   ← 右側固定
-</button>
-       │ 點擊開啟
+</div>
+       │ 點擊 / Enter / Space 開啟
        ▼
 <Popover align="start">
-  <Calendar />                      ← react-day-picker + 本 DS token
+  <DateGrid />                      ← react-day-picker + 本 DS token
 </Popover>`}
           </pre>
         </div>
@@ -934,7 +930,7 @@ export const Accessibility = {
         <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
           <li>Trigger:<code>{`<div role="combobox" tabIndex={0}>`}</code> + <code>aria-haspopup="dialog"</code> + <code>aria-expanded={`{open}`}</code></li>
           <li>Trigger 必含 accessible name(<code>aria-label</code> / 外層 <code>{`<label>`}</code> / fieldCtx label)</li>
-          <li>Popover content:<code>role="dialog"</code> + <code>aria-label="日期選擇"</code>(Range:<code>"日期區間選擇"</code>)</li>
+          <li>Popover content:<code>role="dialog"</code>;單一日期 popover 由 trigger 的 <code>role="combobox"</code> accessible name 標示(dialog 本身不重覆 <code>aria-label</code>)。Range popover 加 <code>aria-label="日期區間選擇"</code></li>
           <li>Range 雙 trigger:<code>aria-expanded</code> 對應只當該 trigger active 時 true</li>
         </ul>
       </section>

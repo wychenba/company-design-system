@@ -1,10 +1,13 @@
 // @story-trait-rationale: hasInteractiveStates 由 anatomy.stories.tsx StateBehavior auto-compile owns(2026-05-15 F-migration);Default scenario 由 Rich / Compact / HoverSwap 等真實上傳情境 story 覆蓋,Disabled state 由 status="error" / "uploading" 真實 state 體現。
 import * as React from 'react'
 import type { Meta } from '@storybook/react'
-import { Trash2 } from 'lucide-react'
+import { Trash2, ChevronDown } from 'lucide-react'
 import { FileItem } from './file-item'
 import { Button } from '@/design-system/components/Button/button'
 import { FileViewer, type FileInfo } from '@/design-system/components/FileViewer/file-viewer'
+// upload-manager 面板消費 overlay-surface header + body SSOT(非手刻)—— 跟 Popover/Dialog 同一組 primitive
+import { SurfaceHeader, SurfaceBody } from '@/design-system/patterns/overlay-surface/overlay-surface'
+import { PopoverTitle } from '@/design-system/components/Popover/popover'
 
 // 錯誤 description 範例(含 clickable "View log"):consumer 自由 ReactNode,通常用底線 link 表 clickable
 const errorDescWithLog = (
@@ -25,24 +28,21 @@ export default meta
 
 const noop = () => {}
 
-// FileItem row dedicated action(2026-04-22 canonical):
-// **Row action 絕對值 cap = ≤ 24px,不隨 row tier 放大**。依 row 高度分兩種實作:
-//   - Rich(row 56)→ Button size="xs" iconOnly(24 固定,≤ cap)
-//   - Compact(row 24)→ ItemInlineActionButton(因 Button xs 24 會填滿 compact row,
-//     失去呼吸;Inline Action icon 16 + hover-bg 22 剛好)
+// FileItem row dedicated action(2026-04-23 統一 canonical):
+// **Row action 絕對值 cap = ≤ 24px,不隨 row tier 放大**。rich + compact 統一用
+// Button size="xs" iconOnly variant="text"(24 固定,≤ cap):
+// compact row 透過 FileItem 內部 suffix wrapper `[&>[data-unbounded]]:my-[calc((1lh-var(--field-height-xs))/2)]`
+// trick 讓 Button(24)layout footprint 收斂到 1lh(~18px)不撐高 row,觸控範圍仍 24。
 // Trash/Delete 非 dismiss 語意(dismiss 嚴格 = X close overlay),不套 `dismiss` prop——
-// Button variant="text" / Inline Action 本來就 fg-muted,視覺已弱化。
+// Button variant="text" 本來就 fg-muted,視覺已弱化(兩 mode 同)。
 // 詳 item-anatomy.spec.md「Predicate」+「Row action 絕對值 cap」
-// rich + compact 統一 Button xs variant="text"(2026-04-23 canonical):
-// compact row 透過 FileItem 內部 `[&_[data-unbounded]]:my-[calc((1lh-xs)/2)]` trick
-// 讓 Button(24)layout 收斂到 1lh(~18px)不影響 row 高度,觸控範圍仍 24。
 const deleteBtn = <Button size="xs" iconOnly variant="text" startIcon={Trash2} aria-label="刪除" onClick={noop} />
 const deleteBtnXs = deleteBtn
 
 export const Rich = {
   name: '豐富樣式',
   render: () => (
-    // Type A upload manager:所有 item 都有 status + progress bar(含 completed 100%)
+    // rich(預設 form surface)各 status 展示:uploading / completed(保留 100% 完成條)/ error
     // 也可傳 onClick/onDownload 讓整 row 點開(預設 FileViewer,consumer 決定)
     // Rich 永遠 border card → list wrapper `gap-2` 防邊框相黏
     <div className="flex flex-col gap-2 max-w-md">
@@ -61,7 +61,7 @@ export const Rich = {
 export const Compact = {
   name: '緊湊樣式',
   render: () => (
-    // Compact + status(永遠有 progress bar)= Type A upload manager
+    // compact + status 各狀態展示(uploading / completed / error,永遠有 progress bar)
     // list wrapper `gap-1`(4px)簡化 canonical — compact list 統一 gap-1,不論純/混合(2026-04-23)
     <div className="flex flex-col gap-1 max-w-md">
       <FileItem mode="compact" name="UXP T-Phone.csv" status="uploading" progress={60} actions={deleteBtnXs} />
@@ -73,7 +73,7 @@ export const Compact = {
 }
 
 export const HoverSwap = {
-  name: 'Hover 替換',
+  name: '懸停替換',
   render: () => (
     <div className="flex flex-col max-w-md gap-4">
       <div>
@@ -93,7 +93,7 @@ export const HoverSwap = {
       </div>
       <div>
         <div className="text-caption text-fg-muted mb-2">
-          同樣 pattern 在 compact mode:status slot 幾何與 Inline Action(16×16 icon)一致,center 自動對齊
+          同樣 pattern 在 compact mode:status slot 幾何與 delete action 一致(兩 mode 統一 Button xs 24),center 自動對齊
         </div>
         {/* Compact list 統一 gap-1(canonical 簡化) */}
         <div className="flex flex-col gap-1">
@@ -188,13 +188,13 @@ export const Clickable = {
 }
 
 export const CompactMixed = {
-  name: 'Compact 混合',
+  name: '緊湊 混合',
   render: () => (
-    // Real-world:email 草稿 — 新上傳中(Type A active)+ 舊已存附件(Type B 靜態)混在同 list
-    // **重要 invariant**:Type A **completed**(bar 100% + ✓)跟 Type B(無 bar)不共存
-    // —— Type A completed 是「剛完成的 upload session」,Type B 是「已存 attachment」,
-    //    業務語義互斥(完成後 consumer 會把 item 轉成 Type B)。
-    // 這 mixed 情境只含:Type A active(uploading/error)+ Type B(saved attachments)
+    // Real-world:email 草稿 — 新上傳中(status=uploading/error)+ 舊已存附件(無 status 靜態)混在同 list
+    // **重要 invariant**:upload-manager 的 **completed**(bar 100% + ✓)跟靜態(無 bar)不共存
+    // —— completed-保留 是「剛完成的 upload session」,無 status 是「已存 attachment」,
+    //    業務語義互斥(表單情境完成後 consumer 會清掉 status 轉靜態)。
+    // 這 mixed 情境只含:上傳中(uploading/error)+ 已存附件(saved attachments,無 status)
     <div className="flex flex-col gap-1 max-w-md">
       <FileItem mode="compact" name="圖片草稿.png" status="uploading" progress={40} actions={deleteBtnXs} />
       <FileItem mode="compact" name="回覆範本.docx" onClick={noop} actions={deleteBtnXs} />
@@ -202,6 +202,64 @@ export const CompactMixed = {
         description={<>Network timeout. <a href="#" className="underline hover:text-error-hover" onClick={(e) => e.preventDefault()}>View log</a></>}
         onRetry={noop} actions={deleteBtnXs} />
       <FileItem mode="compact" name="附件封面.pdf" onClick={noop} actions={deleteBtnXs} />
+    </div>
+  ),
+}
+
+// surface="upload-manager":Google Drive / Dropbox 上傳管理面板。面板組合 canonical(2026-06-03 圖五/圖一 user 校準):
+//   - 左右一律 loose(16px,對齊 header);上下目標「邊緣→item ink」= tight(12px),通則 container 該側 = 12 − item 該側留白
+//   - rich item 上下留白 0 → py-tight(12/12 對稱);compact 上留 8(item py)→ pt-1(4),下進度條貼底留 0 → pb-tight(12)
+//   - 列間 gap 反映密度:rich = tight(12px,卡片+48 縮圖)/ compact = 4px(密集文字列)
+//   - rich item 拿掉全部 padding(px-0 py-0,列高靠 avatar 48);左右交給面板,避免雙重 L/R。對比 surface=form 的 border card。
+export const UploadManagerSurface = {
+  name: '上傳管理器 · 豐富(無邊框)',
+  render: () => (
+    <div className="max-w-md flex flex-col rounded-lg border border-border bg-surface-raised shadow-[var(--elevation-200)]">
+      {/* header 消費 overlay-surface SurfaceHeader + PopoverTitle(輕量浮層 chrome SSOT,非手刻):
+          px-loose py-tight + border-b + chevron(variant=text → 自動 data-unbounded → 套 slot 負 my trick)*/}
+      <SurfaceHeader className="justify-between [--chrome-slot-h:1.25rem]">
+        <div className="flex-1 min-w-0"><PopoverTitle>正在上傳 3 個項目</PopoverTitle></div>
+        <Button iconOnly variant="text" size="sm" startIcon={ChevronDown} aria-label="收合" onClick={noop} />
+      </SurfaceHeader>
+      {/* body 消費 overlay-surface SurfaceBody(非手刻;含 px-loose py-tight + flex-1 scroll 鏈)。
+          rich:py-tight(SurfaceBody 預設)+ gap-tight = 垂直對稱 12px */}
+      <SurfaceBody className="flex flex-col gap-[var(--layout-space-tight)]">
+        <FileItem mode="rich" surface="upload-manager" name="Alan Profile.png" status="uploading" progress={40}
+          description="5.7 MB of 7.5 MB" thumbnailSrc="https://i.pravatar.cc/80?u=alan" actions={deleteBtn} />
+        <FileItem mode="rich" surface="upload-manager" name="Q1 營收報表.xlsx" status="completed"
+          description="2.4 MB" thumbnailSrc="https://i.pravatar.cc/80?u=xls" onDownload={noop} actions={deleteBtn} />
+        <FileItem mode="rich" surface="upload-manager" name="合約草案 v3.pdf" status="error"
+          description={errorDescWithLog} thumbnailSrc="https://i.pravatar.cc/80?u=pdf" onRetry={noop} actions={deleteBtn} />
+      </SurfaceBody>
+    </div>
+  ),
+}
+
+// surface="upload-manager" 的 compact list:左右 loose 16(同 rich,對齊 header);上下「不對稱」=「12 − item 該側留白」:
+// top !pt-1=4(item 自帶 py-2 的 8 + 4 = 12),bottom 12(進度條貼底、item 下方無留白);gap 只 4px(密集列)。
+// 對比 rich panel(item py-0 → 上下對稱 12 / gap 12),demo 兩 mode 密度差異。
+export const UploadManagerCompactSurface = {
+  name: '上傳管理器 · 緊湊(無邊框)',
+  render: () => (
+    <div className="max-w-md flex flex-col rounded-lg border border-border bg-surface-raised shadow-[var(--elevation-200)]">
+      {/* header 消費同一個 overlay-surface SurfaceHeader + PopoverTitle SSOT(同 rich panel)*/}
+      <SurfaceHeader className="justify-between [--chrome-slot-h:1.25rem]">
+        <div className="flex-1 min-w-0"><PopoverTitle>同步 3 個檔案</PopoverTitle></div>
+        <Button iconOnly variant="text" size="sm" startIcon={ChevronDown} aria-label="收合" onClick={noop} />
+      </SurfaceHeader>
+      {/* body 消費 SurfaceBody(px-loose + pb-tight 自 SSOT);compact 只 override top:`!pt-1`(4px,
+          item 文字上方自帶 8px → 4+8=12;bottom 留 SurfaceBody 預設 py-tight=12,因進度條貼底無留白)。
+          用 `!`(important)而非 `pt-1`:twMerge 不 strip 基底 py-[tight] → 非 important 時 top 12/4 競爭看
+          stylesheet 生成順序(非決定性);`!` 強制 top=4 決定性勝(對齊 List-as-region `!px-0` override 慣例)。
+          列間 gap-1(4px,密集列)。 */}
+      <SurfaceBody className="flex flex-col gap-1 !pt-1">
+        <FileItem mode="compact" surface="upload-manager" name="季度報告.docx" status="uploading" progress={60}
+          onClick={noop} actions={deleteBtn} />
+        <FileItem mode="compact" surface="upload-manager" name="客戶名單.csv" status="completed"
+          onClick={noop} actions={deleteBtn} />
+        <FileItem mode="compact" surface="upload-manager" name="封面.png" status="error"
+          description={errorDescWithLog} onRetry={noop} actions={deleteBtn} />
+      </SurfaceBody>
     </div>
   ),
 }

@@ -42,7 +42,7 @@ function ToastInner({
     <Button variant="tertiary" size="xs" onClick={action.onClick}>{action.label}</Button>
   ) : undefined
 
-  // ── Live region 由 outer Toast wrapper 擁有(WAI-ARIA + spec L59-60 canonical) ──
+  // ── Live region 由 outer Toast wrapper 擁有(WAI-ARIA + toast.spec.md「A11y 預設」段 canonical) ──
   // Notice(inner layout)不再帶 role,避免 nested live region。
   // - error / warning → role="alert" + aria-live="assertive"(中斷朗讀)
   // - info / success / neutral → role="status" + aria-live="polite"(空閒朗讀)
@@ -109,7 +109,7 @@ Toaster.displayName = 'Toaster'
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const toastMeta = {
   component: 'Toast',
-  family: null, // non-family composite / overlay / layout
+  family: 2, // Family 2(List item layout)— 透過 Notice 繼承,對齊 toast.spec.md frontmatter L3 + L39
   variants: {
     neutral: { when: '非狀態通知;一般 announcement / tip' },
     info: { when: '資訊性提示(新版本 / 同步完成)' },

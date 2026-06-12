@@ -23,8 +23,8 @@ import './column-types' // ColumnMeta declaration merging
 // ── Sample Data ──────────────────────────────────────────────────────────────
 
 // ── Person sample data canonical ──
-// 對齊 NameCard.stories「Default」預設呈現:name + subtitle + status + statusMessage + fields
-// avatar.spec.md DS-wide:所有 person avatar hover 必出現 NameCard,展示資訊一致(不可精簡)
+// 對齊 ProfileCard.stories「Default」預設呈現:name + subtitle + status + statusMessage + fields
+// avatar.spec.md DS-wide:所有 person avatar hover 必出現 ProfileCard,展示資訊一致(不可精簡)
 import type { PersonData } from '@/design-system/components/PeoplePicker/person-display'
 
 const SELLERS: PersonData[] = [
@@ -163,7 +163,7 @@ export const ColumnResize: Story = {
           />
         </div>
         <div>
-          <h3 className="text-body font-bold text-foreground mb-2">Pinned + Resize 並存(USER #43 sanity)</h3>
+          <h3 className="text-body font-bold text-foreground mb-2">欄位釘選與欄寬調整並存</h3>
           <p className="text-caption text-fg-muted mb-3">
             把 SKU 跟產品名稱固定在左側,依然可以拖動分隔線調整這兩欄的寬度。
             <br />目前各欄寬度:{JSON.stringify(pinnedWidths)}
@@ -296,6 +296,7 @@ export const RowAutoHeight: Story = {
 }
 
 /* ── Empty State ── */
+// 「預設空狀態」pane = 「自訂空狀態」的對照基線;Empty primitive 消費教學 canonical → anatomy.EmptyState,此處不重複教學
 export const EmptyState: Story = {
   name: '空狀態',
   render: () => (
@@ -459,9 +460,9 @@ const TAG_OPTIONS = [
   { value: 'archived', label: '已封存' },
 ]
 // SAMPLE_PEOPLE 完整 PersonData(2026-05-06 v11):每筆都有 default field values(email/phone/
-// department/location)+ status + statusMessage,讓 NameCard hoverCard 永遠完整顯示一致。
-// 對齊 NameCard always-render canonical(NAMECARD_DEFAULT_FIELD_KEYS SSOT)。
-// **2026-05-07 v15.7**:NameCard default fields 改 ['id', 'employeeNumber'] only。
+// department/location)+ status + statusMessage,讓 ProfileCard hoverCard 永遠完整顯示一致。
+// 對齊 ProfileCard always-render canonical(NAMECARD_DEFAULT_FIELD_KEYS SSOT)。
+// **2026-05-07 v15.7**:ProfileCard default fields 改 ['id', 'employeeNumber'] only。
 // Email / Phone / Department / Location 透過 `fields` array opt-in。
 const SAMPLE_PEOPLE: PersonData[] = [
   {
@@ -1390,11 +1391,11 @@ export const FilterPanelModified: Story = {
   },
 }
 
-/* ── 進階篩選 — 長 tag 溢出測試(A5 reproduce)── */
+/* ── 進階篩選 — 長標籤溢出 ── */
 export const FilterPanelLongTagOverflow: Story = {
   name: '進階篩選 — 長標籤溢出',
   render: () => {
-    // 故意用 select_multi op + 多個長 label values,測試 Combobox tag overflow + +N indicator
+    // 製造業 ERP 的產品分類名稱普遍很長 — 示範多選後 Combobox tag 溢出時的 +N 摘要收斂
     const longLabelColumns = [
       col.accessor('category', {
         header: '類別',
@@ -1418,7 +1419,7 @@ export const FilterPanelLongTagOverflow: Story = {
     }))
     return (
       <div className="w-full max-w-[680px]">
-        <p className="text-caption text-fg-muted mb-3">A5 reproduce — 多個超長 label values 是否觸發 Combobox `+N` overflow indicator?</p>
+        <p className="text-caption text-fg-muted mb-3">產品分類名稱很長(製造業 ERP 常見)時,已選的多個標籤超出單行寬度,Combobox 自動收斂為 +N 摘要。</p>
         <DataTableFilterPanel
           mode="flat"
           columns={[...longLabelColumns]}
@@ -1432,14 +1433,14 @@ export const FilterPanelLongTagOverflow: Story = {
 
 /* ── 列拖曳重排(Jira-style + 3-panel pinned columns)──────────────────────
    enableRowDrag + onRowReorder 整合範例(v3 Jira 設計準則):
-   - handle absolute 浮在 row 左 border(Button tertiary iconOnly xs = elevated chip)
+   - handle 浮在 row 左緣(fixed-position;Button tertiary iconOnly xs = elevated chip)
    - 不佔 column 空間 — table 看起來乾淨,沒有預留拖曳欄位
-   - hover row → handle 浮現(opacity 0 → 100)
-   - 拖曳 row → @dnd-kit/sortable 重排;放下 → onRowReorder(sourceId, targetId, 'before' | 'after')
+   - hover row → handle 浮現(JS 控 opacity)
+   - 拖曳 row → @dnd-kit/core useDraggable + useDroppable(v15.0 Path B);放下 → onRowReorder(sourceId, targetId, 'before' | 'after')
    - consumer 自管 data array mutation(同 Notion / Airtable / Linear pattern)
    - sort 啟用時 drag handle 自動 disabled + Tooltip 解釋
-   - pinned-left + pinned-right 同時存在 → mirror regions 跟動 transform(per-region useSortable
-     共享同 SortableContext state) */
+   - pinned-left + pinned-right 同時存在 → source 留原位,2px drop indicator 跨三 region 同步標示落點
+     (per-region useDraggable / useDroppable,不 auto-shift) */
 export const RowDragInteractive: Story = {
   name: '列拖曳重排（含釘選欄）',
   render: () => {
@@ -1462,8 +1463,8 @@ export const RowDragInteractive: Story = {
       <div className="flex flex-col gap-3 max-w-3xl">
         <p className="text-caption text-fg-muted">
           handle 浮在 row 左緣（不佔 column 空間，Jira 設計準則）。pinned-left（SKU）+ pinned-right（Updated）+
-          center 中段欄。拖曳任一列時，三個 region 的 row 會同步跟動 transform（per-region
-          <code>useSortable</code> 共享同 SortableContext state）。
+          center 中段欄。拖曳時 source 列留在原位（壓住視覺），2px 主色 drop indicator 跨三個 region
+          同步標示落點（per-region <code>useDraggable</code> / <code>useDroppable</code>，不 auto-shift）。
         </p>
         <DataTable
           columns={columnsWithPrice}
@@ -1482,12 +1483,12 @@ export const RowDragInteractive: Story = {
 
 /* ── 列拖曳 × 虛擬捲動（200 列）────────────────────────────────────────────
    v3 fix(2026-05-05)— scroll bug 修法:
-   1. enableRowDrag 時 overscan 自動拉到 ≥ 10(避免 row unmount 時 useSortable subscription 跟著
+   1. enableRowDrag 時 overscan 自動拉到 Math.max(overscan, 5)(避免 row unmount 時 useDraggable/useDroppable subscription 跟著
       消失導致 dnd-kit stale lookup → 拖到該 id 視覺錯位)
    2. drag 進行中(activeDragId != null)整個略過 measureElement(任一 row 重新量測會跟 dnd-kit
       transform 競爭,長 list 累積錯位)
-   3. DndContext modifier 鎖 Y 軸(restrictToVerticalAxis inline 實作)— row drag 是垂直語義,
-      X 抖動會觸發水平 transform → 進而 measureElement loop
+   3. DndContext modifier 用 snapToCursorModifier(ghost top-left 對齊 cursor,不鎖軸)— row drag
+      期間 ghost 跟隨游標
    - 200 列 + 固定高度 → virtualizer 啟用
    - 拖曳長距離 + 持續往下捲 → 視覺位置仍對齊,放下後 onRowReorder 收到正確 sourceId / targetId */
 export const RowDragWithVirtualization: Story = {
@@ -1510,8 +1511,8 @@ export const RowDragWithVirtualization: Story = {
     return (
       <div className="flex flex-col gap-3 max-w-3xl">
         <p className="text-caption text-fg-muted">
-          200 列 + 虛擬捲動。v3 修正:enableRowDrag 自動拉高 overscan ≥ 10、drag 期間 freeze
-          measureElement、modifier 鎖 Y 軸 — 拖曳 + 持續往下捲不再錯位。
+          200 列 + 虛擬捲動。v3 修正:enableRowDrag 自動拉高 overscan ≥ 5、drag 期間 freeze
+          measureElement、snapToCursorModifier ghost 對齊游標（不鎖軸）— 拖曳 + 持續往下捲不再錯位。
         </p>
         <DataTable
           columns={baseColumns}
@@ -1888,5 +1889,49 @@ export const RoadmapAllInOne: Story = {
     if (visibleCount < 5) {
       throw new Error(`Virtualization too aggressive:rendered only ${visibleCount} rows`)
     }
+  },
+}
+
+/* ── Feature-split perf budget story(2026-05-14 codex perf debate verdict;2026-06-12 deep-audit
+   R2 重建 — 2026-05-17 stories 整併批次誤 retire,但 spec「六之三」Case B hard gate +
+   scripts/runtime-perf-datatable.mjs:20 仍指向本 story,gate 形同不可跑):──────────────────
+   獨立 perf 量測 story — 同 Roadmap 13 cols rich-cell data(useRoadmapColumns SSOT),但**禁用**
+   row drag / column reorder / column resize / selection / spreadsheet overlay,只保 inline edit
+   display。目的:隔離 feature-stack 疊加 cost(SortableRowProvider / filter / sort / columnOrder
+   state),驗證 rich cell 本體 scroll budget(avg ≤ 50ms / p95 ≤ 80ms / long-task ≤ 1,CPU 4x
+   throttle)。**不動** RoadmapAllInOne demo IA(user 2026-05-10 directive 全合一)。
+   重建版去掉原手刻說明 banner(px-loose + border-b border-divider = R9 chrome-header drift
+   簽名,且量測 story 不需 chrome;說明留本註解)。 */
+export const RoadmapPerfBudget: Story = {
+  name: '效能預算量測',
+  parameters: { layout: 'fullscreen' },
+  tags: ['!autodocs'],
+  render: () => {
+    const bigData = React.useMemo(() => {
+      const arr: RoadmapItem[] = []
+      for (let i = 0; i < 500; i++) {
+        const base = ROADMAP_DATA[i % ROADMAP_DATA.length]
+        const id = `RDM-${String(i + 100).padStart(3, '0')}`
+        arr.push({ ...base, id, title: `${base.title} (#${i + 1})` })
+      }
+      return arr
+    }, [])
+    const [data, setData] = React.useState(bigData)
+    const columns = useRoadmapColumns()
+    const handleCommit = (rowId: string, colId: string, value: unknown) => {
+      setData((prev) => prev.map((r) => (r.id === rowId ? { ...r, [colId]: value } : r)))
+    }
+    return (
+      <div className="mx-[var(--layout-space-loose)] mb-[var(--layout-space-loose)]">
+        <DataTable
+          columns={columns}
+          data={data}
+          height="600px"
+          inlineEdit
+          getRowId={(row) => row.id}
+          onCellCommit={handleCommit}
+        />
+      </div>
+    )
   },
 }

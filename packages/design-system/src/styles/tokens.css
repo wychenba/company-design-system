@@ -34,9 +34,13 @@
 @import './../tokens/opacity/opacity.css';
 @import './../tokens/motion/motion.css';
 
-/* Non-token CSS (patterns/ + components/) containing :root token declarations
+/* Non-token CSS (patterns/ + components/) containing token/runtime declarations
    or component-internal styles — auto-detected by generator scan. Per 2026-05-27
    root-cause fix: src/globals.css 已 import for DS internal, 但 consumer-facing
    tokens.css aggregator 必須也包含, 不然 consumer 拿不到 → 跑版。 */
 @import './../components/DataTable/data-table.css';
 @import './../patterns/header-canonical/header-canonical.css';
+
+/* Base layer — body typography(font-family var(--font-sans))+ reset + focus + button cursor。
+   必在 token 之後(依賴 token vars)。Consumer `@import tokens` 一次拿到。SSOT: styles/base.css。 */
+@import './base.css';

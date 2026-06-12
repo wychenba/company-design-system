@@ -23,7 +23,7 @@ import {
 import { TreeView, TreeItem } from '@/design-system/components/TreeView/tree-view'
 import { ItemAvatar, ItemLabel } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
-import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+import { ProfileCard, ProfileCardDefaultActions } from '@/design-system/components/ProfileCard/profile-card'
 import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
 
 const meta: Meta = {
@@ -74,7 +74,7 @@ const WorkspaceBrand = () => (
  */
 // a11y(2026-04-25 nested-interactive fix):user footer 用 <div role='group'>,避免
 // 外層 button + 內層 Avatar hoverCard focusable trigger 構成 nested-interactive。
-// Avatar hoverCard 本身已是 keyboard accessible 入口(Tab 直接到 Avatar → 開 NameCard
+// Avatar hoverCard 本身已是 keyboard accessible 入口(Tab 直接到 Avatar → 開 ProfileCard
 // 取得 profile actions)。世界級 Slack / Linear user footer 亦 row 非 button,靠
 // inner avatar / menu-button 明確 disclosure。
 // @canonical-pattern: sidebar-menu-button-with-avatar
@@ -90,13 +90,13 @@ const UserFooter = () => (
             alt="Alan Chen"
             color="blue"
             hoverCard={
-              <NameCard
+              <ProfileCard
                 name="Alan Chen"
                 subtitle="Design｜D-0042｜EMP-1001"
                 avatar={{ alt: 'Alan Chen', color: 'blue' }}
                 status="online"
                 statusMessage="Out of Office: Back on Monday!"
-                actions={<NameCardDefaultActions />}
+                actions={<ProfileCardDefaultActions />}
                 fields={[
                   { label: 'ID', value: 'YHANAX' },
                   { label: 'Employee number', value: '1234567' },
@@ -132,10 +132,11 @@ const PageContent = ({ title, description }: { title: string; description: React
       <div className="max-w-2xl">
         <p className="text-body text-fg-secondary mb-6">{description}</p>
         <div className="grid grid-cols-2 gap-4">
-          {['專案數量', '團隊成員', '本週提交', '待處理'].map((t) => (
+          {/* 固定值(非 Math.random)— story 是 visual baseline,必確定性,否則每次 build 像素不同 = composition-fidelity / visual regression 無法比對(2026-06-02 fix)*/}
+          {([['專案數量', 24], ['團隊成員', 8], ['本週提交', 47], ['待處理', 3]] as const).map(([t, v]) => (
             <div key={t} className="rounded-lg border border-divider bg-surface p-4">
               <p className="text-caption text-fg-muted">{t}</p>
-              <p className="text-h5 font-semibold mt-1">{Math.floor(Math.random() * 100)}</p>
+              <p className="text-h5 font-semibold mt-1">{v}</p>
             </div>
           ))}
         </div>
@@ -323,6 +324,22 @@ export const MixedContent: Story = {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
+                  {/* Disabled favorite(已封存專案):host disabled 時 inline actions
+                      整組不渲染——hover 也不出現 ⋯/＋,不可操作就不暗示可操作
+                      (sidebar.spec.md「Host disabled 時」+ inline-action.spec.md 宿主 disabled 規則)。 */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      startIcon={Folder}
+                      disabled
+                      actionsReveal="hover"
+                      inlineActions={[
+                        { icon: MoreVertical, label: '更多動作', onClick: () => {} },
+                        { icon: Plus, label: '新增', onClick: () => {} },
+                      ]}
+                    >
+                      delta（已封存）
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>

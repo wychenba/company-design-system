@@ -81,4 +81,6 @@ Citation:
   - packages/design-system/src/components/Sidebar/sidebar.tsx:1025-1043(asChild docblock)
   - packages/design-system/src/components/Sidebar/sidebar.stories.tsx UserFooter L76-104(canonical)
 EOF
-exit 0
+# 2026-05-31:exit 0 → exit 2(folded-hook-audit:原宣稱 BLOCKER 但 exit 0 = 假 enforcement;
+# SidebarMenuButton implicit-wrap 是 SSOT canonical,verified clean on 現有 sidebar code + 有 env escape)。
+exit 2

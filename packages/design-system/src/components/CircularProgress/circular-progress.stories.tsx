@@ -56,23 +56,44 @@ export const ButtonLoading: Story = {
 
 export const InlineAction: Story = {
   name: '行內操作',
-  render: () => (
-    <div className="flex flex-col gap-4 max-w-sm">
-      <Input
-        startIcon={Search}
-        loading
-        defaultValue="react-"
-        placeholder="搜尋 GitHub repositories..."
-      />
+  render: () => {
+    // 多檔上傳列(Google Drive / Dropbox 慣例):上傳中的檔案 determinate(value + affix
+    // 顯示 %),尚在準備(壓縮 / 掃描)的檔案 indeterminate + label——兩態在同一真實佇列
+    // 中對照。容器 text-body(14px)→ CircularProgress label 天然 inherit,無須
+    // hand-craft label span。
+    const uploads = [
+      { file: 'Q3-revenue-report.xlsx', value: 28 },
+      { file: 'product-roadmap.pdf', value: 64 },
+      { file: 'presentation.pdf', value: undefined },
+    ]
+    return (
+      <div className="flex flex-col gap-4 max-w-sm">
+        <Input
+          startIcon={Search}
+          loading
+          defaultValue="react-"
+          placeholder="搜尋 GitHub repositories..."
+        />
 
-      {/* 容器 text-body(14px)→ CircularProgress label 天然 inherit,無須 hand-craft label span */}
-      <div className="flex items-center gap-2 border border-border rounded-md px-3 py-2 text-body">
-        <Upload size={16} className="text-fg-muted" />
-        <span className="flex-1">presentation.pdf</span>
-        <CircularProgress size={16} label="上傳中" />
+        <div className="flex flex-col gap-2">
+          {uploads.map((u) => (
+            <div
+              key={u.file}
+              className="flex items-center gap-3 border border-border rounded-md px-3 py-2 text-body"
+            >
+              <Upload size={16} className="text-fg-muted" />
+              <span className="flex-1 truncate">{u.file}</span>
+              {u.value != null ? (
+                <CircularProgress size={16} value={u.value} affix="value" aria-label={`${u.file} 上傳 ${u.value}%`} />
+              ) : (
+                <CircularProgress size={16} label="準備中" />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  ),
+    )
+  },
 }
 
 type SyncRow = { file: string; modified: string; sync: 'syncing' | 'synced' }
@@ -109,7 +130,7 @@ const syncData: SyncRow[] = [
 ]
 
 export const InlineCellLoading: Story = {
-  name: 'Cell 局部載入',
+  name: '儲存格局部載入',
   render: () => (
     <div className="max-w-2xl">
       <DataTable columns={syncColumns} data={syncData} />
@@ -130,18 +151,3 @@ export const FullScreenOverlay: Story = {
   ),
 }
 
-export const Determinate: Story = {
-  name: '確定進度',
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-6">
-        <CircularProgress value={25} />
-        <CircularProgress value={50} />
-        <CircularProgress value={75} affix="value" />
-      </div>
-      <p className="text-caption text-fg-muted max-w-prose">
-        達 100% 時,CircularProgress 應由 consumer <strong>swap 為完成 state</strong>(✓ 打勾 icon / 直接呈現該顯示的內容 / 切到 Empty),不保留 value=100 的 CircularProgress。世界級慣例:Gmail / Dropbox / Google Drive 上傳完成即消失。
-      </p>
-    </div>
-  ),
-}

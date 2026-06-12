@@ -51,19 +51,16 @@ export const UsageGuidance: Story = {
       <p>適合 Chip 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/Chip/展示" name="Single Selection"><span className="text-primary hover:underline font-medium cursor-pointer">Single Selection</span></LinkTo>
+          <LinkTo kind="Design System/Components/Chip/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">技術文章列表的語言標籤濾鏡(多選)</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Chip/展示" name="Layout Wrap"><span className="text-primary hover:underline font-medium cursor-pointer">Layout Wrap</span></LinkTo>
+          <LinkTo kind="Design System/Components/Chip/展示" name="帶 Badge"><span className="text-primary hover:underline font-medium cursor-pointer">任務列表的狀態篩選 — Badge 顯示各狀態筆數</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Chip/展示" name="Layout Scroll"><span className="text-primary hover:underline font-medium cursor-pointer">Layout Scroll</span></LinkTo>
-        </li>
-        <li>
-          <LinkTo kind="Design System/Components/Chip/展示" name="Layout Menu"><span className="text-primary hover:underline font-medium cursor-pointer">Layout Menu</span></LinkTo>
+          <LinkTo kind="Design System/Components/Chip/展示" name="單選"><span className="text-primary hover:underline font-medium cursor-pointer">程式語言擇一的單選濾鏡(type="single")</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方「vs 近親元件」段)。</p>
     </div>
 
       {/* vs 近親元件 — 原 VsSegmentedRule */}
@@ -123,7 +120,7 @@ export const UsageGuidance: Story = {
         title="何時不用 / 替代元件 — 加 dismiss X(再點一次 deselect 就是 dismiss)"
         note="Filter chip 的「移除這個 filter」由 toggle(再點一次)承擔。加 X 等於同一動作有兩個 affordance,違反 Hicks's Law。Material 3 / Atlassian / Polaris filter chips 都不提供 X"
       >
-        <Label warn>（範例省略）Chip 型別不提供 onDismiss,設計上就擋住這個錯用</Label>
+        <Label warn>（範例省略）Chip 型別不提供 onRemove,設計上就擋住這個錯用</Label>
       </Rule>
 
       <Rule
@@ -179,7 +176,7 @@ export const LayoutRule: Story = {
 
         <Rule
           title="menu — 單行但要完整選項可見"
-          note="單行 + 溢出的 chip 收進 ⋯ dropdown。對齊 Chrome tab dropdown / VS Code editor tabs 的「show all」pattern。menu 模式必須 controlled(value + onValueChange)"
+          note="單行水平捲動,chip 全可見不隱藏;dropdown(ChevronDown)永遠列出全部 chip。對齊 Chrome tab dropdown / VS Code editor tabs 的「show all」pattern。menu 模式必須 controlled(value + onValueChange)"
         >
           <div className="max-w-md border border-border rounded-md p-3">
             <ChipGroup type="multiple" layout="menu" value={tagsM} onValueChange={(v) => setTagsM(v as string[])}>
@@ -196,7 +193,7 @@ export const LayoutRule: Story = {
 // ── 選中視覺 ─────────────────────────────────────────────────────────────
 
 export const SelectedStyleRule: Story = {
-  name: '選中狀態：text + 邊框 同染，不用 背景 強調',
+  name: '選中狀態：文字 + 邊框 同染，不用背景強調',
   render: () => (
     <div>
       <Rule

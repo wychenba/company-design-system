@@ -32,7 +32,7 @@ benchmark:
 
 **實作基礎**：組合元件——Icon / number indicator + Text 有序序列，無 external primitive base。Radix / shadcn 無對應 Steps primitive。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
-**Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/element-anatomy/item-anatomy.spec.md`「List item layout」章節的 reading-mode 規格。Steps 有明文例外：indicator inline 對齊 label 第一行（不走 24px 閾值）。
+**Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/element-anatomy/item-anatomy.spec.md`「List item layout」章節的 **scanning-mode** 規格——跟 MenuItem / TreeItem 同 scanning-family：label `text-body`、description 縮 `text-caption`（sm/md）+ `leading-compact`（非 reading-mode 的 body + default leading），consume `--item-gap-label-desc-scanning` token。Steps 有明文例外：indicator inline 對齊 label 第一行（不走 24px 閾值）。
 
 > 命名選 `Steps`(複數)而非 `Stepper`——`stepper` 在 web 有 HTML `<input type="number">` 計數器的歷史包袱(spinbutton 也叫 stepper),`Steps` 更精確地表達「一組有序步驟」。對齊 Ant Design 的命名慣例。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
@@ -72,7 +72,7 @@ Steps 是 `patterns/element-anatomy/item-anatomy.spec.md` 的 row primitive **co
 | Prefix | `StepIndicator`(圓形 + 數字 / icon)|
 | Label | `StepLabel` |
 | Description | `StepDescription`(永遠可選)|
-| Suffix | — (Steps 不使用 suffix slot)|
+| Suffix | 展開 chevron(僅 `expansion="multiple"` 且該 step 有 content 時渲染;消費 item-anatomy `<ItemSuffix>`)|
 | Content | `StepContent`(垂直模式特有)|
 
 ### 從 item-layout **繼承**的規則(不重複定義)
@@ -131,6 +131,8 @@ indicator 圓形 flex items-center 居中
 → indicator 位置完全不受 description 有無影響
 ```
 
+實作:indicator 容器(垂直 / 水平)與展開 chevron 一律消費 `patterns/element-anatomy` 的 `<ItemPrefix>` / `<ItemSuffix>` primitive(`h-[1lh] shrink-0 flex items-center` 的 SSOT),不手刻 wrapper(M17)。
+
 ---
 
 ## Size
@@ -171,92 +173,99 @@ indicator 圓形 flex items-center 居中
 | State | 視覺 | 觸發 |
 |---|---|---|
 | `upcoming` | 灰底(`bg-muted`)+ 灰字(`text-fg-disabled`)| 未走到 |
-| `current` | 藍底(`bg-primary`)+ 白字數字 | step === `value` 且不在 completedValues / errorValues |
-| `completed` | 藍底(`bg-primary`)+ 白色 ✓ | step 在 `completedValues` 內 |
+| `current` | 藍底(`bg-info`)+ 白字數字 | step === `value` 且不在 completedValues / errorValues |
+| `completed` | 藍底(`bg-info`)+ 白色 ✓ | step 在 `completedValues` 內 |
+| `reachable` | 藍底(`bg-info`)+ 白字數字(僅 linear;sm 為空心環)| linear 下「下一個未完成」step(非 current / completed / error),可點 |
 | `error` | 紅底(`bg-error`)+ 白色 ✕ | step 在 `errorValues` 內(或單項 `state="error"` override)|
 
 ### Sm size 的 state 視覺
 
 sm 沒有 icon 空間,用色塊表達:
 - `upcoming` → 灰實心點(`bg-fg-disabled`)
-- `current` → 藍色**空心**環(`border-2 border-primary`)
-- `completed` → 藍實心點(`bg-primary`)
+- `current`(linear)→ 藍色**空心**環(`border: 2px solid var(--info-hover)`);non-linear current 走灰實心點(`bg-fg-disabled`)。`reachable` 也是空心環
+- `completed` → 藍實心點(`bg-info`)
 - `error` → 紅實心點(`bg-error`)
 
-### 自動推導(linear / non-linear 行為不同)
+### 自動推導(順序即優先級,對齊 `computeState`)
 
-**Consumer 不手寫每個 step 的 state**。State 由 Steps root 的 props + `linear` flag 推導:
+**Consumer 不手寫每個 step 的 state**。State 由 Steps root 的 props 依下列順序推導(`steps.tsx` `computeState`):
 
 ```
-step 在 completedValues                          → completed
-step 在 errorValues                              → error
-linear && step === value(且不在上面兩者)        → current
-其他                                             → upcoming
+per-item state override(escape hatch)              → 直接採用
+step 在 errorValues                                 → error(優先於 completed;交集一律 error)
+step 在 completedValues                             → completed
+step === value                                      → current(linear / non-linear 都成立)
+linear && step 在 reachable(completed ∪ 首個未完成)→ reachable
+其他                                                → upcoming
 ```
 
-**關鍵**:`current` 狀態**只在 linear 模式**下被 auto-promote。非 linear 模式下,使用者「瀏覽」到 upcoming step 時,step 本身的 content state 仍然是 `upcoming`(還沒做),focus 透過 inset ring 視覺表達,**不會**變成 current 的 filled 藍色。
+**關鍵**:`value` 命中的 step 在兩種模式下 content state 都是 `current`,但 **filled 藍的「正在做」視覺只屬於 linear**。非 linear 的 current 渲染中性 `bg-secondary` + `foreground` 數字(見「Non-linear 被選中 ≠ filled 藍」),focus 由 box-shadow 外環表達,**不會**出現 filled 藍。
 
-### 為什麼非 linear 不 promote
+### 為什麼非 linear 的 current 不渲染 filled 藍
 
-非 linear 模式讓使用者跳著點 step(例如設定頁、教學目錄),value 的語意是「使用者在看哪一步」,**不是**「使用者在做哪一步」。如果每次 value 變化就把該 step promote 成 current,會造成:
+非 linear 模式讓使用者跳著點 step(例如設定頁、教學目錄),value 的語意是「使用者在看哪一步」,**不是**「使用者在做哪一步」。如果非 linear 也渲染 filled 藍,會造成:
 
 - 使用者點 upcoming step 想預覽 → step 立刻變 filled 藍,像是「標記為正在做」
 - 跟 mental model「我只是在看,這步還沒做」衝突
-- completedValues 沒有變化,前一個 current 突然不見
+- completedValues 沒有變化,前一個 filled 藍 step 突然不見
 
-正確做法:focus 跟 content state 完全解耦——focus 透過 inset ring 視覺表達,content state 由 linear/completedValues/errorValues 決定。linear 是 `current` 概念存在的前提。
+正確做法:focus 視覺跟「進度視覺」完全解耦——focus 透過 box-shadow 外環表達,filled 藍由 linear / completedValues 決定。filled「正在做」視覺是 linear 的概念。
 
 Per-item `state="error"` prop 存在但是 **escape hatch**,僅用在 inline JSX 想直接宣告錯誤的罕見場景;一般情況用 `errorValues` array 統一管理,不要混用。
 
 ---
 
-## Focus marker — Inset ring(bounding box 永遠不變)
+## Focus marker — Outer ring(box-shadow,bounding box 永遠不變)
 
-**`value` 指向的 step,透過「inset ring」視覺表達 focus——而非加外圈 ring**。
+**`value` 指向的 step,透過「box-shadow 外圈環」視覺表達 focus**。
 
-### Inset ring 的關鍵設計
+### Outer ring 的關鍵設計
 
-- **Bounding box 固定**:focused / non-focused 的 indicator 佔用完全相同的寬高(md=24px,lg=32px,sm=24px hit area)
-- **Nested element 實作**:外層 span 作為 ring 色彩,內層 absolute span 填 `inset: Npx`(內縮 N px)當 inner 色彩 + 放內容
-- **非 box-shadow inset**:box-shadow 無法讓 ring 跟 inner 用不同顏色(filled state 下 ring 跟 bg 同色會完全隱形),nested element 能乾淨處理所有 state
+- **Bounding box 固定**:box-shadow 不佔 layout(zero layout impact),focused / non-focused 的 indicator 佔用完全相同的寬高(md=24px,lg=32px,sm=24px hit area)
+- **Surface gap + ring 兩層 box-shadow 實作**:`0 0 0 2px var(--surface), 0 0 0 4px <ringColor>`——內圈先用 surface 色拉開 2px gap,外圈再疊 2px ring 色,形成「indicator 外有一圈帶間隙的環」(對齊 Polaris / shadcn focus-ring surface-gap idiom)
+- **Ring 色由 state 決定**:`error` → `--error-hover`;non-linear `current` → `--border-hover`;其餘(含 linear current / completed / upcoming / reachable)→ `--info-hover`
 
 ### State × Focus 視覺矩陣(md/lg)
 
-| State | Non-focused(filled) | Focused(inset ring) |
-|---|---|---|
-| upcoming | `bg-muted` + `text-fg-disabled` 數字 | `bg-primary`(outer ring)+ `bg-muted`(inner)+ `fg-disabled` 數字 |
-| current | `bg-primary` + white 數字 | `bg-primary`(outer ring)+ `bg-surface`(inner)+ `primary` 數字 |
-| completed | `bg-primary` + white ✓ | `bg-primary`(outer ring)+ `bg-surface`(inner)+ `primary` ✓ |
-| error | `bg-error` + white ✕ | `bg-error`(outer ring)+ `bg-surface`(inner)+ `error` ✕ |
+filled 底色與內容色**完全由 content state 決定,不因 focused 改變**;focused 只額外疊一圈 box-shadow 外環。
 
-**注意 linear mode 的 current 永遠 focused**,所以 linear mode 下 current step 永遠是 inset ring 樣式(而非 non-focused 的 filled 藍)。
+| State | 底色 + 內容(focused / non-focused 相同) | Focused 額外疊加 |
+|---|---|---|
+| upcoming(linear)| `bg-muted` + `fg-disabled` 數字 | `--info-hover` 外環 |
+| upcoming(non-linear)| `bg-secondary` + `foreground` 數字 | `--info-hover` 外環 |
+| current(linear)| `bg-info` + white 數字 | `--info-hover` 外環 |
+| current(non-linear)| `bg-secondary` + `foreground` 數字 | `--border-hover` 外環 |
+| completed | `bg-info` + white ✓ | `--info-hover` 外環 |
+| error | `bg-error` + white ✕ | `--error-hover` 外環 |
+
+> **linear vs non-linear upcoming 底色刻意不同**:linear upcoming 用 `bg-muted` + `fg-disabled`(灰、弱字 = 「還到不了/鎖住」);non-linear upcoming 用 `bg-secondary` + `foreground`(中性、可讀 = 「可導覽但非當前」)。因為 non-linear 模式所有 step 都可點(reachable),upcoming 不該呈現 linear 那種「鎖住」的 muted 感。
+>
+> **為何 upcoming 用 `--muted`(locked surface)而非 `--bg-disabled`(互動元件 disabled)**:indicator 是 `aria-hidden` 狀態圖示(非互動 control),填色是「狀態色盤」不是「互動元件背景」;linear upcoming 恰是不可點(`isClickable`=false、無 `role=button`)的 locked 狀態。世界級 source-verified(2026-06-01 M26 benchmark):Atlassian Progress Tracker `unvisited`(`--ds-background-neutral-bold`)≠ `disabled`(`--ds-background-disabled`)為兩個獨立 status;Carbon `incomplete`(`$border-subtle`)≠ `disabled`(`$icon-disabled`);Ant Steps `wait` 用 `colorFillContent`/`colorTextLabel` 刻意避開 `colorTextDisabled`。4/5 家以 neutral/locked 語義處理 upcoming。元件真正的 disabled(`disabled` prop)走 `opacity-disabled` 疊加(保留狀態色不換 token)。
+
+**注意 linear mode 的 current 永遠 focused**,所以 linear mode 下 current step 永遠帶外環(底色仍是 filled 藍,只是多疊一圈 ring)。
 
 ### Sm 尺寸的 focus 處理
 
-sm 的 8px dot 太小,無法用 nested element 做 inset ring。改用 `box-shadow` halo 在 dot 外圍繞 2px 圈——**但仍在 24px hit area 內**,所以 bounding 不變。
+sm 的 8px dot 用同一套 `getOuterRingShadow` box-shadow halo 在 dot 外圍繞圈——**但仍在 24px hit area 內**,所以 bounding 不變。
 
 ### 為什麼 bounding 不變這麼重要
 
-連結線幾何依賴 indicator 的邊緣位置。如果 focus 改變 bounding box,連結線的起點/終點會跟著變,造成「focused step 的連結線比別的短一點點」的視覺不齊感。**Inset ring 讓 indicator 的物理尺寸永遠相同**——focus 狀態變化時 **只有內部視覺改變,外部幾何不變**——連結線可以用統一公式,自然一致。
+連結線幾何依賴 indicator 的邊緣位置。如果 focus 改變 bounding box,連結線的起點/終點會跟著變,造成「focused step 的連結線比別的短一點點」的視覺不齊感。**box-shadow 外環不佔 layout**——focus 狀態變化時外部幾何完全不變——連結線可以用統一公式,自然一致。
 
-### 為什麼不用原本的「外圈 ring」設計
+### 為什麼用 surface-gap 而非單純貼邊 ring
 
-原本實作在 indicator 外加一圈 primary ring,導致兩個問題:
-1. Bounding box 變大,連結線位置隨 focus 切換漂移(這是之前「連結線間距沒韻律」的根因)
-2. Filled primary circle + primary outer ring 的視覺讀成「雙圈」,用户反應「很醜」
+直接在 filled circle 外貼一圈同色 ring 會讀成「雙圈」很醜;先用 `var(--surface)` 拉一圈 2px gap 再疊 ring,讓環跟 indicator 之間有底色間隙,視覺乾淨且各 state 都清楚(對齊 shadcn `ring-offset` / Polaris focus indicator surface-gap canonical)。
 
-改 inset ring 同時解決兩個問題。
+### Non-linear 被選中 ≠ filled 藍(關鍵規則)
 
-### Non-linear 被選中 ≠ current(關鍵規則)
+非 linear 模式使用者點 upcoming step 瀏覽時,step 的 content state 變為 `current`(`computeState` 對 value 命中者一律回 current),但渲染**刻意中性**。視覺上會是(md/lg):
+- 底色:`bg-secondary`(**刻意不同於 linear upcoming 的 `bg-muted`**——non-linear 所有 step 都可點,不該像 linear upcoming 那樣呈現「鎖住/還到不了」的 muted 灰;secondary 傳達「可導覽但非當前」)
+- 數字:`foreground`(可讀,非 disabled 弱字——呼應 step 可達)
+- 外環:`--border-hover` box-shadow ring(focus marker,表達「你在看這一步」;`resolveRingColor` 對 non-linear current)
 
-非 linear 模式使用者點 upcoming step 瀏覽時,step 的 **content state 仍是 upcoming**(見「自動推導」節),只是 focused。視覺上會是:
-- Outer: `primary` ring(focus marker 永遠 primary,表達「你在看這一步」)
-- Inner: `bg-muted`(保留 upcoming 的灰色感)
-- Number: `fg-disabled`(保留 upcoming 的弱字)
+**不會**出現 linear current 的 filled 藍——這對齊使用者 mental model「我只是在看,這步還沒做」。non-linear current 與 upcoming 同為 `bg-secondary` 底,被選中(focused)的 step 以 `--border-hover` 外環標示。sm 尺寸的 dot 在 non-linear current 仍用 `fg-disabled` 灰點(8px dot 最小化呈現)。
 
-**不會**變成 current 的 filled 藍——這對齊使用者 mental model「我只是在看,這步還沒做」。
-
-**Ring 不是 selection marker**。Steps 不是 SelectMenu / DropdownMenu 這類 selection control;ring 是 focus marker 單一語意。`CLAUDE.md` 的「選擇 / 狀態視覺」規則 B 指出的 `bg-neutral-selected`、radio 圓圈等 selection 視覺**都不適用 Steps**——Steps 用 inset ring 表達「you are here」,不是「你選中了這個」。
+**Ring 不是 selection marker**。Steps 不是 SelectMenu / DropdownMenu 這類 selection control;ring 是 focus marker 單一語意。`CLAUDE.md` 的「選擇 / 狀態視覺」規則 B 指出的 `bg-neutral-selected`、radio 圓圈等 selection 視覺**都不適用 Steps**——Steps 用 box-shadow 外環表達「you are here」,不是「你選中了這個」。
 
 ---
 
@@ -290,7 +299,7 @@ Description 在 error state 下維持 `text-fg-secondary`(跟其他 state 一樣
 
 ## Connector 路徑色
 
-連接 `stepA → stepB` 的 connector:**當且僅當 stepA 是 completed 時,該 connector 為藍色**(`border-primary`),其他一律灰(`border-border`)。
+連接 `stepA → stepB` 的 connector:**當且僅當 stepA 是 completed 時,該 connector 為藍色**(`bg-info`),其他一律灰(`bg-border`)。connector 是一條 `w-px`(vertical)/ `h-px`(horizontal)的有底色 div line,故用 `bg-*` 而非 `border-*`。
 
 ### 為什麼藍色只跟 completedValues 走,不跟 value 走
 
@@ -307,7 +316,7 @@ Description 在 error state 下維持 `text-fg-secondary`(跟其他 state 一樣
 
 | Mode | 點擊規則 |
 |---|---|
-| `linear=true`(預設) | 可點:`completed` / `current` / `error`。**不可點**:`upcoming`(尚未解鎖)。 |
+| `linear=true`(預設) | 可點:`completed` / `current` / `error` / `reachable`(下一個未完成)。**不可點**:`upcoming`(尚未解鎖)。 |
 | `linear=false` | 所有非 `disabled` 的 step 都可點。適合 setting wizard、教學目錄等「步驟之間無強依賴」的場景。 |
 
 ### 點擊 completed step 的行為
@@ -318,7 +327,7 @@ Description 在 error state 下維持 `text-fg-secondary`(跟其他 state 一樣
 2. **`completedValues` 維持不變**,不自動 mutate
 3. 如果應用層驗證使用者改錯某欄位需要 block 後續步驟,應用層自己從 `completedValues` 移除該 step 及其後所有 step(這是 business logic,不是元件責任)
 
-這條規則的核心是:**Steps 是純 controlled 元件,從不偷偷改 parent state**。所有 state mutation 都經過 parent 的 state setter,讓應用層完整掌控推進邏輯。
+這條規則的核心是:**Steps 從不偷偷改 parent state**——進度狀態(`completedValues` / `errorValues`)全由 parent own;`value` 為 controlled / uncontrolled(`defaultValue`)雙模,uncontrolled 僅內部記住 focus,不碰進度。所有進度 mutation 都經過 parent 的 state setter,讓應用層完整掌控推進邏輯。
 
 ---
 
@@ -327,7 +336,7 @@ Description 在 error state 下維持 `text-fg-secondary`(跟其他 state 一樣
 | 模式 | 行為 |
 |---|---|
 | `follow-active`(預設) | 只有 `value` 指向的 step 渲染 `<StepContent>`。value 切換時 content 跟著切。其他 step 即使寫了 `<StepContent>` 也不顯示。 |
-| `multiple` | 每個 step 獨立管理展開狀態,**可同時展開多個**。點 step header 切換該 step 的展開(不切換 `value`)。`defaultExpanded` 接 `"all" \| "none" \| string[]`,預設 `"none"`。 |
+| `multiple` | 每個 step 獨立管理展開狀態,**可同時展開多個**。點 step header 永遠先更新 `value`(focus),並額外切換該 step 的展開。`defaultExpanded` 接 `"all" \| "none" \| string[]`,預設 `"none"`。 |
 
 ### 為什麼 `all` 隸屬於 `multiple`
 
@@ -380,7 +389,7 @@ Description 在 error state 下維持 `text-fg-secondary`(跟其他 state 一樣
 
 1. **Single source of truth**:所有狀態集中在 parent,不可能發生「多個 step 同時是 current」「completedValues 跟 item state 互相矛盾」這類 bug。
 2. **Derived state**:每個 step 的 state 由 parent props 推導,consumer 不手算,不會漂移。
-3. **無 side effect**:Steps 不內部 mutate 狀態,所有變動都走 parent 的 state setter,讓應用層完整掌控推進邏輯(驗證 → 加入 completedValues → 推進 value)。
+3. **無 side effect**:Steps 不偷偷 mutate 進度狀態(completedValues / errorValues),進度變動都走 parent 的 state setter,讓應用層完整掌控推進邏輯(驗證 → 加入 completedValues → 推進 value)。
 4. **對齊業界**:Ant Design Steps(`current` + `status`)、Material Stepper(`activeStep`)、Radix Tabs(`value`)全部用此模式。開發者從這些系統來的直覺可直接套用,學習曲線接近零。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ### Per-item `state` escape hatch
@@ -424,10 +433,10 @@ Item-level **內容狀態色彩**(completed / current / upcoming / error indicat
 ## 邊界案例
 
 - **Disabled step**:`disabled` step 視覺繼承 SelectionItem disabled token(`text-fg-disabled`,M24),click 不觸發 navigate;`linear` mode 下 upcoming steps 預設 disabled 直到前面 completed。
-- **Loading(async step state fetch)**:Steps primitive 為 sync render,async data fetch 應由 consumer 在外層 Skeleton 取代整個 Steps;Steps 內部不獨立 own loading prop。
-- **Empty(0 steps)**:`items=[]` 無意義(無進度可呈現);consumer 應條件性不渲 Steps 或渲 `<Empty>` 替代,不渲空 Steps container。
-- **Single step / current=0**:合法初始狀態,渲第一個 step 為 current,後續為 upcoming。
-- **Error state(`errorValues`)**:由元件層級 own — 對應 step indicator 切 error token,connector 切 error muted,後續 step 仍 upcoming 但 user 預期 navigation 暫停。
+- **Loading(async step state fetch)**:Steps primitive 為 sync render,async data fetch 應由 consumer 在外層 Skeleton 取代整個 Steps;Steps 內部不獨立 own loading prop,**也無 per-step loading state**(content state 集合不含 loading)— 單一步驟 async 進行中即 current,進度細節由 consumer 在 `StepContent` 內呈現。
+- **Empty(0 steps)**:無任何 `<StepItem>` children 時無進度可呈現;consumer 應條件性不渲 Steps 或渲 `<Empty>` 替代,不渲空 Steps container。
+- **Single step / `value` 指向第一步**:合法初始狀態,第一個 step 渲染 current,後續依推導為 reachable / upcoming。
+- **Error state(`errorValues`)**:由元件層級 own — 對應 step indicator 切 error token、label 切 `text-error-text`(見「Label 色彩」);connector **不**變色,仍按「Connector 路徑色」規則(前一步 completed 才藍,否則灰);後續 step 仍 upcoming。
 - **Dark mode**:走 semantic token + Primary token 自動 adapt。
 - **Density**:Step indicator 32px 對齊 `AVATAR_SIZE.block.sm/md`,connector 細線跨 density 不變(進度視覺對 density 不敏感)。
 
@@ -446,12 +455,16 @@ Item-level **內容狀態色彩**(completed / current / upcoming / error indicat
 
 ## A11y 預設
 
-**ARIA / Pattern**:對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。
+**ARIA / Pattern**:[W3C APG](https://www.w3.org/WAI/ARIA/apg/patterns/) **無**正式 stepper pattern(2026-06-01 M26 source-verified:APG 31 patterns 無 stepper / wizard / progress)。本元件採 **Carbon ProgressIndicator 模型** — root `<ol>` + clickable step `role="button"` + focused step `aria-current="step"` + indicator `aria-hidden`(純視覺)。
 
-**Keyboard 行為**:
+- **root `aria-label`**:consumer 透過 `<Steps aria-label="註冊流程進度">` 提供(透傳到 `<ol>`),命名此流程。對齊 Angular Material「stepper 必須有 label」。
+- **sr-only 狀態文字**:每個 step header 含 visually-hidden `<span>`「第 N 步,共 M 步,{已完成 / 進行中 / 錯誤 / 未開始}」——indicator 是 `aria-hidden` 純視覺,故 sr-only 是螢幕報讀器**唯一**狀態來源(對齊 Carbon `--assistive-text` 慣例)。
 
-- Tab — focus step(若 clickable)
-- Enter — navigate to step
+**Keyboard 行為**(Carbon 模型 — sequential Tab,非 tablist roving):
+
+- Tab — focus 每個 clickable step(各自 tab stop)
+- Enter / Space — navigate to step(`role=button` 元素必同時支援)
+- **不提供方向鍵 roving**:採 native button sequential Tab(對齊 Carbon ProgressIndicator);MUI / Angular Material 的「tablist + 方向鍵 roving」是另一派世界級做法,本 DS 不採(避免把 `role=button` 改寫成 `role=tab` 的語義改動)。
 
 **Focus**:focus-visible ring 對齊 DS canonical(`outline: 2px solid var(--ring)`);focus management 由元件 own。
 
@@ -462,4 +475,5 @@ Item-level **內容狀態色彩**(completed / current / upcoming / error indicat
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `horizontal-overflow.spec.md`
+- `item-anatomy.spec.md`
 - `progress-bar.spec.md`

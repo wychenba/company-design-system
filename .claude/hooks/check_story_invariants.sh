@@ -57,6 +57,18 @@ rule_anatomy() {
   [ "$EVENT" = "PostToolUse" ] && return 0
   [ -z "${NEW_CONTENT//[[:space:]]/}" ] && return 0
 
+  # 2026-06-11 deep-audit R2(n=41 + n=53):anatomy / principles 檔豁免(比照同 hook R2/R3/R4/R6 既有 skip)。
+  # M7 3-column gap table:
+  #   Spec wording(story-rules.md):anatomy/principles = dev-facing spec stories — 靜態 anatomy preview、
+  #     doc-table、canonical footer 示範皆屬 convention(實測 61 個 anatomy/principles 檔用 raw <table>,
+  #     45 個無 @anatomy-exempt marker → full-file Write 必被 A.2 誤擋 = corpus 級系統衝突)。
+  #   Hook regex:R1 A.1-C 原不分層,anatomy/principles 同樣 BLOCK。
+  #   Gap(spec narrow vs hook broad):誤擋 dropdown-menu.anatomy.stories.tsx:490,508(1lh icon 對齊
+  #     static preview,A.1 誤命中)+ popover.principles.stories.tsx:264,277(PopoverFooter canonical
+  #     取消鍵 = footer 確認/取消對,非 dismiss-X 違規,B 誤命中)。
+  #   展示層 *.stories.tsx 全部檢查不變(真保護不削弱);anatomy/principles 仍有 R5/R8/R9 看守。
+  case "$FILE_PATH" in *anatomy.stories.tsx|*principles.stories.tsx) return 0 ;; esac
+
   # File-level allowlist
   FIRST_LINES=$(printf '%s\n' "$NEW_CONTENT" | sed -n '1,3p')
   echo "$FIRST_LINES" | grep -qE '//[[:space:]]*@anatomy-exempt:' && return 0
@@ -239,11 +251,30 @@ rule_category() {
   done
   [ -z "$SPEC_FILE" ] && return 0
 
+  # 2026-06-11 deep-audit R2(n=37):traits 改 parse 整段 YAML frontmatter(首尾 --- 之間),
+  # 取代 head -30 固定 window — Tag traits 在 tag.spec.md:54(13 個 categorical variant 表前置)
+  # 超出舊 window → hook 對 Tag 永遠靜默 skip(62 單元中唯一漏)。
+  FRONTMATTER=$(awk '/^---[[:space:]]*$/{n++; if(n==2) exit; next} n==1{print}' "$SPEC_FILE")
   TRAITS=""
-  if head -30 "$SPEC_FILE" | grep -q "^traits:"; then
-    TRAITS=$(awk '/^traits:/{i=1;next} i&&/^  - /{sub(/^  - /,"");print;next} i&&!/^  /{i=0}' "$SPEC_FILE" | tr '\n' ' ')
+  if printf '%s\n' "$FRONTMATTER" | grep -q "^traits:"; then
+    TRAITS=$(printf '%s\n' "$FRONTMATTER" | awk '/^traits:/{i=1;next} i&&/^  - /{sub(/^  - /,"");print;next} i&&!/^  /{i=0}' | tr '\n' ' ')
   fi
   [ -z "$TRAITS" ] && return 0
+
+  # 2026-06-11 deep-audit R2(n=36):category-matrix.json 為 SSOT(對齊 audit dim 11)—
+  # traitShape != true 的 category(internal=optional / pattern / token / template)不跑 trait 檢查。
+  # Category resolution 消費既有 classification SSOT(M23,scripts/category-classification-invariant.mjs
+  # L73-77 resolveCategory):internal 權威訊號 = frontmatter `internal: true` OR traits `- isInternal`
+  # (9 元件用 trait 形式:Command / SelectMenu / HoverCard 等);patterns/ → pattern;其餘 components/
+  # → component。Registry path 用 CLAUDE_PROJECT_DIR fallback(R8 同 idiom,防相對路徑靜默失效)。
+  CAT_MATRIX="${CLAUDE_PROJECT_DIR:-.}/packages/design-system/src/story-governance/category-matrix.json"
+  if [ -f "$CAT_MATRIX" ]; then
+    UNIT_CATEGORY="component"
+    case "$FILE_PATH" in */patterns/*) UNIT_CATEGORY="pattern" ;; esac
+    printf '%s\n' "$FRONTMATTER" | grep -qE '^internal:[[:space:]]*true|^[[:space:]]*-?[[:space:]]*isInternal\b' && UNIT_CATEGORY="internal"
+    TRAIT_SHAPE=$(jq -r --arg c "$UNIT_CATEGORY" '.categories[$c].traitShape // empty' "$CAT_MATRIX" 2>/dev/null)
+    [ "$TRAIT_SHAPE" != "true" ] && return 0
+  fi
 
   EXISTING=""
   [ -f "$FILE_PATH" ] && EXISTING=$(cat "$FILE_PATH" 2>/dev/null || echo "")
@@ -254,10 +285,25 @@ ${NEW_CONTENT}"
   has_present() { echo "$EXPORTS" | grep -qE "^${1}$"; }
   has_contains() { echo "$EXPORTS" | grep -qE "${1}"; }
 
+  # 2026-06-11 deep-audit R2(n=36):anatomy 分層 credit — 矩陣類 showcase 的 home 在 anatomy 層
+  # (category-matrix stateComboMatrix/anatomyDiagram + dim 11 三層分工)。Drift 證據:12 個 hasSizes
+  # 元件 SizeMatrix 全在 anatomy 檔,展示檔無 AllSizes;button.stories.tsx:2 等 16 檔被迫用
+  # @story-trait-rationale escape marker 繞 hook(marker hack = required-exports 集合與分層 convention 漂移)。
+  # Credit 對照:hasSizes ← SizeMatrix / Default-AllVariants ← ColorMatrix / hasInteractiveStates ← StateBehavior。
+  # 情境類 trait(isInputLike WithError / isSelectionMulti Group / isOverlay OpenSnapshot)仍 owned by
+  # 展示層,不 credit(真保護不削弱)。
+  ANATOMY_EXPORTS=""
+  for af in "$COMP_DIR"/*.anatomy.stories.tsx "$COMP_DIR"/*.principles.stories.tsx; do
+    [ -f "$af" ] || continue
+    ANATOMY_EXPORTS="${ANATOMY_EXPORTS}
+$(grep -oE '^export const [A-Z][a-zA-Z]+' "$af" 2>/dev/null | awk '{print $3}')"
+  done
+  anatomy_has() { echo "$ANATOMY_EXPORTS" | grep -qE "^${1}$"; }
+
   local violations=""
-  if ! has_present "Default" && ! has_present "AllVariants"; then
+  if ! has_present "Default" && ! has_present "AllVariants" && ! anatomy_has "ColorMatrix"; then
     violations="${violations}
-  • [P1 warn] missing Default/AllVariants story"
+  • [P1 warn] missing Default/AllVariants story(anatomy ColorMatrix 亦可)"
   fi
   for trait in $TRAITS; do
     case "$trait" in
@@ -265,15 +311,15 @@ ${NEW_CONTENT}"
         if ! has_present "AllSizes"; then
           if echo "$EXPORTS" | grep -qE "^(Small|Medium|Large|SizeSm|SizeMd|SizeLg)$"; then
             violations="${violations}
-  • [P0] hasSizes → per-size split,merge AllSizes"
-          else
+  • [P0] hasSizes → per-size split,merge AllSizes(或遷 anatomy SizeMatrix)"
+          elif ! anatomy_has "SizeMatrix"; then
             violations="${violations}
-  • [P0] hasSizes → missing AllSizes"
+  • [P0] hasSizes → missing AllSizes(展示層)/ SizeMatrix(anatomy 層)"
           fi
         fi ;;
       hasInteractiveStates)
-        has_contains "(Disabled|States|Modes)" || violations="${violations}
-  • [P0] hasInteractiveStates → missing Disabled/States/Modes" ;;
+        has_contains "(Disabled|States|Modes)" || anatomy_has "StateBehavior" || violations="${violations}
+  • [P0] hasInteractiveStates → missing Disabled/States/Modes(展示層)/ StateBehavior(anatomy 層)" ;;
       isOverlay)
         if ! has_present "OpenSnapshot" && ! echo "$FULL" | grep -qE "(defaultOpen|useState\(true\))"; then
           violations="${violations}
@@ -479,6 +525,14 @@ rule_story_baseline_reference() {
     *) return 0 ;;
   esac
 
+  # 2026-06-11 R2 held-item #12:anatomy / principles 是 per-family 文件 story —— doc-table /
+  # description 內 <Dialog> / <DataTable> 是說明文字非真 wrap,16 檔每次編輯固定 FP warn。
+  # baseline-cite 要求 scope = scenario stories(story-rules.md「Production-grade composition
+  # fidelity」);file-type skip 對齊 lib/_overlay_handcraft.sh L31 + R9 isOverlay-家 skip idiom。
+  case "$FILE_PATH" in
+    *.anatomy.stories.tsx|*.principles.stories.tsx) return 0 ;;
+  esac
+
   # 跳 same-file:Sidebar / ChromeHeader / DataTable 自己的 stories 不檢查
   case "$FILE_PATH" in
     */Sidebar/*|*/DataTable/*|*/header-canonical/*|*/Dialog/*|*/Sheet/*|*/Popover/*) return 0 ;;
@@ -513,17 +567,21 @@ rule_story_baseline_reference() {
       echo "   Read 其 helper(WorkspaceBrand / MAIN_NAV / PageContent / toolbar)當 baseline。" >&2
       echo "   詳 .claude/rules/story-rules.md 「Production-grade composition fidelity」 +" >&2
       echo "   .claude/skills/story-writing/SKILL.md Phase 0 +" >&2
-      echo "   memory/feedback_story_baseline_reference.md" >&2
+      echo "   memory/feedback_nearest_same_purpose_canonical.md" >&2
     fi
 
     # 偵測明顯 simplified mock anti-pattern
-    if echo "$CONTENT" | grep -qE '<SidebarHeader>[[:space:]]*<span'; then
+    # 2026-06-03 修(同 R8 bug class):tr 換行→空格 flatten(grep 逐行無法跨行)+ tag anchor 加 [^>]*> 容忍屬性
+    # (真實 JSX 是 <ChromeHeader className=...> 多行,原 <ChromeHeader> 死匹配漏)。
+    local CONTENT_FLAT7
+    CONTENT_FLAT7=$(echo "$CONTENT" | tr '\n' ' ')
+    if echo "$CONTENT_FLAT7" | grep -qE '<SidebarHeader[^>]*>[[:space:]]*<span'; then
       echo "❌ R7 anti-pattern:<SidebarHeader><span> — 應 wrap WorkspaceBrand-like ItemAvatar block(per sidebar.stories IconCollapse baseline)" >&2
     fi
-    if echo "$CONTENT" | grep -qE '<SidebarMenuButton>[^<]*<[A-Z][a-zA-Z]+ className="size-'; then
+    if echo "$CONTENT_FLAT7" | grep -qE '<SidebarMenuButton[^>]*>[^<]*<[A-Z][a-zA-Z]+[[:space:]]+className="size-'; then
       echo "❌ R7 anti-pattern:<SidebarMenuButton><Icon className=\"size-N\"> — 應用 startIcon prop + tooltip prop(per sidebar.stories MAIN_NAV map)" >&2
     fi
-    if echo "$CONTENT" | grep -qE '<ChromeHeader>[^<]*<span className="[^"]*flex-1'; then
+    if echo "$CONTENT_FLAT7" | grep -qE '<ChromeHeader[^>]*>.{0,160}<span[[:space:]]+className="[^"]*flex-1'; then
       echo "❌ R7 anti-pattern:<ChromeHeader><span flex-1> — 應 SidebarTrigger + h1 緊鄰 gap-2(per sidebar.stories PageContent baseline)" >&2
     fi
   fi
@@ -534,7 +592,7 @@ rule_story_baseline_reference() {
 # `.claude/references/story-baseline-registry.json` antiPatterns regex,逐條 scan 寫入內容。
 # Severity=block → record_worst 2;severity=warn → stderr only。Allowlist
 # `// @story-baseline-allow: <reason>` 整檔豁免。
-# Ship as warn mode first(2026-05-20),確認 zero existing violation 才升 P0 BLOCKER。
+# 2026-06-02 升 P0 BLOCKER(block-severity antiPattern):DS + consumer 全掃確認零現有違規後升級。
 
 rule_story_archetype_registry() {
   case "$TOOL" in
@@ -552,7 +610,7 @@ rule_story_archetype_registry() {
     */Sidebar/*|*/DataTable/*|*/header-canonical/*|*/Dialog/*|*/Sheet/*|*/Popover/*) return 0 ;;
   esac
 
-  local REGISTRY=".claude/references/story-baseline-registry.json"
+  local REGISTRY="${CLAUDE_PROJECT_DIR:-.}/.claude/references/story-baseline-registry.json"
   [ -f "$REGISTRY" ] || return 0
 
   local CONTENT=""
@@ -562,8 +620,13 @@ rule_story_archetype_registry() {
     CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // ""')
   fi
 
-  # Allow override
+  # Allow override — 2026-06-03 修(同 fragment-vs-file bug class,對抗稽核抓到):Edit 只送 new_string
+  # 片段,@story-baseline-allow marker 在檔頭(不在每次 edit 片段)→ 編輯有 marker 的 story 任一非
+  # marker 行就被 R8 誤擋。補查整檔 disk head(對齊 R7 L499 disk-check 做法)。
   if echo "$CONTENT" | head -10 | grep -qE '@story-baseline-allow:'; then
+    return 0
+  fi
+  if [ -f "$FILE_PATH" ] && head -10 "$FILE_PATH" 2>/dev/null | grep -qE '@story-baseline-allow:'; then
     return 0
   fi
 
@@ -581,9 +644,14 @@ rule_story_archetype_registry() {
     PATTERNS=$(jq -r --arg c "$COMP" '.components[$c].antiPatterns[]? | select(.severity == "block") | .regex' "$REGISTRY" 2>/dev/null)
     [ -z "$PATTERNS" ] && continue
 
+    # 2026-06-03 修:CONTENT 換行 → 空格再 grep。真實 JSX 是多行(<ChromeHeader> 與 <span> 分行),
+    # 而 grep -E 是 line-oriented + registry regex 用 [[:space:]] 可攜語法 → 不正規化的話多行 antiPattern
+    # 靜默漏 = 假 P0(對抗稽核抓到)。tr 後整段成單行,[[:space:]]* / .* 才能跨原換行匹配。
+    local CONTENT_FLAT
+    CONTENT_FLAT=$(echo "$CONTENT" | tr '\n' ' ')
     while IFS= read -r PATTERN; do
       [ -z "$PATTERN" ] && continue
-      if echo "$CONTENT" | grep -qE "$PATTERN"; then
+      if echo "$CONTENT_FLAT" | grep -qE "$PATTERN"; then
         echo "⚠️  R8 story_archetype_registry violation:" >&2
         echo "   $FILE_PATH wrap <$COMP> matches anti-pattern:" >&2
         echo "   regex: $PATTERN" >&2
@@ -592,11 +660,52 @@ rule_story_archetype_registry() {
         echo "   修法:Read baseline story + helpers,抄 production archetype。" >&2
         echo "   或加 \`// @story-baseline-allow: <reason>\` 檔頭豁免(audit-logged)。" >&2
         echo "   詳 .claude/rules/meta-patterns.md M35 + memory/feedback_nearest_same_purpose_canonical.md" >&2
-        # Ship as warn first(2026-05-20):not record_worst 2,exit 0
-        # Future:zero existing violation → 改 record_worst 2 升 P0 BLOCKER
+        record_worst 2  # 2026-06-02 升 P0 BLOCKER:DS + consumer(ds-product-template)全掃確認零現有違規後升級(原 2026-05-20 ship-as-warn 的 TODO 條件達成);只 block-severity antiPattern(warn-severity 仍 stderr-only)
       fi
     done <<< "$PATTERNS"
   done
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# R9 — hand-craft overlay / chrome header(2026-06-04 codify per upload-manager 面板 drift)
+# Story 內手刻 `<div ... px-[var(--layout-space-loose)] ... border-b border-divider ...>`
+# = 浮層 / chrome header signature → 必消費 SurfaceHeader / PopoverHeader / DialogHeader primitive。
+# 零誤判簽名(DS-wide 量測:px-loose + border-b border-divider 同 div 僅手刻 overlay header 用 —
+# doc-table row 用 px-4 硬寫;真 overlay header 寫 `<SurfaceHeader>`,className 不外露)。
+# Anchor:upload-manager 面板原手刻 `<div px-loose py-2 border-b border-divider>`(py-2≠py-tight /
+# 殼 rounded-md≠lg / border-divider≠border / bg-surface≠raised),既有 3 道網全漏:
+#   R1-C(要 div 有 absolute + 附近 onClose/dismiss)、_chrome_header_handcraft(skip stories +
+#   只比 h-[chrome-header-height] signature)、R7/R8(只比已註冊 primitive 名)。adversarial workflow 確認。
+# ─────────────────────────────────────────────────────────────────────────────
+rule_handcraft_overlay_header() {
+  # skip primitive / overlay 家(它們定義 / 示範 header primitive 本身)。
+  # 含全部 isOverlay 元件家(2026-06-04 adversarial workflow R9-SKIP-001:補 HoverCard/Tooltip/DropdownMenu/FileViewer)。
+  case "$FILE_PATH" in
+    */overlay-surface/*|*/header-canonical/*|*/ChromeHeader/*|*/Dialog/*|*/Sheet/*|*/Popover/*|*/Coachmark/*|*/Tabs/*|*/HoverCard/*|*/Tooltip/*|*/DropdownMenu/*|*/FileViewer/*) return 0 ;;
+  esac
+  # allow escape(檔頭 OR 本次片段)
+  if echo "$NEW_CONTENT" | head -10 | grep -qE '@story-baseline-allow:'; then return 0; fi
+  if [ -f "$FILE_PATH" ] && head -10 "$FILE_PATH" 2>/dev/null | grep -qE '@story-baseline-allow:'; then return 0; fi
+  local FLAT
+  # 2026-06-04 adversarial workflow 抓 R9 regex 3 漏洞,robustify:
+  #   (1) drop 純註解行(^//、^*、^/*、^{/*)再 flatten → 避免 commented-out / 描述用 JSX 含 pattern 誤判(FP-002);
+  #       不 strip 行內 // (避免 mutilate https:// URL 造成 FN)。
+  #   (2) token 間用 [^">]*(非 [^>]*)→ px-loose 與 border-b 必在「同一 className 字串」內,不跨 " 屬性邊界
+  #       (FP-001:data-style="border-b border-divider" 不再誤判)。
+  #   (3) border-b[[:space:]]+border-divider(非單空格)→ 多行 className flatten 後多空格不漏(FN-001,同 R8 multiline bug class)。
+  FLAT=$(echo "$NEW_CONTENT" | grep -vE '^[[:space:]]*(//|\*|/\*|\{/\*)' | tr '\n' ' ')
+  if echo "$FLAT" | grep -qE '<div[^>]*px-\[var\(--layout-space-loose\)\][^">]*border-b[[:space:]]+border-divider|<div[^>]*border-b[[:space:]]+border-divider[^">]*px-\[var\(--layout-space-loose\)\]'; then
+    {
+      echo "❌ R9 hand-craft overlay / chrome header:${FILE_PATH}"
+      echo "   偵測到 <div ... px-[var(--layout-space-loose)] ... border-b border-divider> = 手刻浮層 / chrome header。"
+      echo "   必消費 <SurfaceHeader>(patterns/overlay-surface)/ <PopoverHeader> / <DialogHeader>;"
+      echo "   面板殼用 Popover 同款 chrome token(rounded-lg border-border bg-surface-raised elevation-200)。"
+      echo "   理由:px-loose + divider border 的 header chrome 是 overlay-surface SSOT(px-loose py-tight + border-b);手刻 = drift。"
+      echo "   Anchor:2026-06-04 upload-manager 面板手刻 header(py-2≠py-tight / 殼 token 全偏),user 抓。"
+      echo "   豁免:檔頭加 // @story-baseline-allow: <reason>。"
+    } >&2
+    record_worst 2
+  fi
 }
 
 # ─── Run rules ───
@@ -608,5 +717,6 @@ rule_name_jargon
 rule_description_jargon
 rule_story_baseline_reference
 rule_story_archetype_registry
+rule_handcraft_overlay_header
 
 exit $WORST

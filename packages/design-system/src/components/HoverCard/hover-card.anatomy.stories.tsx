@@ -3,7 +3,7 @@
 //   純行為 primitive(基於 Radix HoverCard),不含視覺樣式。bg / border /
 //   shadow / padding / size 全由 consumer 透過 className 決定;無 own variant /
 //   state / size。Overview + VisualVariants 兩個 story 已涵蓋 consumer 兩種
-//   常見視覺(NameCard 亮色 vs OverflowIndicator 深色 tooltip)。
+//   常見視覺(ProfileCard 亮色 vs OverflowIndicator 深色 tooltip)。
 import type { Meta, StoryObj } from '@storybook/react'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from './hover-card'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
@@ -37,7 +37,7 @@ export const Overview: Story = {
               </div>
             </HoverCardContent>
           </HoverCard>
-          <span className="text-caption text-fg-muted">← hover Avatar 彈出 NameCard(可點按鈕)</span>
+          <span className="text-caption text-fg-muted">← hover Avatar 彈出 ProfileCard(可點按鈕)</span>
         </div>
       </div>
 
@@ -76,11 +76,11 @@ export const Overview: Story = {
 }
 
 export const VisualVariants: Story = {
-  name: 'Consumer 的兩種常見視覺',
+  name: '使用方的兩種常見視覺',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
-        <H3>亮色 Card 樣式(NameCard pattern)</H3>
+        <H3>亮色 Card 樣式(ProfileCard pattern)</H3>
         <Desc>人員資訊卡、內容預覽等可互動浮層。使用 `bg-surface-raised + elevation-200 + rounded-lg + border`。</Desc>
         <div className="flex items-center gap-6">
           <HoverCard>
@@ -121,7 +121,7 @@ export const VisualVariants: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>Consumer</Th><Th>視覺風格</Th><Th>典型用途</Th></tr></thead>
             <tbody>
-              <tr><Td>NameCard</Td><Td mono>亮色 Card(bg-surface-raised + elevation-200)</Td><Td>人員 / 組織 / 文件預覽</Td></tr>
+              <tr><Td>ProfileCard</Td><Td mono>亮色 Card(bg-surface-raised + elevation-200)</Td><Td>人員 / 組織 / 文件預覽</Td></tr>
               <tr><Td>OverflowIndicator</Td><Td mono>深色 Tooltip(bg-tooltip + data-theme dark)</Td><Td>+N 溢出清單</Td></tr>
               <tr><Td>Custom</Td><Td>Consumer 自訂</Td><Td>任何需要可互動 hover 浮層的場景</Td></tr>
             </tbody>
@@ -139,7 +139,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `hover-card.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  hover-card  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/hover-card#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入 trigger\n- Hover / focus — 開啟 card\n- Esc — 關閉\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast "}</p>
+      <p className="whitespace-pre-line">{"ARIA 與互動模式:Radix HoverCard 刻意不設角色語意 / aria-* 屬性(定位為 sighted-mouse-user 增強,卡片內容不暴露給輔助技術),只提供 hover / focus 開、Esc 關 + data-state。觸發元素的可聚焦性需 consumer 自補(例如 Avatar 的 hoverCard 在元件內手動加 tabIndex=0 + role=\"button\" + aria-haspopup=\"dialog\")。\n\n鍵盤操作:\n\n- Tab — 焦點移到觸發元素\n- Hover 或 focus — 開啟浮層卡片\n- Esc — 關閉卡片\n\n焦點行為:這是非阻斷(non-modal)的浮層,focus 會開啟卡片但不會把焦點鎖在裡面;焦點仍留在觸發元素,按 Esc 即可關閉。觸發元素 focus 時顯示可見的外框(2px 實線,使用 --ring 色),與整個設計系統的 focus-visible 樣式一致。\n\n鍵盤限制:Radix HoverCard 會把卡片內所有可 Tab 的節點強制設成 tabindex=\"-1\",因此卡片內部的按鈕 / 連結鍵盤 Tab 到不了 — 鍵盤使用者僅能 focus 觸發元素開卡 + Esc 關卡,無法進入卡片操作互動內容。關鍵互動勿放 HoverCard 內,需鍵盤可達的互動浮層請用 Popover(click 觸發)。\n\n驗證:Storybook 無障礙檢測面板應為 0 項嚴重違規;文字對比至少 4.5:1、UI 元素對比至少 3:1,符合 WCAG AA。"}</p>
     </div>
   ),
 }

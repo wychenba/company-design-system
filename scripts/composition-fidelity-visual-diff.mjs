@@ -2,8 +2,10 @@
 /**
  * composition-fidelity-visual-diff.mjs
  *
- * Mechanical mechanism for「DS canonical render 跟 consumer (product-workspace) render 必 visual-identical」
- * Per user 2026-05-27 directive「mechanical 機制讓未來所有 DS components 在 product-workspace 渲染必跟 DS canonical 一致 可被驗證(byte-identity 不夠,visual diff)」
+ * Composition fidelity(2026-05-27 初版 / 2026-06-02 conformance-model 修正,SSOT: .claude/references/composition-fidelity.md)
+ * Consumer 對 DS 用法正確性「主要由靜態 conformance 驗」(對齊 Polaris/Atlassian/Carbon lint);本 script 的 pixel/DOM
+ * identity diff 是「明確 opt-in」(只比標 @composition-fidelity-mode 的 mapping,用於忠實複製 replica / same-story 回歸)。
+ * 單獨 @story-baseline = conformance 意圖,不做 identity diff。禁拿產品範本(內容刻意不同)pixel 比 DS showcase(反 pattern)。
  *
  * Mapping SSOT:consumer story file 的 `// @story-baseline: <DS-story-id>` marker
  *
@@ -108,7 +110,7 @@ for (const file of sources) {
   // G3 + G4: support multiple markers per file + per-mapping threshold override
   const lines = src.split(/\n/)
   let currentThreshold = THRESHOLD_PCT
-  let currentMode = 'pixel'        // v3 2026-05-27: 'pixel' | 'shell-only' | 'structural'
+  let currentMode = null           // 2026-06-02: null = conformance-only(不做 identity diff);標 'pixel'|'shell-only'|'structural' = 明確 opt-in identity 比對
   let currentMaskSelector = null    // CSS selector to mask inner content (replace pixels w/ solid color before diff)
   for (let i = 0; i < lines.length; i++) {
     const tm = lines[i].match(/@composition-fidelity-threshold:\s*([\d.]+)/)
@@ -169,14 +171,31 @@ for (const file of sources) {
   }
 }
 
-if (mapping.length === 0) {
-  console.error('❌ No @story-baseline markers found in consumer source.')
-  console.error(`   Searched root: ${CONSUMER_ROOT}`)
-  process.exit(2)
+// ── 2026-06-02 conformance-model shift ──
+// Per CF research(world-class benchmark:Polaris/Atlassian/Carbon 全用 static lint 驗 consumer 用法,
+// 無一家用「product demo 截圖 == DS showcase 截圖」pixel-identity = 公認反 pattern)+ 專案自身
+// 2026-05-27 結論(memory feedback_ai_ground_truth_unreliable_mechanical_primary:render fidelity 由架構
+// 保障、template-vs-canonical pixel diff = noise 非 drift = false positive)。
+// → @story-baseline 單獨 = conformance 意圖(交靜態 hook 驗:check_consumer_ds_primitive_misuse /
+//   check_layout_space_magic_numbers / check_consumer_story_baseline / check_story_invariants R7/R8)。
+// → pixel/DOM identity 比對改「明確 opt-in」:只有額外標 @composition-fidelity-mode 的 mapping 才比
+//   (用於忠實複製 replica / same-story 跨版本回歸)。對內容刻意不同的 template 不再 false-positive。
+const conformanceOnly = mapping.filter((m) => m.mode === null)
+const identityMappings = mapping.filter((m) => m.mode !== null)
+
+if (conformanceOnly.length) {
+  console.log(`ℹ️  ${conformanceOnly.length} 個 @story-baseline = conformance-only(無 @composition-fidelity-mode)→ 由靜態 conformance hook 驗,不做 pixel/DOM identity diff:`)
+  conformanceOnly.forEach((m) => console.log(`     - ${m.consumerStoryId} ⊢ ${m.baselineRef}`))
+}
+if (identityMappings.length === 0) {
+  console.log('✅ 0 個 identity-opt-in mapping → skip pixel/DOM identity diff。')
+  console.log('   Consumer 對 DS 的用法正確性由靜態 conformance 防線保證(對齊 Polaris/Atlassian/Carbon lint 模型),非 pixel-identity。')
+  console.log('   要做 identity 比對請在該 consumer story 加 @composition-fidelity-mode: structural|pixel|shell-only(用於忠實複製 / same-story 回歸)。')
+  process.exit(0)
 }
 
-console.log(`Found ${mapping.length} @story-baseline mapping(s):`)
-mapping.forEach(m => console.log(`  - ${m.consumerStoryId} → ${m.baselineStoryId}`))
+console.log(`Found ${identityMappings.length} identity-verify mapping(s)(標 @composition-fidelity-mode):`)
+identityMappings.forEach((m) => console.log(`  - ${m.consumerStoryId} → ${m.baselineStoryId} [${m.mode}]`))
 
 // ── 2. Spin up static file servers if needed ──
 function staticServer(dir, port) {
@@ -235,7 +254,7 @@ async function normalizePage(page) {
 // Sanitize filename — story ids may contain unsafe chars
 function safeName(s) { return s.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 180) }
 
-for (const m of mapping) {
+for (const m of identityMappings) {
   const page = await browser.newPage({ viewport: { width: VIEWPORT_W, height: VIEWPORT_H }, deviceScaleFactor: 1 })
   await normalizePage(page)
   const fileSafe = safeName(`${m.consumerStoryId}__vs__${m.baselineStoryId}`)
@@ -376,13 +395,18 @@ for (const m of mapping) {
   const effectiveThreshold = m.threshold ?? THRESHOLD_PCT
   const pixelPassed = diffPct <= effectiveThreshold
 
-  // v4 2026-05-27 dual-track: DOM signature diff(EXPAND not REPLACE pixel layer)
-  // Per feedback_ai_self_audit_unreliable_mechanical_primary_2026_05_27.md:
-  //   - pixel diff = primary visual ground truth
-  //   - DOM diff = secondary structural ground truth(catches drift pixel cannot see + vice versa)
-  //   - any layer FAIL = overall FAIL(union semantics)
+  // dual-track: pixel + DOM signature(EXPAND not REPLACE pixel layer)
+  //   - pixel diff = visual ground truth;DOM diff = structural ground truth(catches drift pixel cannot see)
+  //   - 預設 union(任一 layer FAIL = overall FAIL);**例外:shell-only 模式 skip DOM diff**(2026-06-03,
+  //     見下方 — DOM 仍含被遮內容會 false-positive,故 shell-only 只由 masked pixel 決定 verdict)
+  //   - identity diff 整體是 opt-in(只跑標 @composition-fidelity-mode 的 mapping;單獨 @story-baseline = conformance)
   let domVerdict = { status: 'SKIP', reason: 'no DOM snapshot captured' }
-  if (baselineDom && consumerDom) {
+  if (m.mode === 'shell-only') {
+    // 2026-06-03 修:shell-only 只在 pixel 層遮罩 inner content(白 div overlay),DOM 仍含被遮的內容元素 →
+    // DOM signature diff 會對 by-design 不同的內容 false-positive(等於遮罩沒生效到 DOM)。shell-only 語意 =
+    // 只比遮罩後的視覺殼,故 DOM diff 在此模式無意義 → SKIP,只由 masked pixel 決定 verdict。
+    domVerdict = { status: 'SKIP', reason: 'shell-only mode: DOM diff skipped (content masked at pixel layer only; DOM-diff would false-positive on intentionally-different inner content)' }
+  } else if (baselineDom && consumerDom) {
     const dd = domDiff(baselineDom, consumerDom)
     // Threshold:0 missing/extra/style drift = clean。Any > 0 = potential drift。
     // For template-vs-canonical scope: missing/extra > 5 OR styleDrifts > 20 = FAIL
@@ -420,7 +444,7 @@ await browser.close()
 dsServer?.close()
 consumerServer?.close()
 
-const report = { generatedAt: new Date().toISOString(), threshold: THRESHOLD_PCT, mapping, results, summary: { total: results.length, fail: failCount, pass: results.length - failCount } }
+const report = { generatedAt: new Date().toISOString(), threshold: THRESHOLD_PCT, mapping: identityMappings, conformanceOnly, results, summary: { total: results.length, fail: failCount, pass: results.length - failCount } }
 writeFileSync(join(OUT, 'report.json'), JSON.stringify(report, null, 2))
 
 console.log('\n=== Composition fidelity report ===')

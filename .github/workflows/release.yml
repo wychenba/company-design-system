@@ -31,6 +31,13 @@ on:
           - repoint-latest
           - clear-latest
 
+# 2026-06-02 防「同一 tag 重複觸發 / 重試」的多 run 並行搶發 npm → 序列化(同 group 一次只跑一個,
+# 後到的排隊等前一個發完;配套下方 publish step 的冪等 guard → 後到 run 看到版本已存在就 skip 綠燈,
+# 不再 E403 跳紅）。cancel-in-progress: false = 絕不中途砍正在發版的 run。
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   smoke-shard:
     name: Storybook FULL smoke shard ${{ matrix.shard }}/4
@@ -91,14 +98,29 @@ jobs:
         run: npm run build:lib
 
       - name: Audit gates(must PASS before publish)
+        # 2026-06-04 SSOT 對齊:補 typecheck:stories + story-quality:check + ds-canonical drift —— 原 release.yml
+        # Audit gates 漏這 3 道,但 release-preflight.mjs 有(兩者應 1:1,否則「沒跑 preflight 直接 push tag」會漏掉)。
+        # 此 step 為直接指令(無 pipe)→ bash -e errexit 任一非 0 即停,不需 pipefail。
         run: |
           npx tsc -b
+          npm run --silent typecheck:stories
           node scripts/audit-orphan-tokens.mjs --check
-          node scripts/code-quality-audit.mjs --scope=packages/design-system/src/components
+          node scripts/categorical-color-invariants.mjs
+          node scripts/status-color-invariant.mjs
+          node scripts/layout-space-utility-invariant.mjs
+          node scripts/category-classification-invariant.mjs
+          node scripts/gen-design-system-barrel.mjs --check
+          node scripts/code-quality-audit.mjs --scope=packages/design-system/src/components --check
           node scripts/audit-content-quality.mjs --check
           node scripts/sync-governance-counters.mjs --check
           node scripts/gen-figma-make-artifacts.mjs --check
           node scripts/plugin-structure-validate.mjs
+          npm run --silent story-quality:check
+          node scripts/sync-ds-canonical.mjs --check
+          node scripts/check-src-republish.mjs --check
+          node scripts/sync-template-canonical-app.mjs --check
+          node scripts/gen-llms-txt.mjs --check
+          node scripts/check-field-cascade-resolve.mjs
 
       - name: Build Storybook
         run: npm run build-storybook
@@ -146,10 +168,38 @@ jobs:
           else DIST_TAG=latest; fi
           echo "Publishing with dist-tag: $DIST_TAG"
 
+          # 冪等 publish:發版前先查該版本是否已在 npm。已存在 → skip + 綠燈(重複觸發 / 重試 run
+          # 不再撞 E403「cannot publish over previously published version」跳假紅);不存在 → 才 publish。
+          # Root cause(2026-06-02):同一 tag GitHub 會重複觸發多 run(beta.43=4 / beta.45=3 / beta.46=2),
+          # 舊 step 無 guard → 第二個必 E403 紅。配合上方 concurrency 序列化 → 後到 run 必看到已發 → skip。
+          publish_if_new() {
+            local pkg="$1" ver
+            ver=$(node -p "require('./package.json').version")
+            if npm view "${pkg}@${ver}" version >/dev/null 2>&1; then
+              echo "⏭  ${pkg}@${ver} 已發佈 → skip(冪等,非錯誤）"
+            else
+              echo "📦 publishing ${pkg}@${ver} --tag $DIST_TAG"
+              npm publish --access public --tag "$DIST_TAG"
+            fi
+          }
+
           cd packages/design-system
-          npm publish --access public --tag $DIST_TAG
+          publish_if_new "@qijenchen/design-system"
           cd ../storybook-config
-          npm publish --access public --tag $DIST_TAG
+          publish_if_new "@qijenchen/storybook-config"
+
+      # 2026-05-29 RC3 fix(codex dual-track 共識):pre-1.0 beta-only 套件,`latest` 必自動跟最新 beta。
+      # 否則 latest 停在舊版 → consumer sync-design-system `npm update`(target latest)+ 裸 `npm i` 拿舊版
+      # → 修正(如 beta.34 React #31 fix)送不到 fork repo → 部署仍壞。Anchor:beta.34 latest 卡 beta.33。
+      - name: Repoint latest → this beta(防 latest/beta 分岔)
+        if: startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '-beta')
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          npm dist-tag add @qijenchen/design-system@"$VERSION" latest
+          npm dist-tag add @qijenchen/storybook-config@"$VERSION" latest
+          echo "✅ latest dist-tag → $VERSION(consumer npm update / 裸 npm i 即拿最新 beta)"
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
@@ -162,18 +212,26 @@ jobs:
       # Renovate weekly 不夠 → DS publish 後 repository_dispatch immediate trigger ds-product-template
       # → fork user 24h 內收到 new beta auto-PR(非 weekly cron)
       - name: Dispatch ds-product-template sync(immediate cross-repo propagation)
+        # 2026-06-11 R2:移除 `|| secrets.GITHUB_TOKEN` 假 fallback —— GITHUB_TOKEN 對 cross-repo
+        # dispatch 必 403(repo-scoped),fallback 形同虛設且掩蓋未設 secret 的真相。改:secret 未設
+        # 即明確 ::warning:: skip(receiver 對雙 event 已 concurrency dedup;另一路 CROSS_REPO_TOKEN
+        # job 與 Dependabot daily 為 fallback)。
         if: startsWith(github.ref, 'refs/tags/v') && success()
         continue-on-error: true
         env:
-          GH_TOKEN: ${{ secrets.PRODUCT_WORKSPACE_DISPATCH_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PRODUCT_WORKSPACE_DISPATCH_TOKEN }}
         run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::PRODUCT_WORKSPACE_DISPATCH_TOKEN 未設 — skip ds-published dispatch(CROSS_REPO_TOKEN job / Dependabot daily 仍 fallback)"
+            exit 0
+          fi
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "Dispatching ds-published event to ds-product-template, version=$VERSION"
           gh api repos/ajenchen/ds-product-template/dispatches \
             -f "event_type=ds-published" \
             -f "client_payload[version]=$VERSION" \
             -f "client_payload[tag]=${{ github.ref_name }}" \
-            || echo "⚠️ dispatch failed (secrets.PRODUCT_WORKSPACE_DISPATCH_TOKEN 未設?fork user 仍可 dependabot daily auto-PR)"
+            || echo "::warning::ds-published dispatch failed(token 權限?)— fork user 仍有 Dependabot daily fallback"
 
       # Claude plugin marketplace distribution(Phase 7 — 2026-05-23 ship per real Anthropic spec)
       # Distribution model:**GitHub-direct**(不走 Anthropic public marketplace)

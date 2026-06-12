@@ -1,3 +1,4 @@
+// @anatomy-exempt: anatomy 參考用靜態 props / 責任 / 色彩對照表（純文件,非互動資料表格,不需 DataTable runtime）
 import type { Meta, StoryObj } from '@storybook/react'
 import { Field, FieldLabel, FieldDescription, FieldError, FieldGroup } from './field'
 import { Input } from '@/design-system/components/Input/input'
@@ -52,26 +53,46 @@ export const Overview: Story = {
               <tr><Td>資料格式化(千分位/貨幣/locale)</Td><Td>—</Td><Td>✓ 管</Td></tr>
               <tr><Td>驗證邏輯</Td><Td>—</Td><Td>✓ 管(+ zod schema 於 form 層)</Td></tr>
               <tr><Td>readonly 呈現</Td><Td>—</Td><Td>✓ 管</Td></tr>
-              <tr><Td>DataTable cell 顯示</Td><Td>—</Td><Td>✓ 管(Display 子元件)</Td></tr>
+              <tr><Td>DataTable cell 顯示</Td><Td>—</Td><Td>✓ 管(mode="display" 渲染分支)</Td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
       <div>
-        <H3>Props 速查</H3>
+        <H3>Field Props 速查</H3>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
                 ['orientation', "'vertical' | 'horizontal'", "'vertical'", 'label 位置:上方 / 左方'],
-                ['labelWidth', 'string', "'120px'", 'horizontal 模式 label 寬度'],
+                ['labelWidth', 'string', "'auto'", 'horizontal 模式 label 寬度'],
                 ['required', 'boolean', 'false', '顯示 * 星號 + context.required'],
                 ['invalid', 'boolean', 'false', 'error 狀態 + context.invalid(觸發 aria-invalid)'],
                 ['disabled', 'boolean', 'false', 'context.disabled 傳給 control'],
-                ['size', "'sm' | 'md' | 'lg'", "'md'", 'context.size 傳給 control(field-height tier)'],
-                ['mode', "'edit' | 'readonly' | 'disabled'", "'edit'", 'context.mode 傳給 Field Controls'],
+                ['size', "'sm' | 'md' | 'lg'", "'md'", 'context.size 傳給 input-class control(Input / NumberInput / Select);primitive 不讀'],
+                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", 'context.mode 傳給 Field Controls'],
+                ['variant', "'default' | 'bare' | 'naked'", "'default'", "視覺外殼:default 含 border+bg / bare hover-reveal(toolbar inline edit)/ naked 無 chrome(DataTable cell substrate)"],
+                ['controlLayout', "'inline' | 'block'", '(自動偵測)', '逃生艙:覆寫 control area 佈局(consumer 手寫 JSX 當 control 無法偵測時用)'],
+              ].map(([p, t, d, desc]) => (
+                <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <H3>FieldLabel Props 速查</H3>
+        <div className="overflow-x-auto">
+          <table className="text-caption border-collapse">
+            <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
+            <tbody>
+              {[
+                ['info', 'string', '(無)', 'label 文字後加 info icon(ℹ),hover 出現 tooltip 補充說明'],
+                ['required', 'boolean', '(承 Field context)', '覆寫 Field context.required;預設沿用容器狀態'],
+                ['htmlFor', 'string', '(承 Field context.id)', '覆寫自動綁定的 label htmlFor'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -88,7 +109,7 @@ export const Overview: Story = {
 interface InspectorArgs {
   orientation: 'vertical' | 'horizontal'
   size: 'sm' | 'md' | 'lg'
-  mode: 'edit' | 'readonly' | 'disabled'
+  mode: 'edit' | 'display' | 'readonly' | 'disabled'
   required: boolean
   invalid: boolean
   disabled: boolean
@@ -127,8 +148,8 @@ export const Inspector: Story = {
     },
     mode: {
       control: 'radio',
-      options: ['edit', 'readonly', 'disabled'],
-      description: 'Context 傳給 Field Controls(詳見 field-controls.spec.md)',
+      options: ['edit', 'display', 'readonly', 'disabled'],
+      description: 'Context 傳給控制元件:edit 可編輯 / display 純展示 / readonly 鎖定但保留輸入外觀 / disabled 停用',
     },
     required: { control: 'boolean', description: 'label 後加 * + aria-required' },
     invalid: { control: 'boolean', description: '觸發 error border + FieldError 取代 FieldDescription' },
@@ -171,7 +192,7 @@ export const OrientationMatrix: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Vertical(預設)— label 在控件上方</H3>
-        <Desc>主要表單場景。label 與 control 之間 gap = layout-space-tight,垂直堆疊。</Desc>
+        <Desc>主要表單場景。label 與 control 之間 gap = gap-1(4px),垂直堆疊。</Desc>
         <div className="grid grid-cols-2 gap-6 max-w-4xl">
           <div className="border border-dashed border-divider rounded-md p-4">
             <FieldGroup>
@@ -202,9 +223,9 @@ export const OrientationMatrix: Story = {
 
       <div>
         <H3>Horizontal — label 在控件左方</H3>
-        <Desc>Settings / 詳情頁場景。label 固定寬度(labelWidth,預設 120px)對齊縱向軸,節省垂直空間。</Desc>
+        <Desc>Settings / 詳情頁場景。label 寬度(labelWidth,預設 auto 由內容撐開)對齊縱向軸,節省垂直空間。</Desc>
         <div className="border border-dashed border-divider rounded-md p-4 max-w-2xl">
-          <FieldGroup>
+          <FieldGroup horizontalLabelWidth="120px">
             <Field orientation="horizontal" required>
               <FieldLabel>電子郵件</FieldLabel>
               <Input type="email" defaultValue="user@example.com" />
@@ -241,7 +262,7 @@ export const SizeMatrix: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>三種 Size — 對齊 field-height 系統</H3>
-        <Desc>Field 的 size 透過 context 傳遞給所有 Field Controls(Input / NumberInput / Select / Slider / Switch / Checkbox),讓一個 Field 內所有 control 自動對齊高度。對齊 `--field-height-*` tier(見 uiSize.spec.md)。</Desc>
+        <Desc>Field 的 size 透過 context 傳遞給 input-class control(Input / NumberInput / Select / Combobox / DatePicker / TimePicker / PeoplePicker 等,皆經 useResolvedFieldSize 解析),控制其內部高度對齊 `--field-height-*` tier(見 uiSize.spec.md)。Slider / Switch / Checkbox 等 primitive 維持原生尺寸不讀 context size(見 field.spec.md「為什麼 primitive 不自己變高」),其行高節奏改由 Field control-area 的 min-h-field-{'{size}'} 提供——同一 Field 內所有 control 因此自動對齊高度。</Desc>
         <div className="grid grid-cols-3 gap-6">
           {(['sm', 'md', 'lg'] as const).map(size => (
             <div key={size} className="border border-dashed border-divider rounded-md p-4">
@@ -278,7 +299,7 @@ export const StateBehavior: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Required — label 後加 * 星號</H3>
-        <Desc>Field required 傳 context,FieldLabel 自動加星號並設 aria-required。</Desc>
+        <Desc>Field 的 required 透過 context 傳遞,FieldLabel 自動在文字前加上星號(僅視覺,對讀屏隱藏);aria-required 由內部的輸入控件(如 Input)負責設定。</Desc>
         <div className="border border-dashed border-divider rounded-md p-4 max-w-md">
           <Field required>
             <FieldLabel>姓名</FieldLabel>
@@ -326,7 +347,7 @@ export const StateBehavior: Story = {
       <div>
         <H3>組合:Required + Horizontal + Size=md(settings 典型場景)</H3>
         <div className="border border-dashed border-divider rounded-md p-4 max-w-2xl">
-          <FieldGroup>
+          <FieldGroup horizontalLabelWidth="120px">
             <Field orientation="horizontal" required size="md">
               <FieldLabel>姓名</FieldLabel>
               <Input defaultValue="Ada Chen" />
@@ -376,8 +397,8 @@ export const ColorMatrix: Story = {
               </tr>
               <tr>
                 <Td mono>Required 星號(*)</Td>
-                <Td><TokenCell token="--error" display="error" /></Td>
-                <Td><TokenCell token="--error" display="error" /></Td>
+                <Td><TokenCell token="--fg-muted" display="fg-muted" /></Td>
+                <Td><TokenCell token="--fg-muted" display="fg-muted(不變)" /></Td>
                 <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
               </tr>
               <tr>
@@ -389,14 +410,14 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td mono>FieldError</Td>
                 <Td>—(不渲染)</Td>
-                <Td><TokenCell token="--error" display="error" /></Td>
+                <Td><TokenCell token="--error-text" display="error-text" /></Td>
                 <Td>—</Td>
               </tr>
               <tr>
                 <Td mono>Control border(傳給 Field Controls)</Td>
                 <Td><TokenCell token="--border" display="border" /></Td>
                 <Td><TokenCell token="--error" display="error(border)" /></Td>
-                <Td><TokenCell token="--border" display="border" /></Td>
+                <Td>—(border-transparent,無可見邊框)</Td>
               </tr>
               <tr>
                 <Td mono>Control bg(disabled)</Td>
@@ -430,7 +451,7 @@ export const ColorMatrix: Story = {
             <Field required>
               <FieldLabel>姓名</FieldLabel>
               <Input placeholder="請輸入姓名" />
-              <FieldDescription>本欄位為必填(label 後有紅星 *)</FieldDescription>
+              <FieldDescription>本欄位為必填(label 後有星號 *)</FieldDescription>
             </Field>
           </div>
           <div>
@@ -461,7 +482,7 @@ export const FieldGroupBehavior: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>FieldGroup — 管理多 Field 垂直間距</H3>
-        <Desc>FieldGroup 提供 density-aware 的垂直 gap(跟隨 `--layout-space-tight` token),不需 consumer 手算間距。</Desc>
+        <Desc>FieldGroup 提供三個語意層級的垂直 gap(`compact`→gap-3 / `normal`→gap-4 / `loose`→gap-6),不需 consumer 手算間距。</Desc>
         <div className="grid grid-cols-2 gap-6 max-w-4xl">
           <div className="border border-dashed border-divider rounded-md p-4">
             <div className="text-caption text-fg-muted mb-3 font-mono">vertical orientation</div>
@@ -482,7 +503,8 @@ export const FieldGroupBehavior: Story = {
           </div>
           <div className="border border-dashed border-divider rounded-md p-4">
             <div className="text-caption text-fg-muted mb-3 font-mono">horizontal orientation</div>
-            <FieldGroup>
+            {/* horizontalLabelWidth:同表單 horizontal Field 必統一 label 寬(field.spec.md「FieldGroup horizontalLabelWidth cascade」硬規則)*/}
+            <FieldGroup horizontalLabelWidth="120px">
               <Field orientation="horizontal" required>
                 <FieldLabel>姓名</FieldLabel>
                 <Input placeholder="請輸入姓名" />
@@ -514,7 +536,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `field.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus internal control(Input / Select / DatePicker 等)\n- Esc — 取消 edit mode(若 cell-as-input)\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"Field 本身只是排版容器,不接管任何鍵盤事件——它把焦點、鍵盤與互動全都交給裡面的輸入控件(Input / Select / 日期選擇器等)。\n\n  鍵盤操作  :\n\n- Tab 鍵會把焦點移進裡面的輸入控件,使用者直接操作該控件,不需要滑鼠。\n- 取消編輯、按 Esc 收起等行為,由控件本身或放置它的容器(例如表格儲存格)決定,Field 不負責。\n\n  焦點外框  :焦點外框由控件自己畫(2px 實線),沿用整套設計系統一致的樣式;Field 不另外搶焦點。\n\n  驗證標準  :Storybook 的無障礙檢查面板應該沒有任何嚴重問題;只用鍵盤就能完整操作;文字對比至少 4.5:1、介面元素至少 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

@@ -10,12 +10,12 @@ import { ItemContent, ItemPrefix } from '@/design-system/patterns/element-anatom
 /**
  * FileItem — 檔案顯示 / 上傳進度
  *
- * Typography: 閱讀模式 — text-body (14px) 預設行高 (1.5)
+ * Typography: 兩 mode 統一 scanning — text-body (14px) + leading-compact (1.3)(詳 spec「Typography」段,2026-04-23)
  *
  * 兩種 mode（精簡 vs 完整內容呈現）:
  *
  * compact（★ default）: Paperclip 16px 在左。右側 content + bar。
- *   py = gap = 4px (gap-1)，對稱。
+ *   padding 詳 spec「Padding」表(form: px-3 py-2;surface=upload-manager: px-0 保留 py-2)。
  *   description 只有 error 才顯示。
  *   bar 跟文字左邊對齊（在 icon 右邊的 column 內）。
  *
@@ -25,7 +25,7 @@ import { ItemContent, ItemPrefix } from '@/design-system/patterns/element-anatom
  *   無 bar → justify-center（文字垂直置中對齊 avatar）
  *
  * status 可選。不傳 = 已上傳檔案（無 bar，可點擊下載）。
- * onClick → hover:bg-neutral-hover + cursor-pointer。
+ * onClick → 只加 cursor-pointer(**永不顯示 hover-bg**;FileItem 三型態皆 permanent-anchored,詳 spec「Hover 行為 canonical」)。
  */
 
 const STATUS_ICON = {
@@ -52,6 +52,16 @@ export interface FileItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>
    * - `rich`：縮圖 + 檔名 + size + status + progress 的完整 card 呈現
    */
   mode?: 'compact' | 'rich'
+  /**
+   * 清單所在的 surface context（2026-06-03 codify rich-borderless）：
+   * - `form`（預設）：rich = border card（自立輪廓，Slack/Notion/Linear attachment 慣例）
+   * - `upload-manager`：rich = **無邊框**（Google Drive/Dropbox 上傳管理面板 —— 面板自身已是容器，
+   *   card border 多餘 = 雙層容器）；avatar 作每筆 item 視覺邊界。compact 的進度條/灰底不受 surface 影響
+   *   （由 status 決定）。
+   * surface-driven（非 status-driven）：避免 form 內 rich 上傳中變無邊框、存好變 card 的邊框閃爍。
+   * 列間 gap 由 List wrapper canonical 決定（form rich 8px / upload-manager rich 12px tight / compact 4px，見 spec）。
+   */
+  surface?: 'form' | 'upload-manager'
   status?: 'uploading' | 'completed' | 'error'
   progress?: number
   /** rich mode: 檔案大小、狀態訊息。compact: 只有 error 才顯示。 ReactNode 支援 inline clickable link(如「View log」)。 */
@@ -79,6 +89,7 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
     {
       name,
       mode = 'compact',
+      surface = 'form',
       status,
       progress = 0,
       description,
@@ -101,8 +112,8 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
     const showDesc = isRich ? !!description : (status === 'error' && !!description)
 
     // Hover 行為 canonical(2026-04-23 user 校準):**FileItem 永不顯示 hover-bg**。
-    // 三種型態都有永久 visual anchor:rich = border card / compact Type B = bg-secondary /
-    // compact Type A = 底部 progress bar(分隔線型 affordance)——再加 hover-bg 是
+    // 三種型態都有永久 visual anchor:rich = border card / compact 無 status = bg-secondary /
+    // compact 有 status = 底部 progress bar(分隔線型 affordance)——再加 hover-bg 是
     // double-emphasis,視覺雜。世界級共識(Slack / Notion / Figma / Gmail 皆無 hover-bg):
     // permanent-anchored 元件 hover 只靠 cursor + action icon fade / border highlight,
     // 不靠 row bg。onClick 存在時只給 `cursor-pointer`,affordance 靠 cursor + 點擊行為本身。
@@ -233,8 +244,12 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
         <div
           ref={ref}
           className={cn(
-            'group/row flex items-start gap-2 px-3 py-3 w-full text-body leading-compact transition-colors',
-            'border border-divider rounded-md bg-surface',
+            'group/row flex items-start gap-2 w-full text-body leading-compact transition-colors',
+            // surface=form → border card(自立輪廓);surface=upload-manager → 無邊框(box 自身是容器,
+            // avatar 作 item 邊界)。2026-06-03 codify rich-borderless(原僅 spec 旁註,consumer 自己移除)。
+            // 2026-06-03 圖五:upload-manager rich 拿掉 px+py(卡片移除後 py 多餘,列高靠 avatar 48 的 content minHeight;
+            // 容器 + gap 控制間距)。form 保留 px-3 py-3 卡片內距。
+            surface === 'upload-manager' ? 'rounded-md' : 'px-3 py-3 border border-divider rounded-md bg-surface',
             hoverClass,
             className,
           )}
@@ -264,16 +279,21 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
       )
     }
 
-    // ── compact: py-2 對稱, bar absolute 底部 ──
+    // ── compact: py-2, bar absolute 底部 ──
+    // 左右 padding 單一來源(SSOT):form=12px(= px-3);upload-manager=0(由面板提供 L/R)。
+    // progress bar 是 absolute 定位,其 left/right 必須跟此值「同源」—— 否則 surface 一拿掉 padding,
+    // bar 的 offset 沒同步就會對齊跑掉(2026-06-03 圖五 bug:原本 left/right 寫死 0.75rem 假設 px-3)。
+    const compactPadX = surface === 'upload-manager' ? 0 : 12
     return (
       <div
         ref={ref}
         className={cn(
-          'group/row relative flex items-start gap-2 px-3 py-2 w-full text-body leading-compact transition-colors rounded-md',
+          'group/row relative flex items-start gap-2 py-2 w-full text-body leading-compact transition-colors rounded-md',
           compactStaticBg,
           hoverClass,
           className,
         )}
+        style={{ paddingInline: compactPadX }}
         onClick={onClick}
         {...rowA11y}
         {...props}
@@ -288,9 +308,13 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
           {contentRow}
         </div>
 
-        {/* ProgressBar: absolute 底部, left 對齊 label(跳過 icon + gap) */}
+        {/* ProgressBar: absolute 底部。left/right 與 compactPadX 同源:
+            left = padX + icon + gap-2(0.5rem)對齊 label 首字;right = padX 收在 row 內緣。 */}
         {progressBar && (
-          <div className="absolute bottom-0 right-3" style={{ left: `calc(0.75rem + ${ICON_PX}px + 0.5rem)` }}>
+          <div
+            className="absolute bottom-0"
+            style={{ left: `calc(${compactPadX}px + ${ICON_PX}px + 0.5rem)`, right: compactPadX }}
+          >
             {progressBar}
           </div>
         )}
@@ -311,9 +335,9 @@ export const fileItemMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'],
   tokens: {
-    bg: ['bg-neutral-hover', 'bg-secondary', 'bg-surface'],
+    bg: ['bg-secondary', 'bg-surface'],
     fg: ['text-fg-muted', 'text-fg-secondary'],
     ring: [],
   },

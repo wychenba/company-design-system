@@ -33,9 +33,9 @@ import {
  *   對齊 Material 3 / Atlassian / Polaris 世界級共識
  *
  * ── State ──
- *   default   bg-surface border-border text-foreground
- *   hover     border-border-hover（對齊 Input / SegmentedControl）
- *   selected  bg-primary-subtle border-primary-hover text-primary-hover
+ *   default   bg-surface border-border text-fg-secondary
+ *   hover     border-border-hover text-foreground（對齊 Input / SegmentedControl）
+ *   selected  bg-surface（不變） border-primary-hover text-primary-hover
  *   disabled  cursor-not-allowed text-fg-disabled
  *
  * ── 詳見 chip.spec.md ──
@@ -348,10 +348,10 @@ export const chipMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default', 'hover', 'selected', 'focus-visible', 'disabled'], // selected = data-[state=on](primary-hover);cva 無 active 樣式
   tokens: {
-    bg: ['bg-primary-subtle', 'bg-surface'],
-    fg: ['text-fg-disabled', 'text-fg-secondary', 'text-foreground'],
+    bg: ['bg-surface'],
+    fg: ['text-fg-disabled', 'text-fg-secondary', 'text-foreground', 'text-primary-hover'],
     ring: ['ring-ring'],
   },
 } as const

@@ -35,7 +35,7 @@ const D: Record<string, string> = {
 const actionBtn = <Button variant="tertiary" size="xs">查看詳情</Button>
 
 export const SubtleSingleLine = {
-  name: 'Subtle 單行',
+  name: '低調單行',
   render: () => (
     <div className="flex flex-col gap-3 max-w-lg">
       {ALL.map((v) => <Alert key={v} variant={v} appearance="subtle" title={L[v]} endContent={actionBtn} />)}
@@ -44,7 +44,7 @@ export const SubtleSingleLine = {
 }
 
 export const SolidSingleLine = {
-  name: 'Solid 單行',
+  name: '實心單行',
   render: () => (
     <div className="flex flex-col gap-3 max-w-lg">
       {ALL.map((v) => <Alert key={v} variant={v} appearance="solid" title={L[v]} endContent={actionBtn} />)}
@@ -53,7 +53,7 @@ export const SolidSingleLine = {
 }
 
 export const SubtleWithDescription = {
-  name: '低調 + 說明文字',
+  name: '低調含說明文字',
   render: () => (
     <div className="flex flex-col gap-3 max-w-lg">
       {ALL.map((v) => <Alert key={v} variant={v} appearance="subtle" title={L[v]} description={D[v]} endContent={actionBtn} />)}
@@ -62,7 +62,7 @@ export const SubtleWithDescription = {
 }
 
 export const SolidWithDescription = {
-  name: '實心 + 說明文字',
+  name: '實心含說明文字',
   render: () => (
     <div className="flex flex-col gap-3 max-w-lg">
       {ALL.map((v) => <Alert key={v} variant={v} appearance="solid" title={L[v]} description={D[v]} endContent={actionBtn} />)}
@@ -71,13 +71,12 @@ export const SolidWithDescription = {
 }
 
 export const CornerActionGroup = {
-  name: '框架角落操作群組',
+  name: '右上角操作群組',
   render: () => (
     <div className="flex flex-col gap-4 max-w-lg">
       <span className="text-caption text-fg-muted">
-        Chrome corner 是 action group region(Cat 3)。Close X 左側可並排 refresh / share 等
-        額外 action + Separator,全部同 size Button iconOnly xs(notification banner 家族設計準則)。目前 Alert API 只渲染單一
-        close X,多 action 時 consumer 自疊 wrapper 呈現(Alert 不 native 支援多 corner action)。
+        Alert 右上角是操作按鈕群組。關閉鈕左側可以並排重新整理、分享等額外按鈕,中間用分隔線分群,全部用同一種最小尺寸的純圖示按鈕。
+        Alert 本身只內建單一關閉鈕,要放多個角落按鈕時由使用端自己組合呈現。
       </span>
 
       <div className="relative">
@@ -90,8 +89,8 @@ export const CornerActionGroup = {
         />
         {/* @story-trait-rationale: scenario showcase 沒 AllVariants/States,trait grid 在 anatomy */}
         <div className="absolute top-3 right-4 flex items-center gap-2">
-          {/* Chrome action group canonical(2026-04-28):全 xs(notification banner family canonical),
-              same-row consistency 同尺寸 + ButtonDivider 自帶 mx-1 = 12px 視覺距離(對齊 button-group 主檔)*/}
+          {/* 角落操作群組:全部用最小尺寸按鈕(同尺寸才一致),
+              ButtonDivider 自帶 mx-1(左右各 4px)當分隔間距(對齊 button-group 主檔)*/}
           <Button iconOnly size="xs" variant="text" startIcon={RefreshCw} aria-label="重新整理" />
           <Button iconOnly size="xs" variant="text" startIcon={Share2} aria-label="分享連結" />
           <ButtonDivider />

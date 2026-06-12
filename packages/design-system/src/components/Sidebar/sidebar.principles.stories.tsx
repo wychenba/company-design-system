@@ -22,7 +22,6 @@ import {
   SidebarMenuButton,
 } from './sidebar'
 import { TreeView, TreeItem } from '@/design-system/components/TreeView/tree-view'
-import { ItemAvatar } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 
 const meta: Meta = {
@@ -145,19 +144,19 @@ export const UsageGuidance: Story = {
       <p>適合 Sidebar 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/Sidebar/展示" name="完整佈局"><span className="text-primary hover:underline font-medium cursor-pointer">完整佈局</span></LinkTo>
+          <LinkTo kind="Design System/Components/Sidebar/展示" name="完整佈局"><span className="text-primary hover:underline font-medium cursor-pointer">Linear 式議題追蹤主導覽(完整佈局)</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Sidebar/展示" name="混合內容"><span className="text-primary hover:underline font-medium cursor-pointer">混合內容</span></LinkTo>
+          <LinkTo kind="Design System/Components/Sidebar/展示" name="混合內容"><span className="text-primary hover:underline font-medium cursor-pointer">專案導覽混排群組、徽章與操作(混合內容)</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Sidebar/展示" name="Offcanvas 收合"><span className="text-primary hover:underline font-medium cursor-pointer">Offcanvas 收合</span></LinkTo>
+          <LinkTo kind="Design System/Components/Sidebar/展示" name="抽屜收合（離畫面外）"><span className="text-primary hover:underline font-medium cursor-pointer">側欄整條滑出畫面外的內容優先工作區（抽屜收合）</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Sidebar/展示" name="Mixed prefix"><span className="text-primary hover:underline font-medium cursor-pointer">Mixed prefix</span></LinkTo>
+          <LinkTo kind="Design System/Components/Sidebar/展示" name="混合前綴"><span className="text-primary hover:underline font-medium cursor-pointer">icon 導覽與 GitHub / Slack / Figma 整合並列對齊（混合前綴）</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:對照下方「何時不用 / 替代元件」清單;若情境不屬於垂直持久導覽,改用對應的近親元件。</p>
     </div>
 
       {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
@@ -421,7 +420,7 @@ export const SettingsScenario: Story = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const IconModeRules: Story = {
-  name: 'Icon 模式的 4 條鐵律',
+  name: '圖示模式的 4 條鐵律',
   render: () => (
     <div className="flex flex-col gap-10">
       <Section

@@ -23,8 +23,8 @@
 ### DS spec.md(全部)
 ```bash
 # 列舉所有 spec.md
-find src/design-system -name "*.spec.md" -type f
-# 預期 ~60 file:components/* + patterns/* + tokens/*
+find packages/design-system/src -name "*.spec.md" -type f
+# 預期 ~83 file:components/* + patterns/* + tokens/*
 ```
 
 每個必 Read 全文(spec ≤ 300 lines budget,foundational SSOT ≤ 800-1200)。

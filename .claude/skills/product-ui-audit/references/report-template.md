@@ -15,7 +15,7 @@
 - Dialog / Modal 無 DialogTitle
 - 非 button 綁 onClick(a11y 破壞)
 - 巢狀浮層 / 巢狀 Modal(HTML invalid 或 UX 破壞)
-- CLAUDE.md「同 flex 列互動 slot 幾何鐵律」違反
+- .claude/references/ui-dev-rules.md「同 flex 列互動 slot 幾何鐵律」違反
 
 **處理**: AI 可直接修(surgical fix),commit 時 user 一併 review。
 

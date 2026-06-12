@@ -9,7 +9,7 @@
 //   disabled — input chrome + disabled state(灰底,不可互動,語意「不適用」)
 //
 // `display` vs `readonly` 判別:
-//   - 該位置語意上是「純展示資料」(如 DataTable cell read mode / NameCard meta) → `display`
+//   - 該位置語意上是「純展示資料」(如 DataTable cell read mode / ProfileCard meta) → `display`
 //   - 該位置是「表單欄位但目前不可改」(如 form 鎖部分欄位) → `readonly`
 //
 // World-class refs(M22 verified):

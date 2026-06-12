@@ -32,7 +32,7 @@
 | **Atlassian Button group** | 8px gap;ring/focus outline 限制在 box 內,不 overflow |
 | **Ant Design Space** | default `gap-8`,hover bg 限制 box 內 |
 
-**世界級 idiom**:**hover bg / ring / focus outline 不超出 slot box**,保護 gap token 如實呈現。這對齊 CLAUDE.md`# 同 flex 列的互動 slot 幾何鐵律`。
+**世界級 idiom**:**hover bg / ring / focus outline 不超出 slot box**,保護 gap token 如實呈現。這對齊 .claude/references/ui-dev-rules.md`# 同 flex 列的互動 slot 幾何鐵律`。
 
 ---
 
@@ -114,7 +114,7 @@
 - **Web DS 用 overlay scrollbar 跨 OS 一致**(Radix ScrollArea / Ant Design Scrollbar 都這樣做)
 - **原因**:Windows native scrollbar 吃寬度會讓同一 page 在 Mac 和 Windows 上 layout 不同,違反「設計在任何平台視覺一致」
 
-對應 DS:`components/ScrollArea/` + CLAUDE.md「overflow 使用三規則」。
+對應 DS:`components/ScrollArea/` + `.claude/references/build-ui-canonicals.md`「overflow 使用三規則」。
 
 ---
 

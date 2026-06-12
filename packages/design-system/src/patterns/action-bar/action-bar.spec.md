@@ -1,4 +1,4 @@
-<!-- @benchmark-cited: D5 retrofit 2026-05-18 — verified 0 world-class DS claim in body; blanket retract removed. -->
+<!-- @benchmark-unverified-blanket: body 含 pattern 級 world-class 對照(世界級對照表 L17-24 + Variant narrow-scope 對照 L141-156:Material/VS Code/Figma/Atlassian/Polaris/Linear/GitHub/Gmail/Notion/MUI/Carbon),為 named-reference 級而非 per-source URL/#L/snapshot cite,故 file-level 標 unverified-blanket。 -->
 
 # Action Bar 設計原則
 
@@ -89,7 +89,7 @@ Search 的角色**不由「產品核心是不是搜尋」決定**，而由——
 ┌──────────────────────────┐ ┆ ┌──────────────────────┐
 │       業務操作群組        │ ┆ │  工具操作    溢出      │
 └──────────────────────────┘ ┆ └──────────────────────┘
-       Operations tier               Utilities tier
+    業務層(Operations)          工具層(Utilities)
 ```
 
 兩種對齊的差異只在業務層內部排序方向，工具層位置不變：
@@ -116,9 +116,9 @@ Search 的角色**不由「產品核心是不是搜尋」決定**，而由——
 
 | | |
 |--|--|
-| **允許 variant** | primary、secondary、tertiary、text、checked（`link` 是導覽語意，不屬於操作列） |
-| **Variant 選擇** | 以有框 variant（primary、secondary、tertiary、checked）為主，`text` 用於視覺重量最低的輔助操作。有框操作定義「這是操作區的重心」，text 是補充，不是預設。 |
-| **全局排序** | 先對所有可見業務按鈕做全局排序：`primary > secondary > tertiary > text`；靠右對齊時 primary 在業務層最右，靠左對齊時 primary 在業務層最左（工具層永遠在業務層右側，見第二節）。正確排序後有框操作自然在前、text 在後，不需要額外的集中規則。切換按鈕（text ↔ checked）依預設（未啟用）狀態的 variant 決定排序位置 |
+| **允許 variant** | primary、secondary、tertiary、text（`link` 是導覽語意,不屬於操作列）。**啟用態(on/checked)不是 variant** —— 由 `pressed` prop 表達(產生 `data-state=on`) |
+| **Variant 選擇** | 以有框 variant（primary、secondary、tertiary）為主,`text` 用於視覺重量最低的輔助操作。有框操作定義「這是操作區的重心」,text 是補充,不是預設。可切換按鈕維持其 variant + 加 `pressed` toggle(非換成 checked variant) |
+| **全局排序** | 先對所有可見業務按鈕做全局排序：`primary > secondary > tertiary > text`；靠右對齊時 primary 在業務層最右，靠左對齊時 primary 在業務層最左（工具層永遠在業務層右側，見第二節）。正確排序後有框操作自然在前、text 在後，不需要額外的集中規則。切換按鈕（維持 variant + `pressed` toggle）依預設（未啟用）狀態的 variant 決定排序位置 |
 | **danger 位置** | `danger` 不影響跨 variant 排序。同 variant 內，danger 排在非 danger 之後（遠離主要焦點）。`primary+danger` 不受此規則影響——在刪除確認等場景中，破壞性操作本身就是主要動作 |
 | **danger 可見性** | 破壞性操作預設收進溢出選單。只有同時滿足**高頻**（使用者每次進入此畫面都可能用到）且**可逆**（有 undo 或垃圾桶機制）時，才值得攤開為可見按鈕。頻率不夠高或不可逆的破壞性操作，攤開只會增加誤觸風險（Gmail 的教訓：Delete 從預設可見改為隱藏，因為誤觸是最大客訴） |
 | **功能性分群** | 排序完成後，依功能關係在適當位置加分隔線形成群組；**不要先定義群組再各自排序**（會導致多個 primary 競爭焦點） |
@@ -130,19 +130,19 @@ Search 的角色**不由「產品核心是不是搜尋」決定**，而由——
 | 狀態 | Variant | Label |
 |------|---------|-------|
 | 未配置 | `text`（預設，在 Toolbar 脈絡下）／`tertiary`（脈絡不明確時，見下方 affordance 原則） | 通常 icon-only；脈絡不明確時補 label |
-| 已配置 / 啟用 | `checked`（`data-state=on`） | icon-only |
+| 已配置 / 啟用 | 維持 variant 不變 + `pressed={true}`（產生 `data-state=on`） | icon-only |
 
 篩選、排序、分組三個圖示（Filter、ArrowUpDown、Layers）在資料表格脈絡下意義唯一，Toolbar 場景通常全程 icon-only。
 
-**Checked 狀態的視覺依底層 variant 而變**：
-- `text` + `data-state=on` → `bg-neutral-selected`（灰底 + 原色 icon），低調但仍可辨識
-- `tertiary` + `data-state=on` → `bg-primary-subtle` + `text-primary`（藍底 + 藍色 icon），存在感更強
+**啟用態（`data-state=on`）的視覺由 `pressedTone` prop 決定（非底層 variant）**：
+- `pressedTone="emphasis"`（**button.tsx 預設**）→ `bg-primary-subtle` + `text-primary`（藍底 + 藍色 icon），存在感強。secondary / tertiary / text 三者在此 tone 下視覺相同
+- `pressedTone="neutral"` → `bg-neutral-selected`（灰底 + 原色 icon），低調但仍可辨識
 
 **Variant 選擇 narrow scope**(2026-05-20 codex Layer B D1 verdict + WebFetch ≥ 5 world-class):
 
 | Context | Variant | Cite |
 |---|---|---|
-| **DataTable / Kanban / list 等 dense always-visible data toolbar** filter / sort / column controls | **`text` + pressed** + iconOnly + Popover wrap real panel(DataTableFilterPanel / DataTableSortManager) | `data-table.stories.tsx#WithBulkActions L998` SSOT |
+| **DataTable / Kanban / list 等 dense always-visible data toolbar** filter / sort / column controls | **`text` + pressed** + iconOnly + Popover wrap real panel(DataTableFilterPanel / DataTableSortManager) | `data-table.stories.tsx#WithBulkActions` SSOT |
 | **Standalone / labeled** sole state carrier(toolbar 外 / 單獨 filter UI 非 DataTable context) | `tertiary` + pressed | 視 case |
 | 純動作工具(無 state)/ 低重量輔助 | `text` | 既有 default |
 
@@ -163,7 +163,7 @@ Search 的角色**不由「產品核心是不是搜尋」決定**，而由——
 |--------|---------|
 | 純動作工具（點了就執行，無當前狀態） | `text` |
 | 可切換工具（全螢幕等）— 未啟用 | `text` |
-| 可切換工具 — 已啟用 | `checked` |
+| 可切換工具 — 已啟用 | 維持 variant（如 `text`）+ `pressed={true}` |
 
 **不允許**：primary、secondary（工具層必須是操作列中最低視覺重量）。`danger` 不適用於工具層——破壞性操作一定是對物件的業務操作，不是環境調整。
 
@@ -283,7 +283,7 @@ Icon 的目的是幫助辨識，不是視覺對稱。
 
 **分隔線語意判斷**：遵守以上規則後孤立自然不出現。若出現孤立，先問「這條分隔線有語意理由嗎？」而非接受孤立。
 
-**切換按鈕**：`text ↔ checked` 依預設（text）狀態決定位置與分隔線；切換為 checked 時不移動、不調整分隔線。
+**切換按鈕**：`text` + `pressed` toggle——依預設（未啟用）狀態決定位置與分隔線；切為啟用（`pressed=true`）時不移動、不調整分隔線（啟用態不是 variant，見三節）。
 
 ---
 
@@ -331,6 +331,7 @@ Icon 的目的是幫助辨識，不是視覺對稱。
 ### 共通規則
 
 - 溢出按鈕不構成工具層。工具層需要有固定工具按鈕（⚙ 設定、↺ 刷新、⤢ 全螢幕等）才存在，只有 ··· 不算
+- 溢出選單本體的浮層行為（超出 viewport 的 collision 翻轉 / 內容過長捲動 / Esc 關閉 / 鍵盤導覽）由 `DropdownMenu` own（Radix 預設），本 pattern 不重定義
 - **如果操作列出現大量溢出按鈕，這是資訊架構的問題，應回到功能規劃層重新設計**
 
 ---
@@ -425,7 +426,7 @@ Icon 的目的是幫助辨識，不是視覺對稱。
 ├── 移除它，使用者無法完成任務  →  業務操作
 │     ├── 一般操作                →  label 或 icon + label
 │     ├── 含多個子選項            →  + endIcon={ChevronDown}
-│     └── 可配置資料操作          →  text（未配置）/ checked（已配置）
+│     └── 可配置資料操作          →  text + pressed（未配置 pressed=false / 已配置 pressed=true）
 │           └── 需要更強可操作性提示  →  tertiary（未配置）
 └── 跟任務無關，服務環境          →  工具操作  →  icon-only + tooltip
 
@@ -443,15 +444,21 @@ Icon 的目的是幫助辨識，不是視覺對稱。
 
 ---
 
+## 邊界與分權
+
+本 pattern 是組合指南（無 runtime 元件）——元件級邊界（無可見 action 時不渲染空操作列 / loading / disabled 狀態）與 a11y 細節由消費端元件 own：icon-only 必設 `aria-label` + tooltip（見第四節，Button own）；溢出選單的鍵盤 / focus 行為由 `DropdownMenu` own（見第六節）。
+
 ## 關聯文件
 
 - `button.spec.md`：Button 元件層的設計原則
+- `../../components/DropdownMenu/dropdown-menu.spec.md`：溢出選單浮層行為 SSOT（collision / 捲動 / Esc / 鍵盤）
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `bulk-action-bar.spec.md`
+- `button.spec.md`
 - `calendar.spec.md`
 - `data-table.spec.md`
 - `file-viewer.spec.md`

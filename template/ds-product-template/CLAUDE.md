@@ -22,10 +22,12 @@ per 2026-05-27 user verbatim「fork template 必須要能跟 ds repo 完全 ssot
 /plugin install design-system@qijenchen-ds
 ```
 
+> **2026-05-30 機械強制**:本規則現由 fork 自帶(不依賴 plugin)的 bootstrap hook 落地 —— `.claude/hooks/check_plugin_bootstrap.sh`(SessionStart 每 session 提醒)+ `block_production_edit_without_plugin.sh`(PreToolUse **硬攔** `apps/**` production edit,沒裝 plugin 直接 BLOCK)。補「plugin 硬 hook 隨 plugin 才裝」的 chicken-egg。極罕見純 prototype 才用 escape `CLAUDE_BYPASS_PLUGIN_BOOTSTRAP=1`。
+
 **之後同步用**:`npm run sync-all`(per critical step 1)。
 
 **沒裝後果**(2026-05-26 anchor case):
-- 59 個 DS governance hooks 全部不 fire(M29 anchor preflight / approval-preflight / SSOT propagation 全失效)
+- 52 個 DS governance hooks 全部不 fire(M29 anchor preflight / approval-preflight / SSOT propagation 全失效)
 - AI 寫 `apps/template/src/App.tsx` 憑記憶寫 simplified mock(漏 SidebarTrigger / collapsible / startIcon / tooltip / footer)
 - 視覺直接跑版 + 互動破損(menu toggle 不見 / sidebar 收不起來)
 
@@ -50,6 +52,20 @@ Plus on-demand 讀 `ds-canonical/` 內:
 - `references/` — naming-conventions / ssot-consultation / tailwind-gotchas / props-naming 等 SSOT lookup tables
 - `skills/` — 22 skills(/prototype / /component-quality-gate / /codify-corrections 等)— via plugin install 也 expose
 
+### 🧩 寫某元件 UI 前必讀:DS 官方範例(stories)= 最新最正確的設計參考
+
+**重要**:DS npm 套件**已 ship 全部元件範例原始碼**到 `node_modules/@qijenchen/design-system/src/`(含全部 197 支 `.stories.tsx` + 同元件 `.spec.md`,**含 internal 元件**)。寫某元件 UI 前 / 不確定 composition 怎麼排時,**先讀對應元件的 stories 看官方真實寫法**,不要憑記憶寫 simplified mock(憑記憶寫 = 漏 slot / 漏 prop / 視覺跑版的根因):
+
+```bash
+# 看某元件官方 composition 範例(取代 Figma inspect / 憑印象):
+@node_modules/@qijenchen/design-system/src/components/<Name>/<name>.stories.tsx
+@node_modules/@qijenchen/design-system/src/components/<Name>/<name>.spec.md          # 何時用 / variant / size / 設計原則
+# pattern 同理:src/patterns/<name>/<name>.stories.tsx
+# 全範例索引:@node_modules/@qijenchen/design-system/ds-story-manifest.json(62 元件 / 914 story id)
+```
+
+範例隨 `npm install @qijenchen/design-system@beta`(或 `sync-all` / Dependabot)自動更新到最新 = 天然 SSOT、不 drift。本 repo 自己的 Storybook 只放 product 範例(`apps/**`),DS 元件範例**不在本 repo render**,看 rendered 版到 DS 部署的 Storybook(<https://ajenchen-design-system.netlify.app/>);**AI 取設計參考則直接讀上面 node_modules 的 source**(雲端 sandbox 讀 source 比開網頁可靠)。
+
 → **DS canonical 永遠是 SSOT,本 repo 規則只 extend / override consumer-specific 部分**。
 
 ---
@@ -62,9 +78,9 @@ Fork 本 repo 後,user 用 Claude 開啟,Claude **必依以下順序**做 painle
 |---|---|---|
 | 0 | Cross-load DS canonical(見上)| 拿 design SSOT |
 | 1 | `npm install` | 拉 `@qijenchen/design-system` + `@qijenchen/storybook-config` npm deps + DS canonical 隨 npm 落地 |
-| 2 | `/plugin marketplace add github:ajenchen/design-system` | 拿 DS governance plugin(22 skills / 59 hooks 自動下載) |
+| 2 | `/plugin marketplace add github:ajenchen/design-system` | 拿 DS governance plugin(22 skills / 52 hooks 自動下載) |
 | 3 | `/plugin install design-system@qijenchen-ds` | 啟動 plugin |
-| 4 | `npm run setup:netlify` | Netlify CLI install + login + site 建 + 連 repo;最後印 dashboard URL + Basic Password 設定指引(2026-05-29 改:Identity deprecated;Basic Password 是 free-tier 唯一可用 access control)|
+| 4 | `npm run setup:netlify` | Netlify CLI install + login + site 建 + 連 repo;最後印 dashboard URL + 教 fork user 在 Netlify 設 `STORYBOOK_BASIC_AUTH` env var(`user:password`)→ Edge Function `netlify/edge-functions/basic-auth.ts` 在 edge 層做 HTTP Basic Auth 上密碼(免費,Edge Functions 所有方案含 free-tier 可用)。Dashboard 的 Password protection 與 `_headers` Basic-Auth 都是 Pro 專屬($20/mo),非必須 |
 | 5 | `npm run create-app <new-app-name>`(若需新 product app) | copy `template/` → 新 app folder |
 | 6 | `npm run storybook` 本地 verify | 確認 DS components 視覺正確 |
 | 7 | Push main → Netlify auto-deploy + Storybook auto-rebuild | done |
@@ -78,7 +94,7 @@ Fork 本 repo 後,user 用 Claude 開啟,Claude **必依以下順序**做 painle
 | DS publish 新 beta | Dependabot daily(`.github/dependabot.yml`)+ `sync-design-system.yml` repository_dispatch → 本 repo 自動 bump deps + commit |
 | Plugin / skills / hooks 更新 | User 偶爾跑 `/plugin marketplace update` 拿最新 |
 | 你寫 product code | Plugin hooks 自動 enforce SSOT(import DS internals 攔截 / canonical drift 警告 / story 規範等) |
-| Push main | `audit.yml` tsc + lint:imports + build / `deploy.yml` apps Netlify / Storybook netlify.toml auto-rebuild |
+| Push main | `audit.yml` tsc + lint:imports + build / apps + Storybook 經 `netlify.toml`(Netlify Git integration)auto-rebuild |
 
 ---
 
@@ -95,30 +111,35 @@ Fork 本 repo 後,user 用 Claude 開啟,Claude **必依以下順序**做 painle
 ## 📚 Storybook 用途分工
 
 - **DS repo Storybook**(<https://ajenchen-design-system.netlify.app/>)= DS library 元件 reference docs(public 或 password protected by DS owner)
-- **本 repo Storybook**(Netlify deploy,Basic Password protected)= **真實 product UI demo**(PM / designer / QA 看業務情境)
+- **本 repo Storybook**(Netlify deploy,HTTP Basic Auth via Edge Function 保護)= **真實 product UI demo**(PM / designer / QA 看業務情境)
 - Stories 寫 PRODUCT scenarios(不是 DS element trait grid)— DS trait grid 是 DS repo 責任
 
 ---
 
-## 🔒 Access control — Basic Password(2026-05-29 改 from Identity)
+## 🔒 Access control — 免費 HTTP Basic Auth via Edge Function(2026-06-05 二修)
 
-**Default = Netlify Basic Password**(free-tier 唯一可用 access control,共用 password)。
+**Default(免費)= Netlify Edge Function 自做 HTTP Basic Auth**(本 template 內建,`netlify/edge-functions/basic-auth.ts`)。Edge Functions 所有方案含 free-tier 可用,`.netlify.app` 預設網址直接生效、無需自訂網域,edge 層擋,瀏覽器原生帳密彈窗。
 
-**為何不是 Identity?**
-- Netlify 2024 公告 Identity **deprecated**,新帳號可能看不到 Identity menu
-- Team protection 🔒 鎖,要 Pro plan $19/mo
-- → Basic Password 是 free-tier 真實可用方案
+**為何不是 Netlify 內建密碼(Dashboard Password Protection / `_headers` Basic-Auth)?**
+- Netlify Dashboard 的「Password protection / Basic protection」(Site settings → Access & security)**與** `_headers` 裡的 Basic-Auth header — **兩個都是 Pro 方案專屬**($20/mo,官方 docs + support forum 2026-06-05 三重證實);**free-tier 都沒有**(這就是 fork user 卡住的原因)。官方限制頁另載明 `_headers` 的 basic-auth header **不會套用到 edge function**。
+- 免費要真擋陌生人 → 用 Edge Function 自己實作 HTTP Basic Auth(讀 Authorization header → 比對 env var → 缺/錯回 401)。本 template 已內建。
 
-**設定流程**:
-1. `npm run setup:netlify` 自動跑 CLI install + login + site 建 + 連 repo
-2. Script 跑完印 dashboard URL → 跟著做 2 step 設 password(30 秒)
-3. 把 URL + password 私訊 stakeholder
+**內建機制**:
+- `netlify.toml` build command = `npm run build-storybook`,並 wire `[[edge_functions]]` path=`/*` function=`basic-auth`
+- `netlify/edge-functions/basic-auth.ts` 在 edge 層讀 request 的 `Authorization` header,比對 Netlify env var `STORYBOOK_BASIC_AUTH`(格式 `user:password`,多組空格分隔 `"u1:p1 u2:p2"`);缺/錯 → 回 401 + `WWW-Authenticate`(瀏覽器原生帳密彈窗)。未設 env var = pass-through(站台公開)。
+- **密碼不進 repo**(public repo 不能 commit 明文)— 只存 Netlify 後台 env var,edge 執行時讀取。
 
-**手動 dashboard 步驟**(script 印出):
-- 打開 `https://app.netlify.com/projects/<site>/configuration/visitor-access`
-- **Password Protection** → 「**Basic protection**」→ 輸 password → **Save**
+**fork user 設定(30 秒,免費)**:
+1. `npm run setup:netlify` 自動跑 CLI install + login + site 建 + 連 repo(並印 dashboard URL)
+2. Netlify → Site configuration → Environment variables → 加 `STORYBOOK_BASIC_AUTH` = `user:password`
+3. 下次 deploy(push main / Trigger deploy)→ 站台自動跳帳密彈窗
+4. 把 URL + 帳密私訊 stakeholder
 
-**`.storybook/manager-head.html`**:Identity widget 已移除(Basic Password 在 Netlify edge 層擋,client widget 不需要)。
+**進階(要更好體驗才升級,非必須)**:
+- **Pro Password Protection**($20/mo):dashboard 開關,美化密碼頁、可只擋 deploy preview 放行 production、團隊登入。
+- **Cloudflare Access**(免費 50 user 真 SSO):需自訂網域 + 自架 Cloudflare proxy 在 Netlify 前面。
+
+**`.storybook/manager-head.html`**:無需 client-side auth widget(Basic Auth 在 Netlify edge function 層擋)。
 
 ### 🆘 Claude 引導使用者 — Netlify onboarding(user 不一定知道 Netlify)
 
@@ -126,8 +147,8 @@ Fork 本 repo 後,user 用 Claude 開啟,Claude **必依以下順序**做 painle
 
 1. **解釋 Netlify 是什麼**(一句話):「Netlify 是免費 deploy 平台(類似 Vercel),用來自動跑 Storybook + 給 team 看內部 product UI。Free tier 100GB bandwidth / 0 maintenance」
 2. **沒帳號?GitHub 1-click 自動建**:「fork 本 repo 必有 GitHub 帳號 → 跑 `npm run setup:netlify` 會開瀏覽器 OAuth → 點『Continue with GitHub』授權 → Netlify 自動建帳號(<5 秒)」
-3. **設 Basic Password** 不在 CLI 範圍:「script 跑完印 dashboard URL,你打開連結點 2 個 radio button 輸 password 即可(30 秒)。Netlify CLI 沒提供 password protection 的 API(2026-05-29 verified),只能手動。」
-4. **防 SEO** 已自動:「`netlify.toml` 已 ship `X-Robots-Tag noindex`,Google 不收錄 URL。但**真擋陌生人靠 password**,SEO header 只防搜尋引擎不防直接訪問」
+3. **設密碼(免費)= Netlify 後台加 1 個 env var**:「script 跑完印 dashboard URL。打開 Netlify → Site configuration → Environment variables → 加 `STORYBOOK_BASIC_AUTH` = `user:password`,下次 deploy 站台就自動跳帳密彈窗(30 秒)。免費 — 靠本 template 內建的 Edge Function(`netlify/edge-functions/basic-auth.ts`)在 edge 層擋,Edge Functions 所有方案含 free-tier 可用。Dashboard 那個 Password Protection 開關是 Pro 專屬($20/mo),不用碰。」
+4. **防 SEO** 已自動:「`netlify.toml` 已 ship `X-Robots-Tag noindex`,Google 不收錄 URL。但**真擋陌生人靠上面 Edge Function 的 Basic Auth**,SEO header 只防搜尋引擎不防直接訪問」
 5. **驗證 deploy 成功**:「push main 後 2-3 min,Netlify Dashboard `Deploys` tab 變綠勾 = OK。Site URL = `https://<site-name>.netlify.app`」
 6. **GitHub CLI 未 login?**「Setup script Step 0 偵測 `gh auth status`;沒 login 建議先跑 `gh auth login`(瀏覽器 OAuth,1 分鐘)」
 7. **Cloud-dev path**:「不想本地?GitHub Codespaces 跑得動(`<> Code → Codespaces → Create`),內裝 `npm i -g @anthropic-ai/claude-code` 後 governance 全 fire。免費 60h/月」
@@ -139,7 +160,7 @@ Fork 本 repo 後,user 用 Claude 開啟,Claude **必依以下順序**做 painle
 | 1 | Plugin install slash command | ❌ Architecture | Postinstall warning 印 copy-paste,30 秒 |
 | 2 | `netlify login` OAuth | ❌ OAuth security | 瀏覽器 click「Authorize」1 次 |
 | 3 | `netlify init` site 建立 | ✅ **已自動**:`sites:create` + `link`,site name = `<gh-user>-<repo>` |
-| 4 | **設 Basic Password** | ❌ **Netlify CLI 沒提供 password API**(2026-05-29 verified) | Script 印 dashboard URL,user 點 2 radio button + 輸 password + Save(30 秒) |
+| 4 | **設密碼(免費 Edge Function)** | ⚠️ 半自動 | Edge Function Basic Auth 機制已內建;user 只需在 Netlify 後台加 1 個 env var `STORYBOOK_BASIC_AUTH`=`user:password`(30 秒),下次 deploy 自動生效 |
 | 5 | 分享 password 給 stakeholder | ❌ 沒辦法自動 | Team chat / Slack DM 私訊 |
 | 6 | Push main 觸發 production | ❌ **設計上 user gate**(Git solo-work canonical) | 不修 |
 
@@ -152,8 +173,8 @@ Fork 本 repo 後,user 用 Claude 開啟,Claude **必依以下順序**做 painle
 npm install                      # postinstall warning
 # (Claude session) /plugin marketplace add github:ajenchen/design-system
 # (Claude session) /plugin install design-system@qijenchen-ds
-npm run setup:netlify            # CLI + site + 印 password dashboard URL
-# 開瀏覽器點 Save password → done
+npm run setup:netlify            # CLI + site + 印 dashboard URL
+# Netlify 後台加 env var STORYBOOK_BASIC_AUTH=user:password → Edge Function basic-auth 下次 deploy 自動上密碼(免費)→ done
 ```
 
 **Cloud-dev 模式**(3 path 選一):
@@ -161,7 +182,7 @@ npm run setup:netlify            # CLI + site + 印 password dashboard URL
 - **Path 2** — GitHub Codespaces(`.devcontainer/` 已 ship):fork → Code → Codespaces → Create → container 自動裝齊
 - **Path 3** — 本地 `git clone` + `npm install` + `claude`
 
-**Claude DO NOT**:假設 user 已知 Netlify / 跳過 onboarding 直接寫 code / 沒解釋就要 user 跑 setup 命令 / 嘗試「fully headless password 設定」(Netlify CLI 不支援,做不到)/ 推薦 Identity(已 deprecated)。
+**Claude DO NOT**:假設 user 已知 Netlify / 跳過 onboarding 直接寫 code / 沒解釋就要 user 跑 setup 命令 / 叫 user 去 Dashboard 開 Password Protection 當免費方案(那是 Pro 專屬 $20/mo,免費請走 `STORYBOOK_BASIC_AUTH` env var → Edge Function `basic-auth`)/ 講「`_headers` Basic-Auth 免費」「Dashboard Basic Password 免費 / 是 free-tier 唯一可用 / 唯一真擋陌生人的方法」(全錯;`_headers` Basic-Auth 與 Dashboard Password 都是 Pro $20/mo,免費是 Edge Function Basic Auth)/ 講 build-time 注入 `_headers` 或 `inject-basic-auth.mjs`(該機制已刪,改 edge function)/ 推薦 Netlify Identity 當簡單密碼方案(它是完整 signup/login 系統,對「Storybook 上個密碼」overkill;另注:2026-02 官方已撤回 Identity 的 deprecate,**別再講它「已 deprecated」**那是過期錯誤資訊)。
 
 ---
 
@@ -172,11 +193,11 @@ Plugin install 後自動執行的合規 gate(逐 phase):
 | Phase | Gate | 自動 trigger |
 |---|---|---|
 | Edit time | Hook `check_substantive_edit_approval_preflight.sh` | Pre-write 攔 SSOT-affecting edit 需 user approval |
-| Edit time | Hook `check_ssot_consultation.sh` / `auto_regen_ds_barrel.sh` | 偵 import / canonical drift |
+| Edit time | Hook `check_canonical_propagation.sh` / `auto_regen_ds_barrel.sh` | 偵 import / canonical drift |
 | Pre-commit | `audit-content-quality.mjs` | DS spec 一致性 |
 | CI(push)| `audit.yml` tsc + lint:imports + build | 攔語法 / 邊界 |
 | Pre-deploy | Storybook smoke + visual baseline(via DS repo CI) | 視覺 drift |
-| 季度 / 大改 | `/design-system-audit --deep` skill | 82 dim 全掃 |
+| 季度 / 大改 | `/design-system-audit --deep` skill | 88 dim 全掃 |
 
 → **Claude 寫 code 時 plugin hooks 自動 fire,user 不必每次提醒,違規 = 立即 BLOCKER**。
 
@@ -202,6 +223,5 @@ Vite + React 19 + TypeScript + Tailwind v4 + Storybook 8.6 + `@qijenchen/design-
 ## CI
 
 - `audit.yml` — tsc + lint:imports + build per push/PR
-- `deploy.yml` — `apps/template/dist` per-app Netlify(需 NETLIFY_AUTH_TOKEN + NETLIFY_SITE_ID_TEMPLATE secrets)
-- `netlify.toml` — Storybook Netlify Git integration(無需 secret,直接讀 build command + access headers)
+- `netlify.toml` — apps + Storybook Netlify Git integration(無需 secret,直接讀 build command + access headers)— 無獨立 `deploy.yml` workflow,deploy 全經 Netlify Git integration
 - `sync-design-system.yml` — Dependabot daily + repository_dispatch(DS release 自動 bump deps)

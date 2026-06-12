@@ -24,7 +24,10 @@ set -uo pipefail
 # Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
 source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
 
-set -euo pipefail
+# 2026-05-30:移除 -e(對齊 L2 set -uo)。本 hook = 非阻塞 governance reminder,必永遠 exit 0;
+# set -e 會讓任何未 guard 的 command(eg. L38 grep no-match pipeline 在 node-missing degraded env)
+# 殺掉整個 session-start hook。fail-open > fail-closed。adversarial-verify 2026-05-30 抓出此真 bug。
+set -uo pipefail
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 cd "$PROJECT_DIR" || exit 0
@@ -35,7 +38,7 @@ cd "$PROJECT_DIR" || exit 0
 # Memory sync = harness ↔ repo mirror auto-fix-up,not blocking,always exit 0。
 if [ -f scripts/sync-memory.mjs ]; then
   SYNC_OUT=$(node scripts/sync-memory.mjs 2>&1 || true)
-  COPIED=$(echo "$SYNC_OUT" | grep -oE 'copied: [0-9]+' | grep -oE '[0-9]+' | head -1)
+  COPIED=$(echo "$SYNC_OUT" | grep -oE 'copied: [0-9]+' | grep -oE '[0-9]+' | head -1 || true)
   # COPIED > 0 → 加入 REMINDERS(下面 main flow inject)
   if [ -n "$COPIED" ] && [ "$COPIED" -gt 0 ]; then
     MEMSYNC_NOTE="\n- 🔄 auto sync-memory(SessionStart): harness → repo mirrored ${COPIED} memory file(s)。"
@@ -166,7 +169,7 @@ if [ -f "$FIRES_LOG" ] && [ -d "$TESTS_DIR" ]; then
   fi
 fi
 
-# Check 7: Hook count auto-trigger(soft 25 / hard 30 — Anthropic guideline ~15)
+# Check 7: Hook count auto-trigger(soft 26 / hard 60 — Anthropic guideline ~15;真值見下方 -gt 判斷 + CLAUDE.md `# 治理 canonical`)
 # 2026-05-09 fix:tree-recursive count(含 lib/ helpers)。前身 -maxdepth 1 只 count root,
 # 漏 16 個 lib/ helpers → metric reports 19,reality 35 = system gaming own metric。
 # 2026-05-13 prune consolidation:`_*.sh` 約定 = internal helper(Unix convention)。
@@ -183,8 +186,13 @@ if [ -d "$HOOKS_DIR" ]; then
     2>/dev/null | wc -l | tr -d ' ')
   HOOK_COUNT=${HOOK_COUNT:-0}
 fi
+# 2026-06-11 deep-audit R2(n=8)重估:訊息原以 3 consumer hooks(check_consumer_no_ds_catalog /
+# check_consumer_story_baseline / check_consumer_ds_primitive_misuse)作 60 cap rationale,該 3 hook
+# 已 2026-06-11 prune-merge 入 check_consumer_app_invariants.sh(retired/2026-06-11-prune-merge/),
+# 現值 52。重估 verdict:60 維持 — 52 + 8 headroom(~15%)符合「升 cap 只為已 justified 新 hook」
+# 歷史節奏;降 cap 屬治理 substantive(soft 26 已在 27+ 提供 advisory),留 /knowledge-prune 評估。
 if [ "$HOOK_COUNT" -gt 60 ]; then
-  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 60 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-27 升 50→55→60 per user「眼不見為淨」+「做產品真的要能使用跟 ds repo 一模一樣的元件」directive → 3 new hooks ship(check_consumer_no_ds_catalog + check_consumer_story_baseline + check_consumer_ds_primitive_misuse)。Re-raise 56+ 需 /knowledge-prune 評估 retire / consolidate。"
+  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 60 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-27 升 50→55→60(當時 3 consumer hooks ship;該 3 hook 已 2026-06-11 prune-merge 入 check_consumer_app_invariants,現值基準 52,cap 60 經 2026-06-11 重估維持)。超 60 = 先跑 /knowledge-prune 評估 retire / consolidate,不直接 re-raise。"
 elif [ "$HOOK_COUNT" -gt 26 ]; then
   # 2026-05-15 raised soft cap 25→26 per /knowledge-prune D2 audit:
   # 26 wired hooks reflects M30 wrapper-schema-drift 新增 dedicated hook(justified evolution
@@ -251,6 +259,30 @@ if command -v node >/dev/null 2>&1 && [ -f scripts/sync-governance-counters.mjs 
   fi
 fi
 
+# Check 11: Cross-repo env smoke(2026-05-30 — NON-BLOCKING:只進 PRUNE_TRIGGERS soft channel,
+# 永不進 BLOCKER 路徑、永不非零退出。set -uo pipefail(無 -e)→ 探針非零返回不殺 script;
+# 但 set -u 下 unset var 必 ${VAR:-} guard。每探針獨立、無 network、無 blocking subshell。
+ENV_SMOKE=""
+# (a) plugin-mode 完整性 — CLAUDE_PLUGIN_ROOT 在 ds-repo native mode 可能 UNSET → 先 guard 才用
+if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ ! -d "${CLAUDE_PLUGIN_ROOT:-}/hooks" ]; then
+  ENV_SMOKE="${ENV_SMOKE}\n    - Plugin mode:\$CLAUDE_PLUGIN_ROOT 有設但 hooks/ 找不到 → plugin install 可能不完整(跑 /plugin marketplace update)。"
+fi
+# (b) node 在 PATH — audit scripts 依賴
+if ! command -v node >/dev/null 2>&1; then
+  ENV_SMOKE="${ENV_SMOKE}\n    - node 不在 PATH → audit scripts(dispatch-audit-dims / content-quality)在此環境跑不動。"
+fi
+# (c) codex transport(informational;缺 = fork repo 正常,Phase B 自動 fallback)
+if [ ! -x node_modules/.bin/codex ] && ! command -v codex >/dev/null 2>&1; then
+  ENV_SMOKE="${ENV_SMOKE}\n    - codex CLI 缺 → deep-audit Phase B dual-track 自動 fallback Phase-A-only(fork repo 屬正常;要雙軌跑 npm i -D @openai/codex)。"
+fi
+# (d) consumer-mode DS resolution — fork repo 引 npm DS 但未安裝
+if [ -f package.json ] && grep -q '"@qijenchen/design-system"' package.json 2>/dev/null && [ ! -d node_modules/@qijenchen/design-system ]; then
+  ENV_SMOKE="${ENV_SMOKE}\n    - Consumer repo 引用 @qijenchen/design-system 但 node_modules 沒裝(跑 npm install)。"
+fi
+if [ -n "$ENV_SMOKE" ]; then
+  PRUNE_TRIGGERS="${PRUNE_TRIGGERS}\n- 🩺 env-smoke(non-blocking,環境健檢):${ENV_SMOKE}"
+fi
+
 # Inject if HARD BLOCKERS(must)or auto-prune-triggers or quarterly-prune-overdue
 QUARTERLY_DUE=""
 if [ -f .claude/logs/.last-prune ]; then
@@ -267,10 +299,12 @@ if [ -n "$BLOCKERS" ]; then
   [ -n "$PRUNE_TRIGGERS" ] && MSG="${MSG}\n\n附 soft prune triggers:${PRUNE_TRIGGERS}"
   [ -n "$QUARTERLY_DUE" ] && MSG="${MSG}\n${QUARTERLY_DUE}"
 elif [ -n "$PRUNE_TRIGGERS" ]; then
-  MSG="⚙️ Auto-prune triggers fired (SessionStart):${PRUNE_TRIGGERS}\n建議 invoke /knowledge-prune scope=full 評估 retire / consolidate.${QUARTERLY_DUE}"
+  MSG="⚙️ Auto-prune triggers fired (SessionStart):${PRUNE_TRIGGERS}\nAI 必 AUTO-RUN /knowledge-prune(禁問 user 要不要跑;P0+P1 自動執行,P2 retire 候選列拍板清單 — per deep-audit-cross-codex SKILL C.0a,2026-06-11 user 糾正 codify).${QUARTERLY_DUE}"
 else
   MSG="🧭 Governance hygiene reminder (SessionStart):${QUARTERLY_DUE}\nNot blocking — address inline when convenient."
 fi
+# fail-open:無 jq(eg. 殘缺 PATH / minimal cloud sandbox)→ 靜默 exit 0,不吐 malformed JSON(2026-05-30 硬化)
+command -v jq >/dev/null 2>&1 || exit 0
 ESCAPED=$(printf '%b' "$MSG" | jq -Rs .)
 printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":%s}}\n' "$ESCAPED"
 exit 0

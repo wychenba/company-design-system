@@ -2,8 +2,18 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 /**
- * @internal — DS-internal primitive(2026-05-23 per `.claude/rules/ui-development.md` Public vs Internal canonical)。
- * end-user app 直接 render `<ChromeHeader />` 無 functioning UI;由 Sidebar / FileViewer / Dialog / Sheet / Popover 等 DS 元件 wrap 消費。
+ * Header 家族 tabsSlot wrapper className(W2 SSOT,header-canonical.spec.md Rule W2)。
+ * 兩家族(ChromeHeader chrome / SurfaceHeader overlay)的 column-mode tabsSlot row 共用此契約:
+ * TabsList `w-full`(border-b 延展全寬 = W1 一條線)+ 內 `px-loose` inset triggers(對齊 header content)。
+ * SSOT 在此(header-canonical = 跨家族 W-rule owner);overlay-surface.tsx SurfaceHeader 消費同一 const,
+ * 禁各自 hardcode(原兩處逐字重複,2026-06-08 收斂為單一 SSOT,per user「照你建議做到完美…不改A壞B」)。
+ */
+export const HEADER_TABS_SLOT_WRAPPER_CLASS =
+  '[&>[role=tablist]]:w-full [&>[role=tablist]]:px-[var(--layout-space-loose)]'
+
+/**
+ * Public chrome-header composition primitive(header-canonical Pattern 的 runtime 件,對標 item-anatomy 的 MenuItem/slots:屬公開 Pattern 的可 import primitive)。
+ * 標準頁面 chrome 用成品元件(AppShell / Sidebar / FileViewer 內建 header);自建客製 header 才直接消費本 primitive,並 follow header-canonical.spec.md 設計契約。
  *
  * ChromeHeader — Fixed-height chrome header primitive(Layout Family B,header-canonical.spec.md)
  *
@@ -45,8 +55,9 @@ export interface ChromeHeaderProps
    * Tabs row slot(2026-05-18 加 per W2/W4 真實能用 + user-mandated fix)。
    * 提供時 ChromeHeader 自動 column 結構:
    *   row 1 = children(h-chrome-header-height 固定,px-loose,跟 single-row 模式同)
-   *   row 2 = tabsSlot 包在 `<div px-loose border-b border-divider>`
-   *           ↑ wrapper 提供 W2 padding inheritance + W1 全寬 paint(一條線)
+   *   row 2 = tabsSlot 包在 `HEADER_TABS_SLOT_WRAPPER_CLASS` wrapper
+   *           (`[&>[role=tablist]]:w-full` + 注入 TabsList 內 px-loose;wrapper 本身
+   *           無 padding 無 border——border 由 TabsList 自畫,W1 全寬 paint 一條線)
    *
    * Consumer 傳:`tabsSlot={<TabsList>...</TabsList>}`,TabsContent 放 ChromeHeader 之外。
    * Standalone Tabs(無 chrome header)該直接用 `<TabsList>` 不需 wrapper。
@@ -113,7 +124,7 @@ export const ChromeHeader = React.forwardRef<HTMLElement, ChromeHeaderProps>(
               2026-05-18 v3 fix(同 SurfaceHeader,per user verbatim「分隔線寬度應該要填滿整個
               dialog」+「就這樣做」approval):TabsList 自己 px-loose 內 padding 而非 wrapper
               提供,讓 TabsList border-b 延展全 dialog 寬。對齊 `tabs.spec.md:199` 既有 canonical。*/}
-          <div className="[&>[role=tablist]]:w-full [&>[role=tablist]]:px-[var(--layout-space-loose)]">
+          <div className={HEADER_TABS_SLOT_WRAPPER_CLASS}>
             {tabsSlot}
           </div>
         </header>

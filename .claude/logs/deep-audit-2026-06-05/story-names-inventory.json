@@ -1,0 +1,6484 @@
+[
+ {
+  "file": "patterns/action-bar/action-bar.stories.tsx",
+  "line": 73,
+  "component": "action-bar",
+  "constName": "RoleIdentification",
+  "displayName": "角色識別"
+ },
+ {
+  "file": "patterns/action-bar/action-bar.stories.tsx",
+  "line": 134,
+  "component": "action-bar",
+  "constName": "Structure",
+  "displayName": "排列與結構"
+ },
+ {
+  "file": "patterns/action-bar/action-bar.stories.tsx",
+  "line": 185,
+  "component": "action-bar",
+  "constName": "Dividers",
+  "displayName": "分隔線"
+ },
+ {
+  "file": "patterns/action-bar/action-bar.stories.tsx",
+  "line": 390,
+  "component": "action-bar",
+  "constName": "Overflow",
+  "displayName": "溢出機制"
+ },
+ {
+  "file": "patterns/action-bar/action-bar.stories.tsx",
+  "line": 451,
+  "component": "action-bar",
+  "constName": "CommonMistakes",
+  "displayName": "常見錯誤"
+ },
+ {
+  "file": "patterns/action-bar/action-bar.stories.tsx",
+  "line": 573,
+  "component": "action-bar",
+  "constName": "DismissVsDanger",
+  "displayName": "取消 vs 危險動作 語意區分"
+ },
+ {
+  "file": "patterns/resize-handle/resize-handle.stories.tsx",
+  "line": 39,
+  "component": "resize-handle",
+  "constName": "Dragging",
+  "displayName": "拖拉中"
+ },
+ {
+  "file": "patterns/resize-handle/resize-handle.stories.tsx",
+  "line": 49,
+  "component": "resize-handle",
+  "constName": "Disabled",
+  "displayName": "禁用"
+ },
+ {
+  "file": "patterns/resize-handle/resize-handle.stories.tsx",
+  "line": 59,
+  "component": "resize-handle",
+  "constName": "Vertical",
+  "displayName": "垂直方向"
+ },
+ {
+  "file": "patterns/element-anatomy/item-anatomy.stories.tsx",
+  "line": 905,
+  "component": "element-anatomy",
+  "constName": "Inspector",
+  "displayName": "檢閱器"
+ },
+ {
+  "file": "patterns/element-anatomy/item-anatomy.stories.tsx",
+  "line": 925,
+  "component": "element-anatomy",
+  "constName": "AlignmentThreshold",
+  "displayName": "對齊容器（24px 閾值）"
+ },
+ {
+  "file": "patterns/element-anatomy/item-anatomy.stories.tsx",
+  "line": 1096,
+  "component": "element-anatomy",
+  "constName": "ReadingModes",
+  "displayName": "閱讀模式比較"
+ },
+ {
+  "file": "patterns/element-anatomy/item-anatomy.stories.tsx",
+  "line": 1202,
+  "component": "element-anatomy",
+  "constName": "IconColorsAndPresets",
+  "displayName": "Icon 色彩 + 消費元件預設"
+ },
+ {
+  "file": "patterns/element-anatomy/item-anatomy.stories.tsx",
+  "line": 1432,
+  "component": "element-anatomy",
+  "constName": "IconActionPrimitiveDecision",
+  "displayName": "圖示動作通用零件決策"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.principles.stories.tsx",
+  "line": 39,
+  "component": "RadioGroup",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.principles.stories.tsx",
+  "line": 97,
+  "component": "RadioGroup",
+  "constName": "DecisionNodeRule",
+  "displayName": "決策節點（需對比評估）"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.principles.stories.tsx",
+  "line": 144,
+  "component": "RadioGroup",
+  "constName": "MustBeInGroupRule",
+  "displayName": "單選按鈕不可單獨使用"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.stories.tsx",
+  "line": 17,
+  "component": "RadioGroup",
+  "constName": "Modes",
+  "displayName": "四模式"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.stories.tsx",
+  "line": 62,
+  "component": "RadioGroup",
+  "constName": "VerticalGroup",
+  "displayName": "直式群組"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.stories.tsx",
+  "line": 81,
+  "component": "RadioGroup",
+  "constName": "Horizontal",
+  "displayName": "水平排列"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.stories.tsx",
+  "line": 93,
+  "component": "RadioGroup",
+  "constName": "Disabled",
+  "displayName": "停用"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.anatomy.stories.tsx",
+  "line": 142,
+  "component": "RadioGroup",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.anatomy.stories.tsx",
+  "line": 386,
+  "component": "RadioGroup",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.anatomy.stories.tsx",
+  "line": 403,
+  "component": "RadioGroup",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.anatomy.stories.tsx",
+  "line": 471,
+  "component": "RadioGroup",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.anatomy.stories.tsx",
+  "line": 663,
+  "component": "RadioGroup",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/RadioGroup/radio-group.anatomy.stories.tsx",
+  "line": 670,
+  "component": "RadioGroup",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Tabs/tabs.anatomy.stories.tsx",
+  "line": 14,
+  "component": "Tabs",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Tabs/tabs.anatomy.stories.tsx",
+  "line": 100,
+  "component": "Tabs",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Tabs/tabs.anatomy.stories.tsx",
+  "line": 184,
+  "component": "Tabs",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Tabs/tabs.anatomy.stories.tsx",
+  "line": 222,
+  "component": "Tabs",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Tabs/tabs.anatomy.stories.tsx",
+  "line": 303,
+  "component": "Tabs",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Tabs/tabs.anatomy.stories.tsx",
+  "line": 328,
+  "component": "Tabs",
+  "constName": "OverflowMatrix",
+  "displayName": "超出處理（捲動 / 選單）"
+ },
+ {
+  "file": "components/Tabs/tabs.anatomy.stories.tsx",
+  "line": 382,
+  "component": "Tabs",
+  "constName": "SpacingTokens",
+  "displayName": "間距設計變數"
+ },
+ {
+  "file": "components/Tabs/tabs.anatomy.stories.tsx",
+  "line": 406,
+  "component": "Tabs",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Tabs/tabs.principles.stories.tsx",
+  "line": 45,
+  "component": "Tabs",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Tabs/tabs.principles.stories.tsx",
+  "line": 180,
+  "component": "Tabs",
+  "constName": "SizeSelection",
+  "displayName": "尺寸選擇"
+ },
+ {
+  "file": "components/Tabs/tabs.principles.stories.tsx",
+  "line": 226,
+  "component": "Tabs",
+  "constName": "TriggerSlots",
+  "displayName": "觸發位置插槽使用"
+ },
+ {
+  "file": "components/Tabs/tabs.stories.tsx",
+  "line": 43,
+  "component": "Tabs",
+  "constName": "WithSuffix",
+  "displayName": "帶後綴"
+ },
+ {
+  "file": "components/Tabs/tabs.stories.tsx",
+  "line": 82,
+  "component": "Tabs",
+  "constName": "AllWithStartIcon",
+  "displayName": "全部含起始圖示"
+ },
+ {
+  "file": "components/Tabs/tabs.stories.tsx",
+  "line": 97,
+  "component": "Tabs",
+  "constName": "OverflowScroll",
+  "displayName": "溢出處理 — 水平捲動"
+ },
+ {
+  "file": "components/Tabs/tabs.stories.tsx",
+  "line": 119,
+  "component": "Tabs",
+  "constName": "OverflowMenu",
+  "displayName": "溢出處理 — ⌄ navigator 選單"
+ },
+ {
+  "file": "components/Tabs/tabs.stories.tsx",
+  "line": 144,
+  "component": "Tabs",
+  "constName": "Disabled",
+  "displayName": "停用"
+ },
+ {
+  "file": "components/Sidebar/sidebar.anatomy.stories.tsx",
+  "line": 135,
+  "component": "Sidebar",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Sidebar/sidebar.anatomy.stories.tsx",
+  "line": 267,
+  "component": "Sidebar",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Sidebar/sidebar.anatomy.stories.tsx",
+  "line": 308,
+  "component": "Sidebar",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Sidebar/sidebar.anatomy.stories.tsx",
+  "line": 391,
+  "component": "Sidebar",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Sidebar/sidebar.anatomy.stories.tsx",
+  "line": 536,
+  "component": "Sidebar",
+  "constName": "VariantMatrix",
+  "displayName": "變體對照（預設 vs 次要）"
+ },
+ {
+  "file": "components/Sidebar/sidebar.anatomy.stories.tsx",
+  "line": 582,
+  "component": "Sidebar",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Sidebar/sidebar.anatomy.stories.tsx",
+  "line": 685,
+  "component": "Sidebar",
+  "constName": "ChromeTokens",
+  "displayName": "寬度與框架設計變數"
+ },
+ {
+  "file": "components/Sidebar/sidebar.anatomy.stories.tsx",
+  "line": 755,
+  "component": "Sidebar",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Sidebar/sidebar.stories.tsx",
+  "line": 150,
+  "component": "Sidebar",
+  "constName": "IconCollapse",
+  "displayName": "完整佈局"
+ },
+ {
+  "file": "components/Sidebar/sidebar.stories.tsx",
+  "line": 219,
+  "component": "Sidebar",
+  "constName": "MixedContent",
+  "displayName": "混合內容"
+ },
+ {
+  "file": "components/Sidebar/sidebar.stories.tsx",
+  "line": 355,
+  "component": "Sidebar",
+  "constName": "Offcanvas",
+  "displayName": "抽屜收合（離畫面外）"
+ },
+ {
+  "file": "components/Sidebar/sidebar.stories.tsx",
+  "line": 402,
+  "component": "Sidebar",
+  "constName": "IntegrationSidebar",
+  "displayName": "混合前綴"
+ },
+ {
+  "file": "components/Sidebar/sidebar.principles.stories.tsx",
+  "line": 138,
+  "component": "Sidebar",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Sidebar/sidebar.principles.stories.tsx",
+  "line": 177,
+  "component": "Sidebar",
+  "constName": "ContentTypeChoice",
+  "displayName": "SidebarMenu vs TreeView 的選擇"
+ },
+ {
+  "file": "components/Sidebar/sidebar.principles.stories.tsx",
+  "line": 272,
+  "component": "Sidebar",
+  "constName": "GroupHeaderRules",
+  "displayName": "群組 / 標籤使用原則"
+ },
+ {
+  "file": "components/Sidebar/sidebar.principles.stories.tsx",
+  "line": 353,
+  "component": "Sidebar",
+  "constName": "SettingsScenario",
+  "displayName": "設定類有子頁的頁面"
+ },
+ {
+  "file": "components/Sidebar/sidebar.principles.stories.tsx",
+  "line": 422,
+  "component": "Sidebar",
+  "constName": "IconModeRules",
+  "displayName": "Icon 模式的 4 條鐵律"
+ },
+ {
+  "file": "components/Sidebar/sidebar.principles.stories.tsx",
+  "line": 472,
+  "component": "Sidebar",
+  "constName": "ActiveState",
+  "displayName": "啟用狀態跨群組單一"
+ },
+ {
+  "file": "components/FileUpload/file-upload.anatomy.stories.tsx",
+  "line": 33,
+  "component": "FileUpload",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/FileUpload/file-upload.anatomy.stories.tsx",
+  "line": 114,
+  "component": "FileUpload",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/FileUpload/file-upload.anatomy.stories.tsx",
+  "line": 193,
+  "component": "FileUpload",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/FileUpload/file-upload.anatomy.stories.tsx",
+  "line": 280,
+  "component": "FileUpload",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/FileUpload/file-upload.anatomy.stories.tsx",
+  "line": 334,
+  "component": "FileUpload",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/FileUpload/file-upload.anatomy.stories.tsx",
+  "line": 436,
+  "component": "FileUpload",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/FileUpload/file-upload.principles.stories.tsx",
+  "line": 58,
+  "component": "FileUpload",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/FileUpload/file-upload.principles.stories.tsx",
+  "line": 162,
+  "component": "FileUpload",
+  "constName": "MultipleRule",
+  "displayName": "多選"
+ },
+ {
+  "file": "components/FileUpload/file-upload.principles.stories.tsx",
+  "line": 206,
+  "component": "FileUpload",
+  "constName": "DivisionOfLaborRule",
+  "displayName": "與 FileItem 的職責分工"
+ },
+ {
+  "file": "components/FileUpload/file-upload.principles.stories.tsx",
+  "line": 267,
+  "component": "FileUpload",
+  "constName": "ErrorFeedbackRule",
+  "displayName": "檔案類型 + 最大尺寸 + 拒絕回呼 三配套"
+ },
+ {
+  "file": "components/FileUpload/file-upload.stories.tsx",
+  "line": 20,
+  "component": "FileUpload",
+  "constName": "ResumeUpload",
+  "displayName": "單檔上傳"
+ },
+ {
+  "file": "components/FileUpload/file-upload.stories.tsx",
+  "line": 37,
+  "component": "FileUpload",
+  "constName": "BulkImageUpload",
+  "displayName": "批次上傳"
+ },
+ {
+  "file": "components/FileUpload/file-upload.stories.tsx",
+  "line": 83,
+  "component": "FileUpload",
+  "constName": "WithFileList",
+  "displayName": "內建 files 屬性"
+ },
+ {
+  "file": "components/FileUpload/file-upload.stories.tsx",
+  "line": 120,
+  "component": "FileUpload",
+  "constName": "CustomChildren",
+  "displayName": "自訂內容"
+ },
+ {
+  "file": "components/FileUpload/file-upload.stories.tsx",
+  "line": 141,
+  "component": "FileUpload",
+  "constName": "ButtonVariant",
+  "displayName": "按鈕觸發(表單內)"
+ },
+ {
+  "file": "components/TimePicker/time-picker.stories.tsx",
+  "line": 32,
+  "component": "TimePicker",
+  "constName": "Modes",
+  "displayName": "四模式"
+ },
+ {
+  "file": "components/TimePicker/time-picker.stories.tsx",
+  "line": 62,
+  "component": "TimePicker",
+  "constName": "MeetingSlot",
+  "displayName": "會議時段"
+ },
+ {
+  "file": "components/TimePicker/time-picker.stories.tsx",
+  "line": 86,
+  "component": "TimePicker",
+  "constName": "FlightDepartureTime",
+  "displayName": "航班起飛時間"
+ },
+ {
+  "file": "components/TimePicker/time-picker.stories.tsx",
+  "line": 103,
+  "component": "TimePicker",
+  "constName": "ShopBusinessHours",
+  "displayName": "店家營業時間"
+ },
+ {
+  "file": "components/TimePicker/time-picker.stories.tsx",
+  "line": 125,
+  "component": "TimePicker",
+  "constName": "EventTimestamp",
+  "displayName": "事件發生時間"
+ },
+ {
+  "file": "components/TimePicker/time-picker.stories.tsx",
+  "line": 142,
+  "component": "TimePicker",
+  "constName": "EmployeeShiftSchedule",
+  "displayName": "員工上班時段設定"
+ },
+ {
+  "file": "components/TimePicker/time-picker.stories.tsx",
+  "line": 167,
+  "component": "TimePicker",
+  "constName": "Disabled",
+  "displayName": "整體禁用"
+ },
+ {
+  "file": "components/TimePicker/time-picker.stories.tsx",
+  "line": 181,
+  "component": "TimePicker",
+  "constName": "WithError",
+  "displayName": "驗證錯誤"
+ },
+ {
+  "file": "components/TimePicker/time-picker.anatomy.stories.tsx",
+  "line": 28,
+  "component": "TimePicker",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/TimePicker/time-picker.anatomy.stories.tsx",
+  "line": 37,
+  "component": "TimePicker",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/TimePicker/time-picker.anatomy.stories.tsx",
+  "line": 159,
+  "component": "TimePicker",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/TimePicker/time-picker.anatomy.stories.tsx",
+  "line": 180,
+  "component": "TimePicker",
+  "constName": "ModeMatrix",
+  "displayName": "模式對照"
+ },
+ {
+  "file": "components/TimePicker/time-picker.anatomy.stories.tsx",
+  "line": 195,
+  "component": "TimePicker",
+  "constName": "PrecisionMatrix",
+  "displayName": "精度對照"
+ },
+ {
+  "file": "components/TimePicker/time-picker.anatomy.stories.tsx",
+  "line": 224,
+  "component": "TimePicker",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/TimePicker/time-picker.anatomy.stories.tsx",
+  "line": 250,
+  "component": "TimePicker",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/TimePicker/time-picker.principles.stories.tsx",
+  "line": 33,
+  "component": "TimePicker",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/TimePicker/time-picker.principles.stories.tsx",
+  "line": 74,
+  "component": "TimePicker",
+  "constName": "RuleMinuteStepForMeetings",
+  "displayName": "會議時段用 15 分鐘間隔"
+ },
+ {
+  "file": "components/TimePicker/time-picker.principles.stories.tsx",
+  "line": 101,
+  "component": "TimePicker",
+  "constName": "RuleRangeComposition",
+  "displayName": "時間範圍用兩個 TimePicker 組合,不內建"
+ },
+ {
+  "file": "components/TimePicker/time-picker.principles.stories.tsx",
+  "line": 124,
+  "component": "TimePicker",
+  "constName": "RuleClearNoLabelButton",
+  "displayName": "清除用 X 行內動作,不用文字按鈕"
+ },
+ {
+  "file": "components/Tooltip/tooltip.principles.stories.tsx",
+  "line": 43,
+  "component": "Tooltip",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Tooltip/tooltip.principles.stories.tsx",
+  "line": 152,
+  "component": "Tooltip",
+  "constName": "NeedsTooltipRule",
+  "displayName": "何時需要工具提示"
+ },
+ {
+  "file": "components/Tooltip/tooltip.anatomy.stories.tsx",
+  "line": 105,
+  "component": "Tooltip",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Tooltip/tooltip.anatomy.stories.tsx",
+  "line": 335,
+  "component": "Tooltip",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Tooltip/tooltip.anatomy.stories.tsx",
+  "line": 352,
+  "component": "Tooltip",
+  "constName": "PlacementReference",
+  "displayName": "方向與間距"
+ },
+ {
+  "file": "components/Tooltip/tooltip.anatomy.stories.tsx",
+  "line": 405,
+  "component": "Tooltip",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Tooltip/tooltip.stories.tsx",
+  "line": 47,
+  "component": "Tooltip",
+  "constName": "NonButtonTrigger",
+  "displayName": "非 Button 元素"
+ },
+ {
+  "file": "components/Tooltip/tooltip.stories.tsx",
+  "line": 62,
+  "component": "Tooltip",
+  "constName": "Placement",
+  "displayName": "方向"
+ },
+ {
+  "file": "components/Tooltip/tooltip.stories.tsx",
+  "line": 102,
+  "component": "Tooltip",
+  "constName": "LongText",
+  "displayName": "長文字"
+ },
+ {
+  "file": "components/Rating/rating.anatomy.stories.tsx",
+  "line": 32,
+  "component": "Rating",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Rating/rating.anatomy.stories.tsx",
+  "line": 247,
+  "component": "Rating",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Rating/rating.anatomy.stories.tsx",
+  "line": 265,
+  "component": "Rating",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Rating/rating.anatomy.stories.tsx",
+  "line": 338,
+  "component": "Rating",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Rating/rating.anatomy.stories.tsx",
+  "line": 395,
+  "component": "Rating",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Rating/rating.anatomy.stories.tsx",
+  "line": 486,
+  "component": "Rating",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Rating/rating.principles.stories.tsx",
+  "line": 41,
+  "component": "Rating",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Rating/rating.principles.stories.tsx",
+  "line": 210,
+  "component": "Rating",
+  "constName": "PrecisionChoice",
+  "displayName": "精度選擇"
+ },
+ {
+  "file": "components/Rating/rating.principles.stories.tsx",
+  "line": 254,
+  "component": "Rating",
+  "constName": "YellowStarConvention",
+  "displayName": "為什麼用黃色"
+ },
+ {
+  "file": "components/Rating/rating.stories.tsx",
+  "line": 25,
+  "component": "Rating",
+  "constName": "ReadOnlyProductRating",
+  "displayName": "商品列表平均分"
+ },
+ {
+  "file": "components/Rating/rating.stories.tsx",
+  "line": 57,
+  "component": "Rating",
+  "constName": "InteractiveReview",
+  "displayName": "送出評分流程"
+ },
+ {
+  "file": "components/Rating/rating.stories.tsx",
+  "line": 94,
+  "component": "Rating",
+  "constName": "InField",
+  "displayName": "包在 Field 內"
+ },
+ {
+  "file": "components/Rating/rating.stories.tsx",
+  "line": 117,
+  "component": "Rating",
+  "constName": "Disabled",
+  "displayName": "停用狀態"
+ },
+ {
+  "file": "components/Calendar/calendar.stories.tsx",
+  "line": 31,
+  "component": "Calendar",
+  "constName": "TeamCalendar",
+  "displayName": "團隊行事曆"
+ },
+ {
+  "file": "components/Calendar/calendar.stories.tsx",
+  "line": 60,
+  "component": "Calendar",
+  "constName": "ContentPublishingSchedule",
+  "displayName": "內容發佈月曆"
+ },
+ {
+  "file": "components/Calendar/calendar.stories.tsx",
+  "line": 81,
+  "component": "Calendar",
+  "constName": "EmptyCalendar",
+  "displayName": "空行事曆"
+ },
+ {
+  "file": "components/Calendar/calendar.principles.stories.tsx",
+  "line": 35,
+  "component": "Calendar",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Calendar/calendar.principles.stories.tsx",
+  "line": 100,
+  "component": "Calendar",
+  "constName": "ColorSemantic",
+  "displayName": "事件顏色類別語意"
+ },
+ {
+  "file": "components/Calendar/calendar.principles.stories.tsx",
+  "line": 125,
+  "component": "Calendar",
+  "constName": "MvpScope",
+  "displayName": "MVP 範圍"
+ },
+ {
+  "file": "components/Calendar/calendar.anatomy.stories.tsx",
+  "line": 33,
+  "component": "Calendar",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Calendar/calendar.anatomy.stories.tsx",
+  "line": 43,
+  "component": "Calendar",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Calendar/calendar.anatomy.stories.tsx",
+  "line": 71,
+  "component": "Calendar",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Calendar/calendar.anatomy.stories.tsx",
+  "line": 192,
+  "component": "Calendar",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Calendar/calendar.anatomy.stories.tsx",
+  "line": 210,
+  "component": "Calendar",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Empty/empty.anatomy.stories.tsx",
+  "line": 45,
+  "component": "Empty",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Empty/empty.anatomy.stories.tsx",
+  "line": 100,
+  "component": "Empty",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Empty/empty.anatomy.stories.tsx",
+  "line": 142,
+  "component": "Empty",
+  "constName": "ScenarioMatrix",
+  "displayName": "常見場景"
+ },
+ {
+  "file": "components/Empty/empty.anatomy.stories.tsx",
+  "line": 175,
+  "component": "Empty",
+  "constName": "SlotCombinations",
+  "displayName": "插槽組合（只有說明 → 完整）"
+ },
+ {
+  "file": "components/Empty/empty.anatomy.stories.tsx",
+  "line": 267,
+  "component": "Empty",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Empty/empty.stories.tsx",
+  "line": 23,
+  "component": "Empty",
+  "constName": "SearchNoResults",
+  "displayName": "搜尋無結果"
+ },
+ {
+  "file": "components/Empty/empty.stories.tsx",
+  "line": 38,
+  "component": "Empty",
+  "constName": "NoTasks",
+  "displayName": "空清單"
+ },
+ {
+  "file": "components/Empty/empty.stories.tsx",
+  "line": 53,
+  "component": "Empty",
+  "constName": "LoadFailure",
+  "displayName": "錯誤無法載入"
+ },
+ {
+  "file": "components/Empty/empty.stories.tsx",
+  "line": 68,
+  "component": "Empty",
+  "constName": "NoPermission",
+  "displayName": "權限不足"
+ },
+ {
+  "file": "components/Empty/empty.principles.stories.tsx",
+  "line": 53,
+  "component": "Empty",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Empty/empty.principles.stories.tsx",
+  "line": 158,
+  "component": "Empty",
+  "constName": "NextActionRule",
+  "displayName": "Empty 必須提示下一步動作"
+ },
+ {
+  "file": "components/Empty/empty.principles.stories.tsx",
+  "line": 206,
+  "component": "Empty",
+  "constName": "StructureRule",
+  "displayName": "圖示 + 標題 + 說明 + 動作 結構"
+ },
+ {
+  "file": "components/Empty/empty.principles.stories.tsx",
+  "line": 267,
+  "component": "Empty",
+  "constName": "CopyRule",
+  "displayName": "文案具體化 — 不用 通用 字"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.principles.stories.tsx",
+  "line": 23,
+  "component": "SelectMenu",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.principles.stories.tsx",
+  "line": 67,
+  "component": "SelectMenu",
+  "constName": "CompositionRules",
+  "displayName": "組合規則"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.stories.tsx",
+  "line": 32,
+  "component": "SelectMenu",
+  "constName": "SingleSelect",
+  "displayName": "單選"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.stories.tsx",
+  "line": 57,
+  "component": "SelectMenu",
+  "constName": "Searchable",
+  "displayName": "搜尋"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.stories.tsx",
+  "line": 81,
+  "component": "SelectMenu",
+  "constName": "MultiSelect",
+  "displayName": "多選"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.stories.tsx",
+  "line": 98,
+  "component": "SelectMenu",
+  "constName": "MultiSearchable",
+  "displayName": "多選 + 搜尋"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.stories.tsx",
+  "line": 115,
+  "component": "SelectMenu",
+  "constName": "Clearable",
+  "displayName": "可清除"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.stories.tsx",
+  "line": 123,
+  "component": "SelectMenu",
+  "constName": "States",
+  "displayName": "狀態"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.anatomy.stories.tsx",
+  "line": 61,
+  "component": "SelectMenu",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.anatomy.stories.tsx",
+  "line": 231,
+  "component": "SelectMenu",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.anatomy.stories.tsx",
+  "line": 401,
+  "component": "SelectMenu",
+  "constName": "ModeMatrix",
+  "displayName": "功能模式對照表"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.anatomy.stories.tsx",
+  "line": 594,
+  "component": "SelectMenu",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.anatomy.stories.tsx",
+  "line": 686,
+  "component": "SelectMenu",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/SelectMenu/select-menu.anatomy.stories.tsx",
+  "line": 803,
+  "component": "SelectMenu",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/DateGrid/date-grid.anatomy.stories.tsx",
+  "line": 80,
+  "component": "DateGrid",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/DateGrid/date-grid.anatomy.stories.tsx",
+  "line": 187,
+  "component": "DateGrid",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/DateGrid/date-grid.anatomy.stories.tsx",
+  "line": 302,
+  "component": "DateGrid",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/DateGrid/date-grid.anatomy.stories.tsx",
+  "line": 377,
+  "component": "DateGrid",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/DateGrid/date-grid.anatomy.stories.tsx",
+  "line": 464,
+  "component": "DateGrid",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/DateGrid/date-grid.anatomy.stories.tsx",
+  "line": 554,
+  "component": "DateGrid",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/DateGrid/date-grid.principles.stories.tsx",
+  "line": 61,
+  "component": "DateGrid",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/DateGrid/date-grid.principles.stories.tsx",
+  "line": 168,
+  "component": "DateGrid",
+  "constName": "ModeRule",
+  "displayName": "Mode 選擇"
+ },
+ {
+  "file": "components/DateGrid/date-grid.principles.stories.tsx",
+  "line": 250,
+  "component": "DateGrid",
+  "constName": "VisualTokenRule",
+  "displayName": "視覺 token 統一"
+ },
+ {
+  "file": "components/DateGrid/date-grid.principles.stories.tsx",
+  "line": 301,
+  "component": "DateGrid",
+  "constName": "LocaleRule",
+  "displayName": "Locale 與週首日"
+ },
+ {
+  "file": "components/DateGrid/date-grid.stories.tsx",
+  "line": 52,
+  "component": "DateGrid",
+  "constName": "Single",
+  "displayName": "Single — 生日 / 到期日"
+ },
+ {
+  "file": "components/DateGrid/date-grid.stories.tsx",
+  "line": 85,
+  "component": "DateGrid",
+  "constName": "Multiple",
+  "displayName": "Multiple — 活動可參加日期"
+ },
+ {
+  "file": "components/DateGrid/date-grid.stories.tsx",
+  "line": 125,
+  "component": "DateGrid",
+  "constName": "Range",
+  "displayName": "Range — 分析時段 / 訂單範圍"
+ },
+ {
+  "file": "components/DateGrid/date-grid.stories.tsx",
+  "line": 162,
+  "component": "DateGrid",
+  "constName": "Inline",
+  "displayName": "行內 — 儀表板小卡"
+ },
+ {
+  "file": "components/TreeView/tree-view.stories.tsx",
+  "line": 22,
+  "component": "TreeView",
+  "constName": "FileBrowser",
+  "displayName": "檔案瀏覽"
+ },
+ {
+  "file": "components/TreeView/tree-view.stories.tsx",
+  "line": 55,
+  "component": "TreeView",
+  "constName": "Stepper",
+  "displayName": "步驟引導"
+ },
+ {
+  "file": "components/TreeView/tree-view.stories.tsx",
+  "line": 126,
+  "component": "TreeView",
+  "constName": "WithCheckbox",
+  "displayName": "多選"
+ },
+ {
+  "file": "components/TreeView/tree-view.stories.tsx",
+  "line": 133,
+  "component": "TreeView",
+  "constName": "LongLabel",
+  "displayName": "長 標籤"
+ },
+ {
+  "file": "components/TreeView/tree-view.stories.tsx",
+  "line": 219,
+  "component": "TreeView",
+  "constName": "DragAndDrop",
+  "displayName": "拖曳重排"
+ },
+ {
+  "file": "components/TreeView/tree-view.stories.tsx",
+  "line": 267,
+  "component": "TreeView",
+  "constName": "IndentAlignment",
+  "displayName": "縮排 結構對齊驗證"
+ },
+ {
+  "file": "components/TreeView/tree-view.anatomy.stories.tsx",
+  "line": 14,
+  "component": "TreeView",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/TreeView/tree-view.anatomy.stories.tsx",
+  "line": 100,
+  "component": "TreeView",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/TreeView/tree-view.anatomy.stories.tsx",
+  "line": 172,
+  "component": "TreeView",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/TreeView/tree-view.anatomy.stories.tsx",
+  "line": 221,
+  "component": "TreeView",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/TreeView/tree-view.anatomy.stories.tsx",
+  "line": 297,
+  "component": "TreeView",
+  "constName": "IndentMatrix",
+  "displayName": "縮排 與 樹狀導引"
+ },
+ {
+  "file": "components/TreeView/tree-view.anatomy.stories.tsx",
+  "line": 335,
+  "component": "TreeView",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/TreeView/tree-view.anatomy.stories.tsx",
+  "line": 376,
+  "component": "TreeView",
+  "constName": "KeyboardMatrix",
+  "displayName": "鍵盤導覽（ARIA tree）"
+ },
+ {
+  "file": "components/TreeView/tree-view.anatomy.stories.tsx",
+  "line": 402,
+  "component": "TreeView",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/TreeView/tree-view.principles.stories.tsx",
+  "line": 40,
+  "component": "TreeView",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/TreeView/tree-view.principles.stories.tsx",
+  "line": 114,
+  "component": "TreeView",
+  "constName": "ExpandSelectSeparationRule",
+  "displayName": "展開 與 Select 語意分離"
+ },
+ {
+  "file": "components/TreeView/tree-view.principles.stories.tsx",
+  "line": 148,
+  "component": "TreeView",
+  "constName": "IndentRule",
+  "displayName": "縮排 與 欄 節奏"
+ },
+ {
+  "file": "components/Input/input.stories.tsx",
+  "line": 18,
+  "component": "Input",
+  "constName": "Modes",
+  "displayName": "四模式"
+ },
+ {
+  "file": "components/Input/input.stories.tsx",
+  "line": 54,
+  "component": "Input",
+  "constName": "SizeAlignment",
+  "displayName": "尺寸與 Button 對齊"
+ },
+ {
+  "file": "components/Input/input.stories.tsx",
+  "line": 71,
+  "component": "Input",
+  "constName": "EndAction",
+  "displayName": "尾端操作"
+ },
+ {
+  "file": "components/Input/input.stories.tsx",
+  "line": 117,
+  "component": "Input",
+  "constName": "ErrorState",
+  "displayName": "錯誤狀態"
+ },
+ {
+  "file": "components/Input/input.anatomy.stories.tsx",
+  "line": 169,
+  "component": "Input",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Input/input.anatomy.stories.tsx",
+  "line": 463,
+  "component": "Input",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Input/input.anatomy.stories.tsx",
+  "line": 480,
+  "component": "Input",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Input/input.anatomy.stories.tsx",
+  "line": 576,
+  "component": "Input",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Input/input.anatomy.stories.tsx",
+  "line": 662,
+  "component": "Input",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Input/input.anatomy.stories.tsx",
+  "line": 755,
+  "component": "Input",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Input/input.principles.stories.tsx",
+  "line": 45,
+  "component": "Input",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Input/input.principles.stories.tsx",
+  "line": 107,
+  "component": "Input",
+  "constName": "ModeRule",
+  "displayName": "Mode 選擇"
+ },
+ {
+  "file": "components/Input/input.principles.stories.tsx",
+  "line": 150,
+  "component": "Input",
+  "constName": "StartIconRule",
+  "displayName": "startIcon 語意"
+ },
+ {
+  "file": "components/Input/input.principles.stories.tsx",
+  "line": 176,
+  "component": "Input",
+  "constName": "EndActionRule",
+  "displayName": "endAction 適用場景"
+ },
+ {
+  "file": "components/Input/input.principles.stories.tsx",
+  "line": 237,
+  "component": "Input",
+  "constName": "ErrorRule",
+  "displayName": "Error 呈現"
+ },
+ {
+  "file": "components/Input/input.principles.stories.tsx",
+  "line": 266,
+  "component": "Input",
+  "constName": "DataTypeRule",
+  "displayName": "資料類型匹配"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.principles.stories.tsx",
+  "line": 52,
+  "component": "DropdownMenu",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.principles.stories.tsx",
+  "line": 202,
+  "component": "DropdownMenu",
+  "constName": "ItemTypeRule",
+  "displayName": "Item 類型選擇"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.principles.stories.tsx",
+  "line": 270,
+  "component": "DropdownMenu",
+  "constName": "DestructiveRule",
+  "displayName": "破壞性動作規則"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.principles.stories.tsx",
+  "line": 312,
+  "component": "DropdownMenu",
+  "constName": "SuffixRule",
+  "displayName": "Suffix 使用規則"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.anatomy.stories.tsx",
+  "line": 156,
+  "component": "DropdownMenu",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.anatomy.stories.tsx",
+  "line": 541,
+  "component": "DropdownMenu",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.anatomy.stories.tsx",
+  "line": 558,
+  "component": "DropdownMenu",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.anatomy.stories.tsx",
+  "line": 672,
+  "component": "DropdownMenu",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.anatomy.stories.tsx",
+  "line": 953,
+  "component": "DropdownMenu",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.anatomy.stories.tsx",
+  "line": 960,
+  "component": "DropdownMenu",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.stories.tsx",
+  "line": 47,
+  "component": "DropdownMenu",
+  "constName": "Groups",
+  "displayName": "群組"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.stories.tsx",
+  "line": 75,
+  "component": "DropdownMenu",
+  "constName": "WithSuffix",
+  "displayName": "後綴"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.stories.tsx",
+  "line": 141,
+  "component": "DropdownMenu",
+  "constName": "SubMenu",
+  "displayName": "子選單"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.stories.tsx",
+  "line": 173,
+  "component": "DropdownMenu",
+  "constName": "CheckboxItems",
+  "displayName": "勾選項"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.stories.tsx",
+  "line": 207,
+  "component": "DropdownMenu",
+  "constName": "RadioItems",
+  "displayName": "單選"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.stories.tsx",
+  "line": 221,
+  "component": "DropdownMenu",
+  "constName": "OpenSnapshot",
+  "displayName": "開啟狀態"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.stories.tsx",
+  "line": 251,
+  "component": "DropdownMenu",
+  "constName": "ItemHover",
+  "displayName": "Item Hover 高亮"
+ },
+ {
+  "file": "components/Alert/alert.stories.tsx",
+  "line": 37,
+  "component": "Alert",
+  "constName": "SubtleSingleLine",
+  "displayName": "Subtle 單行"
+ },
+ {
+  "file": "components/Alert/alert.stories.tsx",
+  "line": 46,
+  "component": "Alert",
+  "constName": "SolidSingleLine",
+  "displayName": "Solid 單行"
+ },
+ {
+  "file": "components/Alert/alert.stories.tsx",
+  "line": 55,
+  "component": "Alert",
+  "constName": "SubtleWithDescription",
+  "displayName": "低調 + 說明文字"
+ },
+ {
+  "file": "components/Alert/alert.stories.tsx",
+  "line": 64,
+  "component": "Alert",
+  "constName": "SolidWithDescription",
+  "displayName": "實心 + 說明文字"
+ },
+ {
+  "file": "components/Alert/alert.stories.tsx",
+  "line": 73,
+  "component": "Alert",
+  "constName": "CornerActionGroup",
+  "displayName": "框架角落操作群組"
+ },
+ {
+  "file": "components/Alert/alert.stories.tsx",
+  "line": 109,
+  "component": "Alert",
+  "constName": "Fixed",
+  "displayName": "固定顯示"
+ },
+ {
+  "file": "components/Alert/alert.anatomy.stories.tsx",
+  "line": 18,
+  "component": "Alert",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Alert/alert.anatomy.stories.tsx",
+  "line": 58,
+  "component": "Alert",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Alert/alert.anatomy.stories.tsx",
+  "line": 98,
+  "component": "Alert",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Alert/alert.anatomy.stories.tsx",
+  "line": 143,
+  "component": "Alert",
+  "constName": "PlacementMatrix",
+  "displayName": "出現位置（內嵌 vs 固定）"
+ },
+ {
+  "file": "components/Alert/alert.anatomy.stories.tsx",
+  "line": 185,
+  "component": "Alert",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Alert/alert.anatomy.stories.tsx",
+  "line": 230,
+  "component": "Alert",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Alert/alert.principles.stories.tsx",
+  "line": 35,
+  "component": "Alert",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Alert/alert.principles.stories.tsx",
+  "line": 111,
+  "component": "Alert",
+  "constName": "VariantRule",
+  "displayName": "變體 選擇"
+ },
+ {
+  "file": "components/Alert/alert.principles.stories.tsx",
+  "line": 143,
+  "component": "Alert",
+  "constName": "PlacementRule",
+  "displayName": "行內 vs 固定放置"
+ },
+ {
+  "file": "components/Alert/alert.principles.stories.tsx",
+  "line": 182,
+  "component": "Alert",
+  "constName": "AppearanceRule",
+  "displayName": "低調 vs 實心 選擇"
+ },
+ {
+  "file": "components/Accordion/accordion.principles.stories.tsx",
+  "line": 62,
+  "component": "Accordion",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Accordion/accordion.principles.stories.tsx",
+  "line": 151,
+  "component": "Accordion",
+  "constName": "TypeRule",
+  "displayName": "單一展開 vs 多重展開"
+ },
+ {
+  "file": "components/Accordion/accordion.principles.stories.tsx",
+  "line": 204,
+  "component": "Accordion",
+  "constName": "NoNestingRule",
+  "displayName": "不可巢狀"
+ },
+ {
+  "file": "components/Accordion/accordion.principles.stories.tsx",
+  "line": 266,
+  "component": "Accordion",
+  "constName": "ContentRule",
+  "displayName": "Content 內容限制"
+ },
+ {
+  "file": "components/Accordion/accordion.principles.stories.tsx",
+  "line": 329,
+  "component": "Accordion",
+  "constName": "SingleItemRule",
+  "displayName": "單一 項目 不用 Accordion"
+ },
+ {
+  "file": "components/Accordion/accordion.stories.tsx",
+  "line": 59,
+  "component": "Accordion",
+  "constName": "FAQ",
+  "displayName": "FAQ 常見問題"
+ },
+ {
+  "file": "components/Accordion/accordion.stories.tsx",
+  "line": 95,
+  "component": "Accordion",
+  "constName": "SettingsSections",
+  "displayName": "設定分組"
+ },
+ {
+  "file": "components/Accordion/accordion.stories.tsx",
+  "line": 147,
+  "component": "Accordion",
+  "constName": "AdvancedOptions",
+  "displayName": "進階選項可隱藏"
+ },
+ {
+  "file": "components/Accordion/accordion.anatomy.stories.tsx",
+  "line": 24,
+  "component": "Accordion",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Accordion/accordion.anatomy.stories.tsx",
+  "line": 129,
+  "component": "Accordion",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Accordion/accordion.anatomy.stories.tsx",
+  "line": 248,
+  "component": "Accordion",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Accordion/accordion.anatomy.stories.tsx",
+  "line": 348,
+  "component": "Accordion",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Accordion/accordion.anatomy.stories.tsx",
+  "line": 402,
+  "component": "Accordion",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Accordion/accordion.anatomy.stories.tsx",
+  "line": 488,
+  "component": "Accordion",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Skeleton/skeleton.anatomy.stories.tsx",
+  "line": 28,
+  "component": "Skeleton",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Skeleton/skeleton.anatomy.stories.tsx",
+  "line": 50,
+  "component": "Skeleton",
+  "constName": "CommonShapes",
+  "displayName": "常見形狀"
+ },
+ {
+  "file": "components/Skeleton/skeleton.anatomy.stories.tsx",
+  "line": 118,
+  "component": "Skeleton",
+  "constName": "DesignPrinciple",
+  "displayName": "設計原則"
+ },
+ {
+  "file": "components/Skeleton/skeleton.anatomy.stories.tsx",
+  "line": 137,
+  "component": "Skeleton",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Skeleton/skeleton.stories.tsx",
+  "line": 31,
+  "component": "Skeleton",
+  "constName": "UserProfileCard",
+  "displayName": "個人資料卡載入"
+ },
+ {
+  "file": "components/Skeleton/skeleton.stories.tsx",
+  "line": 44,
+  "component": "Skeleton",
+  "constName": "TaskListLoading",
+  "displayName": "Task 列表載入"
+ },
+ {
+  "file": "components/Skeleton/skeleton.stories.tsx",
+  "line": 61,
+  "component": "Skeleton",
+  "constName": "TableRowLoading",
+  "displayName": "表格列載入"
+ },
+ {
+  "file": "components/Skeleton/skeleton.stories.tsx",
+  "line": 94,
+  "component": "Skeleton",
+  "constName": "DocumentLoading",
+  "displayName": "文件載入"
+ },
+ {
+  "file": "components/Skeleton/skeleton.stories.tsx",
+  "line": 116,
+  "component": "Skeleton",
+  "constName": "CardGridLoading",
+  "displayName": "卡片網格載入"
+ },
+ {
+  "file": "components/Skeleton/skeleton.principles.stories.tsx",
+  "line": 42,
+  "component": "Skeleton",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Skeleton/skeleton.principles.stories.tsx",
+  "line": 146,
+  "component": "Skeleton",
+  "constName": "ShapeMatchRule",
+  "displayName": "形狀貼合真實內容"
+ },
+ {
+  "file": "components/Skeleton/skeleton.principles.stories.tsx",
+  "line": 194,
+  "component": "Skeleton",
+  "constName": "DurationRule",
+  "displayName": "顯示時間短暫"
+ },
+ {
+  "file": "components/Separator/separator.stories.tsx",
+  "line": 35,
+  "component": "Separator",
+  "constName": "Horizontal",
+  "displayName": "水平"
+ },
+ {
+  "file": "components/Separator/separator.stories.tsx",
+  "line": 64,
+  "component": "Separator",
+  "constName": "Vertical",
+  "displayName": "垂直"
+ },
+ {
+  "file": "components/Separator/separator.stories.tsx",
+  "line": 80,
+  "component": "Separator",
+  "constName": "InDropdownMenu",
+  "displayName": "在 DropdownMenu 內"
+ },
+ {
+  "file": "components/Separator/separator.stories.tsx",
+  "line": 100,
+  "component": "Separator",
+  "constName": "BetweenSections",
+  "displayName": "在 DescriptionList 區塊之間"
+ },
+ {
+  "file": "components/Separator/separator.anatomy.stories.tsx",
+  "line": 27,
+  "component": "Separator",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Separator/separator.anatomy.stories.tsx",
+  "line": 79,
+  "component": "Separator",
+  "constName": "TokenMatrix",
+  "displayName": "設計變數 規則（--divider vs --border）"
+ },
+ {
+  "file": "components/Separator/separator.anatomy.stories.tsx",
+  "line": 117,
+  "component": "Separator",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Separator/separator.principles.stories.tsx",
+  "line": 48,
+  "component": "Separator",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Separator/separator.principles.stories.tsx",
+  "line": 99,
+  "component": "Separator",
+  "constName": "DecorativeSemanticRule",
+  "displayName": "裝飾性 vs 語意分隔（讀屏的差別）"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 42,
+  "component": "DatePicker",
+  "constName": "TypedInput",
+  "displayName": "可直接輸入日期"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 74,
+  "component": "DatePicker",
+  "constName": "Modes",
+  "displayName": "四模式"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 104,
+  "component": "DatePicker",
+  "constName": "Clearable",
+  "displayName": "可清除"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 118,
+  "component": "DatePicker",
+  "constName": "SizeAlignment",
+  "displayName": "尺寸"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 140,
+  "component": "DatePicker",
+  "constName": "RangePicker",
+  "displayName": "Range:訂房 / 訂機票情境"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 166,
+  "component": "DatePicker",
+  "constName": "WithError",
+  "displayName": "錯誤狀態"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 180,
+  "component": "DatePicker",
+  "constName": "ShowTime",
+  "displayName": "showTime:會議排程"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 199,
+  "component": "DatePicker",
+  "constName": "RangePopoverOpen",
+  "displayName": "Range:浮層展開狀態"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 219,
+  "component": "DatePicker",
+  "constName": "ShowTimePopoverOpen",
+  "displayName": "showTime:浮層展開狀態"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 238,
+  "component": "DatePicker",
+  "constName": "ShowTimeRangePopoverOpen",
+  "displayName": "showTime Range:浮層展開狀態"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 260,
+  "component": "DatePicker",
+  "constName": "RangeMiddleHoverState",
+  "displayName": "範圍 中段:滑鼠移過 狀態"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 301,
+  "component": "DatePicker",
+  "constName": "ShowTimeRange",
+  "displayName": "showTime Range:活動時段"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 331,
+  "component": "DatePicker",
+  "constName": "Display",
+  "displayName": "展示樣式"
+ },
+ {
+  "file": "components/DatePicker/date-picker.principles.stories.tsx",
+  "line": 42,
+  "component": "DatePicker",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/DatePicker/date-picker.principles.stories.tsx",
+  "line": 109,
+  "component": "DatePicker",
+  "constName": "CalendarRule",
+  "displayName": "自建 Calendar + 視覺一致性"
+ },
+ {
+  "file": "components/DatePicker/date-picker.principles.stories.tsx",
+  "line": 136,
+  "component": "DatePicker",
+  "constName": "FormattingRule",
+  "displayName": "Display 格式化"
+ },
+ {
+  "file": "components/DatePicker/date-picker.principles.stories.tsx",
+  "line": 181,
+  "component": "DatePicker",
+  "constName": "ClearableRule",
+  "displayName": "可清空 使用"
+ },
+ {
+  "file": "components/DatePicker/date-picker.anatomy.stories.tsx",
+  "line": 167,
+  "component": "DatePicker",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/DatePicker/date-picker.anatomy.stories.tsx",
+  "line": 467,
+  "component": "DatePicker",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/DatePicker/date-picker.anatomy.stories.tsx",
+  "line": 484,
+  "component": "DatePicker",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/DatePicker/date-picker.anatomy.stories.tsx",
+  "line": 580,
+  "component": "DatePicker",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/DatePicker/date-picker.anatomy.stories.tsx",
+  "line": 660,
+  "component": "DatePicker",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/DatePicker/date-picker.anatomy.stories.tsx",
+  "line": 778,
+  "component": "DatePicker",
+  "constName": "CalendarTokens",
+  "displayName": "Calendar 內部 token"
+ },
+ {
+  "file": "components/DatePicker/date-picker.anatomy.stories.tsx",
+  "line": 928,
+  "component": "DatePicker",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Toast/toast.stories.tsx",
+  "line": 75,
+  "component": "Toast",
+  "constName": "WithDescription",
+  "displayName": "有 Title + Description"
+ },
+ {
+  "file": "components/Toast/toast.stories.tsx",
+  "line": 105,
+  "component": "Toast",
+  "constName": "Interactive",
+  "displayName": "互動測試"
+ },
+ {
+  "file": "components/Toast/toast.principles.stories.tsx",
+  "line": 36,
+  "component": "Toast",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Toast/toast.principles.stories.tsx",
+  "line": 110,
+  "component": "Toast",
+  "constName": "ActionRule",
+  "displayName": "動作 使用場景（Undo 模式）"
+ },
+ {
+  "file": "components/Toast/toast.principles.stories.tsx",
+  "line": 150,
+  "component": "Toast",
+  "constName": "VariantRule",
+  "displayName": "變體 選擇"
+ },
+ {
+  "file": "components/Toast/toast.principles.stories.tsx",
+  "line": 177,
+  "component": "Toast",
+  "constName": "DurationRule",
+  "displayName": "持續時間 選擇"
+ },
+ {
+  "file": "components/Toast/toast.anatomy.stories.tsx",
+  "line": 19,
+  "component": "Toast",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Toast/toast.anatomy.stories.tsx",
+  "line": 76,
+  "component": "Toast",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Toast/toast.anatomy.stories.tsx",
+  "line": 139,
+  "component": "Toast",
+  "constName": "ContainerArchitecture",
+  "displayName": "Container 三層架構"
+ },
+ {
+  "file": "components/Toast/toast.anatomy.stories.tsx",
+  "line": 169,
+  "component": "Toast",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Toast/toast.anatomy.stories.tsx",
+  "line": 211,
+  "component": "Toast",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Toast/toast.anatomy.stories.tsx",
+  "line": 316,
+  "component": "Toast",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Chart/chart.anatomy.stories.tsx",
+  "line": 74,
+  "component": "Chart",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Chart/chart.anatomy.stories.tsx",
+  "line": 148,
+  "component": "Chart",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Chart/chart.anatomy.stories.tsx",
+  "line": 226,
+  "component": "Chart",
+  "constName": "CategoryTokens",
+  "displayName": "類別配色 設計變數"
+ },
+ {
+  "file": "components/Chart/chart.anatomy.stories.tsx",
+  "line": 250,
+  "component": "Chart",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Chart/chart.anatomy.stories.tsx",
+  "line": 299,
+  "component": "Chart",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Chart/chart.stories.tsx",
+  "line": 106,
+  "component": "Chart",
+  "constName": "BarChartRevenue",
+  "displayName": "長條 Chart — 月營收"
+ },
+ {
+  "file": "components/Chart/chart.stories.tsx",
+  "line": 141,
+  "component": "Chart",
+  "constName": "LineChartResponseTime",
+  "displayName": "折線 Chart — 伺服器回應時間"
+ },
+ {
+  "file": "components/Chart/chart.stories.tsx",
+  "line": 190,
+  "component": "Chart",
+  "constName": "DonutChartTrafficSource",
+  "displayName": "環圈 Chart — 流量來源分布"
+ },
+ {
+  "file": "components/Chart/chart.stories.tsx",
+  "line": 218,
+  "component": "Chart",
+  "constName": "StackedAreaChartExpenses",
+  "displayName": "堆疊 面積 — 部門支出"
+ },
+ {
+  "file": "components/Chart/chart.principles.stories.tsx",
+  "line": 143,
+  "component": "Chart",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Chart/chart.principles.stories.tsx",
+  "line": 211,
+  "component": "Chart",
+  "constName": "ChartTypeRule",
+  "displayName": "何時用哪種 Chart"
+ },
+ {
+  "file": "components/Chart/chart.principles.stories.tsx",
+  "line": 289,
+  "component": "Chart",
+  "constName": "CategoryTokenRule",
+  "displayName": "ChartConfig + 類別色 設計變數"
+ },
+ {
+  "file": "components/Chart/chart.principles.stories.tsx",
+  "line": 317,
+  "component": "Chart",
+  "constName": "FiveCategoryLimitRule",
+  "displayName": "最多 5 類別"
+ },
+ {
+  "file": "components/Chart/chart.principles.stories.tsx",
+  "line": 374,
+  "component": "Chart",
+  "constName": "A11yRule",
+  "displayName": "顏色不是區分類別的唯一手段"
+ },
+ {
+  "file": "components/Chip/chip.stories.tsx",
+  "line": 36,
+  "component": "Chip",
+  "constName": "States",
+  "displayName": "狀態"
+ },
+ {
+  "file": "components/Chip/chip.stories.tsx",
+  "line": 55,
+  "component": "Chip",
+  "constName": "WithBadge",
+  "displayName": "帶 Badge"
+ },
+ {
+  "file": "components/Chip/chip.stories.tsx",
+  "line": 71,
+  "component": "Chip",
+  "constName": "SingleSelection",
+  "displayName": "單選"
+ },
+ {
+  "file": "components/Chip/chip.anatomy.stories.tsx",
+  "line": 24,
+  "component": "Chip",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Chip/chip.anatomy.stories.tsx",
+  "line": 71,
+  "component": "Chip",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Chip/chip.anatomy.stories.tsx",
+  "line": 130,
+  "component": "Chip",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Chip/chip.anatomy.stories.tsx",
+  "line": 232,
+  "component": "Chip",
+  "constName": "SelectionMatrix",
+  "displayName": "多 vs 單 選擇"
+ },
+ {
+  "file": "components/Chip/chip.anatomy.stories.tsx",
+  "line": 260,
+  "component": "Chip",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Chip/chip.anatomy.stories.tsx",
+  "line": 296,
+  "component": "Chip",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Chip/chip.anatomy.stories.tsx",
+  "line": 369,
+  "component": "Chip",
+  "constName": "LayoutMatrix",
+  "displayName": "排版（換行 vs 捲動 vs 選單）"
+ },
+ {
+  "file": "components/Chip/chip.anatomy.stories.tsx",
+  "line": 414,
+  "component": "Chip",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Chip/chip.principles.stories.tsx",
+  "line": 42,
+  "component": "Chip",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Chip/chip.principles.stories.tsx",
+  "line": 134,
+  "component": "Chip",
+  "constName": "LayoutRule",
+  "displayName": "超出處理:換行 vs 捲動 vs 選單"
+ },
+ {
+  "file": "components/Chip/chip.principles.stories.tsx",
+  "line": 189,
+  "component": "Chip",
+  "constName": "SelectedStyleRule",
+  "displayName": "選中狀態：text + 邊框 同染，不用 背景 強調"
+ },
+ {
+  "file": "components/DescriptionList/description-list.anatomy.stories.tsx",
+  "line": 21,
+  "component": "DescriptionList",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/DescriptionList/description-list.anatomy.stories.tsx",
+  "line": 73,
+  "component": "DescriptionList",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/DescriptionList/description-list.anatomy.stories.tsx",
+  "line": 102,
+  "component": "DescriptionList",
+  "constName": "ColsMatrix",
+  "displayName": "欄數（1 / 2 / 3）"
+ },
+ {
+  "file": "components/DescriptionList/description-list.anatomy.stories.tsx",
+  "line": 154,
+  "component": "DescriptionList",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/DescriptionList/description-list.anatomy.stories.tsx",
+  "line": 244,
+  "component": "DescriptionList",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/DescriptionList/description-list.principles.stories.tsx",
+  "line": 47,
+  "component": "DescriptionList",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/DescriptionList/description-list.principles.stories.tsx",
+  "line": 142,
+  "component": "DescriptionList",
+  "constName": "LayoutRule",
+  "displayName": "直式 vs 橫式（欄數對照）"
+ },
+ {
+  "file": "components/DescriptionList/description-list.principles.stories.tsx",
+  "line": 194,
+  "component": "DescriptionList",
+  "constName": "LabelAlignmentRule",
+  "displayName": "標籤 對齊 — 一律左對齊（堆疊）"
+ },
+ {
+  "file": "components/DescriptionList/description-list.principles.stories.tsx",
+  "line": 248,
+  "component": "DescriptionList",
+  "constName": "NoInteractionRule",
+  "displayName": "唯讀 — 不放互動元件 / 不做表格"
+ },
+ {
+  "file": "components/DescriptionList/description-list.stories.tsx",
+  "line": 21,
+  "component": "DescriptionList",
+  "constName": "UserProfile",
+  "displayName": "使用者個資"
+ },
+ {
+  "file": "components/DescriptionList/description-list.stories.tsx",
+  "line": 37,
+  "component": "DescriptionList",
+  "constName": "ProductSpec",
+  "displayName": "產品規格"
+ },
+ {
+  "file": "components/DescriptionList/description-list.stories.tsx",
+  "line": 54,
+  "component": "DescriptionList",
+  "constName": "OrderSummary",
+  "displayName": "訂單明細"
+ },
+ {
+  "file": "components/DescriptionList/description-list.stories.tsx",
+  "line": 75,
+  "component": "DescriptionList",
+  "constName": "DetailPanel",
+  "displayName": "詳情面板"
+ },
+ {
+  "file": "components/DescriptionList/description-list.stories.tsx",
+  "line": 92,
+  "component": "DescriptionList",
+  "constName": "Horizontal",
+  "displayName": "水平佈局"
+ },
+ {
+  "file": "components/DescriptionList/description-list.stories.tsx",
+  "line": 112,
+  "component": "DescriptionList",
+  "constName": "_RETIRED_HorizontalDivided",
+  "displayName": null
+ },
+ {
+  "file": "components/Checkbox/checkbox.anatomy.stories.tsx",
+  "line": 154,
+  "component": "Checkbox",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Checkbox/checkbox.anatomy.stories.tsx",
+  "line": 394,
+  "component": "Checkbox",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Checkbox/checkbox.anatomy.stories.tsx",
+  "line": 411,
+  "component": "Checkbox",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Checkbox/checkbox.anatomy.stories.tsx",
+  "line": 449,
+  "component": "Checkbox",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Checkbox/checkbox.anatomy.stories.tsx",
+  "line": 526,
+  "component": "Checkbox",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Checkbox/checkbox.anatomy.stories.tsx",
+  "line": 618,
+  "component": "Checkbox",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Checkbox/checkbox.stories.tsx",
+  "line": 16,
+  "component": "Checkbox",
+  "constName": "Modes",
+  "displayName": "四模式"
+ },
+ {
+  "file": "components/Checkbox/checkbox.stories.tsx",
+  "line": 42,
+  "component": "Checkbox",
+  "constName": "States",
+  "displayName": "狀態"
+ },
+ {
+  "file": "components/Checkbox/checkbox.stories.tsx",
+  "line": 81,
+  "component": "Checkbox",
+  "constName": "VerticalGroup",
+  "displayName": "直式群組"
+ },
+ {
+  "file": "components/Checkbox/checkbox.stories.tsx",
+  "line": 100,
+  "component": "Checkbox",
+  "constName": "Horizontal",
+  "displayName": "水平排列"
+ },
+ {
+  "file": "components/Checkbox/checkbox.principles.stories.tsx",
+  "line": 37,
+  "component": "Checkbox",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Checkbox/checkbox.principles.stories.tsx",
+  "line": 180,
+  "component": "Checkbox",
+  "constName": "ClampPolicyRule",
+  "displayName": "夾值 政策"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+  "line": 61,
+  "component": "AspectRatio",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+  "line": 193,
+  "component": "AspectRatio",
+  "constName": "RatioChoice",
+  "displayName": "如何選 ratio"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+  "line": 224,
+  "component": "AspectRatio",
+  "constName": "ChildrenFillRule",
+  "displayName": "children 要填滿容器"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.principles.stories.tsx",
+  "line": 262,
+  "component": "AspectRatio",
+  "constName": "PlaceholderAndSkeleton",
+  "displayName": "背景-muted 占位 與 Skeleton 的分界"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.stories.tsx",
+  "line": 33,
+  "component": "AspectRatio",
+  "constName": "HeroBanner16x9",
+  "displayName": "16:9 主視覺橫幅"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.stories.tsx",
+  "line": 52,
+  "component": "AspectRatio",
+  "constName": "ProductPhoto4x3",
+  "displayName": "4/3 產品照片 + 防版面跳動對照"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.stories.tsx",
+  "line": 97,
+  "component": "AspectRatio",
+  "constName": "SquareAvatar1x1",
+  "displayName": "1:1 社群方形貼文"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.stories.tsx",
+  "line": 120,
+  "component": "AspectRatio",
+  "constName": "Ultrawide21x9",
+  "displayName": "21:9 影院橫幅"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.stories.tsx",
+  "line": 139,
+  "component": "AspectRatio",
+  "constName": "CommonRatios",
+  "displayName": "常用 比例 一覽"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.anatomy.stories.tsx",
+  "line": 31,
+  "component": "AspectRatio",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.anatomy.stories.tsx",
+  "line": 142,
+  "component": "AspectRatio",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.anatomy.stories.tsx",
+  "line": 167,
+  "component": "AspectRatio",
+  "constName": "StandardRatios",
+  "displayName": "標準 比例 視覺對照"
+ },
+ {
+  "file": "components/AspectRatio/aspect-ratio.anatomy.stories.tsx",
+  "line": 200,
+  "component": "AspectRatio",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/LinkInput/link-input.stories.tsx",
+  "line": 41,
+  "component": "LinkInput",
+  "constName": "Empty",
+  "displayName": "空值"
+ },
+ {
+  "file": "components/LinkInput/link-input.stories.tsx",
+  "line": 56,
+  "component": "LinkInput",
+  "constName": "Validation",
+  "displayName": "Blur 驗證"
+ },
+ {
+  "file": "components/LinkInput/link-input.stories.tsx",
+  "line": 71,
+  "component": "LinkInput",
+  "constName": "SizeAlignment",
+  "displayName": "尺寸"
+ },
+ {
+  "file": "components/LinkInput/link-input.stories.tsx",
+  "line": 93,
+  "component": "LinkInput",
+  "constName": "Modes",
+  "displayName": "四模式"
+ },
+ {
+  "file": "components/LinkInput/link-input.stories.tsx",
+  "line": 123,
+  "component": "LinkInput",
+  "constName": "Display",
+  "displayName": "展示樣式"
+ },
+ {
+  "file": "components/LinkInput/link-input.principles.stories.tsx",
+  "line": 38,
+  "component": "LinkInput",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/LinkInput/link-input.principles.stories.tsx",
+  "line": 102,
+  "component": "LinkInput",
+  "constName": "DisplayStateRule",
+  "displayName": "兩種狀態：連結 顯示 / input 編輯"
+ },
+ {
+  "file": "components/LinkInput/link-input.principles.stories.tsx",
+  "line": 136,
+  "component": "LinkInput",
+  "constName": "ValidationRule",
+  "displayName": "驗證時機：blur，不即時"
+ },
+ {
+  "file": "components/LinkInput/link-input.principles.stories.tsx",
+  "line": 163,
+  "component": "LinkInput",
+  "constName": "EmptyRule",
+  "displayName": "空值呈現"
+ },
+ {
+  "file": "components/LinkInput/link-input.anatomy.stories.tsx",
+  "line": 199,
+  "component": "LinkInput",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/LinkInput/link-input.anatomy.stories.tsx",
+  "line": 469,
+  "component": "LinkInput",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/LinkInput/link-input.anatomy.stories.tsx",
+  "line": 486,
+  "component": "LinkInput",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/LinkInput/link-input.anatomy.stories.tsx",
+  "line": 652,
+  "component": "LinkInput",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/LinkInput/link-input.anatomy.stories.tsx",
+  "line": 738,
+  "component": "LinkInput",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Slider/slider.anatomy.stories.tsx",
+  "line": 13,
+  "component": "Slider",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Slider/slider.anatomy.stories.tsx",
+  "line": 59,
+  "component": "Slider",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Slider/slider.anatomy.stories.tsx",
+  "line": 90,
+  "component": "Slider",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Slider/slider.anatomy.stories.tsx",
+  "line": 121,
+  "component": "Slider",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Slider/slider.anatomy.stories.tsx",
+  "line": 141,
+  "component": "Slider",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Slider/slider.anatomy.stories.tsx",
+  "line": 172,
+  "component": "Slider",
+  "constName": "ColorBindingRule",
+  "displayName": "範圍 ↔ Thumb 邊框 綁定規則"
+ },
+ {
+  "file": "components/Slider/slider.anatomy.stories.tsx",
+  "line": 201,
+  "component": "Slider",
+  "constName": "KeyboardMatrix",
+  "displayName": "鍵盤操作（Radix 原生）"
+ },
+ {
+  "file": "components/Slider/slider.anatomy.stories.tsx",
+  "line": 227,
+  "component": "Slider",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Slider/slider.principles.stories.tsx",
+  "line": 36,
+  "component": "Slider",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Slider/slider.principles.stories.tsx",
+  "line": 127,
+  "component": "Slider",
+  "constName": "PositionAsStateRule",
+  "displayName": "位置/長度是 state,不是顏色"
+ },
+ {
+  "file": "components/Slider/slider.principles.stories.tsx",
+  "line": 187,
+  "component": "Slider",
+  "constName": "HoverUsesShadowRule",
+  "displayName": "滑鼠移過 / 啟用 用陰影不用色變"
+ },
+ {
+  "file": "components/Slider/slider.principles.stories.tsx",
+  "line": 212,
+  "component": "Slider",
+  "constName": "ThumbBindingRule",
+  "displayName": "Thumb 白底 + 邊框,不用實心"
+ },
+ {
+  "file": "components/Slider/slider.stories.tsx",
+  "line": 21,
+  "component": "Slider",
+  "constName": "SizeAlignment",
+  "displayName": "容器尺寸對齊"
+ },
+ {
+  "file": "components/Slider/slider.stories.tsx",
+  "line": 46,
+  "component": "Slider",
+  "constName": "MinMaxStep",
+  "displayName": "最小 / 最大 / 步階"
+ },
+ {
+  "file": "components/Slider/slider.stories.tsx",
+  "line": 71,
+  "component": "Slider",
+  "constName": "Disabled_REMOVED",
+  "displayName": "停用狀態（已移至設計規格頁示範）"
+ },
+ {
+  "file": "components/Slider/slider.stories.tsx",
+  "line": 90,
+  "component": "Slider",
+  "constName": "OnCommit",
+  "displayName": "提交數值回呼"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+  "line": 98,
+  "component": "FileViewer",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+  "line": 207,
+  "component": "FileViewer",
+  "constName": "InfoPanelDefaultRule",
+  "displayName": "檔案資訊面板預設關閉"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+  "line": 253,
+  "component": "FileViewer",
+  "constName": "CloseButtonPositionRule",
+  "displayName": "工具列 按鈕順序（關閉 永遠最右）"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+  "line": 321,
+  "component": "FileViewer",
+  "constName": "FilmstripRule",
+  "displayName": "Filmstrip 顯示判準"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+  "line": 396,
+  "component": "FileViewer",
+  "constName": "ReadOnlyRule",
+  "displayName": "readOnly 由業務權限決定"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+  "line": 463,
+  "component": "FileViewer",
+  "constName": "NoNestedOverlayRule",
+  "displayName": "禁止 巢狀 浮層"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+  "line": 511,
+  "component": "FileViewer",
+  "constName": "DarkModeLockedRule",
+  "displayName": "檢視器框架鎖暗色（不隨頁面主題）"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.principles.stories.tsx",
+  "line": 550,
+  "component": "FileViewer",
+  "constName": "KeyboardShortcutRule",
+  "displayName": "鍵盤捷徑 是 進階使用者 入口"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.anatomy.stories.tsx",
+  "line": 79,
+  "component": "FileViewer",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.anatomy.stories.tsx",
+  "line": 287,
+  "component": "FileViewer",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.anatomy.stories.tsx",
+  "line": 462,
+  "component": "FileViewer",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.anatomy.stories.tsx",
+  "line": 598,
+  "component": "FileViewer",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.anatomy.stories.tsx",
+  "line": 738,
+  "component": "FileViewer",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.anatomy.stories.tsx",
+  "line": 1008,
+  "component": "FileViewer",
+  "constName": "RendererRegistry",
+  "displayName": "延伸機制（registerFileRenderer）"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.anatomy.stories.tsx",
+  "line": 1114,
+  "component": "FileViewer",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 72,
+  "component": "FileViewer",
+  "constName": "JiraAttachments",
+  "displayName": "Jira — 附件多圖檢視"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 152,
+  "component": "FileViewer",
+  "constName": "NotionGallery",
+  "displayName": "Notion — 頁內配圖 相簿"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 216,
+  "component": "FileViewer",
+  "constName": "FigmaDesignReview",
+  "displayName": "Figma — 單檔 縮放 聚焦"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 270,
+  "component": "FileViewer",
+  "constName": "GmailAttachmentPreview",
+  "displayName": "Gmail — 多附件預覽"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 314,
+  "component": "FileViewer",
+  "constName": "EventPhotosCollection",
+  "displayName": "活動相集 — 縮圖膠卷 開"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 366,
+  "component": "FileViewer",
+  "constName": "FallbackUnknownType",
+  "displayName": "Fallback — 不支援的檔案類型"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 391,
+  "component": "FileViewer",
+  "constName": "OpenSnapshot",
+  "displayName": "開啟狀態"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.principles.stories.tsx",
+  "line": 55,
+  "component": "ProgressBar",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.principles.stories.tsx",
+  "line": 210,
+  "component": "ProgressBar",
+  "constName": "StatusRule",
+  "displayName": "Status 語意"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.principles.stories.tsx",
+  "line": 264,
+  "component": "ProgressBar",
+  "constName": "AffixRule",
+  "displayName": "Affix 選擇"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.stories.tsx",
+  "line": 49,
+  "component": "ProgressBar",
+  "constName": "BatchTask",
+  "displayName": "批次任務進度"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.stories.tsx",
+  "line": 74,
+  "component": "ProgressBar",
+  "constName": "InlineTableCell",
+  "displayName": "DataTable 儲存格 內進度"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.anatomy.stories.tsx",
+  "line": 42,
+  "component": "ProgressBar",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.anatomy.stories.tsx",
+  "line": 275,
+  "component": "ProgressBar",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.anatomy.stories.tsx",
+  "line": 292,
+  "component": "ProgressBar",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.anatomy.stories.tsx",
+  "line": 350,
+  "component": "ProgressBar",
+  "constName": "AffixBehavior",
+  "displayName": "Affix 行為"
+ },
+ {
+  "file": "components/ProgressBar/progress-bar.anatomy.stories.tsx",
+  "line": 430,
+  "component": "ProgressBar",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 25,
+  "component": "Field",
+  "constName": "Vertical",
+  "displayName": "垂直"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 59,
+  "component": "Field",
+  "constName": "Horizontal",
+  "displayName": "水平"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 87,
+  "component": "Field",
+  "constName": "HorizontalLabelAlignment",
+  "displayName": "水平 — 標籤 垂直對齊公式驗證"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 142,
+  "component": "Field",
+  "constName": "MixedControlAlignment",
+  "displayName": "混合 控制元件 的 field 高度對齊"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 212,
+  "component": "Field",
+  "constName": "SegmentedControlInField",
+  "displayName": "SegmentedControl 作為 Field 控制元件"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 302,
+  "component": "Field",
+  "constName": "BlockControlRadioGroup",
+  "displayName": "區塊內控制元件 — RadioGroup"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 374,
+  "component": "Field",
+  "constName": "ButtonAsControl",
+  "displayName": "Button 作為 控制元件"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 416,
+  "component": "Field",
+  "constName": "LabelWidth",
+  "displayName": "Label 寬度"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 443,
+  "component": "Field",
+  "constName": "WithSlider",
+  "displayName": "包 Slider"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 485,
+  "component": "Field",
+  "constName": "SliderAlignsWithOtherFields",
+  "displayName": "Slider 跟 Input / NumberInput 並排"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 519,
+  "component": "Field",
+  "constName": "SliderWithLiveNumberInput",
+  "displayName": "Slider + NumberInput 雙向綁定"
+ },
+ {
+  "file": "components/Field/field.principles.stories.tsx",
+  "line": 44,
+  "component": "Field",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Field/field.principles.stories.tsx",
+  "line": 144,
+  "component": "Field",
+  "constName": "ResponsibilityRule",
+  "displayName": "Field 只負責佈局,不管資料"
+ },
+ {
+  "file": "components/Field/field.principles.stories.tsx",
+  "line": 172,
+  "component": "Field",
+  "constName": "OrientationRule",
+  "displayName": "方向 選擇"
+ },
+ {
+  "file": "components/Field/field.principles.stories.tsx",
+  "line": 235,
+  "component": "Field",
+  "constName": "NotForFormActionsRule",
+  "displayName": "Form 動作 不是 Field 控制元件"
+ },
+ {
+  "file": "components/Field/field.anatomy.stories.tsx",
+  "line": 20,
+  "component": "Field",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Field/field.anatomy.stories.tsx",
+  "line": 119,
+  "component": "Field",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Field/field.anatomy.stories.tsx",
+  "line": 189,
+  "component": "Field",
+  "constName": "OrientationMatrix",
+  "displayName": "方向 × 控制元件 矩陣"
+ },
+ {
+  "file": "components/Field/field.anatomy.stories.tsx",
+  "line": 259,
+  "component": "Field",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Field/field.anatomy.stories.tsx",
+  "line": 296,
+  "component": "Field",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Field/field.anatomy.stories.tsx",
+  "line": 371,
+  "component": "Field",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Field/field.anatomy.stories.tsx",
+  "line": 479,
+  "component": "Field",
+  "constName": "FieldGroupBehavior",
+  "displayName": "FieldGroup — 多 Field 堆疊"
+ },
+ {
+  "file": "components/Field/field.anatomy.stories.tsx",
+  "line": 533,
+  "component": "Field",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Carousel/carousel.anatomy.stories.tsx",
+  "line": 51,
+  "component": "Carousel",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Carousel/carousel.anatomy.stories.tsx",
+  "line": 243,
+  "component": "Carousel",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Carousel/carousel.anatomy.stories.tsx",
+  "line": 260,
+  "component": "Carousel",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Carousel/carousel.anatomy.stories.tsx",
+  "line": 362,
+  "component": "Carousel",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Carousel/carousel.anatomy.stories.tsx",
+  "line": 422,
+  "component": "Carousel",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Carousel/carousel.anatomy.stories.tsx",
+  "line": 508,
+  "component": "Carousel",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Carousel/carousel.principles.stories.tsx",
+  "line": 67,
+  "component": "Carousel",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Carousel/carousel.principles.stories.tsx",
+  "line": 211,
+  "component": "Carousel",
+  "constName": "ArrowHoverOnly",
+  "displayName": "箭頭 滑鼠移過-only 顯示"
+ },
+ {
+  "file": "components/Carousel/carousel.principles.stories.tsx",
+  "line": 281,
+  "component": "Carousel",
+  "constName": "ItemCountLimit",
+  "displayName": "項目數量上限 ~7"
+ },
+ {
+  "file": "components/Carousel/carousel.stories.tsx",
+  "line": 44,
+  "component": "Carousel",
+  "constName": "HomepageHeroBanner",
+  "displayName": "首頁 Hero Banner"
+ },
+ {
+  "file": "components/Carousel/carousel.stories.tsx",
+  "line": 76,
+  "component": "Carousel",
+  "constName": "ProductImageGallery",
+  "displayName": "商品圖片輪播"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.anatomy.stories.tsx",
+  "line": 67,
+  "component": "ScrollArea",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.anatomy.stories.tsx",
+  "line": 162,
+  "component": "ScrollArea",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.anatomy.stories.tsx",
+  "line": 258,
+  "component": "ScrollArea",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.anatomy.stories.tsx",
+  "line": 300,
+  "component": "ScrollArea",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.anatomy.stories.tsx",
+  "line": 358,
+  "component": "ScrollArea",
+  "constName": "OrientationBehavior",
+  "displayName": "方向 行為"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.anatomy.stories.tsx",
+  "line": 423,
+  "component": "ScrollArea",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.principles.stories.tsx",
+  "line": 65,
+  "component": "ScrollArea",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.principles.stories.tsx",
+  "line": 163,
+  "component": "ScrollArea",
+  "constName": "OrientationChoice",
+  "displayName": "方向 選擇"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.principles.stories.tsx",
+  "line": 230,
+  "component": "ScrollArea",
+  "constName": "SolvesDataTableBug",
+  "displayName": "搭配 DataTable 解跑版"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.principles.stories.tsx",
+  "line": 280,
+  "component": "ScrollArea",
+  "constName": "OutOfScopeRule",
+  "displayName": "不該用 ScrollArea 的場景"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.stories.tsx",
+  "line": 58,
+  "component": "ScrollArea",
+  "constName": "VerticalIssueList",
+  "displayName": "垂直捲動 — Linear issue 清單"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.stories.tsx",
+  "line": 83,
+  "component": "ScrollArea",
+  "constName": "SidebarNav",
+  "displayName": "垂直捲動 — Notion sidebar 導覽"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.stories.tsx",
+  "line": 108,
+  "component": "ScrollArea",
+  "constName": "HorizontalProductTable",
+  "displayName": "水平捲動 — Stripe 寬欄位商品表"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.stories.tsx",
+  "line": 152,
+  "component": "ScrollArea",
+  "constName": "BothDirections",
+  "displayName": "雙向捲動 — GitHub PR 大型檢閱表"
+ },
+ {
+  "file": "components/Combobox/combobox.anatomy.stories.tsx",
+  "line": 201,
+  "component": "Combobox",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Combobox/combobox.anatomy.stories.tsx",
+  "line": 509,
+  "component": "Combobox",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Combobox/combobox.anatomy.stories.tsx",
+  "line": 526,
+  "component": "Combobox",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Combobox/combobox.anatomy.stories.tsx",
+  "line": 631,
+  "component": "Combobox",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Combobox/combobox.anatomy.stories.tsx",
+  "line": 756,
+  "component": "Combobox",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Combobox/combobox.anatomy.stories.tsx",
+  "line": 911,
+  "component": "Combobox",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Combobox/combobox.principles.stories.tsx",
+  "line": 49,
+  "component": "Combobox",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Combobox/combobox.principles.stories.tsx",
+  "line": 133,
+  "component": "Combobox",
+  "constName": "WrapRule",
+  "displayName": "Wrap 模式選擇"
+ },
+ {
+  "file": "components/Combobox/combobox.principles.stories.tsx",
+  "line": 181,
+  "component": "Combobox",
+  "constName": "TagOperationRule",
+  "displayName": "Tag 操作規則"
+ },
+ {
+  "file": "components/Combobox/combobox.principles.stories.tsx",
+  "line": 216,
+  "component": "Combobox",
+  "constName": "OverflowRule",
+  "displayName": "溢出指示必須存在"
+ },
+ {
+  "file": "components/Combobox/combobox.stories.tsx",
+  "line": 31,
+  "component": "Combobox",
+  "constName": "Modes",
+  "displayName": "四模式"
+ },
+ {
+  "file": "components/Combobox/combobox.stories.tsx",
+  "line": 63,
+  "component": "Combobox",
+  "constName": "SizeAlignment",
+  "displayName": "尺寸與 Button 對齊"
+ },
+ {
+  "file": "components/Combobox/combobox.stories.tsx",
+  "line": 85,
+  "component": "Combobox",
+  "constName": "WrapModes",
+  "displayName": "單行 vs 換行"
+ },
+ {
+  "file": "components/Combobox/combobox.stories.tsx",
+  "line": 117,
+  "component": "Combobox",
+  "constName": "Searchable",
+  "displayName": "搜尋"
+ },
+ {
+  "file": "components/Combobox/combobox.stories.tsx",
+  "line": 151,
+  "component": "Combobox",
+  "constName": "InDataTable",
+  "displayName": "DataTable 整合"
+ },
+ {
+  "file": "components/Notice/notice.anatomy.stories.tsx",
+  "line": 74,
+  "component": "Notice",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Notice/notice.anatomy.stories.tsx",
+  "line": 218,
+  "component": "Notice",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Notice/notice.anatomy.stories.tsx",
+  "line": 371,
+  "component": "Notice",
+  "constName": "VariantIconMap",
+  "displayName": "變體 × icon 對照"
+ },
+ {
+  "file": "components/Notice/notice.anatomy.stories.tsx",
+  "line": 477,
+  "component": "Notice",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Notice/notice.anatomy.stories.tsx",
+  "line": 602,
+  "component": "Notice",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Notice/notice.stories.tsx",
+  "line": 95,
+  "component": "Notice",
+  "constName": "DeploymentSuccess",
+  "displayName": "部署成功 橫幅"
+ },
+ {
+  "file": "components/Notice/notice.stories.tsx",
+  "line": 119,
+  "component": "Notice",
+  "constName": "BillingFailed",
+  "displayName": "Workspace 付款失敗"
+ },
+ {
+  "file": "components/Notice/notice.stories.tsx",
+  "line": 143,
+  "component": "Notice",
+  "constName": "InlineVariants",
+  "displayName": "行內通知變體對照"
+ },
+ {
+  "file": "components/Notice/notice.stories.tsx",
+  "line": 198,
+  "component": "Notice",
+  "constName": "ToastLikeSolid",
+  "displayName": "Toast 樣式"
+ },
+ {
+  "file": "components/Notice/notice.stories.tsx",
+  "line": 240,
+  "component": "Notice",
+  "constName": "NeutralTitleOnly",
+  "displayName": "Neutral 純文字"
+ },
+ {
+  "file": "components/Notice/notice.principles.stories.tsx",
+  "line": 21,
+  "component": "Notice",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Notice/notice.principles.stories.tsx",
+  "line": 71,
+  "component": "Notice",
+  "constName": "CompositionRules",
+  "displayName": "組合規則"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.stories.tsx",
+  "line": 39,
+  "component": "BulkActionBar",
+  "constName": "WithFilterHidden",
+  "displayName": "部分項目被篩選隱藏"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.stories.tsx",
+  "line": 61,
+  "component": "BulkActionBar",
+  "constName": "WithExtendDatasetHint",
+  "displayName": "提示擴選整個資料集"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.stories.tsx",
+  "line": 125,
+  "component": "BulkActionBar",
+  "constName": "EmptySelectionHidden",
+  "displayName": "無選取時自動藏"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.principles.stories.tsx",
+  "line": 35,
+  "component": "BulkActionBar",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.principles.stories.tsx",
+  "line": 115,
+  "component": "BulkActionBar",
+  "constName": "VsToastRule",
+  "displayName": "BulkActionBar vs Toast — 角色區分"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.principles.stories.tsx",
+  "line": 147,
+  "component": "BulkActionBar",
+  "constName": "ActionVariantRule",
+  "displayName": "動作 變體 規則（不用 主要）"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.principles.stories.tsx",
+  "line": 188,
+  "component": "BulkActionBar",
+  "constName": "HintBannerRule",
+  "displayName": "提示 橫幅 — 用 Alert 不自刻"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.anatomy.stories.tsx",
+  "line": 26,
+  "component": "BulkActionBar",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.anatomy.stories.tsx",
+  "line": 125,
+  "component": "BulkActionBar",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/BulkActionBar/bulk-action-bar.anatomy.stories.tsx",
+  "line": 181,
+  "component": "BulkActionBar",
+  "constName": "Accessibility",
+  "displayName": "無障礙與鍵盤"
+ },
+ {
+  "file": "components/AppShell/app-shell.anatomy.stories.tsx",
+  "line": 22,
+  "component": "AppShell",
+  "constName": "Overview",
+  "displayName": "槽位結構總覽"
+ },
+ {
+  "file": "components/AppShell/app-shell.anatomy.stories.tsx",
+  "line": 57,
+  "component": "AppShell",
+  "constName": "LayoutModeDiagram",
+  "displayName": "兩種布局模式對照圖"
+ },
+ {
+  "file": "components/AppShell/app-shell.anatomy.stories.tsx",
+  "line": 94,
+  "component": "AppShell",
+  "constName": "StateBehavior",
+  "displayName": "右側面板開合行為(兩種模式)"
+ },
+ {
+  "file": "components/AppShell/app-shell.anatomy.stories.tsx",
+  "line": 135,
+  "component": "AppShell",
+  "constName": "Accessibility",
+  "displayName": "無障礙(地標標記 + 跳轉連結 + 鍵盤導覽)"
+ },
+ {
+  "file": "components/AppShell/app-shell.anatomy.stories.tsx",
+  "line": 161,
+  "component": "AppShell",
+  "constName": "SizeMatrix",
+  "displayName": "右側面板寬度範圍(240-640)"
+ },
+ {
+  "file": "components/AppShell/app-shell.stories.tsx",
+  "line": 250,
+  "component": "AppShell",
+  "constName": "PrimarySidebar",
+  "displayName": "主側欄佈局 — Linear 式議題追蹤"
+ },
+ {
+  "file": "components/AppShell/app-shell.stories.tsx",
+  "line": 304,
+  "component": "AppShell",
+  "constName": "PrimarySidebarWithTabs",
+  "displayName": "主側欄佈局 + 頁面分頁"
+ },
+ {
+  "file": "components/AppShell/app-shell.stories.tsx",
+  "line": 388,
+  "component": "AppShell",
+  "constName": "PrimaryHeader",
+  "displayName": "主標頭佈局 — 全域+本地兩層(GitHub/Gmail/Slack 派)"
+ },
+ {
+  "file": "components/AppShell/app-shell.principles.stories.tsx",
+  "line": 11,
+  "component": "AppShell",
+  "constName": "UsageGuidance",
+  "displayName": "使用準則"
+ },
+ {
+  "file": "components/Dialog/dialog.principles.stories.tsx",
+  "line": 46,
+  "component": "Dialog",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Dialog/dialog.principles.stories.tsx",
+  "line": 175,
+  "component": "Dialog",
+  "constName": "HeightBehaviorRule",
+  "displayName": "高度行為選擇"
+ },
+ {
+  "file": "components/Dialog/dialog.principles.stories.tsx",
+  "line": 255,
+  "component": "Dialog",
+  "constName": "FooterActionRule",
+  "displayName": "Footer 按鈕配對"
+ },
+ {
+  "file": "components/Dialog/dialog.anatomy.stories.tsx",
+  "line": 26,
+  "component": "Dialog",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Dialog/dialog.anatomy.stories.tsx",
+  "line": 97,
+  "component": "Dialog",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Dialog/dialog.anatomy.stories.tsx",
+  "line": 148,
+  "component": "Dialog",
+  "constName": "HeightBehavior",
+  "displayName": "高度行為（預設填滿 vs autoHeight）"
+ },
+ {
+  "file": "components/Dialog/dialog.anatomy.stories.tsx",
+  "line": 227,
+  "component": "Dialog",
+  "constName": "DestructiveMatrix",
+  "displayName": "破壞性動作 Dialog"
+ },
+ {
+  "file": "components/Dialog/dialog.anatomy.stories.tsx",
+  "line": 256,
+  "component": "Dialog",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Dialog/dialog.anatomy.stories.tsx",
+  "line": 315,
+  "component": "Dialog",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Dialog/dialog.anatomy.stories.tsx",
+  "line": 414,
+  "component": "Dialog",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Dialog/dialog.anatomy.stories.tsx",
+  "line": 476,
+  "component": "Dialog",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Dialog/dialog.stories.tsx",
+  "line": 114,
+  "component": "Dialog",
+  "constName": "WithForm",
+  "displayName": "表單"
+ },
+ {
+  "file": "components/Dialog/dialog.stories.tsx",
+  "line": 149,
+  "component": "Dialog",
+  "constName": "LongContent",
+  "displayName": "長內容"
+ },
+ {
+  "file": "components/Dialog/dialog.stories.tsx",
+  "line": 261,
+  "component": "Dialog",
+  "constName": "Destructive",
+  "displayName": "危險操作"
+ },
+ {
+  "file": "components/Dialog/dialog.stories.tsx",
+  "line": 307,
+  "component": "Dialog",
+  "constName": "ListBody",
+  "displayName": "主體 放 list"
+ },
+ {
+  "file": "components/Dialog/dialog.stories.tsx",
+  "line": 439,
+  "component": "Dialog",
+  "constName": "WithTabsInHeader",
+  "displayName": "標頭內含分頁"
+ },
+ {
+  "file": "components/Dialog/dialog.stories.tsx",
+  "line": 476,
+  "component": "Dialog",
+  "constName": "OpenSnapshot",
+  "displayName": "開啟狀態"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.anatomy.stories.tsx",
+  "line": 71,
+  "component": "SelectionControl",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.anatomy.stories.tsx",
+  "line": 227,
+  "component": "SelectionControl",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.anatomy.stories.tsx",
+  "line": 385,
+  "component": "SelectionControl",
+  "constName": "PrefixAlignment",
+  "displayName": "Prefix 對齊規則（24px 閾值）"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.anatomy.stories.tsx",
+  "line": 490,
+  "component": "SelectionControl",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.anatomy.stories.tsx",
+  "line": 563,
+  "component": "SelectionControl",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.principles.stories.tsx",
+  "line": 18,
+  "component": "SelectionControl",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.principles.stories.tsx",
+  "line": 57,
+  "component": "SelectionControl",
+  "constName": "CompositionRules",
+  "displayName": "組合規則"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.stories.tsx",
+  "line": 29,
+  "component": "SelectionControl",
+  "constName": "NotificationPreferences",
+  "displayName": "通知偏好"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.stories.tsx",
+  "line": 48,
+  "component": "SelectionControl",
+  "constName": "PlanPicker",
+  "displayName": "方案選擇"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.stories.tsx",
+  "line": 68,
+  "component": "SelectionControl",
+  "constName": "WithPrefixIcon",
+  "displayName": "前綴圖示"
+ },
+ {
+  "file": "components/SelectionControl/selection-item.stories.tsx",
+  "line": 107,
+  "component": "SelectionControl",
+  "constName": "WithPrefixAvatarBlock",
+  "displayName": "前綴頭像"
+ },
+ {
+  "file": "components/Popover/popover.stories.tsx",
+  "line": 23,
+  "component": "Popover",
+  "constName": "FilterPanel",
+  "displayName": "篩選面板"
+ },
+ {
+  "file": "components/Popover/popover.stories.tsx",
+  "line": 67,
+  "component": "Popover",
+  "constName": "OpenSnapshot",
+  "displayName": "開啟狀態"
+ },
+ {
+  "file": "components/Popover/popover.anatomy.stories.tsx",
+  "line": 14,
+  "component": "Popover",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Popover/popover.anatomy.stories.tsx",
+  "line": 78,
+  "component": "Popover",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Popover/popover.anatomy.stories.tsx",
+  "line": 151,
+  "component": "Popover",
+  "constName": "PlacementMatrix",
+  "displayName": "定位（方向 × 對齊）"
+ },
+ {
+  "file": "components/Popover/popover.anatomy.stories.tsx",
+  "line": 180,
+  "component": "Popover",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Popover/popover.anatomy.stories.tsx",
+  "line": 208,
+  "component": "Popover",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Popover/popover.anatomy.stories.tsx",
+  "line": 239,
+  "component": "Popover",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Popover/popover.anatomy.stories.tsx",
+  "line": 269,
+  "component": "Popover",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Popover/popover.principles.stories.tsx",
+  "line": 70,
+  "component": "Popover",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Popover/popover.principles.stories.tsx",
+  "line": 248,
+  "component": "Popover",
+  "constName": "VisualAlignmentRule",
+  "displayName": "視覺對齊 Dialog（浮層視覺語言共用）"
+ },
+ {
+  "file": "components/Textarea/textarea.anatomy.stories.tsx",
+  "line": 18,
+  "component": "Textarea",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Textarea/textarea.anatomy.stories.tsx",
+  "line": 71,
+  "component": "Textarea",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Textarea/textarea.anatomy.stories.tsx",
+  "line": 99,
+  "component": "Textarea",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Textarea/textarea.anatomy.stories.tsx",
+  "line": 117,
+  "component": "Textarea",
+  "constName": "ModeMatrix",
+  "displayName": "模式 對照（編輯 / 展示 / readonly / 停用）"
+ },
+ {
+  "file": "components/Textarea/textarea.anatomy.stories.tsx",
+  "line": 166,
+  "component": "Textarea",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Textarea/textarea.anatomy.stories.tsx",
+  "line": 262,
+  "component": "Textarea",
+  "constName": "RowsResizeMatrix",
+  "displayName": "Rows 與 縮放"
+ },
+ {
+  "file": "components/Textarea/textarea.anatomy.stories.tsx",
+  "line": 296,
+  "component": "Textarea",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Textarea/textarea.stories.tsx",
+  "line": 31,
+  "component": "Textarea",
+  "constName": "InField",
+  "displayName": "在 Field 內"
+ },
+ {
+  "file": "components/Textarea/textarea.principles.stories.tsx",
+  "line": 38,
+  "component": "Textarea",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Textarea/textarea.principles.stories.tsx",
+  "line": 102,
+  "component": "Textarea",
+  "constName": "ResizeRule",
+  "displayName": "縮放 只 垂直，不允許 水平"
+ },
+ {
+  "file": "components/Textarea/textarea.principles.stories.tsx",
+  "line": 126,
+  "component": "Textarea",
+  "constName": "ReadonlyRule",
+  "displayName": "Readonly 用底色標示閱讀區（不同於 Input）"
+ },
+ {
+  "file": "components/Textarea/textarea.principles.stories.tsx",
+  "line": 150,
+  "component": "Textarea",
+  "constName": "NoIconRule",
+  "displayName": "禁止:內部不放 圖示 / endAction"
+ },
+ {
+  "file": "components/Button/button.principles.stories.tsx",
+  "line": 45,
+  "component": "Button",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Button/button.principles.stories.tsx",
+  "line": 120,
+  "component": "Button",
+  "constName": "VariantRule",
+  "displayName": "變體 選擇"
+ },
+ {
+  "file": "components/Button/button.principles.stories.tsx",
+  "line": 179,
+  "component": "Button",
+  "constName": "PrimaryRule",
+  "displayName": "Primary 限制"
+ },
+ {
+  "file": "components/Button/button.principles.stories.tsx",
+  "line": 209,
+  "component": "Button",
+  "constName": "DangerRule",
+  "displayName": "Danger 時機"
+ },
+ {
+  "file": "components/Button/button.principles.stories.tsx",
+  "line": 245,
+  "component": "Button",
+  "constName": "IconRule",
+  "displayName": "Icon 語意"
+ },
+ {
+  "file": "components/Button/button.principles.stories.tsx",
+  "line": 312,
+  "component": "Button",
+  "constName": "OrderRule",
+  "displayName": "排序與對齊"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 88,
+  "component": "Button",
+  "constName": "Pressed",
+  "displayName": "按下狀態"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 113,
+  "component": "Button",
+  "constName": "Danger",
+  "displayName": "Danger 語意"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 138,
+  "component": "Button",
+  "constName": "WithBadge",
+  "displayName": "Badge 槽位"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 161,
+  "component": "Button",
+  "constName": "IconOnly",
+  "displayName": "純圖示"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 192,
+  "component": "Button",
+  "constName": "Disabled",
+  "displayName": "停用"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 237,
+  "component": "Button",
+  "constName": "Loading",
+  "displayName": "載入中"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 307,
+  "component": "Button",
+  "constName": "FullWidth",
+  "displayName": "全寬"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 323,
+  "component": "Button",
+  "constName": "HoverFocusState",
+  "displayName": "滑鼠移過 / 鍵盤聚焦"
+ },
+ {
+  "file": "components/Button/button.stories.tsx",
+  "line": 344,
+  "component": "Button",
+  "constName": "TooltipVisible",
+  "displayName": "純圖示加 Tooltip"
+ },
+ {
+  "file": "components/Button/button.anatomy.stories.tsx",
+  "line": 190,
+  "component": "Button",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Button/button.anatomy.stories.tsx",
+  "line": 472,
+  "component": "Button",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Button/button.anatomy.stories.tsx",
+  "line": 489,
+  "component": "Button",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Button/button.anatomy.stories.tsx",
+  "line": 546,
+  "component": "Button",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Button/button.anatomy.stories.tsx",
+  "line": 634,
+  "component": "Button",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Button/button.anatomy.stories.tsx",
+  "line": 702,
+  "component": "Button",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Steps/steps.principles.stories.tsx",
+  "line": 70,
+  "component": "Steps",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Steps/steps.principles.stories.tsx",
+  "line": 112,
+  "component": "Steps",
+  "constName": "ParentControlled",
+  "displayName": "規則:Parent 管理狀態"
+ },
+ {
+  "file": "components/Steps/steps.principles.stories.tsx",
+  "line": 148,
+  "component": "Steps",
+  "constName": "RingIsFocusMarker",
+  "displayName": "規則:環 是 聚焦 標記,不是 選取"
+ },
+ {
+  "file": "components/Steps/steps.principles.stories.tsx",
+  "line": 183,
+  "component": "Steps",
+  "constName": "BlueConnectorLogic",
+  "displayName": "規則:藍色 連線 只跟 completed 走"
+ },
+ {
+  "file": "components/Steps/steps.principles.stories.tsx",
+  "line": 222,
+  "component": "Steps",
+  "constName": "ColumnRhythm",
+  "displayName": "規則:指示 欄 節奏"
+ },
+ {
+  "file": "components/Steps/steps.principles.stories.tsx",
+  "line": 261,
+  "component": "Steps",
+  "constName": "LinearBackClickDoesNotMutate",
+  "displayName": "規則:Linear 點回 completed 不改狀態"
+ },
+ {
+  "file": "components/Steps/steps.anatomy.stories.tsx",
+  "line": 15,
+  "component": "Steps",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Steps/steps.anatomy.stories.tsx",
+  "line": 80,
+  "component": "Steps",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Steps/steps.anatomy.stories.tsx",
+  "line": 129,
+  "component": "Steps",
+  "constName": "OrientationMatrix",
+  "displayName": "方向"
+ },
+ {
+  "file": "components/Steps/steps.anatomy.stories.tsx",
+  "line": 161,
+  "component": "Steps",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Steps/steps.anatomy.stories.tsx",
+  "line": 242,
+  "component": "Steps",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Steps/steps.anatomy.stories.tsx",
+  "line": 356,
+  "component": "Steps",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Steps/steps.anatomy.stories.tsx",
+  "line": 415,
+  "component": "Steps",
+  "constName": "IndentAlignment",
+  "displayName": "欄位節奏"
+ },
+ {
+  "file": "components/Steps/steps.anatomy.stories.tsx",
+  "line": 440,
+  "component": "Steps",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Steps/steps.stories.tsx",
+  "line": 153,
+  "component": "Steps",
+  "constName": "FocusRingCombinations",
+  "displayName": "Ring 正交示範"
+ },
+ {
+  "file": "components/Steps/steps.stories.tsx",
+  "line": 206,
+  "component": "Steps",
+  "constName": "NonLinear",
+  "displayName": "非線性"
+ },
+ {
+  "file": "components/Steps/steps.stories.tsx",
+  "line": 242,
+  "component": "Steps",
+  "constName": "Horizontal",
+  "displayName": "水平"
+ },
+ {
+  "file": "components/Steps/steps.stories.tsx",
+  "line": 281,
+  "component": "Steps",
+  "constName": "MultipleExpansion",
+  "displayName": "Multiple 展開模式"
+ },
+ {
+  "file": "components/Steps/steps.stories.tsx",
+  "line": 336,
+  "component": "Steps",
+  "constName": "MixedDescription",
+  "displayName": "欄 節奏 驗證"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.principles.stories.tsx",
+  "line": 18,
+  "component": "OverflowIndicator",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.principles.stories.tsx",
+  "line": 60,
+  "component": "OverflowIndicator",
+  "constName": "CompositionRules",
+  "displayName": "組合規則"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.stories.tsx",
+  "line": 55,
+  "component": "OverflowIndicator",
+  "constName": "ComboboxTagOverflow",
+  "displayName": "Combobox 標籤溢出"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.stories.tsx",
+  "line": 93,
+  "component": "OverflowIndicator",
+  "constName": "AvatarStackOverflow",
+  "displayName": "人員頭像 疊合 +N"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.stories.tsx",
+  "line": 127,
+  "component": "OverflowIndicator",
+  "constName": "Shapes",
+  "displayName": "形狀對照"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.stories.tsx",
+  "line": 168,
+  "component": "OverflowIndicator",
+  "constName": "BreadcrumbCollapse",
+  "displayName": "Breadcrumb 中段收合"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.stories.tsx",
+  "line": 226,
+  "component": "OverflowIndicator",
+  "constName": "TableRowAssignees",
+  "displayName": "DataTable 人員欄位"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.anatomy.stories.tsx",
+  "line": 64,
+  "component": "OverflowIndicator",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.anatomy.stories.tsx",
+  "line": 184,
+  "component": "OverflowIndicator",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.anatomy.stories.tsx",
+  "line": 342,
+  "component": "OverflowIndicator",
+  "constName": "ShapeMatrix",
+  "displayName": "形狀對照表"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.anatomy.stories.tsx",
+  "line": 428,
+  "component": "OverflowIndicator",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/OverflowIndicator/overflow-indicator.anatomy.stories.tsx",
+  "line": 540,
+  "component": "OverflowIndicator",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.anatomy.stories.tsx",
+  "line": 21,
+  "component": "SegmentedControl",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.anatomy.stories.tsx",
+  "line": 81,
+  "component": "SegmentedControl",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.anatomy.stories.tsx",
+  "line": 125,
+  "component": "SegmentedControl",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.anatomy.stories.tsx",
+  "line": 159,
+  "component": "SegmentedControl",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.anatomy.stories.tsx",
+  "line": 212,
+  "component": "SegmentedControl",
+  "constName": "FullWidthMatrix",
+  "displayName": "fullWidth 行為"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.anatomy.stories.tsx",
+  "line": 254,
+  "component": "SegmentedControl",
+  "constName": "IconOnlyMatrix",
+  "displayName": "純圖示（群組層）"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.anatomy.stories.tsx",
+  "line": 287,
+  "component": "SegmentedControl",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.stories.tsx",
+  "line": 21,
+  "component": "SegmentedControl",
+  "constName": "ViewSwitcher",
+  "displayName": "視圖切換器"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.principles.stories.tsx",
+  "line": 40,
+  "component": "SegmentedControl",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.principles.stories.tsx",
+  "line": 139,
+  "component": "SegmentedControl",
+  "constName": "SizeLimits",
+  "displayName": "選項數量規則"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.principles.stories.tsx",
+  "line": 185,
+  "component": "SegmentedControl",
+  "constName": "IconOnlyRule",
+  "displayName": "iconOnly 是 群組-level 決策"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.principles.stories.tsx",
+  "line": 227,
+  "component": "SegmentedControl",
+  "constName": "FullWidthRule",
+  "displayName": "fullWidth 的適用情境"
+ },
+ {
+  "file": "components/FieldControlGroup/field-control-group.anatomy.stories.tsx",
+  "line": 29,
+  "component": "FieldControlGroup",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/FieldControlGroup/field-control-group.anatomy.stories.tsx",
+  "line": 55,
+  "component": "FieldControlGroup",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸矩陣"
+ },
+ {
+  "file": "components/FieldControlGroup/field-control-group.anatomy.stories.tsx",
+  "line": 73,
+  "component": "FieldControlGroup",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/FieldControlGroup/field-control-group.anatomy.stories.tsx",
+  "line": 103,
+  "component": "FieldControlGroup",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/FieldControlGroup/field-control-group.principles.stories.tsx",
+  "line": 23,
+  "component": "FieldControlGroup",
+  "constName": "UsageGuidance",
+  "displayName": "使用準則"
+ },
+ {
+  "file": "components/FieldControlGroup/field-control-group.stories.tsx",
+  "line": 45,
+  "component": "FieldControlGroup",
+  "constName": "Phone_NumberInput",
+  "displayName": "電話"
+ },
+ {
+  "file": "components/FieldControlGroup/field-control-group.stories.tsx",
+  "line": 78,
+  "component": "FieldControlGroup",
+  "constName": "Currency_Amount",
+  "displayName": "金額"
+ },
+ {
+  "file": "components/FieldControlGroup/field-control-group.stories.tsx",
+  "line": 108,
+  "component": "FieldControlGroup",
+  "constName": "Search_Submit",
+  "displayName": "搜尋與提交"
+ },
+ {
+  "file": "components/FieldControlGroup/field-control-group.stories.tsx",
+  "line": 142,
+  "component": "FieldControlGroup",
+  "constName": "FilterRow_RealUsage",
+  "displayName": "篩選列（資料表進階篩選實例）"
+ },
+ {
+  "file": "components/Menu/menu-item.principles.stories.tsx",
+  "line": 18,
+  "component": "Menu",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Menu/menu-item.principles.stories.tsx",
+  "line": 61,
+  "component": "Menu",
+  "constName": "CompositionRules",
+  "displayName": "組合規則"
+ },
+ {
+  "file": "components/Menu/menu-item.anatomy.stories.tsx",
+  "line": 201,
+  "component": "Menu",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Menu/menu-item.anatomy.stories.tsx",
+  "line": 531,
+  "component": "Menu",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Menu/menu-item.anatomy.stories.tsx",
+  "line": 548,
+  "component": "Menu",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Menu/menu-item.anatomy.stories.tsx",
+  "line": 658,
+  "component": "Menu",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Menu/menu-item.anatomy.stories.tsx",
+  "line": 772,
+  "component": "Menu",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Menu/menu-item.stories.tsx",
+  "line": 63,
+  "component": "Menu",
+  "constName": "WithDescription",
+  "displayName": "前置圖示 + 說明文字"
+ },
+ {
+  "file": "components/Menu/menu-item.stories.tsx",
+  "line": 76,
+  "component": "Menu",
+  "constName": "AvatarInline",
+  "displayName": "頭像"
+ },
+ {
+  "file": "components/Menu/menu-item.stories.tsx",
+  "line": 89,
+  "component": "Menu",
+  "constName": "AvatarBlock",
+  "displayName": "頭像 + 說明文字"
+ },
+ {
+  "file": "components/Menu/menu-item.stories.tsx",
+  "line": 102,
+  "component": "Menu",
+  "constName": "States",
+  "displayName": "狀態"
+ },
+ {
+  "file": "components/Menu/menu-item.stories.tsx",
+  "line": 143,
+  "component": "Menu",
+  "constName": "MultiSelect",
+  "displayName": "多選"
+ },
+ {
+  "file": "components/Menu/menu-item.stories.tsx",
+  "line": 150,
+  "component": "Menu",
+  "constName": "Groups",
+  "displayName": "群組"
+ },
+ {
+  "file": "components/Menu/menu-item.stories.tsx",
+  "line": 171,
+  "component": "Menu",
+  "constName": "Creatable",
+  "displayName": "可建立新項"
+ },
+ {
+  "file": "components/Menu/menu-item.stories.tsx",
+  "line": 211,
+  "component": "Menu",
+  "constName": "FullExample",
+  "displayName": "完整範例"
+ },
+ {
+  "file": "components/Avatar/avatar.stories.tsx",
+  "line": 16,
+  "component": "Avatar",
+  "constName": "Modes",
+  "displayName": "四模式"
+ },
+ {
+  "file": "components/Avatar/avatar.stories.tsx",
+  "line": 52,
+  "component": "Avatar",
+  "constName": "Fallback",
+  "displayName": "備援顯示"
+ },
+ {
+  "file": "components/Avatar/avatar.stories.tsx",
+  "line": 84,
+  "component": "Avatar",
+  "constName": "InContext",
+  "displayName": "情境用例"
+ },
+ {
+  "file": "components/Avatar/avatar.anatomy.stories.tsx",
+  "line": 130,
+  "component": "Avatar",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Avatar/avatar.anatomy.stories.tsx",
+  "line": 379,
+  "component": "Avatar",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Avatar/avatar.anatomy.stories.tsx",
+  "line": 396,
+  "component": "Avatar",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Avatar/avatar.anatomy.stories.tsx",
+  "line": 501,
+  "component": "Avatar",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Avatar/avatar.anatomy.stories.tsx",
+  "line": 639,
+  "component": "Avatar",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Avatar/avatar.anatomy.stories.tsx",
+  "line": 693,
+  "component": "Avatar",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Avatar/avatar.principles.stories.tsx",
+  "line": 42,
+  "component": "Avatar",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Avatar/avatar.principles.stories.tsx",
+  "line": 119,
+  "component": "Avatar",
+  "constName": "FallbackRule",
+  "displayName": "Fallback 順序"
+ },
+ {
+  "file": "components/Avatar/avatar.principles.stories.tsx",
+  "line": 139,
+  "component": "Avatar",
+  "constName": "WithBadgeOverlayRule",
+  "displayName": "頭像疊加層:在線小點 / 計數徽章"
+ },
+ {
+  "file": "components/Avatar/avatar.principles.stories.tsx",
+  "line": 183,
+  "component": "Avatar",
+  "constName": "HoverCardIntegrationRule",
+  "displayName": "Avatar + ProfileCard 整合"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 42,
+  "component": "FileItem",
+  "constName": "Rich",
+  "displayName": "豐富樣式"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 61,
+  "component": "FileItem",
+  "constName": "Compact",
+  "displayName": "緊湊樣式"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 75,
+  "component": "FileItem",
+  "constName": "HoverSwap",
+  "displayName": "Hover 替換"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 147,
+  "component": "FileItem",
+  "constName": "Clickable",
+  "displayName": "已上傳"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 190,
+  "component": "FileItem",
+  "constName": "CompactMixed",
+  "displayName": "Compact 混合"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 214,
+  "component": "FileItem",
+  "constName": "UploadManagerSurface",
+  "displayName": "Upload manager · 豐富(無邊框)"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 241,
+  "component": "FileItem",
+  "constName": "UploadManagerCompactSurface",
+  "displayName": "Upload manager · 精簡(無邊框)"
+ },
+ {
+  "file": "components/FileItem/file-item.anatomy.stories.tsx",
+  "line": 16,
+  "component": "FileItem",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/FileItem/file-item.anatomy.stories.tsx",
+  "line": 68,
+  "component": "FileItem",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/FileItem/file-item.anatomy.stories.tsx",
+  "line": 96,
+  "component": "FileItem",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/FileItem/file-item.anatomy.stories.tsx",
+  "line": 186,
+  "component": "FileItem",
+  "constName": "ModeMatrix",
+  "displayName": "模式 對照（緊湊 vs 豐富）"
+ },
+ {
+  "file": "components/FileItem/file-item.anatomy.stories.tsx",
+  "line": 227,
+  "component": "FileItem",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/FileItem/file-item.anatomy.stories.tsx",
+  "line": 293,
+  "component": "FileItem",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/FileItem/file-item.anatomy.stories.tsx",
+  "line": 327,
+  "component": "FileItem",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/FileItem/file-item.principles.stories.tsx",
+  "line": 37,
+  "component": "FileItem",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/FileItem/file-item.principles.stories.tsx",
+  "line": 98,
+  "component": "FileItem",
+  "constName": "ModeRule",
+  "displayName": "模式 選擇（緊湊 vs 豐富）"
+ },
+ {
+  "file": "components/FileItem/file-item.principles.stories.tsx",
+  "line": 159,
+  "component": "FileItem",
+  "constName": "StatusProgressRule",
+  "displayName": "上傳狀態與進度視覺"
+ },
+ {
+  "file": "components/FileItem/file-item.principles.stories.tsx",
+  "line": 217,
+  "component": "FileItem",
+  "constName": "ActionsRule",
+  "displayName": "動作 使用"
+ },
+ {
+  "file": "components/Switch/switch.stories.tsx",
+  "line": 15,
+  "component": "Switch",
+  "constName": "Modes",
+  "displayName": "四模式"
+ },
+ {
+  "file": "components/Switch/switch.stories.tsx",
+  "line": 41,
+  "component": "Switch",
+  "constName": "States",
+  "displayName": "狀態"
+ },
+ {
+  "file": "components/Switch/switch.stories.tsx",
+  "line": 74,
+  "component": "Switch",
+  "constName": "WithLabel",
+  "displayName": "搭配標籤"
+ },
+ {
+  "file": "components/Switch/switch.anatomy.stories.tsx",
+  "line": 20,
+  "component": "Switch",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Switch/switch.anatomy.stories.tsx",
+  "line": 60,
+  "component": "Switch",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Switch/switch.anatomy.stories.tsx",
+  "line": 97,
+  "component": "Switch",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Switch/switch.anatomy.stories.tsx",
+  "line": 132,
+  "component": "Switch",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Switch/switch.anatomy.stories.tsx",
+  "line": 188,
+  "component": "Switch",
+  "constName": "LabelIntegration",
+  "displayName": "標籤 / 說明 整合"
+ },
+ {
+  "file": "components/Switch/switch.anatomy.stories.tsx",
+  "line": 219,
+  "component": "Switch",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Switch/switch.principles.stories.tsx",
+  "line": 37,
+  "component": "Switch",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Switch/switch.principles.stories.tsx",
+  "line": 129,
+  "component": "Switch",
+  "constName": "DisabledOpacityRule",
+  "displayName": "停用用半透明保留顏色"
+ },
+ {
+  "file": "components/HoverCard/hover-card.anatomy.stories.tsx",
+  "line": 20,
+  "component": "HoverCard",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/HoverCard/hover-card.anatomy.stories.tsx",
+  "line": 78,
+  "component": "HoverCard",
+  "constName": "VisualVariants",
+  "displayName": "Consumer 的兩種常見視覺"
+ },
+ {
+  "file": "components/HoverCard/hover-card.anatomy.stories.tsx",
+  "line": 137,
+  "component": "HoverCard",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/HoverCard/hover-card.stories.tsx",
+  "line": 36,
+  "component": "HoverCard",
+  "constName": "PersonProfileCard",
+  "displayName": "人員頭像 ProfileCard"
+ },
+ {
+  "file": "components/HoverCard/hover-card.stories.tsx",
+  "line": 78,
+  "component": "HoverCard",
+  "constName": "LinkPreview",
+  "displayName": "連結預覽卡"
+ },
+ {
+  "file": "components/HoverCard/hover-card.stories.tsx",
+  "line": 129,
+  "component": "HoverCard",
+  "constName": "OverflowList",
+  "displayName": "溢出清單"
+ },
+ {
+  "file": "components/HoverCard/hover-card.stories.tsx",
+  "line": 179,
+  "component": "HoverCard",
+  "constName": "RepoCard",
+  "displayName": "Repository 資訊卡"
+ },
+ {
+  "file": "components/HoverCard/hover-card.stories.tsx",
+  "line": 238,
+  "component": "HoverCard",
+  "constName": "TriggerShowcase",
+  "displayName": "Trigger 類型與 delay"
+ },
+ {
+  "file": "components/HoverCard/hover-card.principles.stories.tsx",
+  "line": 44,
+  "component": "HoverCard",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/HoverCard/hover-card.principles.stories.tsx",
+  "line": 174,
+  "component": "HoverCard",
+  "constName": "PureBehaviorPrimitiveRule",
+  "displayName": "純行為 primitive——視覺由 consumer 決定"
+ },
+ {
+  "file": "components/Command/command.stories.tsx",
+  "line": 146,
+  "component": "Command",
+  "constName": "CommandPalette",
+  "displayName": "全域指令面板"
+ },
+ {
+  "file": "components/Command/command.stories.tsx",
+  "line": 155,
+  "component": "Command",
+  "constName": "InlineCommand",
+  "displayName": "行內搜尋清單"
+ },
+ {
+  "file": "components/Command/command.stories.tsx",
+  "line": 241,
+  "component": "Command",
+  "constName": "ThemeSwitcher",
+  "displayName": "外觀切換器"
+ },
+ {
+  "file": "components/Command/command.stories.tsx",
+  "line": 250,
+  "component": "Command",
+  "constName": "EmptyState",
+  "displayName": "無結果狀態"
+ },
+ {
+  "file": "components/Command/command.anatomy.stories.tsx",
+  "line": 27,
+  "component": "Command",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Command/command.anatomy.stories.tsx",
+  "line": 97,
+  "component": "Command",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Command/command.principles.stories.tsx",
+  "line": 18,
+  "component": "Command",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Command/command.principles.stories.tsx",
+  "line": 57,
+  "component": "Command",
+  "constName": "CompositionRules",
+  "displayName": "組合規則"
+ },
+ {
+  "file": "components/NumberInput/number-input.stories.tsx",
+  "line": 23,
+  "component": "NumberInput",
+  "constName": "Modes",
+  "displayName": "四模式"
+ },
+ {
+  "file": "components/NumberInput/number-input.stories.tsx",
+  "line": 51,
+  "component": "NumberInput",
+  "constName": "SizeAlignment",
+  "displayName": "尺寸與 Button 對齊"
+ },
+ {
+  "file": "components/NumberInput/number-input.stories.tsx",
+  "line": 73,
+  "component": "NumberInput",
+  "constName": "FormatOptions",
+  "displayName": "格式化選項"
+ },
+ {
+  "file": "components/NumberInput/number-input.stories.tsx",
+  "line": 98,
+  "component": "NumberInput",
+  "constName": "InDataTable",
+  "displayName": "DataTable 整合"
+ },
+ {
+  "file": "components/NumberInput/number-input.principles.stories.tsx",
+  "line": 45,
+  "component": "NumberInput",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/NumberInput/number-input.principles.stories.tsx",
+  "line": 102,
+  "component": "NumberInput",
+  "constName": "AlignmentRule",
+  "displayName": "對齊原則"
+ },
+ {
+  "file": "components/NumberInput/number-input.principles.stories.tsx",
+  "line": 150,
+  "component": "NumberInput",
+  "constName": "FormatOptionsRule",
+  "displayName": "格式化選項使用"
+ },
+ {
+  "file": "components/NumberInput/number-input.principles.stories.tsx",
+  "line": 189,
+  "component": "NumberInput",
+  "constName": "DataTypeMatchRule",
+  "displayName": "數字一律用 NumberInput"
+ },
+ {
+  "file": "components/NumberInput/number-input.anatomy.stories.tsx",
+  "line": 165,
+  "component": "NumberInput",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/NumberInput/number-input.anatomy.stories.tsx",
+  "line": 435,
+  "component": "NumberInput",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/NumberInput/number-input.anatomy.stories.tsx",
+  "line": 452,
+  "component": "NumberInput",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/NumberInput/number-input.anatomy.stories.tsx",
+  "line": 568,
+  "component": "NumberInput",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/NumberInput/number-input.anatomy.stories.tsx",
+  "line": 646,
+  "component": "NumberInput",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/NumberInput/number-input.anatomy.stories.tsx",
+  "line": 778,
+  "component": "NumberInput",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Select/select.stories.tsx",
+  "line": 35,
+  "component": "Select",
+  "constName": "Modes",
+  "displayName": "四模式"
+ },
+ {
+  "file": "components/Select/select.stories.tsx",
+  "line": 68,
+  "component": "Select",
+  "constName": "DisplayMode",
+  "displayName": "顯示模式"
+ },
+ {
+  "file": "components/Select/select.stories.tsx",
+  "line": 93,
+  "component": "Select",
+  "constName": "SizeAlignment",
+  "displayName": "尺寸與 Button 對齊"
+ },
+ {
+  "file": "components/Select/select.stories.tsx",
+  "line": 115,
+  "component": "Select",
+  "constName": "Clearable",
+  "displayName": "可清除"
+ },
+ {
+  "file": "components/Select/select.stories.tsx",
+  "line": 135,
+  "component": "Select",
+  "constName": "Searchable",
+  "displayName": "搜尋"
+ },
+ {
+  "file": "components/Select/select.stories.tsx",
+  "line": 163,
+  "component": "Select",
+  "constName": "InDataTable",
+  "displayName": "DataTable 整合"
+ },
+ {
+  "file": "components/Select/select.principles.stories.tsx",
+  "line": 59,
+  "component": "Select",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Select/select.principles.stories.tsx",
+  "line": 156,
+  "component": "Select",
+  "constName": "DisplayModeRule",
+  "displayName": "顯示模式選擇"
+ },
+ {
+  "file": "components/Select/select.principles.stories.tsx",
+  "line": 196,
+  "component": "Select",
+  "constName": "ImmediateVsSubmitRule",
+  "displayName": "即時套用 vs 隨 form 送出"
+ },
+ {
+  "file": "components/Select/select.principles.stories.tsx",
+  "line": 243,
+  "component": "Select",
+  "constName": "SearchableRule",
+  "displayName": "Searchable 開啟判斷"
+ },
+ {
+  "file": "components/Select/select.principles.stories.tsx",
+  "line": 287,
+  "component": "Select",
+  "constName": "NativeSelectRule",
+  "displayName": "桌機自建選單 vs 手機原生 picker"
+ },
+ {
+  "file": "components/Select/select.anatomy.stories.tsx",
+  "line": 218,
+  "component": "Select",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Select/select.anatomy.stories.tsx",
+  "line": 562,
+  "component": "Select",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Select/select.anatomy.stories.tsx",
+  "line": 581,
+  "component": "Select",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Select/select.anatomy.stories.tsx",
+  "line": 677,
+  "component": "Select",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Select/select.anatomy.stories.tsx",
+  "line": 819,
+  "component": "Select",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.anatomy.stories.tsx",
+  "line": 38,
+  "component": "ProfileCard",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.anatomy.stories.tsx",
+  "line": 142,
+  "component": "ProfileCard",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.anatomy.stories.tsx",
+  "line": 204,
+  "component": "ProfileCard",
+  "constName": "SectionMatrix",
+  "displayName": "區段 組合（最小 → 完整）"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.anatomy.stories.tsx",
+  "line": 298,
+  "component": "ProfileCard",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.anatomy.stories.tsx",
+  "line": 357,
+  "component": "ProfileCard",
+  "constName": "HoverCardIntegration",
+  "displayName": "HoverCard 整合（觸發行為）"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.anatomy.stories.tsx",
+  "line": 425,
+  "component": "ProfileCard",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.anatomy.stories.tsx",
+  "line": 496,
+  "component": "ProfileCard",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.principles.stories.tsx",
+  "line": 82,
+  "component": "ProfileCard",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.principles.stories.tsx",
+  "line": 124,
+  "component": "ProfileCard",
+  "constName": "TriggerContextRule",
+  "displayName": "觸發點：avatar hover（不作 standalone）"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.principles.stories.tsx",
+  "line": 156,
+  "component": "ProfileCard",
+  "constName": "FixedWidthRule",
+  "displayName": "寬度固定 320px"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.principles.stories.tsx",
+  "line": 195,
+  "component": "ProfileCard",
+  "constName": "SectionRule",
+  "displayName": "Section 各自獨立（選擇性出現）"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.principles.stories.tsx",
+  "line": 58,
+  "component": "Breadcrumb",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.principles.stories.tsx",
+  "line": 181,
+  "component": "Breadcrumb",
+  "constName": "LastItemRule",
+  "displayName": "最後一項是位置標示，不是 link"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.principles.stories.tsx",
+  "line": 230,
+  "component": "Breadcrumb",
+  "constName": "LongPathRule",
+  "displayName": "長路徑中段折疊（保首尾）"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.principles.stories.tsx",
+  "line": 296,
+  "component": "Breadcrumb",
+  "constName": "ScopeRule",
+  "displayName": "只放階層指示，不塞功能"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.stories.tsx",
+  "line": 55,
+  "component": "Breadcrumb",
+  "constName": "InteractiveEllipsis",
+  "displayName": "可互動省略"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.stories.tsx",
+  "line": 111,
+  "component": "Breadcrumb",
+  "constName": "DeclarativeAutoCollapse",
+  "displayName": "宣告式 API + 自動收合"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.stories.tsx",
+  "line": 209,
+  "component": "Breadcrumb",
+  "constName": "WithHomeIcon",
+  "displayName": "首項配 Home icon"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.stories.tsx",
+  "line": 239,
+  "component": "Breadcrumb",
+  "constName": "PairedWithPageTitle",
+  "displayName": "與頁面標題配對"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.stories.tsx",
+  "line": 297,
+  "component": "Breadcrumb",
+  "constName": "IntegrateRouterLink",
+  "displayName": "整合 React Router / Next.js Link"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.anatomy.stories.tsx",
+  "line": 33,
+  "component": "Breadcrumb",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.anatomy.stories.tsx",
+  "line": 78,
+  "component": "Breadcrumb",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.anatomy.stories.tsx",
+  "line": 149,
+  "component": "Breadcrumb",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.anatomy.stories.tsx",
+  "line": 250,
+  "component": "Breadcrumb",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.anatomy.stories.tsx",
+  "line": 288,
+  "component": "Breadcrumb",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.anatomy.stories.tsx",
+  "line": 363,
+  "component": "Breadcrumb",
+  "constName": "UsageExamples",
+  "displayName": "真實場景"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.anatomy.stories.tsx",
+  "line": 415,
+  "component": "Breadcrumb",
+  "constName": "CollapseMatrix",
+  "displayName": "長路徑收合（Ellipsis）"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.anatomy.stories.tsx",
+  "line": 450,
+  "component": "Breadcrumb",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Sheet/sheet.principles.stories.tsx",
+  "line": 69,
+  "component": "Sheet",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Sheet/sheet.principles.stories.tsx",
+  "line": 229,
+  "component": "Sheet",
+  "constName": "SidePropRule",
+  "displayName": "Side 屬性：消費者用 right（其餘內部基建）"
+ },
+ {
+  "file": "components/Sheet/sheet.principles.stories.tsx",
+  "line": 319,
+  "component": "Sheet",
+  "constName": "HeaderFooterStructureRule",
+  "displayName": "Header / Footer 結構"
+ },
+ {
+  "file": "components/Sheet/sheet.anatomy.stories.tsx",
+  "line": 22,
+  "component": "Sheet",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Sheet/sheet.anatomy.stories.tsx",
+  "line": 79,
+  "component": "Sheet",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Sheet/sheet.anatomy.stories.tsx",
+  "line": 137,
+  "component": "Sheet",
+  "constName": "SideMatrix",
+  "displayName": "Side 方向 × 用途"
+ },
+ {
+  "file": "components/Sheet/sheet.anatomy.stories.tsx",
+  "line": 182,
+  "component": "Sheet",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Sheet/sheet.anatomy.stories.tsx",
+  "line": 208,
+  "component": "Sheet",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Sheet/sheet.anatomy.stories.tsx",
+  "line": 234,
+  "component": "Sheet",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Sheet/sheet.anatomy.stories.tsx",
+  "line": 260,
+  "component": "Sheet",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Sheet/sheet.stories.tsx",
+  "line": 27,
+  "component": "Sheet",
+  "constName": "CreateProjectRight",
+  "displayName": "右側建立 專案"
+ },
+ {
+  "file": "components/Sheet/sheet.stories.tsx",
+  "line": 75,
+  "component": "Sheet",
+  "constName": "EditUserRight",
+  "displayName": "右側編輯 使用者 詳情"
+ },
+ {
+  "file": "components/Sheet/sheet.stories.tsx",
+  "line": 133,
+  "component": "Sheet",
+  "constName": "OpenSnapshot",
+  "displayName": "開啟狀態"
+ },
+ {
+  "file": "components/Coachmark/coachmark.stories.tsx",
+  "line": 18,
+  "component": "Coachmark",
+  "constName": "FeatureDiscovery",
+  "displayName": "單步驟新功能介紹"
+ },
+ {
+  "file": "components/Coachmark/coachmark.stories.tsx",
+  "line": 69,
+  "component": "Coachmark",
+  "constName": "MultiStepTour",
+  "displayName": "多步 Onboarding Tour"
+ },
+ {
+  "file": "components/Coachmark/coachmark.stories.tsx",
+  "line": 157,
+  "component": "Coachmark",
+  "constName": "TipsMultiStep",
+  "displayName": "多步 Tips"
+ },
+ {
+  "file": "components/Coachmark/coachmark.anatomy.stories.tsx",
+  "line": 18,
+  "component": "Coachmark",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Coachmark/coachmark.anatomy.stories.tsx",
+  "line": 99,
+  "component": "Coachmark",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Coachmark/coachmark.anatomy.stories.tsx",
+  "line": 182,
+  "component": "Coachmark",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Coachmark/coachmark.anatomy.stories.tsx",
+  "line": 211,
+  "component": "Coachmark",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Coachmark/coachmark.anatomy.stories.tsx",
+  "line": 251,
+  "component": "Coachmark",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/Coachmark/coachmark.anatomy.stories.tsx",
+  "line": 348,
+  "component": "Coachmark",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Coachmark/coachmark.principles.stories.tsx",
+  "line": 79,
+  "component": "Coachmark",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Coachmark/coachmark.principles.stories.tsx",
+  "line": 217,
+  "component": "Coachmark",
+  "constName": "MultiStepBestPracticesRule",
+  "displayName": "多步 Tour 最佳實踐"
+ },
+ {
+  "file": "components/Coachmark/coachmark.principles.stories.tsx",
+  "line": 313,
+  "component": "Coachmark",
+  "constName": "MediaContentRule",
+  "displayName": "Media 內容原則"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.stories.tsx",
+  "line": 89,
+  "component": "PeoplePicker",
+  "constName": "Single",
+  "displayName": "單人"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.stories.tsx",
+  "line": 112,
+  "component": "PeoplePicker",
+  "constName": "Multi",
+  "displayName": "多人"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.stories.tsx",
+  "line": 129,
+  "component": "PeoplePicker",
+  "constName": "SizeAlignment",
+  "displayName": "尺寸"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.stories.tsx",
+  "line": 159,
+  "component": "PeoplePicker",
+  "constName": "RaceTest",
+  "displayName": "載入競態測試"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.principles.stories.tsx",
+  "line": 47,
+  "component": "PeoplePicker",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.principles.stories.tsx",
+  "line": 128,
+  "component": "PeoplePicker",
+  "constName": "SingleVsMultiRule",
+  "displayName": "單選 vs 多選"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.principles.stories.tsx",
+  "line": 172,
+  "component": "PeoplePicker",
+  "constName": "EmptyStateRule",
+  "displayName": "空值呈現"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.anatomy.stories.tsx",
+  "line": 22,
+  "component": "PeoplePicker",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.anatomy.stories.tsx",
+  "line": 97,
+  "component": "PeoplePicker",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.anatomy.stories.tsx",
+  "line": 125,
+  "component": "PeoplePicker",
+  "constName": "ModeMatrix",
+  "displayName": "模式對照"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.anatomy.stories.tsx",
+  "line": 151,
+  "component": "PeoplePicker",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.anatomy.stories.tsx",
+  "line": 198,
+  "component": "PeoplePicker",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.anatomy.stories.tsx",
+  "line": 294,
+  "component": "PeoplePicker",
+  "constName": "StateBehavior",
+  "displayName": "狀態行為"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.anatomy.stories.tsx",
+  "line": 370,
+  "component": "PeoplePicker",
+  "constName": "PersonValueType",
+  "displayName": "PersonValue 型別"
+ },
+ {
+  "file": "components/PeoplePicker/people-picker.anatomy.stories.tsx",
+  "line": 410,
+  "component": "PeoplePicker",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Tag/tag.stories.tsx",
+  "line": 22,
+  "component": "Tag",
+  "constName": "WithAvatar",
+  "displayName": "頭像"
+ },
+ {
+  "file": "components/Tag/tag.stories.tsx",
+  "line": 42,
+  "component": "Tag",
+  "constName": "Dismissable",
+  "displayName": "可移除"
+ },
+ {
+  "file": "components/Tag/tag.stories.tsx",
+  "line": 60,
+  "component": "Tag",
+  "constName": "Truncation",
+  "displayName": "截斷 + Tooltip"
+ },
+ {
+  "file": "components/Tag/tag.principles.stories.tsx",
+  "line": 42,
+  "component": "Tag",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Tag/tag.principles.stories.tsx",
+  "line": 109,
+  "component": "Tag",
+  "constName": "VariantNotSemanticRule",
+  "displayName": "變體 色彩不自動承載語意"
+ },
+ {
+  "file": "components/Tag/tag.principles.stories.tsx",
+  "line": 144,
+  "component": "Tag",
+  "constName": "SubtleVsSolidRule",
+  "displayName": "低調 vs 實心 選擇"
+ },
+ {
+  "file": "components/Tag/tag.principles.stories.tsx",
+  "line": 190,
+  "component": "Tag",
+  "constName": "DismissRule",
+  "displayName": "取消 按鈕行為"
+ },
+ {
+  "file": "components/Tag/tag.principles.stories.tsx",
+  "line": 234,
+  "component": "Tag",
+  "constName": "IconRule",
+  "displayName": "圖示 與 avatar 的使用"
+ },
+ {
+  "file": "components/Tag/tag.anatomy.stories.tsx",
+  "line": 178,
+  "component": "Tag",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Tag/tag.anatomy.stories.tsx",
+  "line": 417,
+  "component": "Tag",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Tag/tag.anatomy.stories.tsx",
+  "line": 434,
+  "component": "Tag",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Tag/tag.anatomy.stories.tsx",
+  "line": 567,
+  "component": "Tag",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Tag/tag.anatomy.stories.tsx",
+  "line": 656,
+  "component": "Tag",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 56,
+  "component": "DataTable",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 107,
+  "component": "DataTable",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 167,
+  "component": "DataTable",
+  "constName": "ColumnTypes",
+  "displayName": "欄 Type 自動渲染"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 212,
+  "component": "DataTable",
+  "constName": "RowHeightMatrix",
+  "displayName": "列高階梯（閱讀 vs 掃描模式）"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 250,
+  "component": "DataTable",
+  "constName": "AlignmentRule",
+  "displayName": "對齊規則（跨產業共識）"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 288,
+  "component": "DataTable",
+  "constName": "Features",
+  "displayName": "功能特性（排序 / 虛擬捲動）"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 326,
+  "component": "DataTable",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 450,
+  "component": "DataTable",
+  "constName": "EmptyState",
+  "displayName": "空狀態"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 469,
+  "component": "DataTable",
+  "constName": "BorderedProp",
+  "displayName": "bordered 屬性（預設 true）"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 509,
+  "component": "DataTable",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 135,
+  "component": "DataTable",
+  "constName": "NumberAlignment",
+  "displayName": "數字靠右對齊"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 143,
+  "component": "DataTable",
+  "constName": "ColumnResize",
+  "displayName": "欄寬調整"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 190,
+  "component": "DataTable",
+  "constName": "ColumnReorder",
+  "displayName": "欄位拖曳重排"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 236,
+  "component": "DataTable",
+  "constName": "RowAutoHeightInlineEdit",
+  "displayName": "自動行高 × 就地編輯（顯示與編輯位置驗證）"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 280,
+  "component": "DataTable",
+  "constName": "RowAutoHeight",
+  "displayName": "自動行高"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 299,
+  "component": "DataTable",
+  "constName": "EmptyState",
+  "displayName": "空狀態"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 323,
+  "component": "DataTable",
+  "constName": "ContainerHeight",
+  "displayName": "容器高度"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 355,
+  "component": "DataTable",
+  "constName": "RowActions",
+  "displayName": "列操作"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 394,
+  "component": "DataTable",
+  "constName": "PinnedColumns",
+  "displayName": "欄位釘選"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 543,
+  "component": "DataTable",
+  "constName": "InlineEdit",
+  "displayName": "就地編輯"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 611,
+  "component": "DataTable",
+  "constName": "InlineEditWithSpreadsheetOverlay",
+  "displayName": "就地編輯 + 試算表浮層"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 662,
+  "component": "DataTable",
+  "constName": "CellErrors",
+  "displayName": "欄位錯誤訊息"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 721,
+  "component": "DataTable",
+  "constName": "CellErrorsFixedRowOverride",
+  "displayName": "欄位錯誤訊息（固定行高 + 逐列撐高）"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 810,
+  "component": "DataTable",
+  "constName": "NestedRows",
+  "displayName": "巢狀列（樹狀表格）"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 858,
+  "component": "DataTable",
+  "constName": "NestedRowsWithDrag",
+  "displayName": "巢狀列 × 拖曳重排"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 919,
+  "component": "DataTable",
+  "constName": "VirtualScroll",
+  "displayName": "大量資料"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 946,
+  "component": "DataTable",
+  "constName": "WithBulkActions",
+  "displayName": "選取 + 批次操作"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1148,
+  "component": "DataTable",
+  "constName": "SelectionKeyboardAndShift",
+  "displayName": "範圍選取與鍵盤"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1176,
+  "component": "DataTable",
+  "constName": "SelectionSingleMode",
+  "displayName": "單選模式"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1203,
+  "component": "DataTable",
+  "constName": "SelectionDisabledRows",
+  "displayName": "不可選取的列"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1258,
+  "component": "DataTable",
+  "constName": "FilterPanelEmpty",
+  "displayName": "進階篩選 — 空狀態"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1277,
+  "component": "DataTable",
+  "constName": "FilterPanelWithConditions",
+  "displayName": "進階篩選 — 已填條件"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1303,
+  "component": "DataTable",
+  "constName": "FilterPanelNested",
+  "displayName": "進階篩選 — 巢狀群組"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1340,
+  "component": "DataTable",
+  "constName": "FilterPanelRelativeDate",
+  "displayName": "進階篩選 — 相對時間群組"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1365,
+  "component": "DataTable",
+  "constName": "FilterPanelModified",
+  "displayName": "進階篩選 — 已改動"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1394,
+  "component": "DataTable",
+  "constName": "FilterPanelLongTagOverflow",
+  "displayName": "進階篩選 — 長標籤溢出"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1443,
+  "component": "DataTable",
+  "constName": "RowDragInteractive",
+  "displayName": "列拖曳重排（含釘選欄）"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1493,
+  "component": "DataTable",
+  "constName": "RowDragWithVirtualization",
+  "displayName": "列拖曳 × 虛擬捲動"
+ },
+ {
+  "file": "components/DataTable/data-table.stories.tsx",
+  "line": 1649,
+  "component": "DataTable",
+  "constName": "RoadmapAllInOne",
+  "displayName": "專案排程全功能整合"
+ },
+ {
+  "file": "components/DataTable/data-table.principles.stories.tsx",
+  "line": 65,
+  "component": "DataTable",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/DataTable/data-table.principles.stories.tsx",
+  "line": 120,
+  "component": "DataTable",
+  "constName": "ColumnTypeRule",
+  "displayName": "用 欄 type 自動渲染,不手寫 儲存格"
+ },
+ {
+  "file": "components/DataTable/data-table.principles.stories.tsx",
+  "line": 163,
+  "component": "DataTable",
+  "constName": "VirtualScrollRule",
+  "displayName": "虛擬捲動時機"
+ },
+ {
+  "file": "components/DataTable/data-table.principles.stories.tsx",
+  "line": 209,
+  "component": "DataTable",
+  "constName": "EmptyStateRule",
+  "displayName": "空 / 錯誤 / 載入中 的對應元件"
+ },
+ {
+  "file": "components/DataTable/data-table.principles.stories.tsx",
+  "line": 245,
+  "component": "DataTable",
+  "constName": "NotSpreadsheetRule",
+  "displayName": "不是試算表"
+ },
+ {
+  "file": "components/Badge/badge.anatomy.stories.tsx",
+  "line": 126,
+  "component": "Badge",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/Badge/badge.anatomy.stories.tsx",
+  "line": 365,
+  "component": "Badge",
+  "constName": "Inspector",
+  "displayName": "元件檢閱器"
+ },
+ {
+  "file": "components/Badge/badge.anatomy.stories.tsx",
+  "line": 382,
+  "component": "Badge",
+  "constName": "ColorMatrix",
+  "displayName": "色彩對照表"
+ },
+ {
+  "file": "components/Badge/badge.anatomy.stories.tsx",
+  "line": 487,
+  "component": "Badge",
+  "constName": "SizeMatrix",
+  "displayName": "尺寸對照表"
+ },
+ {
+  "file": "components/Badge/badge.anatomy.stories.tsx",
+  "line": 574,
+  "component": "Badge",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/Badge/badge.principles.stories.tsx",
+  "line": 39,
+  "component": "Badge",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/Badge/badge.principles.stories.tsx",
+  "line": 140,
+  "component": "Badge",
+  "constName": "DefaultLowRule",
+  "displayName": "預設低強度,有理由才升級"
+ },
+ {
+  "file": "components/Badge/badge.principles.stories.tsx",
+  "line": 204,
+  "component": "Badge",
+  "constName": "ContrastFloorRule",
+  "displayName": "對比 下限（容器對比下限）"
+ },
+ {
+  "file": "components/Badge/badge.principles.stories.tsx",
+  "line": 287,
+  "component": "Badge",
+  "constName": "AccessibilityRule",
+  "displayName": "無障礙必備"
+ },
+ {
+  "file": "components/Badge/badge.principles.stories.tsx",
+  "line": 337,
+  "component": "Badge",
+  "constName": "PlacementRule",
+  "displayName": "三種放置模式"
+ },
+ {
+  "file": "components/Badge/badge.stories.tsx",
+  "line": 21,
+  "component": "Badge",
+  "constName": "Shape",
+  "displayName": "正圓 vs 膠囊"
+ },
+ {
+  "file": "components/Badge/badge.stories.tsx",
+  "line": 47,
+  "component": "Badge",
+  "constName": "Dot",
+  "displayName": "Dot 模式"
+ },
+ {
+  "file": "components/Badge/badge.stories.tsx",
+  "line": 61,
+  "component": "Badge",
+  "constName": "MaxCount",
+  "displayName": "Max 上限"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.anatomy.stories.tsx",
+  "line": 37,
+  "component": "CircularProgress",
+  "constName": "Overview",
+  "displayName": "元件總覽"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.anatomy.stories.tsx",
+  "line": 91,
+  "component": "CircularProgress",
+  "constName": "UsageInButton",
+  "displayName": "在 Button 載入中 狀態內"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.anatomy.stories.tsx",
+  "line": 121,
+  "component": "CircularProgress",
+  "constName": "UsageInline",
+  "displayName": "行內使用"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.anatomy.stories.tsx",
+  "line": 168,
+  "component": "CircularProgress",
+  "constName": "Accessibility",
+  "displayName": "無障礙"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.principles.stories.tsx",
+  "line": 47,
+  "component": "CircularProgress",
+  "constName": "UsageGuidance",
+  "displayName": "使用指引"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.principles.stories.tsx",
+  "line": 155,
+  "component": "CircularProgress",
+  "constName": "IndeterminateVsDeterminateRule",
+  "displayName": "不確定 vs 確定進度"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.principles.stories.tsx",
+  "line": 186,
+  "component": "CircularProgress",
+  "constName": "UsageScenarioRule",
+  "displayName": "使用情境"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.principles.stories.tsx",
+  "line": 229,
+  "component": "CircularProgress",
+  "constName": "SizeMatchContextRule",
+  "displayName": "Size 對應使用情境"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.stories.tsx",
+  "line": 46,
+  "component": "CircularProgress",
+  "constName": "ButtonLoading",
+  "displayName": "按鈕載入中"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.stories.tsx",
+  "line": 57,
+  "component": "CircularProgress",
+  "constName": "InlineAction",
+  "displayName": "行內操作"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.stories.tsx",
+  "line": 111,
+  "component": "CircularProgress",
+  "constName": "InlineCellLoading",
+  "displayName": "Cell 局部載入"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.stories.tsx",
+  "line": 120,
+  "component": "CircularProgress",
+  "constName": "FullScreenOverlay",
+  "displayName": "全頁浮層"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.stories.tsx",
+  "line": 137,
+  "component": "CircularProgress",
+  "constName": "Determinate",
+  "displayName": "確定進度"
+ },
+ {
+  "file": "tokens/color/color.stories.tsx",
+  "line": 82,
+  "component": "?",
+  "constName": "Primitives",
+  "displayName": "原始色票"
+ },
+ {
+  "file": "tokens/color/color.stories.tsx",
+  "line": 154,
+  "component": "?",
+  "constName": "Surface",
+  "displayName": "表面層"
+ },
+ {
+  "file": "tokens/color/color.stories.tsx",
+  "line": 193,
+  "component": "?",
+  "constName": "Text",
+  "displayName": "文字色"
+ },
+ {
+  "file": "tokens/color/color.stories.tsx",
+  "line": 220,
+  "component": "?",
+  "constName": "Semantic",
+  "displayName": "語義色"
+ },
+ {
+  "file": "tokens/color/color.stories.tsx",
+  "line": 298,
+  "component": "?",
+  "constName": "Interactive",
+  "displayName": "互動色"
+ },
+ {
+  "file": "tokens/density/density.stories.tsx",
+  "line": 84,
+  "component": "?",
+  "constName": "Overview",
+  "displayName": "總覽"
+ },
+ {
+  "file": "tokens/density/density.stories.tsx",
+  "line": 141,
+  "component": "?",
+  "constName": "UISize",
+  "displayName": "UI 尺寸"
+ },
+ {
+  "file": "tokens/density/density.stories.tsx",
+  "line": 176,
+  "component": "?",
+  "constName": "LayoutSpace",
+  "displayName": "版面間距"
+ },
+ {
+  "file": "tokens/density/density.stories.tsx",
+  "line": 198,
+  "component": "?",
+  "constName": "PageLayout",
+  "displayName": "頁面版型"
+ },
+ {
+  "file": "tokens/radius/radius.stories.tsx",
+  "line": 25,
+  "component": "?",
+  "constName": "Overview",
+  "displayName": "總覽"
+ },
+ {
+  "file": "tokens/layoutSpace/layoutSpace.stories.tsx",
+  "line": 50,
+  "component": "?",
+  "constName": "Overview",
+  "displayName": "總覽"
+ },
+ {
+  "file": "tokens/opacity/opacity.stories.tsx",
+  "line": 47,
+  "component": "?",
+  "constName": "Overview",
+  "displayName": "總覽"
+ },
+ {
+  "file": "tokens/typography/typography.stories.tsx",
+  "line": 41,
+  "component": "?",
+  "constName": "TypeScale",
+  "displayName": "字型尺寸"
+ },
+ {
+  "file": "tokens/typography/typography.stories.tsx",
+  "line": 67,
+  "component": "?",
+  "constName": "FontWeight",
+  "displayName": "字重"
+ },
+ {
+  "file": "tokens/typography/typography.stories.tsx",
+  "line": 100,
+  "component": "?",
+  "constName": "LineHeight",
+  "displayName": "行高"
+ },
+ {
+  "file": "tokens/elevation/elevation.stories.tsx",
+  "line": 35,
+  "component": "?",
+  "constName": "Overview",
+  "displayName": "總覽"
+ }
+]

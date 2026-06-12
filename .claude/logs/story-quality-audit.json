@@ -1,17 +1,19 @@
 {
-  "ts": "2026-05-23T08:01:24.062Z",
+  "ts": "2026-06-10T19:53:37.428Z",
   "scope": {
-    "total_story_files": 199,
-    "manual_story_files": 75
+    "total_story_files": 197,
+    "manual_story_files": 73
   },
   "violations": {
     "title_canonical": [],
     "name_jargon": [],
     "name_pure_english": [],
-    "placeholder": []
+    "placeholder": [],
+    "name_mixed_english": []
   },
   "totals": {
-    "titles_scanned": 199,
-    "names_scanned": 356
+    "titles_scanned": 197,
+    "names_scanned": 348,
+    "names_mixed_scanned": 938
   }
 }

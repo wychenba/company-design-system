@@ -5,7 +5,7 @@ import { EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
-import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+import { ProfileCard, ProfileCardDefaultActions } from '@/design-system/components/ProfileCard/profile-card'
 import { useTableIsScrolling } from '@/design-system/components/Field/field-context'
 import { ItemPrefix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import {
@@ -16,24 +16,24 @@ import {
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
-// PersonData 承載 NameCard 所需的完整資訊。DS 全域 person avatar 的 hoverCard NameCard 永遠
+// PersonData 承載 ProfileCard 所需的完整資訊。DS 全域 person avatar 的 hoverCard ProfileCard 永遠
 // 顯示同一組 sections(name + subtitle + status + 4 default fields + 自訂 fields + actions + View more)
-// — 缺資料顯 placeholder,不會 collapse。對齊 avatar.spec.md「person avatar hover → NameCard」
+// — 缺資料顯 placeholder,不會 collapse。對齊 avatar.spec.md「person avatar hover → ProfileCard」
 // DS-wide canonical(2026-05-06 v11 always-render schema 升級)。
 export interface PersonData {
   name: string
   avatarUrl?: string
-  /** 角色 / 部門 / ID 等 meta 單行(NameCard subtitle) */
+  /** 角色 / 部門 / ID 等 meta 單行(ProfileCard subtitle) */
   description?: string
   /** Presence 狀態(對齊 Avatar presence canonical)。**2026-05-14 v12 update**(per user 拍板):
    *  production 每 user 一定有 presence state,**undefined = loading transient(資料還沒讀到)**,
-   *  不是「user 沒設定」。NameCard 在 undefined 期間隱藏整 status block,**禁** render「Status not set」
+   *  不是「user 沒設定」。ProfileCard 在 undefined 期間隱藏整 status block,**禁** render「Status not set」
    *  placeholder 文字。 */
   status?: 'online' | 'away' | 'busy' | 'offline'
-  /** Status 訊息(NameCard status section)。只在 status defined 時 render,缺則顯 `—` placeholder。
+  /** Status 訊息(ProfileCard status section)。只在 status defined 時 render,缺則顯 `—` placeholder。
    *  Status undefined 整 block skip(無 statusMessage 也跟著 skip)。 */
   statusMessage?: React.ReactNode
-  /** **2026-05-07 v15.7 user directive**:NameCard default 只 render `id` + `employeeNumber`,
+  /** **2026-05-07 v15.7 user directive**:ProfileCard default 只 render `id` + `employeeNumber`,
    *  其他 description 一律 opt-in by consumer 透過 `fields` array prop。對齊
    *  `NAMECARD_DEFAULT_FIELD_KEYS = ['id', 'employeeNumber']`。 */
   id?: string
@@ -41,7 +41,7 @@ export interface PersonData {
   /** 自訂額外 fields(在 default fields 之後 append)。Email / Phone / Department / Location
    *  / 任何其他 description 一律走這個 prop(opt-in,consumer 自選)。 */
   fields?: { label: string; value: string }[]
-  /** 跳至完整 profile 頁的 handler(hover NameCard 必含,不傳時 fallback noop placeholder) */
+  /** 跳至完整 profile 頁的 handler(hover ProfileCard 必含,不傳時 fallback noop placeholder) */
   onViewProfile?: () => void
 }
 
@@ -51,16 +51,16 @@ function resolvePerson(value: PersonValue): PersonData {
   return typeof value === 'string' ? { name: value } : value
 }
 
-// buildPersonNameCard — DS 全域 person avatar hoverCard 的 canonical NameCard JSX 建構器。
-// SSOT for「avatar hover NameCard 一致視覺」— 任何 person avatar consumer 都走這個 helper,
-// 不可繞道直接 build NameCard。
+// buildPersonProfileCard — DS 全域 person avatar hoverCard 的 canonical ProfileCard JSX 建構器。
+// SSOT for「avatar hover ProfileCard 一致視覺」— 任何 person avatar consumer 都走這個 helper,
+// 不可繞道直接 build ProfileCard。
 //
 // **2026-05-07 v15.7 user directive**:default field values 只 `id` + `employeeNumber`,
 // 對齊 NAMECARD_DEFAULT_FIELD_KEYS。其他 description(email/phone/department/location/etc)
 // consumer 想顯式透過 `person.fields` opt-in 傳入。
-function buildPersonNameCard(person: PersonData): React.ReactNode {
+function buildPersonProfileCard(person: PersonData): React.ReactNode {
   return (
-    <NameCard
+    <ProfileCard
       name={person.name}
       subtitle={person.description}
       avatar={{ src: person.avatarUrl, alt: person.name }}
@@ -71,7 +71,7 @@ function buildPersonNameCard(person: PersonData): React.ReactNode {
         employeeNumber: person.employeeNumber,
       }}
       fields={person.fields}
-      actions={<NameCardDefaultActions />}
+      actions={<ProfileCardDefaultActions />}
       // onViewMore hover context 必含(avatar.spec.md canonical)。consumer 傳
       // `onViewProfile` 則用真 handler,否則 noop placeholder(UI 仍渲染 View more
       // footer,避免 preview 變死路)。
@@ -86,19 +86,19 @@ function buildPersonNameCard(person: PersonData): React.ReactNode {
 const AVATAR_PX: Record<'sm' | 'md' | 'lg', number> = { sm: 20, md: 24, lg: 24 }
 
 // ── PersonAvatar ────────────────────────────────────────────────────────────
-// Consume DS `Avatar` primitive(2026-04-22 refactor,M1 SSOT consumption)+ 預設 NameCard
-// hoverCard(avatar.spec.md DS-wide「person avatar hover → NameCard」canonical)。
+// Consume DS `Avatar` primitive(2026-04-22 refactor,M1 SSOT consumption)+ 預設 ProfileCard
+// hoverCard(avatar.spec.md DS-wide「person avatar hover → ProfileCard」canonical)。
 //
 // 之前用 local `<img>` / `<User icon />` hand-craft 繞過 DS Avatar,違反 M1。本次 refactor:
 // - 所有 person avatar 經過 DS Avatar primitive(size 對應 uiSize family,fallback / icon / badge 集中管理)
-// - 人員資訊 → NameCard(subtitle = description,actions = NameCardDefaultActions)
+// - 人員資訊 → ProfileCard(subtitle = description,actions = ProfileCardDefaultActions)
 
 // 2026-05-13 (a) perf fix(per codex Layer C HoverCard subtree dominant):
-// useMemo `buildPersonNameCard` per-person stable ref。原 every render call → new JSX ref →
+// useMemo `buildPersonProfileCard` per-person stable ref。原 every render call → new JSX ref →
 // Avatar.memo bails → HoverCard subtree 重建。Stable ref → memo skip → big win on scroll。
 //
-// (c) push-up scroll-defer:當 DataTable virtualizer.isScrolling=true,**完全不 build NameCard**
-// (Avatar 收 undefined → 跳 HoverCard wrapper)。原 (c) v1 在 Avatar 層 skip wrapper 但 NameCard
+// (c) push-up scroll-defer:當 DataTable virtualizer.isScrolling=true,**完全不 build ProfileCard**
+// (Avatar 收 undefined → 跳 HoverCard wrapper)。原 (c) v1 在 Avatar 層 skip wrapper 但 ProfileCard
 // JSX subtree 仍在此處 build → 浪費 React reconciliation work。push 到此處才真省。
 function PersonAvatar({
   person,
@@ -113,7 +113,7 @@ function PersonAvatar({
 }) {
   const isTableScrolling = useTableIsScrolling()
   const nameCard = React.useMemo(
-    () => (isTableScrolling ? undefined : buildPersonNameCard(person)),
+    () => (isTableScrolling ? undefined : buildPersonProfileCard(person)),
     [person, isTableScrolling]
   )
   return (
@@ -253,17 +253,17 @@ function MultiPersonDisplay({
               size="sm"
               // Tag.avatar 是 ReactNode(非 AvatarData object)——傳 <Avatar> 元素。
               // Tag 內部用 `w-4 h-4 rounded-full` 容器 slot,Avatar 填滿 object-cover。
-              // **hoverCard 必帶**(avatar.spec.md DS-wide canonical:所有 person avatar 必 hover → NameCard)。
-              // 跟 PersonAvatar 共用 `buildPersonNameCard` helper 確保顯示資訊一致。
+              // **hoverCard 必帶**(avatar.spec.md DS-wide canonical:所有 person avatar 必 hover → ProfileCard)。
+              // 跟 PersonAvatar 共用 `buildPersonProfileCard` helper 確保顯示資訊一致。
               avatar={
                 <Avatar
                   src={person.avatarUrl}
                   alt={person.name}
                   size={16}
-                  hoverCard={buildPersonNameCard(person)}
+                  hoverCard={buildPersonProfileCard(person)}
                 />
               }
-              onDismiss={onRemove ? () => onRemove(value![resolvedMax + i]) : undefined}
+              onRemove={onRemove ? () => onRemove(value![resolvedMax + i]) : undefined}
             >
               {person.name}
             </Tag>
@@ -355,4 +355,4 @@ function PersonAvatarTag({
 }
 PersonAvatarTag.displayName = 'PersonAvatarTag'
 
-export { PersonDisplay, MultiPersonDisplay, PersonAvatarTag, buildPersonNameCard, resolvePerson }
+export { PersonDisplay, MultiPersonDisplay, PersonAvatarTag, buildPersonProfileCard, resolvePerson }

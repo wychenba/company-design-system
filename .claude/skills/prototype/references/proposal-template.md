@@ -217,7 +217,7 @@ Phase 3 建 exploration 時:
 1. **優先用既有元件** `packages/design-system/src/components/`,不自創
 2. **Layout primitives 消費**(per CLAUDE.md 清單):Empty / item-layout / overlay-surface / ScrollArea / AspectRatio
 3. **Token 紀律**:只用 semantic token,不硬寫 hex / rgb / shadow-sm
-4. **hook check_token_hygiene 4 項**:shadcn alias / v4 shorthand / hardcoded shadow / native overflow — 4 項全過
+4. **token 防線 lib/_token_hygiene.sh 5-check**:shadcn alias / v4 shorthand / hardcoded shadow / primitive-color-as-utility / native overflow — 5 項全過
 5. **新元件需求**:**notes.md 明文標示**,不偷偷 add 到 Components/(Checkpoint 3 專屬)
 
 ---

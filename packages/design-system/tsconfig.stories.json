@@ -1,0 +1,20 @@
+{
+  "//": "Story type-check gate (noEmit). 主 tsconfig.json emitDeclarationOnly 故 exclude stories 避免 story .d.ts 污染 dist;但 stories 沒型別檢查 = 安全網漏洞(2026-06-02 SizeMatrix {size} JSX-undefined crash 隨 beta.44 出貨之 root cause)。本 config 純型別檢查 stories(不 emit),deterministic 抓 {var}-undefined / prop 型別錯。npm run typecheck:stories + CI gate 強制。",
+  "extends": "../../tsconfig.app.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/design-system/*": ["./src/*"],
+      "@/lib/*": ["./src/lib/*"]
+    },
+    "types": ["vite/client", "node"],
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "declaration": false,
+    "composite": false,
+    "incremental": false,
+    "rootDir": "./src"
+  },
+  "include": ["src"],
+  "exclude": ["**/*.test.ts", "**/*.spec.ts"]
+}

@@ -4,7 +4,7 @@
 //     comfortable),語意對應「掃描 vs 閱讀」資料密度而非元件大小。命名沿用
 //     Linear / Notion / Airtable 業界共識(row density,非 component size)。
 //   StateBehavior covered by ColorMatrix「Row 狀態色彩」段(default / hover /
-//     selected / striped / disabled)+ Features「排序」段。Row 互動是 row-level
+//     selected / disabled)+ Features「排序」段。Row 互動是 row-level
 //     而非元件 level,集中於 Row 色彩展示更直觀。
 import type { Meta, StoryObj } from '@storybook/react'
 import { createColumnHelper } from '@tanstack/react-table'
@@ -80,9 +80,9 @@ export const Overview: Story = {
             <table className="text-caption border-collapse">
               <thead><tr><Th>Level</Th><Th>責任</Th><Th>實作</Th></tr></thead>
               <tbody>
-                <tr><Td>L1 Structure</Td><Td>DOM 結構 + 捲動行為</Td><Td mono>&lt;div&gt; + ARIA role="grid/row/cell" + useVirtualizer</Td></tr>
+                <tr><Td>L1 Structure</Td><Td>DOM 結構 + 捲動行為</Td><Td mono>&lt;div&gt; + ARIA role="table/row/cell" + useVirtualizer</Td></tr>
                 <tr><Td>L2 Typography / Spacing</Td><Td>Row 高度 / Cell padding / 對齊</Td><Td mono>--table-row-* + --field-height-* token</Td></tr>
-                <tr><Td>L3 Cell Rendering</Td><Td>根據 meta.type 自動選 Display 元件</Td><Td mono>column-types.ts 註冊 text/number/currency/date/select/boolean/person/link</Td></tr>
+                <tr><Td>L3 Cell Rendering</Td><Td>根據 meta.type 自動選 Display 元件</Td><Td mono>column-types.ts 註冊 string/number/currency/date/select/boolean/person/url</Td></tr>
                 <tr><Td>L4 Interactions</Td><Td>排序 / 選取 / 欄位拖動 / frozen column</Td><Td>TanStack Table features + 自訂 state</Td></tr>
               </tbody>
             </table>
@@ -165,7 +165,7 @@ export const Inspector: Story = {
 }
 
 export const ColumnTypes: Story = {
-  name: '欄 Type 自動渲染',
+  name: '欄類型自動渲染',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -190,15 +190,15 @@ export const ColumnTypes: Story = {
             <table className="text-caption border-collapse">
               <thead><tr><Th>meta.type</Th><Th>Display 渲染</Th><Th>對齊</Th><Th>典型場景</Th></tr></thead>
               <tbody>
-                <tr><Td mono>text</Td><Td mono>{`<Input mode="display">`}</Td><Td>left</Td><Td>姓名、title、slug</Td></tr>
+                <tr><Td mono>string</Td><Td mono>{`<Input mode="display">`}</Td><Td>left</Td><Td>姓名、title、slug</Td></tr>
                 <tr><Td mono>number</Td><Td mono>{`<NumberInput mode="display">`}</Td><Td>right</Td><Td>數量、年齡</Td></tr>
                 <tr><Td mono>currency</Td><Td mono>{`<NumberInput mode="display">`}(+ prefix)</Td><Td>right</Td><Td>金額、價格</Td></tr>
                 <tr><Td mono>date</Td><Td mono>{`<DatePicker mode="display">`}</Td><Td>left</Td><Td>日期、時間戳</Td></tr>
-                <tr><Td mono>boolean</Td><Td mono>{`<Checkbox mode="display">`}(✓ / —)</Td><Td>center</Td><Td>啟用 / 可見</Td></tr>
+                <tr><Td mono>boolean</Td><Td mono>{`<Checkbox mode="display">`}(✓ / —)</Td><Td>left</Td><Td>啟用 / 可見</Td></tr>
                 <tr><Td mono>select</Td><Td mono>{`<Select mode="display">`}</Td><Td>left</Td><Td>狀態、類別</Td></tr>
-                <tr><Td mono>combobox</Td><Td mono>{`<Combobox mode="display">`}</Td><Td>left</Td><Td>多選 tags</Td></tr>
+                <tr><Td mono>multiSelect</Td><Td mono>{`<Combobox mode="display">`}</Td><Td>left</Td><Td>多選 tags</Td></tr>
                 <tr><Td mono>person</Td><Td mono>PersonDisplay / MultiPersonDisplay</Td><Td>left</Td><Td>指派者、reviewer</Td></tr>
-                <tr><Td mono>link</Td><Td mono>{`<LinkInput mode="display">`}</Td><Td>left</Td><Td>URL</Td></tr>
+                <tr><Td mono>url</Td><Td mono>{`<LinkInput mode="display">`}</Td><Td>left</Td><Td>URL</Td></tr>
               </tbody>
             </table>
           </div>
@@ -227,9 +227,9 @@ export const RowHeightMatrix: Story = {
             <table className="text-caption border-collapse">
               <thead><tr><Th>Tier</Th><Th>高度</Th><Th>字體</Th><Th>適用</Th></tr></thead>
               <tbody>
-                <tr><Td mono>compact(sm)</Td><Td mono>--table-row-compact</Td><Td>text-body</Td><Td>大量資料掃視(log、交易紀錄)</Td></tr>
-                <tr><Td mono>cozy(md)★default</Td><Td mono>--table-row-cozy</Td><Td>text-body</Td><Td>一般業務資料</Td></tr>
-                <tr><Td mono>comfortable(lg)</Td><Td mono>--table-row-comfortable</Td><Td>text-body-lg</Td><Td>詳情檢視、avatar 多的場景</Td></tr>
+                <tr><Td mono>compact(sm)</Td><Td mono>--table-row-sm</Td><Td>text-body</Td><Td>大量資料掃視(log、交易紀錄)</Td></tr>
+                <tr><Td mono>cozy(md)★default</Td><Td mono>--table-row-md</Td><Td>text-body</Td><Td>一般業務資料</Td></tr>
+                <tr><Td mono>comfortable(lg)</Td><Td mono>--table-row-lg</Td><Td>text-body-lg</Td><Td>詳情檢視、avatar 多的場景</Td></tr>
               </tbody>
             </table>
           </div>
@@ -261,7 +261,7 @@ export const AlignmentRule: Story = {
       <div className="flex flex-col gap-8">
         <div>
           <H3>Column type 決定對齊(由 column-types.ts 定義,不讓 consumer 手動設)</H3>
-          <Desc>數字靠右方便縱向比較位數(Excel / 會計軟體 / 財務系統共識);文字靠左方便閱讀;boolean 置中(symbol 視覺不偏向)。Consumer 不需要設 `align`,column type 就決定了。</Desc>
+          <Desc>數字靠右方便縱向比較位數(Excel / 會計軟體 / 財務系統共識);文字靠左方便閱讀;boolean 靠左跟其他文字欄一致,維持掃視時的左緣節奏。Consumer 不需要設 `align`,column type 就決定了。</Desc>
           <DataTable columns={columns} data={SAMPLE_DATA} height="auto" />
         </div>
 
@@ -273,7 +273,7 @@ export const AlignmentRule: Story = {
               <tbody>
                 <tr><Td>text / select / person / date / link</Td><Td mono>left</Td><Td>閱讀從左到右</Td></tr>
                 <tr><Td>number / currency</Td><Td mono>right</Td><Td>縱向比較位數(小數點縱向對齊)</Td></tr>
-                <tr><Td>boolean(✓ / —)</Td><Td mono>center</Td><Td>symbol 本身無方向性,中置對稱</Td></tr>
+                <tr><Td>boolean(✓ / —)</Td><Td mono>left</Td><Td>跟其他文字欄一致靠左,維持掃視時的左緣節奏</Td></tr>
                 <tr><Td>actions(在 cell 內的按鈕)</Td><Td mono>right</Td><Td>動線尾端,不干擾資料掃視</Td></tr>
               </tbody>
             </table>
@@ -306,7 +306,7 @@ export const Features: Story = {
       <div className="flex flex-col gap-8">
         <div>
           <H3>排序(enableSorting)</H3>
-          <Desc>Column 的 `enableSorting: true` 啟用排序。點擊 header 切換 asc / desc / none 三態,header 右側顯示 ChevronUp / ChevronDown 指示。</Desc>
+          <Desc>Column 的 `enableSorting: true` 啟用排序。點擊 header 切換 asc / desc / none 三態,header 右側顯示向上 / 向下箭頭(ArrowUp / ArrowDown)指示目前排序方向。</Desc>
           <DataTable columns={columns} data={SAMPLE_DATA} height="auto" />
         </div>
 
@@ -355,18 +355,18 @@ export const ColorMatrix: Story = {
               </tr>
               <tr>
                 <Td>Header border-bottom</Td>
-                <Td><TokenCell token="--border" display="border" /></Td>
+                <Td><TokenCell token="--divider" display="divider" /></Td>
                 <Td>區隔 header 與 body</Td>
               </tr>
               <tr>
-                <Td>Sort icon(active)</Td>
-                <Td><TokenCell token="--foreground" display="foreground" /></Td>
-                <Td>排序中的欄位,icon 加深</Td>
+                <Td>Sort icon(排序中)</Td>
+                <Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td>
+                <Td>已套排序(0/1 欄)的欄位顯示升/降冪箭頭;multi-sort(≥2 欄)隱藏箭頭走 SortManager</Td>
               </tr>
               <tr>
-                <Td>Sort icon(inactive hover)</Td>
+                <Td>欄位選單 ⌄(hover)</Td>
                 <Td><TokenCell token="--fg-secondary" display="fg-secondary" /></Td>
-                <Td>Hover 可排序欄時出現的指示</Td>
+                <Td>Hover 可排序欄時出現於右區的欄位選單觸發鈕(ItemInlineActionButton,非 sort 箭頭)</Td>
               </tr>
             </tbody>
           </table>
@@ -376,9 +376,10 @@ export const ColorMatrix: Story = {
       <div>
         <H3>Row 狀態色彩</H3>
         <Desc>
-          Row bg 由四個狀態決定:default / hover / selected / striped。Hover 用 neutral-hover
-          (全系統互動高亮一致,跟 TreeView / MenuItem 同套 token)。Selected 用 primary-subtle 淡底色,
-          提示「此 row 被挑出準備執行 bulk action」——不是「當前導航位置」(那是 neutral-selected)。
+          Row bg 由 default / hover 決定。Hover 用 neutral-hover
+          (全系統互動高亮一致,跟 TreeView / MenuItem 同套 token)。
+          選取狀態不由 row bg 呈現,而是 __select__ 欄的 selection control(checkbox / radio)
+          ——2026-05-31 user 決策:有勾選框就只用勾選框呈現,避免「勾選框 + 底色」雙重指示。
         </Desc>
         <div className="overflow-x-auto mb-4">
           <table className="text-caption border-collapse">
@@ -404,29 +405,19 @@ export const ColorMatrix: Story = {
                 <Td><TokenCell token="--divider" display="divider" /></Td>
               </tr>
               <tr>
-                <Td mono>selected(checkbox 勾選)</Td>
-                <Td><TokenCell token="--primary-subtle" display="primary-subtle" /></Td>
+                <Td mono>disabled row(isRowSelectable=false)</Td>
+                <Td><TokenCell token="--surface" display="surface(不灰底)" /></Td>
                 <Td><TokenCell token="--foreground" display="foreground" /></Td>
-                <Td><TokenCell token="--divider" display="divider" /></Td>
-              </tr>
-              <tr>
-                <Td mono>striped(zebra,可選)</Td>
-                <Td><TokenCell token="--muted" display="muted(odd row)" /></Td>
-                <Td><TokenCell token="--foreground" display="foreground" /></Td>
-                <Td><TokenCell token="--divider" display="divider" /></Td>
-              </tr>
-              <tr>
-                <Td mono>disabled row</Td>
-                <Td><TokenCell token="--bg-disabled" display="bg-disabled" /></Td>
-                <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
                 <Td><TokenCell token="--divider" display="divider" /></Td>
               </tr>
             </tbody>
           </table>
         </div>
         <p className="text-footnote text-fg-muted mt-3">
-          selected 跟 hover 可並存(checkbox 勾選的 row,hover 仍有輕微 tint)。實際優先順序:
-          `selected + hover` → primary-subtle 加深一點;仅 hover → neutral-hover;仅 selected → primary-subtle。
+          選取狀態由 __select__ 欄的 checkbox / radio 呈現,不套 row 底色;hover 與 selection 正交
+          (已選 row 仍可有 hover 的 neutral-hover tint,但不疊額外 selected 底色)。
+          isRowSelectable=false 僅 disable checkbox,row 不灰底(spec 禁止事項);
+          cell-level disabled(inline edit cellDisabled)才套 --bg-disabled。
         </p>
       </div>
 
@@ -522,7 +513,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `data-table.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  radio-group  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/radio-group#accessibility)。\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"DataTable 用一般 div 搭配表格語意標記,而非原生 table 元素——因為虛擬捲動需要絕對定位每一列,而 table 的佈局模型做不到。輔助技術(螢幕報讀器)會把它當成表格朗讀。\n\n  表格語意  :最外層標記為表格、每一列標記為列、每一格標記為儲存格,表頭那一格標記為欄位標題。\n\n  排序  :可排序的表頭會標示目前的排序方向(升冪 / 降冪 / 未排序),報讀器讀得出來。\n\n  選取  :每一列的勾選框都有說明文字(由使用方傳入,沒傳就用「Select row」),全選框的說明文字是「Select all visible rows」。\n\n  鍵盤  :一般表格模式下,用 Tab 進入表格後可操作排序與勾選;方向鍵在儲存格之間移動是試算表模式(spreadsheetMode)才開啟的功能,不是預設。列上的更多操作都收進右側的「更多」選單,確保不用滑鼠也能用。\n\n  焦點  :鍵盤聚焦時顯示清楚的外框,與整個設計系統的聚焦樣式一致。\n\n  驗證  :Storybook 無障礙檢查面板應該沒有嚴重問題;全程鍵盤可操作,不必用到滑鼠;文字對比度達到無障礙標準。"}</p>
     </div>
   ),
 }

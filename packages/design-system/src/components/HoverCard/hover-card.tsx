@@ -1,8 +1,13 @@
+/**
+ * @internal — DS-internal 單元(per `.claude/rules/ui-development.md` Public vs Internal canonical;spec frontmatter `isInternal`)。
+ * 不進 root barrel front-door;由 Avatar(hoverCard)/ OverflowIndicator 等 DS 元件 wrap 消費,end-user app 請用 wrapper 元件。
+ */
 import * as React from "react"
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
 
 import { cn } from "@/lib/utils"
 import { OVERLAY_SIDE_OFFSET } from "@/design-system/tokens/elevation/overlay-geometry"
+import { HOVER_DELAY_RICH_MS, HOVER_DELAY_CLOSE_MS } from "@/design-system/tokens/motion/motion"
 
 /**
  * HoverCard — hover 顯示可互動內容的浮層（行為 primitive）
@@ -11,12 +16,18 @@ import { OVERLAY_SIDE_OFFSET } from "@/design-system/tokens/elevation/overlay-ge
  *
  * **不含視覺樣式**——bg、border、shadow、padding 由 consumer 決定：
  * - OverflowIndicator：深色 Tooltip 樣式（bg-tooltip + data-theme="dark"）
- * - NameCard：亮色 Card 樣式（bg-surface-raised + elevation-200）
+ * - ProfileCard：亮色 Card 樣式（bg-surface-raised + elevation-200）
  *
  * 只提供：z-index、動畫、sideOffset。
  */
 
-const HoverCard = HoverCardPrimitive.Root
+// 2026-06-11 user 拍板 A 案(「確保所有 hover 延遲都有按照設計原則」):Root 預設接 motion token SSOT
+// (rich 700ms open / close 200ms)— 對齊 tooltip.tsx 同 pattern(2026-05-18 拍板 #3A)。
+// 原裸用 Radix 預設 open 700 / close 300:open 巧合同值、close 300 ≠ canonical 200(drift)。
+// Consumer 仍可 per-instance override(Avatar 同值傳入、OverflowIndicator 傳 plain)。
+const HoverCard = ({ openDelay = HOVER_DELAY_RICH_MS, closeDelay = HOVER_DELAY_CLOSE_MS, ...props }: React.ComponentProps<typeof HoverCardPrimitive.Root>) => (
+  <HoverCardPrimitive.Root openDelay={openDelay} closeDelay={closeDelay} {...props} />
+)
 
 const HoverCardTrigger = HoverCardPrimitive.Trigger
 
@@ -27,7 +38,7 @@ const HoverCardContent = React.forwardRef<
   // HoverCardPrimitive.Portal(2026-04-23):把 Content 搬到 `document.body`。
   // 不 Portal 時 Content 會 DOM-nested 在 trigger subtree,如 trigger 位於 OverflowIndicator
   // `data-theme="dark"` tooltip 內部 → Avatar 自帶 HoverCard 的 Content 也卡在 dark subtree,
-  // CSS var(--foreground) 繼承 dark 值 → NameCard 內部文字變 white 看不見(user 抓的 bug)。
+  // CSS var(--foreground) 繼承 dark 值 → ProfileCard 內部文字變 white 看不見(user 抓的 bug)。
   // Portal 到 body 讓 CSS 繼承 chain 從 app root data-theme 起算,不受 trigger subtree 污染。
   //
   // collisionPadding=12:Radix / browser 內部 1-2px rounding 讓 visual padding 比 prop 值少 1-2px。
@@ -68,7 +79,7 @@ export const hoverCardMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'],
   tokens: {
     bg: ['bg-surface-raised'],
     fg: ['--foreground'],

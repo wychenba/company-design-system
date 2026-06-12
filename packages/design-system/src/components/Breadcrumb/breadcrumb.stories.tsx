@@ -1,5 +1,5 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
-// @story-trait-rationale: Breadcrumb 是純結構導覽元件,disabled/states 由 BreadcrumbLink 內部 :focus-visible / :hover / :active 處理(spec.md 互動狀態段已 cover),無 element-level disabled mode(spec.md L107「通常 breadcrumb link 不會 disabled」)。互動行為示範由 InteractiveEllipsis story + anatomy StateBehavior 完整覆蓋。AllSizes retired per F migration 2026-05-15(anatomy auto-compile SizeMatrix owns size showcase)。
+// @story-trait-rationale: Breadcrumb 是純結構導覽元件,disabled/states 由 BreadcrumbLink 內部 :focus-visible / :hover / :active 處理(spec.md 互動狀態段已 cover),無 element-level disabled mode(spec.md 互動狀態 > Disabled 段「通常 breadcrumb link 不會 disabled」)。互動行為示範由 InteractiveEllipsis story + anatomy StateBehavior 完整覆蓋。AllSizes retired per F migration 2026-05-15(anatomy auto-compile SizeMatrix owns size showcase)。
 import type { Meta, StoryObj } from '@storybook/react'
 import { House } from 'lucide-react'
 import {
@@ -59,8 +59,9 @@ export const InteractiveEllipsis: Story = {
       <div className="text-caption text-fg-muted max-w-xl">
         BreadcrumbEllipsis 永遠是 <code>&lt;button&gt;</code>,搭配
         <code> DropdownMenuTrigger asChild </code>把 dropdown 行為注入。
-        點擊 <code>⋯</code> 開選單顯示折疊路徑,hover 時字色變 primary-hover,
-        跟 BreadcrumbLink 同語言。對齊 Material / Atlassian / Ant Design 作法。
+        點擊 <code>⋯</code> 開選單顯示折疊路徑;hover 走 neutral(fg-muted → foreground
+        + neutral hover bg,消費 ItemInlineActionButton),與 BreadcrumbLink 的
+        primary-hover 區隔。對齊 Material / Atlassian / Ant Design 作法。
       </div>
       <Breadcrumb>
         <BreadcrumbList>
@@ -106,7 +107,7 @@ export const InteractiveEllipsis: Story = {
 // @story-trait-rationale: 此 story 展示 Phase B declarative `items` API + auto-collapse
 // (maxItems=4)+ flex-shrink hierarchy + truncate-on-overflow + tooltip canonical(per
 // `tooltip.principles.stories.tsx:190`)。Disabled / States 仍由 BreadcrumbLink 內部 :hover /
-// :focus-visible / :active 處理(spec.md L107 無 element-level disabled)。
+// :focus-visible / :active 處理(spec.md 互動狀態 > Disabled 段,無 element-level disabled)。
 
 export const DeclarativeAutoCollapse: Story = {
   name: '宣告式 API + 自動收合',
@@ -180,11 +181,10 @@ export const DeclarativeAutoCollapse: Story = {
           窄容器 + 長 label — flex-shrink hierarchy + truncate + tooltip
         </h3>
         <p className="text-caption text-fg-muted mb-3">
-          容器寬 320px,item label 過長。Root shrink:3(最先縮)→ middle shrink:2 → current
-          shrink:1。各 item 內 `truncate` + ResizeObserver 偵測 → hover tooltip 顯完整文字
-          (對齊 `tooltip.principles.stories.tsx:190` 設計準則)。
+          縮放瀏覽器寬度可觀察:容器變窄時,首項最先被壓縮、中段次之、當前頁最後才縮。
+          每一項文字被截斷時自動顯示 ...,滑鼠移上去會用 tooltip 顯示完整文字;沒被截斷則不顯示 tooltip。
         </p>
-        {/* @story-trait-rationale: 2026-05-14 per user 拍板「拿掉 fixed 320px 讓 resize window 測 RWD」— Breadcrumb 是純結構導覽,disabled/states 由 BreadcrumbLink :focus-visible/:hover/:active 處理(spec.md L107),trait check 沿用 file header rationale */}
+        {/* @story-trait-rationale: 2026-05-14 per user 拍板「拿掉 fixed 320px 讓 resize window 測 RWD」— Breadcrumb 是純結構導覽,disabled/states 由 BreadcrumbLink :focus-visible/:hover/:active 處理(spec.md 互動狀態 > Disabled 段),trait check 沿用 file header rationale */}
         <div className="border border-dashed border-divider rounded-md p-2">
           <Breadcrumb>
             <BreadcrumbList
@@ -201,85 +201,13 @@ export const DeclarativeAutoCollapse: Story = {
   ),
 }
 
-// ── Deep hierarchy (不折疊, 完整顯示) ──────────────────────────────────────
+// @story-trait-rationale: Deep(5 層)+ TwoLevels(2 層)retired 2026-05-30 per earn-existence 2-test —
+// 兩者與 Default(3 層)教的原則完全相同(BreadcrumbLink + Separator + 末項 BreadcrumbPage),差別僅「深度數字」。
+// 路徑深度變化已由 anatomy Inspector `pathLength` control(3/4/5/6/7 即時切換)+ DeclarativeAutoCollapse(5 層 + auto-collapse)涵蓋。
 
-export const Deep: Story = {
-  name: '深層巢狀',
-  render: () => (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">首頁</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/org">組織</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/org/team">產品團隊</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/org/team/members">成員管理</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>Alice 的權限設定</BreadcrumbPage>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-  ),
-}
-
-// ── Two levels (最小合理深度) ─────────────────────────────────────────────
-
-export const TwoLevels: Story = {
-  name: '兩層巢狀',
-  render: () => (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/docs">文件</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>快速開始</BreadcrumbPage>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-  ),
-}
-
-// ── 首項 Home icon(Material / Atlassian 業界慣例,spec.md startIcon prop)──
-
-export const WithHomeIcon: Story = {
-  name: '首項配 Home icon',
-  parameters: {
-    docs: {
-      description: {
-        story: '首項用 House icon 強化視覺錨點,對齊 Material / Atlassian / Ant Design 慣例。Consumer 只傳 LucideIcon,DS 內部消費 BREADCRUMB_ICON_SIZE SSOT 統一管 size(sm/md=16, lg=20),禁傳 size prop 避免 drift。',
-      },
-    },
-  },
-  render: () => (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/" startIcon={House}>首頁</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/projects">專案</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>新增專案</BreadcrumbPage>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-  ),
-}
+// @story-trait-rationale: WithHomeIcon(首項配首頁圖示)retired 2026-06-11 per earn-existence 2-test —
+// 首項 House icon 慣例 + icon 尺寸隨字級自動(sm/md 16px / lg 20px)已由下方 PairedWithPageTitle 三個
+// size 的首項完整示範(原則層 ScopeRule 另有教學),單獨一則 md 尺寸範例屬重複;LinkTo 全庫 grep 無引用。
 
 // ── 配對頁面標題(spec.md size canonical:sm→h4 / md→h3 / lg→h2)─────────
 
@@ -288,7 +216,7 @@ export const PairedWithPageTitle: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Breadcrumb size 必對應頁面標題層級(spec.md size canonical)。sm 配 h4(Dialog/Panel),md 配 h3(一般頁面 header,預設),lg 配 h2(Detail page hero)。階層視覺維持平衡,breadcrumb 不搶 title 視覺權重。',
+        story: 'Breadcrumb 的字級應對應頁面標題的層級:sm 配 h4(對話框 / 側板),md 配 h3(一般頁面 header,預設),lg 配 h2(詳情頁主視覺)。讓階層視覺維持平衡,麵包屑不搶走標題的視覺權重。首項配 House icon 為業界慣例,用 startIcon 傳入即可,圖示尺寸由元件依字級自動決定(sm/md 16px、lg 20px),三個尺寸可對照觀察。',
       },
     },
   },

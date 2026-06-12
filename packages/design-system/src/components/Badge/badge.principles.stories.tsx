@@ -48,13 +48,13 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/Badge/展示" name="正圓 vs 膠囊"><span className="text-primary hover:underline font-medium cursor-pointer">正圓 vs 膠囊</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Badge/展示" name="Dot 模式"><span className="text-primary hover:underline font-medium cursor-pointer">Dot 模式</span></LinkTo>
+          <LinkTo kind="Design System/Components/Badge/展示" name="圓點模式"><span className="text-primary hover:underline font-medium cursor-pointer">Dot 模式</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Badge/展示" name="Max 上限"><span className="text-primary hover:underline font-medium cursor-pointer">Max 上限</span></LinkTo>
+          <LinkTo kind="Design System/Components/Badge/展示" name="數量上限"><span className="text-primary hover:underline font-medium cursor-pointer">Max 上限</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:先確認使用者真正需要的是「有沒有新東西」(用 Dot)還是「有多少」(用數字)。若兩者都不貼切,代表這裡可能不該放 Badge——改用文字標籤或其他狀態指示。</p>
     </div>
 
       {/* vs 近親 — DotVsCountRule — 原 DotVsCountRule */}
@@ -206,8 +206,8 @@ export const ContrastFloorRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="最終 level = max(semantic urgency, contrast floor)"
-        note="Contrast 是下限（最少要是哪個 level 才看得清）,不是上限（業務需求可永遠再升）。兩個約束各自獨立推高 level"
+        title="最終強度,取「內容急迫度」和「容器最低需求」兩者中的較高者"
+        note="容器需求是下限(底色太深時,badge 最少要到哪個強度才看得清),不是上限——內容本身夠急迫時,還是可以再往上升。兩個條件各自獨立把強度往上推"
       >
         <div className="flex items-center gap-3">
           <span className="text-footnote text-fg-muted w-20">Case 1:</span>
@@ -219,7 +219,7 @@ export const ContrastFloorRule: Story = {
             aria-label="通知 (3)"
             overlayBadge={<Badge count={3} variant="high" />}
           />
-          <Label>semantic=high,容器 contrast floor=low → 用 high(semantic ≥ floor)</Label>
+          <Label>內容急迫度=high,容器要求只到 low → 用 high(內容急迫度已經高於容器最低需求)</Label>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-footnote text-fg-muted w-20">Case 2:</span>
@@ -230,7 +230,7 @@ export const ContrastFloorRule: Story = {
             <Button variant="primary" startIcon={Bell}>通知</Button>
             <Badge count={3} variant="critical" className="absolute -top-1 -right-1" />
           </div>
-          <Label warn>semantic=low(passive)但 primary 容器 contrast floor=high/critical → 被迫 bump(設計錯配訊號)</Label>
+          <Label warn>內容急迫度=low(被動計數),但 primary 按鈕底色深,容器要求逼到 high/critical → 被迫升級(這代表設計擺錯位置)</Label>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-footnote text-fg-muted w-20">Case 3:</span>
@@ -242,7 +242,7 @@ export const ContrastFloorRule: Story = {
             aria-label="錯誤 (5)"
             overlayBadge={<Badge count={5} variant="critical" />}
           />
-          <Label>semantic=critical 業務需求本身急 → critical,不受 floor 封頂</Label>
+          <Label>內容急迫度=critical 業務需求本身就急 → 用 critical,容器最低需求不會把它往下壓</Label>
         </div>
       </Rule>
 
@@ -290,7 +290,7 @@ export const AccessibilityRule: Story = {
     <div>
       <Rule
         title="Parent 元件的 aria-label 必須整合 badge 資訊"
-        note="Badge 本身是裝飾層——screen reader 需要從 parent 的 aria-label 取得完整 context。「通知 (3 則未讀)」比「通知」+「3」更清楚"
+        note="Badge 預設 role=「status」(live region 可播報計數變化),但仍應由 parent 的 aria-label 整合完整 context——「通知 (3 則未讀)」比「通知」+「3」更清楚"
       >
         <Button
           variant="tertiary"
@@ -325,10 +325,8 @@ export const AccessibilityRule: Story = {
         <div className="flex items-center gap-4">
           <Badge dot variant="critical" aria-label="緊急" />
           <Badge dot variant="high" aria-label="重要" />
-          <Badge dot variant="medium" aria-label="一般" />
-          <Badge dot variant="low" aria-label="被動" />
         </div>
-        <Label>↑ 4 個 dot 差異只在顏色——必須靠 aria-label 明確語意,不能只靠「紅色代表緊急」</Label>
+        <Label>↑ critical(橘)vs high(藍)只靠顏色——color-blind 使用者分不清,必須靠 aria-label 明確語意,不能只靠顏色</Label>
       </Rule>
     </div>
   ),
@@ -369,13 +367,13 @@ export const PlacementRule: Story = {
         note="通常是 dot 模式,跟 description 文字並列作為狀態 indicator"
       >
         <div className="flex items-center gap-2">
-          <Badge dot variant="critical" aria-label="離線" />
-          <span className="text-body">離線</span>
+          <Badge dot variant="critical" aria-label="同步失敗" />
+          <span className="text-body">同步失敗</span>
         </div>
       </Rule>
 
       <Rule
-        title="❌ 一個元件同時疊多個同類 badge（signal crowding）"
+        title="❌ 一個元件同時疊多個同類 badge"
         note="同一 trigger 疊兩個不同 urgency 的**同類訊號**(count + dot 都是通知重要性)→ 使用者無法判斷哪個重要。合併成一個 badge。不同角、不同語義 OK(Avatar 右下 presence + 右上 count 是合法,見「Avatar + badgeCount + status」demo)"
       >
         {/* ❌ anti-pattern demo intentionally kept: Button `overlayBadge` prop 只支援單一 badge

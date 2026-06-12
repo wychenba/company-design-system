@@ -55,7 +55,7 @@ const SIZE_SPECS: Record<
   },
   lg: {
     fieldHeight: '--field-height-lg',
-    fieldHeightPx: 40,
+    fieldHeightPx: 36,
     text: 'text-body-lg',
     textPx: 16,
     iconPx: 20,
@@ -75,8 +75,8 @@ export const Overview: Story = {
       <div>
         <H3>Anatomy</H3>
         <Desc>
-          SelectionItem 是 Checkbox / RadioGroup 共用的 layout primitive。4-slot 結構:
-          <code className="font-mono text-footnote mx-1">[control] [optional prefix] [content] [optional suffix]</code>
+          SelectionItem 是 Checkbox / RadioGroup 共用的 layout primitive。3-slot 結構:
+          <code className="font-mono text-footnote mx-1">[control] [optional prefix (icon | avatar)] [content]</code>
           。Padding 公式
           <code className="font-mono text-footnote mx-1">py = (field-height - 1lh) / 2</code>
           讓單行高度自動對齊同 size 的 Input,density 切換時跟著算。
@@ -108,7 +108,7 @@ export const Overview: Story = {
                 <Td mono>control</Td>
                 <Td>Checkbox 或 RadioGroupItem(consumer 傳入)</Td>
                 <Td>跟 prefix 同高度(inline 或 block)</Td>
-                <Td mono>h-[1lh] · block: avatar height</Td>
+                <Td mono>h-[1lh] · block: text-block height (1lh + gap + desc)</Td>
               </tr>
               <tr>
                 <Td mono>prefix(icon)</Td>
@@ -132,7 +132,7 @@ export const Overview: Story = {
                 <Td mono>content · description</Td>
                 <Td>輔助文字(reading mode,最小 14px)</Td>
                 <Td mono>text-fg-secondary · line-height 1.5</Td>
-                <Td mono>mt-0.5</Td>
+                <Td mono>mt-[var(--item-gap-label-desc-reading)]（lg → -reading-lg）</Td>
               </tr>
             </tbody>
           </table>
@@ -192,7 +192,7 @@ export const Overview: Story = {
                 <Td mono>disabled</Td>
                 <Td mono>boolean</Td>
                 <Td mono>false</Td>
-                <Td>label → text-fg-disabled + cursor-not-allowed</Td>
+                <Td>label / description / icon → text-fg-disabled(M24);label 另加 cursor-not-allowed</Td>
               </tr>
               <tr>
                 <Td mono>htmlFor</Td>
@@ -565,7 +565,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `selection-control.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus\n- Space — toggle\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"SelectionItem 是純佈局元件,本身不接管鍵盤與焦點——它只渲染外層容器加上指向控件的 label(label 的 htmlFor 連到控件 id,點文字會觸發控件)。\n\n鍵盤操作、焦點環、勾選狀態都由傳入的控件(Checkbox / Radio)負責:\n\n- Tab — 焦點落在控件本身\n- Space — 由控件切換勾選狀態\n- 焦點環(outline 2px,顏色取自 var(--ring))由控件自己畫\n\n搭配建議:\n\n- 控件對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應的 checkbox / radio pattern。\n- 用 label 的 htmlFor 連到控件 id,讓點擊文字也能操作。\n- 驗證:Storybook 無障礙面板應 0 項嚴重違規;不靠滑鼠也能完整操作。文字對比 ≥ 4.5:1,介面元素對比 ≥ 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

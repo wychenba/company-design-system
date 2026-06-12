@@ -134,6 +134,9 @@ try {
 
   const failures = []
   let probedCount = 0
+  const unprobed = []  // 2026-06-02: GOTO-timeout 未驗的 story 改「追蹤可見化」而非靜默 skip(原 silent
+  // return 把「載不起」藏成綠燈 = SizeMatrix crash 漏 ship beta.44 root cause 之一)。先非致命 log
+  // 觀測 CI 真實 skip 數;若 CI 持續 ≈0 再升 hard coverage-gate(避免盲推 hard-gate 再弄垮 release)。
   const CONCURRENCY = 6  // 6 parallel pages = ~6x speedup
 
   // Process in batches of CONCURRENCY
@@ -153,24 +156,29 @@ try {
         })
 
         try {
-          await page.goto(
-            `http://localhost:${PORT}/iframe.html?id=${encodeURIComponent(id)}`,
-            { waitUntil: 'domcontentloaded', timeout: 10000 },  // domcontentloaded fastest + sufficient for runtime probe
-          )
-          await page.waitForTimeout(400)  // settle React effects + late console.error
-        } catch (e) {
-          // GOTO timeout 表 hung page。pageerrors 已收的才是真 React crash;單純 GOTO timeout 視為 flake skip(下次掃補抓)
-          if (pageErrors.length === 0) {
-            // Skip — likely heavy story slow load,not React error
+          let loaded = false
+          try {
+            await page.goto(
+              `http://localhost:${PORT}/iframe.html?id=${encodeURIComponent(id)}`,
+              { waitUntil: 'domcontentloaded', timeout: 10000 },  // domcontentloaded fastest + sufficient for runtime probe
+            )
+            await page.waitForTimeout(400)  // settle React effects + late console.error
+            loaded = true
+          } catch (e) {
+            // pageerrors 已收 = 真 React crash(有效偵測);純 GOTO timeout 才是「載不起」
+            if (pageErrors.length > 0) loaded = true
+          }
+          if (!loaded) {
+            unprobed.push(id)  // 不靜默 skip:追蹤可見化(報告會列出 + 非致命 warn)
             return
           }
+          probedCount++
+          if (pageErrors.length > 0) {
+            failures.push({ id, errors: pageErrors })
+          }
+        } finally {
+          await page.close()  // 永遠 close(原 skip 路徑漏 close → page 洩漏 → timeout 連鎖)
         }
-
-        probedCount++
-        if (pageErrors.length > 0) {
-          failures.push({ id, errors: pageErrors })
-        }
-        await page.close()
       })
     )
 
@@ -184,8 +192,20 @@ try {
   // Report
   console.log('')
   console.log(`=== Result ===`)
-  console.log(`Total stories probed: ${probedCount}`)
+  console.log(`Total stories probed: ${probedCount}/${storyIds.length}`)
   console.log(`Failures:             ${failures.length}`)
+  console.log(`Unprobed (timeout):   ${unprobed.length}`)
+
+  // 2026-06-02: unprobed 可見化(非致命)。原 silent skip 把「載不起」藏成綠燈;現在列出來。
+  // 暫不 hard-fail —— 需先觀測 CI 真實 skip 數(本機 GDrive 噪音不可靠),若 CI 持續 ≈0 再升
+  // hard coverage-gate(per memory feedback_ai_ground_truth:盲推 hard-gate 曾弄垮 beta.45 release)。
+  if (unprobed.length > 0) {
+    console.log('')
+    console.log(`⚠️  COVERAGE 觀測:${unprobed.length} 個 story GOTO timeout 未驗(非致命 warn)。前 10 個:`)
+    for (const id of unprobed.slice(0, 10)) console.log(`   ◦ ${id}`)
+    if (unprobed.length > 10) console.log(`   ...(${unprobed.length - 10} more)`)
+    console.log('   (若 CI 持續顯示 0 → 可把此升為 hard BLOCKER 防 silent-skip 假綠燈)')
+  }
 
   if (failures.length > 0) {
     console.log('')

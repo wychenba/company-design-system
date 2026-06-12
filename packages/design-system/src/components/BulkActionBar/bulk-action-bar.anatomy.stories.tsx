@@ -1,6 +1,6 @@
 // @anatomy-rationale:
 //   ColorMatrix N/A — BulkActionBar 無 contrast 底色 / 無顏色變體(spec「無底色 contrast」)。
-//   SizeMatrix N/A — 高度 padding-based(`px-loose py-tight`)+ sm Buttons 自然 52md/60lg,無 size prop。
+//   SizeMatrix N/A — 高度 padding-based(`px-loose py-tight`)+ md Buttons 自然撐高,本元件無 size prop。
 //   StateBehavior 集中在 Overview 「selection state-driven 渲染」段;獨立 StateBehavior 會跟 Overview 重複。
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
@@ -30,10 +30,10 @@ export const Overview: Story = {
       <section>
         <H3>結構:[X] [count] [ButtonDivider] [actions]</H3>
         <Desc>
-          全 sm Buttons(same-row consistency)+ gap-2(8px)+ <code>ButtonDivider</code>(自帶 mx-1 = 12px 視覺距離)。
+          全 md Buttons(close X 與 actions 同尺寸,維持同一列視覺一致)+ gap-2(8px)+ <code>ButtonDivider</code>(自帶 mx-1 = 12px 視覺距離)。
           Padding 對齊 SurfaceFooter / DataTable toolbar 設計準則:
           <code> px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]</code>。
-          自然高度 52md / 60lg。
+          自然高度 56md / 68lg(md Button 32/36 + py-tight 12/16 ×2)。
           Action variant 採 <code>tertiary</code>(主)/ <code>tertiary danger</code>(destructive)— <strong>不用 primary</strong>(留給 dialog 確認最終 action)。
         </Desc>
         <div className="border border-divider rounded-md">
@@ -41,9 +41,9 @@ export const Overview: Story = {
             selection={['a', 'b', 'c']}
             actions={
               <>
-                <Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>
-                <Button variant="tertiary" size="sm" startIcon={Download}>匯出</Button>
-                <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+                <Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>
+                <Button variant="tertiary" size="md" startIcon={Download}>匯出</Button>
+                <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
               </>
             }
             onClear={() => {}}
@@ -85,7 +85,7 @@ export const Overview: Story = {
           <div className="border-t border-divider">
             <BulkActionBar
               selection={Array.from({ length: 50 }, (_, i) => `f-${i}`)}
-              actions={<Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>}
+              actions={<Button variant="tertiary" size="md" startIcon={Download}>下載</Button>}
               onClear={() => {}}
             />
           </div>
@@ -110,8 +110,8 @@ function SelectionStateDemo() {
           selection={Array.from({ length: count }, (_, i) => `x-${i}`)}
           actions={
             <>
-              <Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>
-              <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+              <Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>
+              <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
             </>
           }
           onClear={() => setCount(0)}
@@ -157,8 +157,8 @@ function InspectorInner() {
           hiddenByFilter={hidden || undefined}
           actions={
             <>
-              <Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>
-              <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+              <Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>
+              <Button variant="tertiary" size="md" startIcon={Trash2} danger>刪除</Button>
             </>
           }
           onClear={() => setSelectionCount(0)}
@@ -196,7 +196,7 @@ export const Accessibility: Story = {
         <H3>鍵盤(預期 consumer 在 page 層級監聽)</H3>
         <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
           <li><kbd>Esc</kbd> → 觸發 <code>onClear()</code>(consumer 在 page-level keydown 監聽)</li>
-          <li>Tab 序:close → count → actions</li>
+          <li>Tab 序:close → actions(count 是純文字 / aria 朗讀對象,非 tab stop)</li>
           <li>Hint CTA 是 <code>{`<button>`}</code>,鍵盤可達</li>
         </ul>
       </section>
@@ -211,8 +211,8 @@ export const Accessibility: Story = {
             selection={['a', 'b', 'c']}
             actions={
               <>
-                <Button variant="tertiary" size="sm" startIcon={Archive}>封存</Button>
-                <Button variant="tertiary" size="sm" startIcon={Trash2} danger disabled>刪除(無權限)</Button>
+                <Button variant="tertiary" size="md" startIcon={Archive}>封存</Button>
+                <Button variant="tertiary" size="md" startIcon={Trash2} danger disabled>刪除(無權限)</Button>
               </>
             }
             onClear={() => {}}

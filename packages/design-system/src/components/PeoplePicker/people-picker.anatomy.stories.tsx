@@ -10,8 +10,8 @@ const meta: Meta = {
 export default meta
 type Story = StoryObj
 
-// Person sample data canonical:對齊 NameCard 預設呈現(name + subtitle + status + statusMessage + fields)
-// avatar.spec.md DS-wide canonical:所有 person avatar hover 必出 NameCard,展示資訊不可精簡
+// Person sample data canonical:對齊 ProfileCard 預設呈現(name + subtitle + status + statusMessage + fields)
+// avatar.spec.md DS-wide canonical:所有 person avatar hover 必出 ProfileCard,展示資訊不可精簡
 const SAMPLE_PEOPLE: PersonData[] = [
   { name: 'Ada Chen', avatarUrl: 'https://i.pravatar.cc/128?img=1', description: 'Engineering｜Taipei｜EMP-2001', status: 'online', statusMessage: '今日 OnCall。', fields: [{ label: 'ID', value: 'ADA001' }, { label: '部門', value: 'Platform' }, { label: '時區', value: 'TST (GMT+8)' }] },
   { name: 'Alice Wang', avatarUrl: 'https://i.pravatar.cc/128?img=5', description: 'Engineering｜Tokyo｜EMP-2002', status: 'busy', statusMessage: '深度工作中,12:00 後可聊。', fields: [{ label: 'ID', value: 'AW002' }, { label: '部門', value: 'Platform' }, { label: '時區', value: 'JST (GMT+9)' }] },
@@ -25,7 +25,7 @@ export const Overview: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Anatomy</H3>
-        <Desc>PeoplePicker 是組合元件——Popover(浮層)+ Command(cmdk 搜尋)+ SelectMenu(選單)+ PersonDisplay(Avatar + Name)。外觀對齊 Select / Combobox,差異在選項前綴有 Avatar 視覺。</Desc>
+        <Desc>PeoplePicker 是組合元件——single mode 包 Select、multi mode 包 Combobox,已選值用 PersonDisplay(Avatar + Name)呈現。浮層搜尋(Popover + cmdk + SelectMenu)是底層 Select / Combobox 內部細節。外觀對齊 Select / Combobox,差異在選項前綴有 Avatar 視覺。</Desc>
         <div className="max-w-md border border-border rounded-lg p-4">
           <PeoplePicker
             people={SAMPLE_PEOPLE}
@@ -65,14 +65,24 @@ export const Overview: Story = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['mode', "'edit' | 'readonly' | 'disabled'", "'edit'", 'Field mode'],
+                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", 'Field mode'],
+                ['variant', "'default' | 'bare' | 'naked'", "'default'", 'Field chrome variant(對齊 Select / Combobox)'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", '對齊 field-height tier'],
                 ['value', 'PersonValue | PersonValue[] | null', '—', '單選 / 多選(類型決定模式)'],
-                ['onChange', '(value: PersonValue[]) => void', '—', '值變更 callback'],
+                ['onChange', '(value: PersonValue[]) => void', '—', '值變更 callback(永遠 emit array)'],
                 ['people', 'PersonValue[]', '[]', '可選人員清單(dropdown 顯示)'],
+                ['placeholder', 'string', "'請選擇人員'", 'trigger 未選值提示'],
                 ['searchPlaceholder', 'string', "'搜尋人員…'", '搜尋框 placeholder'],
-                ['emptyText', 'string', "'沒有符合的人員'", '空結果提示'],
+                ['emptyText', 'string', "'沒有符合的人員'", '搜尋無結果提示'],
+                ['multiDisplay', "'stack' | 'pill'", "'stack'", '多選顯示樣式(stack 疊合 +N / pill 標籤;single 忽略)'],
+                ['pillShowAvatar', 'boolean', 'true', "multiDisplay='pill' 時是否顯示 avatar prefix"],
+                ['pillWrap', 'boolean', 'true', 'pill 模式是否允許換行'],
+                ['searchIn', "'menu' | 'trigger'", "'menu'", '搜尋型態(menu 浮層內 / trigger inline;multi 才有意義)'],
+                ['showDisplayEndIcon', 'boolean', 'false', 'display 模式渲 ChevronDown + naked wrapper(DataTable cell 對齊)'],
+                ['defaultOpen', 'boolean', 'false', 'uncontrolled 初始開啟狀態'],
+                ['onOpenChange', '(open: boolean) => void', '—', 'open 狀態變更 callback'],
                 ['disabled', 'boolean', 'false', '停用'],
+                ['aria-label', 'string', '—', 'a11y 標籤'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -87,21 +97,25 @@ export const Overview: Story = {
 export const Inspector: Story = {
   name: '元件檢閱器',
   parameters: {
-    docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。切 `mode` 看 edit / readonly / disabled 視覺差異,切 `size` 對照 field-height tier。' } },
+    docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。切 `mode` 看 edit / display / readonly / disabled 視覺差異,切 `size` 對照 field-height tier,切 `variant` 看 default / bare / naked chrome 差異。' } },
   },
   args: {
     mode: 'edit',
+    variant: 'default',
     size: 'md',
     disabled: false,
+    showDisplayEndIcon: false,
     value: SAMPLE_PEOPLE[0],
     people: SAMPLE_PEOPLE,
     searchPlaceholder: '搜尋指派對象…',
     emptyText: '沒有符合的人員',
   },
   argTypes: {
-    mode: { control: 'radio', options: ['edit', 'readonly', 'disabled'] },
+    mode: { control: 'radio', options: ['edit', 'display', 'readonly', 'disabled'] },
+    variant: { control: 'radio', options: ['default', 'bare', 'naked'] },
     size: { control: 'radio', options: ['sm', 'md', 'lg'] },
     disabled: { control: 'boolean' },
+    showDisplayEndIcon: { control: 'boolean' },
     searchPlaceholder: { control: 'text' },
     emptyText: { control: 'text' },
   },
@@ -113,13 +127,18 @@ export const Inspector: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: 'Mode 對照',
+  name: '模式對照',
   render: () => (
     <div className="flex flex-col gap-4 max-w-md">
       <div>
         <H3>edit(預設)</H3>
         <Desc>Field 樣式 + 展開觸發 Popover + Command 搜尋。</Desc>
         <PeoplePicker people={SAMPLE_PEOPLE} value={SAMPLE_PEOPLE[0]} onChange={() => {}} />
+      </div>
+      <div>
+        <H3>display</H3>
+        <Desc>裸 PersonDisplay(Avatar + Name),無 field chrome——DataTable cell / detail panel 純顯示。</Desc>
+        <PeoplePicker mode="display" people={SAMPLE_PEOPLE} value={SAMPLE_PEOPLE[0]} />
       </div>
       <div>
         <H3>readonly</H3>
@@ -192,8 +211,8 @@ export const ColorMatrix: Story = {
       <div>
         <H3>Field Control 色彩(對齊 Input / Select 同一套)</H3>
         <Desc>
-          PeoplePicker 的 field 外觀跟 Select / Combobox 完全一致——共用 `fieldWrapperStyles`。差別只在
-          prefix 多出 Avatar 視覺。所有 field-level 色彩對齊 `field-controls.spec.md`。
+          PeoplePicker 的 field 外觀跟 Select / Combobox 完全一致——共用同一套欄位外框樣式。差別只在
+          前方多出 Avatar 視覺。所有欄位層級的色彩都跟其他 Field 控制項用同一套規範。
         </Desc>
         <div className="overflow-x-auto mb-4">
           <table className="text-caption border-collapse">
@@ -221,12 +240,12 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td mono>edit focus(open)</Td>
                 <Td><TokenCell token="--surface" /></Td>
-                <Td><TokenCell token="--ring" display="ring" /></Td>
+                <Td><TokenCell token="--primary" display="primary" /></Td>
                 <Td><TokenCell token="--foreground" /></Td>
               </tr>
               <tr>
                 <Td mono>readonly</Td>
-                <Td><TokenCell token="--muted" display="muted(緊湊底)" /></Td>
+                <Td><TokenCell token="--bg-readonly" display="bg-readonly(鎖定底)" /></Td>
                 <Td>—(no border)</Td>
                 <Td><TokenCell token="--foreground" /></Td>
               </tr>
@@ -316,7 +335,7 @@ export const StateBehavior: Story = {
       <div>
         <H3>空狀態 — no match found</H3>
         <Desc>
-          搜尋無結果時 dropdown 顯示 `emptyText`,走共用 `Empty` primitive。Consumer 可自訂提示語。
+          搜尋無結果時,下拉選單顯示 `emptyText` 的內容,使用全站共用的空狀態元件。可自訂提示語。
         </Desc>
         <PeoplePicker
           people={SAMPLE_PEOPLE}
@@ -330,7 +349,8 @@ export const StateBehavior: Story = {
       <div>
         <H3>空 value(尚未指派)</H3>
         <Desc>
-          value = null 時 field 顯示 placeholder(「指派對象」)而非 Avatar——暗示可點擊新增。
+          value = null 時 trigger 顯示預設 placeholder(「請選擇人員」)而非 Avatar——暗示可點擊新增。
+          本例只傳 `searchPlaceholder="指派對象…"`(搜尋框 placeholder,展開後才出現在浮層搜尋輸入框內)。
         </Desc>
         <PeoplePicker
           people={SAMPLE_PEOPLE}
@@ -401,7 +421,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `people-picker.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus trigger\n- Enter / Space — 開啟 picker\n- 字母鍵 — type-ahead 搜尋\n- ↑/↓ — 導覽 people\n- Enter — 選擇 / 取消選擇\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — 聚焦到觸發按鈕\n- Enter / Space — 開啟選擇器\n- 字母鍵 — 邊打字邊搜尋\n- ↑/↓ — 在人員清單上下移動\n- Enter — 選擇 / 取消選擇\n\n  Focus  :聚焦框跟整套設計系統一致(底層 Select/Combobox Field wrapper 的 1px `focus-within:!border-primary` 邊框 var(--primary));焦點管理由元件自行處理。\n\n  驗證  :Storybook 無障礙檢查面板應 0 個嚴重問題;不靠滑鼠也能完整操作。文字對比 ≥ 4.5:1、介面元素對比 ≥ 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

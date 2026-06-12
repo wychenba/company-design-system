@@ -53,19 +53,19 @@ export const UsageGuidance: Story = {
       <p>適合 DescriptionList 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/DescriptionList/展示" name="User profile"><span className="text-primary hover:underline font-medium cursor-pointer">User profile</span></LinkTo>
+          <LinkTo kind="Design System/Components/DescriptionList/展示" name="使用者個資"><span className="text-primary hover:underline font-medium cursor-pointer">使用者個資</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DescriptionList/展示" name="Product spec"><span className="text-primary hover:underline font-medium cursor-pointer">Product spec</span></LinkTo>
+          <LinkTo kind="Design System/Components/DescriptionList/展示" name="產品規格"><span className="text-primary hover:underline font-medium cursor-pointer">產品規格</span></LinkTo>
         </li>
         <li>
           <LinkTo kind="Design System/Components/DescriptionList/展示" name="訂單明細"><span className="text-primary hover:underline font-medium cursor-pointer">訂單明細</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DescriptionList/展示" name="Detail panel"><span className="text-primary hover:underline font-medium cursor-pointer">Detail panel</span></LinkTo>
+          <LinkTo kind="Design System/Components/DescriptionList/展示" name="詳情面板"><span className="text-primary hover:underline font-medium cursor-pointer">詳情面板</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DescriptionList/展示" name="Horizontal"><span className="text-primary hover:underline font-medium cursor-pointer">Horizontal</span></LinkTo>
+          <LinkTo kind="Design System/Components/DescriptionList/展示" name="水平佈局"><span className="text-primary hover:underline font-medium cursor-pointer">水平佈局</span></LinkTo>
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
@@ -145,7 +145,7 @@ export const LayoutRule: Story = {
     <div>
       <Rule
         title="cols=1(vertical stack)— 長清單、窄容器、mobile-friendly"
-        note="label 在上、value 在下的垂直堆疊 → 適合 sidebar、NameCard、mobile detail view。Value 可以佔滿整行寬,長文字不壓迫"
+        note="label 在上、value 在下的垂直堆疊 → 適合 sidebar、ProfileCard、mobile detail view。Value 可以佔滿整行寬,長文字不壓迫"
       >
         <Frame className="max-w-xs">
           <DescriptionList cols={1}>
@@ -197,7 +197,7 @@ export const LabelAlignmentRule: Story = {
     <div>
       <Rule
         title="本系統採 stacked(label 在上、value 在下)— label 左對齊"
-        note="對齊 Atlassian / Shopify Polaris / Stripe 慣例——label 與 value 垂直堆疊,兩者都左對齊。閱讀節奏由上往下、由左往右,不需視線左右跳動。這是本系統固定結構,無 `horizontal align` 等 prop 可改"
+        note="對齊 Atlassian / Shopify Polaris / Stripe 慣例——label 與 value 垂直堆疊,兩者都左對齊。閱讀節奏由上往下、由左往右,不需視線左右跳動。這是 vertical(預設)模式的結構;label 左 / value 右的 metadata 列改用既有 `direction=&quot;horizontal&quot;` prop(見 spec「Direction」段)"
       >
         <Frame className="max-w-md">
           <DescriptionList cols={2}>
@@ -225,7 +225,7 @@ export const LabelAlignmentRule: Story = {
 
       <Rule
         title="❌ 不要自己用 flex 改 horizontal layout"
-        note="若試圖改 DescriptionList 為 label 左 / value 右對齊 → 破壞 HTML 語義(dt 和 dd 不再視覺上緊密配對),且在多欄配置下 grid 對齊會錯亂。有此需求 → 改用 Field 系統或自訂 layout"
+        note="手刻 flex 模擬 label 左 / value 右 → 失去 dl/dt/dd 語意,且多欄配置下 grid 對齊錯亂。有此需求 → 用既有 `direction=&quot;horizontal&quot;` prop(dl/dt/dd 語意完整保留,見 showcase「水平佈局」story),不要自組 layout"
       >
         <Frame className="max-w-md">
           <div className="flex justify-between py-1">
@@ -246,7 +246,7 @@ export const LabelAlignmentRule: Story = {
 }
 
 export const NoInteractionRule: Story = {
-  name: '唯讀 — 不放互動元件 / 不做表格',
+  name: '唯讀:不放互動元件',
   render: () => (
     <div>
       <Rule
@@ -303,21 +303,7 @@ export const NoInteractionRule: Story = {
           ↑ dd 內放 Button 破壞「唯讀屬性」語義 → 改用 Field(read-only mode + inline edit)
         </Label>
       </Rule>
-
-      <Rule
-        title="❌ 把 DescriptionList 當表格(多 row 同結構)"
-        note="重複的 label 是反模式 — 視覺上也會讀起來像清單而不是屬性。多筆同結構資料 → DataTable"
-      >
-        <Frame className="max-w-md">
-          <DescriptionList cols={2}>
-            <DescriptionItem label="姓名">Ada Chen</DescriptionItem>
-            <DescriptionItem label="Email">ada.chen@example.com</DescriptionItem>
-            <DescriptionItem label="姓名">王小明</DescriptionItem>
-            <DescriptionItem label="Email">ming@example.com</DescriptionItem>
-          </DescriptionList>
-        </Frame>
-        <Label warn>↑ 「姓名 / Email」重複 → 多筆同結構應用 DataTable</Label>
-      </Rule>
+      {/* 「多筆同結構 → DataTable」的 ❌ 對照由「使用指引」story(vs DataTable 段)擁有,不在此重複 */}
     </div>
   ),
 }

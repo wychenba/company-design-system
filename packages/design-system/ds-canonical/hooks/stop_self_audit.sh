@@ -74,6 +74,31 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
   fi
 fi
 
+# ── Mechanism 7: Completeness-claim without DS-wide scan gate(2026-06-03 user-authorized)──
+# Why: 重複 failure mode — AI 在「剛做完那件事」邊界就宣告「全做完/全部完成」,沒先跑 M10
+#   「改一處看三處」全庫 stale-ref 掃描 → user 問「真的做完?」才補掃出 loose end(CF model 漏 3 ref
+#   / iceberg 等)。觸發器該是「我要宣告全做完」自己,不是 user pushback。
+#   per self-verify.md Pre-final + meta-patterns M10 + mindset #6「tell me once」。
+if [ "${LAST_USER_LINE:-0}" -gt 0 ] && [ -n "$LAST_ASSISTANT" ]; then
+  COMPLETION_CLAIM_RE='(全做完|全部做完|都做完了|全部完成|所有任務.{0,6}(做完|完成)|100%.{0,4}完整|真的.{0,4}做完|全做到完)'
+  # 否定/免責排除(對齊 Mechanism 1 RETRACT_RE 精神,2026-06-03 修 M7 自身 false-positive):
+  # 宣告含「還沒說全做完」「沒資格說全做完」「核心做完…待跑」「等 X 才全做完/落地」等 disclaimer = 非完成宣告 → 不 fire。
+  COMPLETION_NEG_RE='(還沒.{0,6}(說|宣告|算|到)|沒.{0,3}(說|算|資格).{0,8}(全做完|完整)|未.{0,3}全做完|不(敢|算|是|該).{0,6}全做完|核心做完|完整性(掃描)?待|待.{0,4}(跑|落地|驗)|等.{0,18}(才|再).{0,8}(全做完|完整|落地|上架)|尚未.{0,4}完成)'
+  if echo "$LAST_ASSISTANT" | grep -qE "$COMPLETION_CLAIM_RE" && ! echo "$LAST_ASSISTANT" | grep -qE "$COMPLETION_NEG_RE"; then
+    THIS_TURN_FULL=$(tail -n +$((LAST_USER_LINE+1)) "$TRANSCRIPT_PATH" 2>/dev/null)
+    EDIT_COUNT=$(echo "$THIS_TURN_FULL" | grep -oE '"name":"(Edit|Write|MultiEdit)"' | wc -l | tr -d ' ')
+    HAS_COMMIT=$(echo "$THIS_TURN_FULL" | grep -cE 'git commit|git merge --ff')
+    if [ "${EDIT_COUNT:-0}" -ge 2 ] || [ "${HAS_COMMIT:-0}" -gt 0 ]; then
+      # 全庫掃描證據:grep -r/-rn / rg 跨目錄掃 stale ref,OR claim-verify 表 marker
+      SCAN_RE='(grep -[a-zA-Z]*r|rg -|claim-verify|完整性掃描|改一處看三處|stale.?ref|DS-wide|全庫掃)'
+      if ! echo "$THIS_TURN_FULL" | grep -qiE "$SCAN_RE"; then
+        WARNINGS="${WARNINGS}\n  • 🚨 完整性宣告閘:你宣告「全做完/全部完成」+ 本 turn 實質改動,但無「全庫掃描」證據(無 grep -r/rg 掃 stale ref、無 claim-verify 表)。per self-verify.md Pre-final + M10「改一處看三處」:宣告全做完前必先自己跑 DS-wide stale-ref 掃描 + claim-verify,不等 user 問第二次。"
+        CRITICAL_COMPLETENESS=1
+      fi
+    fi
+  fi
+fi
+
 # ── Mechanism 2: Auto-prune trigger ─────────────────────────────────────────
 if [ -f CLAUDE.md ]; then
   L=$(wc -l < CLAUDE.md | tr -d ' ')
@@ -166,13 +191,13 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ] && [ "$LAST_USER_LINE"
     # ── Sub-check M31 Phase-A-first(2026-05-29 codify per user「codex 只是 second opinion」)──
     # 偵測:本 turn 讀 codex reply 但無 prior Claude-solo audit trace(Agent/Explore dispatch OR ≥5 Grep/Read)
     # → codex 被當 primary 而非 second opinion = 違反 M31 dual-track「Claude 必先自己 Phase A」
-    # SSOT: memory/feedback_codex_collab_2026_05_23_directives.md(Sub-rule 3C/3D)
+    # SSOT: memory/feedback_codex_dual_track_synthesizer.md(Sub-rule 3C/3D)
     M31_PRIOR_AUDIT=$(echo "$THIS_TURN_FULL" | grep -cE '"(Agent|Task)"|subagent_type|Explore' 2>/dev/null)
     M31_PRIOR_AUDIT=${M31_PRIOR_AUDIT:-0}
     M31_GREP_READ=$(echo "$THIS_TURN_FULL" | grep -cE '"name":"(Grep|Read)"' 2>/dev/null)
     M31_GREP_READ=${M31_GREP_READ:-0}
     if [ "$M31_PRIOR_AUDIT" -eq 0 ] && [ "$M31_GREP_READ" -lt 5 ]; then
-      WARNINGS="${WARNINGS}\n  • M31 Phase-A-first risk:本 turn 啟 codex 但無 Claude-solo audit trace(Explore/Agent dispatch OR ≥5 Grep/Read)。codex = second opinion,Claude 必先自己跑完整 Phase A 深度 audit 才 defer codex(跑幾個 script ≠ Phase A)。per memory/feedback_codex_collab_2026_05_23_directives.md(Sub-rule 3C/3D)。Anchor 2026-05-29:run test+tsc 就 launch codex 跳過自己 audit,漏 3 個只有 Claude 抓到的 P0。"
+      WARNINGS="${WARNINGS}\n  • M31 Phase-A-first risk:本 turn 啟 codex 但無 Claude-solo audit trace(Explore/Agent dispatch OR ≥5 Grep/Read)。codex = second opinion,Claude 必先自己跑完整 Phase A 深度 audit 才 defer codex(跑幾個 script ≠ Phase A)。per memory/feedback_codex_dual_track_synthesizer.md(Sub-rule 3C/3D)。Anchor 2026-05-29:run test+tsc 就 launch codex 跳過自己 audit,漏 3 個只有 Claude 抓到的 P0。"
     fi
 
     # ── Sub-check: 設計決策 implementation 沒 user approval(2026-05-09 user-authorized)──
@@ -467,6 +492,22 @@ if [ "${CRITICAL_CODEX_TRANSPORT:-0}" = "1" ] && [ -n "$LAST_ASSISTANT" ]; then
     REASON=$(printf '%s' \
       "🚨 CODEX-TRANSPORT-DISCOVERY BLOCKER(M5):本 turn 含 codex collab 意圖但無 \`node_modules/.bin/codex\` discovery cmd trace。SKILL.md Step 0.4 強制 3-test discovery(local CLI / global / auth.json)在啟 codex 前。立刻 (a) 跑 \`ls -la node_modules/.bin/codex && node_modules/.bin/codex --version\` 確認 local CLI,OR (b) 明寫「撤回 codex / 改用 cloud / Explore 替身」+ 解釋為何不走 local。否則 turn 不結束。" \
       "本機制 = 防 2026-05-17 失憶 anti-pattern(嘗試 sudo install / 繞 M28 開 PR / Explore 替身),user-authorized markdown SKILL.md L42-58 升 mechanical BLOCKER。")
+    printf '{"decision":"block","reason":%s}\n' "$(printf '%s' "$REASON" | jq -Rs .)"
+    exit 0
+  fi
+fi
+
+# ── BLOCKER for Mechanism 7 completeness-claim-without-scan(2026-06-03 user-authorized)──
+if [ "${CRITICAL_COMPLETENESS:-0}" = "1" ] && [ -n "$LAST_ASSISTANT" ]; then
+  COMPLETE_HASH=$(echo "$LAST_ASSISTANT" | tail -c 200 | shasum -a 256 | cut -c1-16)
+  LAST_BLOCKED_COMPLETE_FILE="$PROJECT_DIR/.claude/logs/.last-blocked-completeness.txt"
+  LAST_BLOCKED_COMPLETE=""
+  [ -f "$LAST_BLOCKED_COMPLETE_FILE" ] && LAST_BLOCKED_COMPLETE=$(cat "$LAST_BLOCKED_COMPLETE_FILE" 2>/dev/null || echo "")
+  if [ "$COMPLETE_HASH" != "$LAST_BLOCKED_COMPLETE" ]; then
+    echo "$COMPLETE_HASH" > "$LAST_BLOCKED_COMPLETE_FILE" 2>/dev/null || true
+    REASON=$(printf '%s' \
+      "🚨 COMPLETENESS-CLAIM-WITHOUT-SCAN BLOCKER(M7,2026-06-03 user-authorized):你宣告「全做完/全部完成」+ 本 turn 實質多檔改動,但無「全庫掃描」證據。per self-verify.md Pre-final + M10「改一處看三處」+ mindset #6:宣告全做完前必先自己跑 (1) DS-wide stale-ref grep(對你改的東西掃連帶 reference)(2) claim-verify 表(每『done』對應證據)。立刻補跑 OR 把『全做完』改成『核心做完,完整性掃描待跑』。否則 turn 不結束。" \
+      "本機制起因:重複 failure — user 每次問『真的全做完?』我才補掃出 loose end(CF model 漏 3 ref / iceberg)。觸發器改成『宣告完成』本身,非 user pushback。")
     printf '{"decision":"block","reason":%s}\n' "$(printf '%s' "$REASON" | jq -Rs .)"
     exit 0
   fi

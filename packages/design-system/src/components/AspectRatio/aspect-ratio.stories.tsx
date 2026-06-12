@@ -50,7 +50,7 @@ export const HeroBanner16x9: Story = {
 }
 
 export const ProductPhoto4x3: Story = {
-  name: '4/3 產品照片 + CLS 對照',
+  name: '4/3 產品照片 + 防版面跳動對照',
   render: () => (
     <div className="flex flex-col gap-8 max-w-[900px]">
       <div>

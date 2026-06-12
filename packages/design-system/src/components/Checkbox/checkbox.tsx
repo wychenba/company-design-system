@@ -6,8 +6,10 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 import type { FieldMode, FieldVariant } from "@/design-system/components/Field/field-types"
-import { useFieldContext } from "@/design-system/components/Field/field-context"
+import { useFieldContext, useResolvedFieldDisabled, useResolvedFieldMode } from "@/design-system/components/Field/field-context"
 import { SelectionItem } from "@/design-system/components/SelectionControl/selection-item"
+import type { LucideIcon } from "lucide-react"
+import type { AvatarData } from "@/design-system/components/Avatar/avatar"
 import { CheckboxGroupContext } from "./checkbox-group"
 
 // ── Variants ────────────────────────────────────────────────────────────────
@@ -87,6 +89,10 @@ export interface CheckboxProps
    * 在 <Field> context 內時此 prop 會被忽略（由 FieldDescription 接管）。
    */
   description?: React.ReactNode
+  /** 可選左側 icon(label 前)— 2026-06-12 M30 修:轉發 SelectionItem 既有 canonical 槽(selection-item.tsx jsDoc 為 SSOT;與 avatar 互斥)*/
+  icon?: LucideIcon
+  /** 可選左側 avatar(label 前)— 同上,SelectionItem 槽轉發 */
+  avatar?: AvatarData
   /**
    * readonly 模式：鎖定互動但維持 checked/unchecked 視覺正確。
    * 與 disabled 的差異：readonly 不降色（可讀），disabled 降色（弱化）。
@@ -120,6 +126,8 @@ const Checkbox = React.forwardRef<
       className,
       size,
       label,
+      icon,
+      avatar,
       description,
       readOnly = false,
       disabled,
@@ -135,18 +143,9 @@ const Checkbox = React.forwardRef<
     const iconPx = checkIconSize[sizeKey]
     const iconStrokeWidth = checkStrokeWidth[sizeKey]
 
-    // ── mode='display' ─────────────────────────────────────────────────────
-    // 純展示模式:無互動 primitive、無 input variant,渲染 ✓ / —。
-    // 取代既有 BooleanDisplay(2026-05-05 Phase B3 retire)— 該 helper 已併入 Checkbox。
-    // 顯示規則:checked=true → ✓(foreground);其他(false / null / undefined / indeterminate)→ —(fg-muted)
-    if (mode === 'display') {
-      const isChecked = props.checked === true
-      return isChecked
-        ? <span className="text-foreground">✓</span>
-        : <span className="text-fg-muted">—</span>
-    }
-
     // Field context:Checkbox 單獨塞進 Field(binary toggle)時,忽略自己的 label 讓 FieldLabel 接管
+    // 2026-05-31 #35:hooks(useFieldContext / useContext / useId)必在任何 conditional return 前呼叫(Rules of Hooks)。
+    // 原 mode='display' early return 寫在 hooks 之上 → runtime 切 mode 會 hook count 不一致 crash;已下移至 hooks 後。
     //
     // **例外**:Checkbox 是 CheckboxGroup 的 child 時(multi-select 情境),**每個 checkbox
     // 的 label 是它自己的選項名**,FieldLabel 只是群組名稱 — 此時 label **必須保留**,
@@ -173,14 +172,28 @@ const Checkbox = React.forwardRef<
     const generatedId = React.useId()
     const inputId = idProp ?? (insideGroup ? generatedId : (fieldCtx?.id ?? generatedId))
 
+    // 2026-06-08 SSOT cascade:disabled + mode 經 resolver hook(原 raw prop → <Field disabled>/<Field mode="display"> 漏 cascade)
+    const resolvedDisabled = useResolvedFieldDisabled(disabled)
+    const resolvedMode = useResolvedFieldMode({ mode, disabled, readOnly })
+    const effectiveReadOnly = readOnly || resolvedMode === 'readonly'
+
+    // ── mode='display'(下移至所有 hooks 之後,per #35 Rules of Hooks)──────────
+    // 純展示模式:無互動 primitive、渲染 ✓ / —(checked=true → ✓ / 其他 → —)。取代 BooleanDisplay。
+    if (resolvedMode === 'display') {
+      const isChecked = props.checked === true
+      return isChecked
+        ? <span className="text-foreground">✓</span>
+        : <span className="text-fg-muted">—</span>
+    }
+
     const rootEl = (
       <CheckboxPrimitive.Root
         id={inputId}
         ref={ref}
-        disabled={disabled}
-        aria-readonly={readOnly || undefined}
-        data-readonly={readOnly || undefined}
-        tabIndex={readOnly ? -1 : undefined}
+        disabled={resolvedDisabled}
+        aria-readonly={effectiveReadOnly || undefined}
+        data-readonly={effectiveReadOnly || undefined}
+        tabIndex={effectiveReadOnly ? -1 : undefined}
         aria-describedby={fieldCtx?.descriptionId}
         className={cn(checkboxVariants({ size }), className)}
         {...props}
@@ -203,8 +216,10 @@ const Checkbox = React.forwardRef<
         control={rootEl}
         label={effectiveLabel}
         description={effectiveDescription}
+        icon={icon}
+        avatar={avatar}
         htmlFor={inputId}
-        disabled={disabled}
+        disabled={resolvedDisabled}
         size={sizeKey}
       />
     )
@@ -216,16 +231,17 @@ Checkbox.displayName = CheckboxPrimitive.Root.displayName
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const checkboxMeta = {
   component: 'Checkbox',
-  family: 4,
+  family: null, // self-contained primitive(對齊 spec frontmatter self-contained + body L31;非 Family 4)
   variants: {
 
   },
   sizes: {
-    sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
-    md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
-    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },
+    // 2026-06-10 修 stale meta:iconSize 對齊 checkIconSize 真值(L49 sm/md=12, lg=16;deep-audit A.1b 抓 metadata drift)
+    sm: { fieldHeight: 28, iconSize: 12, typography: 'body' },
+    md: { fieldHeight: 32, iconSize: 12, typography: 'body' },
+    lg: { fieldHeight: 36, iconSize: 16, typography: 'body' },
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default', 'hover', 'focus-visible', 'disabled'],
   tokens: {
     bg: ['bg-disabled', 'bg-primary', 'bg-primary-hover', 'bg-surface'],
     fg: ['text-fg-disabled', 'text-fg-secondary', 'text-foreground'],

@@ -15,7 +15,7 @@ description: Pixel-level visual audit for design-system components based on user
 - **Carousel** prev/next 箭頭覆蓋 content
 - **Rating** 星星有多餘邊框
 - **Image viewer** 滾輪縮放跳大步(對標 Figma 該每 notch ~1.1×)
-- **Button 群 gap** 被 hover bg overflow 吃掉(CLAUDE.md 有「同 flex 列互動 slot 幾何鐵律」但缺視覺 audit gate 鎖住)
+- **Button 群 gap** 被 hover bg overflow 吃掉(.claude/references/ui-dev-rules.md 有「同 flex 列互動 slot 幾何鐵律」但缺視覺 audit gate 鎖住)
 - **FileViewer 工具列** dark mode 切換後對比跑掉
 - **FileUpload / FileItem** 沒 fill container
 
@@ -84,7 +84,7 @@ description: Pixel-level visual audit for design-system components based on user
 |---|------|---------|
 | 1 | **4 邊邊距對稱** | 容器 top / right / bottom / left padding 實測值相等(除明文 asymmetric spec 外) |
 | 2 | **垂直對稱(to-top ↔ to-bottom)** | 最外層 element 到容器頂 = 最內層 element 到容器底(DatePicker 箭頭 vs 最後排日期) |
-| 3 | **水平 gap 實際值 == gap token 宣告值** | hover bg / ring / focus outline 不可溢出 box 吃掉宣告 gap(CLAUDE.md「同 flex 列互動 slot 幾何鐵律」) |
+| 3 | **水平 gap 實際值 == gap token 宣告值** | hover bg / ring / focus outline 不可溢出 box 吃掉宣告 gap(.claude/references/ui-dev-rules.md「同 flex 列互動 slot 幾何鐵律」) |
 | 4 | **Overlay 定位(badge / popover / hover-card)** | anchor-offset / side-offset 對稱;不覆蓋 anchor 內容 |
 | 5 | **Typography baseline 對齊** | icon 與同行 text 的 baseline 對齊(非 geometric center 誤植) |
 | 6 | **Icon ↔ text gap 一致** | 同類型 row 裡所有 icon-to-text 距離相等 |
@@ -240,6 +240,6 @@ FAIL 項摘要:
 - `.claude/skills/design-system-audit/SKILL.md` — 全 dim code/spec audit(per design-system-audit SSOT);本 skill 是其 pixel-level 補位
 - `.claude/skills/product-ui-audit/SKILL.md` — consumer UI 對 DS 消費 audit(code 層),不處理視覺
 - `.claude/skills/component-quality-gate/SKILL.md` — 元件合入 DS 前的 45 項 checklist;Ship phase 可 chain 本 skill
-- CLAUDE.md `# 同 flex 列的互動 slot 幾何鐵律` — 本 skill checklist #3 的主要 canonical 來源
+- .claude/references/ui-dev-rules.md `# 同 flex 列的互動 slot 幾何鐵律` — 本 skill checklist #3 的主要 canonical 來源
 - `.claude/rules/ui-development.md`「建立 UI 前必讀」 → layout primitive / token spec 清單 — 本 skill「合格標準」的對照錨
 - `memory/project_pending_tasks`「視覺 regression 基建」條目 — 長期 tech debt(Chromatic / screenshot-diff)

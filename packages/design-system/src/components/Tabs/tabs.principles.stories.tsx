@@ -51,13 +51,13 @@ export const UsageGuidance: Story = {
           <p>適合 Tabs 的真實業務場景(點擊跳轉「展示」頁範例):</p>
           <ul className="space-y-1">
             <li>
-              <LinkTo kind="Design System/Components/Tabs/展示" name="With Suffix"><span className="text-primary hover:underline font-medium cursor-pointer">With Suffix</span></LinkTo>
+              <LinkTo kind="Design System/Components/Tabs/展示" name="帶後綴"><span className="text-primary hover:underline font-medium cursor-pointer">帶後綴</span></LinkTo>
             </li>
             <li>
-              <LinkTo kind="Design System/Components/Tabs/展示" name="Overflow Scroll"><span className="text-primary hover:underline font-medium cursor-pointer">Overflow Scroll</span></LinkTo>
+              <LinkTo kind="Design System/Components/Tabs/展示" name="溢出處理 — 水平捲動"><span className="text-primary hover:underline font-medium cursor-pointer">溢出處理 — 水平捲動</span></LinkTo>
             </li>
             <li>
-              <LinkTo kind="Design System/Components/Tabs/展示" name="Overflow Menu"><span className="text-primary hover:underline font-medium cursor-pointer">Overflow Menu</span></LinkTo>
+              <LinkTo kind="Design System/Components/Tabs/展示" name="溢出處理 — ⌄ 導覽選單"><span className="text-primary hover:underline font-medium cursor-pointer">溢出處理 — 收進選單</span></LinkTo>
             </li>
           </ul>
           <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方「vs 近親」)。</p>
@@ -82,7 +82,7 @@ export const UsageGuidance: Story = {
           note="Tabs label 長度天然不均(「總覽」2 字 vs「成員管理與權限設定」8 字),強制等分會視覺失衡。需要等分選項改用 SegmentedControl"
         >
           <div className="w-full">
-            <SegmentedControl defaultValue="a" fullWidth>
+            <SegmentedControl defaultValue="day" fullWidth>
               <SegmentedControlItem value="day">日</SegmentedControlItem>
               <SegmentedControlItem value="week">週</SegmentedControlItem>
               <SegmentedControlItem value="month">月</SegmentedControlItem>
@@ -178,7 +178,7 @@ export const UsageGuidance: Story = {
 // ── Size ─────────────────────────────────────────────────────────────────────
 
 export const SizeSelection: Story = {
-  name: 'Size 選擇',
+  name: '尺寸選擇',
   render: () => (
     <div>
       <Rule

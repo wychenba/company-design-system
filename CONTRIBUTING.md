@@ -15,34 +15,31 @@
 Roadmap Phase 5+6 完成後,team monorepo `product-workspace` 走 PR + CODEOWNERS 路徑。DS repo
 本身仍是 solo workflow(owner = 1 人,team 只 consume)。
 
-## Release(per Phase 4)
+## Release(手動 bump + tag + GitHub Releases auto-notes)
 
-每個 PR 動 `packages/*` substantive code → 必加 changeset:
-
-```bash
-npx changeset
-# interactive:選 package + bump type + summary
-# 產生 .changeset/<random>.md
-```
-
-CI fail if missing changeset(blocked merge)。
+Release 走**手動 bump beta + tag push**,changelog 由 GitHub Releases auto-notes 自動生成(`release.yml` 配 `generate_release_notes: true`)。無 changeset 流程(stale changesets 已於 2026-05-29 清除,per commit `0146e02f`)。
 
 ### Release flow
 
-1. Author PR + add changeset
-2. Merge to `main`(solo era:直接 merge / team era:CODEOWNERS approve 後 merge)
-3. `changeset-bot` 自動開「Version Packages」PR — aggregate 累積 changesets → bump versions + 寫 CHANGELOG
-4. Merge bot PR → CI tag-push → `.github/workflows/release.yml` 跑:audit gates → build → publish npm → GitHub Release
+1. SSOT-affecting code merge 到 `main`(solo workflow:user 拍板才 merge,no PR)
+2. **手動 bump version**:`packages/design-system` + `packages/storybook-config` 兩 package 同步 bump `0.1.0-beta.<N>`(lockstep),commit `chore(release): bump beta.<N> — <摘要>`
+3. **Tag push** 觸發 release:
 
-### Pre-release(beta/next dist-tag)
+   ```bash
+   git tag v0.1.0-beta.<N>
+   git push origin v0.1.0-beta.<N>
+   ```
+
+4. `.github/workflows/release.yml`(`push: tags: v*`)自動跑:audit gates → build → publish npm(`-beta` suffix → `@beta` dist-tag + auto-repoint `latest`)→ `softprops/action-gh-release@v2`(`generate_release_notes: true`)開 GitHub Release(commit log auto-notes)
+
+### Consumer install
 
 ```bash
-git tag v0.1.0-beta.1
-git push origin v0.1.0-beta.1
-# CI 自動 detect `-beta` suffix → publish to `@beta` dist-tag(consumer:`npm install @qijenchen/design-system@beta`)
+npm install @qijenchen/design-system@beta
+# 裸 npm i 也拿最新 beta(release.yml 自動把 latest dist-tag 重指當前 @beta)
 ```
 
-對齊 Vercel `pkg.pr.new` pre-release model — instant publish,easy rollback。
+對齊 GitHub Releases auto-generated notes + Vercel `pkg.pr.new` pre-release model(instant publish,easy rollback)。
 
 ## Quality gates(merge blocker)
 
@@ -85,7 +82,7 @@ Breaking API change 前 N 個 minor 版本:console.warn 提示 + docs migration 
 
 ## World-class refs
 
-- changesets/changesets GitHub repo
+- GitHub Releases auto-generated release notes(`softprops/action-gh-release`)
 - Vercel pkg.pr.new pre-release
 - Material UI semver discipline
 - Storybook 8.0 codemod

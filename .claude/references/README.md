@@ -4,19 +4,22 @@
 
 Agent 在執行時按需讀的深度 reference 檔 — audit protocol / FP 記憶 / workflow recipe / lookup tables。**不是 product design canonical**(那該進 spec.md / CLAUDE.md)。
 
-## 當前居民(15 檔,2026-05-18 update)
+## 當前居民(17 檔,2026-05-30 update)
 
 | Ref | 用途 |
 |-----|------|
 | `audit-coverage-vs-24-checklist.md` | 業界 24-checklist 對照 + 為何不平行 audit 24 dim rationale |
 | `build-ui-canonicals.md` | 建 UI 前 12 情境 + 8 layout primitive lookup |
+| `composition-fidelity.md` | Composition fidelity SSOT — consumer 用對 DS(conformance)為主,靜態 lint 驗(對齊 Polaris/Atlassian/Carbon);pixel/DOM identity diff 改 opt-in(2026-06-02 model 修正,非追求 product-vs-showcase 一致) |
 | `cva-patterns.md` | cva 適用 / 不適用 + 例外清單(跟 CLAUDE.md shadcn 規範互補) |
 | `drag-canonical.md` | 世界級 drag impl 對照 + dnd-kit collision strategy + Phase 1/2 fix plan |
 | `item-anatomy-recipe.md` | 7 步建立新 row primitive workflow + audit grep guard |
 | `naming-conventions.md` | 命名詳表 + 禁止清單(CLAUDE.md # 命名一致性 pointer) |
 | `principle-dim-map.json` | M-rule / trait / hook → audit dim explicit mapping(SSOT for dim coverage) |
 | `props-naming.md` | Props callback / Badge / icon canonical 詳表 |
+| `scenario-definition.md` | Monorepo 2-Scenario architecture SSOT(Scenario A direct fork DS / Scenario B fork template + mirror chain + verify checkpoints)|
 | `spec-rules.md` | SSOT 機制 / 邊界案例 scope default 詳展 |
+| `story-baseline-registry.json` | Anti-drift registry — stories wrap 既有 primitive 的 machine-readable canonical archetype(hook `check_story_invariants.sh R8` 讀)|
 | `ssot-consultation.md` | SSOT 消費完整對照表 |
 | `ssot-index.md` | High-risk interface ownership map(propose 前 grep 找 owner) |
 | `structural-token-retention.md` | 6 類結構性保留 token canonical(audit Dim 48 triple-verify) |

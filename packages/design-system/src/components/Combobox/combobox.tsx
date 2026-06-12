@@ -1,12 +1,12 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // @renderer-symmetry-allow: ComboboxTagStack(display path)接 consumer tagRenderer 是 Stream C 下 cycle 工作 — 2026-05-12 先 ship Issues 2/3/4 surgical fixes(placeholder vocabulary + cell surface metrics + placeholder truncate),tagRenderer display-path unify deferred per field-controls.spec.md 共享 contract a。當前 multi=1 顯示已透過 PeoplePicker tagRenderer 線 314 PersonDisplay SSOT 對齊;其他 Combobox consumer 走 default `<Tag>` 純文字 backward-compat。
-// code-quality-allow: file-size — Combobox 含 NativeCombobox/CustomCombobox/useOverflowCount/OverflowTagList/ComboboxTagStack 5 子元件 + 共用 helpers,split-into-files 會破壞 measurement closures + 重複 type definitions。當前 751 lines 在 800 hard cap 內。
+// code-quality-allow: file-size — Combobox 含 NativeCombobox/CustomCombobox/useOverflowCount/OverflowTagList/ComboboxTagStack 5 子元件 + 共用 helpers,split-into-files 會破壞 measurement closures + 重複 type definitions。
 import * as React from 'react'
 import { X, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign, fieldDisplayTextClass } from '@/design-system/components/Field/field-wrapper'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant, useResolvedFieldInvalid } from '@/design-system/components/Field/field-context'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
@@ -304,7 +304,7 @@ function OverflowTagList({ containerRef, items, size, wrap, renderTag, renderHid
           {hiddenItems.map(item => (
             renderHiddenTag
               ? <React.Fragment key={item.value}>{renderHiddenTag(item)}</React.Fragment>
-              : <Tag key={item.value} size="sm" onDismiss={onRemove ? () => onRemove(item.value) : undefined}>
+              : <Tag key={item.value} size="sm" onRemove={onRemove ? () => onRemove(item.value) : undefined}>
                   {item.label}
                 </Tag>
           ))}
@@ -400,7 +400,7 @@ export interface ComboboxProps {
    * Selected tag pill 客製 render(2026-05-07 v15.5)。
    *
    * 設了 → 每個 selected tag pill 走 consumer 提供的 ReactNode(收 item={value, label}
-   * + onRemove,consumer 自己組 onDismiss);沒設 → 走預設 `<Tag>` text-only pill。
+   * + onRemove,consumer 自己組 onRemove);沒設 → 走預設 `<Tag>` text-only pill。
    *
    * 用例:PeoplePicker(multi)用此 slot 把 selected tag 換成 avatar + name pill,而非
    * 純文字 Tag。對齊 PeoplePicker = Combobox wrapper SSOT。
@@ -414,12 +414,15 @@ export interface ComboboxProps {
    */
   renderHiddenTag?: (item: { value: string; label: string }) => React.ReactNode
   /**
+   * @internal PeoplePicker stack wrapper 內部協議 — end-user 勿用(measurement-layer hook)。
+   *
    * Optional class merged into each tag's outer measurement wrapper (2026-05-07 v15.13)。
    * Stack avatar 模式用此 hook point 達成 sibling-level overlap (`-ml-0.5`) + group selector
    * (`group/avatar`)— 既保留 Combobox 必要 measurement wrapper,又讓 dismiss/overlap 視覺生效。
    */
   tagWrapperClassName?: string
-  /** 2026-05-16:overflow chip wrapper 套此 class(對齊 tagWrapperClassName)。Stack 模式
+  /** @internal PeoplePicker stack wrapper 內部協議 — end-user 勿用(measurement-layer hook)。
+   *  2026-05-16:overflow chip wrapper 套此 class(對齊 tagWrapperClassName)。Stack 模式
    *  pass `-ml-0.5 first:ml-0` 讓 chip 跟 avatar 同 overlap step,物理上 chip = 1 個 slot 不
    *  外加 24px。Default undefined = chip 不 overlap(text-tag mode 等)。*/
   overflowWrapperClassName?: string
@@ -429,6 +432,8 @@ export interface ComboboxProps {
    * (CSS `gap` 套在 flex container 上會強制 sibling spacing,蓋過 negative margin)。
    * **Q2 known tradeoff**:0 後 useOverflowCount 仍按 wrapper.offsetWidth 累加(不含 overlap
    * 補償)→ +N 偏保守。當前接受;若需精準可 future 加 `overlapPx` 補償邏輯。
+   *
+   * @internal PeoplePicker stack wrapper 內部協議 — end-user 勿用(measurement-layer hook)。
    */
   tagAreaGapPx?: number
   /**
@@ -437,6 +442,8 @@ export interface ComboboxProps {
    * 設值時 tagAreaRef 增 `style.paddingLeft`,**useOverflowCount 的 `available = clientWidth -
    * paddingLeft - paddingRight` 自動 include**(`parseFloat(cs.paddingLeft)` 從 container CSS 抓)
    * → width calc 不漂移,無 side-effect。
+   *
+   * @internal PeoplePicker stack wrapper 內部協議 — 目前無 active consumer(PeoplePicker 傳 undefined),保留供未來精準 padding;新 consumer 請先評估。
    *
    * **2026-05-13 v2 deprecate path**:原 PeoplePicker pass `{8}` 假設「Combobox tagPadding=4px,4+8=12」
    * 但 `tagPadding[size]` 是 density-dependent calc `(field-height - icon-size) / 2`,只在 md size +
@@ -452,6 +459,8 @@ export interface ComboboxProps {
    */
   overflowShape?: ComboboxOverflowShape
   /**
+   * @internal PeoplePicker stack wrapper 內部協議 — end-user 勿用(measurement-layer override)。
+   *
    * 2026-05-15 Bug 3 fix:override visible count via formula-based primitive(opt-in;default 走
    * DOM-based `useOverflowCount`)。PeoplePicker stack mode 用 `avatar-stack-overflow` primitive
    * deterministic formula 計算 visible count,forward 給 Combobox bypass DOM offsetWidth
@@ -519,12 +528,19 @@ function ReadonlyMultiSelect({
         // readonly/disabled path 對齊 L293 display wrapper 已 ship 的 overflow-hidden fix。
         // M10 propagation:原 overflow-visible 讓 readonly tag 越界蓋 indicator,跟 display 不對稱。
         wrap ? 'flex-wrap py-1' : 'overflow-hidden', className)}
-      style={{ gap: GAP, ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode={resolvedMode}>
+      style={{ gap: GAP, ...(wrap ? { height: 'auto' } : undefined) }} data-field-mode={resolvedMode}
+      aria-disabled={resolvedMode === 'disabled' ? true : undefined}>
       {hasTags ? (
         <ComboboxTagStack value={value} options={options} tagSize={sz} wrap={wrap}
           containerRef={containerRef} disabled={resolvedMode === 'disabled'} />
       ) : (
         <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
+      )}
+      {/* 2026-06-10 類型身份 indicator 規則:readonly/disabled 保留 chevron(naked cell 依 showDisplayEndIcon);disabled → fg-disabled */}
+      {(variant === 'naked' ? !!showDisplayEndIcon : true) && (
+        <ItemSuffix className="pointer-events-none">
+          <ChevronDown size={iconSize} className={cn('shrink-0', resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted')} aria-hidden />
+        </ItemSuffix>
       )}
     </div>
   )
@@ -545,13 +561,14 @@ function ReadonlyMultiSelect({
 type ComboboxInternalProps = ComboboxProps & { __triggerRef?: React.Ref<HTMLDivElement> }
 
 function NativeCombobox({
-  mode = 'edit', variant: variantProp, error = false, size = 'md', options, value = [], onChange, placeholder,
-  className, disabled, wrap = false, clearable = false, showDisplayEndIcon = false,
+  mode, variant: variantProp, error = false, size = 'md', options, value = [], onChange, placeholder,
+  className, disabled: disabledProp, wrap = false, clearable = false, showDisplayEndIcon = false,
   __triggerRef,
 }: ComboboxInternalProps) {
-  const fieldCtx = useFieldContext()
-  const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
-  const resolvedMode = disabled ? 'disabled' : mode
+  const disabled = useResolvedFieldDisabled(disabledProp)
+  const variant: FieldVariant = useResolvedFieldVariant(variantProp)
+  // 2026-06-08 SSOT:mode 經 useResolvedFieldMode;修 <Field mode="display"> 漏 cascade
+  const resolvedMode = useResolvedFieldMode({ mode, disabled })
   const iconSize = getIconSize(size)
   const showClear = clearable && value.length > 0 && resolvedMode === 'edit'
 
@@ -592,7 +609,7 @@ function NativeCombobox({
         <OverflowTagList containerRef={tagAreaRef} items={items} size={size} wrap={wrap}
           renderTag={(item) => (
             <Tag size={size} className="shrink-0 relative z-10" onClick={() => { selectRef.current?.showPicker?.(); selectRef.current?.focus() }}
-              onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>
+              onRemove={() => handleRemove(item.value)}>{item.label}</Tag>
           )} onRemove={handleRemove} trailing={value.length === 0 ? selectDropdown : undefined} />
       </div>
       {value.length > 0 && selectDropdown}
@@ -615,7 +632,7 @@ function NativeCombobox({
 // ── Custom Combobox (desktop — consumes SelectMenu) ───────────────────
 
 function CustomCombobox({
-  mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, value = [], onChange, placeholder,
+  mode, variant: variantProp, error: errorProp = false, size = 'md', options, value = [], onChange, placeholder,
   className, disabled: disabledProp, wrap = false, clearable = false, searchable = false, loading, searchIn = 'menu',
   searchPlaceholder = '搜尋…', // i18n-allow: DS default
   searchAriaLabel = '搜尋選項', // i18n-allow: DS default
@@ -636,10 +653,11 @@ function CustomCombobox({
 }: ComboboxInternalProps) {
   const tagAreaGap = tagAreaGapPx ?? GAP
   const fieldCtx = useFieldContext()
-  const error = errorProp || (fieldCtx?.invalid ?? false)
-  const disabled = disabledProp ?? fieldCtx?.disabled
-  const resolvedMode = disabled ? 'disabled' : mode
-  const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+  const error = useResolvedFieldInvalid(errorProp)
+  const disabled = useResolvedFieldDisabled(disabledProp)
+  // 2026-06-08 SSOT:mode 經 useResolvedFieldMode;修 <Field mode="display"> 漏 cascade
+  const resolvedMode = useResolvedFieldMode({ mode, disabled })
+  const variant: FieldVariant = useResolvedFieldVariant(variantProp)
   const iconSize = getIconSize(size)
   const showClear = clearable && value.length > 0 && resolvedMode === 'edit'
   const [open, setOpen] = React.useState(defaultOpen)
@@ -696,7 +714,7 @@ function CustomCombobox({
     <div
       ref={__triggerRef}
       id={fieldCtx?.id}
-      role="combobox" aria-expanded={open} aria-controls={listboxId} tabIndex={0}
+      role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-controls={listboxId} tabIndex={0}
       aria-label={ariaLabel}
       aria-invalid={error || undefined}
       aria-required={fieldCtx?.required || undefined}
@@ -708,7 +726,22 @@ function CustomCombobox({
         // 統一處理 — open=灰深(data-state)/ focus=藍(focus-within !important)。改一處全 control 跟動。
         error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
       style={{ paddingRight: '0.75rem', ...(wrap ? { height: 'auto' } : undefined) }}
-      data-field-mode="edit" data-error={error ? '' : undefined}>
+      data-field-mode="edit" data-error={error ? '' : undefined}
+      // WAI-ARIA APG combobox 鍵盤開啟語意 — 對齊 sibling Select(select.tsx:593-598)。
+      // <div role=combobox> 不像 native <button> 自動 synthesize Enter/Space click,故顯式補:
+      //   Enter/Space → 開(searchable 時不攔,讓 inline search input 自行處理打字);
+      //   Escape → 關;ArrowDown → 開(APG required combobox 展開鍵,僅在 closed 時攔,
+      //   open 後不 preventDefault 讓方向鍵自由流向選單導覽)。
+      // 純 additive:此 trigger 原無 onKeyDown,不覆寫既有 handler;open 邏輯仍走 setOpen SSOT。
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          // 2026-06-11 P0 a11y(R2,同 select.tsx 修):Combobox 恆 searchable → 原 `!searchable`
+          // guard 使 Enter/Space 永遠開不了(僅 ArrowDown 可)。正確 guard = !open。
+          if (!open) { e.preventDefault(); setOpen(true) }
+        }
+        if (e.key === 'ArrowDown' && !open) { e.preventDefault(); setOpen(true) }
+        if (e.key === 'Escape') setOpen(false)
+      }}>
       {/* 2026-05-18 #6A Round 1 Step 2/4(per user 拍板「決策6選a」+ codex M31 Step 5 verdict cite combobox.tsx:648):
           CustomCombobox edit non-wrap tagArea 對齊 L293 display + L451 readonly + L518 native edit 已 ship 的 overflow-hidden fix。
           原 overflow-visible 讓 tag 越界蓋 chevron / +N indicator(user 圖三)。M10 propagation 完整 4-path align。 */}
@@ -724,7 +757,7 @@ function CustomCombobox({
               tagRenderer
                 ? tagRenderer(item, () => handleRemove(item.value))
                 : <Tag size={size} className="shrink-0 relative z-10"
-                    onDismiss={() => handleRemove(item.value)}>{item.label}</Tag>
+                    onRemove={() => handleRemove(item.value)}>{item.label}</Tag>
             )}
             renderHiddenTag={renderHiddenTag}
             onRemove={handleRemove}
@@ -792,14 +825,17 @@ function CustomCombobox({
 // ── Public component ────────────────────────────────────────────────────────
 
 const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
-  (props, ref) => {
+  ({ size: sizeProp, ...props }, ref) => {
+    // B 組 cascade fix:public wrapper 一處 resolve size(prop>Field>surface>md)後 forward 給內層,
+    // 讓 <Field size> / DataTable cell surface-size 對 Combobox 生效(內層默認 'md' 被此顯式 size 覆蓋)。
+    const size = useResolvedFieldSize(sizeProp)
     // 2026-05-16 真 root cause fix:之前用 `_ref` drop ref。修為 forward 給 internal
     // `__triggerRef`,讓 PeoplePicker stack 透過 ref 量 trigger DOM(visibleCountOverride
     // 才生效)。對齊 React forwardRef public-API canonical(MUI Autocomplete / Radix
     // Popover.Trigger 共識)+ codex M31 Step 5 比稿 verdict + DS-wide ref-drop iceberg audit。
     const isMobile = useIsTouchDevice()
-    if (isMobile) return <NativeCombobox {...props} __triggerRef={ref} />
-    return <CustomCombobox {...props} __triggerRef={ref} />
+    if (isMobile) return <NativeCombobox {...props} size={size} __triggerRef={ref} />
+    return <CustomCombobox {...props} size={size} __triggerRef={ref} />
   }
 )
 Combobox.displayName = 'Combobox'

@@ -328,6 +328,20 @@ Ant Design / Carbon / Apple HIG / VS Code / Figma。對每個 example,至少查 
 
 **實例**(2026-04-22 Coachmark):Coachmark 原預設 autoFocus 到 chrome close X → 開 coachmark 立即彈「關閉」tooltip,打擾 user。修法:改走 body first interactive。此類行為應 DS-wide 強制。
 
+## Portal theme/density subtree escape canonical（M3,2026-05-31 audit-time）
+
+**為何 audit-time 不是 write-time hook**:M3 是 runtime CSS cascade + 設計意圖判斷 —— Portal overlay 搬到 `document.body` 後,CSS 繼承 chain 從 app root `<html data-theme>` 起算,**正解對 11 個 overlay 元件是「什麼都不做」**(自然繼承 app root),只有極少數(eg. OverflowIndicator 刻意 lock dark）才需顯式 set。「何時需要 override」無法靠 write-time regex 可靠決定(絕大多數情況不需要,硬偵測必大量誤判)→ 故**不設 hook**,改 audit-time visual probe(誠實:此 invariant 非機械可強制)。
+
+**新 Portal overlay 元件 merge 前必跑 dark-subtree visual probe**:
+1. 把 trigger 放進 `data-theme="dark"` subtree(或反向:trigger 在 dark、app root light)
+2. 開啟 overlay,截圖 Portal Content
+3. **驗**:Content 顏色對齊「它該繼承的 theme」(預設 = app root theme,不被 trigger subtree 污染);若元件刻意要繼承 trigger theme → 必在 spec 聲明 + 顯式 set `data-theme` on Portal Content
+4. **同類 chain**:`data-density` 部分 overlay 刻意 lock `md`(見 `density.spec.md`)→ 同樣 probe 驗
+
+**違反 → M3 portal escape bug**(歷史:DropdownMenu 在 dark subtree 變亮 / Avatar HoverCard NameCard 文字白色)。
+
+**D6e scan memory**:對所有 Portal overlay 元件,額外檢 spec 有無聲明 theme/density 繼承行為 + story 是否有 dark-subtree probe 覆蓋。
+
 ---
 
 ## Integration — 哪個 skill 在哪個 phase 跑 D6
@@ -354,7 +368,7 @@ skill 不再重複 scan 方法 / 判斷表。
 
 ## 本 protocol 自己也是活文件
 
-每次 audit 結束,main agent 自動回填 4 類學習(對齊 CLAUDE.md `# 資訊治理 canonical` → Audit skill Phase F 節):
+每次 audit 結束,main agent 自動回填 4 類學習(對齊 CLAUDE.md `# 治理 canonical` → Audit skill Phase F 節):
 
 1. 新 FP → 加到上方「常見 FP 記憶」
 2. 新 meta-pattern → 提議加到 CLAUDE.md `# Meta-Pattern 預警`

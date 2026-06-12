@@ -131,7 +131,7 @@ export const WithCheckbox: Story = {
 // ── Long label (wrap test) ──────────────────────────────────────────────
 
 export const LongLabel: Story = {
-  name: '長 標籤',
+  name: '長標籤',
   render: () => (
     <div className="flex gap-8 items-start">
       <div className="flex flex-col gap-2">
@@ -265,29 +265,31 @@ export const DragAndDrop: Story = {
 // ── Indent 結構對齊驗證 ─────────────────────────────────────────────────
 
 export const IndentAlignment: Story = {
-  name: '縮排 結構對齊驗證',
+  name: '縮排結構對齊驗證',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <h3 className="text-h6 font-semibold">indentStep = chevronSize + gap-2</h3>
         <p className="text-caption text-fg-muted max-w-xl">
           子 chevron 應對齊父 icon 的起始位置,子 icon 應對齊父 label 的起始位置。
-          這裡用有 icon / 無 icon 混合的 tree 來驗證 placeholder 佔位是否正確。
+          這裡混合有 / 無 children 的 node 驗證 chevron placeholder 佔位(leaf 無條件留等寬空白);
+          icon 無自動佔位——無 icon 的 node(README.md / public)label 起點前移,屬「Icon 使用策略」
+          的混用反例,此處僅作 indent 結構驗證。
         </p>
       </div>
       <div className="w-[300px] border border-divider rounded-lg bg-surface overflow-hidden py-2">
-        <TreeView aria-label="對齊驗證" defaultExpandedIds={['a', 'b', 'c']}>
-          <TreeItem id="a" icon={Folder} label="有 icon + 有 children">
-            <TreeItem id="a1" icon={FileText} label="有 icon leaf" />
-            <TreeItem id="a2" label="無 icon leaf（應有 icon 佔位）" />
+        <TreeView aria-label="專案檔案樹" defaultExpandedIds={['src', 'components', 'public']}>
+          <TreeItem id="src" icon={Folder} label="src">
+            <TreeItem id="app" icon={FileCode} label="App.tsx" />
+            <TreeItem id="readme" label="README.md" />
           </TreeItem>
-          <TreeItem id="b" label="無 icon + 有 children">
-            <TreeItem id="b1" label="子 leaf" />
+          <TreeItem id="public" label="public">
+            <TreeItem id="favicon" icon={Image} label="favicon.ico" />
           </TreeItem>
-          <TreeItem id="c" icon={Folder} label="3 層深度驗證">
-            <TreeItem id="c1" icon={Folder} label="Level 1">
-              <TreeItem id="c1a" icon={FileCode} label="Level 2 leaf" />
-              <TreeItem id="c1b" label="Level 2 無 icon" />
+          <TreeItem id="components" icon={Folder} label="components">
+            <TreeItem id="button" icon={Folder} label="Button">
+              <TreeItem id="button-tsx" icon={FileCode} label="Button.tsx" />
+              <TreeItem id="button-test" label="Button.test.tsx" />
             </TreeItem>
           </TreeItem>
         </TreeView>

@@ -58,7 +58,7 @@
 
 | 類別 | 為什麼禁止 | 改用 |
 |------|----------|------|
-| `shadow-sm/md/lg/xl/2xl` | 繞過 elevation token 系統,沒跟 dark mode 調整聯動 | 用 `shadow-[var(--elevation-N)]` 其中 N ∈ `{100, 200, 300}`(per elevation.spec.md tier)|
+| `shadow-sm/md/lg/xl/2xl` | 繞過 elevation token 系統,沒跟 dark mode 調整聯動 | 用 `shadow-[var(--elevation-N)]` 其中 N ∈ `{100, 200}`(+`-hover` 變體;per elevation.spec.md tier;2026-05-31 修:無 300)|
 | 硬寫色值 `#xxx`, `rgb(...)`, `bg-red-500` | 繞過 semantic token,dark mode / brand swap 會斷 | 對應 semantic token |
 | Tailwind 預設 typography `text-xs/sm/base/lg` | 我們有自己的 `text-caption/body/body-lg/h1/h2` 系統 | 用我們的 typography token |
 | 硬寫 px 值 `w-[48px]` 當有 token | 失去 token 關聯,改值時零散處要一起改 | 對應 token 或 calc() |
@@ -84,4 +84,4 @@
 
 **為什麼**:shadcn alias 是「臨時橋」讓 shadcn add 不炸;我們有自己 design opinion 後直接用 own token,保持 DS 單一真實來源。允許 shadcn alias 進我們的 code = 慢慢讓 shadcn 命名污染回流,DS 自主性退化。
 
-**曾經發生的 bug**:Popover.tsx / Command.tsx 保留 shadcn template 的 `bg-popover`, `text-popover-foreground`, `text-muted-foreground`, `bg-accent`, `text-accent-foreground` 多處,2026-04-18 session 時 audit 發現統一遷移為 direct token(`bg-surface-raised` / `text-foreground` / `text-fg-muted` / `bg-neutral-hover`)。hook `check_token_hygiene.sh` 現已自動攔截此類回流。
+**曾經發生的 bug**:Popover.tsx / Command.tsx 保留 shadcn template 的 `bg-popover`, `text-popover-foreground`, `text-muted-foreground`, `bg-accent`, `text-accent-foreground` 多處,2026-04-18 session 時 audit 發現統一遷移為 direct token(`bg-surface-raised` / `text-foreground` / `text-fg-muted` / `bg-neutral-hover`)。hook `lib/_token_hygiene.sh`(由 `post_edit_dispatcher.sh` source)現已自動攔截此類回流(Check 1 shadcn alias)。

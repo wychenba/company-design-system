@@ -9,9 +9,11 @@ originSessionId: 41fa83c2-f951-431e-911e-ed3ceb185903
 User 2026-05-15 + 2026-05-27 系列 directives codified per Rule-of-3 absorb principle.
 原 2 file(`feedback_propose_in_plain_chinese.md` + `feedback_propose_without_cite_fabrication_2026_05_27.md`)合併本檔。
 
-## Sub-rule 1 — 中文人話(原 propose_in_plain_chinese)
+## Sub-rule 1 — 中文人話(原 propose_in_plain_chinese;2026-05-31 擴大至所有 reply)
 
-**Rule**:propose 給 user 拍板的決策必用中文具體人話講,禁術語 jargon。
+**Rule**:propose 給 user 拍板的決策必用中文具體人話講,禁術語 jargon。**2026-05-31 擴大**:不只 propose —— **所有給 user 的 reply / 清單 / summary** 都必繁中人話。User 看不懂英文,整段/整句英文 = reply 對 user 無效 = 白做。唯一例外:不可避免的識別碼(檔名 / token 名 / commit hash / 指令)出現時必緊跟中文解釋。工具輸出(CI log / git output)要引用 → 摘成中文重點,禁貼原始英文 dump。
+
+**Anchor(2026-05-31)**:user verbatim「你他媽問題後面一長串英文是怎樣?我看不懂英文」。
 
 **Format**:
 ```
@@ -26,15 +28,20 @@ User 2026-05-15 + 2026-05-27 系列 directives codified per Rule-of-3 absorb pri
 **我推**:<A / B / C> 因 <理由>
 ```
 
-**禁止**:`L1-L7` / `canonical` / `primitive` / `SSOT` / `M-rule` / `cva` 等內部術語 propose 內裸用。改翻成人話:
+**禁止**:`L1-L7` / `canonical` / `primitive` / `SSOT` / `consume` / `traits` / `M-rule` / `cva` / `tier` / `tokens` / `wrapper` 等內部術語 propose 內裸用。改翻成人話:
 - canonical → 「主檔/標準寫法」
 - primitive → 「共用零件」
 - SSOT → 「單一資料源」
 - spec → 「規格檔」
+- consume → 「沿用」
+- traits → 「行為類型」
+- tier → 「層級」
+- tokens → 「設計變數」
+- wrapper → 「外殼」
 
 **Anchor**:2026-05-15 user verbatim「要 user 決策必中文具體人話講(發生什麼/影響/選項 outcome)」。
 
-**Mechanical enforcement**:`.claude/hooks/check_propose_plain_chinese.sh` PreToolUse Edit/Write 偵測 propose pattern + jargon keyword → BLOCKER。
+**Mechanical enforcement**:`.claude/hooks/check_propose_discipline.sh(r1,2026-06-11 merge)` PreToolUse Edit/Write 偵測 propose pattern + jargon keyword → BLOCKER。
 
 ## Sub-rule 2 — file:line cite(原 propose_without_cite_fabrication)
 
@@ -52,7 +59,7 @@ User 2026-05-15 + 2026-05-27 系列 directives codified per Rule-of-3 absorb pri
 
 **Anchor**:2026-05-27 user verbatim「誰跟你說的?」— 我曾 cite「caption + muted SSOT 規定」但 grep `semantic.css:49` 是 use-case 描述非 rule。建議 propose 全 retract。
 
-**Mechanical enforcement**:`.claude/hooks/check_propose_cite_required.sh` PreToolUse Edit/Write 偵測 propose pattern + canonical claim 但無 file:line cite → BLOCKER。
+**Mechanical enforcement**:`.claude/hooks/check_propose_discipline.sh(r2,2026-06-11 merge)` PreToolUse Edit/Write 偵測 propose pattern + canonical claim 但無 file:line cite → BLOCKER。
 
 ## How to apply
 
@@ -78,3 +85,9 @@ User 2026-05-15 + 2026-05-27 系列 directives codified per Rule-of-3 absorb pri
 - M22 benchmark cite mandate
 - mindset #1 不取巧:propose 用 jargon = 取巧;沒 cite = 取巧
 - Linux kernel patch:每 claim cite source / Atlassian RFC discipline
+
+
+## Sub-rule:選項題最終訊息必自包含(2026-06-11 第 2 次 mobile 摺疊事故)
+
+**Rule**:turn 的「最後一條訊息」若要 user 拍板選項,必須**完整重述每個選項的人話說明 + 建議 + 理由**,禁止「選 (a) 還是 (b)」引用前文 — 手機 app 會摺疊訊息中段(tool call 之間的文字),user 只看得到最後一條。
+**Anchor**:2026-06-11 R2 拍板題 6/8 完整說明寫在中段、結尾只剩「選 (a) 還是 (b)」→ user 截圖怒「叫你解釋然後又沒解釋」(同 2026-06-10 沙箱三步驟事故同 failure mode)。

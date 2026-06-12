@@ -54,7 +54,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/TimePicker/展示" name="員工上班時段設定"><span className="text-primary hover:underline font-medium cursor-pointer">員工上班時段設定</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">不確定是否該用 TimePicker 時,先對照下方「何時不用」清單;若情境不符,改用清單建議的替代元件(例如同時要日期就用 DatePicker)。</p>
     </div>
 
       {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
@@ -75,14 +75,20 @@ export const RuleMinuteStepForMeetings: Story = {
   name: '會議時段用 15 分鐘間隔',
   render: () => (
     <div className="flex gap-8">
-      <Field>
-        <FieldLabel>✅ 正確(minuteStep=15)</FieldLabel>
-        <TimePicker value="09:15" onChange={() => {}} minuteStep={15} />
-      </Field>
-      <Field>
-        <FieldLabel>❌ 錯誤(預設 minuteStep=1,會議排程無意義)</FieldLabel>
-        <TimePicker value="09:07" onChange={() => {}} />
-      </Field>
+      <div className="flex flex-col gap-1.5">
+        <h3 className="text-caption font-medium text-foreground">✅ minuteStep=15</h3>
+        <Field>
+          <FieldLabel>專案週會時間</FieldLabel>
+          <TimePicker value="09:15" onChange={() => {}} minuteStep={15} />
+        </Field>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <h3 className="text-caption font-medium text-fg-muted">❌ 預設 minuteStep=1(會議排程無意義)</h3>
+        <Field>
+          <FieldLabel>專案週會時間</FieldLabel>
+          <TimePicker value="09:07" onChange={() => {}} />
+        </Field>
+      </div>
     </div>
   ),
 }
@@ -111,20 +117,22 @@ export const RuleRangeComposition: Story = {
 }
 
 /**
- * Rule:禁止用 label Button 作 clear
- * 對齊 CLAUDE.md「Dismiss 按鈕 canonical」—— clear button 必用 ItemInlineActionButton
- * (本元件 clearable=true 自動渲染 X Inline Action 在 endAction slot),禁止自刻
- * `<Button>清除</Button>` 作 clear。
+ * 規則:清除用 X 行內動作,不要用文字按鈕
+ * 設定 clearable 後,TimePicker 會自動在欄位尾端渲染一個 X 行內動作來清空值,
+ * 點擊即清空。不要自己擺一顆「清除」文字按鈕——統一用 X 圖示符合全站慣例。
  */
 export const RuleClearNoLabelButton: Story = {
   name: '清除用 X 行內動作,不用文字按鈕',
   render: () => {
     const [t, setT] = React.useState<string>('14:30')
     return (
-      <Field>
-        <FieldLabel>✅ clearable=true(自動 X Inline Action)</FieldLabel>
-        <TimePicker value={t} onChange={setT} clearable />
-      </Field>
+      <div className="flex flex-col gap-1.5">
+        <h3 className="text-caption font-medium text-foreground">✅ clearable=true(自動渲染 X 行內動作)</h3>
+        <Field>
+          <FieldLabel>提醒時間</FieldLabel>
+          <TimePicker value={t} onChange={setT} clearable />
+        </Field>
+      </div>
     )
   },
 }

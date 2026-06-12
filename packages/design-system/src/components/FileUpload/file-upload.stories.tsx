@@ -5,6 +5,7 @@ import { Image as ImageIcon, X } from 'lucide-react'
 import { FileUpload } from './file-upload'
 import { FileItem } from '@/design-system/components/FileItem/file-item'
 import { Button } from '@/design-system/components/Button/button'
+import { Empty } from '@/design-system/components/Empty/empty'
 
 const meta: Meta<typeof FileUpload> = {
   title: 'Design System/Components/FileUpload/展示',
@@ -120,15 +121,47 @@ export const CustomChildren = {
   name: '自訂內容',
   render: () => (
     <div className="max-w-lg">
+      {/* children 覆寫的正確用法:換 icon(FileUpload 無 icon prop)時仍**消費 Empty SSOT** —
+          字級 / icon 48 / 間距全跟 Empty 不漂移。只改文字用 title/description prop 即可、不必 children;
+          children 是給「換 icon」或「加 icon+title+desc 以外的元素(品牌 logo / 格式 chips)」用。
+          ❌ 反 pattern:hand-build 自訂字級/icon尺寸/間距(= 偏離 Empty 設計語言)。 */}
       <FileUpload accept="image/*,.svg,.fig" multiple onUpload={noop}>
-        <ImageIcon size={32} className="text-primary" aria-hidden />
-        <div className="flex flex-col gap-1">
-          <div className="text-body-lg font-medium text-foreground">匯入你的設計資產</div>
-          <div className="text-caption text-fg-secondary">
-            支援 SVG / PNG / Figma 檔案 · 一次最多 50 個
-          </div>
-        </div>
+        <Empty
+          icon={ImageIcon}
+          title="匯入你的設計資產"
+          description="支援 SVG / PNG / Figma 檔案 · 一次最多 50 個"
+        />
       </FileUpload>
     </div>
   ),
+}
+
+// variant="button":表單內緊湊上傳(*Excel file 欄位場景)— 大 dropzone 太重時用按鈕觸發,
+// 檔案清單在按鈕下方(form compact 靜態)。2026-06-03 加 — FileUpload 常出現在 form。
+export const ButtonVariant = {
+  name: '按鈕觸發(表單內)',
+  render: () => {
+    type Item = { id: string; name: string; size?: number; status?: 'completed' }
+    const [items, setItems] = useState<Item[]>([
+      { id: '1', name: 'UXP T-Phone.xlsx', size: 1_800_000, status: 'completed' },
+    ])
+    return (
+      <div className="max-w-md">
+        <FileUpload
+          variant="button"
+          buttonLabel="Choose Excel file" // i18n-allow: story label
+          accept=".xls,.xlsx,.csv"
+          files={items}
+          fileListMode="compact"
+          onRemove={(id) => setItems((prev) => prev.filter((i) => i.id !== id))}
+          onUpload={(accepted) =>
+            setItems((prev) => [
+              ...prev,
+              ...accepted.map((f, i) => ({ id: `n-${Date.now()}-${i}`, name: f.name, size: f.size, status: 'completed' as const })),
+            ])
+          }
+        />
+      </div>
+    )
+  },
 }

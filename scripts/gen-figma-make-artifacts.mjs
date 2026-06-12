@@ -88,8 +88,8 @@ function sortCanonical(files) {
   })
 }
 
-/** Scan patterns/ + components/ for CSS files containing :root or @theme — these declare
- *  consumer-needed tokens / styles outside tokens/ home. Per 2026-05-27 root-cause:
+/** Scan patterns/ + components/ for CSS files containing token/runtime CSS declarations.
+ *  These declare consumer-needed tokens / styles outside tokens/ home. Per 2026-05-27 root-cause:
  *  src/globals.css 已 import them for DS internal,但 tokens.css consumer aggregator
  *  漏掉導致 consumer 拿不到。Auto-scan 防再犯。 */
 function findExtraCssFiles(dir) {
@@ -102,7 +102,12 @@ function findExtraCssFiles(dir) {
       out.push(...findExtraCssFiles(full))
     } else if (s.isFile() && entry.endsWith('.css')) {
       const content = readFileSync(full, 'utf8')
-      if (content.includes(':root') || content.includes('@theme')) {
+      if (
+        content.includes(':root') ||
+        content.includes('@theme') ||
+        content.includes('@utility') ||
+        content.includes('@keyframes')
+      ) {
         out.push(full)
       }
     }
@@ -126,7 +131,7 @@ function generate() {
     ordered.push(...catFiles)
   }
 
-  // Scan patterns/ + components/ for CSS containing :root / @theme tokens
+  // Scan patterns/ + components/ for CSS containing token/runtime declarations
   const extras = [
     ...findExtraCssFiles(PATTERNS_DIR),
     ...findExtraCssFiles(COMPONENTS_DIR),
@@ -164,16 +169,24 @@ function generate() {
     .map((f) => `@import './../tokens/${relative(TOKENS_DIR, f)}';`)
     .join('\n')
 
-  // Non-token CSS containing :root / @theme — auto-detected per 2026-05-27 root-cause sweep
+  // Non-token CSS containing token/runtime declarations — auto-detected per 2026-05-27 root-cause sweep
   let extrasBlock = ''
   if (extras.length > 0) {
-    extrasBlock = '\n\n/* Non-token CSS (patterns/ + components/) containing :root token declarations\n   or component-internal styles — auto-detected by generator scan. Per 2026-05-27\n   root-cause fix: src/globals.css 已 import for DS internal, 但 consumer-facing\n   tokens.css aggregator 必須也包含, 不然 consumer 拿不到 → 跑版。 */\n'
+    extrasBlock = '\n\n/* Non-token CSS (patterns/ + components/) containing token/runtime declarations\n   or component-internal styles — auto-detected by generator scan. Per 2026-05-27\n   root-cause fix: src/globals.css 已 import for DS internal, 但 consumer-facing\n   tokens.css aggregator 必須也包含, 不然 consumer 拿不到 → 跑版。 */\n'
     extrasBlock += extras
       .map((f) => `@import './../${relative(DS_SRC, f)}';`)
       .join('\n')
   }
 
-  return header + imports + extrasBlock + '\n'
+  // Base layer(body typography + reset + focus + button cursor)— 必在所有 token 之後 import
+  // (依賴 --font-sans / --canvas / --foreground 等)。Consumer 經單一 `@import tokens` 即拿到 base,
+  // 符 single-import 原則(2026-05-29 fix:base.css orphan + consumer 字體 drift root cause)。SSOT: styles/base.css。
+  const baseBlock =
+    '\n\n/* Base layer — body typography(font-family var(--font-sans))+ reset + focus + button cursor。\n' +
+    '   必在 token 之後(依賴 token vars)。Consumer `@import tokens` 一次拿到。SSOT: styles/base.css。 */\n' +
+    "@import './base.css';"
+
+  return header + imports + extrasBlock + baseBlock + '\n'
 }
 
 function ensureDir(dir) {

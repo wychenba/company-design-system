@@ -1,23 +1,15 @@
 # Changesets
 
-2026-05-22 Phase 4 team-distribution-roadmap ship。Changesets-driven semver release pipeline for
+2026-05-22 Phase 4 team-distribution-roadmap ship。Semver release for
 `@qijenchen/design-system` + `@qijenchen/storybook-config`(linked versions per `config.json`)。
 
-## 何時加 changeset
+**2026-05-29 起 release 走手動 bump + GitHub Releases auto-notes**(commit 0146e02f):changesets 一直沒被 consume、`changeset-release/main` bot 支線是純 noise 已刪。目前 `.changeset/config.json` 保留備用(未來若改回 changesets-driven 可直接 re-adopt),但實際 release 不再依賴 `npx changeset` / `changeset-bot` / `changeset publish`。
 
-每個 PR 修 `packages/*` substantive code → 必加一個 `*.md` 到此目錄,描述:
-- 影響哪 package(`@qijenchen/design-system` / `@qijenchen/storybook-config`)
-- patch / minor / major(per semver)
-- 用戶可見 change summary
+## Workflow(手動 bump)
 
-CI(`.github/workflows/release.yml`)強制 PR 有 changeset,no changeset = blocked。
-
-## Workflow
-
-1. **Author**:`npx changeset` interactive → 產 `.changeset/<random>.md`
-2. **Review**:reviewer 看 changeset 對齊 PR 影響
-3. **Merge to main**:`changeset-bot` 自動開「Version Packages」PR
-4. **Release**:merge bot PR → CI 跑 `changeset publish` → npm publish + GitHub Release + changelog
+1. **Bump**:跑版本 bump(同步 `packages/*` + plugin/marketplace manifest)— 見 `scripts/sync-version-to-all-manifests.mjs`(讀 DS package.json 新 version → 同步寫進 plugin.json + marketplace.json 3 處)
+2. **Tag + push**:打 tag(`0.1.0-beta.<N>`)push 上去
+3. **Release**:tag push 觸發 `.github/workflows/release.yml`(`on: push: tags:`)→ audit gates → npm publish → `softprops/action-gh-release` 以 `generate_release_notes: true` 產 GitHub Release(changelog 由 GitHub Releases auto-notes 提供,無 tracked CHANGELOG.md)→ dispatch ds-product-template + fork repos cross-repo sync
 
 ## Codemod for breaking change
 

@@ -47,7 +47,7 @@ export const UsageGuidance: Story = {
         <div className="prose prose-sm max-w-prose mb-8">
           <p>適合 Tag 的真實業務場景(點擊跳轉「展示」頁範例):</p>
           <ul className="space-y-1">
-            <li><LinkTo kind="Design System/Components/Tag/展示" name="Avatar"><span className="text-primary hover:underline font-medium cursor-pointer">Avatar</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Components/Tag/展示" name="頭像"><span className="text-primary hover:underline font-medium cursor-pointer">頭像</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/Tag/展示" name="可移除"><span className="text-primary hover:underline font-medium cursor-pointer">可移除</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/Tag/展示" name="截斷 + Tooltip"><span className="text-primary hover:underline font-medium cursor-pointer">截斷 + Tooltip</span></LinkTo></li>
           </ul>
@@ -123,7 +123,7 @@ export const VariantNotSemanticRule: Story = {
           <Tag color="magenta">洋紅</Tag>
           <Tag color="indigo">靛藍</Tag>
         </div>
-        <Label>↑ 9 種 variant,色彩意義由 consumer 上下文決定</Label>
+        <Label>↑ 13 種 color variant(neutral + 12 categorical 色相,此處節選),色彩意義由 consumer 上下文決定</Label>
       </Rule>
 
       <Rule
@@ -194,12 +194,12 @@ export const DismissRule: Story = {
     return (
       <div>
         <Rule
-          title="用 onDismiss callback,Tag 自動渲染 X button"
-          note="消費者不需要自己組 dismiss button——傳 onDismiss,Tag 內部處理尺寸、hover、a11y。多選 Combobox 的已選 tag 用這個 pattern"
+          title="用 onRemove callback,Tag 自動渲染 X button"
+          note="消費者不需要自己組 remove button——傳 onRemove,Tag 內部處理尺寸、hover、a11y。多選 Combobox 的已選 tag 用這個 pattern"
         >
           <div className="flex items-center gap-2 flex-wrap">
             {tags.map(t => (
-              <Tag key={t} color="blue" onDismiss={() => setTags(tags.filter(x => x !== t))}>
+              <Tag key={t} color="blue" onRemove={() => setTags(tags.filter(x => x !== t))}>
                 {t}
               </Tag>
             ))}
@@ -212,17 +212,17 @@ export const DismissRule: Story = {
           note="不同於一般 inline action 的 fg-muted——Tag 有色變體時 dismiss 跟 Tag 文字同色,視覺一體"
         >
           <div className="flex items-center gap-2 flex-wrap">
-            <Tag color="blue" onDismiss={() => {}}>React</Tag>
-            <Tag color="green" onDismiss={() => {}}>TypeScript</Tag>
-            <Tag color="red" onDismiss={() => {}}>Storybook</Tag>
-            <Tag color="neutral" onDismiss={() => {}}>Design System</Tag>
+            <Tag color="blue" onRemove={() => {}}>React</Tag>
+            <Tag color="green" onRemove={() => {}}>TypeScript</Tag>
+            <Tag color="red" onRemove={() => {}}>Storybook</Tag>
+            <Tag color="neutral" onRemove={() => {}}>Design System</Tag>
           </div>
           <Label>↑ X icon 跟 Tag 文字同色,融入 Tag 視覺</Label>
         </Rule>
 
         <Rule
           title="❌ 用 prefix / suffix / 自訂 button 放 dismiss"
-          note="會失去 Tag 內建的尺寸 / hover / a11y 規則。統一走 onDismiss callback pattern"
+          note="會失去 Tag 內建的尺寸 / hover / a11y 規則。統一走 onRemove callback pattern"
         >
           <Label warn>(範例省略)consumer 自組 dismiss = 漂移風險</Label>
         </Rule>
@@ -232,7 +232,7 @@ export const DismissRule: Story = {
 }
 
 export const IconRule: Story = {
-  name: '圖示 與 avatar 的使用',
+  name: '圖示與頭像的使用',
   render: () => (
     <div>
       <Rule
@@ -261,9 +261,9 @@ export const IconRule: Story = {
 
       <Rule
         title="❌ icon + avatar 同時用(互斥)"
-        note="icon 和 avatar 都是 prefix slot,互斥關係。同時用會破壞 Tag 內部結構"
+        note="icon 和 avatar 都是 prefix slot,設計慣例上互斥(由 consumer 自律,非型別強制)。若同時傳,icon 與 avatar 會並列渲染,破壞 Tag 內部結構"
       >
-        <Label warn>(範例省略)設計上明確禁止,TS 型別會擋</Label>
+        <Label warn>(範例省略)設計慣例上互斥——同時傳會並列渲染,請只擇一</Label>
       </Rule>
     </div>
   ),

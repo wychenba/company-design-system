@@ -105,7 +105,7 @@ if [ -n "$HITS_RADIUS" ]; then
   VIOLATIONS="${VIOLATIONS}\n   [radius out-of-range] $(echo "$HITS_RADIUS" | tr '\n' ' ')"
 fi
 
-# 7) Shadow Tailwind size(shadow-sm/md/lg/xl/2xl/inner — DS 用 shadow-[var(--elevation-N)] N∈{100,200,300})
+# 7) Shadow Tailwind size(shadow-sm/md/lg/xl/2xl/inner — DS 用 shadow-[var(--elevation-N)] N∈{100,200})
 HITS_SHADOW=$(echo "$NEW_CONTENT" | grep -oE "\bshadow-(sm|md|lg|xl|2xl|inner)\b" | sort -u || true)
 if [ -n "$HITS_SHADOW" ]; then
   VIOLATIONS="${VIOLATIONS}\n   [elevation size] $(echo "$HITS_SHADOW" | tr '\n' ' ')"

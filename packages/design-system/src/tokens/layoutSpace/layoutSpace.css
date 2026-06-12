@@ -13,7 +13,7 @@
      備註:本 DS「配對」(uiSize.spec.md)專指 Tag↔Field 等**元件 size 配對**,
      跟本 token 表達的「label + desc typography 組合」不同概念,勿混淆。 */
   --item-gap-label-desc-reading:     2px;  /* reading:    body(14/1.5)    + body(14/1.5) — SelectionItem sm-md / Switch sm-md / DescriptionList / item-anatomy reading row */
-  --item-gap-label-desc-reading-lg:  2px;  /* reading-lg: body-lg(16/1.5) + body(14/1.5) — Dialog / Sheet / Empty / FileUpload / Coachmark / NameCard / SelectionItem lg / Switch lg */
+  --item-gap-label-desc-reading-lg:  2px;  /* reading-lg: body-lg(16/1.5) + body(14/1.5) — Dialog / Sheet / Empty / FileUpload / Coachmark / ProfileCard / SelectionItem lg / Switch lg */
   --item-gap-label-desc-scanning:    2px;  /* scanning:   body(14/1.3)    + caption(12/1.3) — FileItem compact+rich / MenuItem sm-md / Steps sm-md */
   --item-gap-label-desc-scanning-lg: 2px;  /* scanning-lg:body-lg(16/1.3) + body(14/1.3) — MenuItem lg / Steps lg */
 }

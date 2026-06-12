@@ -58,5 +58,29 @@ if (sbConfig.version !== newVersion) {
   console.log(`✓ ${sbConfigPath} already ${newVersion}`)
 }
 
+// template/ds-product-template consumer dep sync(2026-06-08 fix — 根治「為何落後 28 版」)
+// 原 in-monorepo template 的 DS dep 釘死 ^beta.32:不在 5-manifest sync 範圍、無 preflight gate、無 hook 守
+//   → 三道網全漏 → 無人 bump → DS 到 beta.60 它還停 beta.32。下游靠 mirror 重寫 + semver 容錯掩蓋,
+//   但 source 字串本身違反 SSOT(且 DS 一旦 bump 0.2.0,caret 容錯失效 → 本地 dogfood 裝到 stale)。
+// 此處跟著 DS version 改寫 root template 的 DS + storybook-config consumer dep,讓
+//   「ds push main → template 版本自動 SSOT」機械成立(release-preflight.mjs 第一步即跑本 script)。
+// 注:apps/template/package.json 的 DS dep 是 `*`(workspace wildcard,由 mirror transform 處理),不在此動。
+const tmplPkgPath = 'template/ds-product-template/package.json'
+const tmplPkg = JSON.parse(readFileSync(tmplPkgPath, 'utf8'))
+const tmplRange = `^${newVersion}`
+let tmplChanged = false
+for (const dep of ['@qijenchen/design-system', '@qijenchen/storybook-config']) {
+  if (tmplPkg.dependencies?.[dep] && tmplPkg.dependencies[dep] !== tmplRange) {
+    tmplPkg.dependencies[dep] = tmplRange
+    tmplChanged = true
+  }
+}
+if (tmplChanged) {
+  writeFileSync(tmplPkgPath, JSON.stringify(tmplPkg, null, 2) + '\n')
+  console.log(`✓ ${tmplPkgPath} → ${tmplRange}(DS + storybook-config consumer dep)`)
+} else {
+  console.log(`✓ ${tmplPkgPath} already ${tmplRange}`)
+}
+
 console.log('')
 console.log('Done. Commit + tag + push to trigger release.yml.')

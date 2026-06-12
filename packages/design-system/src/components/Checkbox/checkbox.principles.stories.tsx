@@ -51,10 +51,10 @@ export const UsageGuidance: Story = {
         >
           <ul className="space-y-1">
             <li>
-              <LinkTo kind="Design System/Components/Checkbox/展示" name="垂直 Group"><span className="text-primary hover:underline font-medium cursor-pointer">垂直 Group</span></LinkTo>
+              <LinkTo kind="Design System/Components/Checkbox/展示" name="直式群組"><span className="text-primary hover:underline font-medium cursor-pointer">商品類別的複選清單(直式群組)</span></LinkTo>
             </li>
             <li>
-              <LinkTo kind="Design System/Components/Checkbox/展示" name="水平排列"><span className="text-primary hover:underline font-medium cursor-pointer">水平排列</span></LinkTo>
+              <LinkTo kind="Design System/Components/Checkbox/展示" name="水平排列"><span className="text-primary hover:underline font-medium cursor-pointer">篩選列的少量選項複選(水平排列)</span></LinkTo>
             </li>
           </ul>
         </Rule>
@@ -170,7 +170,7 @@ export const UsageGuidance: Story = {
           title="判斷法 — 這個值旁邊有 submit / cancel button 嗎?"
           note="有 → Checkbox;沒有、是獨立 inline control → Switch。Radio 必須在 RadioGroup 內,且至少兩個選項;單一「我同意條款」用 Checkbox。"
         >
-          <Label>完整情境對照表見 checkbox.spec.md「與 Switch 的分界」</Label>
+          <Label>簡單記:旁邊有「儲存 / 取消」按鈕、要送出表單才生效 → Checkbox;切下去就立刻生效(像實體開關)→ Switch。</Label>
         </Rule>
       </div>
     )
@@ -194,7 +194,7 @@ export const ClampPolicyRule: Story = {
 
       <Rule
         title="❌ 絕不預設截斷 agreement 類 Label"
-        note="若 consumer 有合理理由（如 settings 頁掃視節奏）可以顯式覆寫 labelMaxLines / descMaxLines，但這應該是例外，不是預設"
+        note="若 consumer 有合理理由（如 settings 頁掃視節奏）想截斷過長文字，需直接改用 SelectionItem 包裝 Checkbox 並傳 labelMaxLines / descMaxLines 覆寫——Checkbox 本身的 label / description prop 不提供截斷控制。截斷應該是例外，不是預設"
       >
         <Checkbox
           label="我同意非常長的服務條款與隱私政策以及所有使用規範這段文字被截斷了你看不到剩下的部分"
@@ -204,9 +204,9 @@ export const ClampPolicyRule: Story = {
 
       <Rule
         title="Per-instance override：傳 'none' 不是 undefined"
-        note="React destructure default 會把 undefined 當「沒傳」→ fallback 到預設。要明確表達「不截」請傳 'none'"
+        note="這組覆寫設定在 SelectionItem 上（Checkbox 內部用它組合 label）。React destructure default 會把 undefined 當「沒傳」→ fallback 到預設。要明確表達「不截」請傳 'none'"
       >
-        <Label>labelMaxLines='none' / labelMaxLines={1} / labelMaxLines={2}（1-10 的數字）</Label>
+        <Label>SelectionItem labelMaxLines='none' / labelMaxLines={1} / labelMaxLines={2}（1-10 的數字）</Label>
       </Rule>
     </div>
   ),

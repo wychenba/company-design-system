@@ -61,7 +61,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/Dialog/展示" name="危險操作"><span className="text-primary hover:underline font-medium cursor-pointer">危險操作</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Dialog/展示" name="Body 放 list"><span className="text-primary hover:underline font-medium cursor-pointer">Body 放 list</span></LinkTo>
+          <LinkTo kind="Design System/Components/Dialog/展示" name="主體放清單"><span className="text-primary hover:underline font-medium cursor-pointer">主體放清單</span></LinkTo>
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
@@ -253,7 +253,7 @@ export const HeightBehaviorRule: Story = {
 }
 
 export const FooterActionRule: Story = {
-  name: 'Footer 按鈕配對',
+  name: '頁尾按鈕配對',
   render: () => (
     <div>
       <Rule

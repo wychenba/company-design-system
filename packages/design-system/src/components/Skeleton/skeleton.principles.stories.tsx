@@ -48,12 +48,12 @@ export const UsageGuidance: Story = {
           <p>適合 Skeleton 的真實業務場景(點擊跳轉「展示」頁範例):</p>
           <ul className="space-y-1">
             <li><LinkTo kind="Design System/Components/Skeleton/展示" name="個人資料卡載入"><span className="text-primary hover:underline font-medium cursor-pointer">個人資料卡載入</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Components/Skeleton/展示" name="Task 列表載入"><span className="text-primary hover:underline font-medium cursor-pointer">Task 列表載入</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Components/Skeleton/展示" name="任務列表載入"><span className="text-primary hover:underline font-medium cursor-pointer">任務列表載入</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/Skeleton/展示" name="表格列載入"><span className="text-primary hover:underline font-medium cursor-pointer">表格列載入</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/Skeleton/展示" name="文件載入"><span className="text-primary hover:underline font-medium cursor-pointer">文件載入</span></LinkTo></li>
             <li><LinkTo kind="Design System/Components/Skeleton/展示" name="卡片網格載入"><span className="text-primary hover:underline font-medium cursor-pointer">卡片網格載入</span></LinkTo></li>
           </ul>
-          <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方 vs 近親 段)。</p>
+          <p className="text-fg-muted mt-3">判斷不確定時:先確認資料回來後的佈局是否已知;若不符合載入佔位的情境,改用近親元件(見下方「vs 近親元件」段)。</p>
         </div>
       </Section>
 
@@ -151,14 +151,27 @@ export const ShapeMatchRule: Story = {
         title="✅ 形狀模擬最終內容"
         note="avatar 圓形對應圓形頭像、text 行寬度對應真實文字長度、title 高度對應標題字級。資料回來後使用者不會感到「跳版」"
       >
-        <div className="flex items-center gap-3 border border-border rounded-lg p-3 w-72">
-          <Skeleton className="h-10 w-10 rounded-full" />
-          <div className="flex flex-col gap-2 flex-1">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-48" />
+        {/* 2026-06-11:改為「載入中 vs 載入完成」對照(原單卡 demo 與使用指引「vs 近親元件」段重複)。 */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-3 border border-border rounded-lg p-3 w-72">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="flex flex-col gap-2 flex-1">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-48" />
+            </div>
           </div>
+          <Label>載入中 — 圓形對應頭像、兩行對應名字 + 最新訊息</Label>
         </div>
-        <Label>圓形 avatar、兩行文字寬度遞減 — 符合 Slack DM 列表</Label>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-3 border border-border rounded-lg p-3 w-72">
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary text-on-emphasis text-body font-medium shrink-0">林</div>
+            <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+              <span className="text-body font-medium">林雅婷</span>
+              <span className="text-caption text-fg-secondary truncate">已傳送設計稿連結,請查收</span>
+            </div>
+          </div>
+          <Label>載入完成 — 形狀一一對應,版面不跳動(Slack DM 列表)</Label>
+        </div>
       </Rule>
 
       <Rule
@@ -207,14 +220,14 @@ export const DurationRule: Story = {
       </Rule>
 
       <Rule
-        title="❌ 長時間(&gt; 5s)一直 Skeleton——使用者懷疑卡住"
+        title="❌ 長時間(&gt; 10s)一直 Skeleton——使用者懷疑卡住"
         note="長時間靜態 skeleton 會讓使用者以為網路斷線或系統卡住。此時改用 CircularProgress + 進度文案(「處理中,大約 10 秒」),或 ProgressBar"
       >
         <div className="flex items-center gap-2 border border-border rounded-md px-3 py-2 w-72">
           <CircularProgress />
           <span className="text-body text-fg-muted">分析中,這可能需要一分鐘...</span>
         </div>
-        <Label>&gt; 5s 的長工作 → 改用 CircularProgress + 進度文字,告知使用者仍在處理</Label>
+        <Label>&gt; 10s 的長工作 → 改用 CircularProgress + 進度文字,告知使用者仍在處理</Label>
       </Rule>
     </div>
   ),

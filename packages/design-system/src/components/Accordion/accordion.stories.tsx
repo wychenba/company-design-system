@@ -1,3 +1,4 @@
+// @story-trait-rationale: hasInteractiveStates 的 collapsed↔expanded / disabled item / keyboard 矩陣由 anatomy.stories.tsx StateBehavior owns(含 data-state 標註 + 鍵盤對照表 + token rationale);showcase 層只保留真實業務情境(FAQ / 設定分組 / 進階選項),不再平行重教同一組 state(earn-existence 2-test:showcase States 移除後 spec 理解不 degrade,2026-05-30 audit Dim 24)。
 import type { Meta, StoryObj } from '@storybook/react'
 import {
   Accordion,
@@ -23,49 +24,35 @@ const meta: Meta<typeof Accordion> = {
 export default meta
 type Story = StoryObj<typeof Accordion>
 
-// ── Default — 最 minimal 結構展示 ─────────
+// ── Default — minimal single + collapsible(真實退款 FAQ 雙 item)─────────
 
 export const Default: Story = {
   name: '預設',
   render: () => (
     <div className="max-w-[480px]">
-      <Accordion type="single" collapsible defaultValue="item-1">
-        <AccordionItem value="item-1">
-          <AccordionTrigger>第一個區塊</AccordionTrigger>
-          <AccordionContent>展開內容區。</AccordionContent>
+      <Accordion type="single" collapsible defaultValue="refund-window">
+        <AccordionItem value="refund-window">
+          <AccordionTrigger>退款要多久才會入帳?</AccordionTrigger>
+          <AccordionContent>
+            信用卡退款於 5–10 個工作天內退回原付款帳戶,實際入帳時間依發卡銀行作業而定。
+          </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="item-2">
-          <AccordionTrigger>第二個區塊</AccordionTrigger>
-          <AccordionContent>另一段內容。</AccordionContent>
+        <AccordionItem value="refund-fee">
+          <AccordionTrigger>退款會扣手續費嗎?</AccordionTrigger>
+          <AccordionContent>
+            標準訂單退款不收手續費;若為跨境訂單,匯率價差由發卡機構認列,本平台不另收費。
+          </AccordionContent>
         </AccordionItem>
       </Accordion>
     </div>
   ),
 }
 
-// ── States — closed / open / disabled 並列 ─────────
-
-export const States: Story = {
-  name: '狀態',
-  render: () => (
-    <div className="max-w-[480px]">
-      <Accordion type="multiple" defaultValue={['shipping']}>
-        <AccordionItem value="account">
-          <AccordionTrigger>付款方式如何更新?</AccordionTrigger>
-          <AccordionContent>帳戶設定 → 付款 → 新增信用卡。支援 Visa / Mastercard / JCB。</AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="shipping">
-          <AccordionTrigger>國際運費如何計算?</AccordionTrigger>
-          <AccordionContent>依目的地、重量、體積三項計算。亞太區一律免運(滿 NTD 2,000),其他地區依物流商報價。</AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="enterprise" disabled>
-          <AccordionTrigger>企業方案客製化(僅企業帳戶可用)</AccordionTrigger>
-          <AccordionContent>升級企業方案後解鎖。請聯絡業務:enterprise@example.com</AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </div>
-  ),
-}
+// States(showcase)retired 2026-05-30 per audit Dim 24 —
+// closed / open / disabled 並列矩陣與 anatomy StateBehavior 完全重疊(後者另含 data-state
+// 標註 + 鍵盤對照表 + token rationale,教學更完整)。disabled item 的 live 情境改由
+// SettingsSections / AdvancedOptions 真實場景隱含覆蓋,interactive-states trait 由
+// anatomy StateBehavior owns(見檔首 @story-trait-rationale)。
 
 // ── FAQ(single + collapsible)——Stripe / Notion 類說明頁 ─────────
 

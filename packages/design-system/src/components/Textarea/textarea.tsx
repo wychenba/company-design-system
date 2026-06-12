@@ -3,7 +3,7 @@ import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldMode, useResolvedFieldVariant, useResolvedFieldInvalid } from '@/design-system/components/Field/field-context'
 import { EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 
 /**
@@ -84,7 +84,7 @@ const textareaVariants = cva(
       {
         mode: 'readonly',
         variant: 'default',
-        className: 'bg-disabled border border-transparent',
+        className: 'bg-readonly border border-transparent',
       },
       {
         mode: 'disabled',
@@ -162,7 +162,8 @@ export interface TextareaProps
   /**
    * Visual chrome(正交於 mode);Phase B1(2026-05-05)新增。透傳自 FieldContext.variant,per-prop override。
    * - `'default'` — 完整 chrome(form 場景)
-   * - `'bare'` — 透明 variant,hover/focus reveal(toolbar / cell-as-input)
+   * - `'bare'` — 透明 variant,hover/focus 才 reveal inner border(toolbar / inline editing)
+   * - `'naked'` — 完全無 chrome,cell-as-input(host cell 提供 border + focus frame,對齊 Airtable / Notion / Excel cell editing)
    */
   variant?: FieldVariant
   /** Error 狀態（正交於 mode）。border-error + aria-invalid。 */
@@ -192,13 +193,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     // Field context 整合：disabled / mode / chrome / invalid / size / id 都能從 context 繼承
     const fieldCtx = useFieldContext()
     // chrome 透傳:per-prop override context
-    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
-    const error = errorProp || (fieldCtx?.invalid ?? false)
-    const size = sizeProp ?? fieldCtx?.size ?? 'md'
-    // mode resolve order(Phase B1 2026-05-05):prop > fieldCtx > readOnly/disabled fallback > 'edit'
-    const resolvedMode: FieldMode = modeProp
-      ?? fieldCtx?.mode
-      ?? (readOnly ? 'readonly' : (disabled ?? fieldCtx?.disabled) ? 'disabled' : 'edit')
+    const variant: FieldVariant = useResolvedFieldVariant(variantProp)
+    const error = useResolvedFieldInvalid(errorProp)
+    const size = useResolvedFieldSize(sizeProp)
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode 統一解析(prop > 有效 disabled > fieldCtx.mode > readOnly > 'edit')
+    const resolvedMode: FieldMode = useResolvedFieldMode({ mode: modeProp, disabled, readOnly })
     const isEditable = resolvedMode === 'edit'
     const isDisplay = resolvedMode === 'display'
     const inputId = idProp ?? fieldCtx?.id
@@ -256,7 +255,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 Textarea.displayName = 'Textarea'
 
 // Story auto-compile metadata — Phase 1 mechanical migration(2026-04-24)
-// Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
+// sizes 只反映 Textarea 真實控制的軸:typography(size 只控字體,不綁 field-height、無 icon slot —
+//   高度由 rows + resize-y 決定,per textarea.spec.md L88-92 / L64 / L113)。
 export const textareaMeta = {
   component: 'Textarea',
   family: 4,
@@ -264,11 +264,13 @@ export const textareaMeta = {
 
   },
   sizes: {
-    sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
-    md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
-    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },
+    sm: { typography: 'body' },
+    md: { typography: 'body' },
+    lg: { typography: 'body-lg' },
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  // states 對齊 cva compoundVariants + anatomy ColorMatrix 真實 state 集合;
+  //   text input 無 'active'(按下)視覺態(Material/Polaris/Carbon TextArea 共識)。
+  states: ['default', 'hover', 'focus-visible', 'readonly', 'disabled', 'error'],
   tokens: {
     bg: ['bg-disabled', 'bg-surface'],
     fg: ['text-fg-disabled', 'text-fg-muted', 'text-foreground'],

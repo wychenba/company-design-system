@@ -1,7 +1,8 @@
 *.jsonl
 *.jsonl.*
+release-preflight-pass.json
 last-inject-ts.txt
-.last-blocked-claim.txt
+.last-blocked-*.txt
 .stop-drift-last-head
 .last-prune
 !.gitignore

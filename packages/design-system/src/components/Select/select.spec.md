@@ -19,11 +19,22 @@ benchmark:
 
 ## 定位
 
-Select 是**單選下拉的表單 control**——從 3+ 選項中挑恰好一個，選項收在 dropdown 內展開。底層走原生 `<select>`，透過 CSS 客製視覺。
+Select 是**單選下拉的表單 control**——從 3+ 選項中挑恰好一個，選項收在 dropdown 內展開。**裝置自適應雙路徑**:觸控裝置(`pointer: coarse`)走原生 `<select>` 取平台原生 picker;桌機走自建 combobox(`role="combobox"` + Radix Popover + Command 渲染 SelectMenu)。詳下方「實作:裝置自適應雙路徑」段。
 
 共用規則見 `field-controls.spec.md`。本文件只記錄 Select 特有的原則。
 
 **Layout Family**：CLAUDE.md 4-Family Model **Family 4（Field control layout）** 消費者。結構繼承 `components/Field/field-controls.spec.md` 的 `fieldWrapperStyles + [startIcon?] [<editable>] [endAction?]` 規格,視覺對齊 Family 1（Menu item）讓 SelectMenu trigger + options 連續一致。
+
+## 實作：裝置自適應雙路徑
+
+`Select` public component 在 render 時用 `useIsTouchDevice()`（內部 `matchMedia('(pointer: coarse)')`）分流（`select.tsx`）：
+
+| 裝置 | 路徑 | 實作 | 為什麼 |
+|---|---|---|---|
+| 觸控（`pointer: coarse`，手機 / 平板）| `NativeSelect` | 真原生 `<select>` + CSS 客製 trigger | 行動裝置的原生 picker（iOS wheel / Android dialog）是平台最佳 a11y + 操作體驗，自建選單無法取代 |
+| 桌機（精確指標）| `CustomSelect` | 自建 combobox（`role="combobox"` + Radix Popover + Command + SelectMenu）| 桌機需可控渲染：搜尋輸入、選項內頭像 / 描述 / 分組、自訂鍵盤導覽——原生 `<select>` 都做不到 |
+
+**此分流是「裝置」軸，與 `searchable` 正交**：`searchable` 只決定桌機 combobox 的 trigger 要不要顯搜尋輸入框，**不**決定走原生還是 combobox。一個不可搜尋的桌機 Select 仍是完整自建 combobox（可捲動 / 點選，只是沒搜尋框）。
 
 ---
 
@@ -61,7 +72,17 @@ const [country, setCountry] = useState('tw')
 ### 歷史
 
 - **2026-05-21 前**:刻意 controlled-only,理由「內部狀態複雜易 race」
-- **2026-05-21 D3 audit**:per Phase A deep audit Dim 26 verify + user verbatim「決策三照妳建議」+「都給我做到好」→ 補 `defaultValue` + `useState` internal state + 互斥 signal。實作:`select.tsx:L443 isControlled = valueProp !== undefined` + `internalValue` state + `handleValueChange` 內 `if (!isControlled) setInternalValue(v)`
+- **2026-05-21 D3 audit**:per Dim 26 verify + user 拍板(「決策三照妳建議」),補 `defaultValue` + 互斥 signal。NativeSelect / CustomSelect 統一走既有 `useControllable` hook,`valueProp !== undefined` 為 controlled signal(對齊 M17 SSOT)
+
+### Open-pair 例外:open 軸維持 uncontrolled-only(2026-06-12 deep-audit R2 補)
+
+value 軸 dual-mode,open 軸**刻意只有** `defaultOpen`(初始開)+ `onOpenChange`(通知 callback),無 controlled `open` prop:
+
+- **已知需求只要「初始開 + 知道何時關」**:(1) 視覺快照 — Storybook OpenSnapshot / visual-audit(M15)需「免互動即開」state,`defaultOpen` 一行達成;(2) DataTable cell-as-input(`DataTable/cell-registry.tsx`)— click → 1-step 開選單靠 `defaultOpen`,dismiss 後 `onOpenChange(false)` → cell exit edit mode
+- **受控成本高**:open 是內部 interaction state machine 的一環 — 關閉自動清 search(select.tsx「關閉時清搜尋」effect)/ searchable trigger 在 open 時切 input 顯示模式 / Enter / Space / ArrowDown opener + Esc dismiss 全是內部 intent。controlled `open` 要 consumer 忠實 echo 每一條,漏接任一 → 卡開 / 卡關 / search 殘留
+- **世界級對照**:Radix Popover([radix-ui.com/primitives/docs/components/popover](https://www.radix-ui.com/primitives/docs/components/popover))/ Ant Select([ant.design/components/select](https://ant.design/components/select))/ MUI Select([mui.com/material-ui/api/select](https://mui.com/material-ui/api/select/))皆提供 controlled `open` — 它們是泛用 primitive / library,必須支援任意 orchestration;本 DS 是 opinionated form control,無真實 consumer 需求前不為「可能性」付受控成本(Rule-of-3)
+
+**若未來要開 controlled open**:同 value 軸走既有 `useControllable` hook(M17 SSOT)+ 測 controlled↔uncontrolled switch,屬 major API 擴充,目前不在 scope。
 
 ---
 
@@ -71,7 +92,7 @@ const [country, setCountry] = useState('tw')
 - **Toolbar / filter 的選擇**：table 上方的 category filter、sort by、狀態篩選
 - **Table cell 的 inline edit**：Jira-style task 的 status / priority / assignee（見下文「即時 vs on-submit」）
 - **選項 label 自帶語意**：國家、類別、時區——使用者看 label 就知道要選什麼，不需要額外 description
-- **選項 10+ 且不需搜尋**：時區、國家這類使用者熟悉的清單，依賴 native select 的 type-to-jump 快速定位
+- **選項 10+ 且不需搜尋**：時區、國家這類使用者熟悉的清單，靠捲動瀏覽即可定位（type-to-jump 逐字定位只有手機原生 `<select>` 才有；桌機是自建 combobox，非搜尋模式無逐字定位，選項偏多時建議直接開 searchable）
 
 ## 何時不用
 
@@ -171,10 +192,10 @@ Select 的值套用時機是**由 onChange handler 的副作用決定**，不是
   - 郵遞區號、機場代碼（TPE / NRT / JFK）
   - 使用者 ID、專案 slug、ticket number
   - 中文姓名（同姓大量集中，字母跳不動）
-- ❌ **不需要 searchable**：label 是流暢自然語言、品類名稱，native select 的 type-to-jump 就夠用
+- ❌ **不需要 searchable**：label 是流暢自然語言、品類名稱，且選項數量在捲動可輕鬆掃完的範圍
   - `Electronics`、`Furniture`、`Food`
   - `Draft` / `In progress` / `Done`
-  - 國家英文名（按首字母跳夠快）
+  - 國家英文名（清單不長時捲動即可；注意桌機自建 combobox 無逐字定位，國家這類長清單仍建議開 searchable）
 
 ### 次要啟發：選項數量
 
@@ -186,7 +207,7 @@ Select 的值套用時機是**由 onChange handler 的副作用決定**，不是
 
 ### 為什麼不用純數量 threshold
 
-- 100 個 `a` / `b` / `c` / ... 不需要搜尋（native type-to-jump 直達）
+- 100 個 `a` / `b` / `c` / ... 因 label 有序好掃，捲動定位心智成本低（手機原生 `<select>` 另有 type-to-jump 加成；桌機若清單真的很長仍可開 searchable）
 - 5 個 `SKU-4837` / `SKU-8210` / ... 需要搜尋（使用者記不起哪個代碼對應哪個產品）
 
 純量化規則會誤判這兩端。label 性質是唯一可靠的主判準。
@@ -205,17 +226,21 @@ Select 的值套用時機是**由 onChange handler 的副作用決定**，不是
 ### plain 模式
 
 - 原生 select 純文字 + ChevronDown
-- 可搭配 `startIcon`——**field-level leading indicator**(色 muted,對齊 `Input.startIcon` search-icon pattern;`Mail` / `Globe` / `Lock` / `Flag` 等提示「這個 field 的類型 / 屬性」,跟 selected value 變動無關)
-- **代表 value 的 icon(value-bound)走 `option.icon` per-option API**,Select 渲 selected 時 inherit fg-default(對齊 `MenuItem.startIcon` 跨元件 SSOT)
-- 兩 prop 不互斥:`startIcon` field-level 顯示時優先;unset 才落到 selected `option.icon` fallback(select.tsx:197/369 `SelectedIcon` path)
-- **icon kind canonical(2026-05-09 clarified)**:DS 兩種 icon 角色明確區分 — **value icon**(代表 label / 選中項)→ fg-default(MenuItem 內 / `option.icon`)/ **indicator icon**(field-level leading hint)→ muted(Input.startIcon / Select.startIcon)
+- **Icon-binding 矩陣**(icon kind canonical,2026-05-09 clarified):
+
+| Icon 角色 | Prop | 語意 | 色彩 | 優先序 |
+|---|---|---|---|---|
+| **Indicator icon**(field-level leading hint)| `startIcon` | 提示 field 類型 / 屬性(`Mail` / `Globe` / `Lock` / `Flag`),與選中值無關 | muted(對齊 `Input.startIcon` search-icon pattern)| 設定時恆顯,優先 |
+| **Value icon**(代表選中項)| `option.icon`(per-option)| 隨 selected option 變動 | fg-default(對齊 `MenuItem.startIcon` 跨元件 SSOT)| `startIcon` unset 時 fallback |
+
+兩 prop 不互斥——同時設定時 `startIcon` 勝(渲染分支見 `select.tsx`)。
 
 ### tag 模式
 
 - Tag 元件呈現選中值 + 隱藏的原生 select overlay
 - Tag 設為 `pointer-events-none`，點擊穿透到底層 select
 - edit 模式：Tag + ChevronDown + 可選 clear
-- readonly / disabled：Tag 只顯示，無 ChevronDown
+- readonly / disabled：Tag 顯示 + ChevronDown 恆顯(類型身份 indicator;readonly fg-muted / disabled fg-disabled),不可開選單
 
 ---
 
@@ -248,14 +273,23 @@ Select 的值套用時機是**由 onChange handler 的副作用決定**，不是
 
 ## Loading
 
-`loading?: boolean`(forward 給 SelectMenu SSOT,2026-05-15 audit B 補):dropdown body 內取代 options 顯 `<Empty icon={<CircularProgress size={48}/>}/>`(消費 既有 empty.spec.md:182 SSOT)+ `aria-busy`。Trigger 不變(chevron 保留,user 隨時可開)。對齊 MUI Autocomplete `loadingText` 雙層 + Ant Select loading,反 trigger spinner 派。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+`loading?: boolean`(forward 給 SelectMenu SSOT,2026-05-15 audit B 補):dropdown body 內取代 options 顯 `<Empty icon={<CircularProgress size={48}/>}/>`(消費 既有 empty.spec.md「現有消費者」SelectMenu loading row SSOT)+ `aria-busy`。Trigger 不變(chevron 保留,user 隨時可開)。對齊 MUI Autocomplete `loadingText` 雙層 + Ant Select loading,反 trigger spinner 派。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+
+---
+
+## 邊界案例
+
+- **搜尋結果空**:dropdown 顯 `<Empty>`(`emptyText` 預設「沒有符合的選項」,可覆寫)——SSOT `select-menu.spec.md`
+- **disabled 選項**:`option.disabled` forward 至 menu item——不可點選,鍵盤導覽自動跳過(cmdk `aria-disabled` 行為)
+- **大量選項**:選單固定最大高度內捲動(`--menu-max-height` 預設 300px),無分頁 / 虛擬捲動——長清單開 `searchable`(見「Searchable 開啟判斷」)
+- **空值**:無選擇時顯 placeholder;「無選擇是有效狀態」場景開 `clearable`(見「Clearable」)
 
 ---
 
 ## 禁止事項
 
 - ❌ `startIcon` 不可用於 tag 模式——Tag 本身已有視覺標記，startIcon 是冗餘的
-- ❌ 不自建 dropdown menu——使用原生 `<select>` 保證無障礙和行動裝置體驗
+- ❌ 在**觸控裝置**自建 dropdown——手機 / 平板必走原生 `<select>`（平台 picker 的 a11y + 操作體驗最佳）；桌機才走自建 combobox（見「實作：裝置自適應雙路徑」）
 - ❌ 讓使用者搞不清楚是即時還是 on-submit——用 label / 按鈕位置明確傳達
 - ❌ 把「決策節點」選擇塞進 Select（付款方式、訂閱方案）——使用者需要對比評估，用 RadioGroup
 
@@ -279,15 +313,16 @@ Select 是 **Field Controls family 成員**——互動狀態(focus / invalid / 
 
 ## A11y 預設
 
-**ARIA / Pattern**:native `<input>` element 預設 a11y;Field wrapper 補 `aria-labelledby` / `aria-invalid` / `aria-describedby`。
+**ARIA / Pattern**:依裝置分兩條路徑。桌機(非觸控)觸發點是容器 `<div>`,標記 `role="combobox"` + `aria-expanded` / `aria-haspopup="listbox"`,選項在浮層 listbox 裡;searchable 模式時容器內另放可打字篩選的 `<input>`。手機(觸控)改用瀏覽器原生 `<select>` element,直接取得作業系統內建的無障礙與 picker。兩路徑皆由 Field wrapper 補 `aria-invalid` / `aria-required` / `aria-describedby` / `aria-errormessage`。
 
 **Keyboard 行為**:
 
-- Tab — focus
-- 字母鍵 — 輸入
-- Esc — 清空(若 clearable + 有值)
+- Tab — 聚焦到觸發點
+- Enter / Space — 展開選單(searchable 模式則直接進入打字篩選)
+- ↑ / ↓ — 選單展開後在選項間移動
+- Esc — 關閉選單(清除值走右側 clear 按鈕,非 Esc)
 
-**Focus**:native input focus ring;DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供。
+**Focus**:DS focus 藍框(`focus-within:!border-primary`)由 Field wrapper 提供;手機原生 `<select>` 另有系統 focus ring。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
@@ -295,5 +330,8 @@ Select 是 **Field Controls family 成員**——互動狀態(focus / invalid / 
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `checkbox.spec.md`
+- `combobox.spec.md`
 - `people-picker.spec.md`
+- `radio-group.spec.md`
 - `select-menu.spec.md`

@@ -1,0 +1,272 @@
+{
+  "packages/design-system/src/components/Alert/alert.anatomy.stories.tsx": [
+    {
+      "location": "packages/design-system/src/components/Alert/alert.anatomy.stories.tsx:203",
+      "claim": "StateBehavior story Desc:『Chrome corner close 用 Button iconOnly dismiss size=\"xs\"(...見 overlay-surface.spec.md「Chrome dismiss size canonical」三家族分類 — Notice / Alert / Toast 屬 notification banner,xs 為其家族設計準則)』。同樣的『三家族分類(Modal sm / Non-modal xs / Notification xs)』framing 也出現在 notice.tsx:30 與 notice.spec.md:56 的 cross-reference。",
+      "actual": "overlay-surface.spec.md「Chrome dismiss size canonical」(L265-359)現行 canonical 已將『三家族』模型明文 RETIRE:L350『❌ v2「三家族 modal sm / non-modal xs / banner xs」→ 錯:overlay 內部不必分化』。現行 canonical 是 two-category:overlay surface(Dialog/Sheet/Popover)用 size=\"sm\" + data-unbounded 負 margin trick(L271-274、L307);只有 notification banner(Notice/Alert/Toast)用 xs(L313-314)。code 端 Alert→Notice dismiss 用 size=\"xs\"(notice.tsx:131)= 正確符合現行 banner canonical;錯的只是文件引用了已被廢除的『三家族 Modal sm / Non-modal xs / Notification xs』section framing。",
+      "recommendedFix": "改 alert.anatomy.stories.tsx:203(及 notice.tsx:28-30、notice.spec.md:56)的 cross-ref wording,移除『三家族分類(Modal sm / Non-modal xs / Notification xs)』,改述為現行 canonical:『notification banner family(Notice/Alert/Toast)固定 px-4 py-3,dismiss 用 xs;overlay surface 另走 sm + unbounded 負 margin trick』,指向 overlay-surface.spec.md L265-323 現行段落。"
+    }
+  ],
+  "packages/design-system/src/components/Badge/badge.tsx": [
+    {
+      "location": "packages/design-system/src/components/Badge/badge.tsx:95",
+      "claim": "badgeMeta.states = ['default', 'hover', 'active', 'focus-visible', 'disabled'] — auto-compile metadata 宣稱 Badge 有 hover / active / focus-visible / disabled 互動狀態。",
+      "actual": "Badge cva (badge.tsx:20-44) 完全沒有任何 hover: / active: / focus-visible: / disabled: 變體 class,只有 base + variant(4 色)+ dot(true/false)。元件是 plain non-focusable <span>(L68-76),無任何 state machine。spec「為何無 StateBehavior」段(badge.spec.md:363-371)明文「無 hover / focus / active / selected / disabled 這類 state」;anatomy @anatomy-rationale header(badge.anatomy.stories.tsx:3-5)也明文「StateBehavior N/A — Badge 是純展示元件(無互動)」。同檔 badgeMeta.tokens.ring=[] 亦印證無 focus ring。",
+      "recommendedFix": "把 badge.tsx:95 改為 states: ['default'](或空 [] 並加註 // Badge 非互動,無 state — 見 spec「為何無 StateBehavior」),消除與 spec L363-371 + anatomy @anatomy-rationale 的矛盾。"
+    }
+  ],
+  "packages/design-system/src/components/Badge/badge.anatomy.stories.tsx": [
+    {
+      "location": "packages/design-system/src/components/Badge/badge.anatomy.stories.tsx:511",
+      "claim": "SizeMatrix token 表 Dot 模式 Radius 寫 rounded-full,value 標『9999px（implicit via w/h）』——暗示 dot 的圓形是『經由相等 w/h 隱式產生』。",
+      "actual": "cva base class(badge.tsx:25)為 'inline-flex items-center justify-center rounded-full leading-none',rounded-full 顯式寫在 base,同時套用 count 與 dot 兩模式。dot 的圓形來自 base 的 rounded-full(顯式),不是『相等 w/h 隱式』。同表 Count 模式 Radius 也正確標 rounded-full,可見 rounded-full 對兩模式都是顯式 base class。",
+      "recommendedFix": "把 badge.anatomy.stories.tsx:511 dot 列 value 的『9999px（implicit via w/h）』改為『9999px（base rounded-full）』或單純『9999px』,與 Count 列一致。"
+    },
+    {
+      "location": "packages/design-system/src/components/Badge/badge.anatomy.stories.tsx:580",
+      "claim": "Accessibility story:『role=\"status\"：cva 預設,計數更新時自動播報,不需 consumer 設定。』——把 role=\"status\" 預設歸因於 cva。",
+      "actual": "role 預設不是 cva 產生。cva(badgeVariants)只回傳 className 字串。role 是 forwardRef render 邏輯的 JSX 預設:`role={role ?? 'status'}`(badge.tsx:58, 70)。『default role 為 status』行為正確,但機制是 prop 預設(consumer 可 override),非 cva。",
+      "recommendedFix": "把 badge.anatomy.stories.tsx:580 的『role=\"status\"：cva 預設』改為『role=\"status\"：元件預設(forwardRef render,consumer 可傳 role override)』,與 badge.tsx:63-66 註解一致。"
+    }
+  ],
+  "packages/design-system/src/components/FileUpload/file-upload.tsx": [
+    {
+      "location": "packages/design-system/src/components/FileUpload/file-upload.tsx:238",
+      "claim": "對稱 padding p-[var(--layout-space-loose)]:四邊等距,density-aware(md=24px / lg=32px),對齊 DS chrome padding canonical。",
+      "actual": "--layout-space-loose 實際值為 md=16px / lg=24px,非 24/32。SSOT layoutSpace.css:4 (--layout-space-loose: 16px) + layoutSpace.css:23 (lg: 24px);layoutSpace.spec.md:11 表格明列 16px/24px。同元件的 anatomy.stories.tsx (L48/L144/L298/L316) 與 spec.md SizeMatrix 全寫對的 16/24,只有此 tsx docstring 的 24/32 是錯的。",
+      "recommendedFix": "把 tsx L238 註解的「(md=24px / lg=32px)」改為「(md=16px / lg=24px)」對齊 layoutSpace SSOT 與 anatomy/spec。autonomous typo fix。"
+    },
+    {
+      "location": "packages/design-system/src/components/FileUpload/file-upload.tsx:80-82",
+      "claim": "files prop 每項 status 對應 icon:`uploading`:CircularProgress(+ progress bar 若 progress 給);`completed`:綠色 ✓;`error`:紅色 ✗",
+      "actual": "files prop 的 list item 由 FileItem 渲染(file-upload.tsx:167 <FileItem ...>)。FileItem 對 uploading 狀態渲染的是 linear ProgressBar(file-item.tsx:115-122 consume ProgressBar,height 2px/4px),完全沒有 CircularProgress(grep 證實 FileItem 內 0 個 CircularProgress)。completed=綠 CircleCheck/text-success、error=紅 XCircle/text-error 正確(file-item.tsx:31-34 STATUS_ICON)。CircularProgress 只用在 drop-zone 自身的 loading prop(file-upload.tsx:266),不在 files item 的 uploading。",
+      "recommendedFix": "把 tsx L81 的『uploading:CircularProgress(+ progress bar 若 progress 給)』改為『uploading:ProgressBar(linear,via FileItem;rich mode 另顯示 {progress}%)』,對齊 FileItem 真實渲染。autonomous doc fix。"
+    },
+    {
+      "location": "packages/design-system/src/components/FileUpload/file-upload.tsx:177-178",
+      "claim": "視覺與 dismiss 一致(text variant + fg-muted dim)— 對齊 inline-action.spec.md「Dismiss canonical — X close only」L249-251:onRemove callback 不觸發 dismiss prop。",
+      "actual": "inline-action.spec.md 的「### Dismiss canonical — X close only」section 起於 L204;onRemove 不觸發 dismiss 的明文在 L229(『不觸發:callback = onRemove(collection 操作)... 不是 dismiss 語意』)。L249-251 實際是另一個 section「## Escape hatch — config 表達不出時的 10% case」,與引文無關。line ref stale。",
+      "recommendedFix": "把 tsx L178 的行號『L249-251』改為『L204(Dismiss canonical section)/ L229(onRemove 不觸發 dismiss)』。autonomous doc fix。"
+    }
+  ],
+  "packages/design-system/src/components/FileUpload/file-upload.anatomy.stories.tsx": [
+    {
+      "location": "packages/design-system/src/components/FileUpload/file-upload.anatomy.stories.tsx:81-90",
+      "claim": "Props 速查表列出 9 個 prop(onUpload / onReject / multiple / accept / maxSize / disabled / title / description / children)。",
+      "actual": "tsx interface FileUploadProps(file-upload.tsx:54-92)實際導出 16 個 public prop。anatomy Props 速查表完全省略了 headline 內建檔案清單 API(files / fileListMode / onRemove / removeAriaLabel)以及 loading / loadingTitle —— 其中 files/fileListMode/onRemove 是 WithFileList showcase story(stories.tsx:82-116)主打的內建功能,loading 是 anatomy 自己的 4-state 之一。",
+      "recommendedFix": "在 anatomy Props 速查表補列 files / fileListMode / onRemove / removeAriaLabel / loading / loadingTitle 六個 prop 與型別/預設值,或明寫『完整 props 見 interface,本表僅列高頻』。autonomous doc fix。"
+    }
+  ],
+  "packages/design-system/src/components/Input/input.anatomy.stories.tsx": [
+    {
+      "location": "packages/design-system/src/components/Input/input.anatomy.stories.tsx:243",
+      "claim": "「Props」表只列出 5 個 prop:`mode` / `error` / `size` / `startIcon` / `endAction`(L243-251),且註明 endAction「僅 edit 模式渲染」。",
+      "actual": "`InputProps`(input.tsx:15-67)實際公開 9 個語意 prop:除上述 5 個外,還有 `variant`(L28)/ `endSlot`(L42,ReactNode escape hatch)/ `loading`(L50,async 驗證 + aria-busy)/ `autoWidth`(L66,field-sizing:content)。其中 `loading` 與 `autoWidth` 是非 trivial 行為 prop——loading 會在 endAction slot 自動塞 CircularProgress + 設 aria-busy(input.tsx:166,197-198),autoWidth 改 wrapper 為 inline-flex w-auto + input field-sizing:content(input.tsx:161,193)。Props 表完全沒提這 4 個。",
+      "recommendedFix": "在 anatomy Props 表補 `variant`(型別 `'default'|'bare'`,default `'default'`)/ `loading`(boolean,false)/ `autoWidth`(boolean,false)/ `endSlot`(ReactNode,—,跟 endAction 互斥)四列;若 naked 經 user 確認為公開值則 variant 型別也補 naked。"
+    },
+    {
+      "location": "packages/design-system/src/components/Input/input.anatomy.stories.tsx:248",
+      "claim": "Props 表 endAction 說明欄:「右側 inline action(宣告式 API),僅 edit 模式渲染」——暗示 edit 模式下 endAction 一定渲染。",
+      "actual": "endAction 渲染受三層優先序攔截(input.tsx:197-204):`loading ? <CircularProgress/> : endSlot && isEditable ? endSlot : endAction && isEditable ? <ItemInlineAction/> : null`。即 `loading=true` 時 endAction 被 CircularProgress 取代(spec L47 + input.tsx JSDoc L47「與 endAction prop 互斥」明載),`endSlot` 存在時 endAction 被忽略(input.tsx JSDoc L37「同時傳 endSlot 會優先,endAction 被忽略」)。Props 表的「僅 edit 模式渲染」只講了 mode 維度,漏了 loading / endSlot 兩個會搶佔同 slot 的互斥條件。",
+      "recommendedFix": "anatomy Props 表 endAction 說明補一句互斥條件:「僅 edit 模式渲染;loading=true 或傳 endSlot 時被覆蓋」。或直接連結 spec Loading 段。"
+    }
+  ],
+  "packages/design-system/src/components/Input/input.tsx": [
+    {
+      "location": "packages/design-system/src/components/Input/input.tsx:216",
+      "claim": "auto-compile metadata `inputMeta` 宣告 `variants: {}`(空)、`sizes: {}`(空),且 L215 註解「Phase 2 fill needed: purpose descriptions + when rationale + world-class refs」。",
+      "actual": "Input 實際有完整 size 系統 sm/md/lg(input.tsx 透過 `size` prop 餵 fieldWrapperStyles,uiSize.spec.md:30 明列 Input sizes = sm/md/lg default md)且有 chrome variant default/bare(/naked)。`inputMeta.sizes` / `inputMeta.variants` 留空 = 與真實 API 不一致的 stale/未填 metadata。同時 `inputMeta.states`(L225)列了 `'active'` 與 `'focus-visible'`,但 Input 是 native `<input>`+wrapper focus-within border 模型,wrapper 無 active 態樣式(field-wrapper.tsx edit chrome 只有 hover / focus-within / data-state=open,無 active)。",
+      "recommendedFix": "填 `inputMeta.sizes`(sm/md/lg + 對應 field-height token)、`inputMeta.variants`(default/bare,naked 視 user 對 finding A 的裁示)、校正 `states`(移除 active,或註明 focus-visible 經 focus-within 表達),完成 Phase 2 fill 並移除 L214-215 TODO 註解。"
+    }
+  ],
+  "packages/design-system/src/components/Notice/notice.spec.md": [
+    {
+      "location": "packages/design-system/src/components/Notice/notice.spec.md:118",
+      "claim": "邊界案例 Empty:「Notice 必有 title 或 description 其一(消費合約);無 title-only icon-less 形態,layout 至少 1 行內容。」",
+      "actual": "notice.tsx:64 `title: React.ReactNode`(非 optional,必填),notice.tsx:65 `description?`(optional)。真實合約是『title 永遠必填、description 可選』,不是『title 或 description 其一』。且『無 title-only icon-less 形態』與事實相反——notice.stories.tsx:240-257 `NeutralTitleOnly` story 就是 variant=neutral(VARIANT_ICON.neutral=null,無 icon)+ 只給 title 無 description,即一個正常 render 的 title-only icon-less Notice。",
+      "recommendedFix": "改寫成:『Notice 的 title 為必填(消費合約),description 選填;neutral variant 無 status icon 時即為 title-only icon-less 形態(見 NeutralTitleOnly story),仍合法 render。layout 至少 1 行 title 內容。』"
+    }
+  ],
+  "packages/design-system/src/components/Notice/notice.tsx": [
+    {
+      "location": "packages/design-system/src/components/Notice/notice.tsx:182",
+      "claim": "`noticeMeta.family = null, // non-family composite / overlay / layout`",
+      "actual": "同檔 notice.tsx:8 docstring 與 notice.spec.md:3 frontmatter `family: 2` + notice.spec.md:26 『Layout Family:CLAUDE.md 4-Family Model Family 2(List item layout)消費者』都明確聲明 Family 2。compile-stories.mjs:127 `lines.push(\\`**Layout Family**: ${tsxMeta.family}\\`)` 直接消費 noticeMeta.family → 編出 『Layout Family: null』,與 spec SSOT 矛盾。",
+      "recommendedFix": "改 noticeMeta.family 從 null → 2,移除『non-family composite』comment,對齊 spec frontmatter family: 2。(此為 metadata 對齊,非 SSOT 視覺結構改動。)"
+    }
+  ],
+  "packages/design-system/src/components/Popover/popover.anatomy.stories.tsx": [
+    {
+      "location": "packages/design-system/src/components/Popover/popover.anatomy.stories.tsx:49-55",
+      "claim": "Props 速查表 column header 標示 `Prop(PopoverContent)`，table 內列出的 row 含 `open / onOpenChange`(L54)與 `modal`(L55,Default `false`,說明「`true` 時鎖 body scroll + focus trap」)。",
+      "actual": "Radix source 明確區分:`modal` / `open` / `onOpenChange` / `defaultOpen` 全宣告在 `Popover.Root`(PopoverProps,@radix-ui/react-popover/dist/index.d.ts:10-16),**不是** PopoverContent。只有 `side` / `align` / `sideOffset` / `collisionPadding` 才是 Content props(來自 PopperContentProps,react-popper/dist/index.d.ts:23-30)。本 DS 的 PopoverContent forwardRef(popover.tsx:49-52)用 `React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>`,不含 modal/open/onOpenChange。table 把 3 個 Root-only props 放進 `Prop(PopoverContent)` 標題下。",
+      "recommendedFix": "把 Props 速查表拆成兩段或兩欄:`Prop(Popover Root)` 收 `open / onOpenChange / defaultOpen / modal`;`Prop(PopoverContent)` 收 `side / align / sideOffset / collisionPadding`。或將 header 改為泛稱並在每 row 標註所屬元件。"
+    }
+  ],
+  "packages/design-system/src/components/Popover/popover.spec.md": [
+    {
+      "location": "packages/design-system/src/components/Popover/popover.spec.md:155-160",
+      "claim": "「## A11y 預設」段開頭寫「**Radix Popover 自動處理**:焦點管理:開啟時移動焦點進入 content」;Accessibility story(popover.anatomy.stories.tsx:271)同字句「Radix Popover 自動處理:焦點管理」。",
+      "actual": "popover.tsx:37-47 定義 `handlePopoverOpenAutoFocus`,並在 PopoverContent(L60)以 `onOpenAutoFocus={onOpenAutoFocus ?? handlePopoverOpenAutoFocus}` **覆寫 Radix 預設 autofocus**。handler 先 `e.preventDefault()`(取消 Radix 預設行為),再自訂 querySelector 找 body 第一個可互動元素 focus。docblock L36 明說覆寫理由是「避免 focus 到 close X 觸發 tooltip leak」——即 Radix 預設會先 focus close X。所以「開啟時 focus 進入 content」的**結果**成立,但**不是 Radix 自動處理**,是 DS 自訂 handler。",
+      "recommendedFix": "A11y 段與 Accessibility story 改寫為:「焦點管理:DS 覆寫 Radix 預設 autofocus(`onOpenAutoFocus`),開啟時將焦點落在 body 第一個可互動元素(避免 Radix 預設 focus close X 導致 tooltip leak);關閉時由 Radix 將焦點 return to trigger」,區分 DS-custom 與 Radix 內建兩段。"
+    },
+    {
+      "location": "packages/design-system/src/components/Popover/popover.spec.md:159",
+      "claim": "A11y 段以「**Focus trap**」為子標題,bullet 內含「`modal={true}` 時焦點鎖在 content 內;**預設 non-modal 下焦點離開 content 樹會自動關閉**」。",
+      "actual": "Radix non-modal 路徑(react-popover/dist/index.js:213-251 `PopoverContentNonModal`)設 `trapFocus: false`、`disableOutsidePointerEvents: false`——**non-modal 完全沒有 focus trap**。focus 離開 content 觸發 DismissableLayer 的 `useFocusOutside`(react-dismissable-layer/dist/index.js:217-231 focusin listener)→ onInteractOutside → dismiss。modal 路徑(L173-212)才 `trapFocus: context.open`。",
+      "recommendedFix": "將該 bullet 標題拆分:focus trap 只描述 `modal={true}`;non-modal 的「focus 離開即關閉」移到獨立 bullet(如『Dismiss on focus-out(non-modal)』),避免標題與內容語意衝突。"
+    }
+  ],
+  "packages/design-system/src/components/RadioGroup/radio-group.tsx": [
+    {
+      "location": "packages/design-system/src/components/RadioGroup/radio-group.tsx:250",
+      "claim": "radioGroupMeta.sizes.lg = { fieldHeight: 40, iconSize: 20, typography: 'body' }(lg 控件對應 field-height 40px)。sm = fieldHeight 28 / md = fieldHeight 32。",
+      "actual": "Token SSOT 預設密度(:root)`--field-height-lg = 2.25rem = 36px`(uiSize.css:25);40px 只在 lg-density override(uiSize.css:88)。sm=28 / md=32 與 :root 一致正確,但 lg=40 對不上預設密度。Checkbox spec 也明寫 `--field-height-sm/md/lg = 28/32/36px`(checkbox.spec.md:124)。",
+      "recommendedFix": "把 radioGroupMeta.sizes.lg.fieldHeight 由 40 改回 36(對齊 :root --field-height-lg 與 Checkbox spec L124)。"
+    },
+    {
+      "location": "packages/design-system/src/components/RadioGroup/radio-group.tsx:13-24",
+      "claim": "檔頭註解(L13-24)宣稱 display mode『不渲染 Radix primitive,改透過 Context 通知 child RadioGroupItem「我在 display mode、selected value 是 X」;item 自決 — 命中 selected 渲染 label 純文字,未命中 render null』,並定義 RadioGroupDisplayContext 走 context-dispatch 模型。",
+      "actual": "實際實作 RadioGroup display 分支(L51-54 註解明寫『不用 context dispatch 給 RadioGroupItem』+ L55-77)是 RadioGroup 自己 walk props.children 找 control.value===selectedValue 並渲染單一 plain-text span。`RadioGroupDisplayContext.Provider` 全 repo 從未被 render(grep 僅 createContext L24 + useContext L182,無 Provider),故 RadioGroupItem 的 display 分支(L182-186 `displayCtx?.displayMode`)永遠 falsy = 不可達 dead code。整個 RadioGroupDisplayContext 為 dead abstraction。附註:child-walk 對 stories 的 <SelectionItem control={<RadioGroupItem value=.../>} label=.../> 用法可正常運作(讀 child.props.control + child.props.label),功能本身正確。",
+      "recommendedFix": "改檔頭註解 L13-24 描述真實的 walk-children 模型(刪除 context-dispatch 敘述);並移除未使用的 RadioGroupDisplayContext(L20-24)+ RadioGroupItem 內不可達的 displayCtx 分支(L182-186)。屬 autonomous clean(dead code + 註解校正,不動 canonical 行為)。"
+    },
+    {
+      "location": "packages/design-system/src/components/RadioGroup/radio-group.tsx:252",
+      "claim": "radioGroupMeta.states = ['default', 'hover', 'active', 'focus-visible', 'disabled'] — 宣告 radio 有 'active'(pressed)state。",
+      "actual": "cva radioItemVariants(L98-125)無任何 `active:` / `:active` 樣式(只有 default / hover / data-[state=checked] / focus-visible / disabled / data-[readonly])。anatomy Inspector 自己也只用 STATES=['default','hover','disabled'](L21),無 active。",
+      "recommendedFix": "從 radioGroupMeta.states 移除 'active'(改為 ['default','hover','focus-visible','disabled'],並可補 'checked'/'readonly' 以對齊 cva 真實 states),使 meta 與 cva + anatomy STATES 一致。"
+    }
+  ],
+  "packages/design-system/src/components/RadioGroup/radio-group.spec.md": [
+    {
+      "location": "packages/design-system/src/components/RadioGroup/radio-group.spec.md:132",
+      "claim": "聚焦時顯示 visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。",
+      "actual": "cva radioItemVariants(radio-group.tsx:104)用 `focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1` — 即 Tailwind box-shadow ring(非 CSS outline 屬性),且帶 ring-offset-1。anatomy Inspector(L377)正確記為 `ring-2 ring-ring ring-offset-1`。",
+      "recommendedFix": "把 spec L132 的 `outline: 2px solid var(--ring)` 改為實際的 `ring-2 ring-ring ring-offset-1`(box-shadow ring),與 cva L104 + anatomy Inspector L377 對齊。"
+    }
+  ],
+  "packages/design-system/src/components/SelectionControl/selection-item.tsx": [
+    {
+      "location": "packages/design-system/src/components/SelectionControl/selection-item.tsx:68",
+      "claim": "檔頭 block 註解第 68 行宣稱:「control 永遠包在 h-[1lh] 容器內,對齊第一行 label。」(control is ALWAYS wrapped in an h-[1lh] container, aligned to the first line of label)",
+      "actual": "code 並非永遠用 h-[1lh]。L221 `const useBlock = !!avatar && !Icon && !!description && AVATAR_PX.block[sizeKey] > 24`;L223 `const alignClass = useBlock ? blockAlignClass[sizeKey] : 'h-[1lh]'`;L227 control wrapper `<div className={cn(alignClass, ...)}>{control}</div>`。block 模式時 control 容器高度 = blockAlignClass(`h-[calc(1lh+gap+descHeight)]` L60-64),不是 h-[1lh]。此 stale 註解同時與同檔 L51-53 註解(『block 模式時 control 跟 prefix 一起走 block 高度』)及 L84-93 avatar prop jsdoc(『Block 模式時 control(checkbox/radio)也一起走 block 高度』)直接矛盾。",
+      "recommendedFix": "改 L68 註解為:『control 預設包在 h-[1lh] 容器對齊第一行 label;當 avatar + 有 description(block 模式)時,control 改與 avatar 一起走 blockAlignClass 高度,在 text block center 對齊(見 L221 useBlock + L51-53 視覺語意說明)。』與同檔 L51-53 / L84-93 措辭對齊。"
+    }
+  ],
+  "packages/design-system/src/components/SelectionControl/selection-item.anatomy.stories.tsx": [
+    {
+      "location": "packages/design-system/src/components/SelectionControl/selection-item.anatomy.stories.tsx:111",
+      "claim": "Overview『Slot 對照』表 control 列的「共用容器」欄宣稱:`h-[1lh] · block: avatar height`(暗示 block 模式下 control/prefix 容器高度 = avatar 的高度)",
+      "actual": "block 模式容器高度不是 avatar 高度。selection-item.tsx L60-64 `blockAlignClass = h-[calc(1lh + var(--item-gap-label-desc-reading[-lg]) + var(--font-body-size)*1.5)]` = label 第一行 + label/desc 間距 + description 高度 = 整個 text block 高度。avatar 本身的 px(L54/L93-95 AVATAR_SIZE.block = 32/32/40)是放進這個 text-block-height 容器內、用 `flex items-center` 置中(L141 PrefixSlot / L227 control wrapper),容器高度 ≠ avatar 高度(例如 md:avatar=32px,但容器 = 21px lh + 2px gap + 21px desc = 44px)。",
+      "recommendedFix": "把該欄改為精確措辭,例如 `h-[1lh] · block: text-block height (1lh + gap + desc)`,並可註明 avatar/control 在其中以 items-center 置中。與 selection-item.tsx L56-64 blockAlignClass 註解口徑一致。"
+    }
+  ],
+  "packages/design-system/src/components/Separator/separator.tsx": [
+    {
+      "location": "packages/design-system/src/components/Separator/separator.tsx:40",
+      "claim": "separatorMeta.states = ['default', 'hover', 'active', 'focus-visible', 'disabled'] — machine metadata declaring Separator has hover/active/focus-visible/disabled states.",
+      "actual": "Separator 是 Radix Separator passthrough,render 為 non-interactive <div>(separator.tsx:14-24);無 tabIndex、無 hover/active/focus class、無 disabled prop。Radix source (node_modules/@radix-ui/react-separator/dist/index.js:45-59) 確認只接 orientation + decorative,無任何 interactive state。spec L86「無 StateBehavior:非互動元件,無 hover / focus / active / selected / disabled」+ anatomy rationale (separator.anatomy.stories.tsx:1-6) 都明文聲明非互動。更嚴重:scripts/compile-stories.mjs:143-144 `tsxMeta.states.forEach(s => lines.push('- ' + s))` 會把這個 array 直接 emit 成 anatomy 的「## States」section,等於對外輸出「Separator 有 hover/active/focus/disabled state」的錯誤文件。",
+      "recommendedFix": "把 separatorMeta.states 改為 `['default']`(或空 array / 移除),反映 Separator 非互動真實。連帶確認 compile-stories 產出的 anatomy States section 不再列出虛構的 hover/active/focus/disabled。"
+    },
+    {
+      "location": "packages/design-system/src/components/Separator/separator.tsx:33",
+      "claim": "separatorMeta.family = null(// non-family composite / overlay / layout)",
+      "actual": "spec.md frontmatter (separator.spec.md:3) 宣告 `family: self-contained`,spec 正文 L17 亦寫「self-contained primitive(獨立視覺,無 slot 結構)」。tsx metadata 與 spec 兩個文件面對 family 的標示不一致(null vs self-contained)。",
+      "recommendedFix": "把 separatorMeta.family 由 `null` 改為 `'self-contained'`(或定義一致的 enum 值),與 spec frontmatter `family: self-contained` 對齊;這是跨多個 passthrough 元件的 Phase-2 fill 共通缺口,可一併處理。"
+    }
+  ],
+  "packages/design-system/src/components/Separator/separator.spec.md": [
+    {
+      "location": "packages/design-system/src/components/Separator/separator.spec.md:19",
+      "claim": "「實作基礎:基於 Radix Separator(shadcn passthrough)——提供正確的 ARIA `role=\"separator\"` + orientation 語意。」(同樣 framing 見 anatomy separator.anatomy.stories.tsx:33「提供正確的 ARIA `role=\"separator\"`」)",
+      "actual": "Component 預設 `decorative = true`(separator.tsx:11),傳給 Radix 後走 semanticProps = { role: 'none' }(radix source index.js:49),即預設 DOM render `role=\"none\"`,**不是** `role=\"separator\"`。只有 consumer 顯式傳 `decorative={false}` 才 render `role=\"separator\"`。spec 自己的 A11y 段 L96 已正確記載「預設 role=\"none\"」,故 L19 的 positioning 句與同檔 L96 互相矛盾(over-simplify)。",
+      "recommendedFix": "把 L19 / anatomy L33 改為條件式表述,例:「提供正確的 ARIA 語意 — 預設 `role=\"none\"`(decorative),`decorative={false}` 時輸出 `role=\"separator\"`」,與 A11y 段 L96-98 對齊。"
+    }
+  ],
+  "packages/design-system/src/components/Skeleton/skeleton.spec.md": [
+    {
+      "location": "packages/design-system/src/components/Skeleton/skeleton.spec.md:89",
+      "claim": "動畫:`prefers-reduced-motion: reduce` 用戶自動 stop pulse 動畫(對齊 WCAG 2.3.3 Animation from Interactions)",
+      "actual": "skeleton.tsx:10 用 `motion-reduce:animate-none`,確實在 `prefers-reduced-motion: reduce` 下停止 pulse —— 行為正確。但引用的 WCAG SC 編號錯誤:Skeleton 的 pulse 是頁面自動播放的循環動畫(非由使用者互動/捲動觸發),歸 WCAG 2.2.2 Pause, Stop, Hide(Level A);2.3.3 Animation from Interactions 是 Level AAA,僅涵蓋『由互動觸發的位移動畫』,不適用於 auto-play loop。經 WebFetch W3C Understanding 2.3.3 確認:『a continuously looping pulsing skeleton would fall under SC 2.2.2, not SC 2.3.3』。",
+      "recommendedFix": "把 spec.md:89 的『(對齊 WCAG 2.3.3 Animation from Interactions)』改為『(對齊 WCAG 2.2.2 Pause, Stop, Hide — 自動播放動畫;並 honor prefers-reduced-motion)』。"
+    },
+    {
+      "location": "packages/design-system/src/components/Skeleton/skeleton.spec.md:8 (frontmatter traits)",
+      "claim": "traits: - isMatrixHeavy",
+      "actual": "frontmatter 宣告 `isMatrixHeavy` trait。但 `.claude/skills/design-system-audit/references/audit-prompts.md:963` 定義 `isMatrixHeavy → ≥ 4 matrix stories`,且 principle-dim-map.json:248 註記『anatomy matrix completeness』。而 Skeleton 的 spec.md L69-78 + anatomy `@anatomy-rationale` 明文論證 Skeleton **刻意無任何 matrix story**(無 Inspector / ColorMatrix / SizeMatrix / StateBehavior),anatomy 只有 Overview + CommonShapes + DesignPrinciple + Accessibility。trait 宣稱『matrix-heavy(需 ≥4 matrix)』與元件真實本質(零 matrix 的 passive primitive)正好相反。",
+      "recommendedFix": "移除 spec.md frontmatter 的 `- isMatrixHeavy` trait(Skeleton 無 matrix);若需保留 trait-frontmatter 結構則改為更貼切的標記或留空 traits,使其與 L69-78『刻意無 matrix』論述一致。"
+    }
+  ],
+  "packages/design-system/src/components/Skeleton/skeleton.principles.stories.tsx": [
+    {
+      "location": "packages/design-system/src/components/Skeleton/skeleton.principles.stories.tsx:210,217 (DurationRule)",
+      "claim": "❌ 長時間(> 5s)一直 Skeleton——使用者懷疑卡住 / > 5s 的長工作 → 改用 CircularProgress;且『短暫顯示(1–3s)』『Notion < 2s』",
+      "actual": "同一元件三份文件對『多久算太久、該換掉 Skeleton』給出三個不同數字:principles DurationRule 用 `> 5s`(且 ShortDisplay 標 1–3s / <2s);spec.md:65 禁止事項用 `> 10s`;spec.md:90 a11y 段用 `>3s consumer 應 fallback` / `Skeleton 適合 < 3s`;anatomy.stories.tsx:129 用 `> 10s`。code 無任何 duration 邏輯(純 CSS div),故此為純文件閾值。三處(3s / 5s / 10s)互相漂移,無單一 SSOT 數字。",
+      "recommendedFix": "選定單一 SSOT 閾值(例如以 a11y 段的 3s 為 fallback 起點、或統一為 ~5s 業界常見『perceived stuck』門檻),改齊 spec.md:65 / spec.md:90 / anatomy:129 / principles:210,217 四處,使『何時不再適合 Skeleton』只有一個數字。"
+    }
+  ],
+  "packages/design-system/src/components/Switch/switch.d.ts": [
+    {
+      "location": "switch.tsx:272-274 (shipped: dist/components/Switch/switch.d.ts:86-100)",
+      "claim": "switchMeta.sizes 宣稱 sm={fieldHeight:28, iconSize:16}、md={fieldHeight:32, iconSize:16}、lg={fieldHeight:40, iconSize:20}。此 metadata 已 export 並 ship 在 dist d.ts;compile-stories.mjs:139-141 會把它 render 成 spec 的『## Sizes』表(`${tsxS.fieldHeight}px | ${tsxS.iconSize}px`)。",
+      "actual": "元件真實尺寸:track 高 sm/md=20px(h-5)/ lg=24px(h-6)(switch.tsx:64-66);check icon sm/md=12 / lg=16(SPECS L80-82)。spec 自己的尺寸表(switch.spec.md:84-86)也記 track 20/20/24、check 12/12/16。switchMeta 的 fieldHeight 28/32/40 與 iconSize 16/16/20 與真實值不符(那是泛用 field-control 模板值,非 Switch 真值)。",
+      "recommendedFix": "把 switchMeta.sizes 改成反映真實:sm/md trackHeight 20、lg 24;iconSize(check)12/12/16。或若 schema 強制 fieldHeight 欄位語意,明確標註 Switch track 高 ≠ field-height 並填真值,使 compile-stories 產出的 Sizes 表正確。"
+    }
+  ],
+  "packages/design-system/src/components/Tooltip/tooltip.tsx": [
+    {
+      "location": "packages/design-system/src/components/Tooltip/tooltip.tsx:60",
+      "claim": "tooltipMeta.states = ['default', 'hover', 'active', 'focus-visible', 'disabled'] — 宣告 Tooltip 有 hover / active / focus-visible / disabled 五個互動 state。",
+      "actual": "Tooltip 沒有任何互動 state。元件自己的 @anatomy-rationale 明文「Tooltip 無 hover / focus / active(自身就是 hover affordance)」(tooltip.anatomy.stories.tsx:9-12),spec.md「為何無 StateBehavior」段亦明文「無 hover / selected / active / disabled 這類互動元件 state」(tooltip.spec.md:104)。code 無任何 disabled / active / hover prop 或 cva variant — tooltip.tsx 整個檔只有一個固定 className 字串(L34-37),無 state 分支。states 陣列是 Phase 1 mechanical migration 留下的未調和 stub(同檔 L49-50 註解自承『Phase 2 fill needed』)。",
+      "recommendedFix": "把 tooltipMeta.states 改為 ['default'](或空)以對齊 anatomy rationale + spec.md「為何無 StateBehavior」。同步檢查 tooltipMeta.tokens 三個空陣列(bg/fg/ring)是否該補實際消費的 --tooltip / text-on-emphasis / (無 ring) token,完成 Phase 2 fill 或標記此元件豁免 StateBehavior。"
+    }
+  ],
+  "packages/design-system/src/components/Tooltip/tooltip.anatomy.stories.tsx": [
+    {
+      "location": "packages/design-system/src/components/Tooltip/tooltip.anatomy.stories.tsx:202-210",
+      "claim": "Warm-up Pattern 表把 `delayDuration={500}` 與 `skipDelayDuration={300}` 並列呈現,語意上暗示兩者都由 TooltipProvider 設定(『全產品統一一組時間參數,由 TooltipProvider 控制』L198)。",
+      "actual": "DS 的 TooltipProvider(tooltip.tsx:12)只 override `delayDuration = HOVER_DELAY_PLAIN_MS`(=500,motion.ts:11),完全沒有設定 `skipDelayDuration`。300ms 這個值來自兩處:(a) Radix Provider 內建 default `skipDelayDuration = 300`(react-tooltip dist L78);(b) 消費端 storybook-config/preview.tsx:80 與 apps/template/src/App.tsx:132 顯式傳 `skipDelayDuration={300}`。DS Tooltip 元件本身的 wrapper 不 carry 這個值。",
+      "recommendedFix": "anatomy story 補一行註明:delayDuration=500 由 DS TooltipProvider override(motion token SSOT),skipDelayDuration=300 沿用 Radix 內建 default(消費端 app/storybook root 顯式同步設定)。避免讀者誤以為 DS wrapper 同時設定兩者。"
+    }
+  ],
+  "packages/design-system/src/patterns/header-canonical/header-canonical.spec.md": [
+    {
+      "location": "packages/design-system/src/patterns/header-canonical/header-canonical.spec.md:246",
+      "claim": "Grep evidence（production 重複 contract,非 premature abstraction）:`sidebar.tsx:433` + `file-viewer.tsx:333,459` 全是 `flex items-center gap-2 shrink-0 h-[var(--chrome-header-height)] border-b border-divider px-[var(--layout-space-loose)]` 一模一樣手刻。",
+      "actual": "三個 line ref 都 stale（migration 已完成）。sidebar.tsx:433 現在是 SidebarTrigger button 的 onClick/toggleSidebar（非手刻 chrome header）；Sidebar 真正 header 在 L479 用 `<ChromeHeader>`。file-viewer.tsx:333 是 bg-surface-raised 註解、:459 是 `<ChromeHeader lockDensity=\"lg\">`。grep 全 repo 已無任何 `h-[var(--chrome-header-height)] ... border-b border-divider` 手刻 signature（除 chrome-header.tsx primitive 本身）。",
+      "recommendedFix": "把 L246 grep-evidence 改成歷史錨措辭（『migration 前手刻 signature 曾在 …，現已全消費 ChromeHeader』）或更新為當前正確行號（sidebar.tsx:479 / file-viewer.tsx:328,459 皆 `<ChromeHeader>`）。"
+    },
+    {
+      "location": "packages/design-system/src/patterns/header-canonical/header-canonical.spec.md:216",
+      "claim": "Layer 1 Token shared:`--tab-height-sm` / `--tab-height-lg`（uiSize.css:36-38,58-60）。",
+      "actual": "L36-38 正確（md default：sm=2rem L36 / lg=3rem L38）。但 `58-60` 錯——uiSize.css L58-60 是 `--sidebar-width` / `--sidebar-width-min` / `--sidebar-width-mobile` 定義，非 tab-height。lg-density 的 --tab-height 覆寫實際在 L94-96。",
+      "recommendedFix": "把 `58-60` 改成 `94-96`（lg-density override），或移除第二段精確行號改寫『md + lg density 兩 context』描述避免再漂移。"
+    },
+    {
+      "location": "packages/design-system/src/patterns/header-canonical/header-canonical.spec.md:269",
+      "claim": "A11y 預設:Header 用 `<header>` semantic element（SR landmark）。",
+      "actual": "chrome-header.tsx 三個 branch 都 render `<header>` 但從不設 `role`（grep role 僅 L116 的 `[role=tablist]` CSS arbitrary-variant，針對 consumer 傳入的 TabsList，非自身 role）。ChromeHeader 真實使用情境恆 nested 在 Sidebar `<aside>` / Dialog / FileViewer 等 sectioning content 內。",
+      "recommendedFix": "L269 改為與 L96 一致的限定措辭，例如『用 `<header>` semantic element；nested 在 sectioning content 內時不暴露 banner landmark（僅 page-top top-level chrome header 才是 banner）』，移除無限定的『SR landmark』。"
+    },
+    {
+      "location": "packages/design-system/src/patterns/header-canonical/header-canonical.spec.md:73 (對應 css L20)",
+      "claim": "Sync invariant:`--chrome-header-avatar-size` CSS 值 + `<Avatar size={24}>` JS literal + `AVATAR_SIZE.inline.md = 24`（`item-anatomy.tsx:93`）三者必同 24px 值。",
+      "actual": "item-anatomy.tsx:93 是 `export const AVATAR_SIZE = {`（物件宣告開頭），`.md = 24` 的那一列（`inline: { sm: 20, md: 24, lg: 24 }`）在 L94。值本身正確（md=24），但行號 off-by-one。",
+      "recommendedFix": "把 cite 改為 `item-anatomy.tsx:94`（inline 物件那一列），或改寫成 `item-anatomy.tsx AVATAR_SIZE.inline.md` 不帶行號避免漂移。"
+    },
+    {
+      "location": "packages/design-system/src/patterns/header-canonical/header-canonical.spec.md:250-252",
+      "claim": "Layer 4 — Hook mechanical:列出 `chrome_header_dispatcher.sh` → `lib/_header_with_tabs_border.sh` + `lib/_chrome_header_handcraft.sh`（『以上皆 lib helper,經 chrome_header_dispatcher.sh 統一 dispatch』）。",
+      "actual": "dispatcher 實際依序跑 4 個 helper：`_app_shell_primary_header_consistency.sh` / `_header_with_tabs_border.sh` / `_tab_lg_chrome_header_equal.sh`（blocking set）+ `_chrome_header_handcraft.sh`（warn）。Layer 4 段只列其中 2 個；`_tab_lg_chrome_header_equal` 在 W3 段（L165/L179）有提及，但 `_app_shell_primary_header_consistency.sh` 全 spec 從未提及。",
+      "recommendedFix": "Layer 4 段補列 `_tab_lg_chrome_header_equal.sh`（pointer 回 W3）與 `_app_shell_primary_header_consistency.sh`，或加一句『dispatcher 共 4 helper,完整清單見 chrome_header_dispatcher.sh』指向 SSOT 避免 drift。"
+    }
+  ],
+  "packages/design-system/src/patterns/header-canonical/header-canonical.css": [
+    {
+      "location": "packages/design-system/src/patterns/header-canonical/header-canonical.css:16 (對應 spec L71)",
+      "claim": "Consumers（2,需 sync）:1. WorkspaceBrand demo（`_demo-helpers.tsx`）hardcode `<Avatar size={24}>` + comment cite token。spec L71 亦稱『WorkspaceBrand demo（`_demo-helpers.tsx:WorkspaceBrand`）即此 pattern 的 reference implementation』。",
+      "actual": "WorkspaceBrand 唯一存在於 `AppShell/_demo-helpers.tsx`（L68，內含 `<Avatar size={24} shape=\"square\" .../>` L71 + token cite comment L65）。repo 內 `Sidebar/_demo-helpers.tsx` 不存在（find 只回 AppShell 一個）。spec/CSS 用裸路徑 `_demo-helpers.tsx`，在 4.5 段（討論 SidebarHeader 收合）語境下易被讀成 Sidebar 的 demo，實際在 AppShell。",
+      "recommendedFix": "把 spec L71 與 CSS L16 的 `_demo-helpers.tsx` 補成完整路徑 `components/AppShell/_demo-helpers.tsx`，消除『在哪個 dir』的歧義。"
+    }
+  ]
+}

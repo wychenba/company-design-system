@@ -4,7 +4,8 @@
 //     ShapeMatrix(3.)已對照 shape × 色彩 token + consumer 場景。HoverCard
 //     content 走深色 tooltip,色彩繼承 tooltip token。
 //   StateBehavior N/A — Trigger pill 本身無 hover 視覺(hover 觸發 HoverCard
-//     展開即是 state 表達);無 focus / active / disabled。openDelay /
+//     展開即是 state 表達);無 active / disabled;focus-visible ring 屬 a11y
+//     focusable 修正(2026-06-01 #13,見 Accessibility story)非獨立視覺軸。openDelay /
 //     closeDelay 等行為已於 Inspector 展示。HoverCard 內容互動由消費的內容
 //     元件(Avatar / Tag)各自負責。
 import type { Meta, StoryObj } from '@storybook/react'
@@ -12,16 +13,16 @@ import { useState } from 'react'
 import { OverflowIndicator } from './overflow-indicator'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
-import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+import { ProfileCard, ProfileCardDefaultActions } from '@/design-system/components/ProfileCard/profile-card'
 
 const personHover = (name: string) => (
-  <NameCard
+  <ProfileCard
     name={name}
     subtitle="Design｜D-0042｜EMP-1001"
     avatar={{ alt: name }}
     status="online"
     statusMessage="Out of Office: Back on Monday."
-    actions={<NameCardDefaultActions />}
+    actions={<ProfileCardDefaultActions />}
     fields={[
       { label: 'ID', value: 'YHANAX' },
       { label: 'Employee number', value: '1234567' },
@@ -45,10 +46,16 @@ type ShapeKey = 'circle' | 'tag'
 const SIZES: SizeKey[] = ['sm', 'md', 'lg']
 const SHAPES: ShapeKey[] = ['circle', 'tag']
 
-const SIZE_SPECS: Record<SizeKey, { height: string; text: string; heightPx: number; textPx: number }> = {
-  sm: { height: 'h-5 min-w-5', text: 'text-[10px]', heightPx: 20, textPx: 10 },
-  md: { height: 'h-6 min-w-6', text: 'text-caption', heightPx: 24, textPx: 12 },
-  lg: { height: 'h-6 min-w-6', text: 'text-caption', heightPx: 24, textPx: 12 },
+// font-size 依 shape 分流(re-verified 2026-06-01):circle shape 走元件內建 triggerText
+// map(overflow-indicator.tsx:24-28),tag shape 走 tagVariants({ size })(tag.tsx:45-47)。
+// circleText / tagText 兩欄分別對應,避免把 circle-only 字級當成兩 shape 通用。
+const SIZE_SPECS: Record<
+  SizeKey,
+  { height: string; heightPx: number; circleText: string; circleTextPx: number; tagText: string; tagTextPx: number }
+> = {
+  sm: { height: 'h-5 min-w-5', heightPx: 20, circleText: 'text-[10px]', circleTextPx: 10, tagText: 'text-caption', tagTextPx: 12 },
+  md: { height: 'h-6 min-w-6', heightPx: 24, circleText: 'text-caption', circleTextPx: 12, tagText: 'text-body', tagTextPx: 14 },
+  lg: { height: 'h-6 min-w-6', heightPx: 24, circleText: 'text-caption', circleTextPx: 12, tagText: 'text-body', tagTextPx: 14 },
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -103,7 +110,7 @@ export const Overview: Story = {
               <tr>
                 <Td mono>Trigger(tag)</Td>
                 <Td>Tag 組尾端 +N</Td>
-                <Td mono>tagVariants{`{ variant: 'neutral' }`}</Td>
+                <Td mono>tagVariants{`{ color: 'neutral', size }`}</Td>
               </tr>
               <tr>
                 <Td mono>HoverCardContent</Td>
@@ -186,6 +193,9 @@ function OverflowInspector() {
   const [count, setCount] = useState(5)
 
   const spec = SIZE_SPECS[size]
+  // font-size 隨 shape 不同:circle 走 triggerText map、tag 走 tagVariants
+  const textClass = shape === 'tag' ? spec.tagText : spec.circleText
+  const textPx = shape === 'tag' ? spec.tagTextPx : spec.circleTextPx
 
   return (
     <div className="grid grid-cols-[1fr_320px] gap-8 max-w-5xl">
@@ -213,7 +223,7 @@ function OverflowInspector() {
   ┌───────────────┐
   │   +${count.toString().padStart(2, ' ')}           │   ← trigger pill
   │  ${spec.height.padEnd(13)}│      ${spec.heightPx}px (min-width 同高)
-  │  ${spec.text.padEnd(13)}│      ${spec.textPx}px 字體
+  │  ${textClass.padEnd(13)}│      ${textPx}px 字體 (${shape})
   └───────────────┘
          │ hover
          ▼
@@ -293,7 +303,7 @@ function OverflowInspector() {
               </tr>
               <tr>
                 <Td mono>font-size</Td>
-                <Td mono>{spec.text} · {spec.textPx}px</Td>
+                <Td mono>{textClass} · {textPx}px（{shape}）</Td>
               </tr>
               <tr>
                 <Td mono>bg</Td>
@@ -312,11 +322,11 @@ function OverflowInspector() {
               </tr>
               <tr>
                 <Td mono>openDelay</Td>
-                <Td mono>200ms</Td>
+                <Td mono>500ms（HOVER_DELAY_PLAIN_MS）</Td>
               </tr>
               <tr>
                 <Td mono>closeDelay</Td>
-                <Td mono>300ms</Td>
+                <Td mono>200ms（HOVER_DELAY_CLOSE_MS）</Td>
               </tr>
             </tbody>
           </table>
@@ -433,7 +443,8 @@ export const SizeMatrix: Story = {
                 <Th>Size</Th>
                 <Th>Height</Th>
                 <Th>Min-width</Th>
-                <Th>Font-size</Th>
+                <Th>Font-size（circle）</Th>
+                <Th>Font-size（tag）</Th>
                 <Th>對齊</Th>
               </tr>
             </thead>
@@ -443,7 +454,8 @@ export const SizeMatrix: Story = {
                   <Td mono>{s}</Td>
                   <Td mono>{SIZE_SPECS[s].height.split(' ')[0]} · {SIZE_SPECS[s].heightPx}px</Td>
                   <Td mono>{SIZE_SPECS[s].height.split(' ')[1]} · {SIZE_SPECS[s].heightPx}px</Td>
-                  <Td mono>{SIZE_SPECS[s].text} · {SIZE_SPECS[s].textPx}px</Td>
+                  <Td mono>{SIZE_SPECS[s].circleText} · {SIZE_SPECS[s].circleTextPx}px</Td>
+                  <Td mono>{SIZE_SPECS[s].tagText} · {SIZE_SPECS[s].tagTextPx}px</Td>
                   <Td>{s === 'lg' ? '同 md(24px)' : `Tag ${s}`}</Td>
                 </tr>
               ))}
@@ -451,7 +463,9 @@ export const SizeMatrix: Story = {
           </table>
         </div>
         <p className="text-footnote text-fg-muted mt-3">
-          <code className="font-mono">sm</code> 用
+          font-size 依 shape 分流——<code className="font-mono">circle</code> 走元件內建 triggerText map、
+          <code className="font-mono">tag</code> 走 <code className="font-mono">tagVariants</code>(對齊 Tag 字級)。
+          circle shape 的 <code className="font-mono">sm</code> 用
           <code className="font-mono mx-1">text-[10px]</code>
           的理由見 spec「尺寸」段——sub-footnote 特殊例外,與 Badge 共享 micro-indicator typography tier。
         </p>
@@ -529,7 +543,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `overflow-indicator.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus indicator\n- Enter — show overflow menu\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  互動行為  :\n\n  +N trigger 是 keyboard-focusable 計數 span（tabIndex=0 + role=\"button\" + aria-haspopup=\"dialog\"；2026-06-01 #13 由純 passive 改 focusable，修 WCAG 2.1.1 違反）。HoverCard 在 hover 或 trigger 取得 focus 時自動展開，沒有「按 Enter 開選單」的鍵盤指令，也沒有 click 切換。\n\n  Focus  :trigger 是 tab stop（focus-visible ring，鍵盤使用者可 focus 開啟 HoverCard 看溢出內容）；HoverCard 內展開的可互動內容（人員 tag / ProfileCard）由各自內容元件負責 focus 管理。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation；HoverCard 內容透過 hover 或 focus 自動顯示（非鍵盤指令觸發）。WCAG AA contrast ≥ 4.5:1（text）/ 3:1（UI）。"}</p>
     </div>
   ),
 }

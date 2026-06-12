@@ -113,7 +113,7 @@ const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
 interface DropdownMenuContentProps
   extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> {
   size?: SizeKey
-  /** 最小寬度（px），預設跟隨觸發元件寬度 */
+  /** 最小寬度（px），預設 `max(180px, 觸發元件寬度)`——窄 trigger 時吃 180px 地板 */
   minWidth?: number
   /** 最大高度（px），超過時捲動 */
   maxHeight?: number
@@ -129,7 +129,18 @@ const DropdownMenuContent = React.forwardRef<
       sideOffset={sideOffset}
       collisionPadding={collisionPadding}
       align={align}
-      onCloseAutoFocus={(e) => e.preventDefault()}
+      data-density="md"
+      // Focus return on close:不 override `onCloseAutoFocus` — 用 Radix 內建 default
+      // (close 時 focus 還 trigger;outside-interaction 例外由 Radix `hasInteractedOutsideRef` 自管)。
+      // W3C APG menubar「Escape: …return focus to the element…from which the menu was opened」
+      // (w3.org/WAI/ARIA/apg/patterns/menubar/);shadcn dropdown-menu 同樣不 override。
+      // 2026-06-11 移除 2026-04-08 的 `(e) => e.preventDefault()` hardcode:它跑在 Radix
+      // composeEventHandlers 內建 handler 之前,defaultPrevented → trigger focus 被 skip →
+      // Esc 關閉後 focus 掉到 body(APG violation)。原動機「mouse close 後 trigger 殘留
+      // focus ring」不構成 override 理由:實測(2026-06-12 playwright)pointer item-click
+      // close 後 programmatic refocus 在 Chromium 仍可 match `:focus-visible`(UA heuristic),
+      // 但與 shadcn 官方 live demo 同流程 DOM 比對 IDENTICAL — Radix 生態一致接受此
+      // tradeoff:APG keyboard focus-return 優先於 cosmetic ring。
       className={cn(floatingLayerClass, !maxHeight && 'py-2', className)}
       style={{
         boxShadow: 'var(--elevation-200)',
@@ -190,7 +201,7 @@ function buildEndContent(
     <>
       {badge}
       {EndIcon && <EndIcon size={iconPx} className="text-fg-muted" aria-hidden />}
-      {shortcut && <span className="text-caption text-fg-muted">{shortcut}</span>}
+      {shortcut && <span className="text-caption text-fg-muted tracking-shortcut">{shortcut}</span>}
     </>
   )
 }
@@ -211,7 +222,8 @@ interface DropdownMenuItemProps
   badge?: React.ReactNode
   /** 後綴指示型 icon（LucideIcon），fg-muted */
   endIcon?: LucideIcon
-  /** 鍵盤快捷鍵 */
+  /** 鍵盤快捷鍵提示(canonical)——渲染進 MenuItem `endContent` 正規後綴 slot。
+   *  替代方案是 `<DropdownMenuShortcut>` child(composition escape-hatch);**同 item 勿混用**。 */
   shortcut?: string
   /** 單選選中（bg-neutral-selected，持續選中狀態）*/
   selected?: boolean
@@ -407,7 +419,10 @@ const DropdownMenuRadioItem = React.forwardRef<
       ref={ref}
       disabled={disabled}
       onSelect={(e) => e.preventDefault()}
-      className={cn(radixItemClass, 'data-[state=checked]:[&>*]:bg-neutral-selected', className)}
+      // 2026-05-31 #10:selected 底色套在外層 Radix RadioItem 本身(非 `[&>*]` 子 MenuItem),
+      // 因內層 MenuItem 自帶 `!bg-transparent` 會蓋掉子層 bg → 選中底色從不顯示。
+      // 改 parent-bg pattern(對齊 DropdownMenuItem selected):RadioItem 上底色,MenuItem 透明讓它透出。
+      className={cn(radixItemClass, 'data-[state=checked]:bg-neutral-selected', className)}
       {...props}
     >
       <MenuItem
@@ -426,10 +441,14 @@ const DropdownMenuRadioItem = React.forwardRef<
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
 
 // ── Shortcut（鍵盤快捷鍵提示，ml-auto 靠右）──
-// 作為 MenuItem children 的後綴,視覺為 fg-muted 小字。
+// **Canonical 是 `<DropdownMenuItem shortcut="⌘C">`** prop —— 走 MenuItem `endContent` 正規後綴 slot
+// (跟 badge / endIcon 同槽、gap/對齊一致)。本 child 是 **composition escape-hatch**(對齊 shadcn
+// DropdownMenuShortcut idiom),供需手動 compose children 的少數場景;它用 `ml-auto` 塞在 children
+// 內(繞過 endContent slot)。**同一 item 只用一種,勿混用**(見 spec.md 禁止事項)。
+// 視覺統一:text-caption + tracking-shortcut + fg-muted(對齊 prop 後綴 + CommandShortcut)。
 const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
   <span
-    className={cn('ml-auto text-footnote text-fg-muted tracking-shortcut', className)}
+    className={cn('ml-auto text-caption text-fg-muted tracking-shortcut', className)}
     {...props}
   />
 )

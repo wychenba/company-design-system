@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { CircularProgress } from '@/design-system/components/CircularProgress/circular-progress'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useResolvedFieldSize } from '@/design-system/components/Field/field-context'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 
 /**
@@ -20,7 +20,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/compone
  *   link       外觀像連結的按鈕（本質仍是 button）
  *
  * ── danger prop ──
- *   danger     套用在任何 variant 上，將顏色改為危險色（紅色）
+ *   danger     套用危險色（紅色）；僅 primary / secondary / text 支援（tertiary / link 不支援，見 spec 禁止事項）
  *
  *   <Button variant="primary" danger>永久刪除</Button>        → 紅底白字（立即不可逆）
  *   <Button variant="secondary" danger>移至垃圾桶</Button>    → 紅框紅字（點下去還可反悔）
@@ -30,7 +30,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/compone
  *   僅 secondary / tertiary / text 三個 variant 支援 toggle 視覺：
  *     - secondary + pressed → primary-subtle 底、primary 字、透明邊框
  *     - tertiary  + pressed → primary-subtle 底、primary 字、透明邊框（同 secondary 按下視覺）
- *     - text      + pressed → neutral-selected 底，hover 反向變淺，:active 深一階
+ *     - text      + pressed → primary-subtle 底、primary 字、透明邊框（預設 pressedTone='emphasis'，同 secondary/tertiary 按下視覺）；pressedTone='neutral' 時才走 neutral-selected 灰底
  *   primary / link 傳入 pressed 無視覺效果（語意不符）
  *
  * ── Sizes（預設 md）──
@@ -211,7 +211,9 @@ const buttonVariants = cva(
       },
     ],
     defaultVariants: {
-      variant: 'primary',
+      // labeled 預設 = tertiary(2026-06-06 從 primary 改;iconOnly 預設 = text,由 resolvedVariant 注入)。
+      // 真正預設邏輯在元件 resolvedVariant(L394);此 cva default 供直接 buttonVariants() 呼叫者一致。
+      variant: 'tertiary',
       size: 'md',
       pressedTone: 'emphasis',
     },
@@ -219,8 +221,8 @@ const buttonVariants = cva(
 )
 
 // ── ButtonGroup Context ──────────────────────────────────────────────────────
-// ButtonGroup provides this context; Button reads it for fullWidth injection.
-// Context lives here (not in button-group.tsx) so there is no circular import.
+// ButtonGroup 提供此 context;Button 讀取它注入 fullWidth。
+// Context 放本檔(不放 button-group.tsx)以避免循環 import。
 interface ButtonGroupContextValue {
   fullWidth?: boolean
 }
@@ -244,8 +246,8 @@ export interface ButtonProps
    * 按鈕視覺強調等級。
    * `destructive` / `ghost` 為 shadcn 內部 compat，請勿在應用程式碼中直接使用。
    */
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'text' | 'link' | (string & {})
-  /** 套用危險色（紅色）。可與任何 variant 組合使用。 */
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'text' | 'link'
+  /** 套用危險色（紅色）。僅 primary / secondary / text 支援（tertiary / link 不支援，見 spec 禁止事項）。 */
   danger?: boolean
   /**
    * Toggle 按下狀態（持續 on/off）。設定時 Button 變為 toggle：
@@ -350,15 +352,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       loading = false,
       fullWidth = false,
       pressed,
+      pressedTone, // 2026-06-05 fix(deep-audit P0):原漏 destructure → 落入 ...props 噴到 DOM + 永遠用 cva default
       children,
       disabled,
       ...props
     },
     ref
   ) => {
-    // ── FieldContext：在 Field 內時自動讀 size，讓 Button 跟 Input 同高 ──
-    const fieldCtx = useFieldContext?.()
-    const resolvedSize = size ?? (fieldCtx?.size as typeof size) ?? 'md'
+    // ── FieldContext：在 Field 內自動讀 size，讓 Button 跟 Input 同高(SSOT:useResolvedFieldSize)──
+    const resolvedSize = useResolvedFieldSize(size, 'md')
 
     // ── Dismiss 視覺類 override(2026-04-22 cross-implementation dimming canonical) ──
     // dismiss=true 強制:variant="text" + iconOnly=true + icon 色弱化(fg-muted → hover foreground)
@@ -390,11 +392,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // shadcn compat:AlertDialog、Toast 等元件內部會傳入這些 alias,
     // 在此靜默轉換,不暴露到型別或自動完成。
     // dismiss=true 強制 variant=text(dismiss canonical);override 其他 variant 傳入。
+    // 2026-06-06 預設 emphasis 改低(對齊世界級:MUI 預設 text / Ant 預設 default / Polaris 低 emphasis —
+    // 預設 primary CTA 是 outlier)。labeled 無 variant → `tertiary`(中性外框,清楚可點性,再按重要程度升 primary);
+    // iconOnly 無 variant → `text`(toolbar ghost,對齊 action-bar.spec.md「純動作工具/低重量輔助 → text」+
+    // Material 3「icon-only = no fill」)。**CTA 必 explicit `variant="primary"`**(不靠預設)。dismiss 仍強制 text。
     const resolvedVariant: InternalVariant =
       dismiss ? 'text' :
       (variantProp as string) === 'destructive' ? 'primary' :
       (variantProp as string) === 'ghost'        ? 'text'    :
-      (variantProp as InternalVariant) ?? 'primary'
+      (variantProp as InternalVariant) ?? (iconOnly ? 'text' : 'tertiary')
 
     const resolvedDanger = dangerProp || (variantProp as string) === 'destructive'
 
@@ -415,8 +421,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     // Toggle 狀態：pressed 定義時自動寫入 aria-pressed + data-state。
     // 未定義時不寫入任何 toggle 屬性（按鈕為一般 action button）。
-    // 樣式由 cva 的 data-[state=on] 分支套用——secondary/tertiary 走 primary-subtle，
-    // text 走 neutral-selected family；primary/link 不定義 on 分支，傳入無效果。
+    // 樣式由 cva data-[state=on] compoundVariants（variant × pressedTone）套用——
+    // secondary/tertiary/text 預設 pressedTone='emphasis' 走 primary-subtle，
+    // pressedTone='neutral' 才走 neutral-selected family；primary/link 不定義 on 分支，傳入無效果。
     const toggleAttrs =
       pressed === undefined
         ? {}
@@ -432,7 +439,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const buttonEl = (
       <Comp
         className={cn(
-          buttonVariants({ variant: resolvedVariant, danger: resolvedDanger, size: resolvedSize, className }),
+          buttonVariants({ variant: resolvedVariant, danger: resolvedDanger, size: resolvedSize, pressedTone, className }),
           // iconOnly 鐵律:padding-free + aspect-square + flex-center (Polaris idiom)
           // 0 magic-number 0 公式自動正方形。詳 ICON_ONLY_BASE rationale。
           resolvedIconOnly && ICON_ONLY_BASE,
@@ -521,10 +528,10 @@ export const buttonMeta = {
     link: { purpose: '內文連結(inline reading)' },
   },
   sizes: {
-    xs: { fieldHeight: 24, iconSize: 16, typography: 'body' },
+    xs: { fieldHeight: 24, iconSize: 16, typography: 'caption' },
     sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
     md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
-    lg: { fieldHeight: 40, iconSize: 20, typography: 'body-lg' },
+    lg: { fieldHeight: 36, iconSize: 20, typography: 'body-lg' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
@@ -532,7 +539,7 @@ export const buttonMeta = {
     fg: ['--on-emphasis', '--fg-disabled'],
     ring: ['--ring'],
   },
-  defaultVariant: 'primary',
+  defaultVariant: 'tertiary',  // 2026-06-10 修 stale:對齊 cva defaultVariants(2026-06-06 labeled 預設改 tertiary,meta 漏同步)
   defaultSize: 'md',
 } as const
 

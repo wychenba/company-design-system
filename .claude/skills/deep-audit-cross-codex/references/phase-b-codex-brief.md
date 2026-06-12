@@ -11,6 +11,25 @@ ls -la ~/.codex/auth.json                                              # 3 Auth(
 
 **Decision**:1 ✅ → local CLI / 1 ❌ + 2 ✅ → global / 1+2 ❌ + 3 ✅ → `npm install` / 全 ❌ → 報 user。**禁 Explore agent 替身**(M31)。
 
+## B.0.1 — Exec invocation(2026-05-30 bypass-parity,user-authorized;取代 audit-verify 場景的舊 `exec -s read-only`)
+
+**Why**:`-s read-only` 只能 grep/read,跑不了 tsc/playwright/.mjs → verify 不對稱(Claude 機械驗、codex 只目測)違反 M31 Step 2「不可只一方 verify」。bypass 讓 codex 做**跟 Claude 一模一樣**的機械驗證。
+
+```bash
+node_modules/.bin/codex exec \
+  --dangerously-bypass-approvals-and-sandbox \   # user-authorized;codex shell 可跑 audit script
+  --skip-git-repo-check -C "$PWD" \              # 同 repo root → 同 spec.md / scripts / node_modules
+  -c model_reasoning_effort=low \                # 避大 brief plan-turn 燒 budget(per memory Rule 3)
+  --output-last-message /tmp/codex-phaseB.md \   # 截 verdict artifact 供 Step 4.5 diff
+  < brief.md > /tmp/codex-phaseB.log 2>&1 &
+```
+
+**安全護欄(bypass 解鎖 shell 但仍禁寫源)**:
+- Brief 必含「**禁 edit / delete / write `packages/design-system/src/**` 及任何 DS 源**;只跑唯讀 audit script + grep + Playwright screenshot」。
+- **每次 bypass 需 user explicit authorize**(anti-pattern:AI 自動 bypass 不問,per `memory/feedback_codex_exec_transport_canonical`)。
+- codex 截圖寫 `/tmp/codex-screenshots/`(不污染 repo)。
+- 純讀 / cite-only 場景(非 audit-verify)仍用 `-s read-only`(bypass 只給「需跑 script 才能機械驗」的 Phase B verify)。
+
 ## B.1 Brief template
 
 ⚠️ **Faithful relay invariant**(M31 Step 0.05,user-verbatim,不可只送 paraphrase):
@@ -42,12 +61,14 @@ ls -la ~/.codex/auth.json                                              # 3 Auth(
 
 1. **全盤閱讀**(per A.0 file list,不 sample):
    - CLAUDE.md / `.claude/rules/*` / `.claude/references/*`
-   - `packages/design-system/src/**/*.spec.md` 全部(~60 file)
+   - `packages/design-system/src/**/*.spec.md` 全部(brief-gen 時跑 `find packages/design-system/src -name '*.spec.md' | wc -l` 取真數,當前 ~83,禁硬寫)
    - `packages/design-system/src/tokens/**/*.spec.md` + `packages/design-system/src/patterns/**/*.spec.md`
    - `~/.claude/.../memory/MEMORY.md` index + active project memory
 
-2. **全 dim deep audit NO-SAMPLE**(對齊 `.claude/skills/design-system-audit/SKILL.md` Group A-P 全 dim per SKILL.md):
+2. **全 dim deep audit NO-SAMPLE**(對齊 `.claude/skills/design-system-audit/SKILL.md` Group A-Q 全 dim):
+   - **live dim 清單由 Claude brief-gen 時注入**:跑 `node scripts/dispatch-audit-dims.mjs --summary` 把編號 / batch 貼進 brief,並要求 codex **自己再跑一次自確認**(read-only 跑不了 → 用 bypass 跑;禁硬寫 dim 數字,per SKILL.md SSOT-integrity invariant)
    - 每 dim 全 DS-wide 掃,禁 sample top N
+   - **機械維度 codex 自己跑**(bypass sandbox,做跟 Claude 一樣的事):`npx tsc -b` / `node scripts/audit-content-quality.mjs --check` / 相關 `node scripts/*-invariants.mjs` / Playwright screenshot(sequential navigate→wait→screenshot→evaluate,per memory Rule 2,禁 batch unsafe)。**貼每個 command 的 literal stdout 當 cite**;真跑不了的(帳號 / 網路 scoped)明標「mechanical-uncoverable, eyeball-only」讓 Claude B.2 補跑
    - 每 finding 必 cite: <file:line> + <quote> + <違反 spec / rule>
 
 3. **整理完整報告**(P0 / P1 / P2 分類):

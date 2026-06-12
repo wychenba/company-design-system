@@ -33,11 +33,11 @@ export const Default: Story = {
     <Tooltip defaultOpen>
       <TooltipTrigger asChild>
         <Button variant="secondary" startIcon={Info}>
-          將滑鼠移至上方
+          自動套用品牌
         </Button>
       </TooltipTrigger>
       <TooltipContent>
-        <p>這是一個基本的 Tooltip</p>
+        <p>付款頁會自動帶入你的 logo 與主色</p>
       </TooltipContent>
     </Tooltip>
   ),

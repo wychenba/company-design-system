@@ -19,6 +19,10 @@ LinkInput 是 **URL 的**輸入與顯示元件。外觀基於 Input，但 value 
 
 共用規則見 `../Field/field-controls.spec.md`。本文件只記錄 LinkInput 特有的原則。
 
+## Controlled-only rationale(Dim 26)
+
+本元件採 **controlled-only**:`value` + `onChange`,不支援 `defaultValue` uncontrolled fallback(value pair V1)。對齊 Field 家族 canonical(Combobox / DatePicker / TimePicker / SelectMenu 同,rationale 見各 spec 同名段);LinkInput 內部另有「連結顯示 ↔ 編輯中」狀態與 `value` 雙向 sync,dual-mode 會引入 race condition。未來要改 dual-mode 需 `useControllableState` helper,屬 major API 擴充。
+
 **Layout Family**：CLAUDE.md 4-Family Model **Family 4（Field control layout）** 消費者。結構繼承 `components/Field/field-controls.spec.md` 的 `fieldWrapperStyles + [startIcon?] [<editable>] [endAction?]` 規格,視覺對齊 Family 1（Menu item）讓 SelectMenu trigger + options 連續一致。
 
 ---
@@ -64,7 +68,7 @@ LinkInput 是 **URL 的**輸入與顯示元件。外觀基於 Input，但 value 
 遵循 Field 共用驗證標準（blur validation）：
 
 1. **blur 時驗證**——使用者離開 field 時才檢查格式
-2. **開始編輯時清除 error**——重新 focus 或開始打字時移除錯誤狀態
+2. **開始打字時清除 error**——輸入任一字元即移除錯誤狀態(Escape 還原原值亦清除);單純重新 focus 不清除
 3. **Enter 觸發 blur**——等同離開 field
 4. **Escape 取消編輯**——回復原值，不觸發驗證
 
@@ -75,6 +79,14 @@ URL 格式要求：必須包含 `http://` 或 `https://` protocol。
 ## 空值
 
 沒有 URL 時直接顯示 placeholder 並允許輸入，不需要先按 Pencil——因為沒有連結可以開。
+
+---
+
+## 極長 URL（邊界）
+
+- **顯示文字 = hostname**:link 狀態預設只顯示 hostname（去 `www.`,如 `https://github.com/org/repo` → `github.com`）,非完整 URL;`label` prop 可覆寫顯示文字。完整 URL 載於 `href`
+- **單行 truncate**:link / readonly / display 狀態超寬時 ellipsis 截斷,不換行
+- **編輯態**:原生 input 水平捲動,無長度上限
 
 ---
 
@@ -98,7 +110,7 @@ URL 格式要求：必須包含 `http://` 或 `https://` protocol。
 
 LinkInput 是 **Field Controls family 成員**——互動狀態(focus / invalid / disabled / readonly)完全繼承 `../Field/field-controls.spec.md` SSOT「Mode 狀態」。LinkInput 特有的狀態(edit 輸入 vs display link-chip)已在 `Overview` 中說明。重寫 StateBehavior = 與 field-controls SSOT 漂移。
 
-對應 anatomy story:保留 `Overview` + `Inspector` + `ColorMatrix` + `SizeMatrix`。互動 state 見 Input 的 `StateBehavior` + field-controls.spec.md。
+對應 anatomy story:保留 `Overview` + `Inspector` + `ColorMatrix` + `SizeMatrix` + `Accessibility`。互動 state 見 Input 的 `StateBehavior` + field-controls.spec.md。
 
 ---
 
@@ -110,15 +122,16 @@ LinkInput 是 **Field Controls family 成員**——互動狀態(focus / invalid
 
 ## A11y 預設
 
-**ARIA / Pattern**:native `<input>` element 預設 a11y;Field wrapper 補 `aria-labelledby` / `aria-invalid` / `aria-describedby`。
+**ARIA / Pattern**:native `<input type="url">` element 預設 a11y;label 關聯靠 `id`(`fieldCtx.id`)+ FieldLabel `<label htmlFor>`(native `for` 機制);input 上另設 `aria-invalid` / `aria-describedby`(error 時 `aria-errormessage`)。
 
 **Keyboard 行為**:
 
 - Tab — focus
 - 字母鍵 — 輸入
-- Esc — 清空(若 clearable + 有值)
+- Enter — 提交,觸發 blur 驗證
+- Esc — 取消編輯,回復原值,不觸發驗證
 
-**Focus**:native input focus ring;DS focus-visible ring(`focus-visible:!border-primary`)由 Field wrapper 提供。
+**Focus**:原生 input outline 已關閉;focus 視覺提示由 Field wrapper 的 `focus-within:!border-primary` 提供(滑鼠點入也亮藍框,對齊 Field wrapper canonical)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
@@ -127,4 +140,5 @@ LinkInput 是 **Field Controls family 成員**——互動狀態(focus / invalid
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
 - `file-item.spec.md`
+- `input.spec.md`
 - `textarea.spec.md`

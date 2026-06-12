@@ -26,28 +26,28 @@ export const UsageGuidance: Story = {
         <p>適合 Notice 的真實業務場景(點擊跳轉「展示」頁範例):</p>
         <ul className="space-y-1">
           <li>
-            <LinkTo kind="Design System/Internal/Notice/展示" name="部署成功 banner"><span className="text-primary hover:underline font-medium cursor-pointer">部署成功 banner</span></LinkTo>
+            <LinkTo kind="Design System/Internal/Notice/展示" name="部署成功 橫幅"><span className="text-primary hover:underline font-medium cursor-pointer">CI/CD 部署成功橫幅 — 附「查看部署紀錄」動作</span></LinkTo>
           </li>
           <li>
-            <LinkTo kind="Design System/Internal/Notice/展示" name="Workspace 付款失敗"><span className="text-primary hover:underline font-medium cursor-pointer">Workspace 付款失敗</span></LinkTo>
+            <LinkTo kind="Design System/Internal/Notice/展示" name="工作區付款失敗"><span className="text-primary hover:underline font-medium cursor-pointer">工作區付款失敗 — 附「更新付款方式」補救動作</span></LinkTo>
           </li>
           <li>
-            <LinkTo kind="Design System/Internal/Notice/展示" name="Inline 通知變體對照"><span className="text-primary hover:underline font-medium cursor-pointer">Inline 通知變體對照</span></LinkTo>
+            <LinkTo kind="Design System/Internal/Notice/展示" name="行內通知變體對照"><span className="text-primary hover:underline font-medium cursor-pointer">方案限制 / 空間不足 / 連線失敗等行內提示(五種語意變體)</span></LinkTo>
           </li>
           <li>
-            <LinkTo kind="Design System/Internal/Notice/展示" name="Toast 樣式"><span className="text-primary hover:underline font-medium cursor-pointer">Toast 樣式</span></LinkTo>
+            <LinkTo kind="Design System/Internal/Notice/展示" name="Toast 樣式"><span className="text-primary hover:underline font-medium cursor-pointer">「變更已儲存」「已複製連結」Toast 短暫提示</span></LinkTo>
           </li>
           <li>
-            <LinkTo kind="Design System/Internal/Notice/展示" name="Neutral 純文字"><span className="text-primary hover:underline font-medium cursor-pointer">Neutral 純文字</span></LinkTo>
+            <LinkTo kind="Design System/Internal/Notice/展示" name="中性 純文字"><span className="text-primary hover:underline font-medium cursor-pointer">成員邀請待加入提醒 — 中性純文字</span></LinkTo>
           </li>
         </ul>
         <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方 vs 近親段落)。</p>
       </Section>
 
       <Section title="何時不用 + 替代">
-        <p>Notice 是 internal primitive,無 dismiss / no auto-dismiss 行為——需要這些行為改用以下 consumer:</p>
+        <p>Notice 是 internal primitive,自身有 dismiss 按鈕 + <code>onDismiss</code> callback,但不管 dismiss 後的 mount / unmount 生命週期,也無 auto-dismiss 計時——需要這些行為改用以下 consumer:</p>
         <ul>
-          <li><strong>需要 dismiss(永久 inline)</strong> → 用 <code>Alert</code></li>
+          <li><strong>需要管理 dismiss 後移除(永久 inline)</strong> → 用 <code>Alert</code>(內部消費 Notice + 處理 unmount + live region:error/warning role="alert"、其餘 role="status")</li>
           <li><strong>需要 auto-dismiss(短暫 toast)</strong> → 用 <code>Toast</code></li>
           <li><strong>表單欄位錯誤訊息</strong> → 用 <code>Field</code> 內建 errorText,不用 Notice</li>
         </ul>
@@ -74,7 +74,7 @@ export const CompositionRules: Story = {
     <div>
       <Section title="Pattern 1 — Alert(persistent inline announcement)">
         <div className="prose prose-sm max-w-prose">
-          <p>需要「持續顯示直到 user 主動 dismiss」→ <LinkTo kind="Design System/Components/Alert/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Alert</span></LinkTo>。Alert 內部消費 Notice + 加上 dismiss button + role="alert" ARIA。</p>
+          <p>需要「持續顯示直到 user 主動 dismiss」→ <LinkTo kind="Design System/Components/Alert/展示" name="低調單行"><span className="text-primary hover:underline font-medium cursor-pointer">Alert 低調單行</span></LinkTo>。Alert 內部消費 Notice + 加上 dismiss button + live region ARIA(error/warning → role="alert" assertive;info/success/neutral → role="status" polite)。</p>
           <ul>
             <li>典型場景:付款失敗 banner / workspace 警告 / 重要通知 user 必看</li>
             <li>對齊世界級:Polaris <code>Banner</code> / Material <code>Banner</code> / Atlassian <code>InlineMessage</code> — 共識用「persistent + dismissible」</li>
@@ -84,7 +84,7 @@ export const CompositionRules: Story = {
 
       <Section title="Pattern 2 — Toast(auto-dismiss floating announcement)">
         <div className="prose prose-sm max-w-prose">
-          <p>需要「短暫提示,使用者不需 acknowledge」→ <LinkTo kind="Design System/Components/Toast/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Toast</span></LinkTo>。Toast 基於 Sonner + 消費 Notice layout,自動 4 秒消失(可調)。</p>
+          <p>需要「短暫提示,使用者不需 acknowledge」→ <LinkTo kind="Design System/Components/Toast/展示" name="有標題與描述"><span className="text-primary hover:underline font-medium cursor-pointer">有 Title + Description</span></LinkTo>。Toast 基於 Sonner + 消費 Notice layout,自動 4 秒消失(可調)。</p>
           <ul>
             <li>典型場景:儲存成功 / 複製到剪貼簿 / 非關鍵操作回饋</li>
             <li>對齊世界級:Material <code>Snackbar</code> / Polaris <code>Toast</code> / Sonner — 共識用「auto-dismiss + 浮動 + 不阻塞 task」</li>

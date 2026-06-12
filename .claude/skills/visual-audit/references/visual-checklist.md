@@ -34,7 +34,7 @@
 
 **FAIL 範例**:DatePicker 量到 top=12 / right=12 / bottom=8 / left=12,spec 未宣告 bottom asymmetric → FAIL,建議討論是對齊 12 還是補 spec rationale
 
-**對應規則**:CLAUDE.md `# Consistency Audit 原則`(actual == canonical OR rationale-for-deviation)
+**對應規則**:CLAUDE.md `# 稽核 canonical`「Consistency 類稽核必 Phase 0 全掃再判」(actual == canonical OR rationale-for-deviation;design-system-audit Dim 13 enforce)
 
 ---
 
@@ -60,7 +60,7 @@
 
 ## 3. 水平 gap 實際值 == gap token 宣告值(hover bg 不可吃掉)
 
-**Canonical source**: CLAUDE.md `# 同 flex 列的互動 slot 幾何鐵律`(gap 鐵律)
+**Canonical source**: .claude/references/ui-dev-rules.md `# 同 flex 列的互動 slot 幾何鐵律`(gap 鐵律)
 
 **怎麼量**:
 1. 量同一 flex row 相鄰兩 interactive slot 的 **box 邊** 之間距離(不是「視覺中心距離」,是右邊 slot 左緣 - 左邊 slot 右緣)
@@ -70,7 +70,7 @@
 
 **合格標準**:
 - default + hover 兩態的 gap 都 == 宣告值(±1px) → PASS
-- hover 狀態 gap 被 bg overflow 吃掉 → FAIL(違反 CLAUDE.md「同 flex 列幾何鐵律」)
+- hover 狀態 gap 被 bg overflow 吃掉 → FAIL(違反 .claude/references/ui-dev-rules.md「同 flex 列幾何鐵律」)
 
 **FAIL 範例**:FileItem 2026-04-19 bug,Button hover-bg 24px 超出 16px box,`gap-2`(8px)實際剩 ~4px
 

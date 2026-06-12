@@ -37,14 +37,14 @@ interface PartSpec {
 
 const PARTS: Record<PartKey, PartSpec> = {
   caption:      { label: '月份標題',    bg: 'transparent',     text: '--foreground',  border: 'transparent', extra: 'text-body font-medium' },
-  nav:          { label: 'Nav 按鈕',    bg: 'transparent',     text: '--fg-muted',    border: 'transparent', extra: 'h-7 w-7 rounded-md · hover: bg-neutral-hover' },
-  weekday:      { label: '星期標頭',    bg: 'transparent',     text: '--fg-muted',    border: 'transparent', extra: 'text-caption · w-9 h-8' },
-  day:          { label: '日格(default)', bg: 'transparent',   text: '--foreground',  border: 'transparent', extra: 'h-9 w-9 rounded-md' },
+  nav:          { label: 'Nav 按鈕',    bg: 'transparent',     text: '--foreground',  border: 'transparent', extra: 'Button variant=text size=xs iconOnly · hover 藍圈' },
+  weekday:      { label: '星期標頭',    bg: 'transparent',     text: '--foreground',  border: 'transparent', extra: 'text-body font-medium · h-7' },
+  day:          { label: '日格(default)', bg: 'transparent',   text: '--foreground',  border: 'transparent', extra: 'h-field-sm w-field-sm rounded-full' },
   daySelected:  { label: 'Selected',     bg: '--primary',       text: 'white',         border: 'transparent' },
-  dayToday:     { label: 'Today(未選)', bg: 'transparent',     text: '--foreground',  border: '--primary',   extra: 'ring-1 ring-primary' },
-  dayHover:     { label: 'Hover',        bg: '--neutral-hover', text: '--foreground',  border: 'transparent' },
-  dayOutside:   { label: 'Outside 月份', bg: 'transparent',     text: '--fg-disabled', border: 'transparent' },
-  dayDisabled:  { label: 'Disabled',     bg: 'transparent',     text: '--fg-disabled', border: 'transparent', extra: 'text-fg-disabled · pointer-events-none' },
+  dayToday:     { label: 'Today(未選)', bg: 'transparent',     text: '--foreground',  border: 'transparent', extra: '數字下方藍色底線(underline bar)' },
+  dayHover:     { label: 'Hover',        bg: 'transparent',     text: '--foreground',  border: '--primary',   extra: 'hover 藍圈 1.5px(無填底)' },
+  dayOutside:   { label: 'Outside 月份', bg: 'transparent',     text: '--fg-muted',    border: 'transparent' },
+  dayDisabled:  { label: 'Disabled',     bg: '--bg-disabled',   text: '--fg-disabled', border: 'transparent', extra: 'bg-disabled · cursor-not-allowed · native disabled' },
   dayFocus:     { label: 'Focus-visible',bg: 'transparent',     text: '--foreground',  border: '--ring',      extra: 'ring-2 ring-ring' },
 }
 
@@ -83,7 +83,7 @@ export const Overview = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>結構(Anatomy)</H3>
-        <Desc>Calendar 由四個區塊組成:月份 caption、星期標頭、日期網格、左右 nav 按鈕。所有區塊透過 classNames prop 覆寫 react-day-picker 預設樣式,不引入原生 .rdp-* class。</Desc>
+        <Desc>DateGrid 由四個區塊組成:月份 caption、星期標頭、日期網格、左右 nav 按鈕。所有區塊透過 classNames prop 覆寫 react-day-picker 預設樣式,不引入原生 .rdp-* class。</Desc>
 
         <div className="inline-flex flex-col gap-2 border-2 border-dashed border-primary/30 rounded-lg p-4 bg-surface">
           <div className="flex items-center justify-between gap-2">
@@ -104,8 +104,8 @@ export const Overview = {
 
       <div>
         <H3>視覺一覽</H3>
-        <Desc>實際渲染 — single mode,已選今日的前一日展示 selected 視覺,today 以 ring 框定位。</Desc>
-        <div className="inline-flex bg-surface-raised border border-border rounded-lg p-2 w-fit">
+        <Desc>實際渲染 — single mode,已選今日的前一日展示 selected 視覺,today 以數字下方藍色底線標示。</Desc>
+        <div className="inline-flex bg-surface-raised border border-border rounded-lg w-fit">
           <DateGrid
             mode="single"
             selected={(() => {
@@ -196,7 +196,7 @@ export const Inspector = {
           {/* Left: live preview + blueprint */}
           <div className="flex flex-col gap-5">
             <div className="px-6 py-6 rounded-lg bg-canvas border border-divider flex items-center justify-center">
-              <div className="bg-surface-raised border border-border rounded-lg p-2">
+              <div className="bg-surface-raised border border-border rounded-lg">
                 <DateGrid
                   mode="single"
                   selected={selected}
@@ -209,29 +209,29 @@ export const Inspector = {
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3">
                 <Legend c={Z.pad} label="外層 p-3" />
-                <Legend c={Z.head} label="月份 caption h-9" />
-                <Legend c={Z.grid} label="日格 h-9 w-9" />
-                <Legend c={Z.cell} label="星期標頭 h-8" />
+                <Legend c={Z.head} label="月份 caption h-field-xs" />
+                <Legend c={Z.grid} label="日格 h-field-sm" />
+                <Legend c={Z.cell} label="星期標頭 h-7" />
               </div>
 
               <div className="inline-flex flex-col gap-0 rounded-md overflow-hidden" style={{ padding: 12, background: Z.pad.bg, border: `2px solid rgba(0,0,0,0.1)` }}>
-                <div className="flex items-center justify-center font-mono text-[11px] font-bold" style={{ height: 36, background: Z.head.bg, color: Z.head.text, border: `1.5px dashed ${Z.head.border}` }}>
-                  月份 caption · h-9
+                <div className="flex items-center justify-center font-mono text-[11px] font-bold" style={{ height: 24, background: Z.head.bg, color: Z.head.text, border: `1.5px dashed ${Z.head.border}` }}>
+                  月份 caption · h-field-xs（24px）
                 </div>
                 <div className="grid grid-cols-7 gap-0 mt-2">
                   {['M','T','W','T','F','S','S'].map((d, i) => (
-                    <div key={i} className="flex items-center justify-center font-mono text-[10px]" style={{ width: 36, height: 32, background: Z.cell.bg, color: Z.cell.text, border: `1px dashed ${Z.cell.border}` }}>
+                    <div key={i} className="flex items-center justify-center font-mono text-[10px]" style={{ width: 28, height: 28, background: Z.cell.bg, color: Z.cell.text, border: `1px dashed ${Z.cell.border}` }}>
                       {d}
                     </div>
                   ))}
                   {Array.from({ length: 14 }).map((_, i) => (
-                    <div key={i} className="flex items-center justify-center font-mono text-[10px]" style={{ width: 36, height: 36, background: Z.grid.bg, color: Z.grid.text, border: `1px dashed ${Z.grid.border}` }}>
+                    <div key={i} className="flex items-center justify-center font-mono text-[10px]" style={{ width: 28, height: 28, background: Z.grid.bg, color: Z.grid.text, border: `1px dashed ${Z.grid.border}` }}>
                       {i + 1}
                     </div>
                   ))}
                 </div>
               </div>
-              <p className="text-[10px] text-fg-muted">日格固定 36x36(h-9 w-9),不隨 density 變化。</p>
+              <p className="text-[10px] text-fg-muted">日格 h-field-sm(28×28 md / 32×32 lg),隨 density 縮放。</p>
             </div>
           </div>
 
@@ -246,11 +246,11 @@ export const Inspector = {
                 <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Layout</span>
               </div>
               <PropRow label="外層 padding">p-3 · 12px</PropRow>
-              <PropRow label="月份 gap">gap-3 · 12px</PropRow>
-              <PropRow label="日格尺寸">h-9 w-9 · 36×36</PropRow>
-              <PropRow label="星期標頭">w-9 h-8 · 36×32</PropRow>
-              <PropRow label="Nav 按鈕">h-7 w-7 · 28×28</PropRow>
-              <PropRow label="週間距">mt-1 · 4px</PropRow>
+              <PropRow label="月份並排 gap">gap-4 · 16px</PropRow>
+              <PropRow label="日格尺寸">h-field-sm · 28×28 (md) / 32×32 (lg)</PropRow>
+              <PropRow label="星期標頭">h-7 · 28px(寬度 table-native 自動)</PropRow>
+              <PropRow label="Nav 按鈕">size=xs iconOnly · 24×24</PropRow>
+              <PropRow label="Cell gap">border-spacing-1 · 4px(H+V)</PropRow>
             </div>
 
             <div className="px-4 py-1">
@@ -258,7 +258,7 @@ export const Inspector = {
                 <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Typography</span>
               </div>
               <PropRow label="月份標題">text-body · font-medium</PropRow>
-              <PropRow label="星期標頭">text-caption · font-normal</PropRow>
+              <PropRow label="星期標頭">text-body · font-medium</PropRow>
               <PropRow label="日格">text-body · font-normal</PropRow>
             </div>
 
@@ -268,16 +268,16 @@ export const Inspector = {
               </div>
               <PropRow label="Selected bg"><TokenCell token="--primary" /></PropRow>
               <PropRow label="Selected fg">white</PropRow>
-              <PropRow label="Today ring"><TokenCell token="--primary" /></PropRow>
-              <PropRow label="Hover bg"><TokenCell token="--neutral-hover" /></PropRow>
-              <PropRow label="Outside fg"><TokenCell token="--fg-disabled" /></PropRow>
+              <PropRow label="Today bar"><TokenCell token="--primary" /></PropRow>
+              <PropRow label="Hover ring"><TokenCell token="--primary" /></PropRow>
+              <PropRow label="Outside fg"><TokenCell token="--fg-muted" /></PropRow>
             </div>
 
             <div className="px-4 py-1 pb-3">
               <div className="py-2 border-b border-divider">
                 <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Style</span>
               </div>
-              <PropRow label="日格 Radius">rounded-md · 4px</PropRow>
+              <PropRow label="日格 Radius">rounded-full · 圓形</PropRow>
               <PropRow label="Focus">ring-2 ring-ring</PropRow>
               <PropRow label="Transition">transition-colors</PropRow>
             </div>
@@ -288,7 +288,7 @@ export const Inspector = {
     return (
       <div className="flex flex-col gap-4">
         <H3>元件檢閱器</H3>
-        <Desc>Calendar 的所有 layout token 一覽。theme / density 切換時色彩自動反轉,日格尺寸保持不變(浮層 / dashboard 專用,不配對 field-height family)。</Desc>
+        <Desc>DateGrid 的所有 layout token 一覽。theme / density 切換時色彩自動反轉,日格走 h-field-sm 隨 density 縮放(28×28 md / 32×32 lg),與 field 家族保持比例。</Desc>
         <InspectorInner />
       </div>
     )
@@ -305,7 +305,7 @@ export const ColorMatrix = {
     <div className="flex flex-col gap-8">
       <div>
         <H3>日格狀態 × Token 對照</H3>
-        <Desc>日格的所有狀態對應 token。selected 為實心 primary、today 為 ring primary(框不填),兩者併存時 selected 視覺優先(實心覆蓋 ring)。</Desc>
+        <Desc>日格的所有狀態對應 token。selected 為實心 primary、today 為數字下方藍色底線 bar(非 ring,避免與 hover/focus ring 混淆),兩者併存時 selected 實心藍底勝出、bar 切白(on-emphasis)保持可見。</Desc>
       </div>
       <div className="overflow-x-auto">
         <table className="border-collapse text-caption">
@@ -371,7 +371,7 @@ export const ColorMatrix = {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   4. 尺寸對照 — Calendar 固定尺寸說明
+   4. 尺寸對照 — DateGrid 固定尺寸說明
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SizeMatrix = {
@@ -379,12 +379,12 @@ export const SizeMatrix = {
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
-        <H3>固定尺寸 — 不隨 density 變化</H3>
+        <H3>尺寸對照 — 隨 density 縮放</H3>
         <Desc>
-          Calendar 的日格固定 36×36(h-9 w-9),不隨 density token 切換而變化。
-          原因:Calendar 是浮層內(DatePicker popup)或 dashboard 小卡中的 inline 元件,
-          與 field-height family(輸入欄高度)無關。月曆格子需要固定尺寸確保數字對齊、
-          週間視覺節奏一致,參考 shadcn / Google Calendar / Notion 的共識做法。
+          DateGrid 的日格用 h-field-sm w-[var(--field-height-sm)](28×28 md / 32×32 lg),
+          隨 density token 切換而縮放,與 popup 內其他欄位(Input / Button)保持比例。
+          月曆格子靠 table-native border-spacing 確保數字對齊、週間視覺節奏一致,
+          參考 shadcn / Google Calendar / Notion 的共識做法。
         </Desc>
       </div>
 
@@ -407,27 +407,27 @@ export const SizeMatrix = {
             </tr>
             <tr>
               <Td mono>月份 caption</Td>
-              <Td mono>h 36px</Td>
-              <Td mono>h-9</Td>
-              <Td>與日格同高,垂直節奏對齊</Td>
+              <Td mono>h 24px</Td>
+              <Td mono>h-field-xs</Td>
+              <Td>單行置中,nav 按鈕從兩側 absolute 貼齊</Td>
             </tr>
             <tr>
               <Td mono>Nav 按鈕</Td>
-              <Td mono>28×28</Td>
-              <Td mono>h-7 w-7</Td>
-              <Td>比日格稍小,視覺次要</Td>
+              <Td mono>24×24</Td>
+              <Td mono>size=xs iconOnly</Td>
+              <Td>Button variant=text,視覺次要</Td>
             </tr>
             <tr>
               <Td mono>星期標頭</Td>
-              <Td mono>36×32</Td>
-              <Td mono>w-9 h-8</Td>
-              <Td>寬度對齊日格,高度略矮</Td>
+              <Td mono>h 28px(寬 table-native 自動)</Td>
+              <Td mono>h-7</Td>
+              <Td>寬度由 table 自動對齊日格</Td>
             </tr>
             <tr>
               <Td mono>日格</Td>
-              <Td mono>36×36</Td>
-              <Td mono>h-9 w-9</Td>
-              <Td><span className="text-error font-medium">固定</span>,不隨 density 變化</Td>
+              <Td mono>28×28 (md) / 32×32 (lg)</Td>
+              <Td mono>h-field-sm w-[var(--field-height-sm)]</Td>
+              <Td><span className="text-fg-secondary font-medium">隨 density 縮放</span></Td>
             </tr>
             <tr>
               <Td mono>月份 gap</Td>
@@ -442,13 +442,13 @@ export const SizeMatrix = {
       <div className="flex flex-wrap gap-6 items-start">
         <div className="flex flex-col gap-2">
           <span className="text-caption font-medium text-fg-secondary">單月(預設)</span>
-          <div className="bg-surface-raised border border-border rounded-lg p-2">
+          <div className="bg-surface-raised border border-border rounded-lg">
             <DateGrid mode="single" defaultMonth={new Date()} locale={zhTW} />
           </div>
         </div>
         <div className="flex flex-col gap-2">
           <span className="text-caption font-medium text-fg-secondary">雙月並排(range 常用)</span>
-          <div className="bg-surface-raised border border-border rounded-lg p-2">
+          <div className="bg-surface-raised border border-border rounded-lg">
             <DateGrid mode="single" defaultMonth={new Date()} locale={zhTW} numberOfMonths={2} />
           </div>
         </div>
@@ -483,7 +483,7 @@ export const StateBehavior = {
         <div className="flex flex-wrap gap-6 items-start">
           <div className="flex flex-col gap-2 min-w-0">
             <span className="text-caption font-medium text-fg-secondary">mode="single"</span>
-            <div className="bg-surface-raised border border-border rounded-lg p-2">
+            <div className="bg-surface-raised border border-border rounded-lg">
               <DateGrid
                 mode="single"
                 selected={single}
@@ -493,13 +493,13 @@ export const StateBehavior = {
               />
             </div>
             <p className="text-[11px] text-fg-muted max-w-[260px] leading-relaxed">
-              點擊設定唯一選擇。再次點已選日 = 保持(預設);點新日取代舊選。DatePicker 使用此 mode。
+              點擊設定唯一選擇。再次點已選日 = 清除選取(react-day-picker v9 single mode 預設 toggle-off,未傳 required);點新日取代舊選。DatePicker 使用此 mode。
             </p>
           </div>
 
           <div className="flex flex-col gap-2 min-w-0">
             <span className="text-caption font-medium text-fg-secondary">mode="multiple"</span>
-            <div className="bg-surface-raised border border-border rounded-lg p-2">
+            <div className="bg-surface-raised border border-border rounded-lg">
               <DateGrid
                 mode="multiple"
                 selected={multiple}
@@ -515,7 +515,7 @@ export const StateBehavior = {
 
           <div className="flex flex-col gap-2 min-w-0">
             <span className="text-caption font-medium text-fg-secondary">mode="range"</span>
-            <div className="bg-surface-raised border border-border rounded-lg p-2">
+            <div className="bg-surface-raised border border-border rounded-lg">
               <DateGrid
                 mode="range"
                 selected={range}
@@ -559,10 +559,10 @@ export const Accessibility = {
         <H3>ARIA roles(react-day-picker v9 內建,本 DS 不重寫)</H3>
         <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
           <li><code>role="grid"</code> on day grid root</li>
-          <li><code>role="gridcell"</code> + <code>aria-selected</code> on each day button</li>
-          <li>Today cell:<code>aria-current="date"</code></li>
-          <li>Disabled cell:<code>aria-disabled="true"</code></li>
-          <li>Outside-month cell:<code>aria-hidden="true"</code>(視覺顯示但 SR 跳過)</li>
+          <li><code>role="gridcell"</code> + <code>aria-selected</code> on each day cell（<code>&lt;td&gt;</code>，非內層 button）</li>
+          <li>Today cell：<code>data-today</code>（lib 不設 <code>aria-current</code>；今日靠 data-attr + 視覺底線標示）</li>
+          <li>Disabled cell：button 帶 native <code>disabled</code>（focused 時改 <code>aria-disabled="true"</code>）+ cell <code>data-disabled</code></li>
+          <li>Outside-month cell：<code>data-outside</code>（showOutsideDays 時仍 render 可互動 button，非 aria-hidden 隱藏）</li>
         </ul>
       </section>
       <section>
@@ -570,6 +570,8 @@ export const Accessibility = {
         <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
           <li><kbd>←</kbd> <kbd>→</kbd> 切日(focus-only,不觸發 select)</li>
           <li><kbd>↑</kbd> <kbd>↓</kbd> 切週</li>
+          <li><kbd>Shift+←</kbd> <kbd>Shift+→</kbd> 切月(react-day-picker v9 內建)</li>
+          <li><kbd>Shift+↑</kbd> <kbd>Shift+↓</kbd> 切年(react-day-picker v9 內建)</li>
           <li><kbd>PgUp</kbd> <kbd>PgDn</kbd> 切月</li>
           <li><kbd>Shift+PgUp</kbd> <kbd>Shift+PgDn</kbd> 切年</li>
           <li><kbd>Home</kbd> <kbd>End</kbd> 行首 / 行尾</li>

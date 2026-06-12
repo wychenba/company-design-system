@@ -26,10 +26,10 @@ import type { FieldSize } from '@/design-system/components/Field/field-context'
  * - z-index:default 2 / hover|focus|focus-within 3 / disabled 0
  * - Container `display: inline-flex`(Ant default)/ `block` prop → `display: flex; width: 100%`
  *
- * **Size cascade**(對齊 Field family):
- * - `size` prop default = md;cascade 到 children via implicit context inheritance(children 自管 size 或繼承 useFieldContext)
- * - Mode A:整個 FieldControlGroup 包進 Field 當 control slot,size 自動從 Field context 來
- * - Mode B:standalone 用,size 由 prop 控制
+ * **Size**(FCG `size` 為 no-op — 不傳遞 size 給 children,無 Context Provider / 無 cloneElement;見 spec「Size」段):
+ * - children 尺寸完全由 child 自己決定;FCG 只負責 border-collapse 接合(border / radius / z-index)
+ * - Mode A:整個 FieldControlGroup 包進 Field 當 control slot,children 各自讀外層 `<Field>` 的 context size(是 Field 的 context,不是 FCG 的)
+ * - Mode B:standalone 用,逐一給每個 child 設 `size`(設 `<FieldControlGroup size>` 無效)
  *
  * **Width 配置**(Ant Space.Compact W-A canonical):
  * - 子 controls 自管 width(`className="w-[140px]"` / `style={{width:120}}` / `flex-1` etc.)
@@ -62,7 +62,7 @@ import type { FieldSize } from '@/design-system/components/Field/field-context'
  */
 
 export interface FieldControlGroupProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** Children size cascade(Mode B);Mode A 從 Field context 來 */
+  /** no-op — FCG 不傳遞 size 給 children;Mode A 由 children 讀外層 Field context、Mode B 逐一給每個 child 設 size(見 spec「Size」段) */
   size?: FieldSize
   /** Block 模式:width 100% 撐滿 parent(對齊 Ant Space.Compact `block` prop) */
   block?: boolean
@@ -116,13 +116,14 @@ FieldControlGroup.displayName = 'FieldControlGroup'
 // Story auto-compile metadata — Phase 4 migration(2026-05-10 #12 task complete)
 // Per scripts/compile-stories.mjs --check。FieldControlGroup is self-contained
 // structural wrapper(border-collapse pattern for Field controls)。
-// **No own sizes** — size prop is cascade-only(passes through to children Field controls,
-// not own visual variants),so sizes:{} matches spec frontmatter (no sizes declared)。
+// **No own sizes** — size prop 目前為 no-op(不傳遞給 children,無 Context Provider /
+// 無 cloneElement;children 尺寸自管,見上方 docblock「Size」段 + spec「FCG `size` prop 目前為 no-op」),
+// so sizes:{} matches spec frontmatter (no sizes declared)。
 export const fieldControlGroupMeta = {
   component: 'FieldControlGroup',
   family: 'self-contained',
   variants: {},
-  sizes: {},  // self-contained wrapper, sizes cascade to children only
+  sizes: {},  // self-contained wrapper;size prop no-op(children 尺寸自管)
   states: ['default', 'children-hover', 'children-focus', 'children-disabled'],
   tokens: {
     bg: [],  // structural wrapper has no own bg

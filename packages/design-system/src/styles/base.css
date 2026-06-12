@@ -1,0 +1,85 @@
+/* @qijenchen/design-system/styles/base — consumer runtime CSS SSOT
+ *
+ * Why(2026-05-29 fix:ds-product-template storybook 字體 drift,user「請你追根究底去解決」授權):
+ *   `styles/tokens` is the single consumer import. It must include the runtime CSS
+ *   needed by shipped DS components: base element styles plus custom utilities
+ *   backed by DS-owned keyframes.
+ *
+ *   本檔抽出 base 層為單一 SSOT:DS `src/globals.css` + consumer 都 import,字體/reset 永不 drift。
+ *   codex 2026-05-29 dual-track 共識 option (a)。
+ *
+ * 用法(consumer,放在 tokens import 之後):
+ *   @import '@qijenchen/design-system/styles/tokens';
+ *   @import '@qijenchen/design-system/styles/base';
+ */
+
+/* lucide 全域 stroke width */
+.lucide {
+  stroke-width: 1.75;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+    border-color: var(--color-neutral-5);
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Button pointer cursor(Tailwind v4 移除 v3 的 button cursor,補回符合 UX 直覺) */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Radix Collapsible height animation — consumed by TreeView. */
+@keyframes collapsible-down {
+  from { height: 0; }
+  to { height: var(--radix-collapsible-content-height); }
+}
+
+@keyframes collapsible-up {
+  from { height: var(--radix-collapsible-content-height); }
+  to { height: 0; }
+}
+
+@utility animate-collapsible-down {
+  animation: collapsible-down 150ms ease-out;
+}
+
+@utility animate-collapsible-up {
+  animation: collapsible-up 150ms ease-out;
+}
+
+/* Radix Accordion height animation — Radix exposes a different content-height var. */
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+@utility animate-accordion-down {
+  animation: accordion-down 200ms ease-out;
+}
+
+@utility animate-accordion-up {
+  animation: accordion-up 200ms ease-out;
+}

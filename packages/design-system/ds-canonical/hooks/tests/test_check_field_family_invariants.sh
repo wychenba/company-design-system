@@ -56,6 +56,15 @@ function F() { return <span variant="naked" className="inline-flex items-center"
 '
 expect_exit "A.1.2 naked + no SSOT → BLOCK" 2 "naked row-mode propagation"
 
+# 2b. 2026-06-03 回歸防護(同 R8 bug class):naked + items-center 跨多行 className(真實 JSX 格式)
+#     + no SSOT → BLOCK。修前 grep 逐行 → 多行 className 靜默漏 = P0 false-negative(對抗稽核抓到)。
+run_hook "/r/packages/design-system/src/components/BadMulti/bad-multi.tsx" '
+function F() { return <span variant="naked" className="inline-flex
+  bg-white
+  items-center" /> }
+'
+expect_exit "A.1.2b naked + 多行 className → BLOCK(回歸防護)" 2 "naked row-mode propagation"
+
 # 3. allowlist → pass
 run_hook "/r/packages/design-system/src/components/Edge/edge.tsx" '
 // @naked-row-mode-allow: popover content

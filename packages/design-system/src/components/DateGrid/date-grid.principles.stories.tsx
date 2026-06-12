@@ -71,16 +71,16 @@ export const UsageGuidance: Story = {
             <p>適合 DateGrid 的真實業務場景(點擊跳轉「展示」頁範例):</p>
             <ul className="space-y-1">
               <li>
-                <LinkTo kind="Design System/Internal/DateGrid/展示" name="Single — 生日 / 到期日"><span className="text-primary hover:underline font-medium cursor-pointer">Single — 生日 / 到期日</span></LinkTo>
+                <LinkTo kind="Design System/Internal/DateGrid/展示" name="單日 — 生日 / 到期日"><span className="text-primary hover:underline font-medium cursor-pointer">Single — 生日 / 到期日</span></LinkTo>
               </li>
               <li>
-                <LinkTo kind="Design System/Internal/DateGrid/展示" name="Multiple — 活動可參加日期"><span className="text-primary hover:underline font-medium cursor-pointer">Multiple — 活動可參加日期</span></LinkTo>
+                <LinkTo kind="Design System/Internal/DateGrid/展示" name="多日 — 活動可參加日期"><span className="text-primary hover:underline font-medium cursor-pointer">Multiple — 活動可參加日期</span></LinkTo>
               </li>
               <li>
-                <LinkTo kind="Design System/Internal/DateGrid/展示" name="Range — 分析時段 / 訂單範圍"><span className="text-primary hover:underline font-medium cursor-pointer">Range — 分析時段 / 訂單範圍</span></LinkTo>
+                <LinkTo kind="Design System/Internal/DateGrid/展示" name="範圍 — 分析時段 / 訂單範圍"><span className="text-primary hover:underline font-medium cursor-pointer">Range — 分析時段 / 訂單範圍</span></LinkTo>
               </li>
               <li>
-                <LinkTo kind="Design System/Internal/DateGrid/展示" name="Inline — Dashboard 小卡"><span className="text-primary hover:underline font-medium cursor-pointer">Inline — Dashboard 小卡</span></LinkTo>
+                <LinkTo kind="Design System/Internal/DateGrid/展示" name="行內 — 儀表板小卡"><span className="text-primary hover:underline font-medium cursor-pointer">行內 — Linear 專案截止日小卡</span></LinkTo>
               </li>
             </ul>
             <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方「vs 近親」)。</p>
@@ -120,10 +120,10 @@ export const UsageGuidance: Story = {
           </Rule>
         </Section>
 
-        <Section title="vs 近親 — Calendar(inline) vs DatePicker(field trigger)">
+        <Section title="vs 近親 — DateGrid(inline)vs DatePicker(field trigger)">
           <Rule
-            title="Calendar — inline 月曆,頁面上常駐可見"
-            note="dashboard 小卡、側欄 widget、日期 filter bar。使用者一眼就看到整月,不需點開。Calendar 是純 primitive,不自包 Popover。"
+            title="DateGrid — inline 月曆,頁面上常駐可見"
+            note="dashboard 小卡、側欄 widget、日期 filter bar。使用者一眼就看到整月,不需點開。DateGrid 是純 primitive,不自包 Popover。"
           >
             <Demo title="Linear 專案截止日 widget">
               <div className="flex flex-col gap-2 w-fit">
@@ -152,7 +152,7 @@ export const UsageGuidance: Story = {
 
           <Rule
             title="判斷法 — 看「頁面是否常駐顯示整月」"
-            note="常駐(月曆是主要內容)→ Calendar;輔助(主要是一個欄位,偶爾改)→ DatePicker。空間有限的表單永遠用 DatePicker,不要塞整個月曆進表單。"
+            note="常駐(月曆是主要內容)→ DateGrid;輔助(主要是一個欄位,偶爾改)→ DatePicker。空間有限的表單永遠用 DatePicker,不要塞整個月曆進表單。"
           >
             <Label>
               常駐月曆 = 使用者「在選日的脈絡中」(排班、活動、分析時段篩選);
@@ -166,7 +166,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ModeRule: Story = {
-  name: 'Mode 選擇',
+  name: '模式 選擇',
   render: () => {
     const ModeDemo = () => {
       const today = new Date()
@@ -248,12 +248,12 @@ export const ModeRule: Story = {
 }
 
 export const VisualTokenRule: Story = {
-  name: '視覺 token 統一',
+  name: '視覺設計變數 統一',
   render: () => (
     <div>
       <Rule
-        title="selected = bg-primary · today = ring-primary"
-        note="選中日用 primary 實心填滿(和系統其他選中態如 Checkbox checked、Tab active 一致);今日但未選 = ring-1 框定位(告訴使用者「這是今天」,但不搶選中視覺)。兩者同時成立時實心 selected 視覺優先。"
+        title="selected = bg-primary · today = 數字下方藍色底線"
+        note="選中日用 primary 實心填滿(和系統其他選中態如 Checkbox checked、Tab active 一致);今日但未選 = 數字下方藍色底線 bar(after pseudo,告訴使用者「這是今天」,但不搶選中視覺)。兩者同時成立時實心 selected 視覺優先,底線 bar 切 on-emphasis(白)保持可見。"
       >
         <Demo title="今日 + 已選他日">
           <DateGrid
@@ -270,8 +270,8 @@ export const VisualTokenRule: Story = {
       </Rule>
 
       <Rule
-        title="前後月日期 = text-fg-disabled(淡化),禁用日 = text-fg-disabled(semantic)"
-        note="前後月的補格讓使用者認得「跨月邊界」但不搶主要月份的閱讀焦點;disabled 日期保留可見(告訴使用者「這天存在但不能選」),套 `text-fg-disabled` + `pointer-events-none`(對齊 Button variant=text disabled 設計準則,非 opacity)。"
+        title="前後月日期 = text-fg-muted(淡化,比 disabled 弱),禁用日 = text-fg-disabled(semantic)"
+        note="前後月的補格讓使用者認得「跨月邊界」但不搶主要月份的閱讀焦點;disabled 日期保留可見(告訴使用者「這天存在但不能選」),套 `bg-disabled` + `text-fg-disabled` + `cursor-not-allowed`,點擊阻擋靠 react-day-picker 給 button 的 native `disabled` 屬性(對齊 Button disabled 設計準則,非 opacity)。"
       >
         <Demo title="showOutsideDays + disabled 過去日期">
           <DateGrid
@@ -304,9 +304,9 @@ export const LocaleRule: Story = {
     <div>
       <Rule
         title="locale prop 控制週首日與星期標頭語言"
-        note="react-day-picker 接受 date-fns locale 物件。繁中用 zhTW(週首為週日)、英文用 enUS(週首為週日)、德 / 法系國家週首為週一。Consumer 決定傳哪個 locale,DateGrid 不內建語言。"
+        note="react-day-picker 接受 date-fns locale 物件。週首日由 locale 物件決定,不以語言籠統判斷:en-US 週日起、en-GB 週一起——同樣是英文,週首日就不同;zhTW / de / fr(date-fns 內建值)都是週一起。下方對照:zhTW 首欄是週一,en-US 首欄是週日。Consumer 決定傳哪個 locale,DateGrid 不內建語言。"
       >
-        <Demo title="zhTW(繁體中文 · 週日起)">
+        <Demo title="zhTW(繁體中文 · 週一起)">
           <DateGrid mode="single" defaultMonth={new Date(2026, 3, 1)} locale={zhTW} />
         </Demo>
         <Demo title="預設(en-US · 週日起)">

@@ -61,22 +61,22 @@ export const UsageGuidance: Story = {
     <div className="flex flex-col gap-12">
       {/* 何時用 — 原 WhenToUse */}
       <div className="prose prose-sm max-w-prose">
-      <p>適合 Breadcrumb 的真實業務場景(點擊跳轉「展示」頁範例):</p>
+      <p>Breadcrumb 顯示「目前頁面在資訊階層中的位置」,適合 ≥ 3 層的階層頁面。真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/Breadcrumb/展示" name="Interactive ellipsis"><span className="text-primary hover:underline font-medium cursor-pointer">Interactive ellipsis</span></LinkTo>
+          電商多層分類、檔案管理器等深層頁面,路徑過長時中段折疊、點 ⋯ 可展開中間層 —— 見{' '}
+          <LinkTo kind="Design System/Components/Breadcrumb/展示" name="可互動省略"><span className="text-primary hover:underline font-medium cursor-pointer">可互動省略</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Breadcrumb/展示" name="Deep"><span className="text-primary hover:underline font-medium cursor-pointer">Deep</span></LinkTo>
+          路徑由路由 / CMS 資料動態產生,直接傳資料陣列、超過層數自動收合中段 —— 見{' '}
+          <LinkTo kind="Design System/Components/Breadcrumb/展示" name="宣告式 API + 自動收合"><span className="text-primary hover:underline font-medium cursor-pointer">宣告式 API + 自動收合</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Breadcrumb/展示" name="Two Levels"><span className="text-primary hover:underline font-medium cursor-pointer">Two Levels</span></LinkTo>
-        </li>
-        <li>
-          <LinkTo kind="Design System/Components/Breadcrumb/展示" name="asChild prop"><span className="text-primary hover:underline font-medium cursor-pointer">asChild prop</span></LinkTo>
+          SPA 內點麵包屑要走前端路由、不整頁重載 —— 見{' '}
+          <LinkTo kind="Design System/Components/Breadcrumb/展示" name="整合 React Router / Next.js Link"><span className="text-primary hover:underline font-medium cursor-pointer">整合 React Router / Next.js Link</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用相近的其他元件(見下方「跟相近元件怎麼分」的範例)。</p>
     </div>
 
       {/* vs 近親 — VsTabsRule — 原 VsTabsRule */}
@@ -182,7 +182,7 @@ export const UsageGuidance: Story = {
 }
 
 export const LastItemRule: Story = {
-  name: '最後一項是位置標示，不是 link',
+  name: '最後一項是位置標示，不是連結',
   render: () => (
     <div>
       <Rule
@@ -302,7 +302,7 @@ export const ScopeRule: Story = {
     <div>
       <Rule
         title="Breadcrumb 可容納 icon 強化首項（如 Home）"
-        note="首項用 Home icon 是業界慣例(Material / Atlassian),視覺錨點明確。其他 item 通常純文字。Icon size 由 DS 統一管(消費 BREADCRUMB_ICON_SIZE SSOT,對齊 uiSize.spec.md Icon Size Tier sm/md=16,lg=20),consumer 用 `startIcon` prop 不傳 size。"
+        note="首項用 Home icon 是業界慣例(Material / Atlassian),視覺錨點明確。其他 item 通常純文字。圖示大小由設計系統統一控制(小 / 中尺寸 16px、大尺寸 20px),你只要用 `startIcon` 指定要哪個圖示,不用自己設大小。"
       >
         <Breadcrumb>
           <BreadcrumbList>

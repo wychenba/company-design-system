@@ -47,11 +47,11 @@ export const UsageGuidance: Story = {
         <div className="prose prose-sm max-w-prose mb-8">
           <p>適合 DatePicker 的真實業務場景(點擊跳轉「展示」頁範例):</p>
           <ul className="space-y-1">
-            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="四模式"><span className="text-primary hover:underline font-medium cursor-pointer">四模式</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="可清除"><span className="text-primary hover:underline font-medium cursor-pointer">可清除</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="尺寸"><span className="text-primary hover:underline font-medium cursor-pointer">尺寸</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="Range:訂房 / 訂機票情境"><span className="text-primary hover:underline font-medium cursor-pointer">Range:訂房 / 訂機票情境</span></LinkTo></li>
-            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="Display"><span className="text-primary hover:underline font-medium cursor-pointer">Display</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="四模式"><span className="text-primary hover:underline font-medium cursor-pointer">請假單送審後日期欄位從可編輯轉唯讀/純展示(四模式)</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="可清除"><span className="text-primary hover:underline font-medium cursor-pointer">篩選器的選填截止日,填錯一鍵清空(可清除)</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="尺寸"><span className="text-primary hover:underline font-medium cursor-pointer">緊湊工具列與標準表單的尺寸對應(尺寸)</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="範圍模式:訂房 / 訂機票情境"><span className="text-primary hover:underline font-medium cursor-pointer">Range:訂房 / 訂機票情境</span></LinkTo></li>
+            <li><LinkTo kind="Design System/Components/DatePicker/展示" name="展示樣式"><span className="text-primary hover:underline font-medium cursor-pointer">審批詳情頁唯讀展示申請日期(展示樣式)</span></LinkTo></li>
           </ul>
           <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方 vs 近親 段)。</p>
         </div>
@@ -67,7 +67,7 @@ export const UsageGuidance: Story = {
 
         <Rule
           title="❌ 不用其他 calendar library 平行實作"
-          note="未來若需要 Date Range / DateTime,擴充本 Calendar(`./calendar.tsx`)而非引入第二個 library——避免兩套視覺語言在同一系統並存"
+          note="未來若需要 Date Range / DateTime,擴充本 DateGrid(`../DateGrid/date-grid.tsx`)而非引入第二個 library——避免兩套視覺語言在同一系統並存"
         >
           <Label>實作細節見 Design System / Components / DatePicker / 設計規格</Label>
         </Rule>
@@ -90,9 +90,9 @@ export const UsageGuidance: Story = {
 
         <Rule
           title="❌ 不用 DatePicker 選時間(時 / 分 / 秒)→ TimePicker"
-          note="時間改用 TimePicker。如需同時選日期 + 時間 → DatePicker + TimePicker 並列。Notion calendar event 的 time 欄是獨立 TimePicker"
+          note="只選時間改用 TimePicker。如需同時選日期 + 時間 → DatePicker 加 showTime prop(canonical 2026-05-02,Ant idiom;非獨立並列組合,見 spec「showTime」段)。Notion calendar event 的 time 欄是獨立 TimePicker"
         >
-          <Label warn>時間用 TimePicker,日期 + 時間用並列組合</Label>
+          <Label warn>時間用 TimePicker,日期 + 時間用 showTime prop</Label>
         </Rule>
 
         <Rule
@@ -123,7 +123,7 @@ export const CalendarRule: Story = {
 
         <Rule
           title="Calendar 內部 token 全由 DS 控制"
-          note="Calendar 的月份 caption / nav 按鈕 / 星期標頭 / 日格 / hover / selected / today 全部由 DS token 驅動:hover 用 neutral-hover、selected 用 primary、today 用 ring-primary。切 dark mode 自動聯動,不需元件內重寫"
+          note="Calendar 的月份 caption / nav 按鈕 / 星期標頭 / 日格 / hover / selected / today 全部由 DS token 驅動:hover 用 ring-primary 透明底圈、selected 用 primary 藍底白字圓、today 用 primary 底部 bar(after 偽元素)。切 dark mode 自動聯動,不需元件內重寫"
         >
           <DatePicker value={releaseDate} onChange={setReleaseDate} />
           <Label>↑ 發佈日:Calendar 所有視覺 token 來自 semantic.css</Label>
@@ -134,12 +134,12 @@ export const CalendarRule: Story = {
 }
 
 export const FormattingRule: Story = {
-  name: 'Display 格式化',
+  name: '顯示格式化',
   render: () => (
     <div>
       <Rule
-        title="Display 與 Edit trigger 皆用 Intl.DateTimeFormat"
-        note="formatOptions + locale 同時控制 readonly / disabled 的 Display 文字,以及 edit 模式 trigger 顯示的已選日期文字。跨模式一致、跨頁面可預期。Calendar popup 的月份語言由 Calendar 內部 locale 處理"
+        title="格式化跨模式一致 — 預設 YYYY/MM/DD,傳 formatOptions / locale 走 Intl.DateTimeFormat"
+        note="未傳格式 prop 時預設直接組 YYYY/MM/DD(locale-independent);傳 formatOptions + locale 才啟用 Intl.DateTimeFormat,同時控制 readonly / disabled 的 Display 文字與 edit trigger 顯示文字。跨模式一致、跨頁面可預期。Calendar popup 的月份語言由 Calendar 內部 locale 處理"
       >
         <DatePicker
           mode="readonly"

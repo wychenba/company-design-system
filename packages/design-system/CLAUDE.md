@@ -32,7 +32,7 @@
 
 ## 行數預算(Anthropic 對齊)
 
-CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory **per-file ≤ 100 lines** + **MEMORY.md index ≤ 20 entries**(soft 18 / hard 20,session-start hook 攔)。Hooks **26 soft / 60 hard**(SSOT = `session_start_governance_check.sh:186`,2026-05-27 升 50→55→60 per codex M31 P0 hooks + baseline + primitive-misuse 3 new hooks)。動態值見 `scripts/sync-governance-counters.mjs` 跑出為準(snapshot 2026-05-28:**31 M-rules / 82 audit dims / 59 hooks** — 數字僅供 sanity check,真值以 script 輸出為準避 drift)。
+CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory **per-file ≤ 100 lines** + **MEMORY.md index ≤ 20 entries**(soft 18 / hard 20,session-start hook 攔)。Hooks **26 soft / 60 hard**(SSOT = `session_start_governance_check.sh` Check 7 threshold logic,2026-05-27 升 50→55→60 per codex M31 P0 hooks + baseline + primitive-misuse 3 new hooks)。動態值見 `scripts/sync-governance-counters.mjs` 跑出為準(snapshot 2026-06-11:**31 M-rules / 88 audit dims / 52 hooks** — 數字僅供 sanity check,真值以 script 輸出為準避 drift)。
 
 ## Anti-bloat L1-L3
 
@@ -107,7 +107,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 | 3 告訴 user 主要 change(or preview URL)| 讓 user 知道看什麼 |
 | 4 等 user trigger | **「push / OK / 好 / 合 main」** → step 5;**「改 X / 不對 / 等等」** → 繼續 step 1 |
 | 5 Squash merge to main | 不開 PR(可 GitHub API squash-merge OR fast-forward)|
-| 5.5 **SSOT propagation gate**(2026-05-26 加 per user verbatim「push main 後所有 repo 都能獲得更新」)| Hook `check_post_main_ssot_propagate.sh` 偵測 `git push origin main` + diff HEAD~..HEAD 含 SSOT-affecting paths(`packages/{design-system,storybook-config}/src` / `.claude/{rules,hooks,skills,commands,references}` / `.claude-plugin/*.json` / `hooks/hooks.json` / `CLAUDE.md`)→ inject context 提議 bump npm `0.1.0-beta.<N+1>` + tag。AI 跑 bump + push tag → Release workflow auto-fire → npm publish → ds-product-template + fork repos Dependabot daily auto-PR(整鏈 1 trigger 涵蓋 /knowledge-prune / /deep-audit-cross-codex / 一般 dev / 任何 SSOT-affecting 來源,不需 skill-specific Phase Z)|
+| 5.5 **SSOT propagation gate**(2026-05-26 加 per user verbatim「push main 後所有 repo 都能獲得更新」)| Hook `check_post_main_ssot_propagate.sh` 偵測 `git push origin main` + diff HEAD~..HEAD 含 SSOT-affecting paths(`packages/design-system/src` + `packages/storybook-config/{addons,addons-preset.ts,preview.tsx}`(無 src/ dir)/ `.claude/{rules,hooks,skills,commands,references}` / `.claude-plugin/*.json` / `hooks/hooks.json` / `CLAUDE.md`)→ inject context。**AI 必「全自動執行」整條發版鏈、不需 user 再問也不需 user 再確認(2026-06-02 user directive Option A verbatim「我說 push main 時,應該就一切要自動弄得完整弄得好」)**:動到 skill/hook/spec/token/CLAUDE 等 SSOT-affecting paths + user 已給 merge trigger → AI 自動 bump → preflight → tag → publish → `npm view` 驗證,全程不停下問;preflight(發版前 gate)+ `npm view`(發版後驗)= 安全網,故全自動不增風險;user 隨時可喊停。bump npm `0.1.0-beta.<N+1>`。**bump 版本後、tag 前必跑單一指令 `npm run release:preflight`**(sync version 5-manifest + sync ds-canonical + 全 deterministic gate + build + dogfood + 5-manifest verify,fail-fast,全過寫 HEAD-bound pass-marker)—— 取代舊「手動逐道跑」checklist,根治 beta.43/45 連環 push 失敗(漏 sync 步驟)。全過才 tag + push tag → Release workflow auto-fire → npm publish → ds-product-template + fork repos Dependabot daily auto-PR(整鏈 1 trigger 涵蓋所有 SSOT-affecting 來源)|
 | 6 砍 remote branch | `git push origin --delete <branch>` ;sandbox HTTP 403 → 提醒 user GitHub UI 手動 |
 | 7 Local 對齊 | `git checkout main && git fetch && git reset --hard origin/main && git branch -d <branch>` |
 
@@ -154,8 +154,8 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 **Trigger phrase auto-pipeline**(M19 升級):「依原則自主」/「不需問」/「馬不停蹄」/「全部做完」/「自動」→ 進 autonomous mode,僅 SSOT-affecting UI/UX 停下 ASK。
 
 **2026-05-23 永久 reinforcement(user verbatim,hook 機械強制)**:
-- **Triple-verify before propose**(M18 Q0 universal gate):propose / 列 option / 發現「問題」(含 codex / deep audit findings)前必 inline 跑 (1) grep DS-wide (2) Read spec.md / tsx (3) 對照 canonical exception。三題全過才 propose;任一 NO → 自動撤回不煩 user。Hook `check_propose_pre_grep_verify.sh`。Anchor:2026-05-18 Sheet/inline-action/SurfaceBody false positive、2026-05-23 Badge `text-[10px]` 誤判為 drift(spec L161-167 documented exception)
-- **SSOT auto-sync invariant**:M-rule count / hook count / dim count / npm scope / version / plugin name 等跨 file 數字禁 hardcode 多處;SSOT in `session_start_governance_check.sh:173` / `meta-patterns.md` / `design-system-audit/SKILL.md` / `package.json` / `.claude-plugin/plugin.json`;其他 file reference 或 `scripts/sync-governance-counters.mjs` 機械對齊,drift 偵測 auto fix
+- **Triple-verify before propose**(M18 Q0 universal gate):propose / 列 option / 發現「問題」(含 codex / deep audit findings)前必 inline 跑 (1) grep DS-wide (2) Read spec.md / tsx (3) 對照 canonical exception。三題全過才 propose;任一 NO → 自動撤回不煩 user。Hook `check_propose_pre_grep_verify.sh`。Anchor:2026-05-18 Sheet/inline-action/SurfaceBody false positive、2026-05-23 Badge `text-[10px]` 誤判為 drift(badge.spec.md「字體例外」段 documented exception)
+- **SSOT auto-sync invariant**:M-rule count / hook count / dim count / npm scope / version / plugin name 等跨 file 數字禁 hardcode 多處;SSOT in `session_start_governance_check.sh` Check 7 / `meta-patterns.md` / `design-system-audit/SKILL.md` / `package.json` / `.claude-plugin/plugin.json`;其他 file reference 或 `scripts/sync-governance-counters.mjs` 機械對齊,drift 偵測 auto fix
 
 # 遇不確定時的協議
 
@@ -176,14 +176,15 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 | 清 unused imports 後 runtime | tsc 不充分,需 storybook |
 | shadcn compat alias 回流 | dark mode 不聯動 |
 | `asChild ? Slot : Native` 內部 JSX 仍渲染多 children | React.Children.only runtime fail — Slot 規範 children 必為單 element,內部 `{icon}{label}{badge}` 多 expression 變 array → throw。asChild 分支 render 只傳 consumer child;tsc/build 過,story 打開才炸 |
+| `tsc -b` 不 emit declaration | TS4023 漏抓;型別 surface 改動必 `npm run build:lib`(詳 `.claude/rules/self-verify.md` Post-edit)|
+| `rsync -a` 對「等長 + 同秒」檔靜默跳過 | 必 `--checksum` + 寫後 fail-closed 斷言(詳 `scripts/build-published-template-mirror.mjs` 檔頭;2026-06-07 beta.56-58 anchor)|
+| DS css 不在 tokens.css aggregator 也沒被 tsx import = orphan | consumer 靜默拿不到 → 跑版;hook `check_orphan_ds_css.sh` 機械攔(2026-05-27 anchor)|
 
 新 bug → 歸 Meta-Pattern OR 本表 1 行;> 10 條 = 漏寫,**評估 meta-merge 既有 M-rule 而非無腦新增**(meta-patterns velocity ≤ 3/quarter,單 M-rule 必吸收 ≥ 3 prior bugs)。
 
 # 專案 Stack
 
-Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design Token。
-必要檔案:`index.html` / `src/main.tsx` / `src/globals.css` / `vite.config.ts` / `package.json` / `tsconfig.json`。
-完整路徑 + Token 系統 → `packages/design-system/src/tokens/README.md`(charter)— Phase 1 後 DS 內化在 npm workspace。
+Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design Token(必要檔案:`index.html` / `src/main.tsx` / `src/globals.css` / `vite.config.ts` / `package.json` / `tsconfig.json`);完整路徑 + Token 系統 → `packages/design-system/src/tokens/README.md`(charter)— Phase 1 後 DS 內化在 npm workspace。
 
 # Path-scoped rules(2026 Anthropic 推薦)
 

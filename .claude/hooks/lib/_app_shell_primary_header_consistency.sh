@@ -18,13 +18,16 @@
 # Exception escape:`// @app-shell-primary-header-allow: <reason>` 檔頭。
 
 set -uo pipefail
-source "$(dirname "$0")/../_log-fire.sh"
+source "$(dirname "$0")/../_log-fire.sh" 2>/dev/null && log_hook_fire
 
-# 只看 Edit / Write tool
-TOOL_NAME=$(echo "${CLAUDE_TOOL_INPUT:-}" | python3 -c "import sys,json; d=json.load(sys.stdin) if sys.stdin.isatty()==False else {}; print(d.get('tool_name',''))" 2>/dev/null || echo "")
-if [[ "$TOOL_NAME" != "Edit" && "$TOOL_NAME" != "Write" ]]; then exit 0; fi
+# 只看 Edit / Write / MultiEdit tool
+# 2026-05-31 fix(folded-hook-audit):原從 $CLAUDE_TOOL_INPUT env + isatty 讀 → 經 chrome_header_dispatcher
+# 的 stdin pipe 呼叫時 env 為空 → 此 helper 永不 fire(dead)。改標準 INPUT=$(cat) + jq,對齊 sibling helper。
+INPUT=$(cat)
+TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // ""' 2>/dev/null)
+if [[ "$TOOL_NAME" != "Edit" && "$TOOL_NAME" != "Write" && "$TOOL_NAME" != "MultiEdit" ]]; then exit 0; fi
 
-TARGET=$(echo "${CLAUDE_TOOL_INPUT:-}" | python3 -c "import sys,json; d=json.load(sys.stdin) if sys.stdin.isatty()==False else {}; print(d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || echo "")
+TARGET=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""' 2>/dev/null)
 # 只查 .tsx / .stories.tsx consumer file
 if [[ ! "$TARGET" =~ \.(tsx)$ ]]; then exit 0; fi
 if [[ ! -f "$TARGET" ]]; then exit 0; fi
@@ -61,7 +64,6 @@ if [[ ${#VIOLATIONS[@]} -gt 0 ]]; then
   echo "  (a) 傳 globalHeader prop / 撤掉 SidebarHeader" >&2
   echo "  (b) 改 layout=\"primary-sidebar\"(若不需要 global header)" >&2
   echo "  (c) Escape 允許:檔首加 \`// @app-shell-primary-header-allow: <rationale>\`" >&2
-  log_fire "check_app_shell_primary_header_consistency"
   exit 2
 fi
 

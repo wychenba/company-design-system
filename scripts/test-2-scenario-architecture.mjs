@@ -216,8 +216,9 @@ if (missingInWorkflow.length === 0 && missingInAllowlist.length === 0) {
 }
 
 // M2-M5: integrity scans already run as part of M0 build. Re-check stdout.
-if (buildResult.includes('Scan DS source residue: 8 paths checked,0 leaks')) {
-  pass_test('M2', `DS source residue scan(8 paths checked,0 leaks)`)
+// 2026-05-30 robust match(原 exact-string '8 paths checked' 太脆,mirror 訊息一改即誤 fail):認「0 leaks」即可
+if (/Scan DS source residue:.*?,\s*0 leaks/.test(buildResult)) {
+  pass_test('M2', 'DS source residue scan(0 leaks,含 .claude/hooks bootstrap-allowlist)')
 } else {
   fail_test('M2', 'DS source residue scan failed')
 }

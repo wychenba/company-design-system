@@ -68,6 +68,16 @@ Sub-agent dispatch prompt 必含 3 directives(verbatim,不可弱化):
 - ❌「Coverage 12% sampled looks clean」= audit incomplete
 - ❌ Claim「D40 CLEAN」無 cite script output
 
+## Sub-rule 4 — Deep-audit rerun 收斂原則:何時停(2026-06-01,user 問「沒改內容卻每次 rerun 都有新問題,要 rerun 到完全沒問題嗎?」)
+
+**Why**:deep-audit 是 LLM 對抗式稽核 = non-deterministic + 生成式永遠找得到東西 + 高假陽性(本 session Avatar 硬互斥 / FileViewer listbox / DropdownMenu child-only / PeoplePicker className / Input naked 全 over-flag,adversarial 二次驗證後降級)。盲目 auto-rerun-to-zero = 追不到的跑步機 + 假陽性誘發 regression。
+
+**How to apply**:停止判準 = **迭代到某輪「adversarial 二次驗證後真 material/regression = 0」(只剩 marginal + false-positive)才 STOP** —— 既不追零、也不過早宣稱遞減。本 session 實證 material **7→3→2→2→0**(5 輪):第 1 輪抓 regression、2-4 輪清「改一處漏 N 處」的 doc 傳播缺口、第 5 輪歸零 STOP。
+- 每 finding 必 **materiality 三分類**(material=影響使用者/contract/a11y;marginal=措辭 nit;false-positive)+ adversarial 二次驗證 filter audit 高估,再決定修不修。
+- **doc-alignment「改一處看 N 處」**:component 有多面向(spec frontmatter / tsx meta / props 表 / Inspector argTypes / ColorMatrix / ModeMatrix / Accessibility prose / principles / showcase / jsDoc),改一處要全掃 — reruns 一直抓我這缺口。
+- 收斂靠決定性 CI gate + 寫入時紀律,非稽核 loop;deep-audit = 週期性工具(release/季度)非對沒變內容反覆跑。
+- **已 codify(2026-06-01)**:`deep-audit-cross-codex/SKILL.md` Phase C.0 rerun-stop-gate anchor + `references/triage-rubric.md`「收斂判準」完整三分類表 + 「改一處看 N 處」。放 skill 而非新 M-rule(velocity cap + skill-specific,不增 every-session context)。
+
 ## 對齊原則
 
 - CLAUDE.md `# 稽核 canonical` audit-vs-execute 分權

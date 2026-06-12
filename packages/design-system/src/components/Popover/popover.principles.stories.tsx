@@ -79,7 +79,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/Popover/展示" name="篩選面板"><span className="text-primary hover:underline font-medium cursor-pointer">篩選面板</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:往下看下方「Popover 與近親元件的分界」三組對照(對上 Dialog、DropdownMenu、Tooltip),確認該用哪個元件。</p>
     </div>
 
       {/* vs 近親 — VsDialogRule — 原 VsDialogRule */}
@@ -246,7 +246,7 @@ export const UsageGuidance: Story = {
 }
 
 export const VisualAlignmentRule: Story = {
-  name: '視覺對齊對話框（浮層 視覺底 共用）',
+  name: '視覺對齊 Dialog（浮層視覺語言共用）',
   render: () => (
     <div>
       <Rule

@@ -54,7 +54,7 @@ export const Overview = {
               <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md p-3">
                 <Rating value={0} max={1} readOnly size="lg" aria-label="empty" />
               </div>
-              <span className="text-[10px] text-fg-muted font-mono">fill = var(--color-neutral-4)</span>
+              <span className="text-[10px] text-fg-muted font-mono">fill = var(--divider)</span>
             </div>
             <div className="flex flex-col gap-2 items-start">
               <span className="text-[11px] text-fg-muted font-medium">單顆星 — half (precision=half)</span>
@@ -93,10 +93,11 @@ export const Overview = {
               ['defaultValue', 'number', '0', 'uncontrolled 預設值'],
               ['onChange', '(value: number) => void', '—', '評分改變 callback'],
               ['max', 'number', '5', '滿分星數（世界級慣例 = 5，不建議超過 7）'],
-              ['size', "'sm'|'md'|'lg'", "'md'", '尺寸,對應 star icon 20/24/24 px(對齊 inline Avatar,非 icon tier)'],
+              ['size', "'xs'|'sm'|'md'|'lg'", 'xs / md', '尺寸,star icon 20/20/24/24 px(對齊 inline Avatar,非 icon tier)。預設依情境:獨立展示 xs,Field 內跟隨 Field md'],
               ['precision', "'full'|'half'", "'full'", '整星 / 半星'],
               ['readOnly', 'boolean', 'false', '唯讀展示（不響應 hover/click/鍵盤）'],
               ['disabled', 'boolean', 'false', '完全停用'],
+              ['loading', 'boolean', 'false', '暫時性等待,視覺同 disabled、aria-busy(詳 spec「Loading canonical」段)'],
               ['icon', 'LucideIcon', 'Star', '自訂 icon（極少用，禁止換成 Heart/ThumbsUp）'],
               ['aria-label', 'string', '—', 'readOnly 時必填，描述分數'],
             ].map(([p, t, d, desc]) => (
@@ -203,7 +204,7 @@ const InspectorInner = () => {
               <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Color</span>
             </div>
             <PropRow label="Filled"><TokenCell token="--warning" /></PropRow>
-            <PropRow label="Empty"><TokenCell token="--color-neutral-4" /></PropRow>
+            <PropRow label="Empty"><TokenCell token="--divider" /></PropRow>
             <PropRow label="Focus ring"><TokenCell token="--ring" display="ring-2 ring-ring ring-offset-2" /></PropRow>
           </div>
 
@@ -223,8 +224,8 @@ const InspectorInner = () => {
             </div>
             <PropRow label="Role">{readOnly || disabled ? 'img' : 'slider'}</PropRow>
             <PropRow label="tabIndex">{readOnly || disabled ? '—' : '0'}</PropRow>
-            <PropRow label="Hover">{readOnly || disabled ? '—' : 'scale-110 · transition-transform'}</PropRow>
-            <PropRow label="Keyboard">{readOnly || disabled ? '—' : `Arrow ± ${precision === 'half' ? '0.5' : '1'}`}</PropRow>
+            <PropRow label="Hover">{readOnly || disabled ? '—' : '填色預覽至游標所在星（不改尺寸）'}</PropRow>
+            <PropRow label="Keyboard">{readOnly || disabled ? '—' : `Arrow ± ${precision === 'half' ? '0.5' : '1'} · Home=0 · End=max`}</PropRow>
           </div>
 
           <div className="px-4 py-1 pb-3">
@@ -234,7 +235,9 @@ const InspectorInner = () => {
             <PropRow label="aria-valuenow">{readOnly || disabled ? '—' : value}</PropRow>
             <PropRow label="aria-valuemin">{readOnly || disabled ? '—' : '0'}</PropRow>
             <PropRow label="aria-valuemax">{readOnly || disabled ? '—' : '5'}</PropRow>
-            <PropRow label="aria-label">{readOnly ? '必填' : '建議填'}</PropRow>
+            <PropRow label="aria-valuetext">{readOnly || disabled ? '—' : `${value} of 5 stars`}</PropRow>
+            <PropRow label="aria-label">{readOnly ? '必填' : 'Field 內免填 · standalone 必填'}</PropRow>
+            <PropRow label="aria-labelledby">{readOnly || disabled ? '—' : 'Field 內自動指向 FieldLabel'}</PropRow>
           </div>
         </div>
       </div>
@@ -292,35 +295,35 @@ export const ColorMatrix = {
             <Td mono>empty</Td>
             <Td><Rating value={0} readOnly size="md" aria-label="零分" /></Td>
             <Td>—</Td>
-            <Td><TokenCell token="--color-neutral-4" /></Td>
+            <Td><TokenCell token="--divider" /></Td>
             <Td>—</Td>
           </tr>
           <tr>
             <Td mono>half</Td>
             <Td><Rating value={3.5} readOnly precision="half" size="md" aria-label="3.5 星" /></Td>
             <Td><TokenCell token="--warning" /></Td>
-            <Td><TokenCell token="--color-neutral-4" /></Td>
+            <Td><TokenCell token="--divider" /></Td>
             <Td className="text-[11px]">left 50% filled overlay</Td>
           </tr>
           <tr>
             <Td mono>hover (interactive)</Td>
             <Td><Rating defaultValue={3} size="md" aria-label="hover 範例" /></Td>
             <Td><TokenCell token="--warning" /></Td>
-            <Td><TokenCell token="--color-neutral-4" /></Td>
-            <Td className="text-[11px]">scale-110 · transition-transform</Td>
+            <Td><TokenCell token="--divider" /></Td>
+            <Td className="text-[11px]">填色預覽至游標所在星</Td>
           </tr>
           <tr>
             <Td mono>focus (keyboard)</Td>
             <Td><Rating defaultValue={3} size="md" aria-label="focus 範例" /></Td>
             <Td><TokenCell token="--warning" /></Td>
-            <Td><TokenCell token="--color-neutral-4" /></Td>
+            <Td><TokenCell token="--divider" /></Td>
             <Td className="text-[11px]">ring-2 ring-ring ring-offset-2</Td>
           </tr>
           <tr>
             <Td mono>disabled</Td>
             <Td><Rating value={3} disabled size="md" aria-label="disabled 範例" /></Td>
             <Td><TokenCell token="--warning" /></Td>
-            <Td><TokenCell token="--color-neutral-4" /></Td>
+            <Td><TokenCell token="--divider" /></Td>
             <Td className="text-[11px]">opacity-disabled · pointer-events-none</Td>
           </tr>
         </tbody>
@@ -373,12 +376,13 @@ export const SizeMatrix = {
       </table>
 
       <div className="flex flex-col gap-3">
-        <span className="text-caption font-medium text-fg-secondary">為何不走 field-height family</span>
+        <span className="text-caption font-medium text-fg-secondary">Container 消費 field-height,star icon 走 inline-Avatar 尺寸</span>
         <p className="text-caption text-fg-muted max-w-[720px] leading-relaxed">
-          Field-height family（Input / NumberInput / DatePicker / Select 等）需要高度對齊相同 row
-          的其他 Field control，共用 `--field-height-sm/md/lg` token。Rating 沒有 padding / border box，
-          高度由 icon px 自然撐起——若強制套 field-height，icon 周圍會出現不必要的空白。
-          Badge / Switch / Checkbox 等 self-contained primitive 採同樣策略。
+          Rating 的 container 消費 `--field-height-*`（xs=24 / sm=28 / md=32 / lg=36），讓它與
+          Input / NumberInput / DatePicker / Select / Button 等 field-height family 元件並排同一 row 時高度對齊。
+          這一層是「外框高度」對齊；star icon 本身則走 item-anatomy inline Avatar 尺寸（sm=20 / md=24 / lg=24），
+          而非 icon tier（16/16/20）——因為一顆星是 filled identity 視覺（主要資料點），視覺份量要跟 Avatar 齊。
+          兩層分開設計:container 高度對齊 Field row,icon 大小對齊 Avatar 重量。
         </p>
       </div>
     </div>
@@ -434,10 +438,11 @@ export const StateBehavior = {
 
           <div className="flex flex-col gap-2">
             <span className="text-caption font-medium text-fg-secondary">
-              Keyboard — Arrow Left/Right/Up/Down 改值
+              Keyboard — Arrow Left/Right/Up/Down 改值 · Home / End 跳極值
             </span>
             <p className="text-caption text-fg-muted max-w-[720px]">
-              Focus 進入 Rating 容器後，Arrow Right/Up 加一、Arrow Left/Down 減一（precision=half 時 step=0.5）。
+              Focus 進入 Rating 容器後，Arrow Right/Up 加一、Arrow Left/Down 減一（precision=half 時 step=0.5）；
+              Home 跳到 0、End 跳到 max（完整 WAI-ARIA slider 鍵盤 pattern）。
               值範圍 0 ~ max，超出自動 clamp。
             </p>
             <div className="flex items-center gap-4">
@@ -484,7 +489,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `rating.spec.md` 「A11y 預設」段。摘要:\n\n-   interactive  ： role=\"slider\"  +  aria-valuenow={value}  +  aria-valuemin={0}  +  aria-valuemax={max}  +  tabIndex={0} ，鍵盤 Arrow Left/Right/Up/Down 改值（precision=half 時 step=0.5，否則 step=1）\n-   readOnly  ： role=\"img\"  +  aria-label （  必填  ），例： aria-label=\"平均評分 4.7 星，共 5 星\" 。無 tabIndex\n-   disabled  ： aria-disabled=\"true\"  +  pointer-events-none \n-   單顆星    aria-hidden ：所有內部  <button> （包含 half-pre"}</p>
+      <p className="whitespace-pre-line">{"詳 `rating.spec.md` 「A11y 預設」段。摘要:\n\n-   interactive  ： role=\"slider\"  +  aria-valuenow={value}  +  aria-valuemin={0}  +  aria-valuemax={max}  +  aria-valuetext={`{value} of {max} stars`}  +  tabIndex={0} ，鍵盤 Arrow Left/Right/Up/Down ± step（precision=half 時 step=0.5，否則 step=1），Home=0 / End=max（完整 WAI-ARIA slider 鍵盤 pattern）\n-   readOnly  ： role=\"img\"  +  aria-label （  必填  ），例： aria-label=\"平均評分 4.7 星，共 5 星\" 。無 tabIndex\n-   disabled  ： aria-disabled=\"true\"  +  pointer-events-none \n-   單顆星    aria-hidden ：內部點擊目標是  <span role=\"presentation\" aria-hidden> （非 interactive element，避免與外層 role=\"slider\" 形成 axe nested-interactive；含 half-precision 兩個 hover zone）"}</p>
     </div>
   ),
 }

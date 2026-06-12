@@ -68,6 +68,18 @@ expect_warn() {
   fi
 }
 
+expect_block() {
+  local name="$1"; local needle="$2"
+  # exit 2 + stderr contains needle (P0 BLOCKER,2026-06-06 升,跟 item C.4 對稱)
+  if [ "$EXIT" = "2" ] && echo "$STDERR_TEXT" | grep -qF "$needle"; then
+    echo "  PASS  $name"; PASS=$((PASS+1))
+  else
+    echo "  FAIL  $name (expected exit=2 + stderr needle '$needle', got exit $EXIT)"
+    echo "  --- stderr ---"; echo "$STDERR_TEXT" | sed 's/^/    /'; echo "  --- end ---"
+    FAIL=$((FAIL+1)); FAILED_TESTS="${FAILED_TESTS}\n  - $name"
+  fi
+}
+
 echo "=== check_chrome_header_handcraft tests ==="
 
 # 1. Non-DS path → skip
@@ -99,7 +111,18 @@ export const Bar = () => (
   <div className="h-[var(--chrome-header-height)] px-loose border-b border-divider" />
 )
 '
-expect_warn "5. handcraft signature → warn" "CHROME HEADER HANDCRAFT"
+expect_block "5. handcraft signature → BLOCK" "CHROME HEADER HANDCRAFT"
+
+# 5b. 2026-06-03 回歸防護(同 R8 multiline bug class,對抗稽核抓到):h-[chrome-header-height] 與
+#     border-divider 跨多行 className(真實 JSX 格式)→ warn。修前 grep 逐行 + [^"]* 跨屬性 → 多行靜默漏。
+run_hook_write "/repo/packages/design-system/src/components/Baz/baz.tsx" '
+export const Baz = () => (
+  <div className="h-[var(--chrome-header-height)]
+    flex items-center px-loose
+    border-b border-divider" />
+)
+'
+expect_block "5b. handcraft 多行 className → BLOCK(回歸防護)" "CHROME HEADER HANDCRAFT"
 
 # 6. Escape allowlist → silent
 run_hook_write "/repo/packages/design-system/src/components/Bar/bar.tsx" '// @chrome-header-handcraft-allow: tabs cva pattern
@@ -112,7 +135,7 @@ expect_pass_silent "6. @chrome-header-handcraft-allow escape → silent"
 # 7. Edit (new_string) with handcraft → warn
 run_hook_edit "/repo/packages/design-system/src/components/Baz/baz.tsx" \
   '<div className="h-[var(--chrome-header-height)] flex items-center border-b border-divider">'
-expect_warn "7. Edit new_string with handcraft → warn" "CHROME HEADER HANDCRAFT"
+expect_block "7. Edit new_string with handcraft → BLOCK" "CHROME HEADER HANDCRAFT"
 
 echo ""
 echo "=== Summary ==="

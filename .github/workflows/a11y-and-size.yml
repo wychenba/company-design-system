@@ -11,20 +11,35 @@ on:
 permissions:
   contents: read
 
+# 2026-06-04 SSOT 假綠根治:bash -eo pipefail(同 ci.yml)→ `| tail` 不再吞 exit code。
+defaults:
+  run:
+    shell: bash -eo pipefail {0}
+
 jobs:
   a11y-axe:
     name: a11y(axe-core WCAG 2A+AA, Dim 49)
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    continue-on-error: true  # 2026-05-23 ship — advisory until baseline established(Carbon AVT 同 pattern)
+    # 2026-06-04 轉 ENFORCE(移除 continue-on-error):baseline-diff gate 已建立。
+    # 原假綠三重病(缺 build:lib → axe 早夭 / pipefail-mask / continue-on-error)全修:
+    #   ① build:lib 補上 → axe 真的跑;② workflow pipefail default → exit 不被吞;
+    #   ③ baseline(.claude/baselines/a11y-baseline.json,919 fingerprint / 0 audit-error)建立後,
+    #      `--gate` 只 fail「新增 / 增量」violation(regression),不被既有 anatomy 文件表雜訊卡死。
+    # 故可移除 continue-on-error 真 enforce:任何新 a11y 違規(含新 white-on-bright 對比)= CI 紅。
+    # 既有 violation 的清理另案(baseline 已記錄);如需收緊跑 `npm run a11y:check -- --baseline-write`。
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: 'npm' }
       - run: npm ci
+      # 2026-06-04 fix(missing-build-dep):build-storybook 的 prebuild 跑 storybook-config tsc,需 DS dist 型別。
+      # 漏此步 → tsc error code 2 → 無 storybook-static → axe 沒跑。對齊 size-limit job + ci.yml + release.yml。
+      - name: Build DS lib + types(storybook-config tsc + Storybook 前置)
+        run: npm run build:lib 2>&1 | tail -10
       - run: npm run build-storybook 2>&1 | tail -20
-      - name: Run axe-core against all stories
-        run: npm run a11y:check 2>&1 | tail -60
+      - name: Run axe-core gate(baseline-diff:只擋新增/增量 regression)
+        run: npm run a11y:check -- --gate 2>&1 | tail -60
       - name: Upload a11y report
         if: always()
         uses: actions/upload-artifact@v4
@@ -42,10 +57,12 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: 'npm' }
       - run: npm ci
-      - name: Build DS lib + types
-        run: |
-          npm -w @qijenchen/design-system run build 2>&1 | tail -10
-          npm -w @qijenchen/design-system run build:dts 2>&1 | tail -5
+      # 2026-06-10 fix:改用 build:lib(含 storybook-config build)— 原本漏建 storybook-config →
+      # 根目錄 `npm run build` 的 tsc -b 在 .storybook/main.ts 解析不到 '@qijenchen/storybook-config/preset'
+      # 型別(exports 指 dist/,冷環境 npm ci 後無)→ TS2307 silent exit 2(被 tail -10 吞)→ 本 job
+      # 自 6/5 enforce 後連續紅;本地有舊 dist 故不曾復現,乾淨房 clone 才抓到。
+      - name: Build DS lib + types(含 storybook-config,supply .storybook/main.ts 型別)
+        run: npm run build:lib 2>&1 | tail -10
       - name: Build production app(for aggregate budget)
         run: npm run build 2>&1 | tail -10
       - name: Run size-limit

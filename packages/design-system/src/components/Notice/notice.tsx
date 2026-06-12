@@ -1,3 +1,7 @@
+/**
+ * @internal — DS-internal 單元(per `.claude/rules/ui-development.md` Public vs Internal canonical;spec frontmatter `isInternal`)。
+ * 不進 root barrel front-door;由 Alert / Toast wrap 消費,end-user app 請用 wrapper 元件。
+ */
 import * as React from 'react'
 import { X as XIcon, Info, CircleCheck, TriangleAlert, XCircle, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -27,7 +31,7 @@ import { ItemContent, ItemPrefix } from '@/design-system/patterns/element-anatom
  * Rationale(Notification banner family canonical):
  * - Notice / Alert / Toast 屬 **notification banner family**(ephemeral、px-4 py-3 固定不隨 density),
  *   dismiss 是邊角小 affordance,xs 視覺不搶眼不跟 content 競爭。見 `overlay-surface.spec.md`
- *   「Chrome dismiss size canonical」三家族分類(Modal sm / Non-modal xs / Notification xs)
+ *   「Chrome dismiss size canonical」(overlay header 走 sm native + 負 margin trick;xs 只用於 notification banner family)
  * - Close 左側可加 refresh / share(action group region),皆統一 xs
  * - `dismiss` prop 自動套 variant="text" + fg-muted override
  * SSOT:patterns/element-anatomy/inline-action.spec.md「Dismiss canonical — X close only」
@@ -120,6 +124,7 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
         />
 
         {(endContent || dismissible) && (
+          // @row-slot-handcraft-allow: Notice 是非-row alert（非 item-anatomy row），此 end slot 是 Notice 自身 layout 的 dismiss/endContent 容器，不是 row prefix/suffix → 不消費 ItemPrefix/ItemSuffix
           <div className="flex items-center gap-2 shrink-0 h-[1lh]">
             {endContent}
             {dismissible && (
@@ -178,14 +183,14 @@ export function useInverseTheme(): 'dark' | 'light' {
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const noticeMeta = {
   component: 'Notice',
-  family: null, // non-family composite / overlay / layout
+  family: 2, // Family 2（List item layout）消費者 — 對齊 notice.spec.md frontmatter family: 2 + body「Layout Family」段
   variants: {
 
   },
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'], // 無互動 layout primitive(spec「邊界案例」:不擁有 disabled;hover / focus 屬內嵌 dismiss Button)
   tokens: {
     bg: [],
     fg: ['text-error-text', 'text-fg-muted', 'text-fg-secondary', 'text-info-text', 'text-success-text', 'text-warning-text'],

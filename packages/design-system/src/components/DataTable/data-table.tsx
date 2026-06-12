@@ -1,5 +1,17 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 // code-quality-allow: file-size — foundational composite — 拆檔會複雜化 context / ref / state 同步
+//
+// ── 檔案結構(2026-05-03 split matrix;2026-06-11 自 data-table.spec.md 遷入,Level 4 code home)──
+// 每個檔過 M21 / M17 / Rule-of-3 三 test:
+//   - data-table.tsx(主,foundational)
+//   - data-table-filter-panel.tsx + data-table-sort-manager.tsx + data-table-column-visibility-panel.tsx(panel state 隔離)
+//   - cell-registry.tsx(column type → cell display / edit 解析 SSOT)
+//   - data-table-interaction-layer.tsx + active-editor-controller.ts(spreadsheet overlay + portal editor)
+//   - column-types.ts + filter-operators.ts(✓ Rule-of-3 SSOT,3+ consumer)
+//   - filter-tree.ts(pure data + eval,test isolation)
+//   - lib/column-meta.ts(Internal SSOT,消 5 處 `(col as any)`)
+//   - + stories / spec / css
+// M21 retract:filter-value-picker.tsx 1 consumer → 已 inline 回 panel。
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { Empty } from '@/design-system/components/Empty/empty'
@@ -24,7 +36,7 @@ import { DndContext, DragOverlay, useDraggable, useDroppable, useDndContext, poi
 import { cn } from '@/lib/utils'
 import { ICON_SIZE } from '@/design-system/tokens/uiSize/icon-size'
 import { dragSourceStyle, dropIndicatorRow, dropIndicatorColumn, dragActiveCursor, isReorderNoop, reconstructFullRowGhost, snapToCursorModifier } from '@/design-system/lib/drag-visual'
-import { nakedCellEditableDisplayHover } from '@/design-system/components/Field/field-wrapper'
+import { nakedCellEditableDisplayHover, fieldDisplayTextClass } from '@/design-system/components/Field/field-wrapper'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/design-system/components/DropdownMenu/dropdown-menu'
 import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
@@ -56,6 +68,7 @@ type TableSize = 'sm' | 'md' | 'lg'
 export interface DataTableProps<TData>
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>,
     VariantProps<typeof dataTableVariants> {
+  // any-allow: TanStack ColumnDef TValue idiom(per-column value 型別異質,官方範例同)— 對齊本 module 既有 escape 紀律
   columns: ColumnDef<TData, any>[]
   data: TData[]
   size?: TableSize
@@ -175,8 +188,8 @@ export interface DataTableProps<TData>
    *
    * **v2(2026-05-05)修正**:
    * - Virtualizer × transform:被拖 row 略過 `measureElement`(透過 SortableRowCtx 廣播 active id),避免 transform 干擾測量
-   * - 3-panel mirror sync:每 region 都呼叫 `useSortable({id})`(同 SortableContext 共用 state),mirror 自然取得相同 transform
-   * - Cross-parent drop:nested 全 row 進 SortableContext.items,自訂 collisionDetection 過濾出「同 parent siblings」;cross-parent over → 不觸發,handle cursor `not-allowed`
+   * - 3-panel mirror sync:每 region 對同 row id 各呼叫 `useDraggable` + `useDroppable`,mirror 自然取得相同 transform
+   * - Cross-parent drop:nested 全 row 各自 `useDroppable`,自訂 collisionDetection 過濾出「同 parent siblings」;cross-parent over → 不觸發,handle cursor `not-allowed`
    *
    * 詳 `data-table.spec.md`「L4 Row drag」段。
    */
@@ -299,8 +312,8 @@ function columnSizeStyle(
   // **flex-basis: baseSize(2026-05-06 v14.2)**:把 baseSize 當 explicit basis(不是 `0%`)。
   // 為什麼:flex item base = basis + padding(box-sizing: border-box content-box 行為)。前 `0%`
   // basis → cell padding 變 base 一部分。display(padding 12)vs edit(padding 0,Field 接管)
-  // 兩態 base 不同 → flex 重分配 → user 報「Price cell 進 edit 寬度縮 12px」(verify by
-  // debug-v14-1-display-edit-rect-match.mjs:Price display 130.5 → edit 118.5 = -12px)。
+  // 兩態 base 不同 → flex 重分配 → user 報「Price cell 進 edit 寬度縮 12px」
+  // (量測:Price display 130.5 → edit 118.5 = -12px)。
   // explicit basis = baseSize 讓 padding 不參與 base 計算 → display↔edit 寬度穩定。
   return { flex: `1 1 ${baseSize}px`, minWidth: baseSize, maxWidth: maxSize }
 }
@@ -1529,7 +1542,11 @@ function DataTableInner<TData>(
           //     「框框跟 cell 一樣大並取代 cell 的框且與 table 隔線無縫接軌」(2026-05-05)。
           //   - **沒有** cell 自己 box-shadow ring — focus / hover / open ring 由 Field naked 自帶
           //     state machine 提供(對齊 user「狀態樣式取決於原輸入框」reminder)
-          'group/cell flex text-foreground text-body font-normal shrink-0 relative self-stretch',
+          // 字級隨 size:sm/md text-body / lg text-body-lg(fieldDisplayTextClass),對齊 Field family
+          // size→font SSOT。此為非-Field content(consumer 自訂 cell / TruncateCell 純文字)的 fallback 字級;
+          // typed cell 各自的 Field 控件已自帶 size→font(cell-registry 傳 size)。
+          'group/cell flex text-foreground font-normal shrink-0 relative self-stretch',
+          fieldDisplayTextClass(size),
           // Issue 9(2026-05-10):有 cell error → unset overflow-hidden 讓 error message
           // wrap 撐 row 高。**H1(2026-05-10)升級**:overflow-visible 條件改 `rowHasAnyError` —
           // row 內任一 cell 有 error 整 row 全 cells 都 overflow-visible(error 訊息可能多行
@@ -1581,7 +1598,7 @@ function DataTableInner<TData>(
                       type="button"
                       aria-label={isExpanded ? '收合' : '展開'}
                       aria-expanded={isExpanded}
-                      className="inline-flex items-center justify-center shrink-0 w-4 h-4 mr-2 text-fg-muted hover:text-foreground rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-transform"
+                      className="inline-flex items-center justify-center shrink-0 w-4 h-4 mr-2 text-fg-muted hover:text-foreground rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-transform"
                       style={{ transform: isExpanded ? 'rotate(90deg)' : undefined }}
                       onClick={(e) => { e.stopPropagation(); toggleExpand?.() }}
                     >
@@ -1626,7 +1643,7 @@ function DataTableInner<TData>(
                     type="button"
                     aria-label={isExpanded ? '收合' : '展開'}
                     aria-expanded={isExpanded}
-                    className="inline-flex items-center justify-center shrink-0 w-4 h-4 mr-2 text-fg-muted hover:text-foreground rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-transform"
+                    className="inline-flex items-center justify-center shrink-0 w-4 h-4 mr-2 text-fg-muted hover:text-foreground rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-transform"
                     style={{ transform: isExpanded ? 'rotate(90deg)' : undefined }}
                     onClick={(e) => { e.stopPropagation(); toggleExpand?.() }}
                   >
@@ -1875,7 +1892,10 @@ function DataTableInner<TData>(
           // absolute → hover 顯時佔位 → label 自動讓出空間給 sort + more,**不再重疊**(對齊
           // user 圖示質疑 + Notion / Airtable header layout 共識)。
           // cell padding 12px 由外層 cellPadding style 提供 → more 距 cell 右邊 = 12px。
-          'group relative flex items-center gap-2 text-fg-secondary text-body font-normal shrink-0 overflow-hidden select-none',
+          // header 字級也隨 size(原寫死 text-body → lg 表格 header 字偏小,跟 body 不一致)。
+          // 對齊 cell wrapper + Field family size→font SSOT。色弱化由 text-fg-secondary 維持。
+          'group relative flex items-center gap-2 text-fg-secondary font-normal shrink-0 overflow-hidden select-none',
+          fieldDisplayTextClass(size),
           align === 'right' && 'justify-end',
           align === 'center' && 'justify-center',
         )}

@@ -42,7 +42,7 @@ const productImages = [
 // ── Stories ─────────────────────────────────────────────────────────────────
 
 export const HomepageHeroBanner = {
-  name: '首頁 Hero Banner',
+  name: '首頁主視覺橫幅',
   render: () => (
     <div className="max-w-[960px]">
       <p className="text-caption text-fg-muted mb-3">

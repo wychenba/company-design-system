@@ -1,6 +1,6 @@
 ---
 component: RadioGroup
-family: 4
+family: self-contained
 variants: {}
 sizes:
   sm:
@@ -12,7 +12,7 @@ sizes:
 traits:
   - hasSizes
   - hasInteractiveStates
-  - isSelectionMulti
+  - isSelectionSingle
 benchmark:
   - Radix RadioGroup primitive: github.com/radix-ui/primitives/tree/main/packages/react/radio-group
   - Ant Design Radio: github.com/ant-design/ant-design/tree/master/components/radio
@@ -82,7 +82,7 @@ RadioGroup 是**互斥單選且全選項可見**的表單控件——從 2-5 個
 
 ## StateBehavior(RadioGroup 層級特有)
 
-Item-level default / hover / active / checked / disabled **色彩**與 Checkbox 共用同一套 SelectionItem 規則,由 `ColorMatrix` story 承載;RadioGroup 的 `StateBehavior` story 展示**群組層級的互斥行為**(單選模型 / 個別 disabled / 整組 disabled),這是 Checkbox 沒有的維度。
+Item-level default / hover / checked / disabled **色彩**與 Checkbox 共用同一套 SelectionItem 規則,由 `ColorMatrix` story 承載;RadioGroup 的 `StateBehavior` story 展示**群組層級的互斥行為**(單選模型 / 個別 disabled / 整組 disabled),這是 Checkbox 沒有的維度。
 
 ---
 
@@ -107,6 +107,9 @@ Item-level default / hover / active / checked / disabled **色彩**與 Checkbox 
 - **Loading(async option fetch)**:async option list 載入時 consumer 應渲 `<Skeleton>` 對應 radio item count(常見 3-5 行 skeleton),而非空 RadioGroup;RadioGroup 自身不獨立 own loading prop。
 - **Empty(no options)**:罕見場景。應由 consumer 條件性渲 `<Empty>` placeholder(「無可選項目」)取代空 RadioGroup,不渲 0-radio 空 group(SR 會讀「empty group」造成混淆)。
 - **No value selected**:`value=null` 為合法 initial state(所有 radio 都 unchecked);Field validation 在 required + null 時觸發 error。
+- **極長 label / description**:預設不截斷、自然換行(`labelMaxLines` / `descMaxLines` 預設 `'none'`,Clamp 政策 SSOT 見 `checkbox.spec.md`「Clamp 政策」)。
+- **icon / avatar prefix**:`RadioGroupItem` 一級 `icon` / `avatar` props 轉發 `SelectionItem` prefix 槽(2026-06-12 M30;規則 SSOT 見 `checkbox.spec.md` 同段 + `selection-item.spec.md`)。
+- **RTL**:未實作方向鏡像;RTL 屬 DS-wide 決策,未定(與 Chip / Breadcrumb 同口徑)。
 - **Dark mode / density**:走 SelectionItem semantic token 自動 adapt;垂直 gap 隨 layoutSpace token density-aware。
 
 ---
@@ -126,10 +129,10 @@ Item-level default / hover / active / checked / disabled **色彩**與 Checkbox 
 **Keyboard 行為**:
 
 - Tab — 進入 group
-- ↑/↓ — 切 option
+- ↑/↓ 與 ←/→ — 切 option(Radix roving focus,焦點移動即選取;設 `orientation` 時限對應軸向)
 - Space — 選擇
 
-**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+**Focus**:Radix primitive 以 roving tabindex 管理群組內焦點(整組只佔一個 Tab 停留點,方向鍵在選項間移動);**非** focus trap——Tab 仍會離開群組、跳到下一個表單欄位。聚焦時顯示 visible ring(`ring-2 ring-ring ring-offset-1`,box-shadow ring 機制,並 `outline-none` 關閉原生 outline,per design-system focus-visible canonical)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
@@ -137,5 +140,8 @@ Item-level default / hover / active / checked / disabled **色彩**與 Checkbox 
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `checkbox.spec.md`
+- `field-control-group.spec.md`
+- `select.spec.md`
 - `selection-item.spec.md`
 - `steps.spec.md`

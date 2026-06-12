@@ -30,12 +30,12 @@ export const Overview: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Anatomy</H3>
-        <Desc>Separator 是語意分隔元件——consumer 手動放置的分隔線。基於 Radix Separator(shadcn passthrough),提供正確的 ARIA `role="separator"` + orientation 語意。元件固定結構(header/footer 邊框)和裝飾性邊框**不使用 Separator**。</Desc>
+        <Desc>Separator 是語意分隔元件——consumer 手動放置的分隔線。基於 Radix Separator(shadcn passthrough),提供正確的 ARIA 語意:預設 `decorative=true` 時 render `role="none"`(SR 跳過),`decorative={false}` 時 render `role="separator"` + orientation 語意。元件固定結構(header/footer 邊框)和裝飾性邊框**不使用 Separator**。</Desc>
         <div className="border border-border rounded-lg p-4 max-w-md">
           <div className="flex flex-col gap-2 py-2">
-            <div className="text-body">第一個內容群組</div>
+            <div className="text-body">個人資訊</div>
             <Separator />
-            <div className="text-body">第二個內容群組</div>
+            <div className="text-body">團隊與權限</div>
           </div>
         </div>
       </div>
@@ -64,7 +64,7 @@ export const Overview: Story = {
             <tbody>
               {[
                 ['orientation', "'horizontal' | 'vertical'", "'horizontal'", '分隔線方向'],
-                ['decorative', 'boolean', 'true', 'true=裝飾性(無 a11y role)/ false=語意分隔(role="separator")'],
+                ['decorative', 'boolean', 'true', 'true=裝飾性(role="none",SR 跳過)/ false=語意分隔(role="separator")'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -77,7 +77,7 @@ export const Overview: Story = {
 }
 
 export const TokenMatrix: Story = {
-  name: '設計變數 規則（--divider vs --邊框）',
+  name: '設計變數 規則（--divider vs --border）',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -119,7 +119,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"本元件為純視覺呈現,無 keyboard / ARIA role / focus state 需求。Consumer 包 Separator 進互動容器(Button / Card / Link)時 a11y 由容器決定。"}</p>
+      <p className="whitespace-pre-line">{"Separator 非互動元件——不取得 focus、無鍵盤行為。ARIA role 視 decorative 而定(對齊 Radix Separator primitive):\n\n- 預設 decorative=true:render role=\"none\",screen reader 跳過(避免「separator」雜訊干擾 list 朗讀)\n- 語意分隔場景 decorative={false}:render role=\"separator\"(aria-orientation 僅 orientation=\"vertical\" 時輸出;horizontal 為預設方向,Radix 省略冗餘屬性),screen reader 讀出群組邊界\n\n判斷:同 list 內 item 之間的視覺隔線 = decorative(預設);跨 region 的結構分隔(sidebar group / menu group)= semantic。詳 separator.spec.md「A11y 預設」段。"}</p>
     </div>
   ),
 }

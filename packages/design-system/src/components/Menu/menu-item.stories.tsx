@@ -3,18 +3,18 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { Mail, Star, Bell, Settings, Plus, Folder, FileText, BarChart3 } from 'lucide-react'
 import { MenuItem, MenuGroup, MenuFooter } from './menu-item'
-import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+import { ProfileCard, ProfileCardDefaultActions } from '@/design-system/components/ProfileCard/profile-card'
 
-// DS-wide canonical:person avatar 必 hover → NameCard(含 status / statusMessage / fields
-// / actions / onViewMore,name-card.spec.md 重要資訊)。demo helper:
+// DS-wide canonical:person avatar 必 hover → ProfileCard(含 status / statusMessage / fields
+// / actions / onViewMore,profile-card.spec.md 重要資訊)。demo helper:
 const personHover = (name: string, subtitle?: string) => (
-  <NameCard
+  <ProfileCard
     name={name}
     subtitle={subtitle ?? 'Design｜D-0042｜EMP-1001'}
     avatar={{ alt: name }}
     status="online"
     statusMessage="Out of Office: Back on Monday!"
-    actions={<NameCardDefaultActions />}
+    actions={<ProfileCardDefaultActions />}
     fields={[
       { label: 'ID', value: 'YHANAX' },
       { label: 'Employee number', value: '1234567' },

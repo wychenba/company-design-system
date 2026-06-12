@@ -14,7 +14,7 @@ benchmark:
 
 <!-- @benchmark-cited: D5 retrofit 2026-05-18 — Ant Space.Compact + Bootstrap input-group + Chakra Group claims verified via WebFetch + inline URL. -->
 
-# FieldControlGroup spec
+# FieldControlGroup 設計原則
 
 ## 定位
 
@@ -52,7 +52,7 @@ benchmark:
 
 ```ts
 interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
-  size?: 'sm' | 'md' | 'lg'  // default 'md',Mode A 從 Field context 來
+  size?: 'sm' | 'md' | 'lg'  // default 'md';目前為 no-op(FCG 不傳遞),size 由各 child 自管 — 見「Size cascade」
   block?: boolean             // 對齊 Ant Space.Compact `block`,默 false=inline-flex
 }
 ```
@@ -85,23 +85,26 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 
 **禁止**:不開 `Cell` wrapper(指 indirection 不必要;Ant Space.Compact 同樣不開)。
 
-## Size cascade
+## Size
 
-**Mode A**(包進 Field 當 control slot):
+**FCG `size` prop 目前為 no-op**:本元件只負責 border-collapse 接合(border / radius / z-index),不傳遞 size 給 children(無 Context Provider / 無 cloneElement)。Children 的尺寸完全由 child 自己決定 — 以下三種來源:
+
+**Mode A**(包進 Field 當 control slot):children 各自透過 `useFieldContext().size` 讀外層 `<Field>` 的 size(是 Field 的 context,不是 FCG 的)。
 ```tsx
-<Field>
+<Field size="lg">
   <FieldLabel>電話</FieldLabel>
-  <FieldControlGroup>  {/* size 自動繼承 Field context */}
+  <FieldControlGroup>  {/* 各 child 自動繼承外層 Field context size */}
     <Select className="w-[80px]" options={codes} />
     <Input className="flex-1" />
   </FieldControlGroup>
 </Field>
 ```
 
-**Mode B**(standalone):
+**Mode B**(standalone):**逐一給每個 child 設 `size`**(設 `<FieldControlGroup size>` 無效)。
 ```tsx
-<FieldControlGroup size="md">  {/* 顯式 size,默 md */}
-  ...
+<FieldControlGroup>
+  <Select size="md" className="w-[120px]" options={fields} />
+  <Input size="md" className="flex-1" />
 </FieldControlGroup>
 ```
 
@@ -135,9 +138,10 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 | default | 各 child 自身 border | 2 |
 | hover(子)| 該 child border-hover | 3 |
 | focus / focus-within(子)| 該 child focus ring | 3 |
-| disabled(子)| 該 child disabled style + **FCG-local override `border-input`**(K12,2026-05-04) | 0 |
+| disabled(子)| 該 child disabled style + **FCG-local override `border-[var(--border-opaque)]`**(K12,2026-05-04) | 0 |
+| error(子)| 該 child border-error | 2(預設層;聚焦該 child 時才升 3 蓋過鄰接 border)|
 
-**Disabled border integrity canonical(K12,2026-05-04)**:全域 disabled = `border-transparent`(讓 standalone field 視覺輕量),但**FCG context 下,disabled child 強制 `border-input`** — 確保:(a) FCG 整體外圈 border 健在,(b) inner divider 健在(不會因兩相鄰 disabled cells 都 transparent 而消失)。bg-disabled 仍區分狀態,border 維護群組視覺整合性。對齊 [Bootstrap input-group](https://getbootstrap.com/docs/5.3/forms/input-group/) / [Ant Space.Compact](https://ant.design/components/space#spacecompact) disabled idiom。
+**Disabled border integrity canonical(K12,2026-05-04)**:全域 disabled = `border-transparent`(讓 standalone field 視覺輕量),但**FCG context 下,disabled child 強制 `border-[var(--border-opaque)]`** — 確保:(a) FCG 整體外圈 border 健在,(b) inner divider 健在(不會因兩相鄰 disabled cells 都 transparent 而消失)。bg-disabled 仍區分狀態,border 維護群組視覺整合性。對齊 [Bootstrap input-group](https://getbootstrap.com/docs/5.3/forms/input-group/) / [Ant Space.Compact](https://ant.design/components/space#spacecompact) disabled idiom。
 
 實作(v7 — semantic token):
 ```tsx
@@ -147,10 +151,9 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 
 **為什麼用 `--border-opaque` 而非 `--border`**:`--border`(neutral-5 = 15% alpha)會跟 cell bg compositing — 灰底上 composite 略深(物理對比結果)。**`--border-opaque`** semantic token(其 primitive 後盾為 `--color-neutral-5-opaque`,solid #D9D9D9)不分 bg 永遠同色,divider 在 white edit cell 跟 grey disabled cell 上視覺完全一致。
 
-**Token 系統設計**:`--border-opaque` 在 `semantic.css` L289 新增,語意「視覺等同 `--border` 但 alpha-immune」。對齊 [Ant Design `colorBorderSecondary`](https://ant.design/docs/react/customize-theme#seedtoken) solid idiom — Ant 用此 token 在 table 外框 + row divider(non-white bg 場景),跟 input alpha border 視覺層級分。
+**Token 系統設計**:`--border-opaque` 在 `semantic.css` 新增(grep `--border-opaque:` 查定義行,不寫死行號避免漂移),語意「視覺等同 `--border` 但 alpha-immune」。對齊 [Ant Design `colorBorderSecondary`](https://ant.design/docs/react/customize-theme#seedtoken) solid idiom — Ant 用此 token 在 table 外框 + row divider(non-white bg 場景),跟 input alpha border 視覺層級分。
 
 **為什麼不 override bg**:user 明確要求 disabled cells 有底色(辨識 state)。bg 灰底是 disabled state 的主要視覺載體,FCG context 不應抹除。
-| error(子)| 該 child border-error | 3(error 視覺在最上)|
 
 **整 row error**:目前 v1 不支援 row-level error(走 cell-level)。未來若需可走 outer border-error wrapper,但 v1 follow Ant 不做。
 
@@ -159,6 +162,15 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 - Loading:子 control 各自處理(Input loading state / Select loading)
 - Empty:N/A(layout primitive,無資料概念)
 - 驗證:子 control 自管(form library 透過 Field 處理)
+- 「子必 direct child」規則**無 runtime 偵測**——違反(多包 wrapper div)時的症狀是圓角破圖(CSS `[&>*]` 命中 wrapper),見禁止事項 2026-05-04 #2;靠 review + Storybook 目視抓
+- a11y 驗證:Storybook a11y addon panel 0 critical violation;Tab 順序 = children DOM 順序
+
+## 邊界案例
+
+- **子高度不一**:容器 `items-stretch`,但 field controls 自帶固定 `h-field-*`,不會被拉齊——混 size 即視覺高低差(故禁止,見禁止事項)
+- **某子 disabled、某子 edit**:機制上可行(disabled 子降 z-0 + K12 border 維持 divider),但語意一體應一致(見禁止事項);**全組 disabled** 走 K12 canonical(見 States)
+- **極窄容器**:無特化處理——固定寬 children(`w-[Xpx]`)溢出容器、`flex-1` children 壓縮;子自管 width 的對價,consumer 自行配置
+- **單一 child**:radius 選擇器 `:first-child:not(:last-child)` 不命中,圓角完整保留(等同未包 group,但此時應直接用 Field)
 
 ## 世界級對照
 
@@ -170,6 +182,13 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 | **Mantine** | 無此 idiom | — | — | — |
 
 3/4 共識 → 我們的實作對齊 Ant + Bootstrap 主軸。
+
+## 相關
+
+- `../Field/field.spec.md` — FieldGroup(多 Field 垂直堆疊近親,gap 分離)的 home
+- `../Button/button-group.tsx` — 同 border-collapse mechanism 的 Button 版(無獨立 spec,機制同源)
+- `../Field/field-controls.spec.md` — children(Input / Select / DatePicker 等)共用 Field control 規則
+- `../Checkbox/checkbox.spec.md` / `../RadioGroup/radio-group.spec.md` — semantic group 近親(1 question 多 options,非本元件 scope)
 
 ## 變更紀錄
 

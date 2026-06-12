@@ -61,9 +61,26 @@ const ENGLISH_WHITELIST = new Set(['Default','Primary','Secondary','FAQ','AppShe
 const report = {
   ts: new Date().toISOString(),
   scope: { total_story_files: storyFiles.length, manual_story_files: manualStoryFiles.length },
-  violations: { title_canonical: [], name_jargon: [], name_pure_english: [], placeholder: [] },
-  totals: { titles_scanned: 0, names_scanned: 0 },
+  violations: { title_canonical: [], name_jargon: [], name_pure_english: [], placeholder: [], name_mixed_english: [] },
+  totals: { titles_scanned: 0, names_scanned: 0, names_mixed_scanned: 0 },
 }
+
+// ── Dim 41b — Mixed-English story display-name(2026-06-05 反抽樣 gap closure,user 抓 Compact 混合 / Upload manager)──
+// 雙 gap 修:(1)原 name_pure_english 只抓 100%-English,中英混雜(有中文部分)漏;(2)原 name scan 只跑
+// manualStoryFiles,漏 anatomy/principles。本掃描跑「全 storyFiles」+「凡含非白名單拉丁字的 name 即 flag」。
+// 白名單 = 元件名 + 格式縮寫 + 品牌 + camelCase prop + 確認過的真 prop/token/anatomy/unit + vs + 人名 demo。
+const COMPONENT_NAMES = fs.readdirSync(path.join(ROOT, 'packages/design-system/src/components')).filter(d => d !== 'README.md')
+const SUBCOMP = ['MenuItem', 'SidebarMenu', 'SidebarMenuButton', 'FieldGroup', 'FieldControlGroup', 'ChartConfig', 'PersonValue', 'DateGrid', 'SelectMenu', 'ButtonGroup', 'AppShell', 'ItemAnatomy', 'ChromeHeader', 'SurfaceHeader', 'OverflowTagList', 'ResizeHandle', 'ActionBar', 'Link', 'Ellipsis', 'Thumb', 'Affix', 'Filmstrip', 'Prefix']
+const FORMATS = ['API', 'ARIA', 'FAQ', 'MVP', 'PR', 'UI', 'UX', 'URL', 'URI', 'ID', 'PDF', 'CSV', 'JSON', 'XML', 'HTML', 'CSS', 'JS', 'TS', 'JSX', 'TSX', 'SVG', 'PNG', 'JPG', 'WebP', 'HTTP', 'HTTPS', 'OK', 'CTA', 'SEO', 'N', 'X', 'A11y', 'a11y', 'RTL', 'LTR', 'DOM', 'px']
+const BRANDS = ['Figma', 'GitHub', 'Gmail', 'Jira', 'Linear', 'Notion', 'Slack', 'Stripe', 'Google', 'Apple', 'Spotify', 'Trello', 'Asana', 'Dropbox', 'Outlook', 'Zoom', 'Shopify', 'Airtable', 'Polaris', 'Carbon', 'Material', 'Atlassian', 'Ant', 'Radix', 'React', 'Storybook', 'Tailwind', 'Vite', 'Next', 'js', 'Router']
+// 確認過的真 prop / token / anatomy 識別字(deep-audit 2026-06-05 classify;grep .tsx 證實存在)
+const REAL_API = ['files', 'bordered', 'true', 'ratio', 'children', 'Rows', 'rows', 'Wrap', 'wrap', 'Side', 'side', 'right', 'Locale', 'locale', 'Media', 'media', 'field', 'divider', 'border', 'muted', 'tree', 'vs']
+const PERSON_DEMO = ['Ada', 'Chen', 'Alice', 'Bob', 'Lin', 'Charlie', 'Wu', 'Diana', 'Huang', 'Eric', 'Tsai', 'Fiona', 'Lee']
+const NAME_ALLOW = new Set([...COMPONENT_NAMES, ...SUBCOMP, ...FORMATS, ...BRANDS, ...REAL_API, ...PERSON_DEMO])
+const allowWord = (w) => NAME_ALLOW.has(w) || /^Q[1-4]$/.test(w) || /[a-z][A-Z]/.test(w) || /^v?\d+$/.test(w)
+const isDataName = (name) =>
+  /\.(png|jpe?g|pdf|csv|json|zip|docx?|xlsx?|svg|gif|webp|mp4|txt|md|ts|tsx)$/i.test(name) ||
+  /\$\{/.test(name) || /^[A-Z][a-z]+ [A-Z][a-z]+$/.test(name) || /^[a-z0-9-]+$/i.test(name)
 
 // Dim 40 — Title canonical scan(ALL 196 files)
 for (const f of storyFiles) {
@@ -131,15 +148,44 @@ for (const f of manualStoryFiles) {
   }
 }
 
-const LOG_DIR = path.join(ROOT, '.claude/logs')
-if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true })
-fs.writeFileSync(path.join(LOG_DIR, 'story-quality-audit.json'), JSON.stringify(report, null, 2))
+// Dim 41b scan — ALL storyFiles(含 anatomy/principles,修 scope gap)
+for (const f of storyFiles) {
+  const lines = fs.readFileSync(f, 'utf-8').split('\n')
+  for (let i = 0; i < lines.length; i++) {
+    const nm = lines[i].match(/^\s*name:\s*['"`]([^'"`]+)['"`]/)
+    if (!nm) continue
+    const name = nm[1]
+    if (isDataName(name)) continue
+    report.totals.names_mixed_scanned++
+    const bad = (name.match(/[A-Za-z][A-Za-z0-9]*/g) || []).filter(w => !allowWord(w))
+    if (bad.length) report.violations.name_mixed_english.push({ file: path.relative(ROOT, f), line: i + 1, name, bad: bad.join(',') })
+  }
+}
+
+// 2026-06-07 fix:--check 模式純讀(CI gate / codex read-only env)→ 不寫 git-tracked log,完全不碰 tree。
+// 對齊 dispatch-audit-dims.mjs 的 `if (!CHECK)` write-gate(原本無條件寫,--check 也動檔)。
+if (!CHECK) {
+  const LOG_DIR = path.join(ROOT, '.claude/logs')
+  if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true })
+  const auditOutPath = path.join(LOG_DIR, 'story-quality-audit.json')
+  // 2026-06-06 idempotent write:findings(排除 ts)無變則沿用既有 ts,避免每次掃描 churn git tree
+  // (cosmetic;no consumer 讀 ts 判 staleness — 已 grep 確認)。ts 改 = 真有 story-quality 變化。
+  const serializeAudit = (r) => JSON.stringify({ ...r, ts: undefined }, null, 2)
+  if (fs.existsSync(auditOutPath)) {
+    try {
+      const existing = JSON.parse(fs.readFileSync(auditOutPath, 'utf8'))
+      if (serializeAudit(existing) === serializeAudit(report) && existing.ts) report.ts = existing.ts
+    } catch { /* corrupt existing → 正常重寫 */ }
+  }
+  fs.writeFileSync(auditOutPath, JSON.stringify(report, null, 2))
+}
 
 const totalViolations =
   report.violations.title_canonical.length +
   report.violations.name_jargon.length +
   report.violations.name_pure_english.length +
-  report.violations.placeholder.length
+  report.violations.placeholder.length +
+  report.violations.name_mixed_english.length
 
 console.log('═════════════════════════════════════════════════')
 console.log(`▶ Story Quality Audit — DS-wide deterministic scan`)
@@ -151,11 +197,12 @@ console.log(`   Title canonical violations: ${report.violations.title_canonical.
 console.log(`   Name jargon violations: ${report.violations.name_jargon.length}`)
 console.log(`   Name pure-English violations: ${report.violations.name_pure_english.length}`)
 console.log(`   Placeholder violations: ${report.violations.placeholder.length}`)
+console.log(`   Name mixed-English violations: ${report.violations.name_mixed_english.length}(Dim 41b,掃 ${report.totals.names_mixed_scanned} names)`)
 console.log('═════════════════════════════════════════════════')
 
 if (totalViolations > 0) {
   console.error('\n❌ Violations detected:')
-  for (const cat of ['title_canonical', 'name_jargon', 'name_pure_english', 'placeholder']) {
+  for (const cat of ['title_canonical', 'name_jargon', 'name_pure_english', 'placeholder', 'name_mixed_english']) {
     if (report.violations[cat].length) {
       console.error(`\n  [${cat}]`)
       for (const v of report.violations[cat].slice(0, 10)) console.error(`    ${v.file}:${v.line} — ${v.name || v.value}${v.rule ? ` (${v.rule})` : ''}`)

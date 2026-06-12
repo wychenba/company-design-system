@@ -14,6 +14,7 @@ import {
   subMonths,
 } from 'date-fns'
 import { cn } from '@/lib/utils'
+import { CAT_EVENT, CAT_ACCENT, type CategoricalHue } from '@/design-system/tokens/categorical-color'
 import { Button } from '@/design-system/components/Button/button'
 import { SegmentedControl, SegmentedControlItem } from '@/design-system/components/SegmentedControl/segmented-control'
 
@@ -21,7 +22,7 @@ import { SegmentedControl, SegmentedControlItem } from '@/design-system/componen
  * Calendar — 事件檢視 canvas(月 view MVP)
  *
  * 定位:看事件的 page-level canvas,對齊 Notion Calendar / Google Calendar。
- * 完整 spec 見 `event-calendar.spec.md`。
+ * 完整 spec 見 `calendar.spec.md`。
  *
  * ── Layout Family ──
  * 非 4-Family,屬 page-composite(多區塊 Toolbar + Grid + EventTile)。
@@ -46,10 +47,11 @@ export interface CalendarEvent {
   end: string | Date
   allDay?: boolean
   /**
-   * 事件類別色。值為 DS primitive 色名(blue / green / orange / purple / red / yellow)。
-   * 對照 Badge / Tag 的 primitive color variants。
+   * 事件類別色(categorical 色相,1:1 對 `--color-{hue}-*`)。**消費 categorical-color SSOT**,
+   * 與 Tag / Avatar 共用同一組 12 色相。2026-06-04 修:原 `orange` 與 `red` 都誤接 deep-orange;
+   * 改消費 SSOT 後 orange→`--color-orange-*`、red→`--color-red-*`(品牌紅 hue 25),各自獨立。
    */
-  color?: 'blue' | 'green' | 'orange' | 'purple' | 'red' | 'yellow'
+  color?: CategoricalHue
   metadata?: Record<string, unknown>
 }
 
@@ -92,21 +94,19 @@ export interface CalendarProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   /** ARIA labels for chrome controls. Override for i18n. */
   prevAriaLabel?: string
   nextAriaLabel?: string
+  /** 月份導覽 <nav> landmark 的 aria-label。Override for i18n. */
+  navAriaLabel?: string
   viewToggleAriaLabel?: string
   todayLabel?: string
 }
 
 // ── Event tile color tokens ─────────────────────────────────────────────────
-// 對齊 Tag / Badge 的 primitive color system(見 `color.spec.md`)
-
-const EVENT_COLOR_CLASSES: Record<NonNullable<CalendarEvent['color']>, string> = {
-  blue: 'bg-[var(--color-blue-1)] text-[var(--color-blue-7)] hover:bg-[var(--color-blue-2)]',
-  green: 'bg-[var(--color-green-1)] text-[var(--color-green-7)] hover:bg-[var(--color-green-2)]',
-  orange: 'bg-[var(--color-deep-orange-1)] text-[var(--color-deep-orange-7)] hover:bg-[var(--color-deep-orange-2)]',
-  purple: 'bg-[var(--color-purple-1)] text-[var(--color-purple-7)] hover:bg-[var(--color-purple-2)]',
-  red: 'bg-[var(--color-deep-orange-1)] text-[var(--color-deep-orange-7)] hover:bg-[var(--color-deep-orange-2)]',
-  yellow: 'bg-[var(--color-yellow-1)] text-[var(--color-yellow-7)] hover:bg-[var(--color-yellow-2)]',
-}
+// **消費 categorical-color SSOT**(CAT_EVENT = subtle 底 + hover step-2;CAT_ACCENT = 左側 step-6
+// 實心條),與 Tag / Avatar 共用 12 色相,key X 一律對 `--color-X-*`(1:1)。
+// 2026-06-01 allDay:全天事件 = 淡底 tile + 左側實心 accent 條 + medium,視覺區分「全天長條」vs
+// 有時間事件;用 accent border 而非 solid fill 保文字對比安全。對齊 Google Calendar / Outlook 慣例。
+const EVENT_COLOR_CLASSES = CAT_EVENT
+const EVENT_ALLDAY_ACCENT = CAT_ACCENT
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -148,6 +148,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
   locale = 'en-US',
   prevAriaLabel = '上個月', // i18n-allow: DS default; consumer override via prevAriaLabel prop
   nextAriaLabel = '下個月', // i18n-allow: DS default; consumer override via nextAriaLabel prop
+  navAriaLabel = '行事曆月份導覽', // i18n-allow: DS default; consumer override via navAriaLabel prop
   viewToggleAriaLabel = '檢視切換', // i18n-allow: DS default; consumer override via viewToggleAriaLabel prop
   todayLabel = '今天', // i18n-allow: DS default; consumer override via todayLabel prop
   ...props
@@ -221,7 +222,8 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
           'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
         )}
       >
-        <div className="flex items-center gap-2">
+        {/* 月份導覽 landmark:prev / 今天 / next 包成 <nav> 給 SR landmark 導航(per calendar.spec.md a11y 段) */}
+        <nav className="flex items-center gap-2" aria-label={navAriaLabel}>
           <Button
             variant="text"
             size="sm"
@@ -241,7 +243,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
             aria-label={nextAriaLabel}
             onClick={handleNext}
           />
-        </div>
+        </nav>
 
         <h2 className="text-body-lg font-medium text-foreground flex-1 min-w-0 truncate ml-2">
           {monthTitle}
@@ -292,48 +294,57 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
             {days.slice(rowIdx * 7, rowIdx * 7 + 7).map((date) => {
               const inMonth = isSameMonth(date, refDate)
               const isToday = isSameDay(date, today)
-              const dayEvents = eventsOnDate(events, date)
+              // 2026-06-01 allDay:全天事件排 cell 頂端(對齊 Google Calendar 全天列在上)
+              const dayEvents = eventsOnDate(events, date).slice().sort((a, b) => Number(b.allDay ?? false) - Number(a.allDay ?? false))
               const visibleEvents = dayEvents.slice(0, MAX_TILES_PER_CELL)
               const overflowCount = dayEvents.length - visibleEvents.length
 
               return (
-                <button
+                // 2026-06-11 a11y(user 拍板 2c 修 code):cell 從 <button role="gridcell"> 改非互動容器 —
+                // W3C button 語義禁止互動後代,cell 內含 role="button" 事件 tile = nested-interactive 違規。
+                // 對齊 Google Calendar:gridcell = 容器,日期數字按鈕 = 日期級 keyboard 入口,tile 各自為 button。
+                // div onClick 保留滑鼠「點 cell 空白處等同點日期」便利(keyboard 走日期數字按鈕,功能等價)。
+                <div
                   key={date.toISOString()}
-                  type="button"
                   role="gridcell"
-                  aria-label={`${format(date, 'yyyy-MM-dd')},${dayEvents.length} 個事件`}
-              onClick={() => onDateClick?.(date)}
+                  onClick={() => onDateClick?.(date)}
               className={cn(
                 'flex flex-col gap-1 min-h-28 p-1.5 text-left',
                 'border-r border-b border-divider last:border-r-0',
                 '[&:nth-child(7n)]:border-r-0',
                 'hover:bg-neutral-hover transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                 !inMonth && 'bg-muted',
               )}
             >
-              {/* Date number header */}
+              {/* Date number = keyboard 入口;今天/平日統一 24px 圓形 hit-area(WCAG 2.5.8 ≥24,
+                  今天 pill 本就 24px,平日跟齊 → 跨 cell 數字光學對齊) */}
               <div className="flex items-start justify-end">
-                {isToday ? (
-                  <span className="inline-flex items-center justify-center min-w-6 h-6 px-2 rounded-full bg-primary text-on-emphasis text-body font-medium">
-                    {format(date, 'd')}
-                  </span>
-                ) : (
-                  <span
-                    className={cn(
-                      'text-body font-medium',
-                      !inMonth && 'text-fg-disabled',
-                    )}
-                  >
-                    {format(date, 'd')}
-                  </span>
-                )}
+                <button
+                  type="button"
+                  aria-label={`${format(date, 'yyyy-MM-dd')},${dayEvents.length} 個事件`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onDateClick?.(date)
+                  }}
+                  className={cn(
+                    'inline-flex items-center justify-center min-w-6 h-6 rounded-full text-body font-medium',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    isToday && 'px-2 bg-info text-on-emphasis',
+                    !isToday && !inMonth && 'text-fg-disabled',
+                  )}
+                >
+                  {format(date, 'd')}
+                </button>
               </div>
 
               {/* Event tiles */}
               <div className="flex flex-col gap-0.5 min-h-0">
                 {visibleEvents.map((event) => {
-                  const colorClass = EVENT_COLOR_CLASSES[event.color ?? 'blue']
+                  const ec = event.color ?? 'blue'
+                  // 2026-06-01 allDay:淡底 + 左 accent 條 + medium = 「全天長條」視覺(區分有時間事件)
+                  const colorClass = event.allDay
+                    ? cn(EVENT_COLOR_CLASSES[ec], EVENT_ALLDAY_ACCENT[ec], 'font-medium')
+                    : EVENT_COLOR_CLASSES[ec]
                   if (renderEventTile) {
                     return (
                       <div
@@ -365,6 +376,9 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
                       aria-label={`事件:${event.title}`}
                       className={cn(
                         'rounded-md px-1.5 py-0.5 text-caption truncate cursor-pointer transition-colors',
+                        // 2026-05-31 #22:事件 tile 是 focusable(tabIndex=0 role=button)但原無 focus ring
+                        // → WCAG 2.4.7 不合規。補 focus-visible ring 對齊日期格按鈕。
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                         colorClass,
                       )}
                     >
@@ -378,7 +392,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
                   </div>
                 )}
               </div>
-            </button>
+            </div>
               )
             })}
           </div>
@@ -402,7 +416,7 @@ export const calendarMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: ['bg-muted', 'bg-neutral-hover', 'bg-primary', 'bg-surface'],
+    bg: ['bg-muted', 'bg-neutral-hover', 'bg-info', 'bg-surface'],
     fg: ['text-fg-disabled', 'text-fg-muted', 'text-foreground'],
     ring: ['ring-ring'],
   },

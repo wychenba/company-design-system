@@ -10,3 +10,20 @@
 
 # Per-branch deploy previews 預設啟用(任何 branch push → 自動 preview URL)
 # Production deploy 走 main(production URL = 永遠最新 main 的 storybook)
+
+# 2026-05-30:noindex/access-control headers(對齊 template netlify.toml parity)。
+# DS Storybook 的 .storybook/main.ts glob `../apps/**/*.stories.@(tsx|mdx)` → 公開暴露 apps/** 內部 product UI;
+# 無此 header 則 preview + production deploy 會被搜尋引擎收錄(內部 UI SEO leak)。
+# 此 header 只防搜尋引擎索引,不擋直接訪問。
+# 真擋陌生人(免費)= Netlify Edge Function 自做 HTTP Basic Auth(env var STORYBOOK_BASIC_AUTH,edge 層比對;Edge Functions 免費方案可用)。
+#   Netlify 內建密碼 — Dashboard 的 Password protection 與 `_headers` 的 Basic-Auth header — 兩個都是 Pro 方案專屬
+#   ($20/mo,2026-06-05 官方 docs + support forum 三重證實;且 `_headers` basic-auth 不套用到 edge function),free-tier 都沒有。
+#   DS owner 要免費擋人同走 template 的 Edge Function Basic Auth(見 template/ds-product-template/netlify/edge-functions/basic-auth.ts
+#   + netlify.toml [[edge_functions]] path="/*" function="basic-auth");Pro Password / Cloudflare Access 為進階選項。
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"

@@ -50,7 +50,7 @@ export const UsageGuidance: Story = {
           <p>適合 HoverCard 的真實業務場景(點擊跳轉「展示」頁範例):</p>
           <ul className="space-y-1">
             <li>
-              <LinkTo kind="Design System/Internal/HoverCard/展示" name="人員頭像 NameCard"><span className="text-primary hover:underline font-medium cursor-pointer">人員頭像 NameCard</span></LinkTo>
+              <LinkTo kind="Design System/Internal/HoverCard/展示" name="人員頭像 ProfileCard"><span className="text-primary hover:underline font-medium cursor-pointer">人員頭像 ProfileCard</span></LinkTo>
             </li>
             <li>
               <LinkTo kind="Design System/Internal/HoverCard/展示" name="連結預覽卡"><span className="text-primary hover:underline font-medium cursor-pointer">連結預覽卡</span></LinkTo>
@@ -59,10 +59,10 @@ export const UsageGuidance: Story = {
               <LinkTo kind="Design System/Internal/HoverCard/展示" name="溢出清單"><span className="text-primary hover:underline font-medium cursor-pointer">溢出清單</span></LinkTo>
             </li>
             <li>
-              <LinkTo kind="Design System/Internal/HoverCard/展示" name="Repository 資訊卡"><span className="text-primary hover:underline font-medium cursor-pointer">Repository 資訊卡</span></LinkTo>
+              <LinkTo kind="Design System/Internal/HoverCard/展示" name="儲存庫資訊卡"><span className="text-primary hover:underline font-medium cursor-pointer">Repository 資訊卡</span></LinkTo>
             </li>
             <li>
-              <LinkTo kind="Design System/Internal/HoverCard/展示" name="Trigger 類型與 delay"><span className="text-primary hover:underline font-medium cursor-pointer">Trigger 類型與 delay</span></LinkTo>
+              <LinkTo kind="Design System/Internal/HoverCard/展示" name="觸發點類型與延遲"><span className="text-primary hover:underline font-medium cursor-pointer">Trigger 類型與 delay</span></LinkTo>
             </li>
           </ul>
           <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方「vs 近親」)。</p>
@@ -131,7 +131,7 @@ export const UsageGuidance: Story = {
               </div>
             </HoverCardContent>
           </HoverCard>
-          <Label>↑ hover @mention 彈出 NameCard,滑鼠可移到浮層點「傳訊息」</Label>
+          <Label>↑ hover @mention 彈出 ProfileCard,滑鼠可移到浮層點「傳訊息」</Label>
         </Rule>
 
         <Rule
@@ -172,12 +172,12 @@ export const UsageGuidance: Story = {
 }
 
 export const PureBehaviorPrimitiveRule: Story = {
-  name: '純行為 primitive——視覺由 consumer 決定',
+  name: '純行為元件——視覺由使用方決定',
   render: () => (
     <div>
       <Rule
         title="HoverCard 不含視覺樣式——bg / border / shadow / padding 由 consumer 決定"
-        note="HoverCard 本身只提供 z-index、動畫、sideOffset。視覺由消費者(NameCard / OverflowIndicator / custom)各自決定,符合不同場景的視覺語言"
+        note="HoverCard 本身只提供 z-index、動畫、sideOffset。視覺由消費者(ProfileCard / OverflowIndicator / custom)各自決定,符合不同場景的視覺語言"
       >
         <div className="flex gap-6">
           <HoverCard>
@@ -185,7 +185,7 @@ export const PureBehaviorPrimitiveRule: Story = {
               <Button variant="tertiary" size="sm">亮色 Card 樣式</Button>
             </HoverCardTrigger>
             <HoverCardContent className="bg-surface-raised border border-border rounded-lg p-4 shadow-[var(--elevation-200)]">
-              <div className="w-48 text-body">NameCard 風格:亮底 + 邊框 + elevation</div>
+              <div className="w-48 text-body">ProfileCard 風格:亮底 + 邊框 + elevation</div>
             </HoverCardContent>
           </HoverCard>
 
@@ -203,7 +203,7 @@ export const PureBehaviorPrimitiveRule: Story = {
 
       <Rule
         title="Avatar 自動整合(建議 pattern)"
-        note="人員類 Avatar 透過 `hoverCard` prop 自動 wrap HoverCardTrigger,不需要 consumer 手動組合。統一人員 hover 提供 NameCard 的體驗"
+        note="人員類 Avatar 透過 `hoverCard` prop 自動 wrap HoverCardTrigger,不需要 consumer 手動組合。統一人員 hover 提供 ProfileCard 的體驗"
       >
         <div className="flex items-center gap-3">
           <Avatar alt="Ada Chen" size={40} hoverCard={

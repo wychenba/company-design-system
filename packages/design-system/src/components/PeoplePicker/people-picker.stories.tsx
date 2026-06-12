@@ -1,3 +1,4 @@
+// @story-trait-rationale: pre-existing isInputLike WithError trait gap tracked separately (see L62/L72 inline rationale); this edit only adds explicit variant="primary" to the primary-CTA Button per new tertiary/text default migration
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { PeoplePicker } from '@/design-system/components/PeoplePicker/people-picker'
@@ -18,8 +19,8 @@ const meta: Meta = {
 export default meta
 type Story = StoryObj
 
-// PersonData sample 含 NameCard 重要資訊(status / statusMessage / fields)—
-// canonical:所有 person avatar hover 都應 render 完整資訊(name-card.spec.md)。
+// PersonData sample 含 ProfileCard 重要資訊(status / statusMessage / fields)—
+// canonical:所有 person avatar hover 都應 render 完整資訊(profile-card.spec.md)。
 const samplePeople = [
   {
     name: 'Alice Chen', avatarUrl: 'https://i.pravatar.cc/48?u=alice', description: 'Design｜D-0042｜EMP-1001',
@@ -54,7 +55,7 @@ const samplePeople = [
   {
     name: 'Fiona Lee', avatarUrl: 'https://i.pravatar.cc/48?u=fiona', description: 'Design｜D-0056｜EMP-1006',
     status: 'online' as const,
-    statusMessage: 'Working on NameCard v3 refactor',
+    statusMessage: 'Working on ProfileCard v3 refactor',
     fields: [{ label: 'ID', value: 'FLEE' }, { label: 'Employee number', value: 'EMP-1006' }],
   },
 ]
@@ -120,7 +121,7 @@ const SizePicker = ({ size }: { size: 'sm' | 'md' | 'lg' }) => {
   return (
     <div className="flex items-center gap-3">
       <PeoplePicker size={size} value={val} people={samplePeople} onChange={(v) => setVal(v[0] ?? null)} className="max-w-xs" />
-      <Button size={size}>送出</Button>
+      <Button variant="primary" size={size}>送出</Button>
       <span className="text-caption text-fg-muted">size="{size}"</span>
     </div>
   )
@@ -137,26 +138,25 @@ export const SizeAlignment: Story = {
   ),
 }
 
-// @story-name-canonical-allow: race-test fixture for Playwright deterministic state injection
-// @story-trait-rationale: test fixture exposing window setter, not a consumer-facing variant
-const RaceTestPicker = () => {
-  const [val, setVal] = React.useState<PersonValue[]>([])
+/* ── 人員清單非同步載入（已選值先到、名錄後到） ── */
+const AsyncDirectoryPicker = () => {
+  const [people, setPeople] = React.useState<PersonValue[]>([])
+  const [val, setVal] = React.useState<PersonValue[]>([samplePeople[0], samplePeople[2]])
   React.useEffect(() => {
-    ;(window as { __raceTestSetVal?: (v: PersonValue[]) => void; __raceTestPeople?: PersonValue[] }).__raceTestSetVal = setVal
-    ;(window as { __raceTestSetVal?: (v: PersonValue[]) => void; __raceTestPeople?: PersonValue[] }).__raceTestPeople = samplePeople
-    return () => {
-      delete (window as { __raceTestSetVal?: (v: PersonValue[]) => void; __raceTestPeople?: PersonValue[] }).__raceTestSetVal
-      delete (window as { __raceTestSetVal?: (v: PersonValue[]) => void; __raceTestPeople?: PersonValue[] }).__raceTestPeople
-    }
+    const timer = window.setTimeout(() => setPeople(samplePeople), 1500)
+    return () => window.clearTimeout(timer)
   }, [])
   return (
-    <div className="max-w-xs">
-      <PeoplePicker value={val} people={samplePeople} onChange={setVal} />
+    <div className="flex flex-col gap-2 max-w-xs">
+      <PeoplePicker value={val} people={people} onChange={setVal} aria-label="任務協作者" />
+      <p className="text-caption text-fg-secondary">
+        Jira 任務「協作者」欄位場景：已選成員隨任務資料先抵達，組織人員名錄約 1.5 秒後才從 API 回來——已選的 avatar 與姓名立即顯示，不等名錄載入。
+      </p>
     </div>
   )
 }
 
-export const RaceTest: Story = {
-  name: '載入競態測試',
-  render: () => <RaceTestPicker />,
+export const AsyncDirectoryLoad: Story = {
+  name: '人員清單非同步載入',
+  render: () => <AsyncDirectoryPicker />,
 }

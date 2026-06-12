@@ -1,7 +1,7 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { LayoutDashboard, Inbox, Users, Settings, Bell } from 'lucide-react'
+import { LayoutDashboard, Inbox, Users, Settings, Bell, Folder, Plus } from 'lucide-react'
 import {
   SidebarProvider,
   SidebarHeader,
@@ -67,7 +67,7 @@ const Swatch = ({ value }: { value: string }) => (
 const SidebarPreview = ({
   size = 'md',
   activeId = 'dashboard',
-  width = 272,
+  width = 240,
 }: {
   size?: 'sm' | 'md' | 'lg'
   activeId?: string
@@ -155,14 +155,14 @@ export const Overview: Story = {
           <pre className="text-caption font-mono text-fg-secondary bg-canvas p-4 rounded-md border border-divider leading-relaxed">{`SidebarProvider
   Sidebar
     SidebarHeader          ← h-[var(--chrome-header-height)]
-    SidebarContent         ← flex-1 overflow-auto
+    SidebarContent         ← flex-1 + ScrollArea 捲動
       SidebarGroup         ← py-2 + ::before divider
         SidebarGroupLabel  ← item-layout row (header mode)
         SidebarGroupContent
           SidebarMenu        ← flex-col, no gap
             SidebarMenuItem
               SidebarMenuButton  ← item-layout row
-    SidebarFooter          ← h-[var(--chrome-header-height)]
+    SidebarFooter          ← shrink-0 py-2 border-t (高度由內容決定)
   SidebarTrigger           ← 放主內容 header
 `}</pre>
         </div>
@@ -201,9 +201,9 @@ export const Overview: Story = {
             </tr>
             <tr>
               <Td mono>SidebarFooter</Td>
-              <Td>Chrome slot</Td>
+              <Td>Container</Td>
               <Td>—</Td>
-              <Td>同 Header</Td>
+              <Td>靠底 menu group 容器(shrink-0 + border-t),高度由內容決定</Td>
             </tr>
             <tr>
               <Td mono>SidebarContent</Td>
@@ -277,7 +277,7 @@ export const Inspector: Story = {
   args: {
     size: 'md',
     activeId: 'dashboard',
-    width: 272,
+    width: 240,
   },
   argTypes: {
     size: {
@@ -292,7 +292,7 @@ export const Inspector: Story = {
     },
     width: {
       control: { type: 'range', min: 240, max: 360, step: 8 },
-      description: '展開寬度(預設 272 / 最小 240)',
+      description: '展開寬度(預設 240 / 最小 240)',
     },
   },
   render: (args) => {
@@ -395,7 +395,7 @@ export const ColorMatrix: Story = {
       <div className="flex flex-col gap-2">
         <H3>SidebarMenuButton 狀態</H3>
         <Desc>
-          跟 TreeItem / MenuItem 共用同一組 semantic token。Default → hover → active → selected 的色彩都一致。
+          跟 TreeItem / MenuItem 共用同一組 semantic token。Default → hover → selected 的色彩都一致。
         </Desc>
         <table className="min-w-full text-left border-collapse">
           <thead>
@@ -417,12 +417,6 @@ export const ColorMatrix: Story = {
               <Td>hover</Td>
               <Td><Swatch value="--neutral-hover" />bg-neutral-hover</Td>
               <Td><Swatch value="--foreground" />text-foreground (neutral-9)</Td>
-              <Td mono>500</Td>
-            </tr>
-            <tr>
-              <Td>active (press)</Td>
-              <Td><Swatch value="--neutral-active" />bg-neutral-active</Td>
-              <Td><Swatch value="--foreground" />text-foreground</Td>
               <Td mono>500</Td>
             </tr>
             <tr>
@@ -541,44 +535,53 @@ const CollapsedFrame = ({
 // SidebarMenuButton cva 有 variant: { default, meta } 兩個值,本 story 展示 default vs meta 區別
 export const VariantMatrix: Story = {
   name: '變體對照（預設 vs 次要）',
+  // 2026-06-11:改用真 SidebarMenuButton 渲染(原為手繪灰塊 mock row,違 production-grade composition fidelity)
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div className="flex flex-col gap-2">
         <H3>variant=&quot;default&quot;(導覽 item)</H3>
-        <Desc>正常導覽目的地。文字 `text-fg-secondary` + `font-medium`,參與 single-selection,可 active。</Desc>
-        <div className="border border-border rounded-md p-3 bg-surface flex flex-col gap-1">
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
-            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">專案 A</span>
-          </div>
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
-            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">專案 B</span>
-          </div>
+        <Desc>正常導覽目的地。文字 <code>text-fg-secondary</code> + <code>font-medium</code>,參與 single-selection,可 active。</Desc>
+        <div className="border border-border rounded-md p-3 bg-surface">
+          <SidebarProvider defaultActiveId="dashboard" style={{ minHeight: 'auto' }}>
+            <div className="flex flex-col w-full">
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton id="dashboard" startIcon={LayoutDashboard}>Dashboard</SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton id="inbox" startIcon={Inbox}>Inbox</SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </div>
+          </SidebarProvider>
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
         <H3>variant=&quot;meta&quot;(命令 row,非導覽目的地)</H3>
         <Desc>
-          section 底部的命令(「查看更多 / 載入更多 / + 新增專案」)。文字退到 `text-fg-muted` + `font-normal`,
-          視覺重量下沉。**不參與 single-selection**(誤傳 isActive 也不啟動)。對齊 Linear「Show N more」/ Notion「Show more」/ Slack「Show more」/ Gmail Labels「More」共識。
+          section 底部的命令(「查看更多 / 載入更多 / + 新增專案」)。文字退到 <code>text-fg-muted</code> + <code>font-normal</code>,
+          視覺重量下沉。<strong>不參與 single-selection</strong>(誤傳 isActive 也不啟動)。對齊 Linear「Show N more」/ Notion「Show more」/ Slack「Show more」/ Gmail Labels「More」共識。
         </Desc>
-        <div className="border border-border rounded-md p-3 bg-surface flex flex-col gap-1">
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
-            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">專案 A</span>
-          </div>
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-secondary)' }}>
-            <div className="w-4 h-4 rounded bg-current opacity-40 shrink-0" />
-            <span className="text-caption font-medium">專案 B</span>
-          </div>
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-muted)' }}>
-            <span className="text-caption font-normal">+ 新增專案</span>
-          </div>
-          <div className="flex items-center h-8 px-2 gap-2 rounded-md" style={{ color: 'var(--fg-muted)' }}>
-            <span className="text-caption font-normal">查看更多</span>
-          </div>
+        <div className="border border-border rounded-md p-3 bg-surface">
+          <SidebarProvider style={{ minHeight: 'auto' }}>
+            <div className="flex flex-col w-full">
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton id="checkout" startIcon={Folder}>Checkout Revamp</SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton id="billing" startIcon={Folder}>Billing Migration</SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton variant="meta" startIcon={Plus}>新增專案</SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton variant="meta">查看更多</SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </div>
+          </SidebarProvider>
         </div>
       </div>
     </div>
@@ -592,7 +595,7 @@ export const StateBehavior: Story = {
       <div className="flex flex-col gap-1">
         <H3>狀態行為</H3>
         <Desc>
-          Sidebar 層級特有的狀態:collapse / expand 三種模式、mobile offcanvas、active item 跨 session 還原。
+          Sidebar 層級特有的狀態:collapse / expand 三種模式、mobile offcanvas、active item single-selection、open state cookie 持久化。
           Item-level default / hover / active / selected / disabled **色彩**由 `ColorMatrix` 作為 state-driven 矩陣完整呈現(共用 item-anatomy row primitive 主檔);本 story 展示 container 層的結構狀態切換。
         </Desc>
       </div>
@@ -606,7 +609,7 @@ export const StateBehavior: Story = {
         <div className="flex flex-wrap gap-6">
           <CollapsedFrame variant="expanded" label='collapsible="icon" · expanded' width={240} collapsed={false} />
           <CollapsedFrame variant="icon" label='collapsible="icon" · collapsed(icon mode)' width={48} collapsed />
-          <CollapsedFrame variant="offcanvas" label='collapsible="offcanvas" · collapsed(hidden)' width={272} collapsed />
+          <CollapsedFrame variant="offcanvas" label='collapsible="offcanvas" · collapsed(hidden)' width={240} collapsed />
         </div>
       </div>
 
@@ -614,7 +617,7 @@ export const StateBehavior: Story = {
       <div className="flex flex-col gap-3">
         <span className="text-caption font-medium text-fg-secondary">行為 2:Cmd+B / SidebarTrigger 切換 open state</span>
         <Desc>
-          SidebarProvider 內建 Cmd+B (Mac) / Ctrl+B (Win) 全域快捷鍵,同時 SidebarTrigger iconOnly Button 作為視覺 toggle。open state 寫入 cookie(7 天),跨 session 還原。
+          SidebarProvider 內建 Cmd+B (Mac) / Ctrl+B (Win) 全域快捷鍵,同時 SidebarTrigger iconOnly Button 作為視覺 toggle。open state 寫入 cookie(7 天);跨 session 還原需 consumer 讀 cookie 後傳 defaultOpen(詳 spec「持久化與快捷鍵」)。
         </Desc>
         <div className="border border-divider rounded-lg overflow-hidden bg-surface" style={{ width: 480, height: 280 }}>
           <SidebarProvider style={{ minHeight: 'auto', height: '100%' }}>
@@ -674,10 +677,10 @@ export const StateBehavior: Story = {
         <span className="text-caption font-medium text-fg-secondary">行為規則</span>
         <ul className="text-caption text-fg-secondary space-y-1.5 ml-4 list-disc">
           <li>`collapsible="offcanvas"` 用於主內容為主的 app(sidebar 是啟動器,使用者常關);`collapsible="icon"` 用於深度導覽 app(sidebar 是常駐工作區)。</li>
-          <li>open state 寫 cookie `sidebar_state`(7 天 max-age),跨 session 還原——使用者上次關 = 下次也關。</li>
+          <li>open state 寫 cookie `sidebar_state`(7 天 max-age);Provider 只寫不讀,還原由 consumer 讀 cookie 傳 `defaultOpen`(避免 SSR hydration flash)。</li>
           <li>Mobile(&lt;768px)一律走 Sheet overlay,不受 `collapsible` prop 影響——小螢幕 sidebar 永遠不佔固定空間。</li>
           <li>Icon mode 下 active item 的 `bg-neutral-selected` 仍然顯示,但 label 不可見——提供最小視覺指引讓使用者知道「當前在哪」。</li>
-          <li>Cmd+B / Ctrl+B 全域快捷鍵由 SidebarProvider 監聽,任何 focus 位置都可觸發(input 內除外,避免干擾文字輸入)。</li>
+          <li>Cmd+B / Ctrl+B 全域快捷鍵由 SidebarProvider 監聽,任何 focus 位置都可觸發——目前未排除文字輸入框,在 input / textarea 內按下仍會 toggle 並攔掉預設行為(無 disableShortcut opt-out)。</li>
         </ul>
       </div>
     </div>
@@ -704,8 +707,8 @@ export const ChromeTokens: Story = {
           </thead>
           <tbody>
             <tr>
-              <Td><TkVal token="--sidebar-width" value="17rem (272px)" /></Td>
-              <Td mono>17rem</Td>
+              <Td><TkVal token="--sidebar-width" value="15rem (240px)" /></Td>
+              <Td mono>15rem</Td>
               <Td>展開寬度</Td>
             </tr>
             <tr>
@@ -763,7 +766,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `sidebar.spec.md` 「A11y 預設」段。摘要:\n\n-   Landmark  : <Sidebar>  渲染  <nav aria-label=\"Main\"> (或 consumer 傳入更精確的 label,例「Workspace navigation」),作為 page-level navigation landmark,讓 SR user 直接跳轉。\n-   Active item  : SidebarMenuButton  帶  id  + 命中  activeId  時自動加  aria-current=\"page\" ,SR 朗讀「current page」。 variant=\"meta\"  不參與 selection 不加此 attribute。\n-   快捷鍵不衝突  : Cmd+B  /  Ctrl+B  是 industry-standard(VS Code / Linear / shadcn),DS 內建並  prev"}</p>
+      <p className="whitespace-pre-line">{"-   收合切換鍵：Cmd+B(Mac)/ Ctrl+B(Windows)是業界慣例(VS Code / Linear / shadcn 都用),Sidebar 內建並會攔下這組鍵,避免穿透到瀏覽器書籤列。任何焦點位置都能觸發;目前未排除文字輸入框——在 input / textarea 內按下仍會 toggle(無 disableShortcut opt-out)。\n\n-   收合按鈕:SidebarTrigger 內建 aria-label「Toggle Sidebar」,讓螢幕報讀使用者知道按鈕用途;consumer 可傳 aria-label 覆寫(i18n)。SidebarGroupLabel 的收合 chevron 另有 toggleAriaLabel prop(預設「展開或收合」)。\n\n-   當前項目:選中的 menu item 帶 data-active,呈現選取底色(bg-neutral-selected)作為視覺指引;即使收合成 icon-only 模式,選取底色仍然保留,使用者一眼知道現在在哪一頁。\n\n-   手機尺寸:768px 以下自動切換成從旁滑出的抽屜(Sheet),內建焦點鎖定、Esc 關閉、關閉後焦點回到觸發按鈕。"}</p>
     </div>
   ),
 }

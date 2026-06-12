@@ -8,7 +8,7 @@ CLAUDE.md `# SSOT 消費 canonical` 的詳表 + 反例。主章留核心 + point
 |------|---------------|
 | **元件選擇**(這該用哪個既有元件?)| `ls packages/design-system/src/components/` + `ls packages/design-system/src/patterns/` + 近親元件 spec |
 | **Token / 值**(padding / gap / height / color)| 對應 `tokens/{name}/spec.md` + `tokens/README.md` |
-| **Padding / spacing**(chrome vs 元件內 vs 精確幾何)| `.claude/rules/ui-development.md`「Padding source 分層規則」+ `tokens/layoutSpace/layoutSpace.spec.md` |
+| **Padding / spacing**(chrome vs 元件內 vs 精確幾何)| `.claude/references/ui-dev-rules.md`「Padding source 分層規則」+ `tokens/layoutSpace/layoutSpace.spec.md` |
 | **Row / item 結構**(prefix / content / suffix slot)| `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 SSOT) |
 | **連續 item list wrapper gap** | `patterns/element-anatomy/item-anatomy.spec.md`「連續 item 貼邊合法性」— 公式:permanent standalone card/pill → 必 gap;permanent flush / transparent → 0 gap。元件專屬 gap 值 + mixed 混合情境決策表查該元件 spec「List wrapper canonical」節 |
 | **視覺容器 breathing**(自建或 override 帶 bg/border/shadow 的 div)| `patterns/element-anatomy/element-anatomy.spec.md`「視覺容器 breathing invariant」— 有視覺邊界容器必有 inner padding。責任在父容器,子元件 w-full responsive 不變 |
@@ -50,7 +50,7 @@ CLAUDE.md `# SSOT 消費 canonical` 的詳表 + 反例。主章留核心 + point
  */
 ```
 
-Hook `check_ssot_consultation.sh`(Write 新 tsx 到 `packages/design-system/src/components/` 或 `src/explorations/`)→ 若檔內無上述註解區 → warn 要求補齊。
+Hook `check_ssot_consultation.sh`(retired;改靠 mindset #2 + `check_canonical_propagation.sh`)(原 Write 新 tsx 到 `packages/design-system/src/components/` 或 `src/explorations/` → 若檔內無上述註解區 → warn 要求補齊)。
 
 ## 禁止:隱性自創
 

@@ -98,23 +98,23 @@ export const Overview: Story = {
           <div className="bg-canvas text-foreground" style={{ height: 420 }}>
             <div className="h-full w-full flex flex-col">
               {/* Toolbar */}
-              <div className="h-14 shrink-0 flex items-center justify-between bg-surface border-b border-divider px-6">
+              <div className="h-14 shrink-0 flex items-center justify-between bg-surface-raised border-b border-divider px-6">
                 <span className="text-body-lg text-foreground">① Toolbar — 檔名 + zoom/info/download/close</span>
-                <span className="text-caption text-fg-muted">h-14 固定</span>
+                <span className="text-caption text-fg-muted">--chrome-header-height(lg=56）</span>
               </div>
               {/* Viewport + InfoPanel */}
               <div className="flex-1 min-h-0 flex">
-                <div className="flex-1 bg-canvas flex items-center justify-center relative">
+                <div className="flex-1 bg-overlay flex items-center justify-center relative">
                   <span className="text-body-lg text-fg-secondary">② Viewport — renderer 渲染區(flex-1)</span>
                   <span className="absolute left-6 top-1/2 -translate-y-1/2 text-caption text-fg-muted">← prev</span>
                   <span className="absolute right-6 top-1/2 -translate-y-1/2 text-caption text-fg-muted">next →</span>
                 </div>
-                <aside className="w-80 shrink-0 bg-surface border-l border-divider flex items-center justify-center">
+                <aside className="w-80 shrink-0 bg-surface-raised border-l border-divider flex items-center justify-center">
                   <span className="text-body text-fg-secondary">③ InfoPanel — w-80(320px)</span>
                 </aside>
               </div>
               {/* Filmstrip */}
-              <div className="h-24 shrink-0 bg-surface border-t border-divider flex items-center px-6 gap-1">
+              <div className="h-24 shrink-0 bg-surface-raised border-t border-divider flex items-center px-6 gap-1">
                 <span className="text-caption text-fg-muted mr-3">④ Filmstrip</span>
                 {[0, 1, 2, 3, 4].map((i) => (
                   <div
@@ -144,13 +144,13 @@ export const Overview: Story = {
               <tr>
                 <Td mono>Toolbar</Td>
                 <Td>永遠顯示</Td>
-                <Td mono>h-14, bg-surface, border-b</Td>
-                <Td>檔名 + 按鈕列(zoom → info → download → close,影響力遞增)</Td>
+                <Td mono>--chrome-header-height, bg-surface-raised, border-b</Td>
+                <Td>檔名 + 按鈕列(zoom → info → download → close,影響力遞增)；bg-surface-raised 確保 overlay 上的 chrome 不透明</Td>
               </tr>
               <tr>
                 <Td mono>Viewport</Td>
                 <Td>永遠顯示</Td>
-                <Td mono>flex-1, bg-canvas</Td>
+                <Td mono>flex-1(無自身 bg;bg-overlay 透出)</Td>
                 <Td>renderer 渲染區;prev/next arrow 絕對定位於左右</Td>
               </tr>
               <tr>
@@ -162,7 +162,7 @@ export const Overview: Story = {
               <tr>
                 <Td mono>Filmstrip</Td>
                 <Td mono>showFilmstrip && files.length &gt; 1</Td>
-                <Td mono>h-24, bg-surface, border-t</Td>
+                <Td mono>h-24, bg-surface-raised, border-t</Td>
                 <Td>64×64 thumb 水平捲動(horizontal-overflow pattern)</Td>
               </tr>
             </tbody>
@@ -349,7 +349,7 @@ export const Inspector: Story = {
           />
           <p className="text-footnote text-fg-muted mt-2 leading-relaxed">
             提醒:filmstrip 需 `showFilmstrip && files.length &gt; 1` 才顯示;
-            prev/next arrow 需 `files.length &gt; 1`;切換 files 時 zoom 自動重設 100%。
+            prev/next arrow 需 `files.length &gt; 1`;切換 files 時 shell 不重設 zoom,由 renderer onLoad 重新 fit-page。
           </p>
         </div>
 
@@ -377,13 +377,13 @@ export const Inspector: Story = {
                 <tr>
                   <Td>Viewport 背景</Td>
                   <Td>
-                    <TokenCell token="--canvas" display="bg-canvas" />
+                    <TokenCell token="--overlay" display="bg-overlay 透出(自身無 bg)" />
                   </Td>
                 </tr>
                 <tr>
                   <Td>Toolbar / InfoPanel / Filmstrip 背景</Td>
                   <Td>
-                    <TokenCell token="--surface" display="bg-surface" />
+                    <TokenCell token="--surface-raised" display="bg-surface-raised" />
                   </Td>
                 </tr>
                 <tr>
@@ -394,7 +394,7 @@ export const Inspector: Story = {
                 </tr>
                 <tr>
                   <Td>Toolbar 高度</Td>
-                  <Td mono>h-14(56px,與 InfoPanel header 等高)</Td>
+                  <Td mono>--chrome-header-height(lg=56px,ChromeHeader lockDensity="lg",與 InfoPanel header 等高)</Td>
                 </tr>
                 <tr>
                   <Td>Toolbar 水平 padding</Td>
@@ -402,7 +402,7 @@ export const Inspector: Story = {
                 </tr>
                 <tr>
                   <Td>Toolbar 按鈕 gap</Td>
-                  <Td mono>gap-1(icon 群)/ gap-2(左右分組)</Td>
+                  <Td mono>gap-2(8px,對齊 DS 按鈕 gap canonical;含 ZoomInput 內部)</Td>
                 </tr>
                 <tr>
                   <Td>InfoPanel 寬</Td>
@@ -422,7 +422,7 @@ export const Inspector: Story = {
                 </tr>
                 <tr>
                   <Td>Filmstrip thumb gap</Td>
-                  <Td mono>gap-1(4px,對齊 lightbox 慣例)</Td>
+                  <Td mono>gap-[var(--layout-space-tight)](density-aware,對齊 lightbox 慣例)</Td>
                 </tr>
                 <tr>
                   <Td>Filmstrip active thumb ring</Td>
@@ -442,7 +442,7 @@ export const Inspector: Story = {
                 </tr>
                 <tr>
                   <Td>ZoomInput 寬</Td>
-                  <Td mono>w-20(80px,含 dropdown trigger 7w)</Td>
+                  <Td mono>autoWidth(field-sizing:content,隨 % 文字寬;chevron 為 endSlot)</Td>
                 </tr>
                 <tr>
                   <Td>Prev/Next arrow Button size</Td>
@@ -467,7 +467,7 @@ export const ColorMatrix: Story = {
         <H3>Chrome 鎖 dark 的理由</H3>
         <Desc>
           FileViewer 是「內容展示 chrome」,viewer 本身是獨立沉浸式 context——類比 Tooltip 永久 dark、
-          全螢幕影片播放器 UI 永遠暗色。Dark 底 + bg-canvas 讓圖片 / media 顯色最自然
+          全螢幕影片播放器 UI 永遠暗色。Dark 底 + 半透明 bg-overlay backdrop 讓圖片 / media 顯色最自然
           (亮底會跟任何含白色邊緣的圖片打架);rollback 到 light theme 會讓圖片與 chrome 產生
           色溫衝突。實作:DialogPrimitive.Content 內包 &lt;div data-theme="dark"&gt;,子元件 token
           自動解析為 dark 值,不影響背景頁面 theme。
@@ -482,22 +482,22 @@ export const ColorMatrix: Story = {
           style={{ width: 720 }}
         >
           <div className="bg-canvas">
-            <div className="h-14 flex items-center px-6 bg-surface border-b border-divider">
-              <span className="text-body-lg text-foreground">Toolbar — bg-surface</span>
+            <div className="h-14 flex items-center px-6 bg-surface-raised border-b border-divider">
+              <span className="text-body-lg text-foreground">Toolbar — bg-surface-raised</span>
             </div>
             <div className="flex">
               <div
                 className="flex-1 flex items-center justify-center"
-                style={{ height: 180, backgroundColor: 'var(--canvas)' }}
+                style={{ height: 180, backgroundColor: 'var(--overlay)' }}
               >
-                <span className="text-body text-fg-secondary">Viewport — bg-canvas</span>
+                <span className="text-body text-fg-secondary">Viewport — 無自身 bg(bg-overlay 透出)</span>
               </div>
-              <aside className="w-56 bg-surface border-l border-divider flex items-center justify-center">
-                <span className="text-body text-fg-secondary">InfoPanel — bg-surface</span>
+              <aside className="w-56 bg-surface-raised border-l border-divider flex items-center justify-center">
+                <span className="text-body text-fg-secondary">InfoPanel — bg-surface-raised</span>
               </aside>
             </div>
-            <div className="h-24 flex items-center px-6 bg-surface border-t border-divider">
-              <span className="text-body text-fg-secondary">Filmstrip — bg-surface</span>
+            <div className="h-24 flex items-center px-6 bg-surface-raised border-t border-divider">
+              <span className="text-body text-fg-secondary">Filmstrip — bg-surface-raised</span>
             </div>
           </div>
         </div>
@@ -525,16 +525,16 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td>Viewport 背景</Td>
                 <Td>
-                  <TokenCell token="--canvas" display="bg-canvas" />
+                  <TokenCell token="--overlay" display="bg-overlay 透出(自身無 bg)" />
                 </Td>
-                <Td>近黑底,讓 media 顯色</Td>
+                <Td>viewer 自身不畫 viewport bg;半透明遮罩透出,media 周圍近黑</Td>
               </tr>
               <tr>
                 <Td>Toolbar / InfoPanel / Filmstrip</Td>
                 <Td>
-                  <TokenCell token="--surface" display="bg-surface" />
+                  <TokenCell token="--surface-raised" display="bg-surface-raised" />
                 </Td>
-                <Td>比 canvas 高一階,形成 chrome 分層</Td>
+                <Td>遮蓋型浮層必須不透明(不用 bg-surface,dark = white α8 半透明);比 canvas 高一階形成 chrome 分層</Td>
               </tr>
               <tr>
                 <Td>分隔線</Td>
@@ -562,7 +562,7 @@ export const ColorMatrix: Story = {
                 <Td>
                   <TokenCell token="--fg-muted" display="text-fg-muted" />
                 </Td>
-                <Td>「說明」/「檔案資訊」小標</Td>
+                <Td>Filmstrip 非圖 thumb 的 FileText 圖示 + 副檔名 label(InfoPanel「檔案資訊」小標走 text-foreground、「說明」走 FieldLabel,皆非弱化)</Td>
               </tr>
               <tr>
                 <Td>Filmstrip thumb 當前選中</Td>
@@ -632,9 +632,9 @@ export const SizeMatrix: Story = {
               </tr>
               <tr>
                 <Td>Toolbar 高</Td>
-                <Td mono>h-14(56px)</Td>
+                <Td mono>--chrome-header-height(lg=56px)</Td>
                 <Td>Figma toolbar 48–56 / macOS Preview 56</Td>
-                <Td>容 32 px 按鈕 + 12 px 上下 breathing</Td>
+                <Td>ChromeHeader lockDensity="lg",token 驅動;lg 下值為 56px</Td>
               </tr>
               <tr>
                 <Td>InfoPanel 寬</Td>
@@ -646,7 +646,7 @@ export const SizeMatrix: Story = {
                 <Td>Filmstrip 高</Td>
                 <Td mono>h-24(96px)</Td>
                 <Td>Google Photos 96 / Dropbox 88</Td>
-                <Td>thumb 64 + padding 2×16 = 96</Td>
+                <Td>固定 96(對齊 Google Photos 96 benchmark);thumb 64 + py-2(16px)留白</Td>
               </tr>
               <tr>
                 <Td>Filmstrip thumb</Td>
@@ -656,9 +656,9 @@ export const SizeMatrix: Story = {
               </tr>
               <tr>
                 <Td>Filmstrip thumb gap</Td>
-                <Td mono>gap-1(4px)</Td>
+                <Td mono>gap-[var(--layout-space-tight)]</Td>
                 <Td>Google Photos / Dropbox 3–4 px</Td>
-                <Td>緊密排列,lightbox 慣例</Td>
+                <Td>density-aware token,緊密排列 lightbox 慣例</Td>
               </tr>
               <tr>
                 <Td>Toolbar 按鈕</Td>
@@ -668,9 +668,9 @@ export const SizeMatrix: Story = {
               </tr>
               <tr>
                 <Td>ZoomInput 寬</Td>
-                <Td mono>w-20(80px)</Td>
+                <Td mono>autoWidth(field-sizing:content)</Td>
                 <Td>Figma zoom 80 / Google Slides 72</Td>
-                <Td>容「400%」4 字元 + chevron 7w</Td>
+                <Td>隨 % 文字寬自適應,chevron 為 endSlot inline action</Td>
               </tr>
               <tr>
                 <Td>Prev/Next arrow</Td>
@@ -697,8 +697,8 @@ export const SizeMatrix: Story = {
             <tbody>
               <tr>
                 <Td>Panel header 高</Td>
-                <Td mono>h-14</Td>
-                <Td>與 Toolbar 等高,視覺水平對齊</Td>
+                <Td mono>--chrome-header-height</Td>
+                <Td>消費 &lt;ChromeHeader lockDensity=&quot;lg&quot;&gt;,lg = 56px;與 Toolbar 等高,視覺水平對齊</Td>
               </tr>
               <tr>
                 <Td>Body 水平 padding</Td>
@@ -707,18 +707,18 @@ export const SizeMatrix: Story = {
               </tr>
               <tr>
                 <Td>Body 垂直 padding</Td>
-                <Td mono>py-[var(--layout-space-tight)]</Td>
-                <Td>12 / 16 px(隨 density)</Td>
+                <Td mono>pt-[var(--layout-space-tight)] pb-[var(--layout-space-loose)]</Td>
+                <Td>非對稱:top tight / bottom loose(對齊 layoutSpace v6 規則 4「bounded region 容器底 = loose」)</Td>
               </tr>
               <tr>
                 <Td>Section 間 gap</Td>
-                <Td mono>gap-4</Td>
-                <Td>說明 ↔ 檔案資訊 16 px</Td>
+                <Td mono>gap-[var(--layout-space-loose)]</Td>
+                <Td>說明 ↔ 檔案資訊 24 / 32 px(隨 density;跨範疇 parallel = loose)</Td>
               </tr>
               <tr>
-                <Td>dl row 間 gap</Td>
-                <Td mono>gap-1.5</Td>
-                <Td>metadata 條目緊湊排列</Td>
+                <Td>檔案資訊 metadata</Td>
+                <Td mono>&lt;DescriptionList horizontal divided&gt;</Td>
+                <Td>消費 DescriptionList primitive,每 row py-[var(--layout-space-tight)](不再手刻 dl/dt/dd)</Td>
               </tr>
               <tr>
                 <Td>Textarea rows</Td>
@@ -809,27 +809,37 @@ export const StateBehavior: Story = {
               <tr>
                 <Td>初始</Td>
                 <Td mono>mount / 切換檔案</Td>
-                <Td>zoom=100%, centered</Td>
+                <Td>zoom=fit-page(onLoad 自動算 min(cw/iw, ch/ih) 對應 %,如 40%),centered;切換檔案 shell 不重設,renderer onLoad 重 fit-page</Td>
               </tr>
               <tr>
                 <Td>Zoom in</Td>
-                <Td mono>滾輪 / + / = / ZoomInput</Td>
+                <Td mono>+ / = 鍵 / ＋ 按鈕</Td>
                 <Td>下一個 preset(10/25/50/75/100/125/150/200/400)</Td>
               </tr>
               <tr>
                 <Td>Zoom out</Td>
-                <Td mono>反向滾輪 / -</Td>
+                <Td mono>- 鍵 / − 按鈕</Td>
                 <Td>上一個 preset</Td>
               </tr>
               <tr>
-                <Td>Reset</Td>
-                <Td mono>0 key / 雙擊 image</Td>
-                <Td>zoom=100%</Td>
+                <Td>連續 / 任意值</Td>
+                <Td mono>滾輪(step 0.03)/ ZoomInput 打字</Td>
+                <Td>multiplicative 連續縮放,任意 %(非 preset;spec「Wheel step canonical」);ZoomInput preset menu 才跳 preset</Td>
+              </tr>
+              <tr>
+                <Td>Reset 100%</Td>
+                <Td mono>0 key</Td>
+                <Td>固定設 zoom=100%(natural pixel size)</Td>
+              </tr>
+              <tr>
+                <Td>雙擊 toggle</Td>
+                <Td mono>雙擊 image</Td>
+                <Td>在 fit-page 附近(±5pt)→ 跳 100%;否則 → 回 fit-page(對齊 Apple Photos / Preview.app / PhotoSwipe)</Td>
               </tr>
               <tr>
                 <Td>Fit</Td>
                 <Td mono>F / ZoomInput dropdown</Td>
-                <Td>MVP 同 reset(未來 renderer own)</Td>
+                <Td>算 container/image 比例 → fit-width(寬填滿)或 fit-page(完整可見,取較小 scale);emit 回 shell 更新 zoom %</Td>
               </tr>
               <tr>
                 <Td>Pan</Td>
@@ -1111,7 +1121,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `fileviewer.spec.md` 「A11y 預設」段。摘要:\n\nRadix DialogPrimitive 自動處理:\n-  role=\"dialog\"  +  aria-modal=\"true\" \n-  <DialogPrimitive.Title> (sr-only)自動成  aria-labelledby  目標——screen reader 開啟時讀「檔案檢視器:{file.name}」\n- Focus trap:焦點鎖在 viewer 內\n- Esc 關閉;Overlay click 關閉(Radix 預設)\n\n自加的 a11y:\n- 所有 iconOnly button 皆有  aria-label (中文,跟 DS 其他元件風格一致)\n- Filmstrip  role=\"tablist\"  + thumb  role=\"tab\"  +  aria-selected \n- InfoPanel 用  <aside aria-label=\"檔"}</p>
+      <p className="whitespace-pre-line">{"詳 `file-viewer.spec.md` 「A11y 預設」段。摘要:\n\nRadix DialogPrimitive 自動處理:\n-  role=\"dialog\"  +  aria-modal=\"true\" \n-  <DialogPrimitive.Title> (sr-only)自動成  aria-labelledby  目標——screen reader 開啟時讀「檔案檢視器:{file.name}」\n- Focus trap:焦點鎖在 viewer 內\n- Esc 關閉(Radix DismissableLayer);Backdrop click 關閉為自寫 geometric onClick handler(非 Radix outside-click — Content 為 fixed inset-0 全螢幕覆蓋,判斷 click 落在 img rect 外才關)\n\n自加的 a11y:\n- 所有 iconOnly button 皆有  aria-label (中文,跟 DS 其他元件風格一致)\n- Filmstrip  role=\"group\"  + thumb  <button>  +  aria-current (非 tablist:選圖導航非切 tabpanel)\n- InfoPanel 用  <aside aria-label=\"檔案詳細資訊\">  語意標記\n-  onOpenAutoFocus  preventDefault:避免焦點自動跑進第一個 tabbable(讓鍵盤從 viewport 開始)"}</p>
     </div>
   ),
 }

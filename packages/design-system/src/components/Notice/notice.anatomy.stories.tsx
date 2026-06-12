@@ -141,7 +141,7 @@ export const Overview: Story = {
                 <Td mono>dismiss X</Td>
                 <Td>關閉按鈕(可關)</Td>
                 <Td mono>h-[1lh] items-center</Td>
-                <Td mono>16px icon / 18px hover bg</Td>
+                <Td mono>16px icon / 24px hover bg(Button iconOnly xs)</Td>
               </tr>
             </tbody>
           </table>
@@ -169,13 +169,13 @@ export const Overview: Story = {
               </tr>
               <tr>
                 <Td mono>title</Td>
-                <Td mono>string</Td>
+                <Td mono>ReactNode</Td>
                 <Td>—(必填)</Td>
                 <Td>主要訊息,單行 truncate</Td>
               </tr>
               <tr>
                 <Td mono>description</Td>
-                <Td mono>string</Td>
+                <Td mono>ReactNode</Td>
                 <Td mono>undefined</Td>
                 <Td>輔助文字,有值時 title 加粗</Td>
               </tr>
@@ -346,7 +346,7 @@ text-body = 14px   leading-compact = 1.3
               </tr>
               <tr>
                 <Td mono>dismiss hover bg</Td>
-                <Td mono>18px · rounded-md</Td>
+                <Td mono>24px(Button iconOnly xs)· rounded-md</Td>
               </tr>
               <tr>
                 <Td mono>title font</Td>
@@ -369,7 +369,7 @@ text-body = 14px   leading-compact = 1.3
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const VariantIconMap: Story = {
-  name: '變體 × icon 對照',
+  name: '變體 × 圖示 對照',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -514,7 +514,7 @@ export const StateBehavior: Story = {
       <div>
         <H3>Dismiss button 互動</H3>
         <Desc>
-          16px X icon / 18px hover bg / rounded-md——對齊 item-anatomy 的 inline-action pattern。Hover 時
+          16px X icon / 24px hover bg(Button iconOnly xs)/ rounded-md。Hover 時
           <code className="font-mono text-footnote mx-1">text-fg-muted → text-foreground</code>
           ,背景由 transparent 進
           <code className="font-mono text-footnote mx-1">bg-neutral-hover</code>
@@ -526,7 +526,7 @@ export const StateBehavior: Story = {
               <tr>
                 <Th>State</Th>
                 <Th>Icon color</Th>
-                <Th>Hover bg (18×18)</Th>
+                <Th>Hover bg (24×24)</Th>
               </tr>
             </thead>
             <tbody>
@@ -604,7 +604,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `notice.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus dismiss button(若 dismissible)\n- Esc — dismiss(若 dismissible)\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"無障礙設計摘要:\n\n  語意角色  :Notice 本身不帶 ARIA role(由外層的 Alert / Toast 決定要不要朗讀、用什麼急迫度),避免巢狀的即時通知區域被螢幕報讀器重複念出。\n\n  鍵盤操作  :\n\n- 用 Tab 可以把焦點移到關閉按鈕(當通知可關閉時)。\n- 焦點停在關閉按鈕上,按 Enter 或空白鍵即可關閉(就是一般按鈕的行為)。\n- 沒有「按 Esc 關閉」這種快捷鍵;關閉只能透過點擊或用鍵盤觸發關閉按鈕。\n\n  焦點外框  :關閉按鈕的 focus-visible 外框沿用整套系統一致的樣式(2px 實線、用主題的 ring 顏色)。\n\n  驗收  :Storybook 的無障礙檢查面板不應出現任何嚴重違規;不用滑鼠也能完整操作;文字對比至少 4.5:1、介面元素對比至少 3:1。"}</p>
     </div>
   ),
 }

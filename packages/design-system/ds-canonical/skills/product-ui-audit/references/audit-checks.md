@@ -1,4 +1,4 @@
-# Audit Checks — 6 維度 grep pattern + rule
+# Audit Checks — 7 維度 grep pattern + rule
 
 每個維度的具體 check。AI Phase 1 parallel 執行時依此 grep + rule 判斷。
 
@@ -12,7 +12,7 @@
 grep -nE '\b(bg-popover|text-popover-foreground|text-muted-foreground|bg-accent|text-accent-foreground|bg-destructive|bg-background|bg-card|text-card-foreground|border-input|text-primary-foreground)\b' {target}
 ```
 
-**Severity**: P0。**Fix**: 對映見 `check_token_hygiene.sh` hook。
+**Severity**: P0。**Fix**: 對映見 token 防線 `lib/_token_hygiene.sh` + `check_opacity_token_usage.sh`。
 
 ### Check 1.2: Tailwind default shadow
 
@@ -20,7 +20,7 @@ grep -nE '\b(bg-popover|text-popover-foreground|text-muted-foreground|bg-accent|
 grep -nE '\bshadow-(sm|md|lg|xl|2xl|inner)\b' {target}
 ```
 
-**Severity**: P0。**Fix**: shadow-sm → shadow-[var(--elevation-100)] / shadow-md → shadow-[var(--elevation-200)] / shadow-lg → shadow-[var(--elevation-300)]。
+**Severity**: P0。**Fix**: shadow-sm → shadow-[var(--elevation-100)] / shadow-md → shadow-[var(--elevation-200)] / shadow-lg → shadow-[var(--elevation-200)](elevation-300 不存在,最高 tier 200)。
 
 ### Check 1.3: Tailwind v4 `[--foo]` shorthand
 
@@ -192,7 +192,7 @@ grep -nE '(TODO:\s*待確認|TODO:\s*decide|FIXME|XXX)' {target}
 
 例: FileItem `status slot(16px)` + `delete Button sm(28px)` = 不一致 → hover-bg 吃 gap。
 
-**Severity**: P0(世界級 DS 鐵律違反,違反 CLAUDE.md「同 flex 列的互動 slot 幾何鐵律」)。
+**Severity**: P0(世界級 DS 鐵律違反,違反 .claude/references/ui-dev-rules.md「同 flex 列的互動 slot 幾何鐵律」)。
 
 ### Check 5.2: 自造 typography tier
 

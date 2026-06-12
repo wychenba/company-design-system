@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { Folder, FileText, Image, Users, User } from 'lucide-react'
+import { Folder, FileText, Image, Users, User, Pencil, Trash2 } from 'lucide-react'
 import { TreeView, TreeItem } from './tree-view'
 import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
@@ -46,7 +46,7 @@ export const Overview: Story = {
             <thead><tr><Th>職責</Th><Th>說明</Th></tr></thead>
             <tbody>
               <tr><Td>1. 遞迴渲染 + indent</Td><Td mono>indentStep = chevronSize + gap-2(跟 item-layout 一致)</Td></tr>
-              <tr><Td>2. 展開 / 收合狀態管理</Td><Td>Radix Collapsible(controlled / uncontrolled)</Td></tr>
+              <tr><Td>2. 展開 / 收合狀態管理</Td><Td>TreeView 自管 expand state(受控 expandedIds / 非受控 defaultExpandedIds);Radix Collapsible 僅負責子節點高度動畫</Td></tr>
               <tr><Td>3. 鍵盤導覽 + ARIA tree</Td><Td>↑↓ 移動 / → 展開 / ← 收合 / Enter 選取</Td></tr>
             </tbody>
           </table>
@@ -61,17 +61,21 @@ export const Overview: Story = {
             <tbody>
               {[
                 ['TreeView', '', '', ''],
-                ['  value', 'string', '—', '當前選取的 node value(受控)'],
-                ['  onValueChange', '(value: string) => void', '—', '選取 callback'],
+                ['  selectedIds', 'Set<string>', '—', '選取的 node id(受控)'],
+                ['  onSelectedChange', '(ids: Set<string>) => void', '—', '選取變更 callback'],
+                ['  selectionMode', "'single' | 'multiple' | 'none'", "'single'", "multiple 模式自動顯示 checkbox;none=純展開展示不可選(JSON viewer)"],
+                ['  expandedIds / onExpandedChange', 'Set<string> / handler', '—', '展開狀態受控'],
+                ['  defaultExpandedIds', 'string[]', '—', '初始展開(uncontrolled)'],
+                ['  draggable / onDragEnd', 'boolean / handler', 'false', '拖曳重排'],
                 ['  size', "'sm' | 'md' | 'lg'", "'md'", 'font-size tier'],
                 ['TreeItem', '', '', ''],
-                ['  value', 'string', '必填', '唯一識別碼'],
+                ['  id', 'string', '必填', '唯一識別碼'],
                 ['  label', 'ReactNode', '必填', 'node 名稱'],
                 ['  icon', 'LucideIcon', '—', 'Prefix icon(資料夾 / 檔案類型)'],
-                ['  defaultExpanded', 'boolean', 'false', '初始展開狀態(uncontrolled)'],
-                ['  expanded / onExpandedChange', 'boolean / handler', '—', '展開狀態受控'],
-                ['  actions', 'ReactNode', '—', 'hover 時 suffix 顯示的 inline actions'],
-                ['  badge', 'ReactNode', '—', 'suffix 固定 badge(計數等)'],
+                ['  checkbox', 'ReactNode', '—', 'multiple 模式 selection checkbox(通常自動帶入)'],
+                ['  inlineActions', 'InlineActionConfig[]', '—', '右側 inline actions(宣告式 config,內部用 <ItemInlineAction> 渲染)'],
+                ['  inlineActionsSlot', 'ReactNode', '—', 'escape-hatch slot(放自訂元素,跟 inlineActions 互斥)'],
+                ['  disabled', 'boolean', 'false', '停用該 node'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -223,8 +227,8 @@ export const ColorMatrix: Story = {
         <div>
           <H3>Row 四態色彩 Token</H3>
           <Desc>
-            TreeItem row 色彩對齊 item-layout 的「選擇 / 狀態視覺規則」(見
-            `patterns/element-anatomy/item-anatomy.spec.md`)——tree、menu、sidebar 用同一套 state tokens。
+            TreeItem 每一行的色彩沿用列表項目的「選取 / 狀態視覺規則」——樹、選單、側邊欄共用同一套狀態色彩,
+            這樣使用者在不同地方看到的 hover、選取效果都一致。
           </Desc>
           <div className="overflow-x-auto mb-4">
             <table className="text-caption border-collapse">
@@ -240,20 +244,20 @@ export const ColorMatrix: Story = {
                 <tr>
                   <Td mono>default</Td>
                   <Td>—(transparent)</Td>
-                  <Td><TokenCell token="--foreground" display="foreground" /></Td>
-                  <Td><TokenCell token="--fg-muted" display="fg-muted" /></Td>
+                  <Td><TokenCell token="--fg-secondary" display="fg-secondary(muted)" /></Td>
+                  <Td>icon 跟 label 同色;chevron <TokenCell token="--fg-muted" display="fg-muted" /></Td>
                 </tr>
                 <tr>
                   <Td mono>hover</Td>
                   <Td><TokenCell token="--neutral-hover" display="neutral-hover" /></Td>
                   <Td><TokenCell token="--foreground" display="foreground" /></Td>
-                  <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                  <Td>icon 隨 label 變 foreground;chevron 不變(hover chevron 本身才變)</Td>
                 </tr>
                 <tr>
-                  <Td mono>selected</Td>
+                  <Td mono>selected(single)</Td>
                   <Td><TokenCell token="--neutral-selected" display="neutral-selected" /></Td>
-                  <Td><TokenCell token="--foreground" display="foreground(medium)" /></Td>
                   <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                  <Td>icon 隨 label;chevron 不變(multi mode text / bg 皆不變,信號在 checkbox)</Td>
                 </tr>
                 <tr>
                   <Td mono>disabled</Td>
@@ -291,7 +295,7 @@ export const ColorMatrix: Story = {
 }
 
 export const IndentMatrix: Story = {
-  name: '縮排 與 樹狀導引',
+  name: '縮排與樹狀導引',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -357,8 +361,24 @@ export const StateBehavior: Story = {
             <TreeView defaultExpandedIds={['eng', 'frontend']}>
               <TreeItem id="eng" label="Engineering" icon={Users}>
                 <TreeItem id="frontend" label="Frontend" icon={Users}>
-                  <TreeItem id="alice" label="Alice" icon={User} />
-                  <TreeItem id="bob" label="Bob" icon={User} />
+                  <TreeItem
+                    id="alice"
+                    label="Alice"
+                    icon={User}
+                    inlineActions={[
+                      { icon: Pencil, label: '重新命名', onClick: () => {} },
+                      { icon: Trash2, label: '刪除', onClick: () => {} },
+                    ]}
+                  />
+                  <TreeItem
+                    id="bob"
+                    label="Bob"
+                    icon={User}
+                    inlineActions={[
+                      { icon: Pencil, label: '重新命名', onClick: () => {} },
+                      { icon: Trash2, label: '刪除', onClick: () => {} },
+                    ]}
+                  />
                 </TreeItem>
               </TreeItem>
             </TreeView>
@@ -400,7 +420,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `tree-view.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  collapsible  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/collapsible#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入 tree\n- ↑/↓ — 導覽 items\n- ←/→ — collapse/expand\n- Enter — activate\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無"}</p>
+      <p className="whitespace-pre-line">{"TreeView 的無障礙是元件自建的,不是沿用第三方套件的預設。\n\n  角色與屬性  :外層容器標記為 role=\"tree\",每個節點標記為 role=\"treeitem\",並逐一寫上目前展開狀態、是否選取、所在層級;多選時容器再加上「允許多選」標記。展開/收合的動畫是借用 Radix Collapsible,但樹的角色、屬性、鍵盤導覽都是元件自己實作的(Radix 沒有 Tree 元件)。\n\n  鍵盤操作  :\n\n- Tab — 焦點進入整棵樹\n- 上 / 下 — 在可見節點之間移動\n- 右 — 展開資料夾,已展開時移到第一個子節點\n- 左 — 收合資料夾,葉節點時跳回上層\n- Home / End — 跳到第一個 / 最後一個可見節點\n- Enter / 空白鍵 — 選取目前節點\n\n  焦點  :焦點由元件自己管理——整棵樹是單一 Tab 停靠點,鍵盤移動時用一圈內描邊高亮(ring-2 ring-ring)標示目前位置。沒有焦點鎖定、也沒有焦點還原,因為樹不是浮層。\n\n  驗證  :Storybook a11y 面板應為 0 項嚴重問題;不靠滑鼠也能完整操作。文字對比度達 WCAG AA(內文 4.5:1、介面元素 3:1)。"}</p>
     </div>
   ),
 }

@@ -149,19 +149,19 @@ export const UsageGuidance: Story = {
       <p>適合 Chart 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/Chart/展示" name="Bar Chart — 月營收"><span className="text-primary hover:underline font-medium cursor-pointer">Bar Chart — 月營收</span></LinkTo>
+          <LinkTo kind="Design System/Components/Chart/展示" name="長條 Chart — 月營收"><span className="text-primary hover:underline font-medium cursor-pointer">長條 Chart — 月營收</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Chart/展示" name="Line Chart — 伺服器回應時間"><span className="text-primary hover:underline font-medium cursor-pointer">Line Chart — 伺服器回應時間</span></LinkTo>
+          <LinkTo kind="Design System/Components/Chart/展示" name="折線 Chart — 伺服器回應時間"><span className="text-primary hover:underline font-medium cursor-pointer">折線 Chart — 伺服器回應時間</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Chart/展示" name="Donut Chart — 流量來源分布"><span className="text-primary hover:underline font-medium cursor-pointer">Donut Chart — 流量來源分布</span></LinkTo>
+          <LinkTo kind="Design System/Components/Chart/展示" name="環圈 Chart — 流量來源分布"><span className="text-primary hover:underline font-medium cursor-pointer">環圈 Chart — 流量來源分布</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/Chart/展示" name="Stacked Area — 部門支出"><span className="text-primary hover:underline font-medium cursor-pointer">Stacked Area — 部門支出</span></LinkTo>
+          <LinkTo kind="Design System/Components/Chart/展示" name="堆疊 面積 — 部門支出"><span className="text-primary hover:underline font-medium cursor-pointer">堆疊 面積 — 部門支出</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">不確定該不該用 Chart 時:先確認資料是否真的需要視覺化(單一數字、2-3 個小數字或可排序篩選的清單,通常用文字、描述清單或表格更清楚);若資料量夠多且要看趨勢、比例或分布,才用 Chart。</p>
     </div>
 
       {/* 何時不用 / 替代元件 — 原 WhenNotToUse */}
@@ -197,7 +197,7 @@ export const UsageGuidance: Story = {
 
       <Rule
         title="❌ 使用 shadcn 預設的 HSL chart token"
-        note="shadcn 預設 --chart-1..5 走 HSL palette,本 DS 改用 oklch palette(blue-6 / purple-6 / green-6 / yellow-7 / deep-orange-6)。若用 shadcn 預設會與本 DS 其他色彩不同調。"
+        note="shadcn 預設的 --chart-1..5 用的是另一套色彩演算法,本 DS 改用與其他元件一致的色彩系統(blue-6 / purple-6 / green-6 / yellow-7 / deep-orange-6)。若沿用 shadcn 預設值會與本 DS 其他色彩不同調。"
       >
         <Label warn>
           本 DS 的 --chart-1..5 定義在 tokens/color/semantic.css,不要覆寫為 shadcn 範例程式碼內的 HSL 值。
@@ -291,8 +291,8 @@ export const CategoryTokenRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="類別色用 --chart-1..5 primitive,不用 semantic token"
-        note="ChartConfig 把每個 dataKey 對應到 --chart-* token,ChartContainer 自動注入 scoped CSS var --color-{key},Recharts 直接消費 fill='var(--color-...)'。固定到 primitive 而非 semantic 的原因:未來 brand swap(primary 改色)時,categorical data 的色彩意義不會漂移 — 『Desktop 永遠是 chart-1 藍色』跟 brand 色是否改成綠色無關。"
+        title="類別色固定用 --chart-1..5,不用會隨品牌色變動的色彩變數"
+        note="ChartConfig 把每個資料系列對應到一個 --chart-* 色彩變數,ChartContainer 自動轉成 --color-{系列名},Recharts 直接用 fill='var(--color-...)'。用這組固定色(而不是會跟著品牌主色變動的色彩變數)的原因:未來品牌主色改色時,圖表的類別色彩意義不會跟著漂移 — 『Desktop 永遠是 chart-1 藍色』跟品牌色是否改成綠色無關。"
       >
         <div className="w-full max-w-xl">
           <ChartContainer config={countrySalesConfig}>
@@ -425,7 +425,7 @@ export const A11yRule: Story = {
 
       <Rule
         title="Recharts accessibilityLayer prop"
-        note="所有 chart 元件加上 accessibilityLayer,啟用鍵盤焦點與 screen reader announcement。本 DS 所有 showcase / anatomy 範例皆預設開啟。"
+        note="長條、折線、面積圖加上 accessibilityLayer,啟用鍵盤焦點與讀屏器朗讀。圓餅 / 環圈圖經 Recharts 預設一樣啟用 accessibilityLayer(可聚焦),但方向鍵導覽建立在軸刻度數值索引上,無數值軸的圓餅圖無法逐片導覽。"
       >
         <Label>
           &lt;BarChart accessibilityLayer ...&gt; — 方向鍵可瀏覽資料點,讀屏器讀出當前值

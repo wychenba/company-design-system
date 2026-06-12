@@ -3,11 +3,18 @@
 //   StateBehavior covered by ColorMatrix「Dismiss 按鈕色彩」段(default /
 //     hover / active × subtle / solid 兩模式)。Tag 本身是非互動展示元件
 //     ——沒有 hover / focus / active state(對齊 Material Chip / Ant Tag 慣例),
-//     唯一 interactive 部位是 onDismiss button,其狀態色彩集中於 ColorMatrix 比拆 5. 直觀。
+//     唯一 interactive 部位是 onRemove button,其狀態色彩集中於 ColorMatrix 比拆 5. 直觀。
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { Hash } from 'lucide-react'
 import { Tag } from './tag'
+import {
+  CATEGORICAL_HUES,
+  CAT_SUBTLE_TOKENS,
+  CAT_SOLID_TOKENS,
+  type CategoricalColor,
+  type CategoricalHue,
+} from '@/design-system/tokens/categorical-color'
 
 const meta: Meta = {
   title: 'Design System/Components/Tag/設計規格',
@@ -19,49 +26,50 @@ export default meta
    Types & Data
    ═══════════════════════════════════════════════════════════════════════════ */
 
-type VariantKey = 'neutral' | 'blue' | 'red' | 'green' | 'yellow' | 'turquoise' | 'purple' | 'magenta' | 'indigo'
+type VariantKey = CategoricalColor // 'neutral' + 12 categorical 色相
 type SizeKey = 'sm' | 'md' | 'lg'
 type ColorSpec = { bg: string; text: string; border: string }
 type SolidSpec = 'subtle' | 'solid'
 
-const VARIANTS: VariantKey[] = ['neutral', 'blue', 'red', 'green', 'yellow', 'turquoise', 'purple', 'magenta', 'indigo']
+// neutral + 全 12 色相(順序對齊 SSOT CATEGORICAL_HUES,1:1 對 primitives.css / color token 列)
+const VARIANTS: VariantKey[] = ['neutral', ...CATEGORICAL_HUES]
 const SIZES: SizeKey[] = ['sm', 'md', 'lg']
+
+// **TOKEN_MAP 由 categorical-color SSOT 機械衍生**(strip `var()` 取顯示用 token 名),
+// 確保 anatomy 文件表永遠與 cva 真實消費的 token 1:1,零未來漂移(M17 + 2026-06-04 SSOT 重構)。
+const stripVar = (s: string) => s.replace(/^var\(/, '').replace(/\)$/, '')
+const hueSpec = (m: Record<CategoricalHue, { bg: string; text: string }>) =>
+  Object.fromEntries(
+    CATEGORICAL_HUES.map((h) => [h, { bg: stripVar(m[h].bg), text: stripVar(m[h].text), border: 'transparent' }]),
+  ) as Record<CategoricalHue, ColorSpec>
 
 const TOKEN_MAP: Record<SolidSpec, Record<VariantKey, ColorSpec>> = {
   subtle: {
-    neutral:   { bg: '--muted',               text: '--foreground',            border: 'transparent' },
-    blue:      { bg: '--color-blue-1',        text: '--color-blue-7',         border: 'transparent' },
-    red:       { bg: '--color-deep-orange-1', text: '--color-deep-orange-7',  border: 'transparent' },
-    green:     { bg: '--color-green-1',       text: '--color-green-7',        border: 'transparent' },
-    yellow:    { bg: '--color-yellow-1',      text: '--color-yellow-7',       border: 'transparent' },
-    turquoise: { bg: '--color-turquoise-1',   text: '--color-turquoise-7',    border: 'transparent' },
-    purple:    { bg: '--color-purple-1',      text: '--color-purple-7',       border: 'transparent' },
-    magenta:   { bg: '--color-magenta-1',     text: '--color-magenta-7',      border: 'transparent' },
-    indigo:    { bg: '--color-indigo-1',      text: '--color-indigo-7',       border: 'transparent' },
+    neutral: { bg: '--secondary', text: '--foreground', border: 'transparent' },
+    ...hueSpec(CAT_SUBTLE_TOKENS),
   },
   solid: {
-    neutral:   { bg: '--color-neutral-9',     text: '--inverse-fg',            border: 'transparent' },
-    blue:      { bg: '--color-blue-6',        text: 'white (#fff)',           border: 'transparent' },
-    red:       { bg: '--color-deep-orange-6', text: 'white (#fff)',           border: 'transparent' },
-    green:     { bg: '--color-green-6',       text: 'white (#fff)',           border: 'transparent' },
-    yellow:    { bg: '--color-yellow-6',      text: '--warning-foreground',   border: 'transparent' },
-    turquoise: { bg: '--color-turquoise-6',   text: 'white (#fff)',           border: 'transparent' },
-    purple:    { bg: '--color-purple-6',      text: 'white (#fff)',           border: 'transparent' },
-    magenta:   { bg: '--color-magenta-6',     text: 'white (#fff)',           border: 'transparent' },
-    indigo:    { bg: '--color-indigo-6',      text: 'white (#fff)',           border: 'transparent' },
+    neutral: { bg: '--color-neutral-9', text: '--inverse-fg', border: 'transparent' },
+    ...hueSpec(CAT_SOLID_TOKENS),
   },
 }
 
+// categorical 色相描述(裝飾性分類,非語意狀態)。2026-06-04 修:移除「red=錯誤/危險」等
+// 語意框架(red = 品牌紅 hue 25,跟語意 --error〔= deep-orange〕無關),改純色相 + primitive 指向。
 const VARIANT_DESC: Record<VariantKey, string> = {
-  neutral:   '通用分類、草稿、無特定語義',
-  blue:      '進行中、資訊提示、active 狀態',
-  red:       '錯誤、已封鎖、危險',
-  green:     '成功、已完成、已核准',
-  yellow:    '警告、待審核、注意',
-  turquoise: '分類色（無固定語義）',
-  purple:    '分類色（無固定語義）',
-  magenta:   '分類色（無固定語義）',
-  indigo:    '分類色（無固定語義）',
+  neutral:       '通用分類、草稿、無特定語義(secondary 底)',
+  blue:          'categorical 色相（--color-blue-*）',
+  green:         'categorical 色相（--color-green-*）',
+  'deep-orange': 'categorical 色相（--color-deep-orange-*，hue 38）',
+  yellow:        'categorical 色相（--color-yellow-*，淺底深字）',
+  red:           'categorical 色相（--color-red-*，品牌紅家族 hue 25；≠ 語意 --error）',
+  orange:        'categorical 色相（--color-orange-*）',
+  amber:         'categorical 色相（--color-amber-*，淺底深字）',
+  lime:          'categorical 色相（--color-lime-*）',
+  turquoise:     'categorical 色相（--color-turquoise-*）',
+  indigo:        'categorical 色相（--color-indigo-*）',
+  purple:        'categorical 色相（--color-purple-*）',
+  magenta:       'categorical 色相（--color-magenta-*）',
 }
 
 interface SizeSpec {
@@ -130,7 +138,7 @@ const Tab = ({ active, onClick, children }: { active: boolean; onClick: () => vo
 
 const PropRow = ({ label, dot, children }: { label: string; dot?: string; children: React.ReactNode }) => (
   <div className="flex items-start gap-3 py-2 border-b border-divider last:border-b-0">
-    <span className="text-[11px] text-fg-muted font-medium w-[72px] shrink-0 pt-0.5 flex items-center gap-1.5">
+    <span className="text-[11px] text-fg-secondary font-medium w-[72px] shrink-0 pt-0.5 flex items-center gap-1.5">
       {dot && <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: dot }} />}
       {label}
     </span>
@@ -175,36 +183,36 @@ export const Overview = {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <H3>結構（Anatomy）</H3>
-          <Desc>Inline label，用於分類標籤、狀態標記、多選已選值。icon 與 avatar 互斥，onDismiss 自動渲染 dismiss 按鈕。</Desc>
+          <Desc>Inline label，用於分類標籤、狀態標記、多選已選值。icon 與 avatar 互斥，onRemove 自動渲染 remove 按鈕。</Desc>
         </div>
         <div className="flex gap-8">
           {/* Text only */}
           <div className="flex flex-col gap-2 items-start">
-            <span className="text-[11px] text-fg-muted font-medium">純文字</span>
+            <span className="text-[11px] text-fg-secondary font-medium">純文字</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-1">
               {[{ name: 'label', color: 'success' }].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
-                  style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
+                  style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color}-text)` }}>{s.name}</span>
               ))}
             </div>
           </div>
           {/* With icon + dismiss */}
           <div className="flex flex-col gap-2 items-start">
-            <span className="text-[11px] text-fg-muted font-medium">icon + dismiss</span>
+            <span className="text-[11px] text-fg-secondary font-medium">icon + dismiss</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-1">
               {[{ name: 'icon', color: 'info' }, { name: 'icon', color: 'success' }, { name: 'icon', color: 'error' }].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
-                  style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
+                  style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color}-text)` }}>{s.name}</span>
               ))}
             </div>
           </div>
           {/* With avatar */}
           <div className="flex flex-col gap-2 items-start">
-            <span className="text-[11px] text-fg-muted font-medium">avatar</span>
+            <span className="text-[11px] text-fg-secondary font-medium">avatar</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-1">
               {[{ name: 'avatar', color: 'warning' }, { name: 'avatar', color: 'success' }].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
-                  style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
+                  style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color}-text)` }}>{s.name}</span>
               ))}
             </div>
           </div>
@@ -217,7 +225,7 @@ export const Overview = {
       {/* Variant catalog */}
       <div className="flex flex-col gap-3">
         <H3>Variant 一覽</H3>
-        <Desc>以色名命名，語義由消費端決定。前五色有對應語義 token，後四色為分類用途。</Desc>
+        <Desc>以色名命名（色名即色相），語義由消費端內容與上下文決定。13 色（neutral + 12 categorical 色相）皆直接消費 primitive token（{'`--color-{hue}-*`'}），不對應語義 token。</Desc>
         <div className="flex flex-col gap-2">
           {VARIANTS.map((v) => (
             <div key={v} className="flex items-center gap-4">
@@ -231,17 +239,17 @@ export const Overview = {
       {/* Props table */}
       <div className="flex flex-col gap-3">
         <H3>Props</H3>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Tag 變體對照表(可橫向捲動)">
           <table className="text-caption border-collapse">
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['variant', "'neutral'|'blue'|'red'|'green'|'yellow'|'turquoise'|'purple'|'magenta'|'indigo'", "'neutral'", '色彩 variant，語義由消費端決定'],
+                ['color', "'neutral'|'blue'|'green'|'deep-orange'|'yellow'|'red'|'orange'|'amber'|'lime'|'turquoise'|'indigo'|'purple'|'magenta'", "'neutral'", '色相 variant，語義由消費端內容決定（13 色 = neutral + 12 categorical 色相）'],
                 ['size', "'sm'|'md'|'lg'", "'md'", '尺寸（lg = md alias，子元件補齊原則）'],
                 ['icon', 'LucideIcon', '—', '左側 icon，統一 16px。與 avatar 互斥'],
                 ['avatar', 'ReactNode', '—', '左側 avatar（16px 圓形）。與 icon 互斥'],
-                ['onDismiss', '() => void', '—', '可移除——Tag 自動渲染 dismiss 按鈕'],
-                ['solid', 'boolean', 'false', '深底白字模式（step-6 背景 + 白色前景，yellow 例外）'],
+                ['onRemove', '() => void', '—', '可移除——Tag 自動渲染 remove 按鈕'],
+                ['solid', 'boolean', 'false', '深底配對前景模式（step-6 背景；yellow/amber/orange/lime 用深字，其餘白字）'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -272,33 +280,33 @@ const InspectorInner = () => {
       {/* Controls */}
       <div className="flex flex-col gap-2.5">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-16 shrink-0">Variant</span>
+          <span className="text-[11px] text-fg-secondary w-16 shrink-0">Variant</span>
           <div className="flex flex-wrap gap-1.5">
             {VARIANTS.map((v) => <Tab key={v} active={variant === v} onClick={() => setVariant(v)}>{v}</Tab>)}
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-16 shrink-0">Size</span>
+          <span className="text-[11px] text-fg-secondary w-16 shrink-0">Size</span>
           <div className="flex gap-1.5">
             {SIZES.map((sz) => <Tab key={sz} active={size === sz} onClick={() => setSize(sz)}>{sz}</Tab>)}
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-16 shrink-0">Icon</span>
+          <span className="text-[11px] text-fg-secondary w-16 shrink-0">Icon</span>
           <div className="flex gap-1.5">
             <Tab active={!withIcon} onClick={() => setWithIcon(false)}>off</Tab>
             <Tab active={withIcon} onClick={() => setWithIcon(true)}>on</Tab>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-16 shrink-0">Dismiss</span>
+          <span className="text-[11px] text-fg-secondary w-16 shrink-0">Dismiss</span>
           <div className="flex gap-1.5">
             <Tab active={!withDismiss} onClick={() => setWithDismiss(false)}>off</Tab>
             <Tab active={withDismiss} onClick={() => setWithDismiss(true)}>on</Tab>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-16 shrink-0">Solid</span>
+          <span className="text-[11px] text-fg-secondary w-16 shrink-0">Solid</span>
           <div className="flex gap-1.5">
             <Tab active={!solid} onClick={() => setSolid(false)}>off</Tab>
             <Tab active={solid} onClick={() => setSolid(true)}>on</Tab>
@@ -315,7 +323,7 @@ const InspectorInner = () => {
               color={variant}
               size={size}
               icon={withIcon ? Hash : undefined}
-              onDismiss={withDismiss ? () => {} : undefined}
+              onRemove={withDismiss ? () => {} : undefined}
               solid={solid}
             >
               Label
@@ -381,7 +389,7 @@ const InspectorInner = () => {
             <PropRow label="高度" dot={Z.dim.text}><TkVal token={size === 'sm' ? 'h-5' : 'h-6'} value={s.height} /></PropRow>
             <PropRow label="Tag 內距" dot={Z.pad.text}><TkVal token={s.tagPx} value={`${s.tagPxVal}px`} /></PropRow>
             <PropRow label="Text 內距" dot={Z.textPx.text}><TkVal token={s.textPx} value={`${s.textPxVal}px`} /></PropRow>
-            <PropRow label="Max Width"><TkVal token="max-w-40" value="160px" /></PropRow>
+            <PropRow label="Max Width"><TkVal token="min(var(--combobox-tag-area-inline-size, 10rem), 10rem)" value="預設 cap 160px（Combobox 窄格可注入更小有效上限）" /></PropRow>
             <PropRow label="Icon 尺寸" dot={Z.icon.text}>16px（統一不分 size）</PropRow>
             {withDismiss && <PropRow label="Dismiss" dot={Z.dismiss.text}>16px icon · 18px hover 背景</PropRow>}
           </div>
@@ -398,7 +406,7 @@ const InspectorInner = () => {
             <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Style</span></div>
             <PropRow label="Radius"><TkVal token="rounded-md" value="4px" /></PropRow>
             <PropRow label="Border"><TkVal token="border-transparent" value="1px solid transparent" /></PropRow>
-            <PropRow label="Truncate"><TkVal token="truncate" value="超過 max-w-40 截斷 + tooltip" /></PropRow>
+            <PropRow label="Truncate"><TkVal token="truncate" value="超過寬度上限（預設 160px）截斷 + tooltip" /></PropRow>
           </div>
         </div>
       </div>
@@ -430,7 +438,7 @@ export const ColorMatrix = {
       <div className="flex flex-col gap-1">
         <H3>Variant 色彩對照</H3>
         <Desc>
-          Tag 無 hover/active 狀態（非互動元件），只有單一色彩組合。有色 variant 文字一律使用 --color-&#123;hue&#125;-7 primitive token（step-7，不隨 dark mode 反轉），neutral 用 foreground。Solid 模式使用 step-6 背景 + 白字（yellow 例外用 --warning-foreground）。色塊即時渲染，切 dark mode 自動更新。
+          Tag 無 hover/active 狀態（非互動元件），只有單一色彩組合。Subtle 模式有色 variant 文字用 --color-&#123;hue&#125;-7 primitive（step-7，不隨 dark mode 反轉），neutral 用 foreground。Solid 模式 step-6 背景 + on-emphasis 配對文字:夠深的 hue 用白字（--on-emphasis），亮色 hue（yellow/amber/orange/lime）用深字（--on-emphasis-dark），green 維持白字（documented exception）。色塊即時渲染，切 dark mode 自動更新。
         </Desc>
       </div>
 
@@ -631,7 +639,7 @@ export const SizeMatrix = {
                     <Td key={`icon-${sz}`}><Tag color={v} size={sz} icon={Hash}>API</Tag></Td>
                   ))}
                   {SIZES.map((sz) => (
-                    <Td key={`dismiss-${sz}`}><Tag color={v} size={sz} onDismiss={() => {}}>Review</Tag></Td>
+                    <Td key={`dismiss-${sz}`}><Tag color={v} size={sz} onRemove={() => {}}>Review</Tag></Td>
                   ))}
                 </tr>
               ))}
@@ -650,7 +658,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"本元件為純視覺呈現,無 keyboard / ARIA role / focus state 需求。Consumer 包 Tag 進互動容器(Button / Card / Link)時 a11y 由容器決定。"}</p>
+      <p className="whitespace-pre-line">{"靜態 Tag(無 onRemove)為純視覺呈現,無 keyboard / ARIA role / focus state;包進互動容器(Button / Card / Link)時 a11y 由容器決定。傳 onRemove 時 Tag 渲染原生 remove button(aria-label「移除 {label}」):Tab 可聚焦、Enter/Space 觸發移除、focus-visible 帶 outline ring(詳 spec「A11y 預設」)。"}</p>
     </div>
   ),
 }

@@ -51,7 +51,7 @@ ls -la ~/.codex/auth.json                                              # 3 Auth(
 
 **User 原話 SSOT**(2026-05-15):「也要告訴他我的原話,讓他也能有機會解讀我的原話 ... 說不定codex在解讀別人的問題比你還有慧根 ... 請你在infra上避免你下次又在局限codex發現問題的能力」
 
-**Why**:Paraphrase 過濾 user 細節 / 加 Claude 偏見 / frame 問題 → codex 只能在 Claude 框架答 surgical fix → root cause 沒抓到。錨例 2026-05-15:I1 placeholder ellipsis + I3 overflow 兩 bug user 提 2-3 次,每次送 paraphrase → 冰山修。Hook TBD `check_codex_brief_verbatim.sh`(grep `## User 原話` heading missing → warn)。
+**Why**:Paraphrase 過濾 user 細節 / 加 Claude 偏見 / frame 問題 → codex 只能在 Claude 框架答 surgical fix → root cause 沒抓到。錨例 2026-05-15:I1 placeholder ellipsis + I3 overflow 兩 bug user 提 2-3 次,每次送 paraphrase → 冰山修。Hook `check_codex_brief_verbatim.sh`(未實作;verbatim-relay `## User 原話` heading 檢查無 write-time hook — live `check_codex_brief_invariants.sh` 只 cover 全盤閱讀/triple-verify/禁抽樣/禁列檔 audit-flow invariants,不涵蓋此 verbatim-relay,改靠本 Step 0.05 mindset enforcement)。
 
 ## ⚠️ M31 Universal 5-step canonical(2026-05-10 user directive)
 
@@ -62,7 +62,7 @@ ls -la ~/.codex/auth.json                                              # 3 Auth(
 | Step | Claude | Codex | 共通 invariant |
 |---|---|---|---|
 | **1 各自熟讀** | grep / read spec.md / canonical / source 真讀 | `exec -s read-only` grep / git show / read source | 憑印象 propose = M31 違反 |
-| **2 各自驗證** | `npx tsc -b` + invariant + audit script | `exec` 跑 grep / git show 證據 | 任一方未跑真 verify 撤回 propose |
+| **2 各自驗證** | `npx tsc -b` + invariant + audit script | **audit-verify**:`exec --dangerously-bypass-approvals-and-sandbox -C $PWD`(user-authorize)跑**同樣** tsc / invariant / .mjs / Playwright + 貼 stdout(per `references/phase-b-codex-brief.md` B.0.1);**純讀**:`exec -s read-only` grep / git show | 任一方未跑真 verify 撤回;**禁** codex 只目測機械維度(verify 不對稱違 M31 Step 2)|
 | **3 各自視覺稽核** | playwright screenshot + DOM + pixel audit | code-read + diff + grep visual path | 只 code 跳 visual 違反 user directive |
 | **4 各自 cite-based propose** | 3-column:`spec.md path:line / 引文 / reasoning` | 同上獨立出 | hand-wave 無 cite 撤回 |
 | **5 整合完美版本**(NOT pass-through)| Agree → synthesize 補對方缺漏;Disagree → cite battle verify 對方 cite + counter-cite | 同上雙向 | **絕禁** Claude pass-through codex / 只一方驗證跳整合 |
@@ -207,7 +207,7 @@ target PR:當前 working branch 的 PR(`mcp__github__list_pull_requests` 找到 
 
 ### Step 6:User approve → Claude 實作
 
-由我(非 codex)實作,跑完整 stop hook (`stop_meta_self_audit.sh`)+ M14 5-layer pipeline。
+由我(非 codex)實作,跑完整 stop hook (`stop_self_audit.sh`)+ M14 5-layer pipeline。
 
 **Joint test case planning(D-class architectural change 必走,2026-05-07 user 拍板)**:
 
@@ -242,7 +242,7 @@ PR comment:`@codex 結論已 land at <commit>. 感謝 review.`
 
 ## Guardrails
 
-沿用既有 hook(`check_benchmark_citation.sh` / `stop_meta_self_audit.sh`),codex reply 不入 commit,hook 對 final commit 強制。**禁止**:codex commit 直接 push / 跳過 Step 4 送 user 原文 / 把 codex reply 當 ground truth。**M20 self-improvement**:codex 抓的 M-rule violation → 加 `.claude/memory/codex-caught-violations.md`。**Auto-codify(2026-05-07)**:任何 collab 新發現 → 立刻 5-layer(SKILL + memory + CLAUDE.md + planning),trigger「確保記錄起來」「不需要再對你耳提面命」「自然就知道」。
+沿用既有 hook(`check_benchmark_citation.sh` / `stop_self_audit.sh`),codex reply 不入 commit,hook 對 final commit 強制。**禁止**:codex commit 直接 push / 跳過 Step 4 送 user 原文 / 把 codex reply 當 ground truth。**M20 self-improvement**:codex 抓的 M-rule violation → 加 `.claude/memory/codex-caught-violations.md`。**Auto-codify(2026-05-07)**:任何 collab 新發現 → 立刻 5-layer(SKILL + memory + CLAUDE.md + planning),trigger「確保記錄起來」「不需要再對你耳提面命」「自然就知道」。
 
 ## Deep Audit 整合 + Cross-session persistence
 

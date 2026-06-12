@@ -1,29 +1,33 @@
 # patterns/ Charter
 
-## 這裡只收:runtime UI 佈局 / 互動 primitive
+## 這裡收:多元件共用的視覺 primitive + 跨元件設計參照(anatomy)+ 組合指南
 
-每個 pattern 提供**多元件在 runtime 實際消費**的東西:
-- `.tsx` / `.ts` 實作(primitive component / hook)
-- `.spec.md` 設計原則
-- `.stories.tsx` 展示
-- `.example.tsx`(選用)
+每個 pattern 是「給多元件 runtime 消費」**或**「給人/AI 設計時參照」的東西,三型:
+- **runtime primitive / hook**(`.tsx` / `.ts` 實作)— eg. `ChromeHeader`(公開組合 primitive,對標 item-anatomy MenuItem/slots)/ `SurfaceHeader` / `useOverflowItems`(後二者 internal:`internal: true`)
+- **跨元件設計參照 / anatomy**(可見消費者文件)— eg. `item-anatomy` 的 4-slot 結構 + 24px 閾值 + scanning/reading 模式 + Inspector;對齊世界級 **Material/Carbon「Anatomy」可見參照**(2026-06-06 研究:4 家 DS 一律把 anatomy 當可見第一線文件,**不藏**)
+- **跨元件組合指南**(spec 為主,**可無 `.tsx`**)— eg. `action-bar` 的 role 系統 / 排列公式;對齊世界級 **Polaris/Atlassian/Carbon「Pattern = 組合多元件解決情境的指南」**
+- 配 `.spec.md` 設計原則 + `.stories.tsx` 展示(**範例 = 人/AI 設計時的必要可見參照,不可藏**)
 
-**核心特徵**:元件 code 會 `import` 這個 pattern 使用,或遵循它畫出相同視覺結構。
+**核心特徵**:元件 code `import` 它,或設計時遵循它的結構/指南。
+
+**audience-split(2026-06-06 研究 codify;對齊 Polaris/Carbon「Contributing 區」分界)**:
+- ✅ 進這裡(可見前台)= 設計師/工程師**消費時要看的設計參照**(anatomy / 範例 / 組合指南)。
+- ❌ **不**進這裡 = 「我們內部怎麼把東西分 component/pattern/internal/token」這種**分類/治理 meta** → 屬 `.spec.md` + `.claude/` 治理層(世界級放 **Contributing** 區,不放消費前台 Storybook;Storybook 只放範例)。
 
 ## Public pattern vs Internal pattern(2026-05-23 user 永久拍板 SSOT)
 
 詳定義 → `.claude/rules/ui-development.md`「Public component vs Internal primitive canonical」段。
 
-- **Public pattern**:end-user app 可直接 `<X />` render(`action-bar` / `resize-handle` / `element-anatomy` MenuItem)。Storybook title `Design System/Patterns/<Name>`。
-- **Internal pattern**:end-user app 直接 render 無 functioning UI,需 DS 內部其他元件 wrap(`header-canonical/ChromeHeader` / `horizontal-overflow useOverflowItems` / `overlay-surface SurfaceHeader/Body/Footer`)。Storybook title `Design System/Internal Patterns/<Name>`。Frontmatter `internal: true`。Export jsDoc `@internal`。
-- 下方 "當前居民" 表「Consumer」欄 = **DS-internal consumer**(不是 end-user app)— 若 Consumer 全是 other DS components → internal pattern。
+- **Public pattern**:consumer 可直接 import 用,或作為公開設計原則 / anatomy 參照(`action-bar` / `resize-handle` / `element-anatomy`(item-anatomy + slots)/ `header-canonical`(ChromeHeader header anatomy))。Storybook title `Design System/Patterns/<Name>`。
+- **Internal pattern**:只被 DS 內部其他元件 wrap、consumer 不直接碰且**無公開 anatomy 參照**(`horizontal-overflow useOverflowItems` / `overlay-surface SurfaceHeader/Body/Footer`)。Storybook title `Design System/Internal Patterns/<Name>`。Frontmatter `internal: true`。Export jsDoc `@internal`。
+- 下方 "當前居民" 表「Consumer」欄 = **DS-internal consumer**(不是 end-user app)— 若 Consumer 全是 other DS components 且**無公開 anatomy 參照** → internal pattern;但 anatomy 設計原則(item-anatomy / header-canonical)即使 runtime primitive 的 consumer 全是 DS 元件,其 anatomy story 仍是**公開 Patterns**(對齊世界級「anatomy 不藏」)。
 
 ## 當前居民
 
 | Pattern | 提供什麼 runtime primitive | Consumer |
 |---------|-------------------------|----------|
 | `element-anatomy/` | flat 多檔 home:<br>• `element-anatomy.spec.md` — 4-family taxonomy overview(F1-F4,F3/F4 pointer out)<br>• `item-anatomy.{spec.md,tsx,stories.tsx}` — F1/F2 row 深度 SSOT + runtime primitive(`<MenuItem>` + slot components `<ItemIcon>` / `<ItemAvatar>` / `<ItemLabel>` / `<ItemSuffix>` / `<ItemInlineAction>`) | Menu / Tree / Sidebar / File / Selection 等 row 元件;所有元件 spec 第一段宣告 Family 時查 element-anatomy.spec.md |
-| `action-bar/` | `action-bar.tsx` + `action-bar.spec.md` — toolbar / action row 排列公式 | 任何有按鈕列的頁面 |
+| `action-bar/` | **組合指南 pattern**(`action-bar.spec.md` — toolbar / action row 的 role 系統 + 排列公式;**無 `.tsx`**,屬 guidance 非 runtime 件 — 對齊世界級「pattern = 組合指南」)| 任何有按鈕列的頁面,用 Button / ButtonGroup / ButtonDivider 依此指南組合 |
 | `horizontal-overflow/` | `useOverflowItems` hook + fade-mask 樣式 | Tabs / ChipGroup |
 | `overlay-surface/` | `SurfaceHeader/Body/Footer` sub-components + padding SSOT | Dialog / Popover / Sheet |
 | `header-canonical/` | `<ChromeHeader>` primitive(withTabs / lockDensity 窄 API)+ cross-family canonical SSOT(chrome + overlay 兩家族 W1-W6 lockstep:border auto-suppress / token equality / tabs size 對應 / flush stack / md future tier / sm default)| Sidebar / FileViewer Toolbar / FileViewer InfoPanel(ChromeHeader 直接消費);Dialog / Sheet / Popover(SurfaceHeader 走 cross-family canonical)|

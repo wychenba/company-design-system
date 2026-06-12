@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as SliderPrimitive from '@radix-ui/react-slider'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
+import { useFieldContext, useResolvedFieldDisabled } from '@/design-system/components/Field/field-context'
 
 /**
  * Slider — 數值範圍選取器
@@ -9,7 +10,7 @@ import { cn } from '@/lib/utils'
  * 基於 Radix Slider primitive,橋接設計系統 token。詳細設計原則見 `slider.spec.md`。
  *
  * ── 核心設計 ──
- * 1. **視覺單一**:track 厚度、thumb 直徑、ring 尺寸都是固定值,不隨 `size` 變
+ * 1. **視覺單一**:track 厚度、thumb 直徑、thumb 邊框都是固定值,不隨 `size` 變
  * 2. **`size` 只控容器外高**:對齊 Field family 的 `h-field-*` tier,讓 Slider 能跟
  *    Input / NumberInput / Select 在 Field 內並排對齊
  * 3. **Range mode 免費**:Radix 原生支援 `value: number[]`,傳多值自動多 thumb
@@ -52,10 +53,18 @@ export interface SliderProps
   extends Omit<React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>, 'children'>,
     VariantProps<typeof sliderRootVariants> {}
 
+// code-quality-allow: long-function — foundational composite(thumb-count 推導 + Field disabled 整合 + multi-mode render)
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   SliderProps
 >(({ className, size, value, defaultValue, 'aria-label': ariaLabel, ...props }, ref) => {
+  // Field 家族整合:被 <Field mode="disabled"> 包裹時自動 disabled(per slider.spec.md「Slider 作為 Field
+  // 家族整合時繼承其 canonical」)。Slider 已有完整 data-[disabled] 視覺,故只需把 fieldCtx disabled 接上。
+  // 2026-06-08 SSOT:讀 useResolvedFieldDisabled()(fieldCtx.disabled)→ <Field disabled> 與 <Field mode="disabled"> 都生效
+  const fieldDisabled = useResolvedFieldDisabled()
+  // 2026-06-10 a11y:Field 內 Slider thumb(role=slider)無 accessible name(deep-audit axe 抓 aria-input-field-name)
+  // → 預設接 FieldLabel(aria-labelledby),consumer ariaLabel 優先。對齊 rating/time-picker labelId 接線。
+  const fieldLabelId = useFieldContext()?.labelId
   // 推導要渲染幾個 thumb:controlled 用 value,uncontrolled 用 defaultValue,
   // 都沒有時 fallback 單 thumb(Radix 預設行為)
   const thumbCount =
@@ -70,6 +79,7 @@ const Slider = React.forwardRef<
       defaultValue={defaultValue}
       className={cn(sliderRootVariants({ size }), className)}
       {...props}
+      disabled={(props as { disabled?: boolean }).disabled || fieldDisabled}
     >
       {/*
         Track — rest 用 bg-secondary(n-3,「微淡可辨」),disabled 用 bg-muted(n-2,退化)。
@@ -128,7 +138,19 @@ const Slider = React.forwardRef<
             'data-[disabled]:cursor-not-allowed data-[disabled]:border-border',
             'data-[disabled]:hover:[box-shadow:none]',
           )}
-          aria-label={ariaLabel ? (thumbCount > 1 ? `${ariaLabel} (${i + 1})` : ariaLabel) : (thumbCount > 1 ? `Thumb ${i + 1}` : undefined)}
+          // aria-label 策略(對齊 WAI-ARIA APG multi-thumb slider + Radix 原生語意標籤):
+          //   - consumer 傳 ariaLabel:單 thumb → 原樣;多 thumb → `{label} (N)` 區分
+          //   - 沒傳 ariaLabel:回傳 undefined,讓 Radix getLabel 提供語意標籤
+          //     (2 thumb → Minimum/Maximum;>2 thumb → Value N of M;單 thumb → 無)
+          //     比硬寫 `Thumb N` 更語意化,且讓「繼承 Radix a11y 預設」名實相符
+          aria-label={
+            ariaLabel
+              ? thumbCount > 1
+                ? `${ariaLabel} (${i + 1})`
+                : ariaLabel
+              : undefined
+          }
+          aria-labelledby={!ariaLabel && fieldLabelId ? fieldLabelId : undefined}
         />
       ))}
     </SliderPrimitive.Root>
@@ -140,12 +162,15 @@ Slider.displayName = 'Slider'
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const sliderMeta = {
   component: 'Slider',
-  family: 4,
+  family: null, // self-contained(對齊 spec;同 rating.tsx 慣例),
   variants: {},
+  // size 只控容器外高,對齊 Field family h-field-*(md density:28/32/36px,uiSize.css)。
+  // track 厚度 / thumb 直徑固定不隨 size 變,故無 iconSize / typography。
+  // fieldHeight key 對齊 compile-stories.mjs 消費 schema(同 Button/Checkbox/Switch)。
   sizes: {
-    sm: { px: 28, when: 'Toolbar / inline 編輯' },
-    md: { px: 36, when: '預設 — Form / cell inline edit' },
-    lg: { px: 44, when: 'Marketing / 高 touch 區' },
+    sm: { fieldHeight: 28, when: 'Toolbar / inline 編輯' },
+    md: { fieldHeight: 32, when: '預設 — Form / cell inline edit' },
+    lg: { fieldHeight: 36, when: 'Marketing / 高 touch 區' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {

@@ -6,6 +6,7 @@ import type { LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/design-system/components/Tooltip/tooltip"
 import { ItemInlineActionButton } from "@/design-system/patterns/element-anatomy/item-anatomy"
+import { CAT_SUBTLE, CAT_SOLID, CAT_INTERACT } from "@/design-system/tokens/categorical-color"
 
 // ── Tag（inline label）─────────────────────────────────────────────────────
 // 用於分類標籤、狀態標記、多選已選值。
@@ -28,18 +29,13 @@ const tagVariants = cva(
   "inline-flex items-center rounded-md border border-transparent transition-colors cursor-text",
   {
     variants: {
+      // color：categorical 色相(裝飾性分類,非語意狀態)。**消費 categorical-color SSOT**——
+      // key X 一律對 `--color-X-*`(1:1,零 offset)。neutral 非色相(無 hue),用 secondary 底自處理。
+      // 2026-06-04 修:原 `red` 誤接 `--color-deep-orange-*`(red=品牌紅 hue-25 ≠ deep-orange hue-38
+      // ≠ 語意 --error〔= deep-orange〕);改消費 SSOT 後 red→`--color-red-*`,並補齊全 12 色相。
       color: {
-        // 直接引用 primitive（bg=step-1, text=step-7），不經過語義層
-        // step-1 在 dark mode 用 alpha 公式，step-7 用 lighter 公式——兩個 mode 都正確
-        neutral:   "bg-secondary text-foreground",
-        blue:      "bg-[var(--color-blue-1)] text-[var(--color-blue-7)]",
-        red:       "bg-[var(--color-deep-orange-1)] text-[var(--color-deep-orange-7)]",
-        green:     "bg-[var(--color-green-1)] text-[var(--color-green-7)]",
-        yellow:    "bg-[var(--color-yellow-1)] text-[var(--color-yellow-7)]",
-        turquoise: "bg-[var(--color-turquoise-1)] text-[var(--color-turquoise-7)]",
-        purple:    "bg-[var(--color-purple-1)] text-[var(--color-purple-7)]",
-        magenta:   "bg-[var(--color-magenta-1)] text-[var(--color-magenta-7)]",
-        indigo:    "bg-[var(--color-indigo-1)] text-[var(--color-indigo-7)]",
+        neutral: "bg-secondary text-foreground",
+        ...CAT_SUBTLE,
       },
       size: {
         sm: "h-5 px-1 text-caption font-medium",
@@ -54,19 +50,13 @@ const tagVariants = cva(
   }
 )
 
-// ── Solid variant 色彩（step-6 底 + 白字，warning 用 --warning-foreground）──
-// 直接引用 primitive step-6，不經過語義層
-// neutral 用 neutral-9 + --inverse-fg（light=白字, dark=深字，自動反轉）
+// ── Solid variant 色彩（step-6 底 + on-emphasis 配對文字,消費 categorical-color SSOT）──
+// 白字 --on-emphasis(夠深的 hue)/ 深字 --on-emphasis-dark(亮 hue:yellow/amber/orange/lime);green 白字例外。
+// **消費 categorical-color SSOT**(CAT_SOLID,1:1 色相)。neutral 非色相,用 neutral-9
+// + --inverse-fg（light=白字, dark=深字，自動反轉）自處理。
 const SOLID_CLASSES: Record<string, string> = {
-  neutral:   'bg-[var(--color-neutral-9)] text-inverse-fg',
-  blue:      'bg-[var(--color-blue-6)] text-on-emphasis',
-  red:       'bg-[var(--color-deep-orange-6)] text-on-emphasis',
-  green:     'bg-[var(--color-green-6)] text-on-emphasis',
-  yellow:    'bg-[var(--color-yellow-6)] text-[var(--warning-foreground)]',
-  turquoise: 'bg-[var(--color-turquoise-6)] text-on-emphasis',
-  purple:    'bg-[var(--color-purple-6)] text-on-emphasis',
-  magenta:   'bg-[var(--color-magenta-6)] text-on-emphasis',
-  indigo:    'bg-[var(--color-indigo-6)] text-on-emphasis',
+  neutral: 'bg-[var(--color-neutral-9)] text-inverse-fg',
+  ...CAT_SOLID,
 }
 
 export interface TagProps
@@ -76,9 +66,9 @@ export interface TagProps
   icon?: LucideIcon
   /** 左側 avatar（ReactNode），與 icon 互斥。 */
   avatar?: React.ReactNode
-  /** 可移除——Tag 自動渲染 dismiss 按鈕並控制尺寸與互動樣式 */
-  onDismiss?: () => void
-  /** 深底白字模式（step-6 背景 + 白色前景，warning 例外） */
+  /** 可移除——Tag 自動渲染 remove 按鈕並控制尺寸與互動樣式(從集合移除 item) */
+  onRemove?: () => void
+  /** 深底模式（step-6 背景 + on-emphasis 配對前景;亮色 hue yellow/amber/orange/lime 用深字 --on-emphasis-dark,green 白字例外） */
   solid?: boolean
   /**
    * 2026-05-15 Q3 真 SSOT fix(per user verbatim「同空間兩判斷點」+「不要冰山一角」):
@@ -91,20 +81,13 @@ export interface TagProps
 }
 
 // ── Solid dismiss hover/active bg ──
-// 用 semantic --{hue}-hover/active token，跟 --primary-hover/active 同模式：
-// solid 色彩 shade change（hover 較亮 step、active 較暗 step），跟 Button 等
-// 互動元件視覺一致。在 semantic 層做 dark mode swap 確保方向跨 mode 一致。
-// neutral 特例：bg 是 neutral-9 隨 mode 反轉，用 --inverse-neutral-* 鏡射
+// **消費 categorical-color SSOT**(CAT_INTERACT,semantic --{hue}-hover/active token),
+// 跟 --primary-hover/active 同模式:solid 色彩 shade change(hover 較亮 step、active 較暗 step),
+// 在 semantic 層做 dark mode swap 確保方向跨 mode 一致。
+// neutral 特例:bg 是 neutral-9 隨 mode 反轉,用 --inverse-neutral-* 鏡射,自處理。
 const SOLID_DISMISS_HOVER: Record<string, { hover: string; active: string }> = {
-  neutral:   { hover: 'var(--inverse-neutral-hover)', active: 'var(--inverse-neutral-active)' },
-  blue:      { hover: 'var(--blue-hover)',            active: 'var(--blue-active)' },
-  red:       { hover: 'var(--red-hover)',             active: 'var(--red-active)' },
-  green:     { hover: 'var(--green-hover)',           active: 'var(--green-active)' },
-  yellow:    { hover: 'var(--yellow-hover)',          active: 'var(--yellow-active)' },
-  turquoise: { hover: 'var(--turquoise-hover)',       active: 'var(--turquoise-active)' },
-  purple:    { hover: 'var(--purple-hover)',          active: 'var(--purple-active)' },
-  magenta:   { hover: 'var(--magenta-hover)',         active: 'var(--magenta-active)' },
-  indigo:    { hover: 'var(--indigo-hover)',          active: 'var(--indigo-active)' },
+  neutral: { hover: 'var(--inverse-neutral-hover)', active: 'var(--inverse-neutral-active)' },
+  ...CAT_INTERACT,
 }
 
 // ── Dismiss（internal）────────────────────────────────────────────────────
@@ -116,14 +99,14 @@ const SOLID_DISMISS_HOVER: Record<string, { hover: string; active: string }> = {
 // Subtle variant 落用 ItemInlineActionButton 預設 neutral-hover。
 // 圖標色繼承 Tag 文字色 → `text-current` 三態覆寫。
 
-function TagDismiss({ onDismiss, label, solid, color }: { onDismiss: () => void; label: string; solid?: boolean; color?: string }) {
+function TagDismiss({ onRemove, label, solid, color }: { onRemove: () => void; label: string; solid?: boolean; color?: string }) {
   const solidColors = solid && color ? SOLID_DISMISS_HOVER[color] : undefined
 
   return (
     <ItemInlineActionButton
       icon={X}
       size="md"
-      onClick={(e) => { e.stopPropagation(); onDismiss() }}
+      onClick={(e) => { e.stopPropagation(); onRemove() }}
       aria-label={`移除 ${label}`}
       style={solidColors ? ({ '--dismiss-hover': solidColors.hover, '--dismiss-active': solidColors.active } as React.CSSProperties) : undefined}
       hoverBgClassName={
@@ -138,7 +121,7 @@ function TagDismiss({ onDismiss, label, solid, color }: { onDismiss: () => void;
 }
 
 function TagInner(
-  { className, color, size, icon: Icon, avatar, onDismiss, solid, unbounded = false, children, style, ...props }: TagProps,
+  { className, color, size, icon: Icon, avatar, onRemove, solid, unbounded = false, children, style, ...props }: TagProps,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   const solidClass = solid ? SOLID_CLASSES[color ?? 'neutral'] : undefined
@@ -195,7 +178,7 @@ function TagInner(
       {Icon && <Icon size={16} aria-hidden />}
       {avatar && <span className="shrink-0 w-4 h-4 rounded-full overflow-hidden inline-grid place-content-center [&>*]:w-full [&>*]:h-full">{avatar}</span>}
       <span data-tag-text="" className="px-1 truncate min-w-0">{children}</span>
-      {onDismiss && <TagDismiss onDismiss={onDismiss} label={label} solid={solid} color={color ?? 'neutral'} />}
+      {onRemove && <TagDismiss onRemove={onRemove} label={label} solid={solid} color={color ?? 'neutral'} />}
     </div>
   )
 
@@ -217,23 +200,36 @@ Tag.displayName = 'Tag'
 export const tagMeta = {
   component: 'Tag',
   family: 3,
+  // categorical 色相(裝飾性分類,非語意狀態)。**1:1 對 `--color-{hue}-*` primitive,零 offset**。
+  // 不對應語意 token——語意狀態(error/info/success/warning)走 Notice / Alert 等狀態元件,
+  // 不是 Tag 色相。2026-06-04 修:移除原「red 對應 --error / blue 對應 --info ...」誤導框架
+  // (red = 品牌紅 hue-25,跟語意 --error〔= deep-orange〕無關)。
   variants: {
-    neutral: { purpose: '通用分類、草稿、無特定語義' },
-    blue: { purpose: '進行中、資訊提示、active 狀態（對應 --info）' },
-    red: { purpose: '錯誤、已封鎖、危險（對應 --error）' },
-    green: { purpose: '成功、已完成、已核准（對應 --success）' },
-    yellow: { purpose: '警告、待審核、注意（對應 --warning）' },
-    turquoise: { purpose: '分類色（無固定語義）' },
-    purple: { purpose: '分類色（無固定語義）' },
-    magenta: { purpose: '分類色（無固定語義）' },
-    indigo: { purpose: '分類色（無固定語義）' },
+    neutral: { purpose: '通用分類、草稿、無特定語義(secondary 底)' },
+    blue: { purpose: 'categorical 色相(--color-blue-*)' },
+    green: { purpose: 'categorical 色相(--color-green-*)' },
+    'deep-orange': { purpose: 'categorical 色相(--color-deep-orange-*,hue 38)' },
+    yellow: { purpose: 'categorical 色相(--color-yellow-*,淺底深字)' },
+    red: { purpose: 'categorical 色相(--color-red-*,品牌紅家族 hue 25;≠ 語意 --error)' },
+    orange: { purpose: 'categorical 色相(--color-orange-*)' },
+    amber: { purpose: 'categorical 色相(--color-amber-*,淺底深字)' },
+    lime: { purpose: 'categorical 色相(--color-lime-*)' },
+    turquoise: { purpose: 'categorical 色相(--color-turquoise-*)' },
+    indigo: { purpose: 'categorical 色相(--color-indigo-*)' },
+    purple: { purpose: 'categorical 色相(--color-purple-*)' },
+    magenta: { purpose: 'categorical 色相(--color-magenta-*)' },
   },
   sizes: {
-    sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
-    md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
-    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },
+    // Tag 尺寸不引用 field-height token（spec.md:180/241——Tag 與 Field 尺寸獨立）。
+    // height = Tag 自身高度（cva h-5/h-6/h-6 = 20/24/24，lg = md alias）。
+    // iconSize 全尺寸統一 16（tag.tsx:195 硬寫 size={16}）。
+    sm: { height: 20, iconSize: 16, typography: 'caption' },
+    md: { height: 24, iconSize: 16, typography: 'body' },
+    lg: { height: 24, iconSize: 16, typography: 'body' },
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  // Tag 為純展示 indicator，無互動 state（spec.md:249-256「為何無 StateBehavior」）。
+  // 唯一行為 dismiss 屬 Inline Action pattern，非 Tag 自有 state。
+  states: ['default'],
   tokens: {
     bg: ['bg-neutral-active', 'bg-neutral-hover', 'bg-secondary', 'bg-transparent'],
     fg: ['text-foreground', 'text-inverse-fg'],

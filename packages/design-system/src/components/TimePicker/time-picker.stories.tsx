@@ -97,8 +97,8 @@ export const FlightDepartureTime: Story = {
 }
 
 /**
- * 營業時間 — 兩個 TimePicker 組合達成 range 語意(MVP 不內建 Range;
- * 對齊 Ant composition 思路,見 spec「為何無 Range」段)。
+ * 營業時間 — 需要「開始到結束」的時間範圍時,並排放兩個 TimePicker(中間加箭頭)即可,
+ * TimePicker 本身不提供範圍模式。
  */
 export const ShopBusinessHours: Story = {
   name: '店家營業時間',
@@ -109,9 +109,9 @@ export const ShopBusinessHours: Story = {
       <Field>
         <FieldLabel>營業時段</FieldLabel>
         <div className="flex items-center gap-2">
-          <TimePicker value={open} onChange={setOpen} placeholder="Open" />
+          <TimePicker value={open} onChange={setOpen} placeholder="開店時間" />
           <span className="text-fg-muted">→</span>
-          <TimePicker value={close} onChange={setClose} placeholder="Close" />
+          <TimePicker value={close} onChange={setClose} placeholder="打烊時間" />
         </div>
       </Field>
     )
@@ -128,7 +128,7 @@ export const EventTimestamp: Story = {
     const [time, setTime] = React.useState<string>('14:35:22')
     return (
       <Field>
-        <FieldLabel>Event timestamp</FieldLabel>
+        <FieldLabel>事件發生時間</FieldLabel>
         <TimePicker value={time} onChange={setTime} showSeconds clearable />
       </Field>
     )

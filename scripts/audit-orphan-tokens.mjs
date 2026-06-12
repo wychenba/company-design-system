@@ -23,6 +23,16 @@
 //
 // Output: 純結構性 token + 真 retire 候選(comprehensive scan 後若仍 0 consumer)。
 //
+// Gate 邏輯(2026-05-30 — 修「131 orphan 全落 structural-keep → cat.real=0 → --check 永遠過」):
+//   過去 --check 只看 cat.real,但所有 orphan 都被 structural-keep regex 吸收 → cat.real 恆為 0
+//   → gate 沒意義(新 token 撞 structural-keep regex 也 silently pass,不逼人 justify)。
+//   現在 snapshot 現有 structural-keep token 清單到 baseline file,--check 額外 fail 於:
+//     (a) 新 orphan 落 structural-keep 卻不在 baseline → 逼人 justify 後跑 --update;
+//     (b) structural-keep 總數暴增(> baseline + DRIFT_ALLOWANCE)→ 防 regex 過寬 silent absorb;
+//     (c) cat.real > 0(原邏輯保留)。
+//   Flags: --check(CI gate)/ --update(justify 後刷新 baseline)/ --verbose / 預設純報告。
+//   Baseline SSOT: scripts/audit-orphan-tokens.baseline.json。
+//
 // Cite: `tokens/orphan-tokens.spec.md` SSOT canonical for token retire classification rules。
 
 import fs from 'fs'
@@ -111,7 +121,7 @@ const PALETTE_HUES = '(amber|blue|brown|red|green|deep-orange|grey|indigo|lime|o
 const PALETTE_FULL = new RegExp(`^--color-${PALETTE_HUES}-\\d+$`)
 const PALETTE_STATE = new RegExp(`^--${PALETTE_HUES.replace('|magenta|turquoise', '|magenta|turquoise')}-(hover|active|focus|subtle|emphasis|disabled|text)$`)
 const SOP_SEMANTIC = /^--(primary|error|success|warning|info)-(active|hover|text|subtle|emphasis|foreground|focus)$/
-const SOP_HOVER_DELAY = /^--hover-delay-(plain|rich|close|skip)$/
+const SOP_HOVER_DELAY = /^--hover-delay-(plain|rich|close)$/
 
 for (const o of orphans) {
   if (PALETTE_FULL.test(o)) cat.palette.push(o)
@@ -125,10 +135,53 @@ for (const o of orphans) {
   else cat.real.push(o)
 }
 
+// 3.5 Structural-keep baseline(讓 gate 有意義 — 詳 file header「Gate 邏輯」段)
+//
+// Problem(2026-05-30 user verbatim): 131 orphan 全落 structural-keep → cat.real=0 → --check 永遠過,
+// gate 沒意義。任何「新」token 只要命中某個 structural-keep regex(eg. 新增 `--color-blue-11`
+// 撞 PALETTE_FULL,或新 `--primary-text` 撞 SOP_SEMANTIC)就 silently pass,不逼任何人 justify。
+//
+// Fix: snapshot 現有 structural-keep token 清單到 baseline file。--check 時:
+//   (a) 任何「新」structural-keep token(不在 baseline)→ fail,逼人跑 --update 顯式 justify;
+//   (b) structural-keep 總數暴增(> baseline + DRIFT_ALLOWANCE)→ fail(防 regex 過寬 silent absorb);
+//   (c) cat.real > 0 → fail(原有邏輯保留)。
+// baseline 縮減(retire 既有 structural token)不 fail — 只在 --update 時更新清單。
+const BASELINE_PATH = path.join(ROOT, 'scripts/audit-orphan-tokens.baseline.json')
+const DRIFT_ALLOWANCE = 5 // structural-keep 總數可比 baseline 多幾個前才 warn/fail
+
+// 攤平所有 structural-keep category 成單一 sorted token 清單(real 不算 structural-keep)
+const structuralKeepTokens = Object.entries(cat)
+  .filter(([k]) => k !== 'real')
+  .flatMap(([, v]) => v)
+  .sort()
+
+function readBaseline() {
+  if (!fs.existsSync(BASELINE_PATH)) return null
+  try {
+    return JSON.parse(fs.readFileSync(BASELINE_PATH, 'utf8'))
+  } catch {
+    return null
+  }
+}
+
+function writeBaseline() {
+  const payload = {
+    _comment:
+      'Structural-keep orphan token baseline — SSOT for audit-orphan-tokens.mjs gate. ' +
+      '新 token 落 structural-keep 卻不在 tokens[] → --check fail,逼人 justify 後跑 --update 刷新。' +
+      'Cite: tokens/orphan-tokens.spec.md。',
+    generatedAt: new Date().toISOString(),
+    count: structuralKeepTokens.length,
+    tokens: structuralKeepTokens,
+  }
+  fs.writeFileSync(BASELINE_PATH, JSON.stringify(payload, null, 2) + '\n')
+}
+
 // 4. Report
 const argv = process.argv.slice(2)
 const verbose = argv.includes('--verbose')
 const checkOnly = argv.includes('--check')
+const updateBaseline = argv.includes('--update')
 
 console.log('━━━ Orphan Token Audit ━━━')
 console.log(`Declared:               ${declared.size}`)
@@ -154,6 +207,26 @@ if (cat.real.length === 0) {
   for (const o of cat.real) console.log(`  ❌ ${o} @ ${declared.get(o)}`)
 }
 
+// 3.5b Structural-keep baseline drift report
+const baseline = readBaseline()
+const baselineSet = baseline ? new Set(baseline.tokens) : null
+const newStructural = baselineSet ? structuralKeepTokens.filter(t => !baselineSet.has(t)) : []
+const removedStructural = baselineSet ? baseline.tokens.filter(t => !structuralKeepTokens.includes(t)) : []
+const baselineCount = baseline ? baseline.count : null
+
+console.log('')
+console.log('━━━ Structural-keep baseline gate ━━━')
+if (!baseline) {
+  console.log(`  ⚠ 無 baseline file(${path.relative(ROOT, BASELINE_PATH)})— 跑 \`--update\` 建立`)
+} else {
+  console.log(`  Baseline:               ${baselineCount} tokens`)
+  console.log(`  目前 structural-keep:   ${structuralKeepTokens.length} tokens`)
+  console.log(`  新增(不在 baseline):    ${newStructural.length}`)
+  if (newStructural.length) for (const o of newStructural) console.log(`    ＋ ${o} @ ${declared.get(o)}`)
+  console.log(`  移除(已 retire):        ${removedStructural.length}`)
+  if (removedStructural.length && verbose) for (const o of removedStructural) console.log(`    － ${o}`)
+}
+
 if (verbose) {
   for (const [k, v] of Object.entries(cat)) {
     if (v.length === 0) continue
@@ -162,9 +235,44 @@ if (verbose) {
   }
 }
 
+if (updateBaseline) {
+  writeBaseline()
+  console.log(`\n✅ baseline updated → ${path.relative(ROOT, BASELINE_PATH)}(${structuralKeepTokens.length} tokens)`)
+  process.exit(0)
+}
+
 if (checkOnly) {
+  const failures = []
+
+  // (c) 原有邏輯:真 retire 候選 → fail
   if (cat.real.length > 0) {
-    console.error(`\n❌ ${cat.real.length} real orphan token(s) — retire or codify structural-keep category`)
+    failures.push(`${cat.real.length} real orphan token(s) — retire or codify structural-keep category`)
+  }
+
+  if (!baseline) {
+    // 無 baseline = gate 未 bootstrap;不靜默過,逼人先建立 baseline 才有意義
+    failures.push(
+      `no structural-keep baseline — run \`node scripts/audit-orphan-tokens.mjs --update\` to snapshot ${structuralKeepTokens.length} current structural-keep tokens`
+    )
+  } else {
+    // (a) 新 token 落 structural-keep 卻不在 baseline → fail,逼人 justify
+    if (newStructural.length > 0) {
+      failures.push(
+        `${newStructural.length} NEW orphan token(s) landed in a structural-keep bucket but are not in baseline — justify then run \`--update\`:\n` +
+          newStructural.map(o => `      ＋ ${o} @ ${declared.get(o)}`).join('\n')
+      )
+    }
+    // (b) structural-keep 總數暴增 → fail(防 regex 過寬 silent absorb 大量新 token)
+    if (structuralKeepTokens.length > baselineCount + DRIFT_ALLOWANCE) {
+      failures.push(
+        `structural-keep count ${structuralKeepTokens.length} exceeds baseline ${baselineCount} + allowance ${DRIFT_ALLOWANCE} — possible over-broad structural-keep classifier`
+      )
+    }
+  }
+
+  if (failures.length > 0) {
+    console.error('')
+    for (const f of failures) console.error(`❌ ${f}`)
     process.exit(1)
   }
   console.log('\n✅ check passed')

@@ -28,7 +28,7 @@ description: User 說「確保 X 一定要 / 不可繞過 / 永不漂移 / ensur
 ## Preconditions
 
 - 讀 CLAUDE.md M14 / M19(本 skill SSOT 上游)
-- 讀 `# 資訊治理 canonical`(8 home)
+- 讀 `# 治理 canonical`(8 home)
 - 該 rule 的 substantive meaning 還沒 finalize → 必走 Phase 5 user sign-off
 
 ## Workflow(8 phases)
@@ -181,7 +181,7 @@ User 拍板才 Phase 6 起執行。
 
 - CLAUDE.md M14(對話結論 → integrate pipeline)
 - CLAUDE.md M19(本 skill SSOT 上游)
-- CLAUDE.md `# 資訊治理 canonical`(8 home)
+- CLAUDE.md `# 治理 canonical`(8 home)
 - Story splitting principle(2026-04-26 本 skill template 案例,4-layer 落地)
 
 ## 世界級對照(template 細節)

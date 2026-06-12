@@ -45,12 +45,13 @@ const TOKEN_MAP: Record<ModeKey, Record<StateKey, ColorSpec>> = {
     error:    { bg: '--surface',     text: '--foreground',  border: '--error',        icon: '--fg-muted' },
     disabled: { bg: '--bg-disabled', text: '--fg-disabled', border: 'transparent',    icon: '--fg-disabled' },
   },
+  // readonly wrapper 為靜態 bg-readonly(field-wrapper.tsx 無 hover/focus 樣式;mode prop 勝 disabled)
   readonly: {
-    default:  { bg: '--bg-disabled', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
-    hover:    { bg: '--bg-disabled', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
-    focus:    { bg: '--bg-disabled', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
-    error:    { bg: '--bg-disabled', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
-    disabled: { bg: '--bg-disabled', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
+    default:  { bg: '--bg-readonly', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
+    hover:    { bg: '--bg-readonly', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
+    focus:    { bg: '--bg-readonly', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
+    error:    { bg: '--bg-readonly', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
+    disabled: { bg: '--bg-readonly', text: '--foreground',  border: 'transparent', icon: '--fg-muted' },
   },
   disabled: {
     default:  { bg: '--bg-disabled', text: '--fg-disabled', border: 'transparent', icon: '--fg-disabled' },
@@ -223,7 +224,7 @@ export const Overview = {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <H3>結構（Anatomy）— plain 模式</H3>
-          <Desc>display="plain"（預設）。原生 select 純文字 + ChevronDown。可搭配 startIcon 代表 value 的圖示。clearable 有值時出現 clear 按鈕。「plain」表樸素文字呈現,跟 Button variant="text" 區隔(2026-05-01 從 'text' 改名,避免 prop value 跨元件衝突)。</Desc>
+          <Desc>display="plain"（預設）。觸發點顯示選中值的純文字 + ChevronDown。可搭配 startIcon 代表 value 的圖示。clearable 有值時出現 clear 按鈕。「plain」表樸素文字呈現,跟 Button variant="text" 區隔(2026-05-01 從 'text' 改名,避免 prop value 跨元件衝突)。</Desc>
         </div>
         <div className="flex gap-8">
           <div className="flex flex-col gap-2 items-start">
@@ -251,7 +252,7 @@ export const Overview = {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <H3>結構（Anatomy）— tag 模式</H3>
-          <Desc>display="tag"。Tag 元件呈現選中值 + 隱藏的原生 select overlay（absolute inset-0 opacity-0）。Tag 設為 pointer-events-none，點擊穿透到底層 select。startIcon 不可用於 tag 模式。</Desc>
+          <Desc>display="tag"。用一顆 Tag 元件呈現選中值,Tag 設為 pointer-events-none 讓點擊穿透到觸發點容器去開選單。startIcon 不可用於 tag 模式。</Desc>
         </div>
         <div className="flex gap-8">
           <div className="flex flex-col gap-2 items-start">
@@ -262,7 +263,7 @@ export const Overview = {
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
             </div>
-            <span className="text-[10px] text-fg-muted font-mono">select: absolute inset-0 opacity-0 · Tag: pointer-events-none</span>
+            <span className="text-[10px] text-fg-muted font-mono">Tag: pointer-events-none · 點擊穿透到觸發點開選單</span>
           </div>
           <div className="flex flex-col gap-2 items-start">
             <span className="text-[11px] text-fg-muted font-medium">readonly / disabled</span>
@@ -270,7 +271,7 @@ export const Overview = {
               <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                 style={{ borderColor: 'var(--color-turquoise-6)', backgroundColor: 'var(--color-turquoise-1)', color: 'var(--color-turquoise-6)' }}>Tag</span>
             </div>
-            <span className="text-[10px] text-fg-muted font-mono">無 chevron · 無 select overlay · tagPadding 置中</span>
+            <span className="text-[10px] text-fg-muted font-mono">chevron 恆顯(類型身份 indicator)· 不可開選單 · tagPadding 置中</span>
           </div>
         </div>
       </div>
@@ -304,15 +305,25 @@ export const Overview = {
             <tbody>
               {[
                 ['mode', "'edit'|'display'|'readonly'|'disabled'", "'edit'", 'FieldMode 四模式——edit 可編輯 / display 純展示 / readonly 顯示值不可改 / disabled 灰化'],
+                ['variant', "'default'|'bare'|'naked'", "'default'", 'Field chrome variant(預設繼承 context.variant)'],
                 ['display', "'plain'|'tag'", "'plain'", '顯示模式——plain 純文字，tag 用 Tag 元件呈現'],
                 ['size', "'sm'|'md'|'lg'", "'md'", '尺寸，與 Button 同 size 並排高度一致'],
                 ['options', 'SelectOption[]', '—', '選項列表 { value, label }'],
-                ['value', 'string | null', '—', '目前選中的值'],
+                ['groups', 'SelectGroupConfig[]', '—', '分組顯示(option.group 對應 groups[].key)'],
+                ['value', 'string | null', '—', 'controlled 選中值'],
+                ['defaultValue', 'string | null', '—', 'uncontrolled 初始值(同時傳 value 走 controlled)'],
                 ['onChange', '(value: string) => void', '—', '值變更回呼'],
                 ['placeholder', 'string', '—', '未選值時的提示文字'],
                 ['clearable', 'boolean', 'false', '有值時顯示 clear 按鈕（僅 edit 模式）'],
-                ['startIcon', 'LucideIcon', '—', '左側 icon，代表 value 的圖示（僅 text 模式）'],
+                ['searchable', 'boolean', 'false', '啟用搜尋(desktop 時 field 變 input，打字即篩選)'],
+                ['loading', 'boolean', 'false', 'dropdown 開啟時取代 options 顯 CircularProgress'],
+                ['minRows', 'number', '3', 'menu list 最小列數(空 / 選項少時視覺一致)'],
+                ['startIcon', 'LucideIcon', '—', '左側 field-level 指示 icon（muted，僅 plain 模式；代表 value 的圖示走 option.icon）'],
                 ['error', 'boolean', 'false', '紅色邊框 + aria-invalid（僅 edit 模式有視覺效果）'],
+                ['defaultOpen', 'boolean', 'false', 'uncontrolled 初始開啟(DataTable cell click→1 step open)'],
+                ['onOpenChange', '(open: boolean) => void', '—', 'open 狀態變更 callback'],
+                ['showDisplayEndIcon', 'boolean', 'false', 'display 模式渲 ChevronDown(DataTable cell 對齊)'],
+                ['selectedItemRenderer', '(opt: SelectOption) => ReactNode', '—', 'trigger 已選項目客製 render(PeoplePicker 用)'],
                 ['disabled', 'boolean', '—', '原生屬性，自動覆蓋 mode 為 disabled'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
@@ -631,7 +642,7 @@ export const ColorMatrix = {
       {/* ── Tag mode color comparison ── */}
       <div className="flex flex-col gap-3">
         <span className="text-caption font-medium text-fg-secondary">text vs tag 模式色彩差異</span>
-        <Desc>wrapper 色彩相同，tag 模式的 Tag 元件有自己的底色和文字色（bg-muted + text-foreground）。disabled 時 Tag 文字色變為 fg-disabled。</Desc>
+        <Desc>wrapper 色彩相同，tag 模式的 Tag 元件有自己的底色和文字色（neutral = bg-secondary + text-foreground，tagVariant 時用對應色相）。disabled 時 wrapper 變 bg-disabled，Tag 本身色彩不變（Tag 元件無 disabled 樣式）。</Desc>
         <div className="overflow-x-auto">
           <table className="border-collapse">
             <thead><tr><Th>Mode</Th><Th>text 模式</Th><Th>tag 模式</Th><Th>差異說明</Th></tr></thead>
@@ -646,9 +657,9 @@ export const ColorMatrix = {
                     <Select mode={m} display="tag" options={statusOptions} value="active" size="sm" disabled={m === 'disabled'} />
                   </Td>
                   <Td>
-                    {m === 'edit' && 'Wrapper 相同。Tag 用 Tag 元件色彩（bg-muted + text-foreground）'}
-                    {m === 'readonly' && 'Wrapper 相同（bg-disabled）。Tag 用 tagPadding 置中'}
-                    {m === 'disabled' && 'Wrapper 相同。Tag 文字色 fg-disabled + 背景 bg-disabled'}
+                    {m === 'edit' && 'Wrapper 相同。Tag 用 Tag 元件色彩（neutral = bg-secondary + text-foreground）'}
+                    {m === 'readonly' && 'Wrapper 相同（bg-readonly）。Tag 用 tagPadding 置中'}
+                    {m === 'disabled' && 'Wrapper 變 bg-disabled。Tag 本身色彩不變（Tag 元件無 disabled 樣式）'}
                   </Td>
                 </tr>
               ))}
@@ -811,7 +822,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `select.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :native  <input>  element 預設 a11y;Field wrapper 補  aria-labelledby  /  aria-invalid  /  aria-describedby 。\n\n  Keyboard 行為  :\n\n- Tab — focus\n- 字母鍵 — 輸入\n- Esc — 清空(若 clearable + 有值)\n\n  Focus  :native input focus ring;DS focus-visible ring( focus-visible:!border-primary )由 Field wrapper 提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"無障礙行為依裝置分兩條路徑:\n\n  ARIA / Pattern  :桌機(非觸控)觸發點是一個容器,標記  role=\"combobox\"  +  aria-expanded  /  aria-haspopup=\"listbox\" ,選項在浮層的 listbox 裡;searchable 模式時容器內另放一個可打字篩選的  <input> 。手機(觸控)改用瀏覽器原生的  <select>  element,直接取得作業系統內建的無障礙與 picker。Field wrapper 兩邊都補  aria-invalid  /  aria-required  /  aria-describedby  /  aria-errormessage ;手機原生  <select>  另由 FieldLabel 的  htmlFor  關聯取得 accessible name。\n\n  Keyboard 行為  :\n\n- Tab — 聚焦到觸發點\n- Enter / Space — 展開選單(searchable 模式則直接進入打字篩選)\n- ↑ / ↓ — 選單展開後在選項間移動\n- 字母鍵 — searchable 模式為打字篩選;手機原生 <select> 為平台內建 type-to-jump 逐字定位(桌機非 searchable combobox 無逐字定位)\n- Enter — 選定目前 highlight 的選項並關閉\n- Esc — 關閉選單(清除值走右側 clear 按鈕,非 Esc)\n\n  Focus  :DS focus 藍框( focus-within:!border-primary )由 Field wrapper 提供;手機原生  <select>  另有系統 focus ring。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

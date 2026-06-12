@@ -107,6 +107,12 @@ interface TreeViewContextValue {
   expandOnSelect: boolean
   draggable: boolean
   isKeyboardRef: React.RefObject<boolean>
+  /**
+   * Per-tree instance 前綴(React.useId),用來組每個 treeitem 的 DOM `id`
+   * (`${prefix}treeitem-${nodeId}`),讓容器的 `aria-activedescendant` 能指向目前 focused node。
+   * 多棵 TreeView 同頁 / node id 跨樹重複時不會撞 DOM id。
+   */
+  activeDescendantPrefix: string
   expandedIds: Set<string>
   selectedIds: Set<string>
   focusedId: string | null
@@ -174,7 +180,7 @@ export interface TreeViewProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   size?: SizeKey
   /**
    * 使用脈絡,決定 item 的水平 padding:
-   * - `'sidebar'`(預設):頁面側邊欄,px-2(8px)
+   * - `'sidebar'`(預設):頁面側邊欄,`--layout-space-loose`(md=16px / lg=24px,隨 density 連動)
    * - `'menu'`:浮層選單 / dropdown,px-3(12px),對齊 MenuItem
    */
   context?: TreeContext
@@ -196,7 +202,7 @@ export interface TreeViewProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   defaultSelectedIds?: string[]
   /**
    * 啟用拖曳排序。預設 false。
-   * 啟用後每個 TreeItem 左側出現 drag handle(GripVertical icon),
+   * 啟用後整列可拖(Figma 風格,無 grip handle;靠 distance:5 區分 click vs drag),
    * 拖曳時顯示 drop indicator(before / after / inside 三種位置)。
    * Consumer 透過 `onDragEnd` callback 接收 reorder 事件,自行更新 data。
    */
@@ -273,6 +279,12 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
 
     // ── Focus state ──
     const [focusedId, setFocusedId] = React.useState<string | null>(null)
+
+    // ── Virtual focus id prefix ──
+    // DOM focus 永遠停在 role=tree 容器(單一 tab stop);目前 node 透過 aria-activedescendant
+    // 告知 AT(對齊 DS 既有 cmdk virtual-focus canonical:SelectMenu / Command listbox)。
+    // useId 確保多棵 TreeView 同頁 / node id 跨樹重複時 DOM id 不撞。
+    const activeDescendantPrefix = React.useId()
 
     // ── Keyboard vs mouse detection ──
     // focus ring 只在鍵盤操作時顯示,滑鼠點擊用 bg-neutral-selected 表達選中,不顯示 ring
@@ -457,6 +469,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
         expandOnSelect,
         draggable,
         isKeyboardRef,
+        activeDescendantPrefix,
         draggingId,
         dropTarget,
         expandedIds,
@@ -476,6 +489,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
         expandOnSelect,
         draggable,
         isKeyboardRef,
+        activeDescendantPrefix,
         draggingId,
         dropTarget,
         expandedIds,
@@ -591,6 +605,9 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
         ref={treeRef}
         role="tree"
         aria-multiselectable={selectionMode === 'multiple' || undefined}
+        // Virtual focus:DOM focus 停在容器(單一 tab stop),aria-activedescendant 指向目前 node
+        // 的 DOM id,讓 AT 朗讀目前焦點 node(對齊 WAI-ARIA TreeView APG aria-activedescendant 模式)。
+        aria-activedescendant={focusedId ? `${activeDescendantPrefix}treeitem-${focusedId}` : undefined}
         className={cn(
           // TreeView root 不加任何 py——呼吸空間由外層容器負責:
           //   - 在 SidebarGroup 內: SidebarGroup py-2 提供
@@ -697,14 +714,14 @@ export interface TreeItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>
    */
   checkbox?: React.ReactNode
   /**
-   * 右側 inline actions(suffix slot,宣告式 API)。對齊 `uiSize.spec.md`「Inline Action」
+   * 右側 inline actions(suffix slot,宣告式 API)。對齊 `patterns/element-anatomy/inline-action.spec.md`
    * 與 `SidebarMenuButton.inlineActions` 的同一條規格——TreeItem / SidebarMenuButton /
    * 未來的 row primitive 全部用同一個 declarative API。
    *
    * Consumer 只宣告 intent,TreeItem 用 `<ItemInlineAction>` 自動渲染:
    * - Icon 尺寸 = `ICON_SIZE[treeViewSize]`(自動)
    * - Hover bg、tooltip、aria-label、cursor-pointer 自動處理
-   * - **不可以**手刻 button JSX(canonical 實作在 `item-layout.tsx`)
+   * - **不可以**手刻 button JSX(canonical 實作在 `patterns/element-anatomy/item-anatomy.tsx` `ItemInlineAction`)
    *
    * ```tsx
    * <TreeItem
@@ -733,7 +750,7 @@ export interface TreeItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>
    *
    * 規則對齊 Input.endSlot canonical:90% case 用 `inlineActions` 宣告式 API,
    * 10% config 表達不出時走 slot。視覺一致性由 consumer 負責(可使用 host 內部 helper
-   * — 但禁止 app-code 直接 import L3 primitive,見 `check_l3_primitive_import.sh`)。
+   * — 但禁止 app-code 直接 import L3 primitive,見 `check_canonical_propagation.sh` E.2,原 `check_l3_primitive_import` 已 folded)。
    */
   inlineActionsSlot?: React.ReactNode
   /**
@@ -745,8 +762,8 @@ export interface TreeItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>
    */
   actionsReveal?: false | "hover"
   /**
-   * 取代 chevron 的位置。用於 stepper 的 status indicator(●/○/✓)。
-   * 設定後 chevron 不渲染,改渲染 indicator。
+   * 取代 icon 的位置。用於 stepper 的 status indicator(●/○/✓)。
+   * 設定後 icon 不渲染、改渲染 indicator;chevron 永遠保留(expandable=旋轉箭頭 / leaf=placeholder)。
    */
   indicator?: React.ReactNode
   /** 是否停用 */
@@ -776,6 +793,7 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
       registerNode,
       unregisterNode,
       isKeyboardRef,
+      activeDescendantPrefix,
     } = ctx
 
     const hasChildren = React.Children.count(children) > 0
@@ -877,6 +895,9 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             if (typeof ref === 'function') ref(node)
             else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node
           }}
+          // DOM id 供容器 aria-activedescendant 指向(virtual focus);與 data-tree-id 並存
+          // (data-tree-id 給內部 querySelector / drag,id 給 AT)。
+          id={`${activeDescendantPrefix}treeitem-${id}`}
           role="treeitem"
           aria-expanded={hasChildren ? isExpanded : undefined}
           aria-selected={selectionMode !== 'none' ? isSelected : undefined}
@@ -971,7 +992,10 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
                 actionsReveal="hover"(預設):row hover 或 keyboard focus-visible 才顯示;
                 actionsReveal=false:常駐顯示。跟 SidebarMenuButton 共用同一條規則,行為一致。
                 inlineActionsSlot escape hatch 優先(consumer 自控 JSX,reveal 一樣套外層 group)。 */}
-            {inlineActionsSlot ? (
+            {/* 2026-06-12 R2(同 sidebar.tsx 修):宿主 disabled 時 render 層擋 inline actions —
+                inline-action.spec.md「宿主 disabled | 不渲染」;row pointer-events 蓋不住
+                actionsReveal=false 常駐顯示的視覺暗示,必須 render 層 guard。 */}
+            {disabled ? null : inlineActionsSlot ? (
               <ItemSuffix hoverReveal={actionsReveal === 'hover'} hoverGroup="tree-item">
                 {inlineActionsSlot}
               </ItemSuffix>
@@ -1024,7 +1048,7 @@ const ParentIdContext = React.createContext<string | null>(null)
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const treeViewMeta = {
   component: 'TreeView',
-  family: null, // non-family composite / overlay / layout
+  family: 1, // Family 1(Menu item layout)消費者 — 對齊 tree-view.spec.md frontmatter family: 1
   variants: {
 
   },

@@ -31,9 +31,9 @@ import {
 } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import {
-  NameCard,
-  NameCardDefaultActions,
-} from '@/design-system/components/NameCard/name-card'
+  ProfileCard,
+  ProfileCardDefaultActions,
+} from '@/design-system/components/ProfileCard/profile-card'
 
 // ── MAIN_NAV(對齊 sidebar.stories.tsx baseline)────────────────────────
 
@@ -84,12 +84,12 @@ export const UserFooter = () => (
             alt="Alan Chen"
             color="blue"
             hoverCard={
-              <NameCard
+              <ProfileCard
                 name="Alan Chen"
                 subtitle="Design｜D-0042"
                 avatar={{ alt: 'Alan Chen', color: 'blue' }}
                 status="online"
-                actions={<NameCardDefaultActions />}
+                actions={<ProfileCardDefaultActions />}
               />
             }
           />

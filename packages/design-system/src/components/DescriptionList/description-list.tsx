@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils'
  * 不一時需要對齊格線才易讀 → 開 divided；短列表（< 4 rows）不需要。
  *
  * ── 間距 ──
- * vertical: label → value（同 item 內）: `var(--item-gap-label-desc)` token（預設 2px,item-anatomy SSOT）
+ * vertical: label → value（同 item 內）: `var(--item-gap-label-desc-reading)` token（2px,item-anatomy reading tier SSOT;code L115 dd 消費）
  * horizontal: label ↔ value: gap-x-4（16px）最小間距
  * items 之間垂直 gap: layout-space-tight（density-aware）
  * divided horizontal 模式：每 item py-[var(--layout-space-tight)]（cell-like row 高度）
@@ -130,7 +130,7 @@ export const descriptionListMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: [], // 純唯讀 dl/dt/dd,無 hover/active/focus/disabled 互動 state(spec「為何無 ColorMatrix / SizeMatrix」段)
   tokens: {
     bg: [],
     fg: ['text-fg-secondary', 'text-foreground'],

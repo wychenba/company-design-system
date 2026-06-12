@@ -14,7 +14,7 @@ import {
 } from '@/design-system/components/DropdownMenu/dropdown-menu'
 
 // ── TruncatedLabel ────────────────────────────────────────────────────────────
-// 同 `data-table.tsx:339 TruncateCell` + `tag.tsx:138 isTruncated` SSOT pattern
+// 同 `data-table.tsx TruncateCell` + `tag.tsx isTruncated` SSOT pattern
 // (shared ResizeObserver + scrollWidth > clientWidth → wrap Tooltip)。
 // **TODO** future:Rule-of-3 達 → 抽 `patterns/element-anatomy/truncated-text.tsx` 共用
 // (本 component / DataTable TruncateCell / Tag inner 三處同 idiom,符合 M30 SSOT 抽取門檻)。
@@ -105,7 +105,7 @@ function TruncatedLabel({ children, fullText }: { children: React.ReactNode; ful
  * ── 視覺 ──
  *   Link (預設): text-fg-secondary
  *   Link hover:  text-primary-hover (canonical「互動高亮」, 跟 Tabs / Chip 用法一致)
- *   Page (當前): text-foreground + font-medium
+ *   Page (當前): text-foreground(不加粗 — 加粗會讓 breadcrumb 最右端視覺過重,見 spec)
  *   Separator:  ChevronRight (size 跟 list 一致), text-fg-muted
  *
  * ── 詳見 breadcrumb.spec.md ──

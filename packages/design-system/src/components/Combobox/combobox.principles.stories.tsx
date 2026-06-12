@@ -195,18 +195,18 @@ export const TagOperationRule: Story = {
 
         <Rule
           title="readonly / disabled 的 Tag 沒有任何互動"
-          note="沒有 dismiss X、沒有 ChevronDown、沒有 clear。Tag 變純顯示，溢出規則仍然套用（+N 指示器可 hover 查看完整）"
+          note="沒有 dismiss X、沒有 clear;ChevronDown 保留為類型身份 indicator(不可開啟)。Tag 變純顯示,溢出規則仍然套用(+N 指示器可 hover 查看完整)"
         >
           <Combobox mode="readonly" options={categoryOptions} value={ro} />
           <Label>↑ 不可移除、不可新增、不可清空——整個 field 變「顯示」</Label>
         </Rule>
 
         <Rule
-          title="dropdown 只列出未選中選項"
-          note="避免使用者選了同一個選項兩次。已選中的就在 field 裡，用 X 移除即可"
+          title="已選中的選項在下拉裡以打勾標示，再點一次即取消"
+          note="桌機（預設）走自建浮層選單：已選項保留在清單中並以打勾呈現，再點一次即移除——避免使用者跨越下拉與 field 才能對照已選狀態。手機 / 觸控裝置改走原生 select，已選項則不重複出現在原生下拉"
         >
           <Combobox options={categoryOptions} value={['electronics']} onChange={() => {}} />
-          <Label>↑ 打開 dropdown，Electronics 不會出現在清單裡</Label>
+          <Label>↑ 打開 dropdown，Electronics 仍在清單裡並打勾，可再點一次取消</Label>
         </Rule>
       </div>
     )
@@ -228,8 +228,8 @@ export const OverflowRule: Story = {
         </Rule>
 
         <Rule
-          title="❌ 不自建 dropdown"
-          note="與 Select 同理——原生 select 提供 mobile picker、鍵盤導覽、screen reader，自建會失去這些。Combobox 底層也走原生 select，Tag 浮在上層但點擊穿透"
+          title="❌ 不從零自刻下拉互動"
+          note="與 Select 同理——下拉的開關、鍵盤導覽、聚焦管理、screen reader 支援很容易做不完整。Combobox 桌機走共用的浮層選單元件（已內建搜尋與方向鍵導覽），手機則走原生 picker，兩者都不該繞過去從零自刻"
         >
           <Label>實作細節見 Design System / Components / Combobox / 設計規格</Label>
         </Rule>

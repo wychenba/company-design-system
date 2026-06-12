@@ -14,9 +14,9 @@ import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatom
  *
  * 本元件極薄(Radix AspectRatio passthrough),無 variant / size / color token。
  * 結構僅:container 鎖 ratio + children 填滿。因此 anatomy 保留 Overview + Inspector
- * + 元件特有 StandardRatios(DS 慣用 5 ratio)——無 ColorMatrix / SizeMatrix /
- * StateBehavior,rationale 詳見 `aspect-ratio.spec.md`「為何無 ColorMatrix /
- * SizeMatrix / StateBehavior」段。
+ * + 元件特有 StandardRatios(DS 慣用 5 ratio)+ Accessibility(2026-05-17 Dim 13)
+ * ——無 ColorMatrix / SizeMatrix / StateBehavior,rationale 詳見
+ * `aspect-ratio.spec.md`「為何無 ColorMatrix / SizeMatrix / StateBehavior」段。
  */
 
 const meta: Meta = {
@@ -48,7 +48,7 @@ export const Overview: Story = {
           </div>
           <div className="text-caption text-fg-muted max-w-[320px] leading-relaxed">
             <div className="mb-2"><span className="font-mono text-foreground">container</span> — 父層決定寬度(此處 320px),AspectRatio 依 ratio 自動算高(180px = 320 × 9/16)</div>
-            <div><span className="font-mono text-foreground">children</span> — 絕對定位填滿容器;通常是 img / video / illustration</div>
+            <div><span className="font-mono text-foreground">children</span> — 放在內層容器(絕對定位 inset:0 的視覺盒)的正常流中,需自行加 w-full h-full(+ object-cover)才會填滿;通常是 img / video / illustration</div>
           </div>
         </div>
       </div>
@@ -61,7 +61,7 @@ export const Overview: Story = {
             <tbody>
               <tr><Td mono>ratio</Td><Td mono>number</Td><Td mono>1</Td><Td>寬 / 高比值(如 16/9 = 1.777)。DS 標準 ratio 見下方對照</Td></tr>
               <tr><Td mono>asChild</Td><Td mono>boolean</Td><Td mono>false</Td><Td>Radix Slot pattern——把 ratio 行為合併到 children 元素(不常用)</Td></tr>
-              <tr><Td mono>className</Td><Td mono>string</Td><Td mono>—</Td><Td>套在 container 外層(放 bg-muted / rounded-lg / overflow-hidden)</Td></tr>
+              <tr><Td mono>className</Td><Td mono>string</Td><Td mono>—</Td><Td>套在內層容器(絕對定位的視覺可見層,放 bg-muted / rounded-lg / overflow-hidden)</Td></tr>
               <tr><Td mono>children</Td><Td mono>ReactNode</Td><Td mono>—</Td><Td>填滿容器的內容(通常是 img + object-cover)</Td></tr>
             </tbody>
           </table>
@@ -144,7 +144,7 @@ export const Inspector: Story = {
   render: () => (
     <div>
       <H3>互動 ratio 切換</H3>
-      <Desc>點選常用 ratio,觀察容器高度變化與 Inspect 面板的 padding-bottom 計算。AspectRatio 是 pure layout primitive,無 color / size token,只有 ratio 一個決定性 prop。</Desc>
+      <Desc>點選常用 ratio,觀察容器高度變化與 Inspect 面板的 padding-bottom 計算。AspectRatio 是純佈局容器,無 color / size token,只有 ratio 一個決定性 prop。</Desc>
       <InspectorDemo />
     </div>
   ),

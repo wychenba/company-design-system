@@ -1,5 +1,5 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
-// @placeholder-vocabulary-allow: 1-cycle backward-compat — `placeholder` 已加(trigger empty SSOT),`emptyPlaceholder={emptyText}` forward 仍保留讓既有 consumer 不被 silent break;Combobox line 509 `placeholder ?? emptyPlaceholder` fallback → placeholder 永遠 takes precedence。Future cycle 移除 emptyPlaceholder forward(per field-controls.spec.md 共享 contract b)。
+// @placeholder-vocabulary-allow: 1-cycle backward-compat — `placeholder` 已加(trigger empty SSOT),`emptyPlaceholder={emptyText}` forward 仍保留讓既有 consumer 不被 silent break;Combobox line 760 `placeholder ?? emptyPlaceholder` fallback → placeholder 永遠 takes precedence。Future cycle 移除 emptyPlaceholder forward(per field-controls.spec.md 共享 contract b)。
 // @cell-metric-escape-allow: comment describes RETIRED `tagAreaPaddingLeftPx={8}` magic — current code is surface-guarded (`surface === 'form'` only injects `!px-3`; table-cell context untouched, lets naked `!px-[var(--table-cell-px)]` SSOT take over). Hook regex grep'd the comment word, not the live code path. Per (a) fix 2026-05-13 user-approved Path a.
 import * as React from 'react'
 import { ChevronDown } from 'lucide-react'
@@ -7,12 +7,12 @@ import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
 import { ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
-import { useFieldContext, useFieldSurface } from '@/design-system/components/Field/field-context'
+import { useFieldSurface, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant } from '@/design-system/components/Field/field-context'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { Select } from '@/design-system/components/Select/select'
 import { Combobox } from '@/design-system/components/Combobox/combobox'
-import { PersonDisplay, MultiPersonDisplay, PersonAvatarTag, buildPersonNameCard, resolvePerson, type PersonValue } from './person-display'
+import { PersonDisplay, MultiPersonDisplay, PersonAvatarTag, buildPersonProfileCard, resolvePerson, type PersonValue } from './person-display'
 import {
   getAvatarStackVisibleCount,
   AVATAR_STACK_AVATAR_PX,
@@ -35,10 +35,11 @@ export { PEOPLE_PICKER_LENGTH1_WRAPPER_CLASS, getPeoplePickerTagWrapperClass }
 // **2026-05-07 v15.6 SSOT 重構 v2**:
 //
 //   - **single mode** wraps `<Select searchable selectedItemRenderer>`
-//   - **multi mode** 兩種 displayMode(consumer 自選):
+//   - **multi mode** 兩種 displayMode(consumer 自選),**皆 wrap `<Combobox>`**(同 SSOT,
+//     差別在 tagRenderer 視覺):
 //       - **'stack'**(default,baseline 既有視覺)— Avatar 疊合 + `+N` overflow indicator,
-//         不可 wrap。Trigger 自組 + 直接 wrap `<SelectMenu multiple>` primitive,
-//         trigger 內 render `<MultiPersonDisplay>` reuse baseline primitive(SSOT)。
+//         不可 wrap。tagRenderer 渲染 avatar stack(visible count 走 shared `avatar-stack-overflow`
+//         primitive deterministic formula,2026-05-15 Bug 3 fix;display 路徑 `<MultiPersonDisplay>` 同 primitive)。
 //         對齊 Notion / Linear / Atlassian / Slack 多人 quick-glance idiom。
 //       - **'pill'**(opt-in)— 每人 Tag pill,可 wrap。Wrap `<Combobox tagRenderer>`,
 //         tagRenderer 用 Tag 元件 `avatar` prop SSOT(不塞 children)。
@@ -110,7 +111,7 @@ export interface PeoplePickerProps extends Omit<React.HTMLAttributes<HTMLDivElem
 const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(function PeoplePicker({
   mode: modeProp,
   variant: variantProp,
-  size = 'md',
+  size: sizeProp,
   value,
   onChange,
   people = [],
@@ -118,7 +119,7 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
   searchPlaceholder = '搜尋人員…', // i18n-allow: DS default
   emptyText = '沒有符合的人員', // i18n-allow: DS default — only for SelectMenu noResultsText
   className,
-  disabled,
+  disabled: disabledProp,
   defaultOpen = false,
   onOpenChange,
   multiDisplay = 'stack',
@@ -129,11 +130,12 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
   'aria-label': ariaLabel,
   ...rest
 }, ref) {
-  const fieldCtx = useFieldContext()
   const surface = useFieldSurface()
-  const mode: FieldMode = modeProp ?? fieldCtx?.mode ?? 'edit'
-  const resolvedMode: FieldMode = disabled ? 'disabled' : mode
-  const resolvedVariant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+  const size = useResolvedFieldSize(sizeProp)  // B 組 cascade fix
+  const disabled = useResolvedFieldDisabled(disabledProp)
+  // 2026-06-08 SSOT:mode/disabled/variant 統一經 helper;修 <Field disabled> 漏 cascade(原只讀 fieldCtx.mode)
+  const resolvedMode: FieldMode = useResolvedFieldMode({ mode: modeProp, disabled })
+  const resolvedVariant: FieldVariant = useResolvedFieldVariant(variantProp)
   const isMulti = Array.isArray(value)
   const isEmpty = !value || (isMulti && value.length === 0)
 
@@ -176,6 +178,7 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
         ref={ref}
         className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: resolvedVariant, size }), className)}
         data-field-mode={resolvedMode}
+        aria-disabled={resolvedMode === 'disabled' ? true : undefined}
         aria-label={ariaLabel}
         {...rest}
       >
@@ -186,6 +189,12 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
               ? <MultiPersonDisplay value={value as PersonValue[]} size={size} measured />
               : <PersonDisplay value={value as PersonValue} size={size} />}
         </span>
+        {/* 2026-06-10 類型身份 indicator:readonly/disabled 保留 chevron(naked cell 依 showDisplayEndIcon);disabled → fg-disabled */}
+        {(resolvedVariant === 'naked' ? showDisplayEndIcon : true) && (
+          <ItemSuffix className="pointer-events-none">
+            <ChevronDown size={ICON_SIZE[size as 'sm' | 'md' | 'lg']} className={cn('shrink-0', resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted')} aria-hidden />
+          </ItemSuffix>
+        )}
       </div>
     )
   }
@@ -244,7 +253,7 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
         searchPlaceholder={searchPlaceholder}
         // 2026-05-12 Stream C Issue 4(codex Q3):placeholder = trigger empty hint('請選擇人員')
         // — semantic clean separation;emptyText 不再 silent 轉 trigger placeholder。
-        // emptyPlaceholder backward-compat forward(Combobox line 509 `placeholder ?? emptyPlaceholder` fallback)
+        // emptyPlaceholder backward-compat forward(Combobox line 760 `placeholder ?? emptyPlaceholder` fallback)
         // 1 cycle:future 移除 emptyPlaceholder forward,emptyText 改傳 SelectMenu noResultsText。
         placeholder={placeholder}
         emptyPlaceholder={emptyText}
@@ -271,9 +280,9 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
               // Combobox tagRenderer slot,SSOT = Tag primitive 視覺(per codex Round 3 verdict)。
               // 人名 99% < 25 chars 不觸發 cap;極端長名(複數姓 + middle name)觸發 ellipsis 是合理 UX。
               avatar={pillShowAvatar
-                ? <Avatar src={p.avatarUrl} alt={p.name} size={16} hoverCard={buildPersonNameCard(p)} />
+                ? <Avatar src={p.avatarUrl} alt={p.name} size={16} hoverCard={buildPersonProfileCard(p)} />
                 : undefined}
-              onDismiss={onRemove}
+              onRemove={onRemove}
             >
               {p.name}
             </Tag>
@@ -400,10 +409,10 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
                 src={p.avatarUrl}
                 alt={p.name}
                 size={16}
-                hoverCard={buildPersonNameCard(p)}
+                hoverCard={buildPersonProfileCard(p)}
               />
             }
-            onDismiss={() => {
+            onRemove={() => {
               onChange?.(selectedNames.filter(n => n !== item.value).map(n => findPerson(people, n)))
             }}
           >
@@ -420,7 +429,7 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
         // selectedNames.length === 1 → PersonDisplay(avatar + name)代替 PersonAvatarTag(avatar only)。
         // SSOT 對齊 PeoplePicker single mode line 201 selectedItemRenderer。多選 1 人時視覺等同單選,
         // 只在 length > 1 才走 stack(各 avatar 純 chip)。多選 + inline 搜尋場景拿掉 name 改 cursor
-        // 是 future 工作(需 PeoplePicker 加 searchIn='trigger' opt-in,當前 wrapped Combobox 走 menu search)。
+        // 走 `searchIn='trigger'` opt-in(2026-05-12 規則 3 ship,已轉傳 Combobox;default 'menu' 走 panel-top search)。
         if (selectedNames.length === 1) {
           return <PersonDisplay key={item.value} value={p} size={size} />
         }

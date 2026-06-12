@@ -6,6 +6,7 @@
 //     已由 StateBehavior 5. 涵蓋)。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Calendar, type CalendarEvent } from './calendar'
+import { CATEGORICAL_HUES } from '@/design-system/tokens/categorical-color'
 import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta<typeof Calendar> = {
@@ -42,7 +43,7 @@ export const Overview: Story = {
 export const Inspector: Story = {
   name: '元件檢閱器',
   parameters: {
-    docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。view 目前只支援 `month`(week / day 為 tech debt,已 disable)。' } },
+    docs: { description: { story: '右側 Controls 切換 props 即時預覽,取代 Figma 標註。檢視目前只支援「月」(週 / 日檢視尚未實作,為後續增量,選項已停用)。' } },
     layout: 'fullscreen',
   },
   args: {
@@ -70,22 +71,22 @@ export const Inspector: Story = {
 export const ColorMatrix: Story = {
   name: '色彩對照表',
   render: () => {
-    const colorEvents: CalendarEvent[] = (
-      ['blue', 'green', 'orange', 'purple', 'red', 'yellow'] as const
-    ).map((c, i) => ({
+    const colorEvents: CalendarEvent[] = CATEGORICAL_HUES.map((c, i) => ({
       id: `c-${c}`,
       title: `${c} category`,
-      start: `${thisMonth}-${String(i + 3).padStart(2, '0')}`,
-      end: `${thisMonth}-${String(i + 3).padStart(2, '0')}`,
+      start: `${thisMonth}-${String(i + 2).padStart(2, '0')}`,
+      end: `${thisMonth}-${String(i + 2).padStart(2, '0')}`,
       color: c,
     }))
     return (
       <div className="p-4 bg-canvas flex flex-col gap-10">
         <div>
-          <H3>事件類別色(6 色)</H3>
+          <H3>事件類別色</H3>
           <Desc>
-            6 個 event color 對齊 Tag primitive colors(blue / green / orange / purple / red / yellow)。
-            color 是**類別語意**(同 team / 同 project),非 severity。
+            event color = 12 categorical 色相,**消費 categorical-color SSOT**,與 Tag / Avatar 共用同一組
+            (blue / green / deep-orange / yellow / red / orange / amber / lime / turquoise / indigo / purple / magenta)。
+            color 是**類別語意**(同 team / 同 project),非 severity。色名 1:1 對該色相的 `--color-*` primitive(零 offset);
+            2026-06-04 修正前 red 與 orange 都誤接 deep-orange,現各自獨立可區分。
           </Desc>
           <div className="h-[560px]">
             <Calendar events={colorEvents} />
@@ -117,13 +118,13 @@ export const ColorMatrix: Story = {
                 </tr>
                 <tr>
                   <Td>日期 header</Td>
-                  <Td mono>h-7 · text-body · font-medium</Td>
-                  <Td>右上角數字,對齊 Google Calendar</Td>
+                  <Td mono>flex items-start justify-end · text-body · font-medium</Td>
+                  <Td>右上角數字,wrapper 無固定高度(由內容 + cell min-h-28 決定),對齊 Google Calendar</Td>
                 </tr>
                 <tr>
                   <Td>Today cell(日期數字)</Td>
-                  <Td mono>bg-primary · text-on-emphasis · rounded-full · px-2 py-0.5</Td>
-                  <Td>primary-filled pill(對齊 Google Calendar today pill)</Td>
+                  <Td mono>bg-info · text-on-emphasis · rounded-full · min-w-6 h-6 px-2 · text-body font-medium</Td>
+                  <Td>info-filled pill,固定 h-6 + min-w-6 做圓形 badge(對齊 Google Calendar today pill)</Td>
                 </tr>
                 <tr>
                   <Td>Outside day cell</Td>
@@ -136,9 +137,9 @@ export const ColorMatrix: Story = {
                   <Td>提示可點擊新增入口</Td>
                 </tr>
                 <tr>
-                  <Td>Weekend cell(可選)</Td>
+                  <Td>Weekend cell(後續增量)</Td>
                   <Td mono>bg-muted</Td>
-                  <Td>對齊 Google Calendar,可由 prop 控制,MVP 預設關閉</Td>
+                  <Td>對齊 Google Calendar,MVP 未實作(無 weekend prop / 無 isWeekend 邏輯),列後續增量</Td>
                 </tr>
               </tbody>
             </table>
@@ -160,23 +161,23 @@ export const ColorMatrix: Story = {
               <tbody>
                 <tr>
                   <Td>一般 event(timed)</Td>
-                  <Td mono>bg-{`{color}`}-subtle · text-{`{color}`}-text · rounded-md · px-1.5 py-0.5 · text-caption · truncate</Td>
-                  <Td>單行 tile,color 依事件類別</Td>
+                  <Td mono>bg-[var(--color-{`{color}`}-1)] · text-[var(--color-{`{color}`}-7)] · rounded-md · px-1.5 py-0.5 · text-caption · truncate</Td>
+                  <Td>單行 tile,color 依事件類別(12 categorical 色相,消費 categorical-color SSOT,與 Tag / Avatar 共用)。對齊 Tag 色階(step-1 淺底 / step-7 文字)。**色名 1:1 對 `--color-{`{hue}`}-*`,零 offset**(2026-06-04 修:原 red / orange 都誤接 deep-orange,改後 red→`--color-red-*`、orange→`--color-orange-*` 各自獨立)</Td>
                 </tr>
                 <tr>
                   <Td>All-day event</Td>
-                  <Td mono>同上 + grid-column span(橫跨多 cell)</Td>
-                  <Td>實作用 absolute 或 grid span</Td>
+                  <Td mono>同上 + border-l-[3px] border-[var(--color-{`{color}`}-6)] · font-medium</Td>
+                  <Td>2026-06-01 補實作:淡底 + 左側實心 accent 條 + medium,排序在有時間事件之前(cell 頂端);多日全天事件以日精度 filter 在每個涵蓋日各顯示一條</Td>
                 </tr>
                 <tr>
                   <Td>Hover tile</Td>
-                  <Td mono>hover:bg-{`{color}`}-hover</Td>
-                  <Td>微暗化表示可點擊</Td>
+                  <Td mono>hover:bg-[var(--color-{`{color}`}-2)]</Td>
+                  <Td>同色深一階表示可點擊</Td>
                 </tr>
                 <tr>
                   <Td>超出 tile 限制</Td>
-                  <Td mono>「+N more」link(對齊 Google Calendar)</Td>
-                  <Td>click 展開 popover 列表</Td>
+                  <Td mono>「+N more」純文字(text-fg-muted)</Td>
+                  <Td>每格最多顯示 3 筆事件,超出顯示「+N more」弱化計數文字,目前不可點擊(展開列表為後續增量)</Td>
                 </tr>
               </tbody>
             </table>
@@ -193,10 +194,10 @@ export const StateBehavior: Story = {
   render: () => (
     <div className="h-screen p-4 bg-canvas">
       <div className="mb-2 text-body text-fg-muted space-y-1">
-        <div>• <b>today</b> cell:date 數字加 `bg-primary text-on-emphasis rounded-full` 圓</div>
-        <div>• <b>outside month</b>:前後月日期走 `text-fg-muted`</div>
-        <div>• <b>多事件 cell</b>:超出顯示的 event 顯示「+N more」(hover 展開)</div>
-        <div>• <b>event hover</b>:tile 輕微 `hover:brightness-95` + `cursor-pointer`</div>
+        <div>• <b>today</b> cell:date 數字加 `bg-info text-on-emphasis rounded-full` 圓</div>
+        <div>• <b>outside month</b>:前後月日期數字走 `text-fg-disabled`,cell 底色 `bg-muted`</div>
+        <div>• <b>多事件 cell</b>:超出 3 則的 event 顯示「+N more」</div>
+        <div>• <b>event hover</b>:tile 切同色深一階 `hover:bg-{`{color}`}-2`(如 blue → `--color-blue-2`)+ `cursor-pointer`</div>
         <div>• <b>empty cell</b>:無事件保持純底色,點擊觸發 onDateClick</div>
       </div>
       <Calendar events={sampleEvents} />
@@ -211,7 +212,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `calendar.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus calendar\n- ↑/↓/←/→ — 切 day\n- PageUp/Down — 切月\n- Shift+PageUp/Down — 切年\n- Enter — 選 date\n- Esc — 取消 / 關閉\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"詳 `calendar.spec.md` 「A11y 預設」段。摘要:\n\n  Grid role  :月格容器 `role=\"grid\"` + `aria-label`(月份),每列 `role=\"row\"`(`display:contents` 保 CSS grid 佈局),每格 `role=\"gridcell\"`(非互動容器),日期數字按鈕帶 `aria-label`(日期 + 事件數)。事件 tile `role=\"button\"` + `aria-label`(事件標題)。\n\n  Keyboard 行為(MVP 實作現況)  :\n\n- Tab — 逐一 focus 每格的日期數字按鈕與其中的事件 tile(cell 為非互動 gridcell 容器,滑鼠點空白處等同點日期)\n- Enter / Space — 日期數字按鈕觸發 `onDateClick`;事件 tile 觸發 `onEventClick`\n- Toolbar 的 ◀ / 今天 / ▶ / 檢視切換為標準可聚焦控件,Tab 可達\n\n  Keyboard tech debt(尚未實作,見 spec.md「MVP vs 後續增量」)  :\n\n- ↑/↓/←/→ 在日期格間 roving 移動、PageUp/Down 切月、Shift+PageUp/Down 切年、Esc 關閉 — 隨週 / 日 view 增量一併補上 roving tabindex\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );日期數字按鈕與事件 tile 皆有 ring。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

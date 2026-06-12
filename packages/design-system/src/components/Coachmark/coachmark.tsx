@@ -34,9 +34,9 @@ import { OVERLAY_SIDE_OFFSET } from '@/design-system/tokens/elevation/overlay-ge
  *   3. **Multi step 中間 / 最後步**(有 `onPrev`):**Skip 不顯示**(使用者已投入進度,
  *      再給 Skip 會讓「放棄」入口與「回上一步」衝突 — Linear / Pendo / Shepherd.js
  *      同樣規則)。CTA = `isLastStep ? 'Done' : 'Next'`
- *   4. **不強制 autoFocus 任何按鈕** — Radix Popover 預設 focus 第一個 focusable
- *      (通常是 Prev 或 Skip),本元件不額外拉焦點到 Next,避免使用者以為一按 Enter
- *      就會推進(實際上可能還在讀 body)。想推進者 tab 到 Next 再 Enter。
+ *   4. **抑制開啟時的自動 focus** — `onOpenAutoFocus` preventDefault,連 Radix 預設
+ *      focus 第一個 focusable 也一併抑制(焦點停在 trigger),避免使用者還在讀 body 時
+ *      按 Enter 誤推進。想推進者自行 tab 到 CTA 再 Enter(對齊 spec「A11y 預設」)。
  *
  * ── 為什麼 Body+Footer 消費 overlay-surface ──
  * 避免 padding token 漂移:Dialog / Popover / Coachmark 三者共用同一套 Header/Body/Footer
@@ -136,7 +136,9 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
   ) => {
     // 單/多步驟行為推導
     const isSingleStep = isLastStep && !onPrev
-    const showSkip = Boolean(onSkip) && !onPrev   // canonical:有 onPrev → 不顯示 Skip
+    // canonical(spec.md CTA 語義表 L116):有 onPrev → 不顯示 Skip;**單步驟也不顯示 Skip**
+    // (單步「skip」與「知道了」語義重複 = 同一個關閉動作,雙關閉鍵造成困惑;對齊 Apple HIG / Intercom / Pendo 單步 tip 僅一個完成鍵)
+    const showSkip = Boolean(onSkip) && !onPrev && !isSingleStep
     const nextLabel = isSingleStep ? doneLabel : isLastStep ? 'Done' : 'Next'
 
     const hasFooterContent = Boolean(step || showSkip || onNext || onPrev)
@@ -147,6 +149,11 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
       kind === 'tips' || kind === 'new-features'
         ? KIND_TITLE[kind as 'tips' | 'new-features']
         : kind
+
+    // 2026-05-31 #6:PopoverContent(role=dialog)需 accessible name。dialog aria-labelledby 接可見標題
+    // (優先 headerTitle 的 PopoverTitle,否則 body title 的 h3);皆無則 aria-label fallback。
+    const titleId = React.useId()
+    const dialogLabelledBy = (headerTitle || title) ? titleId : undefined
 
     return (
       <Popover open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
@@ -161,6 +168,8 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
           // Coachmark 的 CTA 不該被 auto-focus 偷觸發(user 可能還在讀 body,按 Enter 就推進)。
           // 想推進的 user 自己 tab 到 CTA 即可。
           onOpenAutoFocus={(e) => e.preventDefault()}
+          aria-labelledby={dialogLabelledBy}
+          aria-label={dialogLabelledBy ? undefined : '提示'}
           {...props}
         >
           {headerTitle && (
@@ -168,7 +177,7 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
             // **不 hideClose** — 對齊 Popover / Dialog / 所有 overlay 家族 canonical:header 必有 dismiss X
             // (user 可隨時關閉,跟 Skip / Done 是不同入口,canonical 重複不冗)
             <PopoverHeader>
-              <PopoverTitle>{headerTitle}</PopoverTitle>
+              <PopoverTitle id={titleId}>{headerTitle}</PopoverTitle>
             </PopoverHeader>
           )}
 
@@ -185,7 +194,7 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
             // 世界級參考:Notion / Linear / Figma onboarding tour 皆左對齊;Intercom Messenger 亦如是。
             <PopoverBody className="flex flex-col">
               {title && (
-                <h3 className="text-body-lg font-medium text-foreground">{title}</h3>
+                <h3 id={!headerTitle ? titleId : undefined} className="text-body-lg font-medium text-foreground">{title}</h3>
               )}
               {description && (
                 // title(body-lg 16)+ desc(body 14)→ reading-lg token(label tier 決定)
@@ -244,7 +253,7 @@ export const coachmarkMeta = {
   sizes: {
 
   },
-  states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
+  states: ['default'], // 純 Popover composition — 無自有 hover / active / disabled 視覺(spec「邊界狀態」)
   tokens: {
     bg: ['bg-muted'],
     fg: ['text-fg-secondary', 'text-foreground'],

@@ -34,7 +34,7 @@ export const Overview: Story = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['mode', "'edit' | 'readonly' | 'disabled'", "'edit'", 'Field mode(readonly 保留邊框 padding)'],
+                ['mode', "'edit' | 'display' | 'readonly' | 'disabled'", "'edit'", 'Field mode(display 渲染純文字 div;readonly 用底色 + padding 標示閱讀區)'],
                 ['size', "'sm' | 'md' | 'lg'", "'md'", 'sm/md text-body,lg text-body-lg'],
                 ['rows', 'number', '3', '預設可見行數'],
                 ['placeholder', 'string', '—', '空值提示'],
@@ -59,7 +59,7 @@ export const Overview: Story = {
               <tr><Td>Padding</Td><Td mono>items-center(垂直置中)</Td><Td mono>py-2(上下固定內距)</Td></tr>
               <tr><Td>startIcon / endAction</Td><Td>✓ 支援</Td><Td>❌ 不支援(textarea 慣例無 icon)</Td></tr>
               <tr><Td>Enter 鍵</Td><Td>觸發 form submit</Td><Td>換行</Td></tr>
-              <tr><Td>Readonly 呈現</Td><Td>同高度、緊湊底色</Td><Td>保留邊框 + padding(多行需閱讀區)</Td></tr>
+              <tr><Td>Readonly 呈現</Td><Td>同高度、緊湊底色</Td><Td>保留 padding，改用底色標示閱讀區(多行需閱讀區)</Td></tr>
             </tbody>
           </table>
         </div>
@@ -82,7 +82,7 @@ export const Inspector: Story = {
     defaultValue: '',
   },
   argTypes: {
-    mode: { control: 'radio', options: ['edit', 'readonly', 'disabled'] },
+    mode: { control: 'radio', options: ['edit', 'display', 'readonly', 'disabled'] },
     size: { control: 'radio', options: ['sm', 'md', 'lg'] },
     rows: { control: { type: 'number', min: 1, max: 20 } },
     error: { control: 'boolean', description: 'error 視覺(border-error + aria-invalid)' },
@@ -115,7 +115,7 @@ export const SizeMatrix: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: '模式 對照（編輯 / readonly / 停用）',
+  name: '模式 對照（編輯 / 展示 / 唯讀 / 停用）',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>
@@ -126,8 +126,17 @@ export const ModeMatrix: Story = {
         />
       </div>
       <div>
-        <H3>readonly — 保留邊框 padding(多行需閱讀區邊界)</H3>
-        <Desc>不同於 Input 的 readonly(同高度、緊湊底色)。多行內容扁平化會讓使用者誤以為可編輯或混入純文字內容——必須保留邊界。</Desc>
+        <H3>display — 純展示(渲 div 取代 textarea,whitespace-pre-wrap 保留多行)</H3>
+        <Desc>對齊 Carbon read-only / Cloudscape display mode。常見於檢視已提交的留言 / 評論。</Desc>
+        <Textarea
+          mode="display"
+          rows={3}
+          value="我覺得這個專案非常有潛力,建議加強 onboarding 的引導流程..."
+        />
+      </div>
+      <div>
+        <H3>readonly — 保留 padding，用底色標示閱讀區(多行需閱讀區邊界)</H3>
+        <Desc>不同於 Input 的 readonly(同高度、緊湊底色)。多行內容扁平化會讓使用者誤以為可編輯或混入純文字內容——必須用填色 + 內距標示出明確的閱讀區域。</Desc>
         <Textarea
           mode="readonly"
           rows={3}
@@ -162,7 +171,7 @@ export const ColorMatrix: Story = {
         <H3>四種 mode / state × 色彩 Token</H3>
         <Desc>
           Textarea 作為 Field Control,mode 規則對齊 Input 但 readonly 呈現不同
-          (Textarea readonly 保留邊框 padding,Input readonly 是緊湊底色)。Error border 跟其他
+          (Textarea readonly 保留 padding,用 bg-readonly 底色標示閱讀區;Input readonly 是緊湊底色)。Error border 跟其他
           Field Controls 共用 `--error` 語意色。
         </Desc>
         <div className="overflow-x-auto mb-4">
@@ -187,21 +196,28 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td mono>edit focus</Td>
                 <Td><TokenCell token="--surface" display="surface" /></Td>
-                <Td><TokenCell token="--ring" display="ring(2px ring)" /></Td>
+                <Td><TokenCell token="--primary" display="primary(邊框換色，非額外 ring)" /></Td>
                 <Td><TokenCell token="--foreground" display="foreground" /></Td>
                 <Td><TokenCell token="--fg-muted" display="fg-muted" /></Td>
               </tr>
               <tr>
+                <Td mono>display</Td>
+                <Td>透明（zero-chrome，host context 提供邊界）</Td>
+                <Td>透明（無邊框）</Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
+                <Td>—（display 無 placeholder；空值顯 — em-dash fg-muted）</Td>
+              </tr>
+              <tr>
                 <Td mono>readonly</Td>
-                <Td><TokenCell token="--surface" display="surface(保留邊框)" /></Td>
-                <Td><TokenCell token="--divider" display="divider(比 edit 淡)" /></Td>
+                <Td><TokenCell token="--bg-readonly" display="bg-readonly(填色標示閱讀區)" /></Td>
+                <Td>透明（無可見邊框，靠填色 + padding 區隔）</Td>
                 <Td><TokenCell token="--foreground" display="foreground" /></Td>
                 <Td>—</Td>
               </tr>
               <tr>
                 <Td mono>disabled</Td>
                 <Td><TokenCell token="--bg-disabled" display="bg-disabled" /></Td>
-                <Td><TokenCell token="--border" display="border" /></Td>
+                <Td>透明（無可見邊框，靠填色區隔）</Td>
                 <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
                 <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
               </tr>
@@ -226,7 +242,7 @@ export const ColorMatrix: Story = {
             <Textarea rows={2} placeholder="開始輸入..." />
           </div>
           <div>
-            <div className="text-caption text-fg-muted mb-1 font-mono">readonly(保留邊框)</div>
+            <div className="text-caption text-fg-muted mb-1 font-mono">readonly(底色標示閱讀區)</div>
             <Textarea mode="readonly" rows={2} defaultValue="已送出的意見 — 謝謝您的回饋" />
           </div>
           <div>
@@ -282,7 +298,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `textarea.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :native  <textarea>  element 預設 a11y;Field wrapper 補  aria-labelledby  /  aria-invalid  /  aria-describedby 。\n\n  Keyboard 行為  :\n\n- Tab — focus\n- 字母鍵 — 輸入\n- Esc — 清空(若 clearable + 有值)\n\n  Focus  :native input focus ring;DS focus-visible ring( focus-visible:!border-primary )由 Field wrapper 提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"ARIA / 語意:採用原生 <textarea> 元素,自帶完整無障礙語意;搭配 Field 使用時,標籤透過原生 <label for> 與欄位關聯,並補上 aria-invalid / aria-describedby 連到對應的錯誤與說明文字。\n\n鍵盤操作:\n\n- Tab — 聚焦進出欄位\n- 字母鍵 — 輸入文字\n- Enter — 換行(不送出表單,與 Input 不同)\n\n聚焦:聚焦時邊框換成主色,清楚標示目前作用中的欄位。\n\n對比要求:文字對背景對比至少 4.5:1,邊框等介面元素至少 3:1,確保弱視使用者也能辨識。整個欄位不靠滑鼠也能完整操作。"}</p>
     </div>
   ),
 }

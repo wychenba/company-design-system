@@ -10,7 +10,7 @@ import { Popover, PopoverTrigger, PopoverAnchor, PopoverContent } from '@/design
 import { DateGrid } from '@/design-system/components/DateGrid/date-grid'
 import { Button } from '@/design-system/components/Button/button'
 import { SurfaceFooter } from '@/design-system/patterns/overlay-surface/overlay-surface'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant, useResolvedFieldInvalid } from '@/design-system/components/Field/field-context'
 import {
   TimeColumns,
   isoToTimeParts,
@@ -339,15 +339,17 @@ export interface DatePickerProps
 
 // Trigger uses `<div role="combobox" tabIndex={...}>` instead of `<button>` —
 // 對齊 Combobox / Select / TimePicker 同 pattern,避免 ItemInlineAction(內部 button)
-// 構成 nested-interactive(axe serious)。Radix Popover asChild 仍處理 Enter/Space 鍵盤觸發。
+// 構成 nested-interactive(axe serious)。Radix PopoverTrigger 只 compose onClick(非
+// native button → 無 Enter/Space→click),Enter/Space 開 popover 由本檔自建 onKeyDown 補
+// (對齊 select.tsx desktop trigger canonical);typeable 模式交由內層 <input> 自管鍵盤。
 // code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
   (
     {
-      mode = 'edit',
+      mode,
       variant: variantProp,
       error: errorProp = false,
-      size = 'md',
+      size: sizeProp,
       value,
       onChange,
       placeholder,
@@ -375,10 +377,12 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     ref
   ) => {
     const fieldCtx = useFieldContext()
-    const error = errorProp || (fieldCtx?.invalid ?? false)
-    const disabled = disabledProp ?? fieldCtx?.disabled
-    const resolvedMode = disabled ? 'disabled' : mode
-    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+    const size = useResolvedFieldSize(sizeProp)  // B 組 cascade fix:<Field size>/cell surface-size 對 DatePicker 生效
+    const error = useResolvedFieldInvalid(errorProp)
+    const disabled = useResolvedFieldDisabled(disabledProp)
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode;修 <Field mode="display"> 漏 cascade
+    const resolvedMode = useResolvedFieldMode({ mode, disabled })
+    const variant: FieldVariant = useResolvedFieldVariant(variantProp)
     const isEditable = resolvedMode === 'edit'
     // 2026-05-18 改 import ICON_SIZE SSOT(per user『做完』approval,消除 M17 違反 7+ 重複 ternary)
   const iconSize = ICON_SIZE[size as 'sm' | 'md' | 'lg']
@@ -470,17 +474,22 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
         <div
           className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
+          aria-disabled={resolvedMode === 'disabled' ? true : undefined}
           {...(props as React.HTMLAttributes<HTMLDivElement>)}
         >
-          <span className={cn('flex-1 min-w-0', resolvedMode === 'disabled' && 'text-fg-disabled')}>
+          <span className={cn('flex-1 min-w-0 truncate', resolvedMode === 'disabled' && 'text-fg-disabled')}>
             {value
               ? displayCommitted
               : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
             }
           </span>
-          <ItemSuffix className="pointer-events-none">
-            <CalendarIcon size={iconSize} className="text-fg-muted" aria-hidden />
-          </ItemSuffix>
+          {/* 2026-06-10 類型身份 indicator:readonly/disabled 保留(naked cell 依 showDisplayEndIcon=isEditable,
+              並修掉原「disabled cell 無視 gate 漏顯」之 2026-05-10 cell canonical 違反);disabled → fg-disabled(spec L213)*/}
+          {(variant === 'naked' ? showDisplayEndIcon : true) && (
+            <ItemSuffix className="pointer-events-none">
+              <CalendarIcon size={iconSize} className={resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted'} aria-hidden />
+            </ItemSuffix>
+          )}
         </div>
       )
     }
@@ -518,6 +527,15 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
             aria-expanded={open}
             data-field-mode="edit"
             data-error={error ? '' : undefined}
+            // Radix PopoverTrigger 只 compose onClick(onOpenToggle),`<div>` trigger 無
+            // native Enter/Space→click → 自建 onKeyDown 開 popover(對齊 select.tsx desktop
+            // trigger canonical:Enter/Space → 開;Esc → 關)。typeable 模式不攔 — 內層
+            // <input> 自有 Enter/Esc 語意(commit / reset draft),Calendar icon click 開
+            // popover(Material/Ant typed-date idiom),避免 div 層 keydown 與 input 衝突。
+            onKeyDown={typeable ? undefined : (e) => {
+              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(true) }
+              if (e.key === 'Escape') setOpen(false)
+            }}
             className={cn(
               fieldWrapperStyles({ mode: 'edit', variant: variant, size }),
               'text-left cursor-pointer',
@@ -695,10 +713,10 @@ export interface DatePickerRangeProps
 const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
   (
     {
-      mode = 'edit',
+      mode,
       variant: variantProp,
       error: errorProp = false,
-      size = 'md',
+      size: sizeProp,
       value,
       onChange,
       placeholder,
@@ -720,10 +738,12 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
     ref,
   ) => {
     const fieldCtx = useFieldContext()
-    const error = errorProp || (fieldCtx?.invalid ?? false)
-    const disabled = disabledProp ?? fieldCtx?.disabled
-    const resolvedMode = disabled ? 'disabled' : mode
-    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+    const size = useResolvedFieldSize(sizeProp)  // B 組 cascade fix:<Field size>/cell surface-size 對 DatePicker 生效
+    const error = useResolvedFieldInvalid(errorProp)
+    const disabled = useResolvedFieldDisabled(disabledProp)
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode;修 <Field mode="display"> 漏 cascade
+    const resolvedMode = useResolvedFieldMode({ mode, disabled })
+    const variant: FieldVariant = useResolvedFieldVariant(variantProp)
     const isEditable = resolvedMode === 'edit'
     // 2026-05-18 改 import ICON_SIZE SSOT(per user『做完』approval,消除 M17 違反 7+ 重複 ternary)
   const iconSize = ICON_SIZE[size as 'sm' | 'md' | 'lg']
@@ -867,17 +887,18 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
           ref={ref}
           className={cn(fieldWrapperStyles({ mode: resolvedMode, variant: variant, size }), className)}
           data-field-mode={resolvedMode}
+          aria-disabled={resolvedMode === 'disabled' ? true : undefined}
           {...props}
         >
           <span className={cn('flex-1 min-w-0 truncate', !startIso && 'text-fg-muted', resolvedMode === 'disabled' && 'text-fg-disabled')}>
             {startIso ? formatDateOrDateTime(startIso, showTime, showSeconds, { formatOptions, locale }) : resolvedPlaceholder[0]}
           </span>
-          <ArrowRight size={iconSize} className="shrink-0 text-fg-muted mx-2" aria-hidden />
+          <ArrowRight size={iconSize} className={cn('shrink-0 mx-2', resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted')} aria-hidden />
           <span className={cn('flex-1 min-w-0 truncate', !endIso && 'text-fg-muted', resolvedMode === 'disabled' && 'text-fg-disabled')}>
             {endIso ? formatDateOrDateTime(endIso, showTime, showSeconds, { formatOptions, locale }) : resolvedPlaceholder[1]}
           </span>
           <ItemSuffix className="pointer-events-none">
-            <CalendarIcon size={iconSize} className="text-fg-muted" aria-hidden />
+            <CalendarIcon size={iconSize} className={resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted'} aria-hidden />
           </ItemSuffix>
         </div>
       )

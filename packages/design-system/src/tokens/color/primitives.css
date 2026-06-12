@@ -245,6 +245,13 @@
 
 }
 
+/* Tailwind bridge for absolute anchors.
+   Keep the bridge in the primitive color SSOT so text-white/bg-white ship to consumers. */
+@theme inline {
+  --color-white: oklch(1 0 0);
+  --color-black: oklch(0 0 0);
+}
+
 
 /* ── Layer 1 — Dark Mode Overrides ── */
 [data-theme="dark"] {

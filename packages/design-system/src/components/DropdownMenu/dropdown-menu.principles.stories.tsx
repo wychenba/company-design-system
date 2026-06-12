@@ -58,22 +58,22 @@ export const UsageGuidance: Story = {
       <p>適合 DropdownMenu 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="群組"><span className="text-primary hover:underline font-medium cursor-pointer">群組</span></LinkTo>
+          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="群組"><span className="text-primary hover:underline font-medium cursor-pointer">群組 — 帳號選單(個人資料 / 設定 / 登出分組)</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="後綴"><span className="text-primary hover:underline font-medium cursor-pointer">後綴</span></LinkTo>
+          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="後綴"><span className="text-primary hover:underline font-medium cursor-pointer">後綴 — 收件匣未讀數 badge、外開連結提示</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="子選單"><span className="text-primary hover:underline font-medium cursor-pointer">子選單</span></LinkTo>
+          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="子選單"><span className="text-primary hover:underline font-medium cursor-pointer">子選單 — 主題切換(淺色 / 深色 / 跟隨系統)</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="Checkbox"><span className="text-primary hover:underline font-medium cursor-pointer">Checkbox</span></LinkTo>
+          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="勾選項"><span className="text-primary hover:underline font-medium cursor-pointer">勾選項 — 表格顯示欄位切換</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="單選"><span className="text-primary hover:underline font-medium cursor-pointer">單選</span></LinkTo>
+          <LinkTo kind="Design System/Components/DropdownMenu/展示" name="單選"><span className="text-primary hover:underline font-medium cursor-pointer">單選 — 檔案清單排序方式</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:先看「選完之後畫面是否需要保留選中狀態」——需要就改用 Select / SelectMenu。下方的「DropdownMenu vs 選值元件」與「群組 vs 分隔線」範例提供更完整的對照。</p>
     </div>
 
       {/* vs 近親 — VsSelectMenuRule — 原 VsSelectMenuRule */}
@@ -87,11 +87,11 @@ export const UsageGuidance: Story = {
             <Button variant="tertiary" size="sm" iconOnly startIcon={MoreVertical} aria-label="更多操作" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem><Copy size={16} />複製</DropdownMenuItem>
-            <DropdownMenuItem><Share2 size={16} />分享</DropdownMenuItem>
-            <DropdownMenuItem><Download size={16} />匯出</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Copy}>複製</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Share2}>分享</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Download}>匯出</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-error"><Trash2 size={16} />刪除</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Trash2} className="text-error">刪除</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <Label>↑ 執行動作：複製 / 分享 / 刪除，選完關閉，畫面沒有「選中狀態」</Label>
@@ -118,7 +118,7 @@ export const UsageGuidance: Story = {
         title="判斷法：「選完之後畫面需要保留選中狀態嗎？」"
         note="需要 → Select / SelectMenu；不需要（點完即執行動作）→ DropdownMenu"
       >
-        <Label>完整判斷詳見 dropdown-menu.spec.md「與 SelectMenu 的區別」</Label>
+        <Label>一句話判斷:點完後使用者還需要看到「目前選了什麼」就用 Select / SelectMenu;只是觸發一個動作、選完即關閉就用 DropdownMenu。</Label>
       </Rule>
     </div>
 
@@ -200,7 +200,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ItemTypeRule: Story = {
-  name: 'Item 類型選擇',
+  name: '項目類型選擇',
   render: () => {
     const [showStatus, setShowStatus] = React.useState(true)
     const [showAssignee, setShowAssignee] = React.useState(true)
@@ -217,10 +217,10 @@ export const ItemTypeRule: Story = {
               <Button variant="tertiary">檔案操作</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem><Copy size={16} />複製連結<DropdownMenuShortcut>⌘C</DropdownMenuShortcut></DropdownMenuItem>
-              <DropdownMenuItem><Download size={16} />下載<DropdownMenuShortcut>⌘S</DropdownMenuShortcut></DropdownMenuItem>
+              <DropdownMenuItem startIcon={Copy} shortcut="⌘C">複製連結</DropdownMenuItem>
+              <DropdownMenuItem startIcon={Download} shortcut="⌘S">下載</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-error"><Trash2 size={16} />刪除<DropdownMenuShortcut>⌫</DropdownMenuShortcut></DropdownMenuItem>
+              <DropdownMenuItem startIcon={Trash2} shortcut="⌫" className="text-error">刪除</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </Rule>
@@ -244,8 +244,8 @@ export const ItemTypeRule: Story = {
         </Rule>
 
         <Rule
-          title="RadioItem — 從互斥選項選一（選中後關閉）"
-          note="排序方式、檢視模式等只能選一個的設定。與 Item 的差異：視覺有 radio 指示器表達「已選中」"
+          title="RadioItem — 從互斥選項選一（選中後選單保持開啟）"
+          note="排序方式、檢視模式等只能選一個的設定。選中的那一項以選取底色（neutral-selected 背景）標示，不另畫圓點指示器"
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -260,7 +260,7 @@ export const ItemTypeRule: Story = {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Label>↑ 互斥選一——視覺上一個 dot 指示當前選項</Label>
+          <Label>↑ 互斥選一——目前選中的項目以選取底色標示</Label>
         </Rule>
       </div>
     )
@@ -280,12 +280,11 @@ export const DestructiveRule: Story = {
             <Button variant="tertiary" size="sm" iconOnly startIcon={MoreVertical} aria-label="更多" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem><Copy size={16} />複製</DropdownMenuItem>
-            <DropdownMenuItem><Share2 size={16} />分享</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Copy}>複製</DropdownMenuItem>
+            <DropdownMenuItem startIcon={Share2}>分享</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-error">
-              <Trash2 size={16} />永久刪除
-              <DropdownMenuShortcut>⌫</DropdownMenuShortcut>
+            <DropdownMenuItem startIcon={Trash2} shortcut="⌫" className="text-error">
+              永久刪除
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -310,7 +309,7 @@ export const DestructiveRule: Story = {
 }
 
 export const SuffixRule: Story = {
-  name: 'Suffix 使用規則',
+  name: '後綴使用規則',
   render: () => (
     <div>
       <Rule

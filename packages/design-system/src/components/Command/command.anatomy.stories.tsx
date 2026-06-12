@@ -30,7 +30,7 @@ export const Overview: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Anatomy</H3>
-        <Desc>Command 是 shadcn passthrough(基於 cmdk library)——搜尋 + 鍵盤導覽的指令清單。結構:CommandInput(搜尋框)+ CommandList(捲動區)+ CommandGroup(分組)+ CommandItem(項目)+ CommandEmpty(空狀態)。本 DS 橋接 DS token + 消費 MenuItem / Empty primitive。</Desc>
+        <Desc>Command 是 shadcn passthrough(基於 cmdk library)——搜尋 + 鍵盤導覽的指令清單。結構:CommandInput(搜尋框)+ CommandList(捲動區)+ CommandGroup(分組)+ CommandItem(項目)+ CommandEmpty(空狀態)。本 DS 在 cmdk 原結構上套用設計 token(顏色 / 字級 / 間距),並用 ScrollArea 包住清單做跨系統一致的捲軸;選項與空狀態的樣式直接寫在 Command 內,不透過其他元件。</Desc>
         <div className="rounded-lg border border-border max-w-md overflow-hidden">
           <Command>
             <CommandInput placeholder="輸入指令或搜尋..." />
@@ -68,12 +68,12 @@ export const Overview: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>元件</Th><Th>作用</Th></tr></thead>
             <tbody>
-              <tr><Td mono>Command</Td><Td>根容器(cmdk.Root)</Td></tr>
+              <tr><Td mono>Command</Td><Td>根容器,包住整個搜尋清單</Td></tr>
               <tr><Td mono>CommandInput</Td><Td>搜尋框(自動過濾 items)</Td></tr>
               <tr><Td mono>CommandList</Td><Td>捲動區,包含 items</Td></tr>
-              <tr><Td mono>CommandEmpty</Td><Td>搜尋無結果時顯示(本 DS 消費 Empty primitive)</Td></tr>
+              <tr><Td mono>CommandEmpty</Td><Td>搜尋無結果時顯示的空狀態文案</Td></tr>
               <tr><Td mono>CommandGroup</Td><Td>分組容器(可選 heading)</Td></tr>
-              <tr><Td mono>CommandItem</Td><Td>選項(本 DS 消費 MenuItem layout)</Td></tr>
+              <tr><Td mono>CommandItem</Td><Td>單一選項,含圖示 + 文字 + 右側 shortcut</Td></tr>
               <tr><Td mono>CommandSeparator</Td><Td>分組間分隔線</Td></tr>
               <tr><Td mono>CommandShortcut</Td><Td>右側 shortcut 提示(⌘K 等)</Td></tr>
             </tbody>
@@ -85,7 +85,7 @@ export const Overview: Story = {
         <H3>消費場景</H3>
         <Desc>Command 本身不單獨使用,透過 SelectMenu 外層元件消費:
           <br />• <code className="font-mono text-footnote">SelectMenu</code> — Select / Combobox / PeoplePicker 的 searchable 浮層
-          <br />• <code className="font-mono text-footnote">Command Palette</code>(Cmd+K)— 全局跨頁搜尋入口(consumer 自組,本 DS 尚無包裝元件)
+          <br />• <code className="font-mono text-footnote">Command Palette</code>(Cmd+K)— 全局跨頁搜尋入口(消費本檔 export 的 CommandDialog 包裝,cmdk + Radix Dialog;見展示層「CommandPalette」)
         </Desc>
       </div>
     </div>
@@ -99,7 +99,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `command.spec.md` 「A11y 預設」段。摘要:\n\ncmdk 自動處理：\n\n-   List 語意  ： role=\"listbox\"  +  aria-activedescendant  指向目前 highlight 項\n-   搜尋框  ： role=\"combobox\"  +  aria-expanded  /  aria-controls  指向 list\n-   鍵盤導覽  ：↑ / ↓ 移動 highlight、Enter 選取、Esc 關閉（或清空搜尋）\n-   空狀態  ： <CommandEmpty>  自動帶  role=\"presentation\" ,不干擾 screen reader 的 list 朗讀\n\nConsumer 無需額外處理 a11y,保留 cmdk 原結構 + 使用  <CommandInput>  /  <CommandList>  /  <CommandItem>  即可。"}</p>
+      <p className="whitespace-pre-line">{"詳 `command.spec.md` 「A11y 預設」段。摘要:\n\ncmdk 自動處理：\n\n-   List 語意  ： role=\"listbox\"  +  aria-activedescendant  指向目前 highlight 項\n-   搜尋框  ： role=\"combobox\"  +  aria-expanded  /  aria-controls  指向 list\n-   鍵盤導覽  ：cmdk 提供 ↑ / ↓ 移動 highlight、Enter 選取（另支援 vim-style Ctrl+n/p/j/k、Home/End）。cmdk 本身無 Esc handler — Esc 關閉僅在 CommandDialog（Cmd+K）模式由 Radix Dialog 的 DismissableLayer 提供；inline <Command> 模式按 Esc 無反應\n-   空狀態  ： <CommandEmpty>  自動帶  role=\"presentation\" ,不干擾 screen reader 的 list 朗讀\n\nConsumer 無需額外處理 a11y,保留 cmdk 原結構 + 使用  <CommandInput>  /  <CommandList>  /  <CommandItem>  即可。"}</p>
     </div>
   ),
 }

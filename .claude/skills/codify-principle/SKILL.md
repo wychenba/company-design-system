@@ -129,7 +129,7 @@ User 親自確認 scope / type / affected homes 是否正確,禁 AI 單方面決
 
 - `~/.../memory/MEMORY.md` — index of codified principles
 - `.claude/logs/codified-principles.jsonl` — execution log
-- CLAUDE.md `# 資訊治理 canonical` 8-home — home 識別 rules
+- CLAUDE.md `# 治理 canonical` 8-home — home 識別 rules
 - CLAUDE.md `# Meta-Pattern 預警` M14 / M19 — 上游 pipeline rules
 
 ## 範例呼叫
@@ -141,7 +141,7 @@ Skill 自動:
 2. M8:Polaris/Material/Atlassian React form lib 都支援 dual-mode ✓ (3/3 ≥3)
 3. Draft layer:
    - SSOT:`.claude/rules/ui-development.md`「元件 Props 命名」 + form spec
-   - Hook:`.claude/hooks/check_form_dual_mode.sh` 偵測 missing pair
+   - Hook:`.claude/hooks/check_form_dual_mode.sh`(未實作;此為 5-layer 產物範例 — audit-only via dim,無 write-time hook)偵測 missing pair
    - Audit dim:Dim 31「Dual-mode coherence」(已存在 Dim 26 — STOP 提議擴充而非新增)
    - Scaffold:`/new-component` Phase 4 加 dual-mode template
    - Memory:`project_form_dual_mode_2026_04_26.md`

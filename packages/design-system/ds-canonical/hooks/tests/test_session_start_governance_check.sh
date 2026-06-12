@@ -24,6 +24,13 @@ setup_proj() {
   # NOTE: deliberately NOT creating benchmarks dir(absent dir = no warning,
   # creating an empty one = "never fetched" warning fires)
   echo 'log_hook_fire() { :; }' > "$TMP_PROJ/.claude/hooks/_log-fire.sh"
+  # codex stub:hook L270 env-smoke 檢查 node_modules/.bin/codex(cd 到 PROJECT_DIR 後相對)。
+  # TMP_PROJ 無 node_modules → env-smoke「codex 缺」advisory 會 fire,污染 governance 斷言。
+  # 放可執行 stub 讓 env-smoke deterministic 靜默,測試只驗 governance 邏輯(2026-05-30 加,
+  # 修 env-smoke feature 加入後沒同步更 test 的 pre-existing 失敗)。
+  mkdir -p "$TMP_PROJ/node_modules/.bin"
+  printf '#!/bin/sh\n' > "$TMP_PROJ/node_modules/.bin/codex"
+  chmod +x "$TMP_PROJ/node_modules/.bin/codex"
   # 5-line healthy CLAUDE.md
   printf '%s\n' a b c d e > "$TMP_PROJ/CLAUDE.md"
   # init git for last-prune check (no commits → -1)

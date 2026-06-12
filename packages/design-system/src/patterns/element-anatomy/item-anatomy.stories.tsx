@@ -12,18 +12,18 @@ import { SelectionItem } from '@/design-system/components/SelectionControl/selec
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { Avatar, type AvatarData } from '@/design-system/components/Avatar/avatar'
-import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+import { ProfileCard, ProfileCardDefaultActions } from '@/design-system/components/ProfileCard/profile-card'
 
 /** Person avatar hover canonical helper — avatar.spec.md DS-wide rule:
- *  name-card.spec.md 重要資訊 canonical(status / statusMessage / fields 皆必含) */
+ *  profile-card.spec.md 重要資訊 canonical(status / statusMessage / fields 皆必含) */
 const personHover = (name: string, subtitle?: string) => (
-  <NameCard
+  <ProfileCard
     name={name}
     subtitle={subtitle ?? 'Design｜D-0042｜EMP-1001'}
     avatar={{ alt: name }}
     status="online"
     statusMessage="Out of Office: Back on Monday!"
-    actions={<NameCardDefaultActions />}
+    actions={<ProfileCardDefaultActions />}
     fields={[
       { label: 'ID', value: 'YHANAX' },
       { label: 'Employee number', value: '1234567' },
@@ -96,8 +96,8 @@ const CONSUMERS: Record<ConsumerKey, ConsumerPreset> = {
     pxDesc: '選單標準水平間距',
     gap: 'gap-2 (8px)',
     gapDesc: 'prefix-content 間距',
-    suffixGap: 'gap-1 (4px)',
-    suffixGapDesc: 'value + ChevronRight 更緊湊',
+    suffixGap: 'gap-2 (8px)',
+    suffixGapDesc: 'value + endContent(menu-item.tsx 用 gap-2,同 prefix gap)',
     // Source: menu-item.tsx — label / description 都截到 1 行,維持掃視節奏
     labelMaxLines: 1,
     descMaxLines: 1,
@@ -812,7 +812,7 @@ const InspectorInner = () => {
               {hasPx && <span><strong style={{ color: Z.pad.text }}>padding-x</strong> = {pxPx}</span>}
               {effectiveHasPrefix && <span><strong style={{ color: Z.icon.text }}>prefix-content gap</strong> = {gapPx}</span>}
               <span><strong style={{ color: Z.label.text }}>py</strong> = {preset.py.includes('calc') ? `calc((field-height-${size} − 一行文字高度) / 2)` : preset.py}</span>
-              {hasDescription && <span>label-desc gap = --item-gap-label-desc-reading (2px)</span>}
+              {hasDescription && <span>{`label-desc gap = --item-gap-label-desc-${preset.mode}${size === 'lg' ? '-lg' : ''} (2px)`}</span>}
             </div>
           </div>
         </div>
@@ -839,7 +839,7 @@ const InspectorInner = () => {
               <TkVal token={preset.gap} value={preset.gapDesc} />
             </PropRow>
             {hasDescription && (
-              <PropRow label="label-desc" dot={Z.gap.text}><TkVal token="--item-gap-label-desc-reading" value="2px" /></PropRow>
+              <PropRow label="label-desc" dot={Z.gap.text}><TkVal token={`--item-gap-label-desc-${preset.mode}${size === 'lg' ? '-lg' : ''}`} value="2px" /></PropRow>
             )}
             {effectiveHasSuffix && (
               <PropRow label="suffix gap" dot={Z.suffix.text}>
@@ -1200,7 +1200,7 @@ export const ReadingModes = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const IconColorsAndPresets = {
-  name: 'Icon 色彩 + 消費元件預設',
+  name: '圖示色彩 + 消費元件預設',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">
@@ -1507,7 +1507,7 @@ export const IconActionPrimitiveDecision = {
               <tr><Td>Tag dismiss X</Td><Td>Pill body</Td><Td mono>Inline Action</Td><Td>Colored host,繼承顏色</Td></tr>
               <tr><Td>Menu / TreeView suffix action</Td><Td>Row inline flow</Td><Td mono>Inline Action</Td><Td>Inline with content</Td></tr>
               <tr><Td>SidebarGroup header chevron</Td><Td>Aux toggle</Td><Td mono>Inline Action</Td><Td>Inline header toggle</Td></tr>
-              <tr><Td><strong>FileItem compact</strong>(row 24)</Td><Td>Row slot</Td><Td mono>Inline Action</Td><Td>Row 太小容不下 Button xs 24</Td></tr>
+              <tr><Td><strong>FileItem compact</strong>(row 24)</Td><Td>Row slot</Td><Td mono>Button xs iconOnly</Td><Td>2026-04-23 user 統一 rich + compact 同 primitive(field-height-xs 容器 + data-unbounded 收斂)</Td></tr>
               <tr><Td><strong>FileItem rich</strong>(row 56)</Td><Td>Row slot</Td><Td mono>Button xs iconOnly</Td><Td>&le; 24 cap,不放大</Td></tr>
               <tr><Td><strong>DataTable row action</strong></Td><Td>Row dedicated column</Td><Td mono>Button xs iconOnly</Td><Td>&le; 24 cap(跨 tier 固定)</Td></tr>
               <tr><Td><strong>Dialog / Sheet chrome corner close</strong></Td><Td>Action group region</Td><Td mono>Button sm iconOnly dismiss</Td><Td>corner 屬 action group,可與 refresh / share 並排</Td></tr>
@@ -1591,8 +1591,8 @@ export const IconActionPrimitiveDecision = {
             </div>
           </div>
           <div className="flex items-center gap-3 px-3 py-2 rounded-md border border-border bg-surface">
-            <span className="flex-1 text-caption text-fg-secondary">✅ compact row:都用 Inline Action(icon 16,hover-bg 22)</span>
-            <div className="flex items-center gap-1">
+            <span className="flex-1 text-caption text-fg-secondary">✅ compact row:都用 Inline Action(icon 16,hover-bg 18,size="sm",gap-2)</span>
+            <div className="flex items-center gap-2">
               <ItemInlineActionButton icon={RotateCw} size="sm" aria-label="重試" />
               <ItemInlineActionButton icon={Download} size="sm" aria-label="下載" />
               <ItemInlineActionButton icon={MoreVertical} size="sm" aria-label="更多" />
@@ -1600,7 +1600,7 @@ export const IconActionPrimitiveDecision = {
           </div>
           <div className="flex items-center gap-3 px-3 py-2 rounded-md border border-error bg-surface">
             <span className="flex-1 text-caption text-error-text">❌ 禁止混 Inline Action + Button(box 尺寸不一致)</span>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <ItemInlineActionButton icon={RotateCw} size="sm" aria-label="重試" />
               <Button variant="text" size="xs" iconOnly startIcon={Download} aria-label="下載" />
             </div>

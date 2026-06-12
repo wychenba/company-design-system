@@ -82,7 +82,11 @@ for (const t of cellTypes) {
     const r = cell.getBoundingClientRect()
     return { width: r.width, height: r.height, left: r.left, top: r.top }
   }, t)
-  if (!display) { record('I1', t.label, false, 'cell not found'); continue }
+  if (!display) {
+    // I1 真 assertion 路徑未進入 → 不可假綠,record fail
+    record('I1', `${t.label} display↔edit cell width 一致`, false, 'cell not found(I1 真測路徑未進入)')
+    continue
+  }
 
   await page.mouse.click(display.left + display.width / 2, display.top + 20)
   await page.waitForTimeout(500)
@@ -101,6 +105,8 @@ for (const t of cellTypes) {
   await page.waitForTimeout(300)
 
   if (!edit) {
+    // I1 真 assertion 路徑未進入(沒進 edit mode)→ 不可假綠,record fail
+    record('I1', `${t.label} display↔edit cell width 一致`, false, 'no edit field — I1 真測路徑未進入(may be intentional pattern e.g. multiPerson Popover)')
     record('I1-4', t.label, false, 'no edit field(may be intentional pattern e.g. multiPerson Popover)')
     continue
   }
@@ -109,9 +115,42 @@ for (const t of cellTypes) {
   const heightDelta = Math.abs(display.height - edit.cellHeight)
   const fieldVsCell = Math.abs(edit.cellHeight - edit.fieldHeight)
 
+  // I1:display↔edit cell 寬度一致(cell width = column width,跟 padding/state/mode 無關)
+  // 真量 display cell rect.width vs edit cell rect.width,差異 > 1px → fail
+  record('I1', `${t.label} display↔edit cell 寬度一致(>1px = fail)`, widthDelta <= 1, `display ${display.width.toFixed(2)} vs edit ${edit.cellWidth.toFixed(2)}, delta ${widthDelta.toFixed(2)}`)
+
   record('I2', `${t.label} display↔edit width 0 delta`, widthDelta < 0.5, `delta ${widthDelta.toFixed(2)}`)
   record('I3', `${t.label} display↔edit height 0 delta`, heightDelta < 0.5, `delta ${heightDelta.toFixed(2)}`)
   record('I4', `${t.label} Field 填滿 cell 高度`, fieldVsCell < 1, `cell-field delta ${fieldVsCell.toFixed(2)}`)
+}
+
+// ── INVARIANT (6):cell/header 字級隨 size 對齊 Field family — 全 cell-type @lg 必 16px ──
+// Q2 機械防呆(2026-06-08 user 問「怎麼避免以後新 field 又漏傳 size」):
+// StringCell/NumberCell 曾漏傳 size → naked display fallback 'md' → lg 字卡 14px(commit 84f0c6b6 修)。
+// 此 I6 跨「全 cell-type」守門:任何 display cell 內文字載體 @lg computed font-size ≠ 16px(text-body-lg)
+// → fail。新增 cell 若漏掉 size 繼承 → 字卡 14px → CI 紅,不靠人 review(mechanical = primary defense)。
+// 用 Inspector @size=lg + pinnedLeft=false(全欄在同一 row,涵蓋 string/select/currency/date 多 cell-type)。
+await page.goto('http://localhost:7500/iframe.html?id=design-system-components-datatable-設計規格--inspector&viewMode=story&args=size:lg;pinnedLeft:false', { waitUntil: 'networkidle' })
+await page.waitForSelector('[role="columnheader"]')
+await page.waitForTimeout(500)
+const lgFonts = await page.evaluate(() => {
+  const leafFont = (root) => {
+    let best = null
+    const walk = (el) => { for (const n of el.childNodes) { if (n.nodeType === 3 && n.textContent.trim()) best = el; else if (n.nodeType === 1) walk(n) } }
+    walk(root)
+    return best ? Math.round(parseFloat(getComputedStyle(best).fontSize)) : null
+  }
+  const headers = [...document.querySelectorAll('[role="columnheader"]')].map(h => ({ label: (h.textContent || '').trim().slice(0, 10), px: leafFont(h) }))
+  const firstRow = document.querySelector('[role="row"][data-row-index="0"]')
+  const cells = firstRow ? [...firstRow.children].map(c => ({ label: (c.textContent || '').trim().slice(0, 10), px: leafFont(c) })) : []
+  return { headers, cells }
+})
+const EXPECT_LG_FONT = 16  // text-body-lg(typography.css)
+for (const h of lgFonts.headers) {
+  if (h.px != null) record('I6', `header "${h.label}" @lg font = 16px(text-body-lg)`, h.px === EXPECT_LG_FONT, `got ${h.px}px(應 16,字級沒隨 size)`)
+}
+for (const c of lgFonts.cells) {
+  if (c.px != null) record('I6', `cell "${c.label}" @lg font = 16px(對齊 Field,防漏傳 size)`, c.px === EXPECT_LG_FONT, `got ${c.px}px(應 16,該 cell 漏繼承 size?)`)
 }
 
 // ── Output ──

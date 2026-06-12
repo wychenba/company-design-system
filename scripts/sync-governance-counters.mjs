@@ -158,7 +158,9 @@ for (const root of scopeCheckRoots) {
     if (f === 'scripts/sync-governance-counters.mjs') continue // self-skip drift detector references
     if (f.includes('.claude/logs/')) continue // self-skip log output (contains drift report text)
     const c = fs.readFileSync(path.join(ROOT, f), 'utf-8')
-    if (/@your-org\//.test(c) || /your-org\b/.test(c)) {
+    // 2026-06-08 fix:原 regex 大小寫敏感 → 漏抓 scaffold 佔位 `Your-Org DS Owner`(大寫)。
+    // 加 `i` flag,catch Your-Org / your-org / YOUR-ORG 全形,防 placeholder 殘留無聲漂移。
+    if (/@your-org\//i.test(c) || /your-org\b/i.test(c)) {
       scopeLeftovers.push(f)
     }
   }
@@ -204,6 +206,69 @@ if (fs.existsSync(dsPkgPath) && fs.existsSync(sbPkgPath)) {
   }
 }
 
+// ── 2026-05-30 comprehensive count-drift scan(per user「該 SSOT 就 SSOT,避免更新 A 卻忘 B」)──
+// 原 detector 只查特定 hardcoded 點(session_start / CLAUDE.md header)→ 漏 plugin.json / marketplace /
+// brief-template / fork CLAUDE.md 的「82 audit dims」drift(本 session 踩過)。改全掃 curated live-count 檔。
+// SSOT = 上面算出的 computed count;任一 hardcoded 不符 → drift → --check fail-closed。新增 live-count 檔加進 list。
+const skillDirs = globSync('.claude/skills/*/', { cwd: ROOT }).filter(d => !path.basename(d.replace(/\/+$/, '')).startsWith('_'))
+const skillCount = skillDirs.length
+
+const liveCountFiles = [
+  'CLAUDE.md',
+  'packages/design-system/CLAUDE.md',
+  '.claude/skills/design-system-audit/SKILL.md',
+  '.claude/skills/codex-collab/references/brief-template.md',
+  '.claude-plugin/plugin.json',
+  '.claude-plugin/marketplace.json',
+  'scripts/check-plugin-installed.mjs',
+  'template/ds-product-template/CLAUDE.md',
+  'template/ds-product-template/README.md',
+  // 2026-06-12 fork-audit 抓漏:bootstrap 提示文字含 hook 數,prune-merge 59→52 時漏同步
+  'template/ds-product-template/.claude/hooks/check_plugin_bootstrap.sh',
+  'template/ds-product-template/.claude/hooks/block_production_edit_without_plugin.sh',
+]
+// \b 前置:要求數字前有 word boundary,避免 embedded 數字誤匹配(「P0 hooks」的 0 / 「v14」/「beta.37」等)
+const countPatterns = [
+  { re: /\b(\d+)\s+audit\s+dims?\b/gi, actual: dimCount, label: 'audit dims' },
+  { re: /\b(\d+)\s+dim\s+全掃/g, actual: dimCount, label: 'dim 全掃' },
+  { re: /\b(\d+)\s+hooks\b/g, actual: hookCount, label: 'hooks' },
+  { re: /\b(\d+)\s+個 DS governance hooks/g, actual: hookCount, label: 'governance hooks' },
+  { re: /\b(\d+)\s+skills\b/g, actual: skillCount, label: 'skills' },
+  { re: /\b(\d+)\s+個 skills/g, actual: skillCount, label: '個 skills' },
+  { re: /\b(\d+)\s+(?:active\s+)?M-rules?\b/g, actual: mRuleCount, label: 'M-rules' },
+]
+for (const rel of liveCountFiles) {
+  const p = path.join(ROOT, rel)
+  if (!fs.existsSync(p)) continue
+  const c = fs.readFileSync(p, 'utf-8')
+  for (const { re, actual, label } of countPatterns) {
+    for (const m of c.matchAll(re)) {
+      const declared = parseInt(m[1])
+      if (declared !== actual) drifts.push(`${rel}: "${m[0].trim()}" != actual ${label} ${actual}`)
+    }
+  }
+}
+
+// ── 2026-05-30 mirror ALLOWLIST ↔ workflow trigger paths sync ──
+// per user「該 SSOT 就 SSOT」+ mirror-to-published-template.yml「此 list 必與 ALLOWLIST 同步」註解機械化:
+// ALLOWLIST 加 entry 但忘了加 workflow trigger path → 該 path 改動不 fire mirror → published stale。
+const mirrorSrcPath = path.join(ROOT, 'scripts/build-published-template-mirror.mjs')
+const mirrorWfPath = path.join(ROOT, '.github/workflows/mirror-to-published-template.yml')
+if (fs.existsSync(mirrorSrcPath) && fs.existsSync(mirrorWfPath)) {
+  const src = fs.readFileSync(mirrorSrcPath, 'utf-8')
+  const wf = fs.readFileSync(mirrorWfPath, 'utf-8')
+  const am = src.match(/const ALLOWLIST = \[([\s\S]*?)\n\]/)
+  if (am) {
+    const entries = [...am[1].matchAll(/'([^']+)'/g)].map(x => x[1])
+    for (const e of entries) {
+      const top = e.split('/').slice(0, 2).join('/')
+      if (!wf.includes(e) && !wf.includes(top + '/**') && !wf.includes(top)) {
+        drifts.push(`mirror ALLOWLIST "${e}" 不在 mirror-to-published-template.yml trigger paths(漏 → mirror 不 fire → published stale)`)
+      }
+    }
+  }
+}
+
 // ── Output ───────────────────────────────────────────────────────────
 
 const report = {
@@ -214,6 +279,7 @@ const report = {
     auditDims: dimCount,
     auditDimMin: dimMin,
     auditDimMax: dimMax,
+    skills: skillCount,
     specTraits: traitCount,
   },
   mRulesList: mRules.map(n => `M${n}`),
@@ -224,6 +290,15 @@ const report = {
 const logsDir = path.join(ROOT, '.claude/logs')
 if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true })
 const outPath = path.join(logsDir, 'governance-counters.json')
+// 2026-06-06 idempotent write:內容(排除 ts)無變則沿用既有 ts,避免此檔每次 session-start run
+// 都換 ts 讓 git tree 永遠 dirty(cosmetic churn,no consumer 讀 ts 判 staleness — 已 grep 確認)。
+const serialize = (r) => JSON.stringify({ ...r, ts: undefined }, null, 2)
+if (fs.existsSync(outPath)) {
+  try {
+    const existing = JSON.parse(fs.readFileSync(outPath, 'utf8'))
+    if (serialize(existing) === serialize(report) && existing.ts) report.ts = existing.ts
+  } catch { /* corrupt existing → 正常重寫 */ }
+}
 fs.writeFileSync(outPath, JSON.stringify(report, null, 2))
 
 if (!QUIET || drifts.length) {

@@ -66,13 +66,15 @@ export const Overview: Story = {
             <tbody>
               {[
                 ['Tabs', '', '', ''],
-                ['  size', "'sm' | 'md' | 'lg'", "'sm'", 'tab 高度 tier(對齊 --tab-height-*);2026-05-17 從 md 改 sm,overlay/chrome 預設'],
+                ['  size', "'sm' | 'md' | 'lg'", "'sm'", 'tab 高度 tier(對齊 --tab-height-*);size 選擇指引詳「設計原則 → 尺寸選擇」'],
                 ['  overflow', "'none' | 'scroll' | 'menu'", "'none'", '水平溢出處理(捲動 / 下拉選單)'],
                 ['  defaultValue / value', 'string', '—', '當前 tab 值(受控 / 非受控)'],
                 ['TabsTrigger', '', '', ''],
                 ['  value', 'string', '必填', '唯一識別碼,對應 TabsContent value'],
                 ['  startIcon', 'LucideIcon', '—', '前綴 icon(描述 tab 類型)'],
-                ['  suffix', 'ReactNode', '—', '後綴(badge 計數 / endIcon 指示)'],
+                ['  badge', 'ReactNode', '—', '後綴計數指示(通常放 Badge)'],
+                ['  endIcon', 'LucideIcon', '—', '後綴純視覺 indicator(方向 / 狀態,連同 tab 一起點)'],
+                ['  inlineAction', 'ReactNode', '—', '後綴獨立點擊區(自己的 handler,不切 tab)'],
                 ['  disabled', 'boolean', 'false', '停用該 tab'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
@@ -116,12 +118,12 @@ export const Inspector: Story = {
     size: {
       control: 'radio',
       options: ['sm', 'md', 'lg'],
-      description: 'sm★default=overlay / chrome / dense(2026-05-17 從 md 改)/ md=future tier 無 use case / lg=獨立 tabs 取代 chrome header',
+      description: 'sm★default=overlay / chrome / dense / md=future tier 無 use case / lg=獨立 tabs 取代 chrome header',
     },
     overflow: {
       control: 'radio',
       options: ['none', 'scroll', 'menu'],
-      description: 'none★default / scroll=水平捲動 + fade mask / menu=⋯ dropdown',
+      description: 'none★default / scroll=水平捲動 + fade mask / menu=⌄ navigator dropdown(列全部 tab,全 trigger 仍可見)',
     },
     value: {
       control: 'radio',
@@ -185,12 +187,12 @@ export const SizeMatrix: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>三種 Size — 對應 `--tab-height-*` token</H3>
-        <Desc>Tabs 有自己的高度 tier(不直接複用 field-height)——tab 需要較高視覺重量,`--tab-height-*` 比 `--field-height-*` 略高。</Desc>
+        <Desc>Tabs 有自己的高度 tier(不直接複用 field-height)——tab 需要較高視覺重量,`--tab-height-*` 比 `--field-height-*` 略高。何時選哪個 size 的完整判斷與世界級引用,詳「設計原則 → 尺寸選擇」。</Desc>
         <div className="overflow-x-auto mb-4">
           <table className="text-caption border-collapse">
             <thead><tr><Th>Size</Th><Th>Token</Th><Th>字體</Th><Th>使用場景</Th></tr></thead>
             <tbody>
-              <tr><Td mono>sm ★default</Td><Td mono>--tab-height-sm</Td><Td>text-body</Td><Td>overlay / chrome header / dense(2026-05-17 從 md 改)</Td></tr>
+              <tr><Td mono>sm ★default</Td><Td mono>--tab-height-sm</Td><Td>text-body</Td><Td>overlay / chrome header / dense</Td></tr>
               <tr><Td mono>md</Td><Td mono>--tab-height-md</Td><Td>text-body</Td><Td>future tier — 目前無 recommended use case</Td></tr>
               <tr><Td mono>lg</Td><Td mono>--tab-height-lg</Td><Td>text-body-lg</Td><Td>獨立 tabs 取代 chrome header(像素 = --chrome-header-height)</Td></tr>
             </tbody>
@@ -224,8 +226,8 @@ export const ColorMatrix: Story = {
       <div>
         <H3>TabsTrigger 四態色彩</H3>
         <Desc>
-          Tabs 未選狀態用 fg-secondary(不搶視覺),hover 走 標準互動高亮 primary-hover
-          (跟 Breadcrumb / Chip 一致)。Selected 用 foreground + bottom 2px primary-hover 下線
+          Tabs 未選狀態用 fg-secondary(不搶視覺),hover 時文字色轉 foreground(text-foreground，
+          neutral 最深)。Selected 用 foreground + bottom 2px primary-hover 下線
           ——下線是「當前位置」的明確指示器,不靠底色區分。
         </Desc>
         <div className="overflow-x-auto mb-4">
@@ -247,14 +249,8 @@ export const ColorMatrix: Story = {
               </tr>
               <tr>
                 <Td mono>hover(未選)</Td>
-                <Td><TokenCell token="--primary-hover" display="primary-hover" /></Td>
+                <Td><TokenCell token="--foreground" display="foreground" /></Td>
                 <Td>—(transparent)</Td>
-                <Td>—</Td>
-              </tr>
-              <tr>
-                <Td mono>active(mousedown)</Td>
-                <Td><TokenCell token="--primary-active" display="primary-active" /></Td>
-                <Td>—</Td>
                 <Td>—</Td>
               </tr>
               <tr>
@@ -280,10 +276,10 @@ export const ColorMatrix: Story = {
       </div>
 
       <div>
-        <H3>Badge suffix 色彩(跟隨 selected 狀態)</H3>
+        <H3>Badge suffix 色彩(固定 variant 色,不隨 selected 變)</H3>
         <Desc>
-          Badge 作為 suffix 時,未選狀態保持 Badge 原色(low / high variant);selected 時跟著
-          trigger 文字色變化,視覺重量統一。
+          Badge 作為 suffix 時,顏色固定由其 variant token 決定(low / high),selected 與否
+          都維持 Badge 原色——trigger 的 data-[state=active] 文字色只作用在 trigger 本身,不傳遞到 Badge。
         </Desc>
         <div className="border border-border rounded-lg p-4">
           <Tabs defaultValue="members">
@@ -310,14 +306,14 @@ export const StateBehavior: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>互動狀態對照</H3>
-        <Desc>hover:移 hover 到未選 tab;selected:當前 value 對應 tab,有 primary-hover 底部下線;disabled:停用 tab。</Desc>
+        <Desc>「總覽」為 selected（當前 value，有 primary-hover 底部下線）;「成員」「通知」為 unselected(移 hover 上去文字色轉 foreground);「設定」為 disabled(停用)。</Desc>
         <div className="border border-border rounded-lg p-4">
-          <Tabs defaultValue="selected">
+          <Tabs defaultValue="overview">
             <TabsList>
-              <TabsTrigger value="selected">Selected(當前)</TabsTrigger>
-              <TabsTrigger value="unselected">Unselected</TabsTrigger>
-              <TabsTrigger value="hover">懸停 ↓</TabsTrigger>
-              <TabsTrigger value="disabled" disabled>Disabled</TabsTrigger>
+              <TabsTrigger value="overview">總覽</TabsTrigger>
+              <TabsTrigger value="members">成員</TabsTrigger>
+              <TabsTrigger value="notifications">通知</TabsTrigger>
+              <TabsTrigger value="settings" disabled>設定</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -355,8 +351,8 @@ export const OverflowMatrix: Story = {
       </div>
 
       <div>
-        <H3>overflow="menu" — 隱藏溢出 + DropdownMenu trigger</H3>
-        <Desc>Tabs 超出容器時,溢出部分收入 DropdownMenu(由 OverflowMenuTriggerButton 觸發),避免 scroll 互動。適合 tab 數量較多但使用者不常切換到後面的場景。</Desc>
+        <H3>overflow="menu" — 全部 tab 一直可見 + ⌄ navigator dropdown(列全部 tab 快速跳轉)</H3>
+        <Desc>Tabs 超出容器時,右側出現 ⌄ navigator(OverflowMenuTriggerButton),點開 DropdownMenu 列出全部 tab 供快速跳轉;底層仍是真實捲動容器(全 trigger 可見可捲),點選後該 tab scrollIntoView 至視圖中央。適合 tab 數量較多、需快速跳轉到任一 tab 的場景。</Desc>
         {/* 2026-05-18 fix(user 抓 overflow demo 沒秀真實溢出):max-w-md (448px) 太寬
             8 個短 Chinese tab 加總 < 448 不觸發 overflow。改 280px 強制觸發 + 視覺可見。*/}
         <div className="border border-border rounded-lg p-4 max-w-[280px]">
@@ -398,8 +394,8 @@ export const SpacingTokens: Story = {
       </div>
 
       <div>
-        <H3>Trigger padding</H3>
-        <Desc>水平 `px-3`(sm)/ `px-4`(md, lg)對稱 padding,讓 underline 居中對齊 label。</Desc>
+        <H3>Trigger 無水平 padding</H3>
+        <Desc>Trigger **不加任何水平 padding**——寬度 = 內容寬度(hug content)。selected underline(`::after left-0 right-0`)因此剛好 fit label;若加橫向 padding,underline 會多出鬆散空白。trigger 之間的分隔靠 TabsList 的 `gap-[--layout-space-loose]`,不是 padding。</Desc>
       </div>
     </div>
   ),
@@ -412,7 +408,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `tabs.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  tabs  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/tabs#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入 TabList\n- ←/→ — 切 tab\n- Home/End — 第一 / 最後 tab\n- Enter / Space — activate\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。"}</p>
+      <p className="whitespace-pre-line">{"詳 `tabs.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  tabs  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/tabs#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — 進入 TabList(整組 tabs 是單一 tab stop)\n- ←/→ — 在 tab 之間移動(roving tabindex,焦點不被困在 tab 列內)\n- Home/End — 第一 / 最後 tab\n- Enter / Space — activate\n\n  Focus  :Tabs 是內嵌導覽,不會把焦點困住(無 focus trap);用 roving tabindex 管理 tab 之間的移動。選中的 tab 與內容面板各自有 focus-visible 焦點框(ring-2 ring-ring,per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。"}</p>
     </div>
   ),
 }

@@ -47,7 +47,7 @@ export const Dismissable: Story = {
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-1">
           {tags.map(t => (
-            <Tag key={t} color="neutral" onDismiss={() => setTags(prev => prev.filter(x => x !== t))}>{t}</Tag>
+            <Tag key={t} color="neutral" onRemove={() => setTags(prev => prev.filter(x => x !== t))}>{t}</Tag>
           ))}
         </div>
         {tags.length === 0 && <p className="text-caption text-fg-muted">全部移除了，重新整理頁面可恢復</p>}
@@ -61,8 +61,8 @@ export const Truncation: Story = {
   name: '截斷 + Tooltip',
   render: () => (
     <div className="flex flex-col gap-3" style={{ maxWidth: 300 }}>
-      <Tag color="neutral">Short</Tag>
-      <Tag color="blue">This is a very long tag label that should truncate</Tag>
+      <Tag color="neutral">Bug</Tag>
+      <Tag color="blue">Q3 Checkout Funnel Redesign — Payment Step</Tag>
       <p className="text-caption text-fg-muted">超過 160px 自動截斷，hover 顯示完整文字 tooltip</p>
     </div>
   ),

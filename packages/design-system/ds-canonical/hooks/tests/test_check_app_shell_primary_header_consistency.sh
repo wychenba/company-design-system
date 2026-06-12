@@ -5,7 +5,7 @@
 #   V1 layout="primary-header" 缺 globalHeader prop
 #   V2 layout="primary-header" + 同 file 含 <SidebarHeader>
 #
-# Hook 透過 CLAUDE_TOOL_INPUT env var 讀 tool_input(JSON {tool_name, tool_input})
+# Hook 透過 stdin 讀 tool_input(INPUT=$(cat) + jq;2026-05-31 改 env→stdin 對齊 sibling helper + 讓 dispatcher 能呼叫)
 # 且需 TARGET file 真實存在於 disk(`[[ ! -f "$TARGET" ]] && exit 0`)。
 # 排除:.spec.md / *test* / app-shell.tsx 自身 / `@app-shell-primary-header-allow:` escape。
 # Violation 時 stderr「🚨 AppShell primary-header consistency violation」+ exit 2。
@@ -35,7 +35,7 @@ run_hook_on_file() {
     '{tool_name: $tn, tool_input: {file_path: $fp, new_string: ""}}')
   STDOUT=$(mktemp); STDERR=$(mktemp)
   set +e
-  CLAUDE_TOOL_INPUT="$payload" bash "$HOOK" >"$STDOUT" 2>"$STDERR" </dev/null
+  printf '%s' "$payload" | bash "$HOOK" >"$STDOUT" 2>"$STDERR"
   EXIT=$?
   set -e
   STDERR_TEXT=$(cat "$STDERR")
@@ -50,7 +50,7 @@ run_hook_no_file() {
     '{tool_name: $tn, tool_input: {file_path: $fp, new_string: ""}}')
   STDOUT=$(mktemp); STDERR=$(mktemp)
   set +e
-  CLAUDE_TOOL_INPUT="$payload" bash "$HOOK" >"$STDOUT" 2>"$STDERR" </dev/null
+  printf '%s' "$payload" | bash "$HOOK" >"$STDOUT" 2>"$STDERR"
   EXIT=$?
   set -e
   STDERR_TEXT=$(cat "$STDERR")

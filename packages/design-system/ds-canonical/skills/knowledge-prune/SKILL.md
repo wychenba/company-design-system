@@ -7,7 +7,9 @@ description: Prune governance sprawl across CLAUDE.md / specs / skills / hooks /
 
 **目的**:本 DS governance 自身是活的知識庫,若只 append 會讓 CLAUDE.md 載入成本失控、MEMORY.md 條目爆炸、hook 變殭屍、spec.md 重複。本 skill 掃 8 個 home 找冗贅,提議 retire 候選,加嚴執行 Rule-of-3 SSOT + 行數預算。
 
-**對齊 CLAUDE.md `# 資訊治理 canonical`**:本 skill 是 L3(Periodic deep)實作。L1(pre-write hook)+ L2(fire log)自動執行,L3 需人決策 canonical retire,走 checkpoint。
+**🔒 核心前提(每次必遵,不需 user 提醒 — mindset #6「tell me once」)**:prune 唯一目的是**移除噪音以銳化 signal、提升遵循正確率**,**絕不以犧牲品質換行數 / 條目下降**。每次跑同時必滿足:(a) 品質不可因 prune 打折;(b) 以**提升品質**(清晰度↑ / drift 風險↓ / recall 精度↑)為目標。故:① 只 retire 真冗餘 / stale / 已被上游完整吸收的條目(這類本身是噪音,清掉反提升正確率);② consolidate 重複(同概念多 home → 選 SSOT + pointer);③ **每條真實 invariant / 機械防線必完整保留 — retire 前必 grep 確認保護已被別處覆蓋,否則不動**;④ distinct 條目強合成大條目會降 recall 精度 = 反 pattern,不做。**retire rate 是結果指標非目標**:湊 % 傷品質 = 違本前提;寧可 retire rate < 5% + report 明寫「成熟無冗餘」rationale,也不強刪真保護。本前提 override 下方所有 Phase / Checkpoint 的數值 target。
+
+**對齊 CLAUDE.md `# 治理 canonical`**:本 skill 是 L3(Periodic deep)實作。L1(pre-write hook)+ L2(fire log)自動執行,L3 需人決策 canonical retire,走 checkpoint。
 
 **對齊 CLAUDE.md `# 稽核 canonical`「Audit-vs-execute 分權」**:動 canonical substantive meaning → **STOP 提議**;對齊 / 清 duplicate / 回填 pointer → **AUTO**。
 
@@ -72,13 +74,13 @@ Scan:同概念(同 keyword / 同 canonical)出現在 ≥ 3 個不同 home 寫完
 Example violations(historic — 2026-05-22 prune verify 後均已收斂為 pointer 模式,僅留作教學範例):
 - `Portal 逃脫 theme`:過去在 hover-card.spec.md / avatar.spec.md / color.spec.md 各重述;現只 M3 SSOT + 各 spec pointer。2026-05-22 audit verify 為已對齊(僅 ui-development.md / meta-patterns.md 2 home 涉及,clean pointer)
 - `Inline Action vs Button predicate`:過去 CLAUDE.md / item-anatomy.spec.md / button.spec.md 各完整;現 `inline-action.spec.md` 為 SSOT,其他 cross-link
-- 新範例(2026-05-22 抓):**hook count threshold** 在 CLAUDE.md L35 / meta-patterns M14 / M20 / `session_start_governance_check.sh:173` 4 處 drift 3 值(40/35/30)→ M14/M20 strip 數字改 pointer SSOT 修
+- 新範例(2026-05-22 抓):**hook count threshold** 在 CLAUDE.md `# 治理 canonical` 行數預算表 / meta-patterns M14 / M20 / `session_start_governance_check.sh` 4 處 drift 3 值(40/35/30)→ M14/M20 strip 數字改 pointer SSOT 修
 
 **Output**:duplicate cluster 清單 + 建議 SSOT home。
 
 #### D2 — Dead & stale(fire / edit recency)
 
-- **Dead hooks**:讀 `.claude/logs/hook-fires-per-hook.jsonl`(2026-04-25 起 instrumented via `_log-fire.sh` helper),6 月 0 fire 的 hook 名 → retire 提名
+- **Dead hooks**:跑 `npm run audit:hook-quality`(= `scripts/audit-hook-quality.mjs`,讀 `.claude/logs/hook-fires-per-hook.jsonl` 自動產 per-hook signal-to-noise report → `.claude/logs/hook-quality-report.json`:fire_count_6mo / fire_per_day / hot-warm-cool-dead 分類 / file_exists orphan signal / retire_candidate flag)。6 月 0 fire 的 hook 名 → retire 提名(report 已標 `dead`)
 - **Stale memories**:`ls -la ~/.claude/.../memory/*.md`,6 月無 git log 變動且不在 MEMORY.md index head = stale
 - **Unused skills**:`skill-invokes.jsonl` 3 月 0 invoke(除非是 rare-event skill,例 `delivery-handoff`)
 
@@ -104,68 +106,19 @@ Example:
 
 **Output**:matrix of 衝突點 + 誰該讓步
 
-#### D5 — Canonical drift(spec vs code 語義漂移)— 2026-05-17 加
+#### D5-D10 — 2026-05-17 加維度(各維 scan + Example + Output 詳 references/prune-dimensions-d5-d10.md)
 
-Scan:`*.spec.md` 寫的 canonical vs `*.tsx` 實際 code 行為衝突 / spec 寫禁止但 code 仍用 / spec 升級但 code 沒跟。
-
-Example:
-- `radius.spec.md:57-71` 禁 `rounded-xl/2xl/3xl` → grep `packages/design-system/src/**/*.tsx` 仍有用 → drift
-- `field-controls.spec.md` v13 state machine 升級 → 但 Combobox.tsx 還是 v12 behavior → drift
-
-**Output**:per (spec, code) drift entry + 對應 commit hash 追溯 last alignment 時點
-
-#### D6 — Hook-fire health(log-driven)— 2026-05-17 加
-
-讀 `.claude/logs/hook-fires-per-hook.jsonl`,3 大病徵:
-- **Dead**:6 月 0 fire(retire 候選,per `# Retire rules` Hook 規則)
-- **Hot**(過 fire):fire / day > 50 → 可能 false positive 多 / regex 太鬆
-- **Toggle pattern**:同 fire 反覆 inject + retract → hook design 不穩
-
-**Output**:dead retire list + hot tune list + toggle re-design list
-
-#### D7 — Skill-invoke health(log-driven)— 2026-05-17 加
-
-讀 `.claude/logs/skill-invokes.jsonl`,2 大病徵:
-- **Unused**:3 月 0 invoke(除 rare-event skill 如 delivery-handoff)
-- **Always co-invoked**:Skill A 永遠跟 Skill B 一起 invoke → 該合 1 skill 或 chain auto
-
-**Output**:retire list + merge candidate list
-
-#### D8 — Memory recency / orphan— 2026-05-17 加
-
-Scan `~/.claude/.../memory/*.md`:
-- 6 月無 git log 變動 + 不在 MEMORY.md index head = stale candidate(per existing D2 retire rule)
-- file 存在但 MEMORY.md 沒 entry = orphan(可能 retire 漏刪)
-- entry 存在但 file 不在 = broken pointer
-
-**Output**:stale / orphan / broken pointer 3-class list
-
-#### D9 — Benchmark / citation debt(2026-05-17 加,對應 M22)
-
-Scan 全 repo:
-- `@benchmark-unverified-blanket` marker(per file retraction;codify 後該 backfill cite 變 verified)
-- spec.md / tsx 含 world-class DS keyword(Material / Polaris / Carbon / Ant / Atlassian / Apple)但無 inline URL / GitHub path / screenshot ref
-- 過期 benchmark(cite URL 是 v3 但 framework 已 v5)
-
-**Output**:per (file, claim) cite debt entry + 建議 WebFetch 補 source
-
-#### D10 — Verification artifact rot(2026-05-17 加,對應 M32)
-
-Scan 全 audit / test infra:
-- audit script 只驗 `getAttribute(...)` / `class.includes(...)` 不驗 `getBoundingClientRect()` numeric(pixel-quantified 缺)
-- `*.spec.md` 寫 visual canonical 但無對應 playwright snapshot 或 visual-audit 覆蓋
-- stale screenshot ref(snapshot file 6 月未更新)
-
-**Output**:per audit script 升 pixel-quantified 提名 + 缺 visual coverage 列表
+D5 Canonical drift(spec vs code)/ D6 Hook-fire health / D7 Skill-invoke health / D8 Memory recency-orphan / D9 Benchmark-citation debt(M22)/ D10 Verification artifact rot(M32)。
 
 ### Phase 2 — Triage + Checkpoint 1(MUST ASK)
 
 ```
-Phase 1 findings:
+Phase 1 findings(D1-D10):
 - D1 duplicate: M clusters
 - D2 dead/stale: N items
 - D3 over-concrete: K items (abstract proposals)
 - D4 contradiction: L pairs
+- D5-D10(2026-05-17 加,detail 詳 references/prune-dimensions-d5-d10.md): D5 canonical drift / D6 hook-fire health / D7 skill-invoke health / D8 memory recency-orphan / D9 benchmark-citation debt / D10 verification artifact rot — 各 N items
 
 Priority:
 - P0 (AUTO): 對齊 SSOT / 補 pointer / 刪 confirmed dead hook / retire unused skill — 表達層調整,不動 canonical 意思
@@ -188,15 +141,9 @@ Proceed with P0+P1 as atomic commit? Then discuss P2?
 - 每 P2 item 一個獨立 commit(animation trail 可回溯)
 - 新 meta-pattern 加進 CLAUDE.md `# Meta-Pattern 預警` → 同時**必檢討哪些下游條目冗餘**(上游加 = 下游減)
 
-### Phase Z reference — Cross-repo SSOT propagation(2026-05-26 retract skill-specific Phase Z,移到 CLAUDE.md canonical)
+### Phase Z reference — Cross-repo SSOT propagation
 
-**Per user 2026-05-26 correction**:「不是只要一 knowledge audit deep 之後就要,是等我 push main 後才要」。
-
-Cross-repo SSOT sync trigger 不是「skill 跑完」而是「push main 後 SSOT-affecting diff」— canonical 統一在:
-- `CLAUDE.md` `# Git solo-work canonical` Step 5.5
-- Hook `check_post_main_ssot_propagate.sh`(PostToolUse Bash 偵測 `git push origin main` + diff)
-
-→ /knowledge-prune skill 本身**不負責 trigger sync**;Phase 3-4 commit + Phase 6 user 拍板 push main 後,canonical hook 自動偵測 SSOT diff + 提議 npm bump。**整鏈 1 trigger 同時 cover /deep-audit-cross-codex / 一般 dev / 任何 SSOT-affecting 來源**(DRY,不複製到每個 skill)。
+詳 references/phase-z-cross-repo-ssot-propagation.md(2026-05-26 retract skill-specific Phase Z;sync trigger = push main 後 SSOT-affecting diff,canonical 在 CLAUDE.md `# Git solo-work canonical` Step 5.5 + hook check_post_main_ssot_propagate.sh)。
 
 ---
 
@@ -293,23 +240,11 @@ Phase 1 D3 發現 5+ 條下游條目可被新 meta 吸收 → 提議新 Meta-Pat
 
 ## 世界級對照
 
-本 skill 是本 DS 原創的自我 prune 機制,但對齊:
-
-- **Elasticsearch Index Lifecycle Management**:hot / warm / cold 階段自動降級 + delete old data — 類 retire rate
-- **Linux kernel doc policy**:Sphinx deprecation warnings + removal schedule — 類 transition period 過渡期
-- **Python PEP 387 Backwards Compatibility Policy**:明定哪些改動需 deprecation 期,哪些可立刻刪 — 類 P0 vs P2 triage
+詳 references/world-class-prune-alignment.md(Elasticsearch ILM / Linux kernel doc policy / Python PEP 387)。
 
 ## 與其他 skill 的分工
 
 | Skill | Scope | 不重疊點 |
 |-------|-------|---------|
-| `/design-system-audit` | **33 維 DS code + spec audit**(Phase 0 自建 baseline) | 不管治理文件冗贅 — 找 bug / drift,不 prune governance 大小 |
+| `/design-system-audit` | **full-dim DS code + spec audit**(Phase 0 自建 baseline) | 不管治理文件冗贅 — 找 bug / drift,不 prune governance 大小 |
 | `/knowledge-prune` | **治理文件冗贅 + 行數 + 矛盾** | 不 audit DS code 本體 — 管 governance 不管 DS |
-
----
-
-## Non-goals 重申
-
-- 不 refactor spec.md 內容(改寫走 `/design-system-audit`)
-- 不 retire 有 active consumer 的 rule(必先改 consumer)
-- 不處理 `git log` 歷史 / 歷史 commit 訊息

@@ -12,9 +12,9 @@ paths:
 
 | 層 | 檔案 | Canonical | Hook | Audit Dim |
 |---|------|-----------|------|-----------|
-| 1 展示 | `*.stories.tsx` | trait-based v2 | `check_story_category.sh` | 29 |
-| 2 設計規格 | `*.anatomy.stories.tsx` | 6-canonical(Overview / Inspector / ColorMatrix / SizeMatrix / StateBehavior / Accessibility)| `check_story_anatomy.sh` | 13 |
-| 3 設計原則 | `*.principles.stories.tsx` | Polaris-aligned ≥ 2 of {WhenToUse / WhenNotToUse / Vs*Rule / ContentGuidelines};v3 預設整合 `UsageGuidance` 單一 export(Polaris/Material/Ant 共識) | `check_principles_canonical.sh` | 30 |
+| 1 展示 | `*.stories.tsx` | trait-based v2 | `check_story_invariants.sh` R3 category | 29 |
+| 2 設計規格 | `*.anatomy.stories.tsx` | 6-canonical(Overview / Inspector / ColorMatrix / SizeMatrix / StateBehavior / Accessibility)| `check_story_invariants.sh` R1 anatomy | 13 |
+| 3 設計原則 | `*.principles.stories.tsx` | Polaris-aligned ≥ 2 of {WhenToUse / WhenNotToUse / Vs*Rule / ContentGuidelines};v3 預設整合 `UsageGuidance` 單一 export(Polaris/Material/Ant 共識) | `check_canonical_propagation.sh` E.1 principles | 30 |
 
 ## Title 命名
 
@@ -34,6 +34,8 @@ paths:
 **Internal vs Components 三 test**:(1) 有預設視覺?(2) 直接 `<X>` 有視覺?(3) 所有消費者都包 wrapper?三題傾向 Internal → `Internal/`。**例外:compound-component public API**(`Dialog.Root/Trigger/Content` / `Field + FieldLabel + FieldError + FieldDescription` 等定義 sub-component 給 consumer 拼的 documented composition pattern)豁免三-test — 它**定義** sub-components,不是被 wrap 的零件。對齊 Radix Dialog / MUI FormControl + InputLabel + FormHelperText / Mantine Input.Wrapper compound idiom。
 
 **Title canonical 4-part exemption**(2026-05-16 codified):**Tokens / Patterns** 為 single-file showcase(無 anatomy/principles 對應)→ 3-part title 是 intentional convention(`Design System/Tokens/{Name}` / `Design System/Patterns/{Name}`),不是違反。**Components / Internal** 必 4-part(`/{Name}/{展示|設計規格|設計原則}`)因有 3 stories 對應 file 需 subpage 分流。
+
+**Patterns `{Name}` 必 spaced Title Case**(2026-06-12 codify,命名 3 重 test 全過):多字 pattern title 用人話 spaced(`Action Bar` / `Item Anatomy` / `Resize Handle`),非 PascalCase — title 是 reader-facing label,與 code identifier(`ResizeHandle`)雙軌分工;對齊 Atlassian「Avatar group」/ Polaris「Empty state」/ Carbon「Date picker」catalog spaced idiom。Tokens 第三層維持與 token 資料夾同名構詞(`LayoutSpace` ← `layoutSpace/`),不在此 rule scope。
 
 **MenuItem-as-listbox-child 鍵盤 delegation 例外**(2026-05-16 codified per Combobox spec.md L130-142):MenuItem `<div role="option">` 不需自帶 Enter/Space handler — 由 parent listbox(Combobox / SelectMenu / DropdownMenu)的 hidden native `<select>` handle 鍵盤導覽(對齊 Material/Atlassian/GitHub mixed-control「單 native tab stop + 多 mouse click surface」 canonical)。MenuItem 為 building block 不該重複 handler。
 
@@ -56,7 +58,7 @@ paths:
 - 同 affordance 內 prop variations 用 Controls 不另開(❌ `WithStartIcon`+`WithEndIcon` → ✓ `WithIcon` grid)
 - Compound 有 new constraint 才分
 
-**展示 v2 trait-based**:spec.md frontmatter `traits:` array → required core stories 衍生 + hook `check_story_category.sh` 攔。
+**展示 v2 trait-based**:spec.md frontmatter `traits:` array → required core stories 衍生 + hook `check_story_invariants.sh` R3 category 攔。
 
 **Principles canonical**(Polaris-aligned):universal core ≥ 2 of `WhenToUse`/`WhenNotToUse`/`Vs*Rule`/`ContentGuidelines` + hook 攔。SSOT → `/story-writing` skill `references/category-templates.md`。
 

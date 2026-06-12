@@ -6,7 +6,7 @@
 
 **Repo**:**Private**(team member-only collaborators,non-member 看不到 source)
 **App / Storybook host**:**Netlify**(non-GitHub Pages — public host 不適合 private workspace)
-**權限控管**:**Netlify Basic Password**(free-tier 唯一可用,共用 password)OR Pro Team protection($19/mo,per-account login)OR Cloudflare Access(免費 50 user,自架 SSO)— 2026-05-29 改 from Identity(已 deprecated)
+**權限控管**:**免費 = HTTP Basic Auth via Netlify Edge Function**(本 template 內建 `netlify/edge-functions/basic-auth.ts` + `netlify.toml` 已 wire `[[edge_functions]]`;fork user 在 Netlify 設 env var `STORYBOOK_BASIC_AUTH`=`user:password` 即生效,瀏覽器原生帳密彈窗,Edge Functions 含 free 全方案可用、`.netlify.app` 預設網址直接生效、無需自訂網域)OR **Pro Password Protection**($20/mo dashboard 開關,美化密碼頁 + 可只擋 preview 放行 production)OR **Cloudflare Access**(免費 50 user 真 SSO,需自架 Cloudflare proxy 在 Netlify 前)。注意:Netlify 內建密碼〔dashboard「Password protection」**與** `_headers` Basic-Auth header〕都是 Pro 專屬($20/mo,官方 docs + support forum 證實),free-tier 沒有(且 `_headers` 不套用到 edge function)→ 免費方法走 Edge Function 自做 Basic Auth,非 dashboard password 也非 `_headers`
 
 不適用 host(本 template 已 ban):
 - ❌ **GitHub Pages**:public host,private workspace 不該 expose
@@ -45,35 +45,32 @@ git push origin main
 ```
 template/ds-product-template/
 ├── README.md                            ← consumer-facing quick start
+├── CLAUDE.md                            ← fork-and-go onboarding + consumer canonical
 ├── package.json                          ← workspaces + DS deps + scripts
-├── tsconfig.json                         ← (TODO consumer 自添)
-├── vite.config.ts                        ← (TODO consumer 自添)
+├── tsconfig.json                         ← workspace base tsconfig
+├── netlify.toml                          ← Storybook build + edge-function Basic Auth wire + noindex headers (Netlify Git integration)
+├── netlify/
+│   └── edge-functions/
+│       └── basic-auth.ts                 ← FREE 密碼保護:讀 STORYBOOK_BASIC_AUTH env var 自做 HTTP Basic Auth
 ├── .gitignore
-├── renovate.json                         ← auto DS bump PR
+├── .npmrc
+├── .env.example
 ├── .claude/
 │   └── settings.json                     ← enable design-system@qijenchen plugin
+├── .devcontainer/
+│   ├── devcontainer.json                 ← Codespaces cloud-dev path
+│   └── onboard-banner.sh
 ├── .storybook/
 │   ├── main.ts                           ← import from @qijenchen/storybook-config
-│   └── preview.tsx                       ← import shared preview
+│   ├── preview.tsx                       ← import shared preview
+│   ├── manager-head.html
+│   └── storybook.css
 ├── .github/
 │   ├── CODEOWNERS                        ← team review
+│   ├── dependabot.yml                    ← daily DS version bump PR
 │   └── workflows/
-│       ├── audit.yml                     ← per-PR tsc + content + code + build + storybook
-│       └── deploy.yml                    ← per-app Vercel matrix deploy
-├── apps/
-│   └── _template/                        ← npm run create-app <name> source
-│       ├── package.json
-│       ├── tsconfig.json
-│       ├── vite.config.ts
-│       ├── index.html
-│       └── src/
-│           └── main.tsx                  ← demo with DS Button + Avatar
-├── packages/
-│   └── shared-utils/                     ← (TODO consumer fill 跨 product utility)
-├── scripts/
-│   └── create-app.mjs                    ← npm run create-app <name> generator
-├── codemods/
-│   └── README.md                         ← DS major bump migration scripts hub
+│       ├── audit.yml                     ← per-PR tsc + lint:imports + build + a11y CI
+│       └── sync-design-system.yml        ← DS publish event → auto npm update + commit
 └── docs/
     ├── 01-first-time-setup.md            ← Day 0 上工
     ├── 02-create-new-product.md          ← 生新 app

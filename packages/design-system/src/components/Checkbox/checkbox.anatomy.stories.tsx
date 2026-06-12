@@ -29,13 +29,13 @@ const TOKEN_MAP: Record<CheckedState, Record<InteractionState, ColorSpec>> = {
     disabled: { bg: '--bg-disabled', border: 'transparent',    indicator: 'none' },
   },
   checked: {
-    default:  { bg: '--primary',       border: '--primary',       indicator: 'white' },
-    hover:    { bg: '--primary-hover',  border: '--primary-hover', indicator: 'white' },
+    default:  { bg: '--primary',       border: '--primary',       indicator: '--on-emphasis' },
+    hover:    { bg: '--primary-hover',  border: '--primary-hover', indicator: '--on-emphasis' },
     disabled: { bg: '--bg-disabled',   border: 'transparent',    indicator: '--fg-disabled' },
   },
   indeterminate: {
-    default:  { bg: '--primary',       border: '--primary',       indicator: 'white' },
-    hover:    { bg: '--primary-hover',  border: '--primary-hover', indicator: 'white' },
+    default:  { bg: '--primary',       border: '--primary',       indicator: '--on-emphasis' },
+    hover:    { bg: '--primary-hover',  border: '--primary-hover', indicator: '--on-emphasis' },
     disabled: { bg: '--bg-disabled',   border: 'transparent',    indicator: '--fg-disabled' },
   },
 }
@@ -212,9 +212,9 @@ export const Overview = {
             <tbody>
               {[
                 ['size', "'sm'|'md'|'lg'", "'md'", '控件尺寸（sm = md = 16px，lg = 20px）'],
-                ['checked', 'boolean', '—', '受控模式的選取狀態'],
+                ['checked', "boolean | 'indeterminate'", '—', '受控模式的選取狀態(Radix CheckedState,含 indeterminate)'],
                 ['defaultChecked', 'boolean', 'false', '非受控模式的初始選取狀態'],
-                ['onCheckedChange', '(checked: boolean) => void', '—', '選取狀態變更 callback'],
+                ['onCheckedChange', "(checked: boolean | 'indeterminate') => void", '—', '選取狀態變更 callback'],
                 ['disabled', 'boolean', 'false', '禁止互動'],
                 ['required', 'boolean', 'false', '必填標記'],
                 ['name', 'string', '—', '表單欄位名稱'],
@@ -578,8 +578,8 @@ export const StateBehavior = {
 
       {/* Horizontal Group */}
       <div className="flex flex-col gap-3">
-        <span className="text-caption font-medium text-fg-secondary">水平排列 — Item 之間 gap-6（24px）</span>
-        <div className="flex gap-6 border border-dashed border-divider rounded-md p-2">
+        <span className="text-caption font-medium text-fg-secondary">水平排列 — Item 之間 gap-4（16px）</span>
+        <div className="flex gap-4 border border-dashed border-divider rounded-md p-2">
           <SelectionItem control={<Checkbox id="hg-a" />} label="Email" htmlFor="hg-a" />
           <SelectionItem control={<Checkbox id="hg-b" />} label="SMS" htmlFor="hg-b" />
           <SelectionItem control={<Checkbox id="hg-c" />} label="Push" htmlFor="hg-c" />
@@ -620,7 +620,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `checkbox.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  checkbox  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/checkbox#accessibility)。\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"角色與鍵盤:Checkbox 本身就是一個 checkbox 角色的可勾選控件,螢幕報讀器會唸出「核取方塊 / 已勾選 / 未勾選」。鍵盤上用 Tab 移動焦點、用空白鍵切換勾選狀態。\n\n焦點:用鍵盤移到 Checkbox 上時,會出現一圈藍色焦點外框(focus ring)讓使用者知道焦點在這裡。Checkbox 是單一控件,不像對話框那種會把焦點關在裡面;焦點外框只是視覺提示。\n\n驗證:Storybook 的 a11y 檢查面板應該沒有任何嚴重(critical)問題;不用滑鼠、只用鍵盤也能完整操作。文字對比度至少 4.5:1、控件對比度至少 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

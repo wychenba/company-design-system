@@ -24,10 +24,8 @@
     },
     "M4": {
       "name": "_Group fieldCtx 隔離",
-      "dims": [
-        34
-      ],
-      "note": "Dim 34 disabled state precedence 隱含驗 group context"
+      "dims": [],
+      "note": "2026-05-31 infra-audit 修假覆蓋:原宣稱 dim 34「隱含驗」是假 — dim 34 hook(check_field_family_invariants A.2 FieldControlGroup wrapper + A.4 disabled color)不驗 M4 的 fieldCtx.id 隔離 invariant(_Group child 不共用 fieldCtx.id,否則 label 全抑制+點擊只 toggle 第一個)。無 dedicated mechanical check;靠 runtime story + manual review。queued:考慮加 dim/hook 驗 _Group 建自己 context"
     },
     "M5": {
       "name": "State 疊加 spec coverage",

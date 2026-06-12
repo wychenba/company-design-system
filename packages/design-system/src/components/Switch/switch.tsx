@@ -5,7 +5,7 @@ import { Check } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldDisabled, useResolvedFieldMode } from '@/design-system/components/Field/field-context'
 
 /**
  * Switch — 開關控件
@@ -19,7 +19,7 @@ import { useFieldContext } from '@/design-system/components/Field/field-context'
  *   lg:    track 24×48, thumb 24, 白色圓 20, check 16（= checkbox lg）
  *
  * ── 視覺狀態 ──
- *   OFF: track border (neutral-5), thumb 白色無 border 無 check
+ *   OFF: track border (neutral-5), thumb 白色 + 2px border-border(neutral-5,與 OFF track 同色)無 check
  *   ON:  track primary, thumb 白色 + 2px primary border + primary check icon
  *   disabled: opacity-disabled（整體透明度）
  *   readOnly: 視覺同一般態，但 pointer-events-none + aria-readonly
@@ -131,7 +131,7 @@ const Switch = React.forwardRef<
       label,
       description,
       readOnly = false,
-      disabled,
+      disabled: disabledProp,
       mode,
       // chrome 對 Switch 主體無視覺影響(無 input wrapper)— 接收純為 prop 一致性;destructure 防 leak 到 DOM。
       variant: _chrome,
@@ -143,19 +143,14 @@ const Switch = React.forwardRef<
     const sizeKey = size ?? 'md'
     const spec = SPECS[sizeKey]
 
-    // ── mode='display' ─────────────────────────────────────────────────────
-    // 純展示模式:無互動 toggle、無 input variant,渲染 ✓ / —。
-    // 與 Checkbox display 對齊(同為 boolean primitive)— DataTable boolean cell 場景共用。
-    // 與 readonly 差異:readonly 保留 toggle 視覺 + 鎖互動;display 完全無 toggle 形體。
-    if (mode === 'display') {
-      const isChecked = props.checked === true
-      return isChecked
-        ? <span className="text-foreground">✓</span>
-        : <span className="text-fg-muted">—</span>
-    }
-
     // Field context 偵測：在 Field 內時忽略自己的 label/description，避免雙層
+    // 2026-05-31 #35:hooks(useFieldContext / useId)必在任何 conditional return 前呼叫(Rules of Hooks)。
+    // 原 mode='display' early return 寫在 hooks 之上 → runtime 切 mode 會 hook count 不一致 crash;已下移至 hooks 後。
     const fieldCtx = useFieldContext()
+    // 2026-06-08 SSOT:<Field disabled>/<Field mode> cascade(原 disabled/mode 直傳 prop,漏 fieldCtx)
+    const disabled = useResolvedFieldDisabled(disabledProp)
+    const resolvedMode = useResolvedFieldMode({ mode, disabled, readOnly })
+    const effectiveReadOnly = readOnly || resolvedMode === 'readonly'
     const insideField = fieldCtx?.hasFieldWrapper === true
     const effectiveLabel = insideField ? undefined : label
     const effectiveDescription = insideField ? undefined : description
@@ -172,15 +167,24 @@ const Switch = React.forwardRef<
     const generatedId = React.useId()
     const inputId = idProp ?? fieldCtx?.id ?? generatedId
 
+    // ── mode='display'(下移至所有 hooks 之後,per #35 Rules of Hooks)──────────
+    // 純展示模式:無互動 toggle、渲染 ✓ / —。與 Checkbox display 對齊(同 boolean primitive)。
+    if (resolvedMode === 'display') {
+      const isChecked = props.checked === true
+      return isChecked
+        ? <span className="text-foreground">✓</span>
+        : <span className="text-fg-muted">—</span>
+    }
+
     const rootEl = (
       <SwitchPrimitives.Root
         id={inputId}
         className={cn(switchVariants({ size }), alignRightInField, className)}
         ref={ref}
         disabled={disabled}
-        aria-readonly={readOnly || undefined}
-        data-readonly={readOnly || undefined}
-        tabIndex={readOnly ? -1 : undefined}
+        aria-readonly={effectiveReadOnly || undefined}
+        data-readonly={effectiveReadOnly || undefined}
+        tabIndex={effectiveReadOnly ? -1 : undefined}
         aria-describedby={fieldCtx?.descriptionId}
         {...props}
       >
@@ -264,14 +268,14 @@ Switch.displayName = SwitchPrimitives.Root.displayName
 // Phase 2 fill needed: purpose descriptions + when rationale + world-class refs
 export const switchMeta = {
   component: 'Switch',
-  family: 4,
+  family: null, // self-contained primitive(對齊 spec frontmatter self-contained + body L31;非 Family 4)
   variants: {
 
   },
   sizes: {
-    sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
-    md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
-    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },
+    sm: { fieldHeight: 28, iconSize: 12, typography: 'body' },
+    md: { fieldHeight: 32, iconSize: 12, typography: 'body' },
+    lg: { fieldHeight: 36, iconSize: 16, typography: 'body-lg' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {

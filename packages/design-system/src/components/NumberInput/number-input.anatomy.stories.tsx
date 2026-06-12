@@ -45,7 +45,7 @@ const TOKEN_MAP: Record<ModeKey, Record<StateKey, ColorSpec>> = {
     disabled: { bg: 'transparent',    text: '--fg-disabled',  border: 'transparent' },
   },
   readonly: {
-    default:  { bg: '--bg-disabled',  text: '--foreground',   border: 'transparent' },
+    default:  { bg: '--bg-readonly',  text: '--foreground',   border: 'transparent' },
     hover:    { bg: '--bg-disabled',  text: '--foreground',   border: 'transparent' },
     focus:    { bg: '--bg-disabled',  text: '--foreground',   border: 'transparent' },
     error:    { bg: '--bg-disabled',  text: '--foreground',   border: 'transparent' },
@@ -244,7 +244,7 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['mode', "'edit'|'readonly'|'disabled'", "'edit'", '顯示模式'],
+                ['mode', "'edit'|'display'|'readonly'|'disabled'", "'edit'", '顯示模式'],
                 ['error', 'boolean', 'false', '紅色邊框 + aria-invalid（僅 edit 生效）'],
                 ['size', "'sm'|'md'|'lg'", "'md'", '尺寸，與 Button 同 size 對齊'],
                 ['value', 'number | null', '—', '數值'],
@@ -254,8 +254,8 @@ export const Overview = {
                 ['precision', 'number', '—', '小數位數'],
                 ['locale', 'string', "'en-US'", '數字格式 locale'],
                 ['endAction', 'InlineActionConfig', '—', '右側 inline action（宣告式 API）'],
-                ['disabled', 'boolean', 'false', '原生屬性，自動覆蓋 mode 為 disabled'],
-                ['readOnly', 'boolean', 'false', '原生屬性，自動覆蓋 mode 為 readonly'],
+                ['disabled', 'boolean', 'false', '原生屬性；mode 未顯式指定時解析為 disabled（顯式 mode prop 永遠最優先，useResolvedFieldMode SSOT）'],
+                ['readOnly', 'boolean', 'false', '原生屬性；mode 未顯式指定且無 Field context mode 時解析為 readonly（優先序 mode > 有效 disabled > fieldCtx.mode > readOnly）'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -663,7 +663,7 @@ export const StateBehavior = {
             <div className="w-[200px]">
               <NumberInput value={focusValue} onChange={setFocusValue} prefix="$" placeholder="點擊 focus" />
             </div>
-            <span className="text-[11px] text-fg-muted">input 永遠 focus-visible（瀏覽器規範），統一 border-primary 1px</span>
+            <span className="text-[11px] text-fg-muted">input outline-none；focus 時由 wrapper focus-within 觸發 border-primary 1px</span>
           </div>
         </div>
 
@@ -760,7 +760,7 @@ export const StateBehavior = {
                   ['type="text" inputMode="decimal"', '用 text 而非 number，避免瀏覽器 spinner 干擾'],
                   ['空字串 / "-" → onChange(null)', '清空或只剩負號時回傳 null'],
                   ['NaN 忽略', '非數字輸入不觸發 onChange'],
-                  ['disabled / readOnly 原生屬性覆蓋 mode', 'disabled → mode="disabled", readOnly → mode="readonly"'],
+                  ['disabled / readOnly 參與 mode 推導', 'mode 未顯式指定時：有效 disabled → "disabled"；readOnly 排在 Field context mode 之後 → "readonly"（顯式 mode prop 永遠最優先，useResolvedFieldMode）'],
                 ].map(([rule, desc]) => (
                   <tr key={rule}><Td mono>{rule}</Td><Td>{desc}</Td></tr>
                 ))}
@@ -780,7 +780,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `number-input.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :native  <input>  element 預設 a11y;Field wrapper 補  aria-labelledby  /  aria-invalid  /  aria-describedby 。\n\n  Keyboard 行為  :\n\n- Tab — focus\n- ↑/↓ — 加 / 減 step\n- 字母鍵 — 輸入數字\n\n  Focus  :native input focus ring;DS focus-visible ring( focus-visible:!border-primary )由 Field wrapper 提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"ARIA  :使用原生  <input type=\"text\" inputMode=\"decimal\">  ;外層 Field 自動補上標籤、錯誤狀態與描述的關聯。 inputMode=\"decimal\"  讓行動裝置彈出數字鍵盤。\n\n  鍵盤行為  :\n\n- Tab — 移入欄位\n- 數字鍵 — 輸入數值\n\n  焦點  :原生 input 焦點外框,聚焦時外框轉為主色,由外層 Field 提供。\n\n  驗證  :Storybook 無障礙檢查面板應為 0 項嚴重問題;不靠滑鼠也能完整操作。文字對比度至少 4.5:1、介面元件至少 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

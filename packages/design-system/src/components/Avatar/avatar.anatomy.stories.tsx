@@ -2,11 +2,18 @@
 // @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
 // @anatomy-rationale:
 //   StateBehavior 涵蓋 fallback chain(src 失敗 → icon → alt 首字 → User icon)
-//   與 status presence dot 三態,屬資料載入的視覺降級而非互動狀態。
+//   與 status presence dot 四態(online / away / busy / offline),屬資料載入的視覺降級而非互動狀態。
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { Building2, Folder, Globe } from 'lucide-react'
 import { Avatar } from './avatar'
+import {
+  CATEGORICAL_HUES,
+  CAT_SUBTLE_TOKENS,
+  CAT_SOLID_TOKENS,
+  type CategoricalColor,
+  type CategoricalHue,
+} from '@/design-system/tokens/categorical-color'
 
 const meta: Meta = {
   title: 'Design System/Components/Avatar/設計規格',
@@ -20,37 +27,31 @@ export default meta
 
 type ModeKey = 'image' | 'icon' | 'text'
 type ShapeKey = 'circle' | 'square'
-type ColorKey = 'neutral' | 'blue' | 'red' | 'green' | 'yellow' | 'purple' | 'magenta' | 'turquoise' | 'indigo'
+type ColorKey = CategoricalColor // 'neutral' + 12 categorical 色相
 
-const ALL_COLORS: ColorKey[] = ['neutral', 'blue', 'red', 'green', 'yellow', 'purple', 'magenta', 'turquoise', 'indigo']
+const ALL_COLORS: ColorKey[] = ['neutral', ...CATEGORICAL_HUES]
 const PRESET_SIZES = [20, 24, 32, 40] as const
 
 type VariantKey = 'subtle' | 'solid'
 
-// 與 Tag 元件完全對齊：使用 primitive token（--color-blue-1 等），不用 semantic（--primary 等）
-// subtle = primitive step-1 背景 + step-7 前景，solid = step-6 背景 + 白字（yellow 例外）
+// 與 Tag 元件完全對齊：**消費 categorical-color SSOT**(strip `var()` 取顯示用 token 名),
+// key X 一律對 `--color-X-*`(1:1,零 offset)。subtle = step-1 底 + step-7 字,solid = step-6 底
+// + on-emphasis 配對字(亮 hue yellow/amber/orange/lime → --on-emphasis-dark 深字;green 白字例外)。neutral 非色相,Avatar 用 --muted 自處理。
+// 2026-06-04 SSOT 重構後 anatomy 表機械衍生,永遠與 tsx COLOR_MAP 1:1 無漂移(M17)。
+const stripVar = (s: string) => s.replace(/^var\(/, '').replace(/\)$/, '')
+const hueTokens = (m: Record<CategoricalHue, { bg: string; text: string }>) =>
+  Object.fromEntries(
+    CATEGORICAL_HUES.map((h) => [h, { bg: stripVar(m[h].bg), text: stripVar(m[h].text) }]),
+  ) as Record<CategoricalHue, { bg: string; text: string }>
+
 const COLOR_TOKENS: Record<VariantKey, Record<ColorKey, { bg: string; text: string }>> = {
   subtle: {
-    neutral:   { bg: '--muted',               text: '--foreground' },
-    blue:      { bg: '--color-blue-1',        text: '--color-blue-7' },
-    red:       { bg: '--color-deep-orange-1', text: '--color-deep-orange-7' },
-    green:     { bg: '--color-green-1',       text: '--color-green-7' },
-    yellow:    { bg: '--color-yellow-1',      text: '--color-yellow-7' },
-    turquoise: { bg: '--color-turquoise-1',   text: '--color-turquoise-7' },
-    purple:    { bg: '--color-purple-1',      text: '--color-purple-7' },
-    magenta:   { bg: '--color-magenta-1',     text: '--color-magenta-7' },
-    indigo:    { bg: '--color-indigo-1',      text: '--color-indigo-7' },
+    neutral: { bg: '--muted', text: '--foreground' },
+    ...hueTokens(CAT_SUBTLE_TOKENS),
   },
   solid: {
-    neutral:   { bg: '--color-neutral-9',     text: '--inverse-fg' },
-    blue:      { bg: '--color-blue-6',        text: 'white (#fff)' },
-    red:       { bg: '--color-deep-orange-6', text: 'white (#fff)' },
-    green:     { bg: '--color-green-6',       text: 'white (#fff)' },
-    yellow:    { bg: '--color-yellow-6',      text: '--warning-foreground' },
-    turquoise: { bg: '--color-turquoise-6',   text: 'white (#fff)' },
-    purple:    { bg: '--color-purple-6',      text: 'white (#fff)' },
-    magenta:   { bg: '--color-magenta-6',     text: 'white (#fff)' },
-    indigo:    { bg: '--color-indigo-6',      text: 'white (#fff)' },
+    neutral: { bg: '--color-neutral-9', text: '--inverse-fg' },
+    ...hueTokens(CAT_SOLID_TOKENS),
   },
 }
 
@@ -189,7 +190,10 @@ export const Overview = {
                 ['alt', 'string', '—', '替代文字（圖片失敗時取首字作 fallback）'],
                 ['icon', 'LucideIcon', '—', 'Icon 模式（與 src/alt 互斥優先）'],
                 ['color', 'ColorKey', "'neutral'", 'Icon / Text 模式的背景色'],
-                ['solid', 'boolean', 'false', '深底白字模式（step-6 背景 + 白色前景，yellow 例外）'],
+                ['solid', 'boolean', 'false', '深底配對前景模式（step-6 背景；yellow/amber/orange/lime 用深字，其餘白字）'],
+                ['status', "'online' | 'away' | 'busy' | 'offline'", '—', '在線狀態 dot（presence），顯示在右下角；可與 badgeCount（右上）並存'],
+                ['badgeCount', 'number', '—', '未讀 / 通知計數 badge，顯示在右上角（消費 Badge critical，>99 顯示 99+）；可與 status（右下）並存'],
+                ['hoverCard', 'ReactNode', '—', 'hover 時彈出的內容（如 ProfileCard），person avatar 預設必帶'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -670,7 +674,7 @@ export const StateBehavior = {
 
       <div className="flex flex-col gap-1">
         <H3>Status presence dot(線上 / 離開 / 忙碌 / 離線)</H3>
-        <Desc>傳 status prop 在 Avatar 右下角加 6px 狀態點,色彩語意對齊 Slack / Teams 業界共識(見 NameCard ColorMatrix「四種狀態對應色彩」)。狀態本身為唯讀,Avatar 不擁有切換邏輯。</Desc>
+        <Desc>傳 status prop 在 Avatar 右下角加狀態點,尺寸為 avatar 的 28%(clamp 8–16px),色彩語意對齊 Slack / Teams 業界共識(見 ProfileCard ColorMatrix「四種狀態對應色彩」)。狀態本身為唯讀,Avatar 不擁有切換邏輯。</Desc>
       </div>
       <div className="flex items-center gap-6">
         {(['online', 'away', 'busy', 'offline'] as const).map(s => (
@@ -691,7 +695,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `avatar.spec.md` 「A11y 預設」段。摘要:\n\n-    alt  必傳  :即使有  src , alt  是 image fallback / SR 訊號雙重來源。Person avatar  alt  應含 name + presence(例  \"Alan Chen (online)\" ),entity avatar 用品牌 / 專案名,純裝飾(極罕見)用空字串  alt=\"\" ( aria-hidden )。\n-   無  alt  時 fallback  :image 模式自動降級 initials / icon;一律不靜默渲染無 SR 標的元素。\n-   Status dot SR 處理  :status dot 內部 span  aria-hidden (presence 訊號整合進 parent  alt ),避免  role=\"status\"  live region 在 member list 造成 SR 洪水(詳「"}</p>
+      <p className="whitespace-pre-line">{"・alt 必傳：即使有圖片,alt 同時是「圖片載入失敗時的文字 fallback」與「螢幕報讀時的身份說明」。人員頭像的 alt 建議含姓名與在線狀態(例:「陳冠霖(在線)」),組織 / 專案頭像用品牌或專案名;極少數純裝飾用途才用空字串。\n\n・沒有 alt 時的降級:圖片模式會自動降級為首字或 icon,不會留下沒有任何報讀內容的空頭像。\n\n・在線狀態點不另發報讀:右下角的狀態小點不會被螢幕報讀單獨朗讀,在線狀態整合進頭像本身的 alt 文字。這樣一長串成員名單就不會同時朗讀一堆「在線 / 離線」造成讀屏洪水。\n\n・hover 名片可用鍵盤抵達:當頭像帶有 hoverCard 時,頭像本身會變成可用 Tab 聚焦的按鈕並顯示聚焦框,鍵盤使用者也能打開名片浮層。"}</p>
     </div>
   ),
 }

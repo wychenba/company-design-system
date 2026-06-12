@@ -1,0 +1,381 @@
+[
+ {
+  "item": "Tag onDismiss → onRemove 重新命名(全 DS-wide + consumer)",
+  "verify": {
+   "subject": "Tag onDismiss → onRemove 重新命名(全 DS-wide + consumer)",
+   "confirmedReal": [
+    {
+     "fileLine": "recommendation: 範圍清單(6 DS consumer + 4 story + spec 6 處 + combobox doc)",
+     "claim": "漏掉 2 處 Tag 'onDismiss' 文字引用,未列入 edits — 改完會留 stale/dangling reference,違反 mindset #3「改一處看三處」",
+     "codeReality": "rg 全庫確認 chip.spec.md:85『（走 LinkInput / Tag + onDismiss 路線）』直接點名 Tag 的 prop;chip.principles.stories.tsx:117『Chip 型別不提供 onDismiss』引用 Tag(已改名)的 prop 名。兩處都應同步改 onRemove。皆 markdown/story 字串,tsc 抓不到,但屬 doc drift。建議補進 edit list。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "edits[0..30] old-string 逐字存在性 + 唯一性",
+     "claim": "全部 30 個 edit 的 old 字串逐字存在且可唯一匹配",
+     "codeReality": "逐檔 Read + grep -c:tag.tsx 5 處各 count=1;combobox L307/403/595/740 各 1;PeoplePicker 3 處、4 story、spec.md 6 處全逐字命中。關鍵風險 combobox L595/L740 單行相同(出現 2 次),但 edit old 各含不同前置行(L594 onClick+14sp vs L739 無 onClick+20sp),perl 多行匹配各唯一(A=1,B=1),可確定性套用。無 old 不符。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "recommendation: onRemove 對齊 props-naming.md:13 canonical",
+     "claim": "canonical 前提正確 — onRemove 才是 Tag 的 SSOT 名,現有 onDismiss 是 drift",
+     "codeReality": "props-naming.md:13 已列『onRemove | 從集合移除 item | ... Tag(in list)』;L12 onDismiss=『通知被忽略』給 Alert/Notice/Toast/Coachmark。故 Tag 現用 onDismiss 確為 drift,rename 是修正對齊既有 canonical,非新發明。保留 Notice/Alert/Toast/Coachmark/inline-action/item-anatomy/action-bar 的 onDismiss 正確。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "breakage: check_story_invariants.sh onDismiss 偵測",
+     "claim": "rename 不會誤觸或誤通過 story-invariants hook",
+     "codeReality": "hook L124/L135 的 onDismiss\\b grep 是 B(dismiss via label Button)/ C(hand-crafted overlay)規則的 context 確認用,只在偵測 <Button>關閉</Button> 或 <div absolute bg-...> 時才查。Tag edits 不新增此 pattern,移除 Tag stories onDismiss 不 trip 也不新通過。無 hook 破壞。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "breakage: 外部 consumer + isSSOTUIUX 判斷",
+     "claim": "破壞分析準確、isSSOTUIUX 判斷正確",
+     "codeReality": "rg onDismiss 在 apps/ + template/ = 0 Tag 用法;ds-canonical mirror onDismiss 全是泛用 4-callback canonical 非 Tag consumer code,正確不動。public-component prop rename = SSOT-affecting,breakage『是』判斷準確未低估;pre-1.0 beta + user 拍板 clean-no-alias(warning-foreground 先例)合理。tsc baseline exit 0,改後需重跑驗證。",
+     "severity": "P1",
+     "category": "OTHER"
+    }
+   ],
+   "dismissed": [
+    {
+     "claim": "combobox L595/L740 兩處 onDismiss 單行相同會造成 Edit 套錯 / 歧義",
+     "whyDismissed": "edit old 各自包含不同前置行(L594 帶 onClick+14sp vs L739 不帶 onClick+20sp),perl 多行正則確認各唯一匹配 1 次,Edit 可確定性區分。非真問題。"
+    },
+    {
+     "claim": "patterns/inline-action.spec.md / item-anatomy.stories.tsx / action-bar.stories.tsx 的 onDismiss 也該一起改",
+     "whyDismissed": "逐行讀確認這些是 overlay-close / Banner.onDismiss / Button dismiss prop 的『關閉浮層 / 忽略通知』語意,非 Tag collection-remove。保留正確。"
+    },
+    {
+     "claim": "Notice/Alert/Toast 的 onDismiss 與 Tag 共用同名需一起處理",
+     "whyDismissed": "props-naming.md 明確 onDismiss(通知忽略)vs onRemove(集合移除)是兩個不同語意 callback;Notice/Alert/Toast/Coachmark 是通知關閉語意,保留 onDismiss 正確。"
+    }
+   ]
+  }
+ },
+ {
+  "item": "Button variant `(string & {})` loose-autocomplete escape hatch — 收緊評估",
+  "verify": {
+   "subject": "Button variant `(string & {})` loose-autocomplete escape hatch — 收緊評估",
+   "confirmedReal": [
+    {
+     "fileLine": "edit: button.tsx:247 old-string verbatim/uniqueness",
+     "claim": "verified",
+     "codeReality": "`old` 字串 `variant?: 'primary' | 'secondary' | 'tertiary' | 'text' | 'link' | (string & {})` 在 button.tsx:247 逐字存在且全庫唯一(grep 1 hit)。`new` 正確移除 `| (string & {})`,edit 可精確套用。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "file": "",
+     "fileLine": "breakage: tsc 機械驗證",
+     "claim": "verified",
+     "codeReality": "實際套用 edit 後跑 `npx tsc -b packages/design-system` → 退出碼 0(baseline 也 0)。已還原。收緊後 0 type error,機械證實非破壞。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "breakage(a): 全 DS consumer variant ∈ 封閉集合",
+     "claim": "verified",
+     "codeReality": "全 monorepo(packages/+src/+apps/)grep `<Button variant=`:僅 {tertiary 306, text 222, primary 177, secondary 52, link 4, 'primary' 1},零個落在封閉集合外。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "breakage(b): story loop variant={v} 不衍生自開放型別",
+     "claim": "verified",
+     "codeReality": "button.anatomy.stories.tsx:16 `type VariantKey = 'primary'|...|'link'`(獨立封閉 union),L22 `const VARIANTS: VariantKey[]`。loop 的 v 來自此封閉陣列非 ButtonProps['variant'],收緊後照常 type-check。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "breakage(c): destructive/ghost 內部 cast 解耦",
+     "claim": "verified",
+     "codeReality": "destructive/ghost 處理純為 button.tsx L396-400 的 `(variantProp as string) === 'destructive'/'ghost'` runtime cast。全 source 零個 JSX literal `<Button variant=\"destructive\">`,spec/story 只有 prose 提及(禁用說明)。cast 與 public 型別解耦,收緊後運作不變。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "breakage(d): 無 ButtonProps['variant'] 型別依賴",
+     "claim": "verified",
+     "codeReality": "全 monorepo grep `ButtonProps['variant']` / `as ButtonProps` / `satisfies ButtonProps` / `variant: string` 餵 Button → 0 hit。確認無開放字串型別依賴。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "recommendation: 設計理由(spec 反對 custom variant)",
+     "claim": "verified",
+     "codeReality": "button.spec.md 定義嚴格封閉 5-variant catalog(各附 world-class 對照),L40 明列 `variant=destructive` 為反例(反例),全 spec 無 custom/arbitrary variant string 條款。ssot-consultation 無『允許自訂 variant』canonical。收緊符合 DS 既有 SSOT。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "recommendation: 潛在被低估的 grep 噪音(非缺陷)",
+     "claim": "verified (caveat, not a defect)",
+     "codeReality": "naive `variant=` grep 會撈到 default/button/bare/icon/naked/critical 等值,但全在其他元件(Input/Field/FileUpload/Sidebar CollapsedFrame/Tag/Alert)非 Button。建議已正確 scope 到 `<Button>`,故非漏掉的 consumer;已逐一 verify 確認。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "isSSOTUIUX 判斷",
+     "claim": "issue(執行模式 caveat,非分析錯誤)",
+     "codeReality": "此收緊是 foundational Button 的 public type-surface / API contract 改動,依 CLAUDE.md `# 自主執行 canonical` 偏 SSOT-affecting → 應 propose 給 user 拍板再 merge,不該逕自 auto-apply。分析與 edit 本身技術正確且非破壞;這是 execution-gate caveat,不影響調查結論正確性。",
+     "severity": "P1",
+     "category": "OTHER"
+    }
+   ],
+   "dismissed": [
+    {
+     "claim": "benchmark claim「Material 開放字串為 theme augmentation,本 DS 無此需求」未經 WebFetch 驗證",
+     "whyDismissed": "read-only 對抗審查不跑 WebFetch;但此 benchmark 與 spec.md 既有 per-variant world-class 對照(L190-195 已 cite Polaris/Material/Ant/Atlassian/Carbon)一致,且收緊決策的非破壞性已由 tsc + grep 機械證實,benchmark 僅為設計理由佐證非 load-bearing,不影響結論。"
+    }
+   ]
+  }
+ },
+ {
+  "item": "Combobox 4 個 internal-mechanism escape-hatch props 對外暴露評估",
+  "verify": {
+   "subject": "Combobox 4 個 internal-mechanism escape-hatch props 對外暴露評估",
+   "confirmedReal": [
+    {
+     "fileLine": "Edit 1 (combobox.tsx ComboboxProps tagWrapperClassName, ~L416-421)",
+     "claim": "old 字串逐字存在且唯一",
+     "codeReality": "確認:exact-match count = 1。雖然 tagWrapperClassName 在檔內出現於兩個 interface(OverflowTagListProps L247-258 + ComboboxProps L416-421),但 old 字串含 ComboboxProps 版本獨有的 jsDoc 文字(`group selector (group/avatar)`),故唯一匹配 ComboboxProps。可精確套用。",
+     "severity": "P3",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "Edit 2 (combobox.tsx overflowWrapperClassName, ~L422-425)",
+     "claim": "old 字串逐字存在且唯一",
+     "codeReality": "確認:exact-match count = 1,匹配 ComboboxProps L422-425(`2026-05-16:overflow chip wrapper...物理上 chip = 1 個 slot`),與 OverflowTagListProps L259-261 版本文字不同故唯一。可精確套用。",
+     "severity": "P3",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "Edit 3 (combobox.tsx visibleCountOverride, ~L454-460)",
+     "claim": "old 字串逐字存在且唯一",
+     "codeReality": "確認:exact-match count = 1。visibleCountOverride 在檔內出現 3 次(useOverflowCount param L58 / OverflowTagListProps L269-274 / ComboboxProps L454-460),但 old 字串含 ComboboxProps 獨有完整 jsDoc 故唯一匹配。可精確套用。",
+     "severity": "P3",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "Edit 4 (combobox.spec.md '## 定位')",
+     "claim": "old 字串逐字存在且唯一",
+     "codeReality": "確認:'## 定位' 在 spec 內僅 1 次(L19)。new 字串為 blockquote 補充,不改既有定位段內容,純 additive 表達層。可精確套用。",
+     "severity": "P3",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "Edit 5 (combobox.tsx tagAreaPaddingLeftPx, ~L441)",
+     "claim": "old 字串逐字存在且唯一",
+     "codeReality": "確認:exact-match count = 1(`**2026-05-13 v2 deprecate path**:原 PeoplePicker pass {8}...`)。tagAreaPaddingLeftPx?: number 在 src 僅 1 處定義。可精確套用。",
+     "severity": "P3",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "Edit 6 (combobox.tsx tagAreaGapPx, ~L430-433)",
+     "claim": "old 字串逐字存在且唯一",
+     "codeReality": "確認:exact-match count = 1(`**Q2 known tradeoff**:0 後 useOverflowCount...tagAreaGapPx?: number`)。唯一定義處。可精確套用。",
+     "severity": "P3",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "Recommendation: 唯一 consumer = PeoplePicker / 0 end-user",
+     "claim": "無漏掉的 consumer",
+     "codeReality": "確認:全 repo grep 6 props(tagWrapperClassName/overflowWrapperClassName/tagAreaGapPx/tagAreaPaddingLeftPx/visibleCountOverride/overflowShape)→ src 唯一 consumer = packages/design-system/src/components/PeoplePicker/people-picker.tsx(L372/377/378/379/384/387)。其餘命中皆 dist/ build artifact(會被下次 build 覆蓋,不算 source consumer)。apps/template 0 個 Combobox 使用。consumer 與 Combobox 同 package(同 repo),@internal 是 jsDoc 非 access modifier,不阻擋同 repo 使用 → PeoplePicker 編譯+行為不變。breakage 分析正確。",
+     "severity": "P2",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "Breakage claim: tsc -b 不受 @internal 影響",
+     "claim": "verified",
+     "codeReality": "確認:tsconfig 全無 stripInternal 設定(grep 0 命中)→ @internal 不從 .d.ts strip 型別、不改 runtime/DOM/cva。純 doc/IDE marker。breakage='不破壞' 正確。",
+     "severity": "P2",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "Recommendation: @internal 是 DS 標準做法",
+     "claim": "verified — 對齊既有 DS canonical",
+     "codeReality": "確認:DS src 已有 5 檔用 @internal(overlay-surface/chrome-header/item-anatomy/horizontal-overflow/input.tsx);ui-development.md『Public component vs Internal primitive canonical』明文『export jsDoc 加 @internal marker(IDE intellisense 警示 end-user)』。建議完全對齊既有 canonical,非自創。",
+     "severity": "P3",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "isSSOTUIUX 判斷(spec 編輯非 canonical substantive)",
+     "claim": "判斷正確",
+     "codeReality": "確認:6 props 在 spec 原本 0 次提及(未文件化),新增 blockquote 僅標記哪些 prop 是 internal-only,不改任何視覺/結構 canonical 語義、不改 API contract、不改 cva/token。屬表達層補充。@internal jsDoc 同樣零行為改動。判定『非 SSOT-UI/UX substantive』正確,走 AUTO(文件對齊)合理。",
+     "severity": "P3",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "Subject/scope 內部 count 不一致(『4 props』vs 實際標 5 props)",
+     "claim": "investigation framing 與 edits 數量不符,需釐清",
+     "codeReality": "subject 寫『4 個 escape-hatch props』,但 edits 實際把 5 個 prop 標 @internal:tagWrapperClassName / overflowWrapperClassName / tagAreaGapPx / tagAreaPaddingLeftPx / visibleCountOverride(recommendation 文字有解釋『把 visibleCountOverride 一起標 @internal,同一批 stack 機制』,故 4+1)。非 bug、edits 本身正確且一致,但對外『4』vs 實際『5』的數字落差是溝通層 inconsistency,建議在落地 commit message / spec 用語統一為『5 個 stack-mechanism internal props』避免後續 contributor 混淆。overflowShape 正確保留 public(typed enum,矩形/圓形 +N),不在標記之列——此判斷合理。",
+     "severity": "P2",
+     "category": "OTHER"
+    }
+   ],
+   "dismissed": [
+    {
+     "claim": "應該也把 OverflowTagListProps 內的重複 prop 定義一起標 @internal(否則不一致)",
+     "whyDismissed": "OverflowTagListProps 是 module-private interface(無 export keyword,L230),不在 barrel export、end-user IDE 永遠看不到 → 標 @internal 對 end-user 認知面零作用,只增噪音。edit 只標 exported 的 ComboboxProps 是正確最小 scope。recommendation 的『同一批 stack 機制一起標避免不一致』指的是 public ComboboxProps 內部 5 props 的一致性,已達成。"
+    },
+    {
+     "claim": "加 @internal 可能 break dist/ 型別或下游 import",
+     "whyDismissed": "dist/combobox.d.ts 是 build 產物,下次 build 由 src 重生;且無 stripInternal 設定,@internal 不從 .d.ts 移除型別。end-user 若強行用這些 prop 仍可編譯(只是 IDE 灰字警示),屬 graceful、非 hard break。breakage 分析已正確涵蓋此點。"
+    },
+    {
+     "claim": "spec.md 『定位』段補 blockquote 屬 SSOT substantive 改動需 user 拍板",
+     "whyDismissed": "補的是『哪些 prop 是 internal-only』的文件化標記,不改任何既有定位語義 / 視覺結構 / API contract / canonical 規則,且這些 prop 原本 spec 0 次提及。屬表達層 additive 補充(audit-vs-execute 分權中的 AUTO 類:對齊/表達統一)。判定非 substantive 正確。"
+    }
+   ]
+  }
+ },
+ {
+  "item": "LinkInput readOnly 沒接到 mode resolution(#4)",
+  "verify": {
+   "subject": "LinkInput readOnly 沒接到 mode resolution(#4)",
+   "confirmedReal": [
+    {
+     "fileLine": "link-input.tsx L106-107(調查項主張:readOnly 沒參與 mode resolution)",
+     "claim": "verified",
+     "codeReality": "確認屬實。L106 `const mode: FieldMode = modeProp ?? fieldCtx?.mode ?? 'edit'` + L107 `const resolvedMode = disabled ? 'disabled' : mode` 完全沒有 readOnly 分支。對照 sibling canonical:input.tsx L110-112、textarea.tsx L202、number-input.tsx L107 三家全部含 `(readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')` fallback。LinkInput 是唯一漏接的。spec field-controls.spec.md L125 明文契約『disabled 和 readOnly 原生 HTML 屬性會自動覆蓋 mode prop』未在 LinkInput 落地。真 bug。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "edit 1 — link-input.tsx L94-95 解構加 readOnly",
+     "claim": "verified",
+     "codeReality": "old 字串 `      label,\\n      showDisplayEndIcon = false,\\n      id: idProp,` 逐字存在於 L93-95(6-space indent),grep -c = 1 唯一。readOnly 來自 L51 `extends React.InputHTMLAttributes<HTMLInputElement>` 且不在 Omit list,型別安全 tsc 無虞。可精確套用。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "edit 2 — link-input.tsx L105-107 mode resolution 改寫",
+     "claim": "verified",
+     "codeReality": "old 三行字串(comment L105 + `const mode` L106 + `const resolvedMode` L107)逐字存在且唯一(grep -c 各 = 1)。關鍵對抗驗證:移除中間變數 `mode` 後是否殘留引用?grep 全檔 standalone `mode` identifier 只剩 comment(L32/33/231/249)+ 型別字面量(L52 'mode'|'variant'),零執行引用 → 移除安全,tsc 不會 unused/undefined error。新公式 `modeProp ?? fieldCtx?.mode ?? (readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')` 與 input.tsx L110-112 字字一致。語義回溯正確:無 readOnly 時退化回舊路徑(`disabled ? 'disabled' : (modeProp ?? fieldCtx?.mode ?? 'edit')`),行為不變。可精確套用。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "edit 3 — link-input.tsx L271-272 原生 input 補 readOnly={resolvedMode === 'readonly'}",
+     "claim": "verified",
+     "codeReality": "old 字串 `          placeholder={placeholder}\\n          aria-invalid={(error || fieldCtx?.invalid) || undefined}`(10-space indent)逐字存在於 L271-272 且唯一。reasoning 正確:readOnly 一旦在 edit 1 被解構就脫離 ...props(L277 spread),edit-mode 原生 input 會丟掉原本經 ...props 注入的 readOnly → 必須顯式補回,對齊 input.tsx L189 canonical 防回歸。edit 模式下此值為 false(不鎖,正確);readonly 模式根本不渲染此 input(走 L210 !isEditable 分支),語義無誤。可精確套用。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "breakage 分析 — 4 類 consumer 影響",
+     "claim": "verified",
+     "codeReality": "全庫 grep `LinkInput` + readonly:0 個 consumer 傳原生 `readOnly` boolean(所有命中皆為 `mode=\"readonly\"` prop,非 native attr;含 cell-registry.tsx L427 走 `mode={displayOrDisabled(...)}`)。故『現傳 readOnly 的 consumer 行為改變』在當前 codebase 實際零命中 — 不是破壞而是補實未被使用的契約。沒傳 readOnly 的 consumer:undefined → false → 沿用舊路徑零影響,確認屬實。modeProp 優先序(`modeProp ?? ...`)保證 mode='edit'+readOnly 同傳時 edit 勝出,對齊 sibling『顯式 mode 最高優先』。非破壞性成立。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "isSSOTUIUX 判斷 = AUTO bug fix",
+     "claim": "verified",
+     "codeReality": "判斷正確。本修無新 design decision:(a)公式直接抄 input/textarea/number-input 三家既有 canonical;(b)spec L125 契約已宣稱、本修僅落地;(c)無新 token/variant/API/cross-component 語義。屬『對齊既有 canonical + 補實已宣稱契約』= bug fix,符合 CLAUDE.md 自主執行 canonical『Bug fix / 對齊既有 canonical → AUTO』。可 AUTO 修。",
+     "severity": "P1",
+     "category": "OTHER"
+    }
+   ],
+   "dismissed": [
+    {
+     "claim": "edit 3 reasoning 可能漏了原生 input 也該補 disabled={resolvedMode === 'disabled'}(input.tsx L190 有,LinkInput edit-mode input 沒有)",
+     "whyDismissed": "非本修 scope 且無回歸。disabled 模式同樣 route 到 L210 !isEditable 分支,edit-mode text input(L263)在 disabled 時根本不渲染,故缺 disabled native attr 無害、屬 pre-existing 狀況。本修只需補 readOnly(因 readOnly 被解構後脫離 ...props),不需也不該順手加 disabled — disabledProp 早已在 L104 解構且不在 ...props,行為不受本修影響。建議刻意不碰 disabled 是正確的最小修。"
+    }
+   ]
+  }
+ },
+ {
+  "item": "DataTable `advanced-filter-operators.draft.md` 非法檔名後綴處置",
+  "verify": {
+   "subject": "DataTable `advanced-filter-operators.draft.md` 非法檔名後綴處置",
+   "confirmedReal": [
+    {
+     "fileLine": "breakage analysis — dead ref `advanced-filter.draft.md` 處置",
+     "claim": "issue:漏掉一個相同 dead ref consumer。investigation 只在 panel L68『順手清掉』dead ref `advanced-filter.draft.md`,但 filter-tree.ts L7 有一模一樣的 dead ref `./advanced-filter.draft.md`(指向不存在的檔),edit list 完全沒觸及 L7。",
+     "codeReality": "grep 確認 production code 有 2 處 ref dead file:data-table-filter-panel.tsx:68 + filter-tree.ts:7。investigation 的 breakage 段只列 panel L68 dead ref,漏 filter-tree.ts:7。既然 investigation 自己選擇 scope-expand『順手清 dead ref』,一致性要求兩處都清(或都不碰);只清一處留另一處 = 不一致殘留。建議:edit filter-tree.ts L7 把 `詳:./advanced-filter.draft.md` 改成 `詳:./filter-operators.spec.md`(它自己的 L238 cite 已指該 spec)或直接刪該行。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "breakage — `rg advanced-filter-operators 全庫掃確認 0 殘留` claim",
+     "claim": "issue(minor):rename 後 dist/ build artifact 仍帶舊 ref,『0 殘留』需限定 src/。",
+     "codeReality": "dist/components/DataTable/filter-tree.d.ts:7 帶 `./advanced-filter.draft.md`(build 產物)。`.md` 不入 tsc/bundle graph,dist 是 stale 編譯輸出,下次 build 重生,非 source 問題;但 investigation 宣稱『全庫掃 0 殘留』會被 dist 命中 → sweep 應限 src/ 或加 --glob '!dist'。不影響 runtime/build 正確性。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "edit filter-operators.ts L10 old 字串",
+     "claim": "verified",
+     "codeReality": "od 確認 L10 = ` * 詳細 spec:`./advanced-filter-operators.draft.md``(1 leading space + `*`),逐字符合 edit old;grep count=1 唯一。new 路徑改 `./filter-operators.spec.md` 精確可套。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "edit filter-tree.ts L238 old 字串 + 行號 cite 有效性",
+     "claim": "verified",
+     "codeReality": "od 確認 L238 = 4 leading spaces + `// Per `advanced-filter-operators.draft.md` L116...`,逐字符合;grep count=1 唯一。cite 目標 draft L116 = `對齊 CU UX:`is` 直接接受多值,**不另設 `is_any_of` / `is_none_of`**` 與 cite 引文完全一致;L103-116 涵蓋 `select` 章節。investigation『內容 byte-for-byte 不動 → L116 行號不變 cite 仍有效』正確。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "edit data-table-filter-panel.tsx L68 old 字串",
+     "claim": "verified",
+     "codeReality": "od 確認 L68 = ` * 詳:`./advanced-filter.draft.md` + `./advanced-filter-operators.draft.md``,逐字符合 edit old(整行替換);grep count=1 唯一。new 替換成單一 `./filter-operators.spec.md` 同步清掉 dead ref + 改正確後綴,精確可套。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "recommendation — `.draft.md` 為非法自創後綴前提",
+     "claim": "verified",
+     "codeReality": "naming-conventions.md L56 明文『❌ 對新元件用新的 suffix(既有都是 .tsx / .spec.md / .stories.tsx / .anatomy.stories.tsx / .principles.stories.tsx,不自創如 .design.md / .tokens.tsx)』。`.draft.md` 不在 allowlist = 自創後綴,前提成立。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "recommendation — home 分層 Level 2 spec(非 Level 9 planning)判斷",
+     "claim": "verified",
+     "codeReality": "planning README『這裡不收』反例表:『設計 canonical judgment → 正確去處 spec.md → 已執行的 canonical 不該寄生 planning』。filter-operators.ts(registry,git-tracked,已 implemented)存在 → feature 已 executed → 內容屬 Level 2 spec rationale,不該入 planning。判斷正確。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "recommendation — co-locate 為 DataTable sub-spec(不併入 data-table.spec.md)+ Field/ 3-spec precedent",
+     "claim": "verified",
+     "codeReality": "Field/ 確有 3 個並列 .spec.md(field.spec.md / field-controls.spec.md / form-validation.spec.md)在同一 component dir,co-location precedent 成立。data-table.spec.md L359 已 cite『filter-operators.ts 是唯一 truth』,新 sub-spec 補 registry rationale 與主 spec 互補不衝突。建議合理。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "breakage — 零 runtime/build 破壞 + tsc -b 必過",
+     "claim": "verified",
+     "codeReality": "grep 確認 src/ 無任何 `import ... .md`(item-anatomy.tsx 命中項僅 jsDoc 註解提及 spec 名,非 import)。`.md` 不入 tsc/bundle dependency graph,故 rename + 改字串 = 零 runtime/build 破壞,tsc -b 必過。結論正確。",
+     "severity": "P1",
+     "category": "OTHER"
+    },
+    {
+     "fileLine": "isSSOTUIUX 判斷 — mechanical rename(AUTO)vs DRAFT-status/frontmatter(ASK propose)拆分",
+     "claim": "verified",
+     "codeReality": "拆分判斷正確:(a) git mv + 改 3 處 doc-comment 路徑字串 = 純機械重命名 + 對齊 allowlist,不動 canonical meaning → AUTO 合理;(b) 把 DRAFT canonical-status 文字升正式 = 改 canonical meaning(substantive),且改檔頭 6 行會 shift L116 cite 行號 → 與 cite 更新綁一起,列 propose 給 user 拍板。draft.md 確實無 YAML frontmatter(以 `#` 開頭),補 frontmatter 對齊 data-table.spec.md 的提議有依據。分權符合 CLAUDE.md 自主執行 canonical。",
+     "severity": "P1",
+     "category": "OTHER"
+    }
+   ],
+   "dismissed": [
+    {
+     "claim": "filter-tree.ts L7 的 dead ref 應否算本次 rename 任務的破壞遺漏",
+     "whyDismissed": "L7 ref 的是 `advanced-filter.draft.md`(另一個不存在的 dead file),不是本次 rename 對象 `advanced-filter-operators.draft.md`,嚴格說屬獨立 dead-ref 議題、非 rename 直接破壞。但因 investigation 自己選擇在 panel L68『順手清』同一個 dead ref,一致性上仍應併清 L7 — 故未完全 dismiss,降級為 confirmedReal P1 一致性遺漏。",
+     "whyDismissed2": ""
+    },
+    {
+     "claim": "rename 應改用合併進 data-table.spec.md 而非新建 filter-operators.spec.md",
+     "whyDismissed": "data-table.spec.md 已是 foundational_ssot ≤800-1200 例外的最複雜 composite spec;再塞 51-op registry rationale 會脹破 budget。Field/ 3-spec co-location precedent 支持獨立 sub-spec。investigation 選 co-locate sub-spec 正確,合併方案 dismiss。"
+    }
+   ]
+  }
+ }
+]

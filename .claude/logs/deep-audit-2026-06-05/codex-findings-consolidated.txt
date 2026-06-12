@@ -1,0 +1,106 @@
+
+### B1-date
+Calendar|packages/design-system/src/components/Calendar/calendar.spec.md:32|`<DatePicker>` 互動模型:「點 trigger → 浮層 Calendar → 選一個 → 回填 input」|code 真實為 DatePicker 消費 `<DateGrid>`，非 `<Calendar>`；`date-picker.tsx:606` render `<DateGrid />`|claim-vs-code|P2
+Calendar|packages/design-system/src/components/Calendar/calendar.spec.md:33|`<Calendar>`(DayPicker 包裝) 是 DatePicker 的內部 calendar grid primitive|code/SSOT 真實為 DayPicker 包裝元件叫 `DateGrid`；`date-grid.tsx:43` import `DayPicker` 且 export `DateGrid`|claim-vs-code|P1
+Calendar|packages/design-system/src/components/Calendar/calendar.spec.md:172|Toolbar navigation 用 `<nav aria-label="calendar navigation">`|`calendar.tsx:192` toolbar 是 plain `<div>`，沒有 `<nav>`/`aria-label="calendar navigation"`|claim-vs-code|P1
+Calendar|packages/design-system/src/components/Calendar/calendar.spec.md:216|無 `StateBehavior`: Calendar 本身無 `hover / focus / disabled` 狀態|code 真實有 cell `hover:bg-neutral-hover`、`focus-visible:ring-2`，event tile 也有 focus ring；stories 也有 `StateBehavior`|spec-internal|P2
+DatePicker|packages/design-system/src/components/DatePicker/date-picker.spec.md:28|鍵盤觸發由 Radix Popover `asChild` 處理 Enter / Space|code 真實為自建 `onKeyDown` 處理 Enter/Space；`date-picker.tsx:523-530` 且同檔註解明說 Radix 只 compose onClick|claim-vs-code|P1
+DatePicker|packages/design-system/src/components/DatePicker/date-picker.spec.md:36|controlled-only: `value` + `onChange` 必傳|TS API 真實為 `value?: string | null`、`onChange?: (value: string) => void`；Range 也 optional|claim-vs-code|P2
+DatePicker|packages/design-system/src/components/DatePicker/date-picker.spec.md:181|Range popover: `mode="range"` + `numberOfMonths={2}`|code 真實固定傳 `mode="single"`，用 manual modifiers；`numberOfMonths={showTime ? 1 : 2}`|claim-vs-code|P1
+DatePicker|packages/design-system/src/components/DatePicker/date-picker.spec.md:185|期間 user 可 hover 未來端點預覽 range track 視覺(Calendar 內建)|code 真實不用 RDP range mode，只有已選 start/end 產生 `rangeModifiers`，沒有 hover preview state/handler|claim-vs-code|P2
+DatePicker|packages/design-system/src/components/DatePicker/date-picker.spec.md:286|DatePicker 不 `...props` spread DOM|code 真實 edit trigger `date-picker.tsx:542`、readonly wrapper `date-picker.tsx:475` 都 spread `...props`|claim-vs-code|P1
+DatePicker|packages/design-system/src/components/DatePicker/date-picker.spec.md:305|Trigger 鍵盤 Space/Enter open; Esc close + focus return to trigger(Radix Popover 內建)|Space/Enter/Esc 是本檔自建 `onKeyDown`; focus return 才可歸 Radix/Popover 行為|claim-vs-code|P2
+DateGrid|packages/design-system/src/components/DateGrid/date-grid.spec.md:103|range 端點 pseudo `inset-y-0.5` + `left/right-0.5`|code 真實為 `before:inset-y-0`、`before:left-0 before:-right-[2px]` / `before:-left-[2px] before:right-0`|claim-vs-code|P1
+DateGrid|packages/design-system/src/components/DateGrid/date-grid.spec.md:104|range middle pseudo `inset-y-0.5 inset-x-0`|code 真實為 `before:inset-y-0 before:-inset-x-[2px]`;同檔檔頭 comment 也 canonical 為 `inset-y-0 -inset-x-[2px]`|claim-vs-code|P1
+DateGrid|packages/design-system/src/components/DateGrid/date-grid.spec.md:121|week header 同寬,`h-field-sm`|code 真實 weekday class 是 `h-7 align-middle text-center`，不是 `h-field-sm`|claim-vs-code|P2
+DateGrid|packages/design-system/src/components/DateGrid/date-grid.spec.md:128|day cell 隨 density 縮放|同 spec `date-grid.spec.md:200` 又宣稱 cell 尺寸固定不隨 density 變；段落內部自相矛盾|spec-internal|P2
+TimePicker|packages/design-system/src/components/TimePicker/time-picker.spec.md:25|Radix Popover 在 `asChild` 下會自動 inject Enter / Space 開啟 handler + 正確 aria attributes|code 真實為 TimePicker 自建 `onKeyDown`；`time-picker.tsx:301-305` 明說 Radix 不 inject onKeyDown|claim-vs-code|P1
+TimePicker|packages/design-system/src/components/TimePicker/time-picker.spec.md:34|controlled-only: `value` + `onChange` 必傳|TS API 真實為 `value?: string | null`、`onChange?: (value: string) => void`，皆 optional|claim-vs-code|P2
+
+### B2-select
+Select|packages/design-system/src/components/Select/select.spec.md:218|原生 select 純文字 + ChevronDown|桌機路徑是 `CustomSelect`：`<div role="combobox">` + `SelectMenu`/cmdk；只有觸控路徑才是原生 `<select>`|claim-vs-code|P1
+Select|packages/design-system/src/components/Select/select.spec.md:226|Tag 元件呈現選中值 + 隱藏的原生 select overlay|桌機 tag 模式仍是 custom combobox + `SelectMenu`；隱藏原生 `<select>` overlay 只存在 `NativeSelect` 觸控路徑|claim-vs-code|P1
+Select|packages/design-system/src/components/Select/select.anatomy.stories.tsx:283|（預設）狀態、類別等純文字選項。原生 select 純文字 + ChevronDown|桌機 Select plain 是 `CustomSelect` 的 `role="combobox"` div，不是原生 select；原生 `<select>` 只在 `useIsTouchDevice()` true 時走|claim-vs-code|P1
+Combobox|packages/design-system/src/components/Combobox/combobox.anatomy.stories.tsx:786|量測在 useLayoutEffect 內 paint 前同步完成，超出的 tag 在繪製前就已隱藏，避免閃爍|`useOverflowCount` 實際使用 `React.useEffect`，且同檔註解明確說從 `useLayoutEffect` 改回 `useEffect`，可能接受 1-2 frame flicker|claim-vs-code|P1
+SelectMenu|packages/design-system/src/components/SelectMenu/select-menu.anatomy.stories.tsx:168|型別決定單 / 多選|實際由 `multiple` prop 決定單/多選；`value` 型別只被 normalize 成 selectedValues，`multiple=false` 即使 value 是 array 仍走單選 close path|claim-vs-code|P1
+SelectMenu|packages/design-system/src/components/SelectMenu/select-menu.anatomy.stories.tsx:209|trigger 寬度|`minWidth` 預設是 `max(var(--radix-popover-trigger-width), 15rem)`，不是純 trigger 寬度|claim-vs-code|P2
+SelectMenu|packages/design-system/src/components/SelectMenu/select-menu.spec.md:213|非 searchable 時落在 content 容器|實際 `handleNonSearchableAutoFocus` preventDefault 後 query `[cmdk-root]` 並 focus cmdk root，不是 PopoverContent content 容器|claim-vs-code|P1
+SelectMenu|packages/design-system/src/components/SelectMenu/select-menu.anatomy.stories.tsx:808|非 searchable 時落在 content 容器|同上：code focus 到 `[cmdk-root]`|claim-vs-code|P1
+PeoplePicker|packages/design-system/src/components/PeoplePicker/people-picker.anatomy.stories.tsx:232|edit focus(open) / Field border = --ring|PeoplePicker edit 實際透過 Select/Combobox 的 `fieldWrapperStyles`，focus/open border 是 `border-primary` / `data-state=open`: border-hover，沒有使用 `--ring` 作為 field border|claim-vs-code|P2
+PeoplePicker|packages/design-system/src/components/PeoplePicker/people-picker.anatomy.stories.tsx:415|聚焦框跟整套設計系統一致(2px solid var(--ring))|底層 Select/Combobox Field wrapper 是 1px border token flow (`focus-within:!border-primary`)，不是 2px solid `--ring`|claim-vs-code|P2
+Command|CLEAN(checked 24 claims)
+
+### B3-overlay
+Dialog|CLEAN(checked 42 claims)
+Popover|CLEAN(checked 55 claims)
+Sheet|packages/design-system/src/components/Sheet/sheet.spec.md:19|消費者 API = 右側滑入；top / bottom / left 變體保留 DS 內部基建用，消費者 code 禁止傳 side="top" | "bottom" | "left"|`SheetContentProps` publicly exposes `side: 'top' | 'right' | 'bottom' | 'left'` via `VariantProps<typeof sheetVariants>`; `SheetContent` accepts and renders all four sides with no guard. DS stories also pass `side="left"` / `side="bottom"` directly.|claim-vs-code|P1
+Sheet|packages/design-system/src/components/Sheet/sheet.spec.md:31|Mobile fullscreen 編輯：桌機用 Dialog 的場景在手機改用 Sheet bottom / fullscreen|Code has no fullscreen Sheet mode; `bottom` exists only as a side variant and the same spec/story canonical says bottom is DS-internal/non-consumer and should be a future dedicated BottomSheet, not consumer Sheet.|spec-internal|P1
+HoverCard|CLEAN(checked 34 claims)
+Tooltip|packages/design-system/src/components/Tooltip/tooltip.principles.stories.tsx:138|tooltip 裡放「查看 profile」按鈕 → 滑鼠離開就消失,點不到|Radix Tooltip default is hoverable content (`disableHoverableContent=false`); dist source creates a pointer grace area between trigger and content and keeps content open while pointer is over content. DS wrapper does not disable this. The semantic rule “don’t put interactive content in Tooltip” is valid, but “點不到” is factually false.|claim-vs-code|P2
+DropdownMenu|CLEAN(checked 49 claims)
+Menu|packages/design-system/src/components/Menu/menu-item.anatomy.stories.tsx:282|停用，所有子元素統一 fg-disabled|`MenuItem` applies `text-fg-disabled` to wrapper/text and startIcon, passes `disabled` to Checkbox, but Avatar receives no disabled/fg-disabled treatment and suffix `tag/endContent` gets `opacity-disabled`, not `fg-disabled`.|claim-vs-code|P2
+
+### B4-controls
+Checkbox|CLEAN(checked 47 claims)
+RadioGroup|CLEAN(checked 42 claims)
+Switch|CLEAN(checked 39 claims)
+Slider|packages/design-system/src/components/Slider/slider.spec.md:3|`family: 4`|同檔 line 42 宣稱 self-contained primitive、非 row/pill/field slot 結構；`slider.tsx:154` 也寫 `family: 4`，與 spec body 內部矛盾|spec-internal|P2
+Slider|packages/design-system/src/components/Slider/slider.spec.md:200|`Mode / readonly / dark mode / density 詳見 ../Field/field-controls.spec.md(Slider 作為 Field 家族整合時繼承其 canonical...)`|`slider.tsx:51-58` props 只繼承 Radix Slider Root + size，沒有 `mode` / `readOnly` prop、沒有 `useFieldContext()`，也沒有 Field mode handling|claim-vs-code|P1
+SelectionControl|CLEAN(checked 36 claims)
+Rating|packages/design-system/src/components/Rating/rating.spec.md:22|`外層 role="slider" / role="img" 依 readOnly 切換`|`rating.tsx:125` 用 `!readOnly && !disabled && !loading` 算 `isInteractive`，`rating.tsx:154` 是 interactive 才 `slider`，否則 `img`；disabled/loading 也會變 `role="img"`，不是只依 readOnly|claim-vs-code|P1
+Rating|packages/design-system/src/components/Rating/rating.spec.md:61|`aria-label ... readOnly 時必填`|`rating.tsx:88` 將 `'aria-label'?: string` 設為 optional；`rating.tsx:151-181` 沒有 runtime required check/warn，`...props` 可能完全不含 aria-label|claim-vs-code|P1
+SegmentedControl|packages/design-system/src/components/SegmentedControl/segmented-control.spec.md:252|`未傳 value 時預設「全都未選」——SegmentedControl 必須有 default value`|`segmented-control.tsx:97-128` 允許 `value` / `defaultValue` 都是 undefined，直接傳給 Radix；只忽略 deselect 的空字串，沒有要求或自動補 default value|claim-vs-code|P1
+
+### B5-field
+Field|packages/design-system/src/components/Field/field.spec.md:139|`block` = `flex flex-col items-start` + `padding-top: calc((field-height - 1lh) / 2)`|code 的 block control area 只有 `flex flex-col items-start min-w-0`，無 paddingTop；同 spec line 190 也寫 block control area 不加 paddingTop|claim-vs-code + spec-internal|P1
+Field|packages/design-system/src/components/Field/field.spec.md:205|`mode` = `edit` / `readonly` / `disabled`|FieldMode 真實為 `edit | display | readonly | disabled`，spec 同檔其他段落與 stories 也包含 display|claim-vs-code + spec-internal|P2
+Field|packages/design-system/src/components/Field/form-validation.spec.md:134|Required indicator: label 的 `*` 必加 `aria-label="required"` 或 hidden span|FieldLabel 只渲染 `aria-hidden="true"` 的 `*`，沒有 `aria-label` 或 hidden required text|claim-vs-code|P1
+Field|packages/design-system/src/components/Field/form-validation.spec.md:135|DS error variant 自動 prefix `<AlertCircle/>` icon|FieldError 只渲染 `<p role="alert">children</p>`，無 AlertCircle prefix；Field Controls spec 還明確禁止尾部 error icon|claim-vs-code + canonical exception check|P2
+FieldControlGroup|packages/design-system/src/components/FieldControlGroup/field-control-group.tsx:65|`size?: FieldSize` — Children size cascade(Mode B)|實作解構為 `_size = 'md'` 但完全未使用；spec line 90 也承認 FCG `size` 目前 no-op|docblock-vs-code|P1
+NumberInput|packages/design-system/src/components/Field/field-controls.spec.md:89|Loading 實作 canonical(Input / NumberInput / Combobox 等 Field 元件): `loading?: boolean` + spinner + `aria-busy`|NumberInputProps 無 `loading`，實作無 CircularProgress / aria-busy；number-input.spec.md line 99 明確例外：NumberInput 不提供 loading state|claim-vs-code + canonical exception check|P1
+LinkInput|packages/design-system/src/components/Field/field-controls.spec.md:125|`disabled` 和 `readOnly` 原生 HTML 屬性會自動覆蓋 `mode` prop|LinkInput 只用 `disabled` 覆蓋 resolvedMode；`readOnly` 未解構/未參與 mode resolution，只會被 `...props` 傳到 edit input 分支|claim-vs-code|P1
+LinkInput|packages/design-system/src/components/FieldControlGroup/field-control-group.spec.md:92|Mode A: children 各自透過 `useFieldContext().size` 讀外層 `<Field>` 的 size|LinkInput 解構 `size: sizeProp = 'md'`，導致 `sizeProp ?? fieldCtx?.size` 永遠先取 md，無法繼承 Field size|claim-vs-code|P1
+Textarea|packages/design-system/src/components/Textarea/textarea.spec.md:148|DS focus-visible ring 由 Field wrapper 提供|Textarea 無 Field wrapper composite；focus 樣式在 native `<textarea>` 自身 `textareaVariants` 上用 `focus-visible:!border-primary`|claim-vs-code|P2
+Input|CLEAN(checked 34 claims)
+
+### B6-radix-recent
+AspectRatio|CLEAN(checked 31 claims)
+ScrollArea|packages/design-system/src/components/ScrollArea/scroll-area.tsx:102|states: ['default', 'hover', 'active', 'focus-visible', 'disabled']|code/spec 真實: ScrollArea 無 disabled/active 狀態；spec 明寫唯一 state 是 scrollbar visible/hidden 且非 prop 可控|docblock-vs-code|P2
+Tabs|packages/design-system/src/components/Tabs/tabs.spec.md:119|選中 trigger 底部有 2px 的 `bg-primary` 底線|code真實: selected underline 是 `data-[state=active]:after:bg-primary-hover`|claim-vs-code|P2
+TreeView|CLEAN(checked 54 claims)
+Accordion|packages/design-system/src/components/Accordion/accordion.spec.md:95|content `role="region"` + `aria-labelledby`|Radix source 真實: AccordionContent 透過 Collapsible.Content 設 `aria-labelledby`，未設 `role="region"`|claim-vs-code|P1
+FileItem|packages/design-system/src/components/FileItem/file-item.spec.md:344|onClick prop,consumer 傳入即進 clickable 模式(hover + cursor + keyboard)|code真實: onClick 只掛 row + cursor-pointer；無 role/tabIndex/Enter/Space，且同 spec L443 明寫整列僅滑鼠可點|spec-internal|P1
+FileUpload|packages/design-system/src/components/FileUpload/file-upload.spec.md:76|`button` | 緊湊 `<Button variant="secondary" startIcon={Upload}>`|code真實: button variant 使用 `<Button variant="tertiary" startIcon={UploadIcon}>`|claim-vs-code|P2
+FileUpload|packages/design-system/src/components/FileUpload/file-upload.spec.md:102|`disabled`: 完全停用(pointer-events 關)|code真實: disabled 由 handler `isBlocked` guard + hidden input disabled + cursor-not-allowed；未加 pointer-events-none，且同 spec L58 說移除 pointer-events-none|spec-internal|P1
+FileUpload|packages/design-system/src/components/FileUpload/file-upload.tsx:15|上傳後的檔案清單顯示交給 consumer 用 FileItem 渲染|code真實: FileUpload 已有 `files` prop，內部在 dropzone/button 下方 render `<FileItem>` list|docblock-vs-code|P1
+FileViewer|CLEAN(checked 68 claims)
+
+### B7-feedback
+Alert|CLEAN(checked 61 claims)
+Notice|packages/design-system/src/components/Notice/notice.spec.md:116|Consumer(Alert / Toast)若需 disable dismiss,應透過 consumer-level prop pass-through。|Notice 的 `...props` 只 spread 到 root `<div>`；dismiss `<Button>` 沒有接收/forward consumer disabled prop，無 consumer-level pass-through 可 disable dismiss。|claim-vs-code|P1
+Toast|packages/design-system/src/components/Toast/toast.spec.md:73|sonner 會自動 queue|Sonner 會保留/渲染 toast 陣列並用 `visibleToasts=3` + `data-visible=false` 隱藏超出項，不是嚴格 queue 到 DOM 外或延後建立。|claim-vs-code|P2
+Toast|packages/design-system/src/components/Toast/toast.spec.md:151|sonner 已實作 portal / queue / stack / viewport 內部|portal/stack/viewport 有；queue 不準確，同上為 visible limit + hidden stacked items。|claim-vs-code|P2
+Coachmark|packages/design-system/src/components/Coachmark/coachmark.principles.stories.tsx:116|永遠提供 Skip 反而提升完成率|同元件 source 明確規則是 `showSkip = Boolean(onSkip) && !onPrev && !isSingleStep`，多步中/末與單步都隱藏 Skip；同 spec/docblock 也寫有 `onPrev` 不顯示 Skip。|spec-internal|P1
+Coachmark|packages/design-system/src/components/Coachmark/coachmark.principles.stories.tsx:252|永遠提供 Skip — 尊重退出意願|同上，canonical source/spec 不是「永遠」，而是只在第一步/特定情境顯示 Skip。|spec-internal|P1
+Empty|packages/design-system/src/components/Empty/empty.spec.md:21|間距走 layout-space token(density-aware)|code 使用固定 `mb-4`、`mt-6` 與 `--item-gap-label-desc-reading-lg`；同 spec「間距」段也說固定不隨 density 變，非 layout-space density-aware。|spec-internal|P2
+Empty|packages/design-system/src/components/Empty/empty.spec.md:76|Description ... `fg-muted` placeholder 等級色|code 只有 description-only 才 `text-fg-muted`；有 title 或 action 時 description 是 `text-fg-secondary`。|claim-vs-code|P2
+Empty|packages/design-system/src/components/Empty/empty.spec.md:112|Empty 不渲染 heading tag(`<h1>` / `<h2>`),只 `<div>` + 視覺 typography。|code title/description render 為 `<span>`，不是 `<div>`。heading 不渲染為真，但 element claim 錯。|claim-vs-code|P2
+Badge|packages/design-system/src/components/Badge/badge.principles.stories.tsx:293|Badge 本身是裝飾層|code 預設 `role={role ?? 'status'}`，不是純裝飾層；也允許 count/dot 本身帶 aria-label。|claim-vs-code|P1
+Tag|CLEAN(checked 83 claims)
+Chip|CLEAN(checked 58 claims)
+
+### B8-crosscut
+72|packages/design-system/src/components/Menu/index.ts:5|MenuItem spec 標 `isInternal` 且「不直接使用」，但 barrel re-export 成 public API|P1
+72|packages/design-system/src/components/SelectionControl/index.ts:5|SelectionItem spec 標 `isInternal` 且透過 Checkbox/RadioGroup 消費，但 barrel re-export 成 public API|P1
+72|packages/design-system/src/components/OverflowIndicator/index.ts:5|OverflowIndicator spec 標 `isInternal` 且「不直接使用」，但 barrel re-export 成 public API|P1
+72|packages/design-system/src/components/SelectMenu/index.ts:5|SelectMenu spec 標 `isInternal` 且「不直接使用」，但 barrel re-export 成 public API|P1
+72|packages/design-system/src/components/DateGrid/index.ts:5|DateGrid spec 標 `isInternal` 且由 DatePicker 包裝，但 barrel re-export 成 public API|P1
+72|packages/design-system/src/components/Notice/index.ts:5|Notice spec 標 `isInternal` 且透過 Alert/Toast 消費，但 barrel re-export 成 public API|P1
+72|packages/design-system/src/components/Command/index.ts:5|Command spec/doc 明確「app 不直接使用」，但 barrel re-export 成 public API|P1
+72|packages/design-system/src/components/HoverCard/index.ts:5|HoverCard spec 標 `isInternal`，但 barrel re-export 成 public API|P1
+72|packages/design-system/src/components/ProfileCard/index.ts:5|ProfileCard spec 標 `isInternal`，但 barrel re-export 成 public API|P1
+72|packages/design-system/src/patterns/header-canonical/index.ts:5|header-canonical frontmatter/docblock 標 `internal:true`/`@internal`，但 pattern barrel re-export 成 public API|P1
+72|packages/design-system/src/patterns/overlay-surface/index.ts:5|overlay-surface frontmatter 標 `internal:true` 且 DS-internal consumer only，但 pattern barrel re-export 成 public API|P1
+72|packages/design-system/src/patterns/horizontal-overflow/index.ts:5|horizontal-overflow frontmatter 標 `internal:true` 且 DS-internal consumer only，但 pattern barrel re-export 成 public API|P1
+72|packages/design-system/src/patterns/element-anatomy/index.ts:5|inline-action spec 禁 app-code 直接 import L3 primitive，但 item-anatomy barrel re-export `ItemInlineActionButton`/`ItemInlineAction`/`RowSizeProvider`|P1
+14|packages/design-system/src/components/ProfileCard/profile-card.tsx:302|`nameCardMeta` 與 component/spec/public naming `ProfileCard` 漂移；DS-wide meta 命名慣例為 `{componentName}Meta`|P2

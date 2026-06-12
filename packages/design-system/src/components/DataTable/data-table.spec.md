@@ -25,13 +25,13 @@ TanStack Table 負責邏輯，DataTable 負責視覺與互動。
 簡單展示場景也用 DataTable（最少 config），不另外維護靜態 Table。
 底層使用 `<div>` + ARIA role，不用語義 `<table>`——虛擬捲動需要絕對定位 row，且未來 frozen column 需要獨立 scroll 區域，`<table>` 的佈局模型兩者都不支援。
 
-**不是試算表**——不做公式計算、不做跨 cell 選取。
+**預設不是試算表**——預設模式不做公式計算、不做跨 cell 選取(定位是「資料展示 + row 操作」,非 Excel)。但提供 **opt-in `spreadsheetMode` prop**:啟用後支援方向鍵跨 cell 導覽 + cell editing(見「鍵盤」段 L504-507),給確實需要 Excel-like 編輯的 productivity 場景。預設關閉以保持單純。(2026-06-01:原定位「不是試算表」與已 ship 的 `spreadsheetMode` opt-in 自相矛盾,改為「預設不是 + 可 opt-in」對齊 code;user 拍板保留功能)
 
 **Layout Family**：非上述 family — composite / multi-section（多區塊組合，自 own layout）。
 
-### 檔案結構(2026-05-03 split matrix)
+### 檔案結構
 
-12 file,每個過 M21 / M17 / Rule-of-3 三 test:`data-table.tsx`(主,foundational)/ `data-table-filter-panel.tsx` + `data-table-sort-manager.tsx`(panel state 隔離)/ `column-types.ts` + `filter-operators.ts`(✓ Rule-of-3 SSOT,3+ consumer)/ `filter-tree.ts`(pure data + eval,test isolation)/ `lib/column-meta.ts`(Internal SSOT,消 5 處 `(col as any)`)+ stories/spec/css。**M21 retract**:`filter-value-picker.tsx` 1 consumer → 已 inline 回 panel。
+檔案拆分架構(12 file split matrix)與工程決策史屬 code home — 詳 `data-table.tsx` 檔頭 docblock(2026-06-11 遷移,Level 4;spec 只管設計語言)。
 
 ---
 
@@ -64,7 +64,7 @@ TanStack Table 負責邏輯，DataTable 負責視覺與互動。
 |------|------|------|
 | **L1 基礎結構** | 骨架、尺寸、border、色彩、高度模式、行高模式 | ✅ 完成(本文件 L1 段)|
 | **L2 選取** | row selection、checkbox、單/多選、bulk action 整合 | ✅ 完成(本文件 L2 段)|
-| **L3 欄位互動** | 排序(本文件 L3)、resize、reorder、pin、顯示隱藏 | 部分完成(sort 完成,resize/reorder/pin/visibility 待 v2)|
+| **L3 欄位互動** | 排序(本文件 L3)、resize、reorder、pin、顯示隱藏 | ✅ 完成(sort + resize + reorder + pin + visibility 全 props 支援:`enableColumnResize` / `enableColumnReorder` / `columnVisibility` / `pinnedLeftColumns` / `pinnedRightColumns`,見 `data-table.tsx` `DataTableProps` 宣告)|
 | **L4 資料操作 + Cell 能力** | 進階篩選(本文件 L4 Filter)、inline edit、nested rows、row drag(本文件 L4 段)| ✅ Filter / Inline edit / Nested rows / Row drag v3 完成(Jira canonical + virtualization fix) |
 | **L5 進階** | 分組、搜尋、tree data v2 enhancements、export CSV/Excel | 待 v2 |
 
@@ -79,6 +79,8 @@ DataTable 有三種尺寸（`sm`、`md`、`lg`），透過 `size` prop 控制。
 **Size 不等於 density。** Size 是這張表格的結構決策（需要多緊湊），density 是全域的使用者偏好。同一頁可以有不同 size 的表格，density 全頁一致。
 
 水平 padding 固定,不隨 size 或 density 變化(具體 token 見 `data-table.tsx`);垂直方向由行高模式決定(見第四節)。
+
+**Cell / header 字級隨 size,對齊 Field family。** 三種 size 的 cell 與 header 預設字級**必與同 size 的 Field 一致**:`sm`/`md` → `text-body`(14px)、`lg` → `text-body-lg`(16px),SSOT = `fieldDisplayTextClass()`(`field-wrapper.tsx`)。`lg` 行高放大時字級同步放大,避免「字小、行高大」失衡。**機制**:typed cell 由各自 Field 控件吃 `size` 自動套用(cell-registry 各 cell display mode 必傳 `size`,**禁漏傳**否則 fallback md 卡 14px);header 與非-Field 內容(consumer 自訂 cell)由 cell wrapper / header `cn(fieldDisplayTextClass(size))` 套用。`1lh`-based cell-py 公式(見第四節)隨字級自動吸收,row 高不變。
 
 ### 二、高度模式
 
@@ -103,17 +105,17 @@ Table 分三層:
 
 完整 class / overflow 規則見 `data-table.tsx`。
 
-**Header 在 scroll 容器外面。** 不用 CSS sticky——header 結構性地在 body 上方，永遠固定在頂部。Header bg 用 `neutral-2-opaque`（不透明），不受底層色影響。
+**Header 在 scroll 容器外面。** 不用 CSS sticky——header 結構性地在 body 上方，永遠固定在頂部。Header bg 用 `--muted`（code `HEADER_BG = 'bg-muted'`,比 surface 深一階,同 anatomy ColorMatrix）。
 
 **三個 region 共享垂直捲動。** body-viewport 是唯一的垂直 scroll container，三個 body region 是它的 flex children。垂直捲動天然同步，不需 JS。
 
-**只有 center 水平捲動。** center-body `overflow-x: auto`。center-header `overflow: hidden`，用 JS sync：`centerBody.scrollLeft → centerHeader.scrollLeft`。
+**只有 center 水平捲動。** center-body 是唯一的水平 scroll container,center-header 跟隨其捲動位置同步（同步機制見「捲軸」段 + `data-table.tsx`）。
 
-**Left / right 不水平捲動。** `overflow: hidden`。Frozen 邊界用 `border-divider`（全高度）。
+**Left / right 不水平捲動。** Frozen 邊界用 `border-divider`（全高度）。
 
 **固定行高確保跨 region 對齊。** 所有 row 用 `h-table-row-{size}`，三個 region 的 row 精確同高。
 
-**Header/body region 寬度同步。** Header region 寬度由內容決定（columns + actions），body region 用 ResizeObserver 量測 header 寬度並同步。
+**Header/body region 寬度同步。** Header region 寬度由內容決定（columns + actions），body region 量測 header 寬度同步（機制見 `data-table.tsx`）。
 
 ### 四、行高模式
 
@@ -171,9 +173,11 @@ Row actions 欄本質上是 frozen right column，左邊界也使用 full-height
 | Case | Story | Avg / p95 / long-task | Gate |
 |---|---|---|---|
 | A Plain virt | `VirtualScroll` | ≤16.67/≤33/0 | hard |
-| B Rich budget | `RoadmapPerfBudget`(500×13 rich+inline-edit,fixed 600px) | ≤50/≤80/≤1 | hard |
-| C Row drag | `RowDragVirtualization` | ≤33/≤50/longest<100 | soft(DnD thermal) |
+| B Rich budget | `RoadmapPerfBudget`(500×13 rich+inline-edit,fixed 600px;2026-05-17 整併誤 retire → 2026-06-12 R2 重建,gate 恢復可跑) | ≤50/≤80/≤1 | hard |
+| C Row drag | `RowDragWithVirtualization` | ≤33/≤50/longest<100 | soft(DnD thermal) |
 | D Edit isolation | `<Profiler>` TBD | skip ≥ visible−active | hard |
+
+**2026-06-12 重建後實測**(static build,3 runs/case):1x CPU — A 16.56/16.8/0、B 24.0/33.4/0、C 16.67/16.8/0 全過 gate;script 預設 4x throttle 在有背景負載機器上全 case 一致 ~2.3x 超標(含未動過的對照組 A)→ 本表門檻實證對應 1x/閒置條件,4x 門檻是否重校 = user 決策(本表數字不動)。
 
 **Anti-pattern**:`RoadmapAllInOne`(全 features stack)≈117ms 不達 B,因 SortableRowProvider/column reorder/resize/selection/overlay 同時開。Consumer:13+ cols rich-cell → 拆 detail drawer / column visibility 預設 hide,不該期 60fps + 全 feature stack。Cite + Phase 1/2 history → `cell-registry.tsx:480-499` JSDoc + commits log。
 
@@ -183,8 +187,8 @@ Row actions 欄本質上是 frozen right column，左邊界也使用 full-height
 
 ### 八、Row 狀態
 
-- **不使用斑馬紋**——hover + selected 兩種狀態已足夠，斑馬紋疊加會產生四種以上的背景色組合，增加視覺雜訊
-- **Hover 與 selected 用不同色系**（neutral vs primary-subtle），讓使用者一眼區分「正在看的」與「已選的」
+- **不使用斑馬紋**——hover 狀態已足夠區分行，斑馬紋疊加會產生多種背景色組合，增加視覺雜訊
+- **選取狀態僅由 row 內的 selection control（`multi`→Checkbox / `single`→Radio）呈現，不另加 selected-row 底色**——避免「勾選框 + row 底色」雙重冗餘指示（2026-05-31 user 決策：有 checkbox 就只用 checkbox 呈現狀態）；hover 用 neutral-hover，與 selection 正交（純表示「正在看的」）
 
 ### 九、Row Actions
 
@@ -420,7 +424,7 @@ ValueShape ↔ DS picker 對照(canonical 2026-05-02):
 | number / currency | click cell | `<NumberInput>` |
 | date | click cell | `<DatePicker>` |
 | select / multiSelect | click cell | `<Select>` / `<Combobox>` |
-| person / multiPerson | click cell | `<Input>` v1 fallback |
+| person / multiPerson | click cell | `<PeoplePicker variant="naked">`(選人 picker) |
 | **boolean** | direct toggle | `<Checkbox>` 無 mode 切換 |
 | **url** | **hover cell → Pencil 按鈕(xs iconOnly tertiary)→ click** | `<Input>`(read 永遠是連結;cell click 走 anchor 開連結,**不**進 edit)|
 
@@ -433,7 +437,7 @@ tableOptions={{ getSubRows, getRowCanExpand, state: { expanded }, onExpandedChan
 - Chevron:注入 first non-`__select__` content cell,rotate-90 展/收
 - Click 分權:chevron stopPropagation 不 fire select
 - Leaf placeholder:同層 sibling 有 expandable 時 leaf 也佔位
-- a11y:row `aria-expanded` / `aria-level`
+- a11y:`aria-expanded` 套在展開 chevron `<button>`(非 row);`aria-level` 尚未實作(row depth 目前僅以 `--tree-indent-*` 縮排視覺呈現)
 - Selection cascade:default OFF;`selectionCascade` opt-in 待 v2
 
 ### Drag visual SSOT(2026-05-06 v14.5)
@@ -442,11 +446,11 @@ Row drag + column reorder + TreeView 共用 `lib/drag-visual.ts`:source `opacity
 
 ### Row drag(Jira canonical,v3 已 ship)
 
-`enableRowDrag?: boolean` + `onRowReorder?: (sourceId, targetId, 'before' | 'after')`。Library:@dnd-kit/sortable + @dnd-kit/core。**必填 `getRowId`**(否則 dnd 用 row.index reorder 後錯位)。
+`enableRowDrag?: boolean` + `onRowReorder?: (sourceId, targetId, 'before' | 'after')`。Library:@dnd-kit/core(v15.0 Path B 用 `useDraggable` + `useDroppable`,不用 `@dnd-kit/sortable`)。**必填 `getRowId`**(否則 dnd 用 row.index reorder 後錯位)。
 
-- **Handle**:`<Button variant="tertiary" iconOnly size="xs" startIcon={GripVertical} />` 24px elevated chip(`bg-surface` + `border-divider`),`absolute left-1 top-1/2 -translate-y-1/2` 4px inset 不佔 column 空間;**hover-reveal** `opacity-0 group-hover/row:opacity-100`。對齊 Jira backlog(@benchmark-unverified,M22)。Tertiary chip 非 ItemInlineAction 因透明背景撞 table border。
+- **Handle**:Button tertiary iconOnly xs(GripVertical)24px chip,所有 state(idle / hover / aria-disabled)統一 `bg-surface-raised`(border / shadow 已 retire,2026-05-12 per user「我有叫你加 elevation 嗎」),fixed-position 浮層貼 row 左緣、不佔 column 空間(位置 JS 計算,實作見 `data-table.tsx`);**hover-reveal** 由 JS 控 visibility / opacity(row 或 handle hover 顯示;drag 中 source 強制顯示、其他列隱藏)。對齊 Jira backlog(@benchmark-unverified,M22)。Tertiary chip 非 ItemInlineAction 因透明背景撞 table border。
 - **Sort × Drag 互斥**:sort.length>0 → handle disabled+Tooltip。**Top-level only**(`row.depth>0` 不顯 handle)。**Position**:active vs over 視覺位置 → `'after'`/`'before'` 對齊 `arrayMove`。**Consumer-managed mutation**:`onRowReorder(sourceId, targetId, position)`,DS 不持 row order(Notion/Airtable/Linear)。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
-- **Virtualization 整合**(v3 2026-05-05):enableRowDrag 自動 `overscan≥10` + drag 期 freeze `measureElement` + `modifiers={[restrictToVerticalAxis]}` 鎖 Y 軸。**3-panel mirror sync**:各 region 共享 SortableContext.items 自然同 transform;handle 只 render primary region(left 優先 → center)避雙觸發。**Cross-parent drop 禁止**(已知 limit):nested 只同 top-level 重排,collisionDetection 過濾,顯 invalid signal。
+- **Virtualization 整合**(v3 2026-05-05):enableRowDrag 自動把 overscan 拉到 `Math.max(overscan, 5)` + drag 期 freeze `measureElement` + `modifiers={[snapToCursorModifier]}`(ghost top-left 對齊 cursor,不鎖軸)。**3-panel mirror sync**:各 region 對同 row id 各呼叫 `useDraggable` + `useDroppable`,mirror 自然取得相同 transform;handle 只 render primary region(left 優先 → center)避雙觸發。**Cross-parent drop 禁止**(已知 limit):nested 只同 top-level 重排,collisionDetection 過濾,顯 invalid signal。
 
 ---
 
@@ -460,7 +464,7 @@ Row drag + column reorder + TreeView 共用 `lib/drag-visual.ts`:source `opacity
 
 ## 禁止事項
 
-- ❌ 不使用斑馬紋——hover / selected 已足夠區分行，斑馬紋增加狀態組合的視覺複雜度
+- ❌ 不使用斑馬紋——hover 已足夠區分行，斑馬紋增加狀態組合的視覺複雜度
 - ❌ 無隱藏內容、無 frozen column、非 inline edit 的表格不加外框
 - ❌ 非 inlineEdit table 的 body cell 之間不加垂直分隔線——靠 header 建立的欄位邊界引導即可。inlineEdit table 的 body cells **4 邊均有 1px divider**(grid editing surface canonical;對齊 AG Grid / Material X cellEditable) <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - ❌ Toolbar 不內建在 DataTable 裡——toolbar 是外部組合，職責分離
@@ -494,32 +498,35 @@ DataTable 是 composite multi-section 元件,**不套 canonical 5**(Inspector / 
 **ARIA / Pattern**:DataTable 是 composite tabular widget,**對齊 W3C ARIA Authoring Practices Guide `grid` pattern**(非 `radio-group`):
 
 - Root 套 `role="table"`(currently)或 `role="grid"`(future tier,when cell editing 普及)— 詳 [WAI-ARIA APG: grid](https://www.w3.org/WAI/ARIA/apg/patterns/grid/) + [MDN grid role](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/grid_role)
-- Column headers:`<th scope="col">` 自帶 `role="columnheader"`(implicit per HTML semantics)
-- Row headers(若有):`<th scope="row">` 自帶 `role="rowheader"`
-- Sortable column:`aria-sort="none" | "ascending" | "descending"` on `<th>`
-- Selection state(若啟用 selection mode):row 套 `aria-selected="true" | "false"`,multi-selectable 場景套 `aria-multiselectable="true"` on grid root
-- 字 cell hover overlay action:trigger `aria-haspopup` + `aria-controls` 對應 floating overlay
+- Column headers:以 `<div role="columnheader">` 顯式標記(本元件用 div + ARIA role,非語義 `<table>` — 見定位段;不渲染 `<th>` / `scope`)
+- Row headers:目前無對應(平面 row,無 row header 語意;未渲染 `role="rowheader"`)
+- Sortable column:`aria-sort="none" | "ascending" | "descending"` on 該 column header `<div role="columnheader">`
+- Selection state(若啟用 selection mode):視覺**僅由 `__select__` 欄的 selection control(`multi`→Checkbox / `single`→Radio)呈現,不套 selected-row 底色**;control 自帶 `aria-checked` 傳達狀態(row 本身目前**未**套 `aria-selected`,`grid` root 亦未套 `aria-multiselectable` — 留待 `role="grid"` future tier)
+- 字 cell hover overlay action:overlay 為 absolute/fixed paint layer(`DataTableInteractionLayer`),trigger 目前**未**套 `aria-haspopup` / `aria-controls`(留待 future tier)
 
-**Keyboard 行為**(per APG grid pattern):
-- ↑↓←→:cell-to-cell navigation(focus walks 一格一格)
-- Home / End:row 開頭 / 結尾
-- Ctrl+Home / Ctrl+End:grid 開頭 / 結尾
-- PageDown / PageUp:跳 viewport-rows
-- Enter / Space:cell action(activate editing or select)
-- Esc:cancel editing / clear selection
+**Keyboard 行為**(目前實作 — `tableKeyboardHandler`):
+- ↑↓←→:cell-to-cell navigation **僅 `spreadsheetMode` opt-in 時生效**(`spreadsheetMode && selectedCellId != null && editingCellId == null`);預設模式方向鍵無作用
+- Enter / F2:spreadsheet 模式下進 cell editing(cell 可編輯 + 非 boolean/url + 非 disabled 時)
+- Cmd/Ctrl+A:`mode="multi"` selection 時選全可見列(扣 disabled)
+- Esc:取消 editing(spreadsheet)/ 清 selection(selection mode)
+- Tab:進入表格後操作排序與勾選
 
-**Focus**:focus walks single tab stop into grid then `tabindex=-1` cells with arrow nav;focus-visible ring(`outline: 2px solid var(--ring)`)。對齊 [WAI APG keyboard model](https://www.w3.org/WAI/ARIA/apg/patterns/grid/#keyboardinteraction)。
+> APG grid full keyboard model(Home/End、Ctrl+Home/End、PageUp/PageDown、roving cell action)為 `role="grid"` future tier 目標,**尚未實作**。
+
+**Focus**:table root `tabIndex=0` **僅在 selection enabled 或 `spreadsheetMode` 時**(否則 `undefined` = 不可 focus);cell 目前無 roving `tabindex=-1` 機制。互動元素(勾選框 / 排序 header / 展開鈕 / row action)各自 focusable + focus-visible ring(`outline: 2px solid var(--ring)`)。APG grid roving-tabindex focus model 為 future tier 目標,尚未實作 → 見 [WAI APG keyboard model](https://www.w3.org/WAI/ARIA/apg/patterns/grid/#keyboardinteraction)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 
 **Why not radio-group**:之前 boilerplate 從 RadioGroup spec 誤抄。DataTable 是 multi-row / multi-column composite,not single-choice selection group;a11y semantics 完全不同(grid vs radio-group)。 <!-- @benchmark-verified: 2026-05-18 D1 rewrite -->
 
-
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
 
+- `bulk-action-bar.spec.md`
 - `carousel.spec.md`
 - `circular-progress.spec.md`
+- `description-list.spec.md`
+- `opacity.spec.md`
 - `scroll-area.spec.md`
-- `item-anatomy.spec.md`
+- `tree-view.spec.md`

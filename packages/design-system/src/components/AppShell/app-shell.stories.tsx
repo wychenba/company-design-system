@@ -195,7 +195,7 @@ const PRIORITY_COLOR = {
  * @usage-consumes: ItemContent(entity identity)+ Tag(status/priority)+ DescriptionList(metadata)+ Button(actions)
  *
  * Per codex Layer B D1+D2(2026-05-20):
- * - Entity identity(title + id 副標)→ ItemContent(item-anatomy Family 2 subtitle pattern,非 NameCard 因 scope 是 people only)
+ * - Entity identity(title + id 副標)→ ItemContent(item-anatomy Family 2 subtitle pattern,非 ProfileCard 因 scope 是 people only)
  * - Status / Priority marker → Tag color-coded(per tag.spec.md status use case)
  * - Metadata fields → DescriptionList + DescriptionItem(per description-list.spec.md「detail panel 屬性列表」use case)
  * - Actions → Button(已對齊)

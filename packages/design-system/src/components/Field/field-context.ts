@@ -134,3 +134,101 @@ export function TableScrollProvider({
 }): React.ReactElement {
   return React.createElement(TableScrollContext.Provider, { value: isScrolling }, children)
 }
+
+/**
+ * Surface size signal — 獨立於 FieldContext + FieldSurfaceContext 的純視覺 size context(2026-06-08)。
+ * 讓 host(DataTable cell substrate)把「這片 surface 的 density size」propagate 給 child Field controls,
+ * 未來新 cell 漏傳 size prop 也自動繼承 → 字級一致(根治 StringCell/NumberCell 漏傳 size class)。
+ *
+ * 不放進 FieldSurfaceContext value(避免 string→object identity drift on scroll → 全 cell 重渲,
+ * 同 TableScrollContext L119-121 canonical)— 獨立 Context,value = FieldSize primitive(stable when unchanged)。
+ * 絕不污染 FieldContext:不碰 hasFieldWrapper/mode/invalid/disabled,useFieldContext() 在 cell 內仍 null。
+ */
+const FieldSurfaceSizeContext = React.createContext<FieldSize | null>(null)
+
+/**
+ * Resolve Field control size — 控件用此 helper 取代散落的 `sizeProp ?? fieldCtx?.size ?? 'md'`。
+ * 優先序:prop(caller 顯式)> FieldContext.size(真 <Field> wrapper)> surface-size(host 如 cell)> 'md'。
+ * 真 <Field> 永遠勝 host surface(安全序);cell 無 Field wrapper(fieldCtx=null)→ 自動接 surface-size,
+ * 漏傳 size 的新 cell 也字級一致。
+ */
+export function useResolvedFieldSize<T extends string = FieldSize>(sizeProp?: T | null, fallback?: T): T {
+  const fieldCtx = React.useContext(FieldContext)
+  const surfaceSize = React.useContext(FieldSurfaceSizeContext)
+  // generic T(預設 FieldSize)讓非-input 控件(SegmentedControl/Rating 的 'xs'|'sm'|'md'|'lg' 超集、各自 fallback)
+  // 也走同一 SSOT resolution。fieldCtx.size/surfaceSize 為 FieldSize(T 的子集)→ widen cast 安全。
+  // fallback 未傳預設 'md'(input-class 控件向後相容);Rating 傳 'xs'、SegmentedControl 傳 'md'。
+  return (sizeProp ?? (fieldCtx?.size as T | undefined) ?? (surfaceSize as T | undefined) ?? fallback ?? ('md' as T))
+}
+
+/**
+ * Resolve Field control 的 **disabled** — 取代散落的 `disabledProp ?? fieldCtx?.disabled`(2026-06-08 SSOT)。
+ * 優先序:顯式 prop > FieldContext.disabled(`<Field disabled>` / `<Field mode="disabled">`)> false。
+ * **caller 必傳「未預設」的原始 prop**(沒傳 = undefined),否則 `disabled=false` 預設會吃掉 `??` fallback。
+ * DataTable cell 無 FieldContext(fieldCtx=null)→ 回 prop 或 false,行為與現況完全一致(inert)。
+ */
+export function useResolvedFieldDisabled(disabledProp?: boolean | null): boolean {
+  const fieldCtx = React.useContext(FieldContext)
+  return disabledProp ?? fieldCtx?.disabled ?? false
+}
+
+/**
+ * Resolve Field control 的 **mode**(display / readonly / disabled / edit)— 2026-06-08 SSOT,統一兩派散落:
+ *   舊 Input 派 `modeProp ?? fieldCtx?.mode ?? (...)` → `<Field disabled>` 時 ctx.mode 仍 'edit',漏 disabled chrome。
+ *   舊 picker 派 `disabled ? 'disabled' : mode`(mode 預設 'edit')→ 完全不讀 fieldCtx.mode,`<Field mode="display">` 失效。
+ * 統一優先序(world-class:MUI FormControl disabled 完整 cascade + 顯式 prop 永遠最優先):
+ *   1. 顯式 mode prop(caller / DataTable cell 的 displayOrDisabled)→ **永遠最優先**,故表格等顯式場景 inert
+ *   2. 有效 disabled(prop 或 `<Field disabled>`)→ 'disabled'(完整 disabled chrome)
+ *   3. FieldContext.mode(`<Field mode="display"/"readonly">`)→ 讓 mode cascade 真正生效
+ *   4. 本地 readOnly → 'readonly'
+ *   5. 'edit'
+ * cell:mode prop 必有 → step 1 命中、fieldCtx=null → 完全 inert(Δ=0)。`disabled` 傳已 resolve 的 boolean 或未預設 prop。
+ */
+export function useResolvedFieldMode({
+  mode,
+  disabled,
+  readOnly,
+}: {
+  mode?: FieldMode | null
+  disabled?: boolean | null
+  readOnly?: boolean
+}): FieldMode {
+  const fieldCtx = React.useContext(FieldContext)
+  if (mode) return mode
+  if ((disabled ?? fieldCtx?.disabled) === true) return 'disabled'
+  if (fieldCtx?.mode) return fieldCtx.mode
+  if (readOnly) return 'readonly'
+  return 'edit'
+}
+
+/**
+ * Resolve Field control 的 **variant**(default / bare / naked 視覺外殼)— 2026-06-08 SSOT。
+ * 優先序:顯式 prop > FieldContext.variant > 'default'。與既有各控件公式一字不差(Δ=0),統一以利 gate 強制。
+ */
+export function useResolvedFieldVariant(variantProp?: FieldVariant | null): FieldVariant {
+  const fieldCtx = React.useContext(FieldContext)
+  return variantProp ?? fieldCtx?.variant ?? 'default'
+}
+
+/**
+ * Resolve Field control 的 **error/invalid** — 取代散落的 `errorProp || (fieldCtx?.invalid ?? false)`(2026-06-08 SSOT)。
+ * 自身 error prop **或** FieldContext.invalid(`<Field invalid>`)任一為真即 error。與既有公式一致(Δ=0)。
+ */
+export function useResolvedFieldInvalid(errorProp?: boolean): boolean {
+  const fieldCtx = React.useContext(FieldContext)
+  return Boolean(errorProp) || (fieldCtx?.invalid ?? false)
+}
+
+/**
+ * Host(non-Field-wrapper,如 DataTable cell)注 surface density size 給 child Field controls。
+ * 僅注 size 視覺訊號,不污染 FieldContext。Usage:cell-registry buildCellWithSurface。
+ */
+export function FieldSurfaceSizeProvider({
+  size,
+  children,
+}: {
+  size: FieldSize
+  children: React.ReactNode
+}): React.ReactElement {
+  return React.createElement(FieldSurfaceSizeContext.Provider, { value: size }, children)
+}

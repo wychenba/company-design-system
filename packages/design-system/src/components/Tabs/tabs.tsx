@@ -109,7 +109,7 @@ Tabs.displayName = 'Tabs'
 // - 跟 Dialog / Sheet / Popover / Sidebar header `border-b border-divider`(neutral-4)同色
 // - withTabs scenario 下 tabs underline = chrome separator,跟 dialog 其他 separator 視覺一致
 // - Selected trigger 2px primary 仍 overlay underlying divider(對比 primary >> divider 不弱)
-// - 對齊 `color.spec.md:706-708` outer-vs-divider 判準(Dialog 結構,T-junction 思路適用)
+// - 對齊 `color.spec.md`「T-junction connectivity 原則」段 outer-vs-divider 判準(Dialog 結構,T-junction 思路適用)
 const TABS_LIST_BASE = [
   'inline-flex items-stretch',
   'gap-[var(--layout-space-loose)]',
@@ -123,7 +123,7 @@ interface TabsListProps
    * Overflow 處理模式。詳見 tabs.spec.md 的 overflow 段。
    *   'none'   ★ 預設，不處理，triggers 溢出父容器（適用 tabs 數量可控的情境）
    *   'scroll' 單行橫向滾動 + 邊緣 fade mask（Material / Polaris / iOS 作法）
-   *   'menu'   塞不下收進 "⋯" dropdown，所有 triggers 仍在 DOM 保留 Radix a11y
+   *   'menu'   show-all navigator——全部 triggers 一直顯示在底層 overflow-x-auto 捲動容器內,
    *            （Ant Design / Atlassian 作法）
    */
   overflow?: TabsOverflow
@@ -204,7 +204,7 @@ const ScrollTabsList = React.forwardRef<
     //   overflow-x:auto + overflow-y:visible 必 compute auto)。
     //   不加 `pb-px`(outer border 撤後 list border 已接 -1px 部分,加 pb 多 1px 多餘空白)。
     //   對齊 Primer UnderlineNav `overflow-x:auto; overflow-y:hidden` canonical 同步動
-    //   horizontal-overflow.spec.md L75/L101/L129 owner 升 list 內部。
+    //   horizontal-overflow.spec.md(「Hook re-export」+「典型 scroll / menu 模式組裝」段)owner 升 list 內部。
     <div className="relative">
       <div
         ref={scrollRef}
@@ -234,7 +234,7 @@ ScrollTabsList.displayName = 'ScrollTabsList'
 // Show-all navigator pattern (Chrome tab dropdown / VS Code editor tabs / Discord channel jumper):
 //   - Menu 永遠顯示全部 tabs,active 的用 checked 標記 (單選語意)
 //   - 點 menu item = onValueChange + scrollIntoView(center),把該 tab 捲到視圖中央
-//   - Menu 內容穩定,跟 scroll 位置無關,使用者對「⋯ = navigator」的直覺一致
+//   - Menu 內容穩定,跟 scroll 位置無關,使用者對「⌄ = navigator」的直覺一致
 //
 // 為什麼底層仍是 overflow-x-auto 而非 overflow-hidden:
 //   - scrollIntoView 需要真實 scroll 容器
@@ -497,10 +497,11 @@ export const tabsMeta = {
   variants: {
 
   },
+  // 注:`fieldHeight` 為 meta 通用 height key;Tabs **不複用 field-height**,值為 `--tab-height-*`(md density,對齊 spec.md size table + uiSize.css)
   sizes: {
-    sm: { fieldHeight: 28, iconSize: 16, typography: 'body' },
-    md: { fieldHeight: 32, iconSize: 16, typography: 'body' },
-    lg: { fieldHeight: 40, iconSize: 20, typography: 'body' },
+    sm: { fieldHeight: 32, iconSize: 16, typography: 'body' },
+    md: { fieldHeight: 40, iconSize: 16, typography: 'body' },
+    lg: { fieldHeight: 48, iconSize: 20, typography: 'body-lg' },
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {

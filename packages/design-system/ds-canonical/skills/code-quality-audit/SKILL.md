@@ -20,7 +20,7 @@ Scope:**tsx / ts code hygiene**,跟 design canonical 正交。
 | 3 | Long function | P1 > 80 行 | naive:`function`/`const` 宣告到 matching `}` indent 行距 |
 | 4 | Dead export | P1 | `export` 名稱在其他 src/ 檔無出現;exempt `*Props/Options/Config/Args/Context/Variants/Value` 型別 API 慣例 |
 | 5 | Circular dep | P0 | DFS import graph,找 cycle |
-| 6 | Magic number | P1 | 覆蓋不完整 → 由 `check_token_hygiene.sh` hook 層負責(primitive color / shadow / Tailwind v4 `[--foo]`);本 skill 不重複 |
+| 6 | Magic number | P1 | 覆蓋不完整 → 由 token 防線(`lib/_token_hygiene.sh` + `check_opacity_token_usage.sh`)層負責(primitive color / shadow / Tailwind v4 `[--foo]`);本 skill 不重複 |
 
 ## When to run
 
@@ -60,4 +60,4 @@ Scope:**tsx / ts code hygiene**,跟 design canonical 正交。
 
 - `scripts/code-quality-audit.mjs` — 實作
 - `.claude/hooks/check_code_quality.sh` — per-edit lite check
-- 相關:`check_token_hygiene.sh`(正交 — token 紀律 vs code 紀律)
+- 相關:token 防線 `lib/_token_hygiene.sh` + `check_opacity_token_usage.sh`(正交 — token 紀律 vs code 紀律)

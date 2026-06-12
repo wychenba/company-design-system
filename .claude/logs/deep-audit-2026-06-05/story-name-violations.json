@@ -1,0 +1,506 @@
+[
+ {
+  "file": "components/DropdownMenu/dropdown-menu.stories.tsx",
+  "line": 251,
+  "component": "DropdownMenu",
+  "displayName": "Item Hover 高亮",
+  "why": "「Hover」是狀態詞,有中文等價(懸停),非元件名/格式縮寫/品牌名。同元件其餘 story name 全中文(基本/群組/勾選項/開啟狀態),此處應一致中文。「Item」雖可指 DropdownMenuItem 子元件,但與全中文 sibling 不一致,宜中文化為「選項」。",
+  "suggestedFix": "選項懸停高亮"
+ },
+ {
+  "file": "components/Skeleton/skeleton.stories.tsx",
+  "line": 44,
+  "component": "Skeleton",
+  "displayName": "Task 列表載入",
+  "why": "「Task」是一般物件詞,有中文等價(任務),非 prop/元件名/品牌名。同元件其餘載入情境 story 全中文(個人資料卡載入/表格列載入/文件載入/卡片網格載入),此處英文破壞一致性。",
+  "suggestedFix": "任務列表載入"
+ },
+ {
+  "file": "components/Steps/steps.principles.stories.tsx",
+  "line": 112,
+  "component": "Steps",
+  "displayName": "規則:Parent 管理狀態",
+  "why": "「Parent」是一般詞(父層/上層),有中文等價,非 prop literal/元件名/品牌名(sibling 的 completed / Linear 是 Steps 的真實 state 值與 mode literal 才保留英文)。此處指父元件管理狀態的受控模式,應中文。",
+  "suggestedFix": "規則:狀態由父層管理"
+ },
+ {
+  "file": "components/SegmentedControl/segmented-control.principles.stories.tsx",
+  "line": 185,
+  "component": "SegmentedControl",
+  "displayName": "iconOnly 是 群組-level 決策",
+  "why": "「iconOnly」是真實 prop 名(API,可保留),但「群組-level」中英混雜,「level」是一般詞(層級)有中文等價。同元件 sibling「純圖示（群組層）」已用中文「群組層」,術語應一致,不可同概念 群組層 vs 群組-level 並存。",
+  "suggestedFix": "iconOnly 是群組層級決策"
+ },
+ {
+  "file": "components/HoverCard/hover-card.anatomy.stories.tsx",
+  "line": 78,
+  "component": "HoverCard",
+  "displayName": "Consumer 的兩種常見視覺",
+  "why": "「Consumer」是一般詞(使用方/消費端),有中文等價,非 prop/元件名/品牌名。同 anatomy 其餘 story(元件總覽/無障礙)為中文,應一致。",
+  "suggestedFix": "使用方的兩種常見視覺"
+ },
+ {
+  "file": "components/Select/select.principles.stories.tsx",
+  "line": 196,
+  "component": "Select",
+  "displayName": "即時套用 vs 隨 form 送出",
+  "why": "「form」是一般詞(表單),有中文等價,非 Select 的 prop/元件名/品牌名(本 DS 無 Form 元件,Field 才是佈局 primitive)。指泛用表單送出概念,應中文。",
+  "suggestedFix": "即時套用 vs 隨表單送出"
+ },
+ {
+  "file": "components/Field/field.principles.stories.tsx",
+  "line": 235,
+  "component": "Field",
+  "displayName": "Form 動作 不是 Field 控制元件",
+  "why": "「Field」是元件名(允許),但「Form」是一般詞(表單),有中文等價;本 DS 無 Form 元件,「Form 動作」指表單層級的提交/取消動作概念,應中文。",
+  "suggestedFix": "表單動作 不是 Field 控制元件"
+ },
+ {
+  "file": "components/Alert/alert.stories.tsx",
+  "line": 37,
+  "component": "Alert",
+  "displayName": "Subtle 單行",
+  "why": "'Subtle' 是 appearance variant 的一般英文詞(有中文等價:低調),非專有名詞/縮寫/品牌。且同元件內已有既定中文譯法不一致 — 同檔 'low-key' variant 用 '低調 + 說明文字',principles 用 '低調 vs 實心 選擇',此處卻用英文 'Subtle'。同概念在同元件用不同詞 = 違規,需統一為 '低調'(對齊 DS 既有 subtle=低調 / solid=實心 譯法)。",
+  "suggestedFix": "低調 單行"
+ },
+ {
+  "file": "components/Select/select.principles.stories.tsx",
+  "line": 243,
+  "component": "Select",
+  "displayName": "Searchable 開啟判斷",
+  "why": "'Searchable'(大寫 S)是被當成一般英文形容詞用,有中文等價(可搜尋),非專有名詞/縮寫/品牌。它並非合規的 prop-identifier 引用:Select 的實際 prop 是小寫 'searchable',而 DS 既有慣例引用 prop 一律保留原始大小寫(同檔/同庫 'startIcon'/'endAction'/'fullWidth'/'readOnly' 皆原樣小駝峰)。capital-S 'Searchable' 既不符 prop 字面、又是有中文等價的描述詞;同元件 demo story(select.stories.tsx:136)已用中文 '搜尋'。應改中文或對齊 prop 字面小寫。",
+  "suggestedFix": "可搜尋 開啟判斷"
+ },
+ {
+  "file": "patterns/element-anatomy/item-anatomy.stories.tsx",
+  "line": 1202,
+  "component": "element-anatomy",
+  "displayName": "Icon 色彩 + 消費元件預設",
+  "why": "「Icon」是有中文等價(圖示)的一般詞,非 DS 元件名(無 components/Icon/ 目錄)、非格式縮寫、非品牌。同一檔案 L1433 同概念已用「圖示」(name: '圖示動作通用零件決策'),屬同元件術語不一致,canonical 要求統一為中文。",
+  "suggestedFix": "圖示色彩 + 消費元件預設"
+ },
+ {
+  "file": "components/Alert/alert.stories.tsx",
+  "line": 46,
+  "component": "Alert",
+  "displayName": "Solid 單行",
+  "why": "「Solid」是模式/外觀英文詞(appearance 值),有中文等價。同一 stories 檔內同概念已用中文「實心」(L65 '實心 + 說明文字'),principles 檔亦用「低調 vs 實心 選擇」(L183)。同元件同概念兩種語言並存 = canonical 明列的「同元件術語不一致」違規,應統一對齊 DS 既有中文詞「實心」。",
+  "suggestedFix": "實心 單行"
+ },
+ {
+  "file": "components/LinkInput/link-input.stories.tsx",
+  "line": 56,
+  "component": "LinkInput",
+  "displayName": "Blur 驗證",
+  "why": "「Blur」是有中文等價(失焦)的一般互動/事件詞,非元件名/格式縮寫/品牌。經查 link-input.tsx 無 blur prop(僅內部 onBlur/handleBlur),故非 API 識別字引用,屬一般動作英文詞,應中文化。",
+  "suggestedFix": "失焦驗證"
+ },
+ {
+  "file": "components/Carousel/carousel.principles.stories.tsx",
+  "line": 211,
+  "component": "Carousel",
+  "displayName": "箭頭 滑鼠移過-only 顯示",
+  "why": "「only」是一般英文副詞(等價於 僅/才),夾在中文中形成中英混雜,非元件名/格式縮寫/品牌,無 API 識別字依據。",
+  "suggestedFix": "箭頭僅滑鼠移過時顯示"
+ },
+ {
+  "file": "components/HoverCard/hover-card.stories.tsx",
+  "line": 179,
+  "component": "HoverCard",
+  "displayName": "Repository 資訊卡",
+  "why": "「Repository」是有中文等價(儲存庫)的一般名詞,非品牌名(GitHub 才是品牌)、非元件名、非格式縮寫。經查 hover-card.tsx 無 repository prop,故非 API 識別字引用,應中文化。",
+  "suggestedFix": "儲存庫資訊卡"
+ },
+ {
+  "file": "components/Select/select.principles.stories.tsx",
+  "line": 287,
+  "component": "Select",
+  "displayName": "桌機自建選單 vs 手機原生 picker",
+  "why": "「picker」是有中文等價(選擇器/選單)的一般詞,夾在中文中形成中英混雜,非元件名/格式縮寫/品牌。同 name 前半已用中文「選單」,後半卻用英文 picker,前後不一致。",
+  "suggestedFix": "桌機自建選單 vs 手機原生選擇器"
+ },
+ {
+  "file": "components/Tabs/tabs.stories.tsx",
+  "line": 119,
+  "component": "Tabs",
+  "displayName": "溢出處理 — ⌄ navigator 選單",
+  "why": "'navigator' 是有中文等價的英文一般詞(導覽器),非 DS 元件名 / 格式縮寫 / 品牌名。違反 name 必中文人話。",
+  "suggestedFix": "溢出處理 — ⌄ 導覽選單"
+ },
+ {
+  "file": "components/DatePicker/date-picker.anatomy.stories.tsx",
+  "line": 778,
+  "component": "DatePicker",
+  "displayName": "Calendar 內部 token",
+  "why": "'token' 有中文等價且 DS 既有 story name 統一用「設計變數」(Separator '設計變數 規則' / Chart 'ChartConfig + 類別色 設計變數' / Slider 等),此處用 token = 同概念術語不一致。Calendar 是 DS 元件名故保留。",
+  "suggestedFix": "Calendar 內部設計變數"
+ },
+ {
+  "file": "components/LinkInput/link-input.principles.stories.tsx",
+  "line": 102,
+  "component": "LinkInput",
+  "displayName": "兩種狀態：連結 顯示 / input 編輯",
+  "why": "'input' 是有中文等價的英文一般詞(輸入框),非元件名(此處非指 Input 元件而是描述編輯態的輸入框)/ 縮寫 / 品牌。與前半中文「連結 顯示」混雜不對稱。",
+  "suggestedFix": "兩種狀態:連結顯示 / 輸入框編輯"
+ },
+ {
+  "file": "components/Carousel/carousel.stories.tsx",
+  "line": 44,
+  "component": "Carousel",
+  "displayName": "首頁 Hero Banner",
+  "why": "'Hero Banner' 是有中文等價的英文一般設計詞(主視覺橫幅 / 橫幅),非 DS 元件名 / 縮寫 / 品牌名。",
+  "suggestedFix": "首頁主視覺橫幅"
+ },
+ {
+  "file": "components/Steps/steps.stories.tsx",
+  "line": 153,
+  "component": "Steps",
+  "displayName": "Ring 正交示範",
+  "why": "'Ring' 是有中文等價的英文一般詞(focus ring → 聚焦環 / 外框),非 DS 元件名 / 縮寫 / 品牌名。",
+  "suggestedFix": "聚焦環正交示範"
+ },
+ {
+  "file": "components/HoverCard/hover-card.stories.tsx",
+  "line": 238,
+  "component": "HoverCard",
+  "displayName": "Trigger 類型與 delay",
+  "why": "'Trigger'(觸發點)與 'delay'(延遲)皆為有中文等價的英文一般詞,非元件名 / 縮寫 / 品牌名。同 DS 其他 story 已用中文「觸發」(ProfileCard '觸發行為')。",
+  "suggestedFix": "觸發點類型與延遲"
+ },
+ {
+  "file": "components/Tag/tag.principles.stories.tsx",
+  "line": 234,
+  "component": "Tag",
+  "displayName": "圖示 與 avatar 的使用",
+  "why": "'avatar' 小寫為一般詞,DS 既有 story name 同概念用「頭像」(Avatar 元件 stories.tsx name:'頭像' / OverflowIndicator '人員頭像 疊合')。同概念術語不一致,且與前半中文「圖示」混雜不對稱。",
+  "suggestedFix": "圖示與頭像的使用"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.principles.stories.tsx",
+  "line": 229,
+  "component": "CircularProgress",
+  "displayName": "Size 對應使用情境",
+  "why": "'Size' 是有中文等價的英文一般詞,DS 既有 story name 統一用「尺寸」(Input/Combobox/Select/NumberInput '尺寸與 Button 對齊' / CircularProgress anatomy '尺寸對照表')。同概念術語不一致。",
+  "suggestedFix": "尺寸對應使用情境"
+ },
+ {
+  "file": "components/Input/input.principles.stories.tsx",
+  "line": 107,
+  "component": "Input",
+  "displayName": "Mode 選擇",
+  "why": "「Mode」是有中文等價的英文一般詞（模式),非專有名詞/格式縮寫/品牌。同元件術語不一致:Input 自己的主 stories 用『四模式』(line 19)、『錯誤狀態』(line 118),證明 DS canonical 中文詞為『模式』。principles story 卻保留英文 Mode = drift。",
+  "suggestedFix": "模式選擇"
+ },
+ {
+  "file": "components/Toast/toast.stories.tsx",
+  "line": 75,
+  "component": "Toast",
+  "displayName": "有 Title + Description",
+  "why": "「Title」(標題)、「Description」(描述)皆為有中文等價的英文一般詞,非元件名/縮寫/品牌。Toast 自身 anatomy/principles 全用中文(色彩對照表/狀態行為/動作 使用場景),此 name 卻中英混雜英文一般詞。",
+  "suggestedFix": "有標題與描述"
+ },
+ {
+  "file": "components/LinkInput/link-input.principles.stories.tsx",
+  "line": 136,
+  "component": "LinkInput",
+  "displayName": "驗證時機：blur，不即時",
+  "why": "「blur」為有中文等價的英文一般事件詞(失焦),非專有名詞/縮寫/品牌。LinkInput 多數 name 用中文(空值/尺寸/四模式),此處夾入小寫英文一般詞。",
+  "suggestedFix": "驗證時機:失焦,不即時"
+ },
+ {
+  "file": "components/Steps/steps.stories.tsx",
+  "line": 281,
+  "component": "Steps",
+  "displayName": "Multiple 展開模式",
+  "why": "「Multiple」是有中文等價的英文一般詞(多重),非元件名/縮寫/品牌。DS canonical 中文詞為『多重』(Accordion 用『單一展開 vs 多重展開』)。Steps 自身其餘 stories 全中文(預設/非線性/水平)。",
+  "suggestedFix": "多重展開模式"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 75,
+  "component": "FileItem",
+  "displayName": "Hover 替換",
+  "why": "「Hover」是 canonical 明列的狀態英文詞(應→懸停),非專有名詞/縮寫/品牌。FileItem 自身其餘 name 用中文(豐富樣式/緊湊樣式/已上傳),且 Carousel 同概念用『滑鼠移過』。",
+  "suggestedFix": "懸停替換"
+ },
+ {
+  "file": "components/HoverCard/hover-card.principles.stories.tsx",
+  "line": 174,
+  "component": "HoverCard",
+  "displayName": "純行為 primitive——視覺由 consumer 決定",
+  "why": "「consumer」(使用方/消費端)為有中文等價的英文一般詞,非元件名/縮寫/品牌;「primitive」亦有中文等價(元件/基元),非 (a)(b)(c) 任一例外。name 應為中文人話。",
+  "suggestedFix": "純行為元件——視覺由使用方決定"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.principles.stories.tsx",
+  "line": 124,
+  "component": "ProfileCard",
+  "displayName": "觸發點：avatar hover（不作 standalone）",
+  "why": "「hover」為 canonical 明列狀態詞(→懸停)、「standalone」為一般詞(獨立使用)、小寫「avatar」此處作泛稱頭像(DS 慣用『頭像』,如 OverflowIndicator『人員頭像 疊合』),三者皆非 (a)(b)(c) 例外。",
+  "suggestedFix": "觸發點:頭像懸停(不作獨立使用)"
+ },
+ {
+  "file": "components/DataTable/data-table.anatomy.stories.tsx",
+  "line": 167,
+  "component": "DataTable",
+  "displayName": "欄 Type 自動渲染",
+  "why": "「Type」是有中文等價的英文一般詞(類型),非縮寫/品牌。DataTable 自身 anatomy 其餘 name 全中文(列高階梯/對齊規則/功能特性/空狀態)。",
+  "suggestedFix": "欄類型自動渲染"
+ },
+ {
+  "file": "components/CircularProgress/circular-progress.stories.tsx",
+  "line": 111,
+  "component": "CircularProgress",
+  "displayName": "Cell 局部載入",
+  "why": "「Cell」是有中文等價的英文一般詞,DS canonical 中文詞為『儲存格』(ProgressBar『DataTable 儲存格 內進度』、DataTable『不手寫 儲存格』)。CircularProgress 自身其餘 stories 全中文(預設/按鈕載入中/行內操作/全頁浮層/確定進度)。",
+  "suggestedFix": "儲存格局部載入"
+ },
+ {
+  "file": "components/DateGrid/date-grid.principles.stories.tsx",
+  "line": 168,
+  "component": "DateGrid",
+  "displayName": "Mode 選擇",
+  "why": "'Mode' 是模式概念詞,有明確中文等價 '模式',非專有名詞/縮寫/品牌。DS-wide canonical 同概念 story name 一律用中文 '模式'(TimePicker '模式對照' / Textarea '模式 對照' / FileItem '模式 選擇' / PeoplePicker '模式對照')。僅 DateGrid 與 Input 用 'Mode',為不一致 outlier。屬模式英文詞違規 + 同概念跨元件術語不一致。",
+  "suggestedFix": "模式 選擇"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 140,
+  "component": "DatePicker",
+  "displayName": "Range:訂房 / 訂機票情境",
+  "why": "'Range' 是範圍/區間概念詞(對應 mode='range'),有明確中文等價 '範圍',非品牌/縮寫。同一 DatePicker 檔案 line 261 已用中文 '範圍 中段:滑鼠移過 狀態',故此處 'Range' 為同元件術語不一致 + 模式英文詞違規。",
+  "suggestedFix": "範圍模式:訂房 / 訂機票情境"
+ },
+ {
+  "file": "components/Toast/toast.principles.stories.tsx",
+  "line": 110,
+  "component": "Toast",
+  "displayName": "動作 使用場景（Undo 模式）",
+  "why": "'Undo' 是動作詞,有明確中文等價 '復原 / 撤銷',非專有名詞/縮寫/品牌。屬 canonical 列的『動作/物件英文詞 → 應中文』違規(中英混雜)。",
+  "suggestedFix": "動作 使用場景(復原 模式)"
+ },
+ {
+  "file": "components/Field/field.stories.tsx",
+  "line": 416,
+  "component": "Field",
+  "displayName": "Label 寬度",
+  "why": "'Label' 是一般詞,有明確中文等價 '標籤',非品牌/縮寫。DS-wide canonical 同概念一律用 '標籤'(Sidebar '群組 / 標籤使用原則' / TreeView '長 標籤' / DescriptionList '標籤 對齊' / Switch '標籤 / 說明 整合'),且 Field 自身 line 88 已用 '標籤 垂直對齊公式驗證'。同元件術語不一致 + 一般英文詞違規(sub-component 名為 FieldLabel,非裸 Label)。",
+  "suggestedFix": "標籤 寬度"
+ },
+ {
+  "file": "components/Notice/notice.anatomy.stories.tsx",
+  "line": 371,
+  "component": "Notice",
+  "displayName": "變體 × icon 對照",
+  "why": "'icon' 是一般詞,有明確中文等價 '圖示',非品牌/縮寫。DS-wide canonical 同概念一律用 '圖示'(Tabs '全部含起始圖示' / Empty '圖示 + 標題...' / SelectionControl '前綴圖示' / Button '純圖示' / Tag '圖示 與 avatar' / Menu '前置圖示')。此處 'icon' 為一般詞非 prop 名(prop 為 startIcon/iconOnly),屬一般英文詞違規。",
+  "suggestedFix": "變體 × 圖示 對照"
+ },
+ {
+  "file": "components/Button/button.principles.stories.tsx",
+  "line": 209,
+  "component": "Button",
+  "displayName": "Danger 時機",
+  "why": "'Danger' 是語意/狀態詞,有明確中文等價 '危險',非品牌/縮寫/格式。Dialog 對相同破壞性動作概念已用中文 'Dialog... 危險操作'(dialog.stories.tsx:262)。capitalized 'Danger' 讀作概念詞而非 code 字面 token(prop 為小寫 danger),屬狀態英文詞違規 + 跨元件同概念術語不一致。",
+  "suggestedFix": "危險 時機"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 190,
+  "component": "FileItem",
+  "displayName": "Compact 混合",
+  "why": "'Compact' 是模式詞,canonical 明確列為違規,DS canonical compact=緊湊。同一 FileItem 檔案已用中文 '緊湊樣式'(line 62)/ '豐富樣式'(line 43)/ '模式 選擇(緊湊 vs 豐富)',此處 'Compact 混合' 為同元件術語不一致(緊湊 vs Compact)+ 中英混雜違規。",
+  "suggestedFix": "緊湊 混合"
+ },
+ {
+  "file": "components/Coachmark/coachmark.stories.tsx",
+  "line": 69,
+  "component": "Coachmark",
+  "displayName": "多步 Onboarding Tour",
+  "why": "'Onboarding' 與 'Tour' 皆一般英文詞,有明確中文等價(新手引導 / 導覽),非專有名詞/縮寫/品牌。DS 同概念已用中文(TreeView '步驟引導' / '鍵盤導覽' / ScrollArea 'Notion sidebar 導覽')。屬一般英文詞違規(中英混雜)。",
+  "suggestedFix": "多步 新手導覽"
+ },
+ {
+  "file": "components/Sidebar/sidebar.principles.stories.tsx",
+  "line": 422,
+  "component": "Sidebar",
+  "displayName": "Icon 模式的 4 條鐵律",
+  "why": "「Icon」是有中文等價的一般詞(圖示),非 DS 元件名/格式縮寫/品牌。DS canonical 用「圖示」(Button story「純圖示」L162 即用中文)。此處英文 Icon 用作「圖示模式」概念詞 = 違規。",
+  "suggestedFix": "圖示模式的 4 條鐵律"
+ },
+ {
+  "file": "components/DateGrid/date-grid.principles.stories.tsx",
+  "line": 250,
+  "component": "DateGrid",
+  "displayName": "視覺 token 統一",
+  "why": "「token」是有中文等價的一般詞。DS 既有 canonical 中文為「設計變數」(Chart「類別色 設計變數」、Separator「設計變數 規則」、Sidebar「寬度與框架設計變數」、density「間距設計變數」)。此處用英文 token 與全庫術語不一致 = 違規。",
+  "suggestedFix": "視覺設計變數 統一"
+ },
+ {
+  "file": "components/Toast/toast.anatomy.stories.tsx",
+  "line": 139,
+  "component": "Toast",
+  "displayName": "Container 三層架構",
+  "why": "「Container」此處指通用「容器結構」概念,非已匯出的 ToastContainer 子元件名(grep toast.tsx 無此 export);story 本文亦用「container 結構/三層結構」。一般詞有中文等價(容器) = 違規。",
+  "suggestedFix": "容器 三層架構"
+ },
+ {
+  "file": "components/Chip/chip.principles.stories.tsx",
+  "line": 189,
+  "component": "Chip",
+  "displayName": "選中狀態：text + 邊框 同染，不用 背景 強調",
+  "why": "「text」是有中文等價的一般詞(文字),非元件名/縮寫/品牌。同 name 內已用中文「邊框/背景/染」,獨留 text 為中英混雜 = 違規。",
+  "suggestedFix": "選中狀態：文字 + 邊框 同染，不用背景強調"
+ },
+ {
+  "file": "components/FileViewer/file-viewer.stories.tsx",
+  "line": 366,
+  "component": "FileViewer",
+  "displayName": "Fallback — 不支援的檔案類型",
+  "why": "「Fallback」是有中文等價的一般概念詞(後備/退回顯示),非 DS 元件名/格式縮寫/品牌。story 本文已用中文「不支援的檔案類型」描述同概念 = 違規。",
+  "suggestedFix": "後備顯示 — 不支援的檔案類型"
+ },
+ {
+  "file": "components/ScrollArea/scroll-area.stories.tsx",
+  "line": 58,
+  "component": "ScrollArea",
+  "displayName": "垂直捲動 — Linear issue 清單",
+  "why": "「Linear」是品牌(例外 c,OK),但「issue」是有中文等價的一般詞(議題),非縮寫/品牌/元件名 = 違規。對照同檔「GitHub PR 大型檢閱表」中 PR 是約定俗成縮寫(OK),issue 則應中文。",
+  "suggestedFix": "垂直捲動 — Linear 議題清單"
+ },
+ {
+  "file": "components/Notice/notice.stories.tsx",
+  "line": 119,
+  "component": "Notice",
+  "displayName": "Workspace 付款失敗",
+  "why": "「Workspace」此處為通用 SaaS 概念詞(工作區)而非特定品牌/產品名,有中文等價 = 違規。對照同元件其他 name 多為純中文(部署成功 橫幅 / 行內通知變體對照)。",
+  "suggestedFix": "工作區付款失敗"
+ },
+ {
+  "file": "components/Dialog/dialog.stories.tsx",
+  "line": 307,
+  "component": "Dialog",
+  "displayName": "主體 放 list",
+  "why": "「list」是有中文等價的一般詞(清單),非元件名/縮寫/品牌。中英混雜 = 違規。",
+  "suggestedFix": "主體放清單"
+ },
+ {
+  "file": "components/Button/button.principles.stories.tsx",
+  "line": 245,
+  "component": "Button",
+  "displayName": "Icon 語意",
+  "why": "「Icon」是有中文等價的一般詞(圖示),此處非 Button variant 值(Danger/Primary 是 variant 值故 OK),而是泛指圖示概念。Button 自身他處用「純圖示」(L162) = 同元件術語不一致,違規。",
+  "suggestedFix": "圖示語意"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 214,
+  "component": "FileItem",
+  "displayName": "Upload manager · 豐富(無邊框)",
+  "why": "「Upload manager」是有中文等價的一般詞組(上傳管理器),非元件名/縮寫/品牌。且同 name 已用中文「豐富(無邊框)」= 中英混雜;FileItem 全庫上傳概念用「上傳」(上傳狀態與進度視覺 L160) = 術語不一致,違規。",
+  "suggestedFix": "上傳管理器 · 豐富(無邊框)"
+ },
+ {
+  "file": "components/ProfileCard/profile-card.principles.stories.tsx",
+  "line": 195,
+  "component": "ProfileCard",
+  "displayName": "Section 各自獨立（選擇性出現）",
+  "why": "「Section」是有中文等價的一般詞(區段),非已匯出子元件名(profile-card.tsx 無 ProfileCardSection export)。同元件 anatomy story 用「區段 組合」(L205) = 同元件術語不一致,違規。",
+  "suggestedFix": "區段各自獨立（選擇性出現）"
+ },
+ {
+  "file": "components/Coachmark/coachmark.stories.tsx",
+  "line": 157,
+  "component": "Coachmark",
+  "displayName": "多步 Tips",
+  "why": "「Tips」是有中文等價的一般詞(提示),非元件名/縮寫/品牌。中英混雜 = 違規。",
+  "suggestedFix": "多步提示"
+ },
+ {
+  "file": "components/Accordion/accordion.principles.stories.tsx",
+  "line": 264,
+  "component": "Accordion",
+  "displayName": "Content 內容限制",
+  "why": "「Content」是有中文等價的英文一般詞（內容），且後面緊接 redundant 翻譯「內容」。它不是 Accordion 的 component/API/slot 名稱，僅是泛指『內容區』概念。同元件其他 principle story 全用乾淨中文（單一展開 vs 多重展開 / 不可巢狀 / 單一 項目 不用 Accordion）。違規例外 (a)(b)(c) 皆不適用。",
+  "suggestedFix": "內容限制"
+ },
+ {
+  "file": "components/Notice/notice.stories.tsx",
+  "line": 818,
+  "component": "Notice",
+  "displayName": "Workspace 付款失敗",
+  "why": "「Workspace」是有中文等價的英文一般詞（工作區），屬泛用 SaaS 概念而非真實品牌/產品名（非『Slack Workspace』式具名品牌），不符例外 (c)。同元件其他情境 story 用中文（部署成功 橫幅）。",
+  "suggestedFix": "工作區付款失敗"
+ },
+ {
+  "file": "components/FileItem/file-item.stories.tsx",
+  "line": 1098,
+  "component": "FileItem",
+  "displayName": "Upload manager · 豐富(無邊框)",
+  "why": "「Upload manager」是有中文等價的英文一般詞（上傳=Upload / 管理器=Manager），非專有名詞/格式縮寫/品牌名，屬 rubric 明列的中英混雜違規（'Upload manager · 豐富' = 違規）。中文部分『豐富』已對齊 DS canonical(rich=豐富)，僅英文前綴需中譯。",
+  "suggestedFix": "上傳管理器 · 豐富(無邊框)"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.principles.stories.tsx",
+  "line": 1245,
+  "component": "Breadcrumb",
+  "displayName": "最後一項是位置標示，不是 link",
+  "why": "「link」是有中文等價的英文一般詞（連結），非元件名/格式縮寫/品牌名。Breadcrumb 並無名為 link 的 API；此處 link 僅泛指『可點連結』語意。",
+  "suggestedFix": "最後一項是位置標示，不是連結"
+ },
+ {
+  "file": "components/DateGrid/date-grid.stories.tsx",
+  "line": 52,
+  "component": "DateGrid",
+  "displayName": "Single — 生日 / 到期日",
+  "why": "「Single」是 mode 模式英文詞(react-day-picker `mode=\"single\"` 的值),屬一般模式詞且有明確中文等價,非專有名詞/品牌/DS 元件名。canonical 明列「模式/狀態英文詞」需中文。DateGrid spec.md L69 既有 canonical 中文術語為「單日」(單日選取),且同元件其餘 reader-facing 描述皆中文。",
+  "suggestedFix": "單日 — 生日 / 到期日"
+ },
+ {
+  "file": "components/Notice/notice.stories.tsx",
+  "line": 240,
+  "component": "Notice",
+  "displayName": "Neutral 純文字",
+  "why": "「Neutral」是 variant 變體值(notice.tsx L37 `NoticeVariant = 'neutral' | ...`)的英文一般詞,有明確中文等價「中性」,非專有名詞/品牌/元件名。canonical 明列變體/狀態英文詞需中文。同元件其他 story name(部署成功 橫幅 / 行內通知變體對照)皆已中文,此處中英混雜為 drift。",
+  "suggestedFix": "中性 純文字"
+ },
+ {
+  "file": "components/DateGrid/date-grid.stories.tsx",
+  "line": 85,
+  "component": "DateGrid",
+  "displayName": "Multiple — 活動可參加日期",
+  "why": "Multiple 是 mode prop-VALUE(mode=\"multiple\"),非元件名/格式縮寫/品牌名,且有乾淨中文等價詞。對齊 canonical 自身舉的 Compact/Rich 違規例(那也是 prop-value 模式詞)+ FileItem precedent(file-item.stories.tsx 把 compact/rich 譯成 緊湊/豐富)。DateGrid spec.md L52/L70 已明定此 mode 的中文術語為「多日選擇」。同檔 Inline story 已用中文「行內」,Multiple 保英 = 不一致。",
+  "suggestedFix": "多日 — 活動可參加日期"
+ },
+ {
+  "file": "components/DropdownMenu/dropdown-menu.principles.stories.tsx",
+  "line": 312,
+  "component": "DropdownMenu",
+  "displayName": "Suffix 使用規則",
+  "why": "Suffix 是有中文等價詞的英文一般詞(後綴),非公開 prop 名(.tsx 僅內部 comment 提及,非 public API)。最關鍵:同元件術語不一致 — dropdown-menu.stories.tsx:76 同概念已用 name:'後綴'(中文),且 spec.md L124 中文術語也是「後綴容器」。principles 用 Suffix(英)= 違 canonical「同元件同概念須統一中文」。",
+  "suggestedFix": "後綴使用規則"
+ },
+ {
+  "file": "components/DatePicker/date-picker.stories.tsx",
+  "line": 238,
+  "component": "DatePicker",
+  "displayName": "showTime Range:浮層展開狀態",
+  "why": "showTime 是 camelCase API prop 名,可保留(API identifier 引用,同 fullWidth);但 Range 是 mode prop-value(範圍選擇),有乾淨中文等價詞,屬 canonical Compact/Rich 同類模式詞。同元件術語不一致:同檔 date-picker.stories.tsx:261 同概念已用中文「範圍 中段:滑鼠移過 狀態」,而 L141/L200/L238/L302 卻用英文 Range → 須統一為中文 範圍。",
+  "suggestedFix": "showTime 範圍:浮層展開狀態"
+ },
+ {
+  "file": "components/Textarea/textarea.anatomy.stories.tsx",
+  "line": 117,
+  "component": "Textarea",
+  "displayName": "模式 對照（編輯 / 展示 / readonly / 停用）",
+  "why": "中英混雜不一致:括號內其餘三個 state 詞(編輯/展示/停用)皆中文,唯 readonly 用英文。readonly 此處非作為 code identifier `readOnly` 引用,而是與中文 state 詞並列的描述詞,有乾淨中文等價(唯讀)。同 parenthetical 內須統一中文。",
+  "suggestedFix": "模式 對照（編輯 / 展示 / 唯讀 / 停用）"
+ },
+ {
+  "file": "components/Breadcrumb/breadcrumb.stories.tsx",
+  "line": 209,
+  "component": "Breadcrumb",
+  "displayName": "首項配 Home icon",
+  "why": "Home(首頁)與 icon(圖示)皆為有中文等價詞的英文一般詞,非專有名詞/格式縮寫/品牌名。story doc 內文指的就是首頁錨點圖示。同檔 sibling story names 全中文(預設/可互動省略/與頁面標題配對),此處保英 = drift。",
+  "suggestedFix": "首項配首頁圖示"
+ }
+]

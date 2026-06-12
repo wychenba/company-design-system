@@ -5,7 +5,7 @@ import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant, useResolvedFieldInvalid } from '@/design-system/components/Field/field-context'
 import { ItemInlineAction, ItemPrefix, type InlineActionConfig } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { CircularProgress } from '@/design-system/components/CircularProgress/circular-progress'
 import { ICON_SIZE } from '@/design-system/tokens/uiSize/icon-size'
@@ -19,10 +19,13 @@ export interface InputProps
   mode?: FieldMode
   /**
    * Visual chrome(正交於 mode);Phase B1(2026-05-05)從 `variant` 改名 `chrome`,對齊 FieldContext.variant 透傳。
+   * 公開 variant 兩個:
    * - `'default'`(預設)— Field wrapper 完整 variant:bg-surface + 明顯 border + hover/focus 回饋。適用表單、Field 內嵌。
-   * - `'bare'` — 透明 variant,hover / focus 才出現 border。適用 Toolbar inline editing(如 FileViewer zoom input / chart config toolbar / rich text toolbar number input)+ DataTable cell-as-input。保留 padding / typography / height,只拿掉背景和常態 border。
+   * - `'bare'` — 透明 variant,hover / focus 才出現 border。適用 Toolbar inline editing(如 FileViewer zoom input / chart config toolbar / rich text toolbar number input)。保留 padding / typography / height,只拿掉背景和常態 border。
    *
-   * 透傳:在 `<Field variant="bare">` 內自動繼承 context.variant;per-prop override context。
+   * @internal `'naked'` — 完全無 chrome / 無 border / 無 focus ring。單獨使用無視覺邊界,**不可直接 standalone 用**;僅供 DS 內部 cell-as-input 組合(host cell 自管 border + focus visual,正被 `FieldSurfaceContext='table-cell'` 取代)。consumer 請用 `default` / `bare`。
+   *
+   * 透傳:在 `<Field variant="default|bare">` 內自動繼承 context.variant;per-prop override context。
    * 世界級對照(bare):VS Code settings input / Figma toolbar number / Notion prop input。
    */
   variant?: FieldVariant
@@ -75,14 +78,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       mode: modeProp,
       variant: variantProp,
       error = false,
-      size,
+      size: sizeProp,
       startIcon: StartIcon,
       endAction,
       endSlot,
       loading = false,
       autoWidth = false,
       className,
-      disabled,
+      disabled: disabledProp,
       readOnly,
       value,
       id: idProp,
@@ -94,19 +97,19 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ) => {
     // ── FieldContext 自動讀取(在 <Field> 內時,invalid / disabled / mode / chrome 由 context 接管) ──
     const fieldCtx = useFieldContext()
+    // 2026-05-31 #11/#12:size + disabled 從 Field context cascade(對齊 NumberInput number-input.tsx:100-101
+    // + MUI FormControl)。原 Input 不讀 fieldCtx.size/disabled → <Field size="lg"> / <Field disabled> 對 Input 無效。
+    const size = useResolvedFieldSize(sizeProp)
+    const disabled = useResolvedFieldDisabled(disabledProp)
     // chrome 透傳:per-prop override context;context 沒值則 'default'
-    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
-    // mode resolve order(Phase B1 2026-05-05):
-    //   prop > fieldCtx.mode > (readOnly → 'readonly') > (disabled → 'disabled') > 'edit'
-    // loading 期間 input 保持可編輯(Ant Input.Search 派,UX「邊改邊讀」)
-    // 只用 aria-busy + endAction Spinner 標示狀態,不動 mode
-    const resolvedMode: FieldMode = modeProp
-      ?? fieldCtx?.mode
-      ?? (readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')
+    const variant: FieldVariant = useResolvedFieldVariant(variantProp)
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode 統一解析(prop > 有效 disabled > fieldCtx.mode > readOnly > 'edit')。
+    // loading 期間 input 保持可編輯(Ant Input.Search 派),只用 aria-busy + endAction Spinner,不動 mode。
+    const resolvedMode: FieldMode = useResolvedFieldMode({ mode: modeProp, disabled, readOnly })
     const isEditable = resolvedMode === 'edit'
     const isDisplay = resolvedMode === 'display'
     // error 合併:自身 error prop OR Field context invalid
-    const resolvedError = error || (fieldCtx?.invalid ?? false)
+    const resolvedError = useResolvedFieldInvalid(error)
     // 2026-05-18 改 import ICON_SIZE SSOT(per user『做完』approval,消除 M17 違反 7+ 重複 ternary)
   const iconSize = ICON_SIZE[size as 'sm' | 'md' | 'lg']
     const iconColor = resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted'

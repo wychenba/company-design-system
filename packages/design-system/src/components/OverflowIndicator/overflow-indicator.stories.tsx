@@ -2,19 +2,19 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { OverflowIndicator } from './overflow-indicator'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
-import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
+import { ProfileCard, ProfileCardDefaultActions } from '@/design-system/components/ProfileCard/profile-card'
 
 /** Person avatar hover canonical helper — 對齊 avatar.spec.md DS-wide rule:
- *  person avatar 必 hover → NameCard,必含 status / statusMessage / fields / actions / onViewMore
- *  (name-card.spec.md 重要資訊 canonical;consumer 的 person 資料全備則全 render) */
+ *  person avatar 必 hover → ProfileCard,必含 status / statusMessage / fields / actions / onViewMore
+ *  (profile-card.spec.md 重要資訊 canonical;consumer 的 person 資料全備則全 render) */
 const personHoverCard = (p: { name: string; role?: string; empId?: string }) => (
-  <NameCard
+  <ProfileCard
     name={p.name}
     subtitle={p.role ? `${p.role}｜${p.empId ?? 'EMP-0000'}` : 'Design｜D-0042｜EMP-1001'}
     avatar={{ alt: p.name }}
     status="online"
     statusMessage="Out of Office: Back on Monday! For urgent matters please contact @Wei-Lun Cheng in the meantime."
-    actions={<NameCardDefaultActions />}
+    actions={<ProfileCardDefaultActions />}
     fields={[
       { label: 'ID', value: 'YHANAX' },
       { label: 'Employee number', value: '1234567' },
@@ -120,49 +120,13 @@ export const AvatarStackOverflow: Story = {
   ),
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Story 3:形狀對照(circle vs tag)
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-export const Shapes: Story = {
-  name: '形狀對照',
-  render: () => (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <span className="text-caption text-fg-muted">shape="circle" — 搭配 Avatar stack 用,圓形 pill</span>
-        <div className="flex items-center gap-3">
-          <OverflowIndicator count={3} shape="circle" size="sm">
-            <div className="text-caption">sm 20px</div>
-          </OverflowIndicator>
-          <OverflowIndicator count={12} shape="circle" size="md">
-            <div className="text-caption">md 24px</div>
-          </OverflowIndicator>
-          <OverflowIndicator count={99} shape="circle" size="lg">
-            <div className="text-caption">lg 24px</div>
-          </OverflowIndicator>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <span className="text-caption text-fg-muted">shape="tag" — 搭配 Tag 組溢出,rounded-md rectangle</span>
-        <div className="flex items-center gap-3">
-          <OverflowIndicator count={3} shape="tag" size="sm">
-            <div className="text-caption">sm Tag 樣式</div>
-          </OverflowIndicator>
-          <OverflowIndicator count={12} shape="tag" size="md">
-            <div className="text-caption">md Tag 樣式</div>
-          </OverflowIndicator>
-          <OverflowIndicator count={99} shape="tag" size="lg">
-            <div className="text-caption">lg Tag 樣式</div>
-          </OverflowIndicator>
-        </div>
-      </div>
-    </div>
-  ),
-}
+// @story-trait-rationale: Shapes(形狀對照)retired 2026-06-11 per audit Dim 24/25 —
+//   shape × size 全矩陣已由 anatomy ShapeMatrix「Shape × Size 視覺矩陣」+ SizeMatrix
+//   (overflow-indicator.anatomy.stories.tsx)完整覆蓋,展示層只留真實業務場景;
+//   principles UsageGuidance 對應 LinkTo 已同步移除。
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Story 4:Breadcrumb 中段收合(+N 顯示隱藏路徑)
+   Story 3:Breadcrumb 中段收合(+N 顯示隱藏路徑)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const BreadcrumbCollapse: Story = {
@@ -192,7 +156,7 @@ export const BreadcrumbCollapse: Story = {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Story 5:DataTable row 的指派人員溢出
+   Story 4:DataTable row 的指派人員溢出
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const rows = [

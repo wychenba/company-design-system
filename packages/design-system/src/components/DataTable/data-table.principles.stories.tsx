@@ -71,19 +71,13 @@ export const UsageGuidance: Story = {
       <p>適合 DataTable 的真實業務場景(點擊跳轉「展示」頁範例):</p>
       <ul className="space-y-1">
         <li>
-          <LinkTo kind="Design System/Components/DataTable/展示" name="Column Types"><span className="text-primary hover:underline font-medium cursor-pointer">Column Types</span></LinkTo>
+          <LinkTo kind="Design System/Components/DataTable/展示" name="數字靠右對齊"><span className="text-primary hover:underline font-medium cursor-pointer">商品庫存後台 — 單價 / 金額數字靠右對齊</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DataTable/展示" name="數字靠右對齊"><span className="text-primary hover:underline font-medium cursor-pointer">數字靠右對齊</span></LinkTo>
+          <LinkTo kind="Design System/Components/DataTable/展示" name="自動行高"><span className="text-primary hover:underline font-medium cursor-pointer">商品備註長短不一 — 自動行高撐開列高</span></LinkTo>
         </li>
         <li>
-          <LinkTo kind="Design System/Components/DataTable/展示" name="行高模式"><span className="text-primary hover:underline font-medium cursor-pointer">行高模式</span></LinkTo>
-        </li>
-        <li>
-          <LinkTo kind="Design System/Components/DataTable/展示" name="空狀態"><span className="text-primary hover:underline font-medium cursor-pointer">空狀態</span></LinkTo>
-        </li>
-        <li>
-          <LinkTo kind="Design System/Components/DataTable/展示" name="外框"><span className="text-primary hover:underline font-medium cursor-pointer">外框</span></LinkTo>
+          <LinkTo kind="Design System/Components/DataTable/展示" name="空狀態"><span className="text-primary hover:underline font-medium cursor-pointer">目錄尚無商品 — 空狀態引導新增</span></LinkTo>
         </li>
       </ul>
       <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
@@ -124,7 +118,7 @@ export const UsageGuidance: Story = {
 }
 
 export const ColumnTypeRule: Story = {
-  name: '用 欄 type 自動渲染,不手寫 儲存格',
+  name: '用 欄類型 自動渲染,不手寫 儲存格',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -253,8 +247,8 @@ export const NotSpreadsheetRule: Story = {
   render: () => (
     <div>
       <Rule
-        title="DataTable 不做公式計算、不做跨 cell 選取"
-        note="DataTable 的心智模型是「結構化資料展示」——每筆資料是一 row,每個屬性是一 column。不做:Excel 的公式、跨 cell range selection(Ctrl+drag)、cell clipboard paste、pivot、跨欄運算"
+        title="DataTable 預設不做公式計算、不做跨 cell 選取"
+        note="DataTable 的心智模型是「結構化資料展示」——每筆資料是一 row,每個屬性是一 column。預設不做:Excel 的公式、跨 cell range selection(Ctrl+drag)、cell clipboard paste、pivot、跨欄運算。**逃生門**:確需 Excel-like 編輯可 opt-in `spreadsheetMode` prop(Shift+click range + 方向鍵 cell 導覽 + cell editing;仍不做公式計算),對齊 spec.md L28。"
       >
         <Label>需要試算表能力 → 用專門 library(AG Grid Enterprise / Handsontable / Luckysheet),不往 DataTable 塞</Label>
       </Rule>

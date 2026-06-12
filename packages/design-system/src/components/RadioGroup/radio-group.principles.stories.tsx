@@ -46,10 +46,10 @@ export const UsageGuidance: Story = {
           <div className="prose prose-sm max-w-prose mb-8">
             <p>適合 RadioGroup 的真實業務場景(點擊跳轉「展示」頁範例):</p>
             <ul className="space-y-1">
-              <li><LinkTo kind="Design System/Components/RadioGroup/展示" name="垂直 Group"><span className="text-primary hover:underline font-medium cursor-pointer">垂直 Group</span></LinkTo></li>
-              <li><LinkTo kind="Design System/Components/RadioGroup/展示" name="水平排列"><span className="text-primary hover:underline font-medium cursor-pointer">水平排列</span></LinkTo></li>
+              <li><LinkTo kind="Design System/Components/RadioGroup/展示" name="直式群組"><span className="text-primary hover:underline font-medium cursor-pointer">直式群組</span></LinkTo><span className="text-fg-secondary"> — 訂閱方案選擇(月付 / 年付 / 終身):需要對比價格與說明的決策節點,直式 + description 完整閱讀</span></li>
+              <li><LinkTo kind="Design System/Components/RadioGroup/展示" name="水平排列"><span className="text-primary hover:underline font-medium cursor-pointer">水平排列</span></LinkTo><span className="text-fg-secondary"> — 外觀主題切換(淺色 / 深色 / 系統):2-3 個短 label、不需描述文字,橫排省垂直空間</span></li>
             </ul>
-            <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見下方 vs 近親 段)。</p>
+            <p className="text-fg-muted mt-3">判斷不確定時:回頭看「何時用 / 何時不用」;若仍不符,改用近親元件(見下方「vs 近親元件」)。</p>
           </div>
         </Section>
 
@@ -76,17 +76,10 @@ export const UsageGuidance: Story = {
 
         <Section title="vs 近親元件">
           <Rule
-            title="判斷三角度(完整 完整定義在 Select spec)"
-            note="1. Progressive disclosure 成本(Select 藏 vs RadioGroup 露)2. 視覺重量(O(1) vs O(n))3. 評估深度(使用者需對比嗎)。完整對照詳見 select.spec.md「與 RadioGroup 的分界」"
+            title="從三個角度判斷該用哪個"
+            note="1. 展開成本:Select 把選項藏進下拉、RadioGroup 全部攤開 2. 視覺份量:Select 只佔一行、RadioGroup 佔 N 行 3. 評估深度:使用者需要逐項對比才能決定嗎?需要對比 → RadioGroup;不需要 → Select。灰色地帶的一句話判斷:「使用者看一眼 label 就能下決定嗎?」能 → Select;不能、需要閱讀 description → RadioGroup"
           >
-            <Label>主檔擁有者:Select spec(通用預設元件 own 此比較)</Label>
-          </Rule>
-
-          <Rule
-            title="Fallback heuristic"
-            note="「使用者看一眼 label 就能下決定嗎?」能 → Select;不能、需要閱讀 description → RadioGroup"
-          >
-            <Label>灰色地帶時用這句話判斷</Label>
+            <Label>選項一眼就懂、不需對比時,優先用 Select 省空間;拿不定主意用「看一眼 label 能否下決定」快速判斷</Label>
           </Rule>
         </Section>
       </div>
@@ -148,7 +141,7 @@ export const MustBeInGroupRule: Story = {
     return (
       <div>
         <Rule
-          title="Radio 必須在 RadioGroup 內(TS 層強制)"
+          title="單選按鈕必須放在 RadioGroup 內"
           note="Radio 的語意是「從 N 個選項選一個」——N ≥ 2 才有意義。單個 Radio 無法表達互斥選擇,若只是 yes/no 用 Checkbox 或 Switch"
         >
           <RadioGroup value={accept} onValueChange={setAccept}>
@@ -159,8 +152,8 @@ export const MustBeInGroupRule: Story = {
         </Rule>
 
         <Rule
-          title="RadioGroup 必須有 default value"
-          note="Radio 的語意不允許「都沒選」——沒有預設值使用者看到一組全空的 radio 會困惑「我要選什麼」。必須指定 defaultValue 或 value"
+          title="RadioGroup 預設建議給 default value"
+          note="一組全空的 radio 會讓使用者困惑「我要選什麼」——通常應指定 defaultValue 或 value。例外:表單要求使用者主動表態時,value=null 為合法 initial state(見 spec「邊界案例」),由 Field required 驗證引導選擇"
         >
           <Label>若真的「可以不選」(選填)→ 用 Select + clearable 或 Checkbox stack</Label>
         </Rule>

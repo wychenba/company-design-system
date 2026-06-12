@@ -122,7 +122,7 @@
    │   (subtle)   bg-{primary|info|error|success|warning}-subtle         │
    │   (text)     text-{info|error|success|warning}-text                  │
    │                  ↑ 用於 subtle bg 上的文字（資訊呈現）                │
-   │  Special     text-warning-foreground（yellow solid 例外）            │
+   │  On-fill     --on-emphasis（白）/ --on-emphasis-dark（深,亮底用）   │
    │  Neutral     bg-neutral-hover / bg-neutral-active / bg-disabled     │
    │              bg-neutral-selected / bg-neutral-selected-hover /       │
    │              bg-neutral-selected-active                              │
@@ -171,20 +171,29 @@
 
   /* 文字 / Icon */
   --foreground:           var(--color-neutral-9);
-  --warning-foreground:   var(--black-a85);
   --fg-secondary:         var(--color-neutral-8);
   --fg-muted:             var(--color-neutral-7);
   --fg-disabled:          var(--color-neutral-6);
 
-  /* On-emphasis:飽和色底的對比文字(white on filled surface)
-     消費者:Avatar color variants(blue/red/green/... fill + on-emphasis text)
-           Steps filled indicator(completed/active 的 icon 色)
-     為什麼獨立 token:foreground 是 neutral 文字色,warning-foreground 是 warning
-     子場景 amber 底的對比,都不是「任何飽和色底的通用對比」。Polaris 叫 text-onEmphasis,
-     Material 叫 on-primary/on-secondary family。我們用 on-emphasis 保持通用。
-     Dark mode 不反轉(白字在飽和色底永遠白)
-     2026-05-20 fix:raw oklch → primitive --color-white */
+  /* ── On-emphasis 配對:飽和 / 填色底上的對比文字 ──────────────────────────────
+     世界級對照:Material on-primary/on-secondary family、Radix --accent-contrast、
+     Polaris text-{x}-on-bg-fill —— 「填色底的文字色」依底色明暗成對提供,不是單一固定白。
+     本 DS 採「2-bucket」(白 + 深)而非 per-hue(12 個 token = 過度設計;深底白字已是最大對比,
+     per-hue 救不了暗色邊緣):
+       --on-emphasis       = 白字,用於「夠深」的飽和色底(WCAG ≥3:1 大粗字達標的 hue)
+       --on-emphasis-dark  = 深字(= black-a85),用於「太亮」的色底(白字連 3:1 都不及格:yellow/amber/orange/lime)
+     命名:配對白↔深;不用「inverse」(已保留給 --inverse-* 反相 surface 命名空間),不用 mode 字眼
+     (token 名一律不編碼 light/dark mode,mode 靠 redefinition)。
+     合規門檻(2026-06-04 user 拍板「以最低為原則」)= WCAG large/bold 3:1(solid chip/avatar 視大粗字)。
+     消費者:Avatar / Tag solid color variants、Steps filled indicator、Calendar today、Tooltip、
+     warning solid surface(黃底深字)等 —— 「亮底深字」一律消費 --on-emphasis-dark(不再有 warning 專屬 token)。
+     兩者都「Dark mode 不反轉」(白 / 深字在飽和底永遠同極性,底色明暗跨 mode 不變)。
+     ⚠️ green 例外:green-6 白字實測 2.47(連 3:1 都不過),但 user 拍板維持白字(沿用世界級慣見的
+        「綠底白字」按鈕觀感)→ documented exception(知情違反),待日後評估是否調 green-6。
+     2026-06-04 改名:原 --warning-foreground 被 categorical yellow/amber 借用 = 誤名(它跟 warning 無關,
+        本質是「亮底深字」通用概念)→ 改名 --on-emphasis-dark + 移除 warning 專屬 alias(user「以乾淨為主」)。 */
   --on-emphasis:          var(--color-white);
+  --on-emphasis-dark:     var(--black-a85);
 
   /* Brand / Action — 品牌主操作色
      --primary-text 為 SOP 規定的 5 件套之一，目前無消費者
@@ -319,6 +328,7 @@
   --neutral-hover:        var(--color-neutral-1);
   --neutral-active:       var(--color-neutral-2);
   --bg-disabled:          var(--color-neutral-2);
+  --bg-readonly:          var(--color-neutral-2);  /* readonly 鎖定欄位 chrome — 同值但獨立 owner(≠ disabled:可聚焦/選取/提交,僅不可改值);詳 color.spec.md Static Subtle 邊界 */
 
   /* Neutral Interactive — Selected state family
      ─────────────────────────────────────────────────────────────
@@ -450,6 +460,7 @@
   /* Foreground */
   --color-foreground:            var(--foreground);
   --color-on-emphasis:           var(--on-emphasis);
+  --color-on-emphasis-dark:      var(--on-emphasis-dark);
 
   /* Primary */
   --color-primary:               var(--primary);
@@ -463,7 +474,6 @@
   --color-error:                 var(--error);
   --color-success:               var(--success);
   --color-warning:               var(--warning);
-  --color-warning-foreground:    var(--warning-foreground);
   --color-notification:          var(--notification);
 
   /* Presence Status(Avatar badge) */
@@ -506,6 +516,7 @@
   --color-neutral-hover:             var(--neutral-hover);
   --color-neutral-active:            var(--neutral-active);
   --color-disabled:                  var(--bg-disabled);
+  --color-readonly:                  var(--bg-readonly);
 
   /* Neutral Interaction — Selected state family */
   --color-neutral-selected:          var(--neutral-selected);

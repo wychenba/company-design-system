@@ -8,13 +8,13 @@
  *
  * Tier semantics 對齊 world-class consensus(see motion.spec.md「世界級對照」段):
  *   - plain  → passive hint  | Tooltip 文字提示    | 500ms  | Material 3 / Apple HIG / shadcn-Radix default 主流共識
- *   - rich   → rich preview  | HoverCard / NameCard | 700ms  | 含 fetch / multi-section,避免列表掃視誤觸發
+ *   - rich   → rich preview  | HoverCard / ProfileCard | 700ms  | 含 fetch / multi-section,避免列表掃視誤觸發
  *   - close  → universal exit| 全部關閉延遲          | 200ms  | UX research consensus accidental-hover 容錯
  *
  * 2026-05-20 user 拍板「太快很容易干擾人」+ B 選項(plain 500 / rich 700):
  *   - plain 200 → 500ms:對齊 Material 3 plain tooltip 500ms + Apple HIG ~500ms + shadcn-Radix default 500ms
  *     主流共識(MUI 100ms / Ant 100ms 是 fast-tier 例外);200ms 偏快會打擾滑過列表的 user
- *   - rich 300 → 700ms:HoverCard 含 fetch + multi-section(NameCard avatar / actions),
+ *   - rich 300 → 700ms:HoverCard 含 fetch + multi-section(ProfileCard avatar / actions),
  *     需 user「真停留」才觸發;300ms 列表掃視易觸發 N 次 fetch
  *   - close 200ms 維持:close delay ≤ open delay UX 共識(user 誤滑出可回來)
  *

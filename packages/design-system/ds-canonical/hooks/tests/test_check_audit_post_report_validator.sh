@@ -63,6 +63,17 @@ expect_stdout_contains() {
   fi
 }
 
+# 2026-05-31:Validator C/F/G critical fail 現 exit 2 真 block(原只 additionalContext soft)。
+expect_block_stderr() {
+  local name="$1"; local needle="$2"
+  if [ "$EXIT" = "2" ] && echo "$STDERR_TEXT" | grep -qF "$needle"; then
+    echo "  PASS  $name"; PASS=$((PASS+1))
+  else
+    echo "  FAIL  $name (expected exit 2 + stderr '$needle', got exit $EXIT)"
+    FAIL=$((FAIL+1)); FAILED_TESTS="${FAILED_TESTS}\n  - $name"
+  fi
+}
+
 echo "=== check_audit_post_report_validator tests ==="
 
 # 1. Non-audit file path → skip silently
@@ -90,13 +101,14 @@ run_hook "$TMPDIR_TEST/.claude/memory/project_audit_progress.md" "Write"
 # stdout should be silent (TRIGGER_PRUNE=0)
 expect_silent "4. valid file no prune trigger → silent stdout"
 
-# 5. audit-prompts.md present but only 2 prompts → TRIGGER_PRUNE=1, stdout JSON
+# 5. judgment dim(dim 99 PURE-JUDGMENT)缺 `## 99.` prompt → Validator C CRITICAL → exit 2 真 block
+#    (2026-05-31:原測 additionalContext soft;改測 set-membership C + exit-2 block)
 mkdir -p "$TMPDIR_TEST/.claude/skills/design-system-audit/references"
+cat > "$TMPDIR_TEST/.claude/logs/audit-coverage-matrix.json" <<'EOF'
+{"coverage_by_dim":{"99":{"tier":"PURE-JUDGMENT","mechanism":"test judgment dim"}}}
+EOF
 cat > "$TMPDIR_TEST/.claude/skills/design-system-audit/references/audit-prompts.md" <<'EOF'
-### Dim 1: foo
-prompt
-
-### Dim 2: bar
+## 1. foo
 prompt
 EOF
 cat > "$TMPDIR_TEST/.claude/memory/project_audit_progress.md" <<'EOF'
@@ -104,7 +116,7 @@ cat > "$TMPDIR_TEST/.claude/memory/project_audit_progress.md" <<'EOF'
 Dim 1: pass
 EOF
 run_hook "$TMPDIR_TEST/.claude/memory/project_audit_progress.md" "Edit"
-expect_stdout_contains "5. audit-prompts coverage low → prune trigger JSON" "prune-chain-trigger"
+expect_block_stderr "5. judgment dim 缺 prompt → Validator C exit-2 block" "VALIDATOR BLOCK"
 
 echo ""
 echo "=== Summary ==="
