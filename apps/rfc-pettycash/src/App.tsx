@@ -2341,7 +2341,7 @@ function CreateFormPage({
   const [deleteItemTarget, setDeleteItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
   const [editInvoiceTarget, setEditInvoiceTarget] = useState<Invoice | null>(null)
   const [deleteInvoiceTarget, setDeleteInvoiceTarget] = useState<string | null>(null)
-  const [scenarioBMode, setScenarioBMode] = useState(false)
+  const [scenarioBMode, setScenarioBMode] = useState(true)
   const [bInvoices, setBInvoices] = useState<Invoice[]>([])
   const [bItemsMap, setBItemsMap] = useState<Record<string, PaymentItem[]>>({})
   const [bEditItemTarget, setBEditItemTarget] = useState<{ invoiceId: string; seq: number } | null>(null)
@@ -2421,20 +2421,6 @@ function CreateFormPage({
           <h1 className="text-h3 font-semibold">一般項目申請單 {formNumber}</h1>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex rounded-md border border-divider overflow-hidden text-body font-medium">
-            <button
-              onClick={() => setScenarioBMode(false)}
-              className={`px-3 py-1.5 transition-colors ${!scenarioBMode ? 'bg-[var(--info)] text-white' : 'text-fg-secondary hover:bg-surface-raised'}`}
-            >
-              流程 A
-            </button>
-            <button
-              onClick={() => setScenarioBMode(true)}
-              className={`px-3 py-1.5 transition-colors ${scenarioBMode ? 'bg-[var(--info)] text-white' : 'text-fg-secondary hover:bg-surface-raised'}`}
-            >
-              流程 B
-            </button>
-          </div>
           <Button variant="tertiary" startIcon={Upload} disabled>批次匯入申請</Button>
         </div>
       </div>
